@@ -1,0 +1,18 @@
+<!ENTITY % sfb632_header SYSTEM "sfb632_header.dtd">
+%sfb632_header;
+
+<!ELEMENT structList (struct*)>
+<!ATTLIST structList type (const|constrst|annoSet|type) #REQUIRED
+                     xmlns:xlink CDATA #IMPLIED
+		     xml:base CDATA #IMPLIED>
+
+<!ELEMENT struct (rel*)>
+<!ATTLIST struct id ID #REQUIRED
+>
+
+<!ELEMENT rel EMPTY>
+<!ATTLIST rel id ID #REQUIRED
+               xlink:href CDATA #REQUIRED
+	       xmlns:xlink CDATA #IMPLIED
+               type (edge|secedge) #IMPLIED
+>

@@ -1,0 +1,72 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_mark.dtd">
+
+
+<paula version="1.0">
+	<header paula_id="urml.rst.maz-10205_discUnit" />
+
+	<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="urml.discUnit"
+		xml:base="merged.maz-10205.tok.xml">
+
+		<mark id="seg_1" xlink:href="#xpointer(id('tok_1')/range-to(id('tok_2')))" />
+		<!--
+			Keine [..] Autoritäten
+		-->
+		<mark id="seg_2" xlink:href="#xpointer(id('tok_3')/range-to(id('tok_17')))" />
+		<!--
+			Unter [..] ,
+		-->
+		<mark id="seg_3" xlink:href="#xpointer(id('tok_18')/range-to(id('tok_22')))" />
+		<!--
+			war [..] .
+		-->
+		<mark id="seg_4" xlink:href="#xpointer(id('tok_23')/range-to(id('tok_27')))" />
+		<!--
+			Das [..] ,
+		-->
+		<mark id="seg_5" xlink:href="#xpointer(id('tok_28')/range-to(id('tok_39')))" />
+		<!--
+			nervt [..] .
+		-->
+		<mark id="seg_6" xlink:href="#xpointer(id('tok_40')/range-to(id('tok_67')))" />
+		<!--
+			Wenn [..] .
+		-->
+		<mark id="seg_7" xlink:href="#xpointer(id('tok_68')/range-to(id('tok_86')))" />
+		<!--
+			Doch [..] .
+		-->
+		<mark id="seg_8" xlink:href="#xpointer(id('tok_87')/range-to(id('tok_99')))" />
+		<!--
+			Deshalb [..] .
+		-->
+		<mark id="seg_9" xlink:href="#xpointer(id('tok_100')/range-to(id('tok_106')))" />
+		<!--
+			Doch [..] ?
+		-->
+		<mark id="seg_10" xlink:href="#xpointer(id('tok_107')/range-to(id('tok_127')))" />
+		<!--
+			Die [..] ,
+		-->
+		<mark id="seg_11" xlink:href="#xpointer(id('tok_128')/range-to(id('tok_135')))" />
+		<!--
+			die [..] .
+		-->
+		<mark id="seg_12" xlink:href="#xpointer(id('tok_136')/range-to(id('tok_145')))" />
+		<!--
+			Die [..] ,
+		-->
+		<mark id="seg_13" xlink:href="#xpointer(id('tok_146')/range-to(id('tok_156')))" />
+		<!--
+			also [..] .
+		-->
+		<mark id="seg_14" xlink:href="#xpointer(id('tok_157')/range-to(id('tok_167')))" />
+		<!--
+			Die [..] .
+		-->
+		<mark id="seg_15" xlink:href="#xpointer(id('tok_168')/range-to(id('tok_181')))" />
+		<!--
+			Glück [..] .
+		-->
+	</markList>
+</paula>

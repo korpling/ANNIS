@@ -1,0 +1,14 @@
+<description>
+	<tool name="PAULAAnalyzer" version="1.0">
+		<desc>
+			???
+      </desc>
+		<flag name="-h" isOptional="true">prints this help</flag>
+		<flag name="-h" isOptional="true">prints the created graph to
+			dot-file</flag>
+		<flag name="-f" isOptional="true" appendix="folder name">the name and
+			location of the input-folder (in wich the PAULA_files are)</flag>
+		<flag name="-a" isOptional="true" appendix="archive name">the name and
+			location of the input-archive (in wich the PAULA_files are)</flag>
+	</tool>
+</description>

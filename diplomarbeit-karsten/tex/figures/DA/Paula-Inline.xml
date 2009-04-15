@@ -1,0 +1,26 @@
+<paula>
+  <inline>
+	<example:span _id="10" _gid="10" example:value="example">
+	  <tok _id="1" pos="ADV">kommt</tok>
+	</example:span>
+    <tiger:const _id="11" _gid="11" tiger:cat="S">
+      <tiger:const _id="12" _gid="12" tiger:cat="S">
+        <tok _id="2" pos="ADV">auch</tok>
+      </tiger:cat>
+      <tiger:const _id="13" _gid="13" tiger:cat="PP">
+        <example:span _id="10_1" _gid="10">
+          <tok _id="3" pos="APPRART">zum</tok>
+          <tok _id="4" pos="NN">Tragen</tok>
+        </example:span>
+      </tiger:cat>
+    </tiger:const>
+    <tok _id="5" pos="$,">,</tok>
+    <tiger:const _id="11_1" _gid="11">
+      <tiger:const _id="12_1" _gid="12">
+        <tok _id="6" pos="KOUS">wenn</tok>
+        <tok _id="7" pos="PIS">man</tok>
+        <tok _id="8" pos="PRF">sich</tok>
+      </tiger:const>
+    </tiger:const>
+  </inline>
+</paula>

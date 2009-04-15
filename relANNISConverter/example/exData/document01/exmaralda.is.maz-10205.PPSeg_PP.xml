@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10205_PP" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.PP"
+		xml:base="exmaralda.is.maz-10205.PPSeg.xml">
+
+		<feat xlink:href="#PPSeg_1" value="PP" />
+		<!--
+			Unter...Schriftstellern
+		-->
+		<feat xlink:href="#PPSeg_2" value="PP" /><!-- von...Schröder -->
+		<feat xlink:href="#PPSeg_3" value="PP" />
+		<!--
+			am...Samstagabend
+		-->
+		<feat xlink:href="#PPSeg_4" value="PP" />
+		<!--
+			in...Angelegenheiten
+		-->
+		<feat xlink:href="#PPSeg_5" value="PP" /><!-- zu...Wort -->
+		<feat xlink:href="#PPSeg_6" value="PP" />
+		<!--
+			wegen...Kriegsteilnahme
+		-->
+		<feat xlink:href="#PPSeg_7" value="PP" /><!-- gegen...ihn -->
+		<feat xlink:href="#PPSeg_8" value="PP" />
+		<!--
+			zu...Meinungsführern
+		-->
+		<feat xlink:href="#PPSeg_9" value="PP" />
+		<!--
+			von...Normalbürgern
+		-->
+		<feat xlink:href="#PPSeg_10" value="PP" /><!-- auf...alten -->
+		<feat xlink:href="#PPSeg_11" value="PP" /><!-- von...Brandt -->
+		<feat xlink:href="#PPSeg_12" value="PP" /><!-- für...Schröder -->
+	</featList>
+
+</paula>

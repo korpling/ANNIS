@@ -1,0 +1,25 @@
+<project name="PAULAAnalyzer" basedir="." default="all">
+	<path id="lib">
+		<fileset dir="${basedir}/PAULAImporter/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!--
+		================================= target: all
+		=================================
+	-->
+	<target name="all" description="--> description">
+		<javac srcdir="PAULAStructureAnalyzer/src;PAULAAnalyzer/src;PAULAImporter/src" destdir="bin" debug="on">
+			<classpath refid="lib" />
+		</javac>
+		<!--
+		<javac srcdir="PAULAAnalyzer/src" destdir="bin" debug="on">
+			<classpath refid="lib" />
+		</javac>
+		<javac srcdir="PAULAImporter/src" destdir="bin" debug="on">
+			<classpath refid="lib" />
+		</javac>
+		-->
+	</target>
+</project>

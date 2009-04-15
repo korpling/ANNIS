@@ -1,0 +1,707 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_mark.dtd">
+
+
+<paula version="1.0">
+	<header paula_id="urml.rst.maz-10374_tok" />
+
+	<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="tok"
+		xml:base="merged.maz-10374.text.xml">
+		<mark id="tok_1" xlink:href="#xpointer(string-range(//body,'',1,8))" />
+		<!--
+			Fürchtet
+		-->
+		<mark id="tok_2" xlink:href="#xpointer(string-range(//body,'',10,4))" />
+		<!--
+			euch
+		-->
+		<mark id="tok_3" xlink:href="#xpointer(string-range(//body,'',15,5))" />
+		<!--
+			nicht
+		-->
+		<mark id="tok_4" xlink:href="#xpointer(string-range(//body,'',21,1))" />
+		<!--
+			!
+		-->
+		<mark id="tok_5" xlink:href="#xpointer(string-range(//body,'',23,3))" />
+		<!--
+			Die
+		-->
+		<mark id="tok_6" xlink:href="#xpointer(string-range(//body,'',27,8))" />
+		<!--
+			einstige
+		-->
+		<mark id="tok_7" xlink:href="#xpointer(string-range(//body,'',36,17))" />
+		<!--
+			Fußball_Weltmacht
+		-->
+		<mark id="tok_8" xlink:href="#xpointer(string-range(//body,'',54,7))" />
+		<!--
+			zittert
+		-->
+		<mark id="tok_9" xlink:href="#xpointer(string-range(//body,'',62,3))" />
+		<!--
+			vor
+		-->
+		<mark id="tok_10" xlink:href="#xpointer(string-range(//body,'',66,5))" />
+		<!--
+			einem
+		-->
+		<mark id="tok_11" xlink:href="#xpointer(string-range(//body,'',72,8))" />
+		<!--
+			Winzling
+		-->
+		<mark id="tok_12" xlink:href="#xpointer(string-range(//body,'',81,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_13" xlink:href="#xpointer(string-range(//body,'',83,3))" />
+		<!--
+			Mit
+		-->
+		<mark id="tok_14" xlink:href="#xpointer(string-range(//body,'',87,6))" />
+		<!--
+			seinem
+		-->
+		<mark id="tok_15" xlink:href="#xpointer(string-range(//body,'',94,3))" />
+		<!--
+			Tor
+		-->
+		<mark id="tok_16" xlink:href="#xpointer(string-range(//body,'',98,3))" />
+		<!--
+			zum
+		-->
+		<mark id="tok_17" xlink:href="#xpointer(string-range(//body,'',102,3))" />
+		<!--
+			1:0
+		-->
+		<mark id="tok_18" xlink:href="#xpointer(string-range(//body,'',106,3))" />
+		<!--
+			für
+		-->
+		<mark id="tok_19" xlink:href="#xpointer(string-range(//body,'',110,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_20" xlink:href="#xpointer(string-range(//body,'',114,7))" />
+		<!--
+			Ukraine
+		-->
+		<mark id="tok_21" xlink:href="#xpointer(string-range(//body,'',122,7))" />
+		<!--
+			stürzte
+		-->
+		<mark id="tok_22" xlink:href="#xpointer(string-range(//body,'',130,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_23" xlink:href="#xpointer(string-range(//body,'',134,4))" />
+		<!--
+			1,62
+		-->
+		<mark id="tok_24" xlink:href="#xpointer(string-range(//body,'',139,5))" />
+		<!--
+			Meter
+		-->
+		<mark id="tok_25" xlink:href="#xpointer(string-range(//body,'',145,5))" />
+		<!--
+			große
+		-->
+		<mark id="tok_26" xlink:href="#xpointer(string-range(//body,'',151,7))" />
+		<!--
+			Gennadi
+		-->
+		<mark id="tok_27" xlink:href="#xpointer(string-range(//body,'',159,5))" />
+		<!--
+			Subow
+		-->
+		<mark id="tok_28" xlink:href="#xpointer(string-range(//body,'',165,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_29" xlink:href="#xpointer(string-range(//body,'',169,8))" />
+		<!--
+			deutsche
+		-->
+		<mark id="tok_30" xlink:href="#xpointer(string-range(//body,'',178,11))" />
+		<!--
+			Nationalelf
+		-->
+		<mark id="tok_31" xlink:href="#xpointer(string-range(//body,'',190,13))" />
+		<!--
+			vorübergehend
+		-->
+		<mark id="tok_32" xlink:href="#xpointer(string-range(//body,'',204,2))" />
+		<!--
+			in
+		-->
+		<mark id="tok_33" xlink:href="#xpointer(string-range(//body,'',207,3))" />
+		<!--
+			ein
+		-->
+		<mark id="tok_34" xlink:href="#xpointer(string-range(//body,'',211,6))" />
+		<!--
+			Trauma
+		-->
+		<mark id="tok_35" xlink:href="#xpointer(string-range(//body,'',218,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_36" xlink:href="#xpointer(string-range(//body,'',220,7))" />
+		<!--
+			Nachdem
+		-->
+		<mark id="tok_37" xlink:href="#xpointer(string-range(//body,'',228,3))" />
+		<!--
+			den
+		-->
+		<mark id="tok_38" xlink:href="#xpointer(string-range(//body,'',232,6))" />
+		<!--
+			tapfer
+		-->
+		<mark id="tok_39" xlink:href="#xpointer(string-range(//body,'',239,10))" />
+		<!--
+			kämpfenden
+		-->
+		<mark id="tok_40" xlink:href="#xpointer(string-range(//body,'',250,6))" />
+		<!--
+			Gästen
+		-->
+		<mark id="tok_41" xlink:href="#xpointer(string-range(//body,'',257,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_42" xlink:href="#xpointer(string-range(//body,'',261,9))" />
+		<!--
+			Ausgleich
+		-->
+		<mark id="tok_43" xlink:href="#xpointer(string-range(//body,'',271,8))" />
+		<!--
+			gelungen
+		-->
+		<mark id="tok_44" xlink:href="#xpointer(string-range(//body,'',280,3))" />
+		<!--
+			war
+		-->
+		<mark id="tok_45" xlink:href="#xpointer(string-range(//body,'',284,1))" />
+		<!--
+			,
+		-->
+		<mark id="tok_46" xlink:href="#xpointer(string-range(//body,'',286,9))" />
+		<!--
+			wechselte
+		-->
+		<mark id="tok_47" xlink:href="#xpointer(string-range(//body,'',296,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_48" xlink:href="#xpointer(string-range(//body,'',300,3))" />
+		<!--
+			wie
+		-->
+		<mark id="tok_49" xlink:href="#xpointer(string-range(//body,'',304,4))" />
+		<!--
+			eine
+		-->
+		<mark id="tok_50" xlink:href="#xpointer(string-range(//body,'',309,5))" />
+		<!--
+			Mumie
+		-->
+		<mark id="tok_51" xlink:href="#xpointer(string-range(//body,'',315,3))" />
+		<!--
+			auf
+		-->
+		<mark id="tok_52" xlink:href="#xpointer(string-range(//body,'',319,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_53" xlink:href="#xpointer(string-range(//body,'',323,4))" />
+		<!--
+			Bank
+		-->
+		<mark id="tok_54" xlink:href="#xpointer(string-range(//body,'',328,8))" />
+		<!--
+			sitzende
+		-->
+		<mark id="tok_55" xlink:href="#xpointer(string-range(//body,'',337,11))" />
+		<!--
+			ukrainische
+		-->
+		<mark id="tok_56" xlink:href="#xpointer(string-range(//body,'',349,5))" />
+		<!--
+			Coach
+		-->
+		<mark id="tok_57" xlink:href="#xpointer(string-range(//body,'',355,4))" />
+		<!--
+			noch
+		-->
+		<mark id="tok_58" xlink:href="#xpointer(string-range(//body,'',360,4))" />
+		<!--
+			zwei
+		-->
+		<mark id="tok_59" xlink:href="#xpointer(string-range(//body,'',365,8))" />
+		<!--
+			ähnliche
+		-->
+		<mark id="tok_60" xlink:href="#xpointer(string-range(//body,'',374,14))" />
+		<!--
+			Leichtgewichte
+		-->
+		<mark id="tok_61" xlink:href="#xpointer(string-range(//body,'',389,3))" />
+		<!--
+			ein
+		-->
+		<mark id="tok_62" xlink:href="#xpointer(string-range(//body,'',393,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_63" xlink:href="#xpointer(string-range(//body,'',395,3))" />
+		<!--
+			Was
+		-->
+		<mark id="tok_64" xlink:href="#xpointer(string-range(//body,'',399,4))" />
+		<!--
+			soll
+		-->
+		<mark id="tok_65" xlink:href="#xpointer(string-range(//body,'',404,3))" />
+		<!--
+			das
+		-->
+		<mark id="tok_66" xlink:href="#xpointer(string-range(//body,'',408,4))" />
+		<!--
+			erst
+		-->
+		<mark id="tok_67" xlink:href="#xpointer(string-range(//body,'',413,6))" />
+		<!--
+			morgen
+		-->
+		<mark id="tok_68" xlink:href="#xpointer(string-range(//body,'',420,5))" />
+		<!--
+			Abend
+		-->
+		<mark id="tok_69" xlink:href="#xpointer(string-range(//body,'',426,2))" />
+		<!--
+			im
+		-->
+		<mark id="tok_70" xlink:href="#xpointer(string-range(//body,'',429,7))" />
+		<!--
+			zweiten
+		-->
+		<mark id="tok_71" xlink:href="#xpointer(string-range(//body,'',437,5))" />
+		<!--
+			Spiel
+		-->
+		<mark id="tok_72" xlink:href="#xpointer(string-range(//body,'',443,6))" />
+		<!--
+			werden
+		-->
+		<mark id="tok_73" xlink:href="#xpointer(string-range(//body,'',450,1))" />
+		<!--
+			?
+		-->
+		<mark id="tok_74" xlink:href="#xpointer(string-range(//body,'',452,4))" />
+		<!--
+			Wenn
+		-->
+		<mark id="tok_75" xlink:href="#xpointer(string-range(//body,'',457,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_76" xlink:href="#xpointer(string-range(//body,'',461,4))" />
+		<!--
+			drei
+		-->
+		<mark id="tok_77" xlink:href="#xpointer(string-range(//body,'',466,7))" />
+		<!--
+			Knirpse
+		-->
+		<mark id="tok_78" xlink:href="#xpointer(string-range(//body,'',474,3))" />
+		<!--
+			von
+		-->
+		<mark id="tok_79" xlink:href="#xpointer(string-range(//body,'',478,8))" />
+		<!--
+			Anbeginn
+		-->
+		<mark id="tok_80" xlink:href="#xpointer(string-range(//body,'',487,7))" />
+		<!--
+			wirbeln
+		-->
+		<mark id="tok_81" xlink:href="#xpointer(string-range(//body,'',495,1))" />
+		<!--
+			,
+		-->
+		<mark id="tok_82" xlink:href="#xpointer(string-range(//body,'',497,6))" />
+		<!--
+			könnte
+		-->
+		<mark id="tok_83" xlink:href="#xpointer(string-range(//body,'',504,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_84" xlink:href="#xpointer(string-range(//body,'',508,2))" />
+		<!--
+			um
+		-->
+		<mark id="tok_85" xlink:href="#xpointer(string-range(//body,'',511,4))" />
+		<!--
+			Ehre
+		-->
+		<mark id="tok_86" xlink:href="#xpointer(string-range(//body,'',516,3))" />
+		<!--
+			und
+		-->
+		<mark id="tok_87" xlink:href="#xpointer(string-range(//body,'',520,10))" />
+		<!--
+			Reputation
+		-->
+		<mark id="tok_88" xlink:href="#xpointer(string-range(//body,'',531,10))" />
+		<!--
+			kämpfenden
+		-->
+		<mark id="tok_89" xlink:href="#xpointer(string-range(//body,'',542,10))" />
+		<!--
+			Mannschaft
+		-->
+		<mark id="tok_90" xlink:href="#xpointer(string-range(//body,'',553,3))" />
+		<!--
+			von
+		-->
+		<mark id="tok_91" xlink:href="#xpointer(string-range(//body,'',557,4))" />
+		<!--
+			Rudi
+		-->
+		<mark id="tok_92" xlink:href="#xpointer(string-range(//body,'',562,6))" />
+		<!--
+			Völler
+		-->
+		<mark id="tok_93" xlink:href="#xpointer(string-range(//body,'',569,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_94" xlink:href="#xpointer(string-range(//body,'',573,3))" />
+		<!--
+			Weg
+		-->
+		<mark id="tok_95" xlink:href="#xpointer(string-range(//body,'',577,3))" />
+		<!--
+			zur
+		-->
+		<mark id="tok_96" xlink:href="#xpointer(string-range(//body,'',581,17))" />
+		<!--
+			Weltmeisterschaft
+		-->
+		<mark id="tok_97" xlink:href="#xpointer(string-range(//body,'',599,9))" />
+		<!--
+			endgültig
+		-->
+		<mark id="tok_98" xlink:href="#xpointer(string-range(//body,'',609,7))" />
+		<!--
+			verbaut
+		-->
+		<mark id="tok_99" xlink:href="#xpointer(string-range(//body,'',617,4))" />
+		<!--
+			sein
+		-->
+		<mark id="tok_100" xlink:href="#xpointer(string-range(//body,'',622,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_101" xlink:href="#xpointer(string-range(//body,'',624,2))" />
+		<!--
+			Je
+		-->
+		<mark id="tok_102" xlink:href="#xpointer(string-range(//body,'',627,7))" />
+		<!--
+			kleiner
+		-->
+		<mark id="tok_103" xlink:href="#xpointer(string-range(//body,'',635,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_104" xlink:href="#xpointer(string-range(//body,'',639,6))" />
+		<!--
+			Kicker
+		-->
+		<mark id="tok_105" xlink:href="#xpointer(string-range(//body,'',646,11))" />
+		<!--
+			daherkommen
+		-->
+		<mark id="tok_106" xlink:href="#xpointer(string-range(//body,'',658,1))" />
+		<!--
+			,
+		-->
+		<mark id="tok_107" xlink:href="#xpointer(string-range(//body,'',660,5))" />
+		<!--
+			desto
+		-->
+		<mark id="tok_108" xlink:href="#xpointer(string-range(//body,'',666,6))" />
+		<!--
+			größer
+		-->
+		<mark id="tok_109" xlink:href="#xpointer(string-range(//body,'',673,4))" />
+		<!--
+			wird
+		-->
+		<mark id="tok_110" xlink:href="#xpointer(string-range(//body,'',678,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_111" xlink:href="#xpointer(string-range(//body,'',682,6))" />
+		<!--
+			Gegner
+		-->
+		<mark id="tok_112" xlink:href="#xpointer(string-range(//body,'',689,7))" />
+		<!--
+			geredet
+		-->
+		<mark id="tok_113" xlink:href="#xpointer(string-range(//body,'',697,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_114" xlink:href="#xpointer(string-range(//body,'',699,3))" />
+		<!--
+			Die
+		-->
+		<mark id="tok_115" xlink:href="#xpointer(string-range(//body,'',703,18))" />
+		<!--
+			Fußball_Kleinmacht
+		-->
+		<mark id="tok_116" xlink:href="#xpointer(string-range(//body,'',722,3))" />
+		<!--
+			vom
+		-->
+		<mark id="tok_117" xlink:href="#xpointer(string-range(//body,'',726,5))" />
+		<!--
+			Dnepr
+		-->
+		<mark id="tok_118" xlink:href="#xpointer(string-range(//body,'',732,5))" />
+		<!--
+			steht
+		-->
+		<mark id="tok_119" xlink:href="#xpointer(string-range(//body,'',738,4))" />
+		<!--
+			kurz
+		-->
+		<mark id="tok_120" xlink:href="#xpointer(string-range(//body,'',743,5))" />
+		<!--
+			davor
+		-->
+		<mark id="tok_121" xlink:href="#xpointer(string-range(//body,'',749,1))" />
+		<!--
+			,
+		-->
+		<mark id="tok_122" xlink:href="#xpointer(string-range(//body,'',751,3))" />
+		<!--
+			das
+		-->
+		<mark id="tok_123" xlink:href="#xpointer(string-range(//body,'',755,9))" />
+		<!--
+			scheinbar
+		-->
+		<mark id="tok_124" xlink:href="#xpointer(string-range(//body,'',765,3))" />
+		<!--
+			mit
+		-->
+		<mark id="tok_125" xlink:href="#xpointer(string-range(//body,'',769,5))" />
+		<!--
+			einem
+		-->
+		<mark id="tok_126" xlink:href="#xpointer(string-range(//body,'',775,15))" />
+		<!--
+			Dauerabonnement
+		-->
+		<mark id="tok_127" xlink:href="#xpointer(string-range(//body,'',791,3))" />
+		<!--
+			für
+		-->
+		<mark id="tok_128" xlink:href="#xpointer(string-range(//body,'',795,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_129" xlink:href="#xpointer(string-range(//body,'',799,2))" />
+		<!--
+			WM
+		-->
+		<mark id="tok_130" xlink:href="#xpointer(string-range(//body,'',802,13))" />
+		<!--
+			ausgestattete
+		-->
+		<mark id="tok_131" xlink:href="#xpointer(string-range(//body,'',816,4))" />
+		<!--
+			Team
+		-->
+		<mark id="tok_132" xlink:href="#xpointer(string-range(//body,'',821,2))" />
+		<!--
+			in
+		-->
+		<mark id="tok_133" xlink:href="#xpointer(string-range(//body,'',824,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_134" xlink:href="#xpointer(string-range(//body,'',828,14))" />
+		<!--
+			schwarz_weißen
+		-->
+		<mark id="tok_135" xlink:href="#xpointer(string-range(//body,'',843,5))" />
+		<!--
+			Kluft
+		-->
+		<mark id="tok_136" xlink:href="#xpointer(string-range(//body,'',849,3))" />
+		<!--
+			und
+		-->
+		<mark id="tok_137" xlink:href="#xpointer(string-range(//body,'',853,4))" />
+		<!--
+			eine
+		-->
+		<mark id="tok_138" xlink:href="#xpointer(string-range(//body,'',858,5))" />
+		<!--
+			ganze
+		-->
+		<mark id="tok_139" xlink:href="#xpointer(string-range(//body,'',864,6))" />
+		<!--
+			Nation
+		-->
+		<mark id="tok_140" xlink:href="#xpointer(string-range(//body,'',871,2))" />
+		<!--
+			in
+		-->
+		<mark id="tok_141" xlink:href="#xpointer(string-range(//body,'',874,3))" />
+		<!--
+			das
+		-->
+		<mark id="tok_142" xlink:href="#xpointer(string-range(//body,'',878,3))" />
+		<!--
+			Tal
+		-->
+		<mark id="tok_143" xlink:href="#xpointer(string-range(//body,'',882,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_144" xlink:href="#xpointer(string-range(//body,'',886,6))" />
+		<!--
+			Tränen
+		-->
+		<mark id="tok_145" xlink:href="#xpointer(string-range(//body,'',893,2))" />
+		<!--
+			zu
+		-->
+		<mark id="tok_146" xlink:href="#xpointer(string-range(//body,'',896,7))" />
+		<!--
+			treiben
+		-->
+		<mark id="tok_147" xlink:href="#xpointer(string-range(//body,'',904,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_148" xlink:href="#xpointer(string-range(//body,'',906,5))" />
+		<!--
+			Dabei
+		-->
+		<mark id="tok_149" xlink:href="#xpointer(string-range(//body,'',912,5))" />
+		<!--
+			haben
+		-->
+		<mark id="tok_150" xlink:href="#xpointer(string-range(//body,'',918,3))" />
+		<!--
+			die
+		-->
+		<mark id="tok_151" xlink:href="#xpointer(string-range(//body,'',922,9))" />
+		<!--
+			deutschen
+		-->
+		<mark id="tok_152" xlink:href="#xpointer(string-range(//body,'',932,14))" />
+		<!--
+			Nationalkicker
+		-->
+		<mark id="tok_153" xlink:href="#xpointer(string-range(//body,'',947,5))" />
+		<!--
+			einen
+		-->
+		<mark id="tok_154" xlink:href="#xpointer(string-range(//body,'',953,1))" />
+		<!--
+			"
+		-->
+		<mark id="tok_155" xlink:href="#xpointer(string-range(//body,'',955,4))" />
+		<!--
+			Rudi
+		-->
+		<mark id="tok_156" xlink:href="#xpointer(string-range(//body,'',960,5))" />
+		<!--
+			Riese
+		-->
+		<mark id="tok_157" xlink:href="#xpointer(string-range(//body,'',966,1))" />
+		<!--
+			"
+		-->
+		<mark id="tok_158" xlink:href="#xpointer(string-range(//body,'',968,3))" />
+		<!--
+			auf
+		-->
+		<mark id="tok_159" xlink:href="#xpointer(string-range(//body,'',972,3))" />
+		<!--
+			der
+		-->
+		<mark id="tok_160" xlink:href="#xpointer(string-range(//body,'',976,4))" />
+		<!--
+			Bank
+		-->
+		<mark id="tok_161" xlink:href="#xpointer(string-range(//body,'',981,3))" />
+		<!--
+			und
+		-->
+		<mark id="tok_162" xlink:href="#xpointer(string-range(//body,'',985,5))" />
+		<!--
+			einen
+		-->
+		<mark id="tok_163" xlink:href="#xpointer(string-range(//body,'',991,5))" />
+		<!--
+			Franz
+		-->
+		<mark id="tok_164" xlink:href="#xpointer(string-range(//body,'',997,11))" />
+		<!--
+			Beckenbauer
+		-->
+		<mark id="tok_165" xlink:href="#xpointer(string-range(//body,'',1009,3))" />
+		<!--
+			mit
+		-->
+		<mark id="tok_166" xlink:href="#xpointer(string-range(//body,'',1013,6))" />
+		<!--
+			heißem
+		-->
+		<mark id="tok_167" xlink:href="#xpointer(string-range(//body,'',1020,5))" />
+		<!--
+			Draht
+		-->
+		<mark id="tok_168" xlink:href="#xpointer(string-range(//body,'',1026,3))" />
+		<!--
+			zum
+		-->
+		<mark id="tok_169" xlink:href="#xpointer(string-range(//body,'',1030,11))" />
+		<!--
+			Fußballgott
+		-->
+		<mark id="tok_170" xlink:href="#xpointer(string-range(//body,'',1042,1))" />
+		<!--
+			.
+		-->
+		<mark id="tok_171" xlink:href="#xpointer(string-range(//body,'',1044,8))" />
+		<!--
+			Fürchtet
+		-->
+		<mark id="tok_172" xlink:href="#xpointer(string-range(//body,'',1053,4))" />
+		<!--
+			euch
+		-->
+		<mark id="tok_173" xlink:href="#xpointer(string-range(//body,'',1058,5))" />
+		<!--
+			nicht
+		-->
+		<mark id="tok_174" xlink:href="#xpointer(string-range(//body,'',1064,1))" />
+		<!--
+			!
+		-->
+	</markList>
+</paula>

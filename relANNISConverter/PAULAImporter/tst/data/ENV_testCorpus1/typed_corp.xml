@@ -1,0 +1,119 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE corpus SYSTEM "typed_corp.dtd">
+<corpus name="test_paulaStructAnalyzer">
+	<corpus name="test_collection">
+		<corpus name="corpus">
+			<document name="document">
+				<anno>
+					<!--
+						analyzed by: PrimDataAnalyzer this document contains primary data
+						wich has to be annotated.
+					-->
+					<file name="mmax.maz-10205_text" analyze_type="PrimData"
+						import="yes"
+						path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\mmax.maz-10205.text.xml"
+						dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\sfb632_text.dtd" />
+					<!--
+						analyzed by: TokDataAnalyzer this document contains primary data
+						wich has to be annotated.
+					-->
+					<file name="tiger.ID_maz-10205_tok" analyze_type="TokData"
+						import="yes"
+						path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\tiger.ID_maz-10205.tok.xml"
+						dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\sfb632_mark.dtd" />
+					<!--
+						analyzed by: StructEdgeDataAnalyzer this document contains
+						structures over token and other structures. The structures have
+						edges.
+					-->
+					<file name="urml.maz-10205_const" analyze_type="StructEdgeData"
+						import="yes"
+						path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\urml.maz-10205.const.xml"
+						dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\sfb632_struct.dtd" />
+					<!--
+						analyzed by: AnnoDataAnalyzer this document contains annotations
+						over token and structural nodes.
+					-->
+					<file name="tiger.ID_maz-10205_cat" analyze_type="AnnoData"
+						import="yes"
+						path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\tiger.ID_maz-10205.const_cat.xml"
+						dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\sfb632_feat.dtd" />
+				</anno>
+			</document>
+		</corpus>
+		<document name="document_1">
+			<anno>
+				<!--
+					analyzed by: PrimDataAnalyzer this document contains primary data
+					wich has to be annotated.
+				-->
+				<file name="mmax.maz-10205_text" analyze_type="PrimData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\mmax.maz-10205.text.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\sfb632_text.dtd" />
+				<!--
+					analyzed by: TokDataAnalyzer this document contains primary data
+					wich has to be annotated.
+				-->
+				<file name="tiger.ID_maz-10205_tok" analyze_type="TokData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\tiger.ID_maz-10205.tok.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\sfb632_mark.dtd" />
+				<!--
+					analyzed by: StructEdgeDataAnalyzer this document contains
+					structures over token and other structures. The structures have
+					edges.
+				-->
+				<file name="urml.maz-10205_const" analyze_type="StructEdgeData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\urml.maz-10205.const.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\sfb632_struct.dtd" />
+				<!--
+					analyzed by: AnnoDataAnalyzer this document contains annotations
+					over token and structural nodes.
+				-->
+				<file name="tiger.ID_maz-10205_cat" analyze_type="AnnoData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\tiger.ID_maz-10205.const_cat.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\sfb632_feat.dtd" />
+			</anno>
+		</document>
+		<document name="document_2">
+			<anno>
+				<!--
+					analyzed by: PrimDataAnalyzer this document contains primary data
+					wich has to be annotated.
+				-->
+				<file name="mmax.maz-10205_text" analyze_type="PrimData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\mmax.maz-10205.text.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\sfb632_text.dtd" />
+				<!--
+					analyzed by: TokDataAnalyzer this document contains primary data
+					wich has to be annotated.
+				-->
+				<file name="tiger.ID_maz-10205_tok" analyze_type="TokData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\tiger.ID_maz-10205.tok.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\sfb632_mark.dtd" />
+				<!--
+					analyzed by: StructEdgeDataAnalyzer this document contains
+					structures over token and other structures. The structures have
+					edges.
+				-->
+				<file name="urml.maz-10205_const" analyze_type="StructEdgeData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\urml.maz-10205.const.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\sfb632_struct.dtd" />
+				<!--
+					analyzed by: AnnoDataAnalyzer this document contains annotations
+					over token and structural nodes.
+				-->
+				<file name="tiger.ID_maz-10205_cat" analyze_type="AnnoData"
+					import="yes"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\tiger.ID_maz-10205.const_cat.xml"
+					dtd="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\sfb632_feat.dtd" />
+			</anno>
+		</document>
+	</corpus>
+</corpus>

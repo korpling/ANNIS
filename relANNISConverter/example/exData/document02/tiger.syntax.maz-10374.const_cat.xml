@@ -1,0 +1,92 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="tiger.syntax.maz-10374_cat" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="tiger.cat"
+		xml:base="tiger.syntax.maz-10374.const.xml">
+
+		<feat xlink:href="#const_1" value="S" />
+		<feat xlink:href="#const_2" value="NP" />
+		<feat xlink:href="#const_3" value="PP" />
+		<feat xlink:href="#const_4" value="S" />
+		<feat xlink:href="#const_5" value="PP" />
+		<feat xlink:href="#const_6" value="NP" />
+		<feat xlink:href="#const_7" value="PN" />
+		<feat xlink:href="#const_8" value="NP" />
+		<feat xlink:href="#const_9" value="PP" />
+		<feat xlink:href="#const_10" value="PP" />
+		<feat xlink:href="#const_11" value="AP" />
+		<feat xlink:href="#const_12" value="PP" />
+		<feat xlink:href="#const_13" value="NP" />
+		<feat xlink:href="#const_14" value="S" />
+		<feat xlink:href="#const_15" value="AP" />
+		<feat xlink:href="#const_16" value="NP" />
+		<feat xlink:href="#const_17" value="NP" />
+		<feat xlink:href="#const_18" value="PP" />
+		<feat xlink:href="#const_19" value="NP" />
+		<feat xlink:href="#const_20" value="NP" />
+		<feat xlink:href="#const_21" value="AP" />
+		<feat xlink:href="#const_22" value="VP" />
+		<feat xlink:href="#const_23" value="NP" />
+		<feat xlink:href="#const_24" value="S" />
+		<feat xlink:href="#const_25" value="S" />
+		<feat xlink:href="#const_26" value="AVP" />
+		<feat xlink:href="#const_27" value="VP" />
+		<feat xlink:href="#const_28" value="PP" />
+		<feat xlink:href="#const_29" value="S" />
+		<feat xlink:href="#const_30" value="NP" />
+		<feat xlink:href="#const_31" value="PP" />
+		<feat xlink:href="#const_32" value="CNP" />
+		<feat xlink:href="#const_33" value="PN" />
+		<feat xlink:href="#const_34" value="PP" />
+		<feat xlink:href="#const_35" value="S" />
+		<feat xlink:href="#const_36" value="PP" />
+		<feat xlink:href="#const_37" value="PP" />
+		<feat xlink:href="#const_38" value="NP" />
+		<feat xlink:href="#const_39" value="AP" />
+		<feat xlink:href="#const_40" value="NP" />
+		<feat xlink:href="#const_41" value="VP" />
+		<feat xlink:href="#const_42" value="VP" />
+		<feat xlink:href="#const_43" value="S" />
+		<feat xlink:href="#const_44" value="AP" />
+		<feat xlink:href="#const_45" value="NP" />
+		<feat xlink:href="#const_46" value="NP" />
+		<feat xlink:href="#const_47" value="S" />
+		<feat xlink:href="#const_48" value="AVP" />
+		<feat xlink:href="#const_49" value="AP" />
+		<feat xlink:href="#const_50" value="VP" />
+		<feat xlink:href="#const_51" value="S" />
+		<feat xlink:href="#const_52" value="PP" />
+		<feat xlink:href="#const_53" value="PP" />
+		<feat xlink:href="#const_54" value="PP" />
+		<feat xlink:href="#const_55" value="NP" />
+		<feat xlink:href="#const_56" value="NP" />
+		<feat xlink:href="#const_57" value="VZ" />
+		<feat xlink:href="#const_58" value="NP" />
+		<feat xlink:href="#const_59" value="PP" />
+		<feat xlink:href="#const_60" value="PP" />
+		<feat xlink:href="#const_61" value="AP" />
+		<feat xlink:href="#const_62" value="NP" />
+		<feat xlink:href="#const_63" value="CNP" />
+		<feat xlink:href="#const_64" value="VP" />
+		<feat xlink:href="#const_65" value="PP" />
+		<feat xlink:href="#const_66" value="S" />
+		<feat xlink:href="#const_67" value="NP" />
+		<feat xlink:href="#const_68" value="NP" />
+		<feat xlink:href="#const_69" value="PP" />
+		<feat xlink:href="#const_70" value="PN" />
+		<feat xlink:href="#const_71" value="PP" />
+		<feat xlink:href="#const_72" value="PN" />
+		<feat xlink:href="#const_73" value="PP" />
+		<feat xlink:href="#const_74" value="NP" />
+		<feat xlink:href="#const_75" value="NP" />
+		<feat xlink:href="#const_76" value="CNP" />
+		<feat xlink:href="#const_77" value="S" />
+		<feat xlink:href="#const_78" value="S" />
+	</featList>
+
+</paula>

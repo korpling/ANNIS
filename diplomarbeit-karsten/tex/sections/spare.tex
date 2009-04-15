@@ -1,0 +1,70 @@
+\newpage
+\section{Der Entwicklungsprozess}
+
+Jedes Softwareprojekt erfordert eine bestimmte Vorgehensweise. Kleinstprojekte bei der alle Aufgaben von ein und der selben Person, d.h. von den Anforderungen über die Implementierungen bis hin zur Qualitätskontrolle, übernommen werden lassen sich oft ohne die tiefergehende Planungsarbeiten erfolgreich umsetzen. Sobald jedoch die Anforderungen komplexer werden und mehrere Personen oder sogar Teams an der Umsetzung beteiligt sind, ist Planungs- und Koordinationsarbeit unabdingbar.
+
+Die Entwicklung von \emph{ANNIS 2.0} stellt in dieser Hinsicht nicht zuletzt durch die nicht genau ausgearbeiteten Anforderungen eine Herausforderung bei der Umsetzung dar. Mit \emph{ANNIS 1.0} gibt es schon eine lauffähige Umsetzung einer Benutzerschnittstelle, die einen minimalen Funktionsumfang definiert.
+
+Darüber hinaus existieren für die fertige Suchschnittstelle nur rudimentäre Anforderungen. Lediglich die Experten im Team haben Vorstellungen von den Eigenschaften des zu erstellenden Systems. Konkrete Spezifikationsdokumente oder ein Pflichtenheft existieren nicht. Eine hohe Flexibilität und einfacher Erweiterbarkeit haben damit einen hohen Stellenwert sowohl bei der entwickelten Anwendung als auch für Entwicklungsprozess. Die Durchführung des Projektes in einem strikt linearen Vorgehensmodell wie dem Phasen-, Wasserfall- oder Schleifenmodell ist dadurch und aufgrund des gegebenen Zeitrahmens nicht möglich \citep[vgl.][Seiten 99-102]{bunse2002}. Um schon kurz nach Beginn der Entwicklungsarbeiten Ergebnisse erstellen zu können wird inkrementell vorgegangen.
+
+\subsection{Inkrementelles Vorgehensmodell}\label{sec:Vorgehensmodell}
+
+Bei dem inkrementellen Vorgehensmodell werden bekannte Teilmengen der Anforderungen sequenziell umgesetzt. Die fertiggestellte Implementierung einer Anforderungsteilmenge wird als \emph{Inkrement} bezeichnet. \emph{Inkremente} werden anhand neuer Anforderungen erweitert.
+
+In Abbildung \ref{fig:Vorgehensmodell} wird der Entwicklungsverlauf in einem inkrementellen Vorgehensmodell illustriert. Es besteht aus sechs Aktivitäten und deutet die Inkremente durch die Vervielfältigung aller Aktivitäten an. Die Erweiterung eines Inkrements erfordert, dass alle Entwicklungsaktivitäten erneut durchlaufen werden müssen. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=1.0\textwidth]{figures/DA/Vorgehensmodell.pdf}
+	\caption{Entwicklungsverlaufs in einem inkrementellen Vorgehensmodell \citep[][Seite 12]{bunse2002}}\label{fig:Vorgehensmodell}
+\end{figure}
+
+
+Dieses Vorgehen führt zu einem für den Kunden transparenten Entstehungsprozess erfordert jedoch, dass Experten und Anwender mit unterschiedlichen Voraussetzungen fest mit einbezogen werden müssen. Dies ist notwendig um Qualität und Akzeptanz der fertigen Software sicherzustellen. Durch die rasche Einbindung des Prototypen in reale Arbeitsprozesse können Konzeptions- und Implementierungsfehler früh erkannt, diskutiert und behoben  werden. Nicht zuletzt durch die Verwendung dieser Methode ist sichergestellt, dass die Software für reale Arbeitsprozesse eingesetzt wird.
+
+Der wohl schwerwiegendste Nachteil dieser Methode ist, dass sich während des Entwicklungsprozesses die Anforderungen ändern oder durch neue Funktionalität und Features erweitert werden. Das stellt bei grösseren Teams sehr hohe Anforderungen an das Projektmanagement. Die Beachtung eines strikten \emph{Change Management}\footnote{Change Management beschreibt alle Prozesse und Vereinbarungen die von allen Projektbeteiligten bei Änderungen oder Erweiterung der Anforderungen einzuhalten sind.} ist hierbei insbesondere beider Identifizierung von \emph{Changes} wichtig.
+
+Wird der Aspekt des \emph{Change Management} vernachlässigt, kann es im Entwicklerteam sogar zu einer Art von \emph{Cowboy Coding} kommen. Dabei macht dann jedes Teammitglied das von dem es denkt, dass es das Richtige ist. Dieser Zustand sollte unbedingt vermieden werden.
+
+Nachdem in diesem Abschnitt der Entwicklungsprozess beschrieben wurde, wird in den nachfolgenden Abschnitten detaillierter auf das eigentliche Korpussystem, dessen Aufbau und auf die Besonderheiten eingegangen.
+
+
+
+
+
+
+Der folgende Abschnitt erläutert die Eigenschaften Verteilter Infrastrukturen und die Besonderheiten von \emph{Java RMI}.
+
+\subsection{Verteilte Infrastruktur mit \emph{Java RMI}}\label{sec:RMI}
+
+\cite{alonso2004webservices} sehen in der Entwicklung moderner Netzwerke die Hauptvoraussetzung für die Architektur heutiger Informationssysteme. Durch die stabilen Schnittstellen und hohen Bandbreiten ermöglichen zusätzlich zur Client-Server-Kommunikation auch Server-Server-Schnittstellen und damit N-Schicht Architekturen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=0.8\textwidth]{figures/DA/N-SchichtArchitektur.pdf}
+	\caption{Ein N-Schicht System entsteht duch die Erweiterung eines 3-Schicht Systems durch Hinzufügen eines Web Servers zur Präsentationsschicht \citep[vgl.][S. 20]{alonso2004webservices}}\label{fig:N-SchichtArchitektur}
+\end{figure}
+
+Mit den in Abbildung \ref{fig:N-SchichtArchitektur} dargestellten N-Schicht Architekturen können weitaus komplexere und vielseitigere Systeme entwickelt werden. Die Nutzung der Ressourcen mehrerer Systeme führt zusätzlich zu einer besseren Lastverteilung und ermöglicht höhere Ausfallsicherheit durch Fail-Over-Systemen. Diese Vorteile werden auch für das Korpussystem von \emph{ANNIS 2.0} genutzt.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=0.5\textwidth]{figures/DA/KorpussystemArchitektur.pdf}
+	\caption{Das Korpussystems von \emph{ANNIS 2.0} ist als N-Schicht Architektur implementiert}\label{fig:KorpussystemArchitektur}
+\end{figure}
+
+Wie Abbildung \ref{fig:KorpussystemArchitektur} zeigt, ist die Web Application \emph{ANNIS 2.0} logisch vom \emph{Annis RMI Service} getrennt. Um auch eine physikalische Trennung zu ermöglichen ist der Service nicht Teil des \emph{ANNIS 2.0} Software Paketes. Er läuft in einer eigenen \emph{Java Virtual Machine JVm}\footnote{JVM: Java Virtual Machine, Ausführungsumgebung für \emph{Java} Anwendungen}. Die Kommunikation geschieht über \emph{Java RMI}. \emph{Java RMI} ist die \emph{Java} spezifische Umsetzung von \emph{Remote Procedure Calls RPC} und ist damit eine einfache Möglichkeit, Methodenaufrufe über \emph{JVM}s hinweg zu realisieren. \emph{Java RMI} basiert auf \emph{TCP/IP}\footnote{\emph{TCP/IP}: Transmission Control Protocol/Internet Protocol} und erlaubt es, Client-Anwendung und Service auf unterschiedlichen, im Netzwerk verbundenen, Hosts zu installieren.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=0.33\textwidth]{figures/DA/RMI-Blocking.pdf}
+	\caption{\emph{RMI} Methodenaufrufe blockieren das aufrufende Programm}\label{fig:RMI.Blocking}
+\end{figure}
+
+Ebenso wie lokale Methodenaufrufe innerhalb einer \emph{JVM} sind \emph{RMI} Aufrufe synchron. Dies bedeutet wie in Abbildung \ref{fig:RMI.Blocking}, dass das aufrufende Programm während Abarbeitung der aufgerufenen Methode blockiert und erst danach weiterverarbeitet werden kann.
+
+Um eine asynchrone Verarbeitung des Methodenaufrufs und anderer Verarbeitungsschritte im aufrufenden Programm zu realisieren, können \emph{Threads}\footnote{\emph{Threads (of execution)} bezeichnen ein Programmierkonzept zu Aufteilung eines Programms in zwei oder mehr Teilprogramme die simultan oder pseudo-simultan abgearbeitet werden können.} eingesetzt werden.
+
+Die eigentliche Umsetzung den \emph{ANNIS Service} ist nicht Teil dieser Arbeit und soll deshalb nur im nächsten Abschnitt kurz Erwähnung finden. Dort werden auch weiterführenden Quellen angegeben.
+
+

@@ -1,0 +1,3 @@
+makeindex Expose.glo -s nomencl.ist -o Expose.gls 
+makeindex Expose 
+bibtex Expose

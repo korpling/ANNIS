@@ -1,0 +1,16 @@
+<description>
+	<tool name="PAULAImporter" version="1.1">
+		<desc>
+			Imports a typed corpus into the database relANNIS. You can run only one
+			instance of this tool.
+      </desc>
+		<flag name="-h" isOptional="true">prints this help</flag>
+		<flag name="-dot" isOptional="true">prints each document as graph
+			in dot format into temproray folder</flag>
+		<flag name="-s" isOptional="true" appendix="folder name">the name and
+			location of the input-folder (in which the PAULA_files and the typed
+			file are)</flag>
+		<flag name="-d" isOptional="true" appendix="archive name">the name and
+			location of a temprorary folder for writing the tab files</flag>
+	</tool>
+</description>

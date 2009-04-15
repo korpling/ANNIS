@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10205_NP" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.NP"
+		xml:base="exmaralda.is.maz-10205.NPSeg.xml">
+
+		<feat xlink:href="#NPSeg_1" value="NP" />
+		<!--
+			den...Schriftstellern
+		-->
+		<feat xlink:href="#NPSeg_2" value="NP" /><!-- die -->
+		<feat xlink:href="#NPSeg_3" value="NP" />
+		<!--
+			Gerhard...Schröder
+		-->
+		<feat xlink:href="#NPSeg_4" value="NP" /><!-- Samstagabend -->
+		<feat xlink:href="#NPSeg_5" value="NP" /><!-- kein...Gesicht -->
+		<feat xlink:href="#NPSeg_6" value="NP" /><!-- Das -->
+		<feat xlink:href="#NPSeg_7" value="NP" /><!-- kein...Zufall -->
+		<feat xlink:href="#NPSeg_8" value="NP" /><!-- die...Autoren -->
+		<feat xlink:href="#NPSeg_9" value="NP" />
+		<!--
+			die...Besserwisserei
+		-->
+		<feat xlink:href="#NPSeg_10" value="NP" />
+		<!--
+			der...Altgedienten
+		-->
+		<feat xlink:href="#NPSeg_11" value="NP" /><!-- Günter...Grass -->
+		<feat xlink:href="#NPSeg_12" value="NP" /><!-- Christa...Wolf -->
+		<feat xlink:href="#NPSeg_13" value="NP" /><!-- Stefan...Heym -->
+		<feat xlink:href="#NPSeg_14" value="NP" />
+		<!--
+			politischen...Angelegenheiten
+		-->
+		<feat xlink:href="#NPSeg_15" value="NP" /><!-- Wort -->
+		<feat xlink:href="#NPSeg_16" value="NP" />
+		<!--
+			ein...Intellektuellen
+		-->
+		<feat xlink:href="#NPSeg_17" value="NP" /><!-- Schröder -->
+		<feat xlink:href="#NPSeg_18" value="NP" /><!-- Angst -->
+		<feat xlink:href="#NPSeg_19" value="NP" /><!-- die...Meinung -->
+		<feat xlink:href="#NPSeg_20" value="NP" />
+		<!--
+			der...Kriegsteilnahme
+		-->
+		<feat xlink:href="#NPSeg_21" value="NP" /><!-- ihn -->
+		<feat xlink:href="#NPSeg_22" value="NP" /><!-- er -->
+		<feat xlink:href="#NPSeg_23" value="NP" />
+		<!--
+			die...Tuchfühlung
+		-->
+		<feat xlink:href="#NPSeg_24" value="NP" />
+		<!--
+			den...Meinungsführern
+		-->
+		<feat xlink:href="#NPSeg_25" value="NP" /><!-- sie -->
+		<feat xlink:href="#NPSeg_26" value="NP" /><!-- Die...Autoren -->
+		<feat xlink:href="#NPSeg_27" value="NP" /><!-- gute...Bücher -->
+		<feat xlink:href="#NPSeg_28" value="NP" /><!-- sie -->
+		<feat xlink:href="#NPSeg_29" value="NP" /><!-- dem...Kanzler -->
+		<feat xlink:href="#NPSeg_30" value="NP" /><!-- Ratschläge -->
+		<feat xlink:href="#NPSeg_31" value="NP" /><!-- die -->
+		<feat xlink:href="#NPSeg_32" value="NP" /><!-- die -->
+		<feat xlink:href="#NPSeg_33" value="NP" /><!-- Normalbürgern -->
+		<feat xlink:href="#NPSeg_34" value="NP" /><!-- Die...Nation -->
+		<feat xlink:href="#NPSeg_35" value="NP" />
+		<!--
+			keine...Klassensprecher
+		-->
+		<feat xlink:href="#NPSeg_36" value="NP" />
+		<!--
+			der...Bundeskanzler
+		-->
+		<feat xlink:href="#NPSeg_37" value="NP" /><!-- die...alten -->
+		<feat xlink:href="#NPSeg_38" value="NP" /><!-- dem...Enkel -->
+		<feat xlink:href="#NPSeg_39" value="NP" /><!-- Willy...Brandt -->
+		<feat xlink:href="#NPSeg_40" value="NP" /><!-- die...Leviten -->
+		<feat xlink:href="#NPSeg_41" value="NP" /><!-- Glück -->
+		<feat xlink:href="#NPSeg_42" value="NP" /><!-- die...Namen -->
+		<feat xlink:href="#NPSeg_43" value="NP" />
+		<!--
+			wenig...Autorität
+		-->
+	</featList>
+
+</paula>

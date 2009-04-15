@@ -1,0 +1,76 @@
+\section{Einführung}
+Die Suche in annotierten Textdaten ist ein wichtiges Hilfsmittel in der modernen Sprachwissenschaft, von dem mehr und mehr Linguisten Gebrauch machen. Die Vorteile bei der systematischen, computergestützten Suche in Korpusdaten liegen vor allem in der Belegsuche und statistischen Analysen über annotierten Textdaten. Dabei kann es sich um verschiedenartige geschriebene Texte oder um transkribierte gesprochene Sprache handeln.
+
+Die Annotationen gehören meist nicht zu den Primärdaten und werden nachträglich automatisch, halbautomatisch oder manuell hinzugefügt. Sehr häufig werden Wortart (Part of Speech) und Wortstamm (Lemma) mit Hilfe von spezialisierter Tagger-Software annotiert \citep[vgl.][für die automatische Annotation von Wortarten]{schmidt94}. Zusätzlich werden abhängig von den Forschungsfragen, die mit dem Korpus bearbeitet werden sollen, spezielle Annotationen erstellt. Hierbei kann es sich bspw. um Syntaxbäume über den Textdaten, um Annotationen der Informationsstruktur oder im Fall von Lernerkorpora um die Markierung und Klassifizierung von sprachlichen Fehlern handeln \citep[][]{falko-konvens06}.
+
+Zur Illustration unterschiedlicher Annotationsebenen Abbildung \ref{fig:tiger-example1} entnommen aus \citet[][]{lezius02}.
+
+\begin{verbatim}Ein Mann kommt, der lacht.\end{verbatim}
+
+Die Annotationsebene direkt unter dem Ausgangssatz zeigt die automatisch erstellte Ebene der Wortarten. Darunter ist eine genauere Klassifikation der Token nach Genus, Kasus und Numerus zu sehen (morphologische Annotation). Über dem Text befindet sich die grafische Repräsentation der syntaktischen Struktur des Satzes. Gerade bei manuellen Annotationen wird deutlich, dass es sich immer um eine Interpretation des Ausgangstextes handelt. Die Einflüsse dieses Interpretationsprozesses müssen später bei der Nutzung berücksichtigt werden. Hierbei handelt es sich aber um ein prinzipielles Problem, auf das im Folgenden nicht weiter eingegangen werden kann.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=1.0\textwidth]{figures/tiger-example1}
+	\caption{Annotierter Beispielsatz aus dem Tiger-Korpus.}
+	\label{fig:tiger-example1}
+\end{figure}
+
+
+Korpusdaten sind durch ihre Struktur und Menge nicht immer einfach zu handhaben. Deswegen werden seit Jahren Suchsysteme für spezielle Daten entwickelt. Im englischsprachigen Raum sind die bekanntesten Systeme die \emph{Penn Treebank} mit dem Suchinterface \emph{CorpusSearch} \citep[http://www.cis.upenn.edu/\~{}treebank/]{marcus1994building} und das \emph{British National Corpus} mit dem Suchinterface \emph{Xaira} \citep[\\ http://www.natcorp.ox.ac.uk/]{burnard2000reference}, für den deutschsprachigen Raum ist es das \emph{TigerKorpus} mit \emph{TIGERSearch} \citep[\\ http://www.ims.uni-stuttgart.de/projekte/TIGER/TIGERSearch/]{lezius-diss}. \emph{Xaira} und \emph{TigerSearch} mit dem Zusatzwerkzeug \emph{TigerRegistry} können darüber hinaus vielfältige andere XML-Korpusdaten durchsuchen. Leider besitzt fast jedes Korpus eine eigene Suchplattform/Bentzerschnittstelle mit individuell sehr unterschiedlichen Methodologien. Die Suche über mehrere verschiedenartige Korpora ist daher auch dann nicht möglich, wenn sie vergleichbare Annotationen (Annotationsebenen- und kategorien) besitzen. 
+
+Im Rahmen des Sonderforschungsbereiches SFB 632 ''Informationsstruktur: Die sprachlichen Mittel der Gliederung von Äußerung, Satz und Text''\footnote{http://www.sfb632.uni-potsdam.de/main3322.html} soll im Teilprojekt D1 ''Datenbank für Informationsstruktur: Annotation und Retrieval''\footnote{http://www.sfb632.uni-potsdam.de/\~{ }d1/} eine flexible Suchplattform für Mehrebenenkorpora geschaffen und einer breiten Nutzergruppe zur Verfügung gestellt werden. Dies ist eine große Herausforderung sowohl für die Entwicklung der eigentlichen Suche als auch für die Erarbeitung einer allgemeinen Benutzerschnittstelle.
+
+\subsection{Aktueller Stand des Teilprojektes D1}
+
+Der erste Schritt für die Umsetzung eines solchen Suchsystems war die Entwicklung der Abfragesprache \emph{ANNIS Query Language} \emph{ANNISQL} und die Entwicklung des darauf aufbauenden webbasierten Suchsystems \emph{ANNIS} \citep[http://www.sfb632.uni-potsdam.de/\~{ }d1/annis/]{annis}. \emph{ANNISQL} ist syntaktisch an die Baumstruktur linguistischer Daten angelehnt. Sie beschreibt die gesuchten Teilgraphen durch die Eigenschaften der Knoten und Kanten. Deshalb bietet \emph{ANNISQL} Vorteile in der Vermittlung für Neueinsteiger und ist für diverse Mehrebenenkorpora gut geeignet.
+
+Die permanente Speicherung der Daten erfolgt im flexiblen XML-standoff-Format \emph{Paula} (\citet[]{dipper2005}, \citet[]{woerner2006}). Die \emph{Paula}-Daten werden in eine Hauptspeicherrepräsentation des Graphen überführt und können dann durchsucht werden. Die stärkste Einschränkung dieser Vorgehensweise ist die Platzbegrenzung des Hauptspeichers. Insbesondere kann der Java Heap auf 32bit-Systemen eine Gesamtgröße von 1.996.800kb ($\approx$2Gb) nicht überschreiten. Damit ist diese Herangehensweise für große Korpora ungeeignet.
+
+Deswegen soll zukünftig die von \citet{dddquery-springer} vorgestellte Anfragesprache zur Suche verwendet werden. \emph{DDDQuery} beinhaltet ein Datenbankmodell zur Ablage von Korpora und wird mit Hilfe eines Compilers in SQL-Anfragen übersetzt. \emph{DDDQuery}  ist eine sehr umfangreiche und damit komplexe Abfragesprache, mit der die meisten Endbenutzer nicht konfrontiert werden können. Daher soll zukünftig \emph{ANNISQL} nach \emph{DDDQuery} überführt werden.
+
+Auch die Umsetzung der \emph{ANNIS}-Benutzerschnittstelle bietet aufgrund mangelnder Übersichtlichkeit Ansatzpunkte für Erweiterungen und Verbesserungen. Die Anforderungen dafür sind aktuell nur unvollständig ausgearbeitet.
+
+\section{Ziel}
+
+Ziel der Diplomarbeit ist es, eine neue webbasierte Benutzerschnittstelle für \emph{ANNISQL} über Mehrebenenkorpora zu entwickeln. Die wichtigste Anforderung an dieses Interface sind eine flexible, verständliche Darstellung der Korpusdaten bzw. Suchergebnisse, ein Werkzeug zur grafischen Erstellung von Anfragen, die Unterstützung von statistischen Anfragen und der Export der Suchergebnisse in einem vielseitig verwendbaren Format. Hierfür sind z.B. CSV\footnote{CSV: Comma Separated Values. Ein Austauschformat für tabellarische Daten.} für die Tabellenansichten und \emph{Paula} für die Baumstrukturen denkbar.
+
+Das Hauptaugenmerk soll aber nicht ausschließlich auf den Features  der Anwendung liegen. Es ist weitgehend bekannt, dass Nutzerfreundlichkeit ein wichtiges Qualitätskriterium von Hard- und Software ist \citep[][]{mayhew94}. Um eine langfristig nachhaltige Anwendung zu entwickeln, muss deshalb ingenieurspsychologischen Aspekten besondere Beachtung zukommen.
+
+
+%Studien zeigen, dass die Nutzerfreundlichkeit von Software maßgeblichen Einfluss auf die Akzeptanz der Anwender und damit auf deren Erfolg der Produktes hat.
+
+
+\section{Vorgehen}
+
+Zuerst findet eine Auswahl von Usability-Kriterien für die Benutzerschnittstelle statt. Hierbei steht die DIN EN ISO 9241 als Leitnorm und Basis vieler Normen der Softwareergonomie im Mittelpunkt - insbesondere deren ''Grundlagen für die Dialoggestaltung'' (Teil 10) \citep[][]{beimel94}. In Abgrenzung dazu kann auf Grund der hohen Anforderungen an die Interaktivität des Systems eine Barrierefreiheit im Sinne der Norm ISO/TS 16701 nicht gewährleistet werden. Die Lauffähigkeit auf den gängigen Browsern kann jedoch sichergestellt werden.
+
+Um die vorhandenen Anforderungen bestätigen und klassifizieren zu können, wird ein Online-Fragebogen zur genauen Erfassung der positiven und negativen Nutzerkritiken zu einer Auswahl verfügbarer Systeme erstellt. Aufgrund des engen Zeitrahmens kann dieser nur oberflächliche Kriterien abfragen und von einer kleinen Gruppe von Benutzern im Rahmen des Sonderforschungsbereichs beantwortet werden. Genaue Aussagen über die Nutzerzufriedenheit und resultierende Anforderungen lassen sich damit zwar nicht treffen, aber sicherlich zeigt sie den Handlungsbedarf und gibt neue Impulse für das Projekt. 
+
+Die Entwicklung der Software erfolgt als Prototyping. Es werden frühzeitig Experten und fachkundige Anwender in den Entwicklungsprozess einbezogen um die Qualität und die Akzeptanz der fertigen Software sicherzustellen. Durch die rasche Einbindung des Prototypen in reale Arbeitsprozesse können Konzeptions- und Implementierungsfehler früh erkannt, diskutiert und behoben  werden. Nicht zuletzt durch die Verwendung dieser Methode ist sichergestellt, dass die Software für reale Arbeitsprozesse eingesetzt wird.
+
+Als praktisches Werkzeug für die Gestaltung der Interaktion zwischen Nutzer und System werden für das Projekt spezifische Personas eingeführt. Personas dienen als Modelle realer Nutzergruppen. Sie stellen u.a. den fachlichen Wissensstand, die Computer Literacy\footnote{Computer Literacy beschreibt das Wissen und die Fähigkeit, Technologie im Allgemeinen und Computer im Speziellen effizient nutzen zu können.} und Gebrauchsmotive realer Nutzer dar. Das von \citet{cooper1999inmates} vorgestellte Persona-Konzept ist auch heute noch ein fester Bestandteil des Usability Engineerings.
+
+Das Webinterface wird auf dem JavaScript-Framework EXTJS\footnote{EXTJS Website: http://extjs.com} entwickelt. EXTJS bietet alle notwendigen Funktionen zur Gestaltung Fenster-orientierter Anwendungen wie es die Designstudie in Abbildung \ref{fig:ANNIS2_Screenshot} zeigt. Dadurch ist es für den Benutzer möglich, erlernte Umgangsweisen aus grafischen Betriebssystemen auf eine Webapplikation zu übertragen, so dass Vertrautheit geschaffen und die Lernschwelle gesenkt wird. Mit der Verwendung asynchroner Kommunikation zwischen Webbrowser und Webserver mittels AJAX\footnote{AJAX: ''Asynchronous JavaScript and XML'' steht für das Konzept des asynchronen Datenaustausches zwischen Webbrowser und Webserver und bricht mit und stellt eine Ergänzung zum Request-Response-Paradigma des WWW dar.} kann dem Benutzer stets direkte Rückmeldung auf dessen Eingaben und ausgeführte Aktionen gegeben werden. Die umfangreichen Mechanismen von EXTJS für die Ein- und Ausgabe sind die Grundlage für kurze Entwicklungszyklen und damit ideal für das Prototyping.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=1.0\textwidth]{figures/ANNIS2_Screenshot}
+	\caption{Designstudie der fensterorientierte Suchoberfläche.}
+	\label{fig:ANNIS2_Screenshot}
+\end{figure}
+
+Die Kommunikation mit dem Suchbackend findet über einen Java RMI Service statt. Dieser bietet der Webapplikation alle notwendigen Funktionen zur Abfrage von verfügbaren Korpora und deren Metadaten, von Suchergebnissen und statistischen Auswertungen. Dieser Service übernimmt die Umwandlung der \emph{ANNISQL}-Anfrage in \emph{DDDQuery}  und führt diese dann im Backend aus. Für eine einzelne Suchanfrage ergibt sich dann der in Abbildung \ref{fig:Informationsfluss} dargestellte Informationsfluss.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics*[width=1.0\textwidth]{figures/Informationsfluss}
+	\caption{Informationsfluss vom HTML-Suchformular bis zur HTML-Ausgabe der Ergebnisliste.}
+	\label{fig:Informationsfluss}
+\end{figure}
+
+Die logische Aufteilung des Gesamtsystems bietet den Vorteil, dass sowohl das Frontend als auch das Backend zu einem späteren Zeitpunkt ausgetauscht werden können, ohne sich zu beeinflussen. Hier ist insbesondere die Anbindung neuer Suchbackends durch eine andere Implementierung des Service oder die Entwicklung neuer Client-Anwendungen unter Nutzung des Service denkbar. Auch die parallele Benutzung einer Serviceinstanz mit unterschiedlichen Client Applikationen ist möglich.
+
+Damit eine reibungslose Kommunikation zwischen Frontend und Suchbackend erfolgen kann, muss die Schnittstelle genau definiert werden. Hierfür wurde ein Java-Paket mit Interfaces für den Service und die zurückgegebenen Datenobjekte erstellt.
+
+\emph{DDDQuery} wird derzeit aufbauend auf \citet{dddquery} einschließlich einiger Optimierungen fertiggestellt. Noch ist es nicht möglich, alle für das Frontend notwendigen Informationen zu liefern. Außerdem ist die aktuell importierte Datenbasis noch sehr klein und nicht repräsentativ. Um aber das Prototyping wie geplant durchführen zu können wird zumindest ein funktionaler Service benötigt, der \emph{ANNISQL}-Anfragen entgegennehmen und die Schnittstelle mit repräsentativen Rückgabewerten bedienen kann.

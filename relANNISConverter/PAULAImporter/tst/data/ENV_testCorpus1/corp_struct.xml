@@ -1,0 +1,38 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE corpus SYSTEM "corp_struct.dtd">
+<corpus name="test_paulaStructAnalyzer">
+	<corpus name="test_collection">
+		<corpus name="corpus">
+			<document name="document">
+				<file name="mmax.maz-10205.text.xml"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\mmax.maz-10205.text.xml" />
+				<file name="tiger.ID_maz-10205.const_cat.xml"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\tiger.ID_maz-10205.const_cat.xml" />
+				<file name="tiger.ID_maz-10205.tok.xml"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\tiger.ID_maz-10205.tok.xml" />
+				<file name="urml.maz-10205.const.xml"
+					path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\corpus\document\urml.maz-10205.const.xml" />
+			</document>
+		</corpus>
+		<document name="document_1">
+			<file name="mmax.maz-10205.text.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\mmax.maz-10205.text.xml" />
+			<file name="tiger.ID_maz-10205.const_cat.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\tiger.ID_maz-10205.const_cat.xml" />
+			<file name="tiger.ID_maz-10205.tok.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\tiger.ID_maz-10205.tok.xml" />
+			<file name="urml.maz-10205.const.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_1\urml.maz-10205.const.xml" />
+		</document>
+		<document name="document_2">
+			<file name="mmax.maz-10205.text.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\mmax.maz-10205.text.xml" />
+			<file name="tiger.ID_maz-10205.const_cat.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\tiger.ID_maz-10205.const_cat.xml" />
+			<file name="tiger.ID_maz-10205.tok.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\tiger.ID_maz-10205.tok.xml" />
+			<file name="urml.maz-10205.const.xml"
+				path="E:\UniJob\testData\test_paulaStructAnalyzer\test_collection\document_2\urml.maz-10205.const.xml" />
+		</document>
+	</corpus>
+</corpus>

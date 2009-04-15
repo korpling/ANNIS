@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="urml.rst.maz-10374_rstRel_type" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="urml.rstRel_type"
+		xml:base="urml.rst.maz-10374.const.xml">
+
+		<feat xlink:href="#const_1" value="hypRelation" />
+		<feat xlink:href="#const_2" value="parRelation" />
+		<feat xlink:href="#const_3" value="hypRelation" />
+		<feat xlink:href="#const_4" value="hypRelation" />
+		<feat xlink:href="#const_5" value="hypRelation" />
+		<feat xlink:href="#const_6" value="hypRelation" />
+		<feat xlink:href="#const_7" value="hypRelation" />
+		<feat xlink:href="#const_8" value="parRelation" />
+		<feat xlink:href="#const_9" value="hypRelation" />
+		<feat xlink:href="#const_10" value="hypRelation" />
+	</featList>
+
+</paula>

@@ -1,0 +1,192 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="tiger.syntax.maz-10374_lemma" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="tiger.lemma"
+		xml:base="merged.maz-10374.tok.xml">
+
+		<feat xlink:href="#tok_1" value="f&#xFC;rchten" /><!--  -->
+		<feat xlink:href="#tok_2" value="euch" /><!--  -->
+		<feat xlink:href="#tok_3" value="nicht" /><!--  -->
+		<feat xlink:href="#tok_4" value="!" /><!--  -->
+		<feat xlink:href="#tok_5" value="der" /><!--  -->
+		<feat xlink:href="#tok_6" value="einstig" /><!--  -->
+		<feat xlink:href="#tok_7" value="Fu&#xDF;ball-Weltmacht" />
+		<!--
+		-->
+		<feat xlink:href="#tok_8" value="zittern" /><!--  -->
+		<feat xlink:href="#tok_9" value="vor" /><!--  -->
+		<feat xlink:href="#tok_10" value="ein" /><!--  -->
+		<feat xlink:href="#tok_11" value="Winzling" /><!--  -->
+		<feat xlink:href="#tok_12" value="." /><!--  -->
+		<feat xlink:href="#tok_13" value="mit" /><!--  -->
+		<feat xlink:href="#tok_14" value="sein" /><!--  -->
+		<feat xlink:href="#tok_15" value="Tor" /><!--  -->
+		<feat xlink:href="#tok_16" value="zu" /><!--  -->
+		<feat xlink:href="#tok_17" value="1:0" /><!--  -->
+		<feat xlink:href="#tok_18" value="f&#xFC;r" /><!--  -->
+		<feat xlink:href="#tok_19" value="der" /><!--  -->
+		<feat xlink:href="#tok_20" value="Ukraine" /><!--  -->
+		<feat xlink:href="#tok_21" value="st&#xFC;rzen" /><!--  -->
+		<feat xlink:href="#tok_22" value="der" /><!--  -->
+		<feat xlink:href="#tok_23" value="1,62" /><!--  -->
+		<feat xlink:href="#tok_24" value="Meter" /><!--  -->
+		<feat xlink:href="#tok_25" value="gro&#xDF;" /><!--  -->
+		<feat xlink:href="#tok_26" value="Gennadi" /><!--  -->
+		<feat xlink:href="#tok_27" value="Subow" /><!--  -->
+		<feat xlink:href="#tok_28" value="der" /><!--  -->
+		<feat xlink:href="#tok_29" value="deutsch" /><!--  -->
+		<feat xlink:href="#tok_30" value="Nationalelf" /><!--  -->
+		<feat xlink:href="#tok_31" value="vor&#xFC;bergehend" /><!--  -->
+		<feat xlink:href="#tok_32" value="in" /><!--  -->
+		<feat xlink:href="#tok_33" value="ein" /><!--  -->
+		<feat xlink:href="#tok_34" value="Trauma" /><!--  -->
+		<feat xlink:href="#tok_35" value="." /><!--  -->
+		<feat xlink:href="#tok_36" value="nachdem" /><!--  -->
+		<feat xlink:href="#tok_37" value="der" /><!--  -->
+		<feat xlink:href="#tok_38" value="tapfer" /><!--  -->
+		<feat xlink:href="#tok_39" value="k&#xE4;mpfend" /><!--  -->
+		<feat xlink:href="#tok_40" value="Gast" /><!--  -->
+		<feat xlink:href="#tok_41" value="der" /><!--  -->
+		<feat xlink:href="#tok_42" value="Ausgleich" /><!--  -->
+		<feat xlink:href="#tok_43" value="gelingen" /><!--  -->
+		<feat xlink:href="#tok_44" value="sein" /><!--  -->
+		<feat xlink:href="#tok_45" value="," /><!--  -->
+		<feat xlink:href="#tok_46" value="wechseln" /><!--  -->
+		<feat xlink:href="#tok_47" value="der" /><!--  -->
+		<feat xlink:href="#tok_48" value="wie" /><!--  -->
+		<feat xlink:href="#tok_49" value="ein" /><!--  -->
+		<feat xlink:href="#tok_50" value="Mumie" /><!--  -->
+		<feat xlink:href="#tok_51" value="auf" /><!--  -->
+		<feat xlink:href="#tok_52" value="der" /><!--  -->
+		<feat xlink:href="#tok_53" value="Bank" /><!--  -->
+		<feat xlink:href="#tok_54" value="sitzend" /><!--  -->
+		<feat xlink:href="#tok_55" value="ukrainisch" /><!--  -->
+		<feat xlink:href="#tok_56" value="Coach" /><!--  -->
+		<feat xlink:href="#tok_57" value="noch" /><!--  -->
+		<feat xlink:href="#tok_58" value="zwei" /><!--  -->
+		<feat xlink:href="#tok_59" value="&#xE4;hnlich" /><!--  -->
+		<feat xlink:href="#tok_60" value="Leichtgewicht" /><!--  -->
+		<feat xlink:href="#tok_61" value="ein" /><!--  -->
+		<feat xlink:href="#tok_62" value="." /><!--  -->
+		<feat xlink:href="#tok_63" value="was" /><!--  -->
+		<feat xlink:href="#tok_64" value="sollen" /><!--  -->
+		<feat xlink:href="#tok_65" value="der" /><!--  -->
+		<feat xlink:href="#tok_66" value="erst" /><!--  -->
+		<feat xlink:href="#tok_67" value="morgen" /><!--  -->
+		<feat xlink:href="#tok_68" value="Abend" /><!--  -->
+		<feat xlink:href="#tok_69" value="in" /><!--  -->
+		<feat xlink:href="#tok_70" value="zweiter" /><!--  -->
+		<feat xlink:href="#tok_71" value="Spiel" /><!--  -->
+		<feat xlink:href="#tok_72" value="werden" /><!--  -->
+		<feat xlink:href="#tok_73" value="?" /><!--  -->
+		<feat xlink:href="#tok_74" value="wenn" /><!--  -->
+		<feat xlink:href="#tok_75" value="der" /><!--  -->
+		<feat xlink:href="#tok_76" value="drei" /><!--  -->
+		<feat xlink:href="#tok_77" value="Knirps" /><!--  -->
+		<feat xlink:href="#tok_78" value="von" /><!--  -->
+		<feat xlink:href="#tok_79" value="Anbeginn" /><!--  -->
+		<feat xlink:href="#tok_80" value="wirbeln" /><!--  -->
+		<feat xlink:href="#tok_81" value="," /><!--  -->
+		<feat xlink:href="#tok_82" value="k&#xF6;nnen" /><!--  -->
+		<feat xlink:href="#tok_83" value="der" /><!--  -->
+		<feat xlink:href="#tok_84" value="um" /><!--  -->
+		<feat xlink:href="#tok_85" value="Ehre" /><!--  -->
+		<feat xlink:href="#tok_86" value="und" /><!--  -->
+		<feat xlink:href="#tok_87" value="Reputation" /><!--  -->
+		<feat xlink:href="#tok_88" value="k&#xE4;mpfend" /><!--  -->
+		<feat xlink:href="#tok_89" value="Mannschaft" /><!--  -->
+		<feat xlink:href="#tok_90" value="von" /><!--  -->
+		<feat xlink:href="#tok_91" value="Rudi" /><!--  -->
+		<feat xlink:href="#tok_92" value="V&#xF6;ller" /><!--  -->
+		<feat xlink:href="#tok_93" value="der" /><!--  -->
+		<feat xlink:href="#tok_94" value="Weg" /><!--  -->
+		<feat xlink:href="#tok_95" value="zu" /><!--  -->
+		<feat xlink:href="#tok_96" value="Weltmeisterschaft" /><!--  -->
+		<feat xlink:href="#tok_97" value="endg&#xFC;ltig" /><!--  -->
+		<feat xlink:href="#tok_98" value="verbauen" /><!--  -->
+		<feat xlink:href="#tok_99" value="sein" /><!--  -->
+		<feat xlink:href="#tok_100" value="." /><!--  -->
+		<feat xlink:href="#tok_101" value="je" /><!--  -->
+		<feat xlink:href="#tok_102" value="klein" /><!--  -->
+		<feat xlink:href="#tok_103" value="der" /><!--  -->
+		<feat xlink:href="#tok_104" value="Kicker" /><!--  -->
+		<feat xlink:href="#tok_105" value="daherkommen" /><!--  -->
+		<feat xlink:href="#tok_106" value="," /><!--  -->
+		<feat xlink:href="#tok_107" value="desto" /><!--  -->
+		<feat xlink:href="#tok_108" value="gro&#xDF;" /><!--  -->
+		<feat xlink:href="#tok_109" value="werden" /><!--  -->
+		<feat xlink:href="#tok_110" value="der" /><!--  -->
+		<feat xlink:href="#tok_111" value="Gegner" /><!--  -->
+		<feat xlink:href="#tok_112" value="reden" /><!--  -->
+		<feat xlink:href="#tok_113" value="." /><!--  -->
+		<feat xlink:href="#tok_114" value="der" /><!--  -->
+		<feat xlink:href="#tok_115" value="Fu&#xDF;ball-Kleinmacht" />
+		<!--
+		-->
+		<feat xlink:href="#tok_116" value="von" /><!--  -->
+		<feat xlink:href="#tok_117" value="Dnepr" /><!--  -->
+		<feat xlink:href="#tok_118" value="stehen" /><!--  -->
+		<feat xlink:href="#tok_119" value="kurz" /><!--  -->
+		<feat xlink:href="#tok_120" value="davor" /><!--  -->
+		<feat xlink:href="#tok_121" value="," /><!--  -->
+		<feat xlink:href="#tok_122" value="der" /><!--  -->
+		<feat xlink:href="#tok_123" value="scheinbar" /><!--  -->
+		<feat xlink:href="#tok_124" value="mit" /><!--  -->
+		<feat xlink:href="#tok_125" value="ein" /><!--  -->
+		<feat xlink:href="#tok_126" value="Dauerabonnement" /><!--  -->
+		<feat xlink:href="#tok_127" value="f&#xFC;r" /><!--  -->
+		<feat xlink:href="#tok_128" value="die" /><!--  -->
+		<feat xlink:href="#tok_129" value="WM" /><!--  -->
+		<feat xlink:href="#tok_130" value="ausgestattet" /><!--  -->
+		<feat xlink:href="#tok_131" value="Team" /><!--  -->
+		<feat xlink:href="#tok_132" value="in" /><!--  -->
+		<feat xlink:href="#tok_133" value="der" /><!--  -->
+		<feat xlink:href="#tok_134" value="schwarz-wei&#xDF;" /><!--  -->
+		<feat xlink:href="#tok_135" value="Kluft" /><!--  -->
+		<feat xlink:href="#tok_136" value="und" /><!--  -->
+		<feat xlink:href="#tok_137" value="ein" /><!--  -->
+		<feat xlink:href="#tok_138" value="ganz" /><!--  -->
+		<feat xlink:href="#tok_139" value="Nation" /><!--  -->
+		<feat xlink:href="#tok_140" value="in" /><!--  -->
+		<feat xlink:href="#tok_141" value="der" /><!--  -->
+		<feat xlink:href="#tok_142" value="Tal" /><!--  -->
+		<feat xlink:href="#tok_143" value="der" /><!--  -->
+		<feat xlink:href="#tok_144" value="Tr&#xE4;ne" /><!--  -->
+		<feat xlink:href="#tok_145" value="zu" /><!--  -->
+		<feat xlink:href="#tok_146" value="treiben" /><!--  -->
+		<feat xlink:href="#tok_147" value="." /><!--  -->
+		<feat xlink:href="#tok_148" value="dabei" /><!--  -->
+		<feat xlink:href="#tok_149" value="haben" /><!--  -->
+		<feat xlink:href="#tok_150" value="der" /><!--  -->
+		<feat xlink:href="#tok_151" value="deutsch" /><!--  -->
+		<feat xlink:href="#tok_152" value="Nationalkicker" /><!--  -->
+		<feat xlink:href="#tok_153" value="ein" /><!--  -->
+		<feat xlink:href="#tok_154" value="&quot;" /><!--  -->
+		<feat xlink:href="#tok_155" value="Rudi" /><!--  -->
+		<feat xlink:href="#tok_156" value="Riese" /><!--  -->
+		<feat xlink:href="#tok_157" value="&quot;" /><!--  -->
+		<feat xlink:href="#tok_158" value="auf" /><!--  -->
+		<feat xlink:href="#tok_159" value="der" /><!--  -->
+		<feat xlink:href="#tok_160" value="Bank" /><!--  -->
+		<feat xlink:href="#tok_161" value="und" /><!--  -->
+		<feat xlink:href="#tok_162" value="ein" /><!--  -->
+		<feat xlink:href="#tok_163" value="Franz" /><!--  -->
+		<feat xlink:href="#tok_164" value="Beckenbauer" /><!--  -->
+		<feat xlink:href="#tok_165" value="mit" /><!--  -->
+		<feat xlink:href="#tok_166" value="hei&#xDF;" /><!--  -->
+		<feat xlink:href="#tok_167" value="Draht" /><!--  -->
+		<feat xlink:href="#tok_168" value="zu" /><!--  -->
+		<feat xlink:href="#tok_169" value="Fu&#xDF;ballgott" /><!--  -->
+		<feat xlink:href="#tok_170" value="." /><!--  -->
+		<feat xlink:href="#tok_171" value="f&#xFC;rchten" /><!--  -->
+		<feat xlink:href="#tok_172" value="euch" /><!--  -->
+		<feat xlink:href="#tok_173" value="nicht" /><!--  -->
+		<feat xlink:href="#tok_174" value="!" /><!--  -->
+	</featList>
+
+</paula>

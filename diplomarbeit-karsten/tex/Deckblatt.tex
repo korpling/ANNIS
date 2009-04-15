@@ -1,0 +1,237 @@
+\begin{titlepage}
+
+%
+% -------- only change entries beginning here ----------------------------
+%
+% enter the type: either D for diploma
+%                 or P for phd
+%                 or S for seminar
+%                 or p for Bakkalaureat Projekt
+%                 or s for Bakkalaureat Seminar
+\def\type{D}
+% enter the name of the bakk-seminar
+\def\bakkname{Entwicklung einer Benutzerschnittstelle f\"ur die Suche in linguistischen Mehrebenen-Korpora unter Betrachtung softwareergonomischer Gesichtspunkte}
+% enter the study (Stienrichtung)
+% z.B. \def\study{Technische Mathematik}
+\def\study{Informatik}
+%
+% enter the title
+\def\title{\bakkname}
+%
+% titlelength influences vertical spacing depending on the length of the title
+% recommended values are:
+% 0: for short title (1 line)
+% 1: for medium length title (2 lines)
+% 2: for long title (3 lines)
+% 3: for over-long title (>3 lines)
+\def\titlelength{0}
+%
+%-------- Fields for seminars --------
+% LVA number
+% z.B. \def\lvanr{353.063}
+\def\lvanr{000.000}
+%
+% LVA title
+% z. B. \def\lvatitle{Seminar: Computernetzwerke (Sicherheitsfragen)}
+\def\lvatitle{Seminartitle}
+%
+% LVA date
+% z. B. \def\lvasemester{WS2004/05}
+\def\lvasemester{Semester}
+%-------------------------------------
+%
+% enter the supervisor
+\def\supervisor{Prof. Ulf Leser \small{Institut f\"ur Informatik}}
+%
+% in case of a second supervisor: define \secondsupervisor appropriately
+% (for phd theses there MUST BE two supervisors)
+% otherwise remove or comment the defintion.
+\def\secondsupervisor{Prof. Hartmut Wandke \small{Institut f\"ur Psychologie}}
+%
+% enter the name of the institute
+% z.B. \def\institute{Institut f\"ur Symbolisches Rechnen}
+\def\institute{Institut f\"ur Informatik}
+%
+% enter the name of the student
+\def\name{Karsten H\"utter}
+%
+% enter sex of student (f for female, m for male)
+\def\sex{m}
+% enter month year
+\def\date{January 2006}
+%
+% in case of an additional supervisor: define \additionalsupervisor
+% appropriately.
+% otherwise remove or comment the definition.
+%
+\def\additionalsupervisor{}
+%
+% -------- only change entries until here --------------------------------
+%
+\if \type p
+        \def\bakkname{Projektpraktikum}
+\fi
+
+\if \sex f
+        \if \type p
+                \def\sexsuffix{a}
+        \else
+                \if \type s
+                        \def\sexsuffix{a}
+                \else
+                        \def\sexsuffix{in}
+                \fi
+        \fi
+\else
+        \if \type p
+                \def\sexsuffix{us}
+        \else
+                \if \type s
+                        \def\sexsuffix{us}
+                \else
+                        \def\sexsuffix{}
+                \fi
+        \fi
+\fi
+
+
+\def\diplskip{\ifnum\titlelength>2\if\type + \medskip\else\bigskip\fi\else\bigskip\fi}
+\def\varskip{\ifcase\titlelength\bigskip\bigskip\bigskip\or\bigskip\bigskip\or\bigskip\else\smallskip\fi}
+\def\ifundefined#1{\expandafter\ifx\csname#1\endcsname\relax}
+\ifundefined{additionalsupervisor}\def\addsuper{-}\else\def\addsuper{+}\fi
+\unitlength 1cm
+\begin{picture}(0,0)
+%\put(.88,-1.98){\psfig{file=tnf-logo.eps,width=2.4cm}}
+%\put(-2.45,-2.35){\psfig{file=uborder.eps}}
+
+\put(-0.90,-1.50){\includegraphics{hukombi_bbw_rgb_op.pdf}}
+%\put(-2.85,1.25){\psfig{file=figures/uni-logo-with-bg.eps,width=20.5cm}}
+
+%\put(10.4,1.255){\sffamily\Large J\,O\,H\,A\,N\,N\,E\,S~~K\,E\,P\,L\,E\,R}
+%\put(10.4,.6){\sffamily\Large U\,N\,I\,V\,E\,R\,S\,I\,T\,\"A\,T~~L\,I\,N\,Z}
+
+%\put(6.91,.1){\sffamily N\,e\,t\,z\,w\,e\,r\,k~~f\,\"u\,r~~F\,o\,r\,s\,c\,h%
+%\,u\,n\,g\,,~~L\,e\,h\,r\,e~~u\,n\,d~~P\,r\,a\,x\,i\,s}
+%
+\put(-.97,-4.2){\begin{minipage}[t]{17cm}
+\begin{center}
+\LARGE \textbf{\title}
+\varskip\bigskip\par
+\if \type D
+% -> case diploma
+\Large \textsc{Diplomarbeit}
+\bigskip\par
+\normalsize zur Erlangung des akademischen Grades
+\bigskip\par
+\Large \textsc{Diplominformatiker\\ (Dipl.-Inf.)}
+%\bigskip\par
+%\normalsize in der Studienrichtung
+%\bigskip\par
+%\Large \textsc{\study}
+% -> end case diploma
+\else
+\if \type P
+% -> case phd
+\bigskip
+\Large \textsc{Dissertation}
+\bigskip\par
+\normalsize zur Erlangung des akademischen Grades
+\bigskip\par
+\Large \textsc{Doktor\sexsuffix\ der Technischen Wissenschaften}
+\bigskip
+% -> end case phd
+\else
+\if \type S
+% -> case seminar
+\bigskip
+\Large \textsc{Seminararbeit}
+\bigskip\par
+\large \lvatitle
+\medskip\par
+\normalsize LVA-Nummer: \lvanr, \lvasemester
+% -> end case seminar
+\else
+\if \type s
+                \Large \textsc{Bakkalaureatsarbeit}
+                \par\normalsize(\bakkname)
+                \bigskip\par
+                \normalsize zur Erlangung des akademischen Grades
+                \bigskip\par
+                \Large \textsc{Bakkalaure\sexsuffix\ der Technischen Wissenschaften}
+                \bigskip\par
+                \normalsize in der Studienrichtung
+                \bigskip\par
+                \Large \textsc{\study}
+% -> end case Bakkalaureat Seminar
+\else
+\if \type p
+                \Large \textsc{Seminararbeit}
+                \par\normalsize(\bakkname)
+                \bigskip\par
+                \normalsize in der Studienrichtung
+                \bigskip\par
+                \Large \textsc{\study}
+% -> end case Bakkalaureat Project
+\else
+% -> WRONG TYPE
+\Huge !!TYPE IS NOT SET CORRECTLY!!\\
+check type value in \LaTeX-source!
+\fi % \if \type p
+\fi % \if \type s
+\fi % \if \type S
+\fi % \if \type P
+\fi % \if \type D
+\end{center}
+\ifundefined{secondsupervisor}\vspace*{4mm}\fi
+\if\addsuper -
+\vspace*{2mm}
+\else
+\vspace*{-2mm}
+\fi
+\varskip\par
+\normalsize Angefertigt am {\sl \institute}.
+\bigskip\bigskip\par
+\if\addsuper -
+\vspace*{6mm}
+\fi
+Gutachter:
+\diplskip\par
+\large\textsl{\supervisor}
+\ifundefined{secondsupervisor}\diplskip\else\smallskip\par\textsl{\secondsupervisor}\bigskip\fi
+\bigskip\par
+\normalsize Eingereicht von:
+\diplskip\par
+\large\textsl{\name}
+\if\addsuper +
+
+\textsl{\additionalsupervisor} 
+\fi 
+	\if\addsuper -
+		\bigskip
+	\fi
+	\ifundefined{secondsupervisor}
+		\bigskip
+		\bigskip
+	\else\if\addsuper -
+		\bigskip
+		\bigskip
+	\else
+		\ifnum\titlelength>2
+			\bigskip
+		\else
+			\bigskip
+			\medskip
+		\fi
+	\fi
+\fi
+\par
+\normalsize Berlin, \today
+\end{minipage}}
+%
+%\put(-2.55,-24.2){\psfig{file=lborder.eps}}
+\put(3.13,-23.1){\footnotesize\sffamily\bfseries Humboldt-Universit\"at zu Berlin $\cdot$ Math.-Nat. Fakultät II}
+\put(.95,-23.5){\footnotesize\sffamily D-12489 Berlin $\cdot$ Rudower Chaussee 25 $\cdot$ Internet: http://www.informatik.hu-berlin.de}
+
+\end{picture}
+\newpage
+\end{titlepage}

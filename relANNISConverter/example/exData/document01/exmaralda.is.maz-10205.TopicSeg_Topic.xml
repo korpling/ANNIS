@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10205_Topic" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Topic"
+		xml:base="exmaralda.is.maz-10205.TopicSeg.xml">
+
+		<feat xlink:href="#TopicSeg_1" value="ab" /><!-- den..., -->
+		<feat xlink:href="#TopicSeg_2" value="ab" /><!-- Das -->
+		<feat xlink:href="#TopicSeg_3" value="ab" />
+		<!--
+			die...Altgedienten
+		-->
+		<feat xlink:href="#TopicSeg_4" value="ab" />
+		<!--
+			Günter...Heym
+		-->
+		<feat xlink:href="#TopicSeg_5" value="ab" /><!-- Schröder -->
+		<feat xlink:href="#TopicSeg_6" value="ab" /><!-- er -->
+		<feat xlink:href="#TopicSeg_7" value="ab" />
+		<!--
+			Die...Autoren
+		-->
+		<feat xlink:href="#TopicSeg_8" value="ab" /><!-- Die...Nation -->
+		<feat xlink:href="#TopicSeg_9" value="ab" />
+		<!--
+			der...Bundeskanzler
+		-->
+		<feat xlink:href="#TopicSeg_10" value="ab" /><!-- Die -->
+		<feat xlink:href="#TopicSeg_11" value="ab" />
+		<!--
+			dem...Brandt
+		-->
+		<feat xlink:href="#TopicSeg_12" value="ab" /><!-- die...Namen -->
+	</featList>
+
+</paula>

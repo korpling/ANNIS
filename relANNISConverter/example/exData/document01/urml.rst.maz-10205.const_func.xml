@@ -1,0 +1,82 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="urml.rst.maz-10205_func" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="urml.func"
+		xml:base="urml.rst.maz-10205.const.xml">
+
+		<feat xlink:href="#rel_1" value="nucleus" />
+		<!--
+			Keine ...
+		-->
+		<feat xlink:href="#rel_2" value="satellite" />
+		<feat xlink:href="#rel_3" value="nucleus" />
+		<!--
+			Unter ...
+		-->
+		<feat xlink:href="#rel_4" value="satellite" />
+		<!--
+			war ...
+		-->
+		<feat xlink:href="#rel_5" value="nucleus" />
+		<!--
+			also ...
+		-->
+		<feat xlink:href="#rel_6" value="satellite" />
+		<feat xlink:href="#rel_7" value="nucleus" />
+		<feat xlink:href="#rel_8" value="satellite" />
+		<feat xlink:href="#rel_9" value="nucleus" />
+		<feat xlink:href="#rel_10" value="satellite" />
+		<!--
+			Glück ...
+		-->
+		<feat xlink:href="#rel_11" value="nucleus" />
+		<feat xlink:href="#rel_12" value="satellite" />
+		<!--
+			Doch ...
+		-->
+		<feat xlink:href="#rel_13" value="nucleus" />
+		<feat xlink:href="#rel_14" value="satellite" />
+		<!--
+			Die ...
+		-->
+		<feat xlink:href="#rel_15" value="nucleus" />
+		<feat xlink:href="#rel_16" value="satellite" />
+		<!--
+			Die ...
+		-->
+		<feat xlink:href="#rel_17" value="nucleus" />
+		<feat xlink:href="#rel_18" value="satellite" />
+		<feat xlink:href="#rel_19" value="nucleus" />
+		<!--
+			Das ...
+		-->
+		<feat xlink:href="#rel_20" value="satellite" />
+		<feat xlink:href="#rel_21" value="nucleus" />
+		<!--
+			Wenn ...
+		-->
+		<feat xlink:href="#rel_22" value="satellite" />
+		<feat xlink:href="#rel_23" value="nucleus" />
+		<!--
+			Deshalb ...
+		-->
+		<feat xlink:href="#rel_24" value="satellite" />
+		<!--
+			Doch ...
+		-->
+		<feat xlink:href="#rel_25" value="nucleus" />
+		<!--
+			Die ...
+		-->
+		<feat xlink:href="#rel_26" value="satellite" />
+		<!--
+			die ...
+		-->
+	</featList>
+
+</paula>

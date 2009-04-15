@@ -1,0 +1,34 @@
+<paula>
+  <inline>
+    <mmax:primmarkSeg id="4711" mmax:referentiality="discourse-new">
+      <tok id="1" id="">Dagmar</tok>
+      <tok id="2">Ziegler</tok>
+    </mmax:primmarkSeg>
+    <tok id="3">sitzt</tok>
+    <tok id="4">in</tok>
+    <tok id="5">der</tok>
+    <tok id="6">Schuldenfalle</tok>
+    <tok id="7">.</tok>
+    <tok id="8">Auf</tok> 
+    <tok id="9">Grund</tok> 
+    <tok id="10">der</tok> 
+    <tok id="11">dramatischen</tok> 
+    <tok id="12">Kassenlage</tok> 
+    <tok id="13">in</tok> 
+    <tok id="14">Brandenburg</tok> 
+    <tok id="15">hat</tok> 
+    <mmax:primmarkSeg _id="4712" mmax:referentiality="referring">
+        <_relations>
+         <_rel mmax:anaphor_antecedent="default" _target="4711"/>
+        </_relations>
+      <tok id="16">sie</tok>
+    </mmax:primmarkSeg>
+    <tok id="17">jetzt</tok> 
+    <tok id="18">eine</tok>
+    <tok id="19">Kabinettsvorlage</tok>
+    <tok id="21">auf</tok> 
+    <tok id="22">Eis</tok> 
+    <tok id="23">gelegt</tok>
+    <tok id="24">.</tok>
+  </inline>
+</paula>

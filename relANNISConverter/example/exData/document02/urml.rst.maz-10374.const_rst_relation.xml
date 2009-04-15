@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="urml.rst.maz-10374_rst_relation" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="urml.rst_relation"
+		xml:base="urml.rst.maz-10374.const.xml">
+
+		<feat xlink:href="#const_1" value="elaboration" />
+		<feat xlink:href="#const_2" value="sequence" />
+		<feat xlink:href="#const_3" value="preparation" />
+		<feat xlink:href="#const_4" value="background" />
+		<feat xlink:href="#const_5" value="restatement" />
+		<feat xlink:href="#const_6" value="evidence" />
+		<feat xlink:href="#const_7" value="evaluation" />
+		<feat xlink:href="#const_8" value="list" />
+		<feat xlink:href="#const_9" value="evidence" />
+		<feat xlink:href="#const_10" value="concession" />
+	</featList>
+
+</paula>

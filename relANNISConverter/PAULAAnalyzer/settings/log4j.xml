@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+	<appender name="stdDEBUG" class="org.apache.log4j.FileAppender">
+		<param name="File" value="log/debug.log" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="debug" />
+			<param name="LevelMax" value="debug" />
+		</filter>
+	</appender>
+
+	<appender name="stdTRACE" class="org.apache.log4j.FileAppender">
+		<param name="File" value="log/trace.log" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="debug" />
+			<param name="LevelMax" value="debug" />
+		</filter>
+	</appender>
+
+	<appender name="stdWARN" class="org.apache.log4j.FileAppender">
+		<param name="File" value="log/warn.log" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="error" />
+			<param name="LevelMax" value="error" />
+		</filter>
+	</appender>
+
+	<appender name="stdErr" class="org.apache.log4j.FileAppender">
+		<param name="File" value="log/err.log" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="error" />
+			<param name="LevelMax" value="error" />
+		</filter>
+	</appender>
+
+	<appender name="stdOut" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="info" />
+			<param name="LevelMax" value="info" />
+		</filter>
+	</appender>
+
+
+	<logger name="WarnLogger" additivity="false">
+		<level value="warn" />
+		<appender-ref ref="stdWARN" />
+	</logger>
+
+	<logger name="TraceLogger" additivity="false">
+		<level value="trace" />
+		<appender-ref ref="stdTRACE" />
+	</logger>
+
+
+	<root>
+		<priority value="all"></priority>
+		<appender-ref ref="stdDEBUG" />
+		<appender-ref ref="stdWARN" />
+		<appender-ref ref="stdErr" />
+		<appender-ref ref="stdOut" />
+	</root>
+
+</log4j:configuration>

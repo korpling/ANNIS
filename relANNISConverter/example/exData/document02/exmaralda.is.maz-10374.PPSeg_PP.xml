@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_PP" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.PP"
+		xml:base="exmaralda.is.maz-10374.PPSeg.xml">
+
+		<feat xlink:href="#PPSeg_1" value="PP" /><!-- vor...Winzling -->
+		<feat xlink:href="#PPSeg_2" value="PP" /><!-- Mit...Tor -->
+		<feat xlink:href="#PPSeg_3" value="PP" /><!-- zum...1:0 -->
+		<feat xlink:href="#PPSeg_4" value="PP" /><!-- für...Ukraine -->
+		<feat xlink:href="#PPSeg_5" value="PP" /><!-- in...Trauma -->
+		<feat xlink:href="#PPSeg_6" value="PP" /><!-- wie...Mumie -->
+		<feat xlink:href="#PPSeg_7" value="PP" /><!-- auf...Bank -->
+		<feat xlink:href="#PPSeg_8" value="PP" /><!-- im...Spiel -->
+		<feat xlink:href="#PPSeg_9" value="PP" /><!-- von...Anbeginn -->
+		<feat xlink:href="#PPSeg_10" value="PP" />
+		<!--
+			um...Reputation
+		-->
+		<feat xlink:href="#PPSeg_11" value="PP" /><!-- von...Völler -->
+		<feat xlink:href="#PPSeg_12" value="PP" />
+		<!--
+			zur...Weltmeisterschaft
+		-->
+		<feat xlink:href="#PPSeg_13" value="PP" /><!-- vom...Dnepr -->
+		<feat xlink:href="#PPSeg_14" value="PP" />
+		<!--
+			mit...Dauerabonnement
+		-->
+		<feat xlink:href="#PPSeg_15" value="PP" /><!-- für...WM -->
+		<feat xlink:href="#PPSeg_16" value="PP" /><!-- in...Kluft -->
+		<feat xlink:href="#PPSeg_17" value="PP" /><!-- in...Tränen -->
+		<feat xlink:href="#PPSeg_18" value="PP" /><!-- auf...Bank -->
+		<feat xlink:href="#PPSeg_19" value="PP" /><!-- mit...Draht -->
+		<feat xlink:href="#PPSeg_20" value="PP" />
+		<!--
+			zum...Fußballgott
+		-->
+	</featList>
+
+</paula>

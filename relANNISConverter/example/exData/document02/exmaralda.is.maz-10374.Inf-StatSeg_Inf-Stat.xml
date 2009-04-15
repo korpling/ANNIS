@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_Inf-Stat" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Inf-Stat"
+		xml:base="exmaralda.is.maz-10374.Inf-StatSeg.xml">
+
+		<feat xlink:href="#Inf-StatSeg_1" value="new" />
+		<!--
+			Die...Fußball_Weltmacht
+		-->
+		<feat xlink:href="#Inf-StatSeg_2" value="new" />
+		<!--
+			vor...Winzling
+		-->
+		<feat xlink:href="#Inf-StatSeg_3" value="new" />
+		<!--
+			seinem...Tor
+		-->
+		<feat xlink:href="#Inf-StatSeg_4" value="acc-gen" />
+		<!--
+			die...Ukraine
+		-->
+		<feat xlink:href="#Inf-StatSeg_5" value="giv-active" />
+		<!--
+			der...Subow
+		-->
+		<feat xlink:href="#Inf-StatSeg_6" value="acc-gen" />
+		<!--
+			die...Nationalelf
+		-->
+		<feat xlink:href="#Inf-StatSeg_7" value="giv-active" />
+		<!--
+			den...Gästen
+		-->
+		<feat xlink:href="#Inf-StatSeg_8" value="acc-inf" />
+		<!--
+			der...Ausgleich
+		-->
+		<feat xlink:href="#Inf-StatSeg_9" value="acc-inf" />
+		<!--
+			der...Coach
+		-->
+		<feat xlink:href="#Inf-StatSeg_10" value="acc-inf" />
+		<!--
+			zwei...Leichtgewichte
+		-->
+		<feat xlink:href="#Inf-StatSeg_11" value="acc-gen" />
+		<!--
+			zweiten...Spiel
+		-->
+		<feat xlink:href="#Inf-StatSeg_12" value="giv-inactive" />
+		<!--
+			die...Knirpse
+		-->
+		<feat xlink:href="#Inf-StatSeg_13" value="acc-inf" />
+		<!--
+			Anbeginn
+		-->
+		<feat xlink:href="#Inf-StatSeg_14" value="giv-inactive" />
+		<!--
+			der...Mannschaft
+		-->
+		<feat xlink:href="#Inf-StatSeg_15" value="new" />
+		<!--
+			Rudi...Völler
+		-->
+		<feat xlink:href="#Inf-StatSeg_16" value="acc-gen" />
+		<!--
+			Weltmeisterschaft
+		-->
+		<feat xlink:href="#Inf-StatSeg_17" value="acc-gen" />
+		<!--
+			die...Kicker
+		-->
+		<feat xlink:href="#Inf-StatSeg_18" value="giv-active" />
+		<!--
+			der...Gegner
+		-->
+		<feat xlink:href="#Inf-StatSeg_19" value="giv-inactive" />
+		<!--
+			Die...Fußball_Kleinmacht
+		-->
+		<feat xlink:href="#Inf-StatSeg_20" value="acc-gen" />
+		<!--
+			Dnepr
+		-->
+		<feat xlink:href="#Inf-StatSeg_21" value="giv-inactive" />
+		<!--
+			das...Team
+		-->
+		<feat xlink:href="#Inf-StatSeg_22" value="acc-inf" />
+		<!--
+			der...Kluft
+		-->
+		<feat xlink:href="#Inf-StatSeg_23" value="acc-gen" />
+		<!--
+			eine...Nation
+		-->
+		<feat xlink:href="#Inf-StatSeg_24" value="idiom" />
+		<!--
+			das...Tränen
+		-->
+		<feat xlink:href="#Inf-StatSeg_25" value="giv-active" />
+		<!--
+			die...Nationalkicker
+		-->
+		<feat xlink:href="#Inf-StatSeg_26" value="giv-inactive" />
+		<!--
+			einen..."
+		-->
+		<feat xlink:href="#Inf-StatSeg_27" value="acc-gen" />
+		<!--
+			der...Bank
+		-->
+		<feat xlink:href="#Inf-StatSeg_28" value="acc-gen" />
+		<!--
+			einen...Beckenbauer
+		-->
+		<feat xlink:href="#Inf-StatSeg_29" value="idiom" />
+		<!--
+			heißem...Draht
+		-->
+		<feat xlink:href="#Inf-StatSeg_30" value="idiom" />
+		<!--
+			Fußballgott
+		-->
+		<feat xlink:href="#Inf-StatSeg_31" value="acc-sit" />
+		<!--
+			euch
+		-->
+	</featList>
+
+</paula>

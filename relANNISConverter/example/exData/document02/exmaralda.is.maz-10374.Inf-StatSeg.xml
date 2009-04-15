@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_mark.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_Inf-StatSeg" />
+
+	<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Inf-StatSeg"
+		xml:base="merged.maz-10374.tok.xml">
+
+		<mark id="Inf-StatSeg_1" xlink:href="#xpointer(id('tok_5')/range-to(id('tok_7')))" />
+		<!--
+			Die...Fußball_Weltmacht
+		-->
+		<mark id="Inf-StatSeg_2" xlink:href="#xpointer(id('tok_9')/range-to(id('tok_11')))" />
+		<!--
+			vor...Winzling
+		-->
+		<mark id="Inf-StatSeg_3" xlink:href="#xpointer(id('tok_14')/range-to(id('tok_15')))" />
+		<!--
+			seinem...Tor
+		-->
+		<mark id="Inf-StatSeg_4" xlink:href="#xpointer(id('tok_19')/range-to(id('tok_20')))" />
+		<!--
+			die...Ukraine
+		-->
+		<mark id="Inf-StatSeg_5" xlink:href="#xpointer(id('tok_22')/range-to(id('tok_27')))" />
+		<!--
+			der...Subow
+		-->
+		<mark id="Inf-StatSeg_6" xlink:href="#xpointer(id('tok_28')/range-to(id('tok_30')))" />
+		<!--
+			die...Nationalelf
+		-->
+		<mark id="Inf-StatSeg_7" xlink:href="#xpointer(id('tok_37')/range-to(id('tok_40')))" />
+		<!--
+			den...Gästen
+		-->
+		<mark id="Inf-StatSeg_8" xlink:href="#xpointer(id('tok_41')/range-to(id('tok_42')))" />
+		<!--
+			der...Ausgleich
+		-->
+		<mark id="Inf-StatSeg_9" xlink:href="#xpointer(id('tok_47')/range-to(id('tok_56')))" />
+		<!--
+			der...Coach
+		-->
+		<mark id="Inf-StatSeg_10" xlink:href="#xpointer(id('tok_58')/range-to(id('tok_60')))" />
+		<!--
+			zwei...Leichtgewichte
+		-->
+		<mark id="Inf-StatSeg_11" xlink:href="#xpointer(id('tok_70')/range-to(id('tok_71')))" />
+		<!--
+			zweiten...Spiel
+		-->
+		<mark id="Inf-StatSeg_12" xlink:href="#xpointer(id('tok_75')/range-to(id('tok_77')))" />
+		<!--
+			die...Knirpse
+		-->
+		<mark id="Inf-StatSeg_13" xlink:href="#tok_79" />
+		<!--
+			Anbeginn
+		-->
+		<mark id="Inf-StatSeg_14" xlink:href="#xpointer(id('tok_83')/range-to(id('tok_89')))" />
+		<!--
+			der...Mannschaft
+		-->
+		<mark id="Inf-StatSeg_15" xlink:href="#xpointer(id('tok_91')/range-to(id('tok_92')))" />
+		<!--
+			Rudi...Völler
+		-->
+		<mark id="Inf-StatSeg_16" xlink:href="#tok_96" />
+		<!--
+			Weltmeisterschaft
+		-->
+		<mark id="Inf-StatSeg_17" xlink:href="#xpointer(id('tok_103')/range-to(id('tok_104')))" />
+		<!--
+			die...Kicker
+		-->
+		<mark id="Inf-StatSeg_18" xlink:href="#xpointer(id('tok_110')/range-to(id('tok_111')))" />
+		<!--
+			der...Gegner
+		-->
+		<mark id="Inf-StatSeg_19" xlink:href="#xpointer(id('tok_114')/range-to(id('tok_115')))" />
+		<!--
+			Die...Fußball_Kleinmacht
+		-->
+		<mark id="Inf-StatSeg_20" xlink:href="#tok_117" /><!-- Dnepr -->
+		<mark id="Inf-StatSeg_21" xlink:href="#xpointer(id('tok_122')/range-to(id('tok_131')))" />
+		<!--
+			das...Team
+		-->
+		<mark id="Inf-StatSeg_22" xlink:href="#xpointer(id('tok_133')/range-to(id('tok_135')))" />
+		<!--
+			der...Kluft
+		-->
+		<mark id="Inf-StatSeg_23" xlink:href="#xpointer(id('tok_137')/range-to(id('tok_139')))" />
+		<!--
+			eine...Nation
+		-->
+		<mark id="Inf-StatSeg_24" xlink:href="#xpointer(id('tok_141')/range-to(id('tok_144')))" />
+		<!--
+			das...Tränen
+		-->
+		<mark id="Inf-StatSeg_25" xlink:href="#xpointer(id('tok_150')/range-to(id('tok_152')))" />
+		<!--
+			die...Nationalkicker
+		-->
+		<mark id="Inf-StatSeg_26" xlink:href="#xpointer(id('tok_153')/range-to(id('tok_157')))" />
+		<!--
+			einen..."
+		-->
+		<mark id="Inf-StatSeg_27" xlink:href="#xpointer(id('tok_159')/range-to(id('tok_160')))" />
+		<!--
+			der...Bank
+		-->
+		<mark id="Inf-StatSeg_28" xlink:href="#xpointer(id('tok_162')/range-to(id('tok_164')))" />
+		<!--
+			einen...Beckenbauer
+		-->
+		<mark id="Inf-StatSeg_29" xlink:href="#xpointer(id('tok_166')/range-to(id('tok_167')))" />
+		<!--
+			heißem...Draht
+		-->
+		<mark id="Inf-StatSeg_30" xlink:href="#tok_169" />
+		<!--
+			Fußballgott
+		-->
+		<mark id="Inf-StatSeg_31" xlink:href="#tok_172" /><!-- euch -->
+	</markList>
+
+</paula>

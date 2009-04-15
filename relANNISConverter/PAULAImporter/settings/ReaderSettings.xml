@@ -1,0 +1,17 @@
+<setMgr:settings xmlNs:setMgr="irgendwo">
+	<!--
+		Hier werden die moeglichen specific Analyzers fuer die Analyse eines
+		PAULA-Korpus angegeben
+	-->
+	<setMgr:setting xml:id="PAULA_READER">
+		<readers>
+			<!--
+				Mit einer Collection koennen Analyzer zu Gruppen zusammengeschlossen
+				werden; path gibt einen Ordner an, indem die Dateien liegen
+			-->
+			<collection path="">
+				<reader name="" className="" priority="1.0" />
+			</collection>
+		</readers>
+	</setMgr:setting>
+</setMgr:settings>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_Focus_newInf" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Focus_newInf"
+		xml:base="exmaralda.is.maz-10374.Focus_newInfSeg.xml">
+
+		<feat xlink:href="#Focus_newInfSeg_1" value="nf-unsol" />
+		<!--
+			zittert...Winzling
+		-->
+		<feat xlink:href="#Focus_newInfSeg_2" value="nf-unsol" />
+		<!--
+			stürzte
+		-->
+		<feat xlink:href="#Focus_newInfSeg_3" value="nf-unsol" />
+		<!--
+			die....
+		-->
+		<feat xlink:href="#Focus_newInfSeg_4" value="nf-unsol" />
+		<!--
+			wechselte...ein
+		-->
+		<feat xlink:href="#Focus_newInfSeg_5" value="nf-unsol" />
+		<!--
+			könnte
+		-->
+		<feat xlink:href="#Focus_newInfSeg_6" value="nf-unsol" />
+		<!--
+			der...sein
+		-->
+		<feat xlink:href="#Focus_newInfSeg_7" value="nf-unsol" />
+		<!--
+			steht...treiben
+		-->
+		<feat xlink:href="#Focus_newInfSeg_8" value="nf-unsol" />
+		<!--
+			Dabei...haben
+		-->
+		<feat xlink:href="#Focus_newInfSeg_9" value="nf-unsol" />
+		<!--
+			einen...Fußballgott
+		-->
+	</featList>
+
+</paula>

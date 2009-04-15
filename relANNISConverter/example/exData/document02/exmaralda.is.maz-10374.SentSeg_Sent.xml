@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_Sent" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Sent"
+		xml:base="exmaralda.is.maz-10374.SentSeg.xml">
+
+		<feat xlink:href="#SentSeg_1" value="s" /><!-- Die.... -->
+		<feat xlink:href="#SentSeg_2" value="s" /><!-- Mit.... -->
+		<feat xlink:href="#SentSeg_3" value="s" /><!-- Nachdem.... -->
+		<feat xlink:href="#SentSeg_4" value="s" /><!-- Was...? -->
+		<feat xlink:href="#SentSeg_5" value="s" /><!-- Wenn.... -->
+		<feat xlink:href="#SentSeg_6" value="s" /><!-- Je.... -->
+		<feat xlink:href="#SentSeg_7" value="s" /><!-- Die.... -->
+		<feat xlink:href="#SentSeg_8" value="s" /><!-- Dabei.... -->
+		<feat xlink:href="#SentSeg_9" value="s" />
+		<!--
+			Fürchtet...nicht
+		-->
+	</featList>
+
+</paula>

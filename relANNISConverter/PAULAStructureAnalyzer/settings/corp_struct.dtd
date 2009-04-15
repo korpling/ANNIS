@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT korpus (korpus*, document*)>
+	<!ATTLIST korpus name CDATA #REQUIRED>
+
+<!-- hier steht die Beschreibung eines einzelnen Documents -->
+<!ELEMENT korpus (korpus*, document*)>
+	<!ATTLIST korpus name CDATA #REQUIRED>
+	
+<!-- hier steht die Beschreibung einer einzelnen PAULA-Datei -->
+<!ELEMENT file (file*)>
+	<!ATTLIST file 	
+		name	CDATA	#REQUIRED					
+		path		CDATA	#REQUIRED
+	>

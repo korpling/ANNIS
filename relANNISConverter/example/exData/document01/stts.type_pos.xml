@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_struct.dtd">
+
+	<!--
+		based on tigersampler_stts.xml from
+		TIGERSearch/TIGERCorpora/DemoCorpora/German/TIGERSampler/
+	-->
+
+<paula version="1.0">
+	<header paula_id="stts_type_pos" />
+
+	<structList xmlns:xlink="http://www.w3.org/1999/xlink" type="type_pos">
+
+		<!-- base type: pos -->
+		<struct id="pos">
+			<rel xlink:href="openclass" />
+			<rel xlink:href="closedclass" />
+			<rel xlink:href="punctuation" />
+			<rel xlink:href="misc" />
+		</struct>
+
+		<!-- open word classes-->
+		<struct id="openclass">
+			<rel xlink:href="N" />
+			<rel xlink:href="V" />
+			<rel xlink:href="ADJ" />
+			<!-- adverb -->
+			<rel xlink:href="ADV" />
+		</struct>
+
+
+		<!-- closed word classes-->
+		<struct id="closedclass">
+			<!-- definite or indefinite article -->
+			<rel xlink:href="ART" />
+			<!-- pronouns, quantifiers -->
+			<rel xlink:href="P" />
+			<!-- cardinal number -->
+			<rel xlink:href="CARD" />
+			<!-- conjunction -->
+			<rel xlink:href="KO" />
+			<!--interrogative adverb or adverbial relative pronoun -->
+			<rel xlink:href="PWAV" />
+			<!-- pronominal adverb (in TIGER corpus: PROAV) -->
+			<rel xlink:href="PROAV" />
+			<!-- pronominal adverb (in original STTS: PAV) -->
+			<rel xlink:href="PAV" />
+			<!-- adposition -->
+			<rel xlink:href="AP" />
+			<!-- interjection -->
+			<rel xlink:href="ITJ" />
+			<!-- particle -->
+			<rel xlink:href="PT" />
+		</struct>
+
+		<!-- noun -->
+		<struct id="N">
+			<!-- common noun -->
+			<rel xlink:href="NN" />
+			<!-- proper noun -->
+			<rel xlink:href="NE" />
+		</struct>
+
+		<!-- verb -->
+		<struct id="V">
+			<rel xlink:href="VV" />
+			<rel xlink:href="VM" />
+			<rel xlink:href="VA" />
+		</struct>
+
+		<!-- full verb -->
+		<struct id="VV">
+			<!-- finite verb -->
+			<rel xlink:href="VVFIN" />
+			<!-- imperative -->
+			<rel xlink:href="VVIMP" />
+			<!-- inifinitive -->
+			<rel xlink:href="VVINF" />
+			<!-- infinitive with zu -->
+			<rel xlink:href="VVIZU" />
+			<!-- past participle -->
+			<rel xlink:href="VVPP" />
+		</struct>
+
+		<!-- modal -->
+		<struct id="VM">
+			<!-- finite verb -->
+			<rel xlink:href="VMFIN" />
+			<!-- inifinitive -->
+			<rel xlink:href="VMINF" />
+			<!-- past participle -->
+			<rel xlink:href="VMPP" />
+		</struct>
+
+		<!-- auxiliary -->
+		<struct id="VA">
+			<!-- finite verb -->
+			<rel xlink:href="VAFIN" />
+			<!-- imperative -->
+			<rel xlink:href="VAIMP" />
+			<!-- inifinitive -->
+			<rel xlink:href="VAINF" />
+			<!-- past participle -->
+			<rel xlink:href="VAPP" />
+		</struct>
+
+
+		<!-- adjective -->
+		<struct id="ADJ">
+			<!-- attributive adjective -->
+			<rel xlink:href="ADJA" />
+			<!-- adverbal or predicative adjective -->
+			<rel xlink:href="ADJD" />
+		</struct>
+
+		<!-- proform -->
+		<struct id="P">
+			<rel xlink:href="PD" />
+			<rel xlink:href="PI" />
+			<!-- irreflexive personal pronoun -->
+			<rel xlink:href="PPER" />
+			<rel xlink:href="PPOS" />
+			<rel xlink:href="PREL" />
+			<!-- reflexive pronoun -->
+			<rel xlink:href="PRF" />
+			<rel xlink:href="PW" />
+		</struct>
+
+		<!-- demonstrative pronoun -->
+		<struct id="PD">
+			<!-- substitutive demonstrative pronoun -->
+			<rel xlink:href="PDS" />
+			<!-- attributive demonstrative pronoun -->
+			<rel xlink:href="PDAT" />
+		</struct>
+
+		<!-- indefinite pronoun -->
+		<struct id="PI">
+			<!-- substitutive indefinite pronoun -->
+			<rel xlink:href="PIS" />
+			<!-- attributive indefinite pronoun -->
+			<rel xlink:href="PIAT" />
+		</struct>
+
+		<!-- posessive pronoun -->
+		<struct id="PPOS">
+			<!-- substitutive possesive pronoun -->
+			<rel xlink:href="PPOSS" />
+			<!-- attributive possessive pronoun -->
+			<rel xlink:href="PPOSAT" />
+		</struct>
+
+		<!-- relative pronoun -->
+		<struct id="PREL">
+			<!-- substitutive relative pronoun -->
+			<rel xlink:href="PRELS" />
+			<!-- attributive relative pronoun -->
+			<rel xlink:href="PRELAT" />
+		</struct>
+
+		<!-- interrogative pronoun -->
+		<struct id="PW">
+			<!-- substitutive interrogative pronoun -->
+			<rel xlink:href="PWS" />
+			<!-- attributive interrogative pronoun -->
+			<rel xlink:href="PWAT" />
+		</struct>
+
+		<!-- conjunction -->
+		<struct id="KO">
+			<rel xlink:href="KOU" />
+			<!-- coordinating conjunction -->
+			<rel xlink:href="KON" />
+			<!-- comparative conjunction -->
+			<rel xlink:href="KOKOM" />
+		</struct>
+
+		<!-- subordinating conjunction -->
+		<struct id="KOU">
+			<!-- subordinating conjunction with zu-infinitive -->
+			<rel xlink:href="KOUI" />
+			<!-- subordinating conjunction with sentence -->
+			<rel xlink:href="KOUS" />
+		</struct>
+
+		<!-- adposition -->
+		<struct id="AP">
+			<!-- preposition -->
+			<rel xlink:href="APPR" />
+			<!-- preposition + article -->
+			<rel xlink:href="APPRART" />
+			<!-- postposition -->
+			<rel xlink:href="APPO" />
+			<!-- circumposition, right part -->
+			<rel xlink:href="APZR" />
+		</struct>
+
+		<!-- particle -->
+		<struct id="PT">
+			<!-- "zu" before infinitive -->
+			<rel xlink:href="PTKZU" />
+			<!-- negating particle -->
+			<rel xlink:href="PTKNEG" />
+			<!-- separated verb particle -->
+			<rel xlink:href="PTKVZ" />
+			<!-- answer particle -->
+			<rel xlink:href="PTKANT" />
+			<!-- particle with adjektive or adverb -->
+			<rel xlink:href="PTKA" />
+		</struct>
+
+		<struct id="punctuation">
+			<!-- comma -->
+			<rel xlink:href="DOLLAR_COMMA" />
+			<!-- final punctuation -->
+			<rel xlink:href="DOLLAR_PERIOD" />
+			<!-- other punctuation marks -->
+			<rel xlink:href="DOLLAR_OPENPAREN" />
+		</struct>
+
+		<struct id="misc">
+			<!-- foreign material -->
+			<rel xlink:href="FM" />
+			<!-- nonword, with special characters -->
+			<rel xlink:href="XY" />
+			<!-- truncated element -->
+			<rel xlink:href="TRUNC" />
+			<!-- untagged -->
+			<rel xlink:href="TWO_HYPHENS" />
+			<!-- tagging of the token unknown -->
+			<rel xlink:href="UNKNOWN" />
+		</struct>
+
+		<struct id="ADV" />
+		<struct id="ART" />
+		<struct id="CARD" />
+		<struct id="ITJ" />
+		<struct id="NN" />
+		<struct id="NE" />
+		<struct id="VVFIN" />
+		<struct id="VVIMP" />
+		<struct id="VVINF" />
+		<struct id="VVIZU" />
+		<struct id="VVPP" />
+		<struct id="VMFIN" />
+		<struct id="VMINF" />
+		<struct id="VMPP" />
+		<struct id="VAFIN" />
+		<struct id="VAIMP" />
+		<struct id="VAINF" />
+		<struct id="VAPP" />
+		<struct id="ADJA" />
+		<struct id="ADJD" />
+		<struct id="PPER" />
+		<struct id="PRF" />
+		<struct id="PROAV" />
+		<struct id="PDS" />
+		<struct id="PDAT" />
+		<struct id="PIS" />
+		<struct id="PIAT" />
+		<struct id="PPOSS" />
+		<struct id="PPOSAT" />
+		<struct id="PRELS" />
+		<struct id="PRELAT" />
+		<struct id="PWS" />
+		<struct id="PWAT" />
+		<struct id="PWAV" />
+		<struct id="KON" />
+		<struct id="KOKOM" />
+		<struct id="KOUI" />
+		<struct id="KOUS" />
+		<struct id="APPR" />
+		<struct id="APPRART" />
+		<struct id="APPO" />
+		<struct id="APZR" />
+		<struct id="PTKZU" />
+		<struct id="PTKNEG" />
+		<struct id="PTKVZ" />
+		<struct id="PTKANT" />
+		<struct id="PTKA" />
+		<struct id="DOLLAR_COMMA" />
+		<struct id="DOLLAR_PERIOD" />
+		<struct id="DOLLAR_OPENPAREN" />
+		<struct id="FM" />
+		<struct id="XY" />
+		<struct id="TRUNC" />
+		<struct id="TWO_HYPHENS" />
+		<struct id="UNKNOWN" />
+
+	</structList>
+
+</paula>

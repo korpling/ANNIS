@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<!DOCTYPE paula SYSTEM "paula_feat.dtd">
+<paula version="1.0">
+
+	<header paula_id="exmaralda.is.maz-10374_Topic" />
+
+	<featList xmlns:xlink="http://www.w3.org/1999/xlink" type="exmaralda.Topic"
+		xml:base="exmaralda.is.maz-10374.TopicSeg.xml">
+
+		<feat xlink:href="#TopicSeg_1" value="ab" />
+		<!--
+			Die...Fußball_Weltmacht
+		-->
+		<feat xlink:href="#TopicSeg_2" value="fs" />
+		<!--
+			Mit...Ukraine
+		-->
+		<feat xlink:href="#TopicSeg_3" value="ab" /><!-- der...Subow -->
+		<feat xlink:href="#TopicSeg_4" value="fs" /><!-- Nachdem..., -->
+		<feat xlink:href="#TopicSeg_5" value="fs" /><!-- erst...Abend -->
+		<feat xlink:href="#TopicSeg_6" value="fs" /><!-- Wenn..., -->
+		<feat xlink:href="#TopicSeg_7" value="ab" /><!-- der...Völler -->
+		<feat xlink:href="#TopicSeg_8" value="ab" /><!-- Die...Dnepr -->
+		<feat xlink:href="#TopicSeg_9" value="ab" />
+		<!--
+			die...Nationalkicker
+		-->
+	</featList>
+
+</paula>

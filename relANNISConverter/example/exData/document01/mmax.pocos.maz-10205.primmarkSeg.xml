@@ -1,0 +1,48 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE paula SYSTEM "paula_mark.dtd">
+
+
+<paula version="1.0">
+	<header paula_id="mmax.pocos.maz-10205_primmarkSeg" />
+
+	<markList xmlns:xlink="http://www.w3.org/1999/xlink" type="mmax.primmarkSeg"
+		xml:base="merged.maz-10205.tok.xml">
+		<mark id="primmarkSeg_33" xlink:href="#tok_69" />
+		<mark id="primmarkSeg_47" xlink:href="#xpointer(id('tok_148')/range-to(id('tok_149')))" />
+		<mark id="primmarkSeg_54" xlink:href="#xpointer(id('tok_173')/range-to(id('tok_175')))" />
+		<mark id="primmarkSeg_28" xlink:href="#xpointer(id('tok_37')/range-to(id('tok_38')))" />
+		<mark id="primmarkSeg_53" xlink:href="#xpointer(id('tok_169')/range-to(id('tok_170')))" />
+		<mark id="primmarkSeg_42" xlink:href="#xpointer(id('tok_107')/range-to(id('tok_109')))" />
+		<mark id="primmarkSeg_32" xlink:href="#xpointer(id('tok_58')/range-to(id('tok_63')))" />
+		<mark id="primmarkSeg_23" xlink:href="#xpointer(id('tok_10')/range-to(id('tok_12')))" />
+		<mark id="primmarkSeg_31" xlink:href="#xpointer(id('tok_48')/range-to(id('tok_49')))" />
+		<mark id="primmarkSeg_26" xlink:href="#xpointer(id('tok_30')/range-to(id('tok_33')))" />
+		<mark id="primmarkSeg_34" xlink:href="#xpointer(id('tok_74')/range-to(id('tok_76')))" />
+		<mark id="primmarkSeg_50" xlink:href="#xpointer(id('tok_159')/range-to(id('tok_163')))" />
+		<mark id="primmarkSeg_25" xlink:href="#tok_23" />
+		<mark id="primmarkSeg_46" xlink:href="#xpointer(id('tok_136')/range-to(id('tok_137')))" />
+		<mark id="primmarkSeg_44" xlink:href="#xpointer(id('tok_122')/range-to(id('tok_123')))" />
+		<mark id="primmarkSeg_39" xlink:href="#xpointer(id('tok_91')/range-to(id('tok_95')))" />
+		<mark id="primmarkSeg_45" xlink:href="#xpointer(id('tok_132')/range-to(id('tok_134')))" />
+		<mark id="primmarkSeg_43" xlink:href="#tok_121" />
+		<mark id="primmarkSeg_24" xlink:href="#xpointer(id('tok_13')/range-to(id('tok_14')))" />
+		<mark id="primmarkSeg_36" xlink:href="#xpointer(id('tok_83')/range-to(id('tok_84')))" />
+		<mark id="primmarkSeg_48" xlink:href="#xpointer(id('tok_152')/range-to(id('tok_154')))" />
+		<mark id="primmarkSeg_51" xlink:href="#xpointer(id('tok_161')/range-to(id('tok_163')))" />
+		<mark id="primmarkSeg_27" xlink:href="#xpointer(id('tok_34')/range-to(id('tok_38')))" />
+		<mark id="primmarkSeg_37" xlink:href="#tok_87" />
+		<mark id="primmarkSeg_40" xlink:href="#xpointer(id('tok_93')/range-to(id('tok_95')))" />
+		<mark id="primmarkSeg_41" xlink:href="#tok_105" />
+		<mark id="primmarkSeg_38" xlink:href="#tok_89" />
+		<mark id="primmarkSeg_49" xlink:href="#tok_157" />
+		<mark id="primmarkSeg_55" xlink:href="#xpointer(id('tok_42')/range-to(id('tok_49')))" />
+		<mark id="primmarkSeg_22"
+			xlink:href="(#xpointer(id('tok_3')/range-to(id('tok_7'))),#xpointer(id('tok_9')/range-to(id('tok_17'))))" />
+		<mark id="primmarkSeg_29" xlink:href="#xpointer(id('tok_42')/range-to(id('tok_43')))" />
+		<mark id="primmarkSeg_35" xlink:href="#xpointer(id('tok_77')/range-to(id('tok_79')))" />
+		<mark id="primmarkSeg_30" xlink:href="#xpointer(id('tok_45')/range-to(id('tok_46')))" />
+		<mark id="primmarkVirt_1"
+			xlink:href="(mmax.pocos.maz-10205.primmarkSeg.xml#primmarkSeg_22,mmax.pocos.maz-10205.primmarkSeg.xml#primmarkSeg_34)"
+			type="virtual" />
+	</markList>
+</paula>
