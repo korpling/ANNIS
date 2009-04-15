@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	">
+
+	<!-- Enable bean autowiring -->
+	<context:annotation-config/>
+
+	<!-- Properties configuration -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${annis.home}/conf/annis-service.properties</value>
+				<value>file:${annis.home}/conf/database.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Datasource for database access, configured in database.properties -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${datasource.driver}"/>
+		<property name="url" value="${datasource.url}"/>
+		<property name="username" value="${datasource.username}"/>
+		<property name="password" value="${datasource.password}"/>
+	</bean>
+	
+	<!-- Transaction management -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- Public API for corpus administration -->
+	<bean id="administration" class="annisservice.administration.CorpusAdministration"/>
+
+	<!-- Low-level API for manipulating the Annis database -->
+	<bean id="annisDatabaseUtils" class="annisservice.administration.AnnisDatabaseUtils">
+		<property name="scriptPath" value="${annis.script-path}"/>
+	</bean>
+	
+	<!-- Helper object for managing external files -->
+	<bean id="externalFileManager" class="annisservice.extFiles.ExternalFileMgrImpl">
+		<property name="externalDataFolder" value="${annis.external-data-path}"/>
+	</bean>
+	
+	<!-- Helper objects for managing external files (database access) -->
+	<bean id="externalFileManagerDao" class="annisservice.extFiles.ExternalFileMgrDAO">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- Hack for WEKA-Export -->
+	<bean id="getWekaHandler" class="annisservice.handler.GetWekaHandler">
+		<property name="queryExecution" ref="queryExecution"/>
+	</bean>
+	
+	<bean 
+		id="queryExecution" class="de.deutschdiachrondigital.dddquery.helper.QueryExecution">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="getCountHandler" class="annisservice.handler.CachingGetCountHandler">
+		<lookup-method name="dddQueryMapper" bean="dddQueryMapper"/>
+		<lookup-method name="graphMatcher" bean="graphMatcher"/>
+		<property name="cacheEnabled" value="False"/>
+	</bean>
+	
+	<bean id="dddQueryMapper" class="de.deutschdiachrondigital.dddquery.helper.AnnisQlTranslator" scope="prototype"/>
+	
+	<bean id="graphMatcher" class="de.deutschdiachrondigital.dddquery.sql.GraphMatcher" scope="prototype">
+		<property name="preProcessors" ref="sqlGenerationPreProcessors"/>
+		<property name="parser" ref="dddQueryParser"/>
+		<property name="graphTranslator" ref="graphTranslator"/>
+		<property name="sqlGenerator" ref="sqlGenerator"/>
+		<property name="queryExecution" ref="planQueryExecution"/>
+		<property name="matchFilters">
+			<util:list>
+				<bean class="de.deutschdiachrondigital.dddquery.sql.GraphMatcher$MultipleTextsFilter" scope="prototype"/>
+				<bean class="de.deutschdiachrondigital.dddquery.sql.GraphMatcher$DuplicateMatchFilter" scope="prototype"/>
+			</util:list>
+		</property>				
+	</bean>
+
+	<bean id="disjunctiveNormalformNormalizer" class="de.deutschdiachrondigital.dddquery.sql.preprocessors.DisjunctiveNormalformNormalizer" scope="prototype"/>
+	<bean id="leadingChildAxisRemover" class="de.deutschdiachrondigital.dddquery.sql.preprocessors.LeadingChildAxisRemover" scope="prototype"/>
+
+	<util:list id="sqlGenerationPreProcessors" value-type="de.deutschdiachrondigital.dddquery.analysis.DepthFirstAdapter">
+		<ref bean="disjunctiveNormalformNormalizer"/>
+		<ref bean="leadingChildAxisRemover"/>
+	</util:list>
+	
+	<bean id="dddQueryParser" class="de.deutschdiachrondigital.dddquery.parser.DddQueryParser" scope="prototype">
+		<property name="postProcessors" ref="parseTreePostProcessors"/>
+	</bean>
+	
+	<!-- parser postprocessors -->
+	<bean id="markerNormalizer" class="de.deutschdiachrondigital.dddquery.parser.postprocessors.MarkerNormalizer" scope="prototype"/>
+	<bean id="stringLiteralNormalizer" class="de.deutschdiachrondigital.dddquery.parser.postprocessors.StringLiteralNormalizer" scope="prototype"/>
+	<bean id="varrefNodeTestNormalizer" class="de.deutschdiachrondigital.dddquery.parser.postprocessors.VarrefNodeTestNormalizer" scope="prototype"/>
+	<bean id="childAxisNormalizer" class="de.deutschdiachrondigital.dddquery.parser.postprocessors.ChildAxisNormalizer" scope="prototype"/>
+	<bean id="nodeTestNormalizer" class="de.deutschdiachrondigital.dddquery.parser.postprocessors.NodeTestNormalizer" scope="prototype"/>
+	
+	<util:list id="parseTreePostProcessors" value-type="de.deutschdiachrondigital.dddquery.analysis.DepthFirstAdapter">
+		<ref bean="markerNormalizer"/>
+		<ref bean="stringLiteralNormalizer"/>
+		<ref bean="varrefNodeTestNormalizer"/>
+		<ref bean="childAxisNormalizer"/>
+		<ref bean="nodeTestNormalizer"/>
+	</util:list>
+	
+	<bean id="aliasSetProvider" class="de.deutschdiachrondigital.dddquery.sql.AliasSetProvider"  scope="prototype"/>
+	
+	<bean id="pathTranslator" class="de.deutschdiachrondigital.dddquery.sql.PathTranslator4" scope="prototype">
+		<property name="aliasSetProvider" ref="aliasSetProvider"/>
+		<property name="rankTable" value="rank"/>
+		<property name="rankAnnoTable" value="rank_anno"/>
+		<property name="structTable" value="struct_annotation"/>
+		<property name="annoTable" value="struct_annotation"/>
+		<property name="annoAttributeTable" value="struct_annotation"/>
+	</bean>
+	
+	<bean id="graphTranslator" class="de.deutschdiachrondigital.dddquery.sql.GraphTranslator" scope="prototype">
+		<!--  property name="aliasSetProvider" ref="aliasSetProvider"/ -->
+		<property name="pathTranslator" ref="pathTranslator"/>
+	</bean>
+	
+	<bean id="sqlGenerator" class="de.deutschdiachrondigital.dddquery.sql.SqlGenerator" scope="prototype">
+		<property name="pathTranslator" ref="pathTranslator"/>
+	</bean>
+	
+	<bean id="planQueryExecution" class="de.deutschdiachrondigital.dddquery.helper.PlanQueryExecution" scope="prototype">
+		<property name="queryExecution" ref="queryExecution"/>
+		<property name="analyze" value="False"/>
+	</bean>
+	
+	
+	
+	
+	
+	
+	
+</beans>

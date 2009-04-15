@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="AnnisService"/>
+		<property name="service" ref="annisService"/>
+		<property name="serviceInterface" value="annisservice.AnnisService"/>
+		<property name="registryPort" value="4711"/>
+	</bean>
+	
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="ExternalFileMananger"/>
+		<property name="service" ref="externalFileManager"/>
+		<property name="serviceInterface" value="annisservice.extFiles.ExternalFileMgr"/>
+		<property name="registryPort" value="4711"/>
+	</bean>
+	
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="AnnisResolverService"/>
+		<property name="service" ref="annisResolver"/>
+		<property name="serviceInterface" value="annisservice.annisresolver.AnnisResolverService"/>
+		<property name="registryPort" value="4711"/>
+	</bean>
+	
+</beans>
