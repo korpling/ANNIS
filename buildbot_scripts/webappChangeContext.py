@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
+import sys
+
 #conf
-context_file_path='/etc/jetty/contexts/annis-trunk.xml'
-path_to_app='/srv/jetty/Annis-trunk'
-context='Annis-trunk'
+context_file_path=sys.argv[1]
+path_to_app=sys.argv[1]
+context=sys.argv[1]
 
 #code
 f = open(context_file_path, 'w')
