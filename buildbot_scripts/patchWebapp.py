@@ -8,22 +8,23 @@ rev=sys.argv[2]
 user_conf_dir=sys.argv[3]
 
 #code
-print "patching config.js (with revision number:" + rev + ")" 
-fJS = open(path_to_app + "/javascript/annis/config.js", 'rw')
-for s in fJS.xreadlines():
-  fJS.write(s.replace("${SVN_REVISION}", rev))
+config_js_path=path_to_app + "/javascript/annis/config.js"
+print "patching " + config_js_path  + " (with revision number: " + rev + ")" 
+fJS = open(config_js_path, "r")
+JSContent = fJS.read();
+fJS.close();
+
+fJS = open(config_js_path, "w")
+fJS.write(JSContent.replace("${SVN_REVISION}", rev))
 fJS.close()
 
-print "patching web.xml (user-conf-dir:" + user_conf_dir + ")" 
-lineWasFound = false
-fWeb = open(path_to_app + "/WEB-INF/web.xml", 'rw')
-for s in fWeb.xreadlines():
-  if lineWasFound:  
-    fWeb.write(s)
-    stripped=s.strip()
-    if stripped == "<param-name>config_path</param-name>":
-      lineWasFound = true
-  else:
-    lineWasFound = false
-    fWeb.write("<param-value>%s</param-value>" % user_conf_dir)
+web_xml_path=path_to_app + "/WEB-INF/web.xml"
+print "patching " + web_xml_path  + " (user-conf-dir: " + user_conf_dir + ")" 
+lineWasFound = False
+fWeb = open(web_xml_path, 'r')
+WebContent = fWeb.read()
+fWeb.close()
+
+fWeb = open(web_xml_path, 'w')
+fWeb.write(WebContent.replace("<param-value>/etc/annis/user_config_dev/</param-value>", "<param-value>%s</param-value>\n" % user_conf_dir))
 fWeb.close()
