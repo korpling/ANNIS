@@ -1,0 +1,11 @@
+<setMgr:settings xmlNs:setMgr= "irgendwo">
+	<!-- Hier erfolgt die Angabe der Verbindungsparameter zur Datenbank -->
+	<setMgr:setting xml:id= "DB_CONNECTION">
+		<entry name= "driver" value= "org.postgresql.Driver"/>
+		<entry name= "host" value= "localhost"/>
+		<entry name= "port" value= "5432"/>
+		<entry name= "database" value= "dddquery"/>
+		<entry name= "user" value= "dddquery"/>
+		<entry name= "password" value= "dddquery"/>
+	</setMgr:setting>
+</setMgr:settings>

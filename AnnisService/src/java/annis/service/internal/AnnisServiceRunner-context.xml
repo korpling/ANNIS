@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<!-- DddQueryMapper -->
+	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
+	
+	<!-- AnnisDao -->
+	<import resource="classpath:annis/dao/SpringAnnisDao-context.xml"/>
+
+	<!-- AnnisService -->
+	<bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
+		<property name="dddQueryParser" ref="dddQueryParser"/>
+		<property name="dddQueryMapper" ref="dddQueryMapper"/>
+		<property name="annisDao" ref="springAnnisDao"/>
+	</bean>
+
+	<!-- Exception handling aspect for AnnisService -->
+	<bean class="annis.service.AnnisServiceExceptionHandler"/>
+
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="AnnisService"/>
+		<property name="service" ref="annisService"/>
+		<property name="serviceInterface" value="annis.service.AnnisService"/>
+		<property name="registryPort" value="4711"/>
+	</bean>
+	
+	<!-- XXX: wird eigentlich nicht benötigt, da der importer direkt auf den ExternalFileManager zugreift 
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="ExternalFileMananger"/>
+		<property name="service" ref="externalFileManager"/>
+		<property name="serviceInterface" value="annisservice.extFiles.ExternalFileMgr"/>
+		<property name="registryPort" value="4711"/>
+	</bean>
+	-->
+	
+</beans>

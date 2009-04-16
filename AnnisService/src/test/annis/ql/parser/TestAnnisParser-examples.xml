@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+		
+	<util:map id="exampleSyntaxTrees">
+
+<entry key="tok"><value><![CDATA[Start
+   ATextSearchExpr]]></value></entry>
+
+	</util:map>
+	
+	<util:list id="good">
+		<value><![CDATA[/das/]]></value>
+		<value><![CDATA["Dorf"]]></value>
+		<value><![CDATA[das=/Haus/]]></value>
+		<value><![CDATA[tok]]></value>
+		<value><![CDATA[node]]></value>
+		<value><![CDATA[/das/ & /Haus/ & #1 . #2]]></value>
+		<value><![CDATA[node & pos="VVFIN" & cat="S" & node & #3 >[func="OA"] #1 & #3 >[func="SB"] #4 & #3 > #2 & #1 .* #2 & #2 .* #4]]></value>
+		<value><![CDATA[/das/ & ( cat=/NP/ & #1 . #2 | /Haus/ & #1 . #3 )]]></value>
+		<value><![CDATA[( node & cat=/NP/ & #1 . #2 | /das/ & /Haus/ & #3 . #4 )]]></value>
+	</util:list>
+	
+	<util:list id="bad">
+		<value><![CDATA[tok &]]></value>	<!-- Parse error -->
+		<value><![CDATA[#1 . #2]]></value>	<!-- linguistic operator without search expressions -->
+		<value><![CDATA[/das/ & /Haus/]]></value>	<!-- search expressions not bound with linguistic operator -->
+		<value><![CDATA[/das/ & cat=/NP/ & node & #1 . #2]]></value>	<!-- search expression (node) not bound -->
+		<value><![CDATA[/das/ & /Haus/ & #1 . #3]]></value>	<!-- unknown search reference (#3) / search expression (/Haus/) not bound -->
+		<value><![CDATA[node & ( cat=/NP/ & #1 . #2 | /Haus/ & #1 . #2 )]]></value>	<!-- /Haus/ not bound (should be #3) -->
+		<value><![CDATA[( node & cat=/NP/ & #1 . #2 | /das/ & /Haus/ & #1 . #2 )"]]></value>	<!-- second alternative not bound (should be #3 . #4) -->
+	</util:list>
+	
+</beans>

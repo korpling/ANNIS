@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+	
+	<!-- transforms a DDDquery into its disjunctive normal form -->	
+	<bean id="dnfTransformer" class="annis.sqlgen.DnfTransformer"/>
+	
+	<!-- analyzes a single clause of a DDDquery -->
+	<bean id="clauseAnalysis" class="annis.sqlgen.ClauseAnalysis" scope="prototype">
+		<property name="precedenceBound" value="0"/>
+	</bean>
+	
+	<!-- generates a SQL statement for a single clause -->
+	<bean id="clauseSqlAdapter" class="annis.sqlgen.ClauseSqlAdapter">
+		<property name="nodeSqlAdapterFactory" ref="nodeSqlAdapterFactory"/>
+	</bean>
+	
+	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
+		<property name="tableAliases">
+			<util:map>
+				<entry key="node" value="struct_annotation"/>
+				<entry key="node_annotation" value="struct_annotation"/>
+				<entry key="rank" value="rank_annotations"/>
+				<entry key="edge_annotation" value="rank_annotations"/>
+			</util:map>
+		</property>
+		<property name="columnAliases">
+			<util:map>
+				<entry key="node_annotation">
+					<util:map>
+						<entry key="node_ref" value="id"/>
+ 						<entry key="namespace" value="anno_namespace"/>
+						<entry key="name" value="anno_name"/>
+						<entry key="value" value="anno_value"/>
+					</util:map>
+				</entry>
+				<entry key="rank">
+					<util:map>
+						<entry key="name" value="edge_name"/>
+					</util:map>
+				</entry>
+				<entry key="edge_annotation">
+					<util:map>
+						<entry key="namespace" value="anno_namespace"/>
+						<entry key="name" value="anno_name"/>
+						<entry key="value" value="anno_value"/>
+					</util:map>
+				</entry>
+			</util:map>
+		</property>
+	</bean>
+	
+	<bean id="nodeSqlAdapter1" class="annis.sqlgen.TableJoinsInFromClauseNodeSqlAdapter" scope="prototype">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+	
+	<bean id="nodeSqlAdapter2" class="annis.sqlgen.TableJoinsInWhereClauseNodeSqlAdapter" scope="prototype">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+	
+	<!-- pluggable factory for SqlTableNodeAdapter classes -->
+	<bean id="nodeSqlAdapterFactory" class="annis.sqlgen.NodeSqlAdapterFactory">
+		<lookup-method name="createNodeSqlAdapter" bean="nodeSqlAdapter1"/>
+	</bean>
+	
+	<!-- strategies for the selection of corpora -->
+	<bean id="corpusSelectionStrategy1" class="annis.dao.CorpusSelectionStrategy1" scope="prototype"/>
+	
+	<bean id="corpusSelectionStrategy2" class="annis.dao.CorpusSelectionStrategy2" scope="prototype">
+		<property name="structTable" value="struct_annotation"/>
+		<property name="viewSuffix" value="_v"/>
+	</bean>
+
+	<!-- pluggable factory for CorpusSelectionStrategy classes -->
+	<bean id="corpusSelectionStrategyFactory" class="annis.dao.CorpusSelectionStrategyFactory">
+		<lookup-method name="createCorpusSelectionStrategy" bean="corpusSelectionStrategy2"/>
+	</bean>
+
+	<!-- SqlGenrator: generates a SQL statement for a DDDquery -->
+	<bean id="sqlGenerator" class="annis.sqlgen.SqlGenerator">
+		<property name="disjunctiveNormalForm" ref="dnfTransformer"/>
+		<lookup-method name="getClauseAnalysis" bean="clauseAnalysis"/>
+		<property name="clauseSqlAdapter" ref="clauseSqlAdapter"/>
+	</bean>
+	
+</beans>
