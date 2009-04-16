@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>The ANNIS2 Query Builder - Search and Visualization in Multilevel Linguistic Corpora</title>
+<link href="ANNIS_site.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div id="tutorialcontent">
+<h2>Using the ANNIS2 Query Builder</h2>
+<p>To open the graphical query builder, click on the<strong> Query Builder tab</strong> at the bottom of the Search Form. On the left-hand side of the toolbar at the top of the query builder canvans, you will see the <strong>Create Node button</strong>.
+Use this button to define nodes to be searched for (tokens, non-terminal nodes or annotations). Creating nodes and modifying them on the canvas will immediately update AnnisQL field in the Search Form with your query, though updating the query on the Search Form will not create a new graph in the Query Builder. </p>
+<img src="query_builder_empty.jpg" alt="The Query Builder tab and the Create Node button" height="340" width="450">
+<p>In each node you create you may click on "Add" to specify an annotation value. The annotation name can be typed in or selected from a drop down list. The "Op[erator]" field in the middle allows you to choose between an exact match 
+(the '=' symbol) or wildcard search using Regular Expressions (the '~' symbol). The annotation value is given on the right, and should <strong>NOT</strong> be surrounded by quotations (see the example below). 
+It is also possible to specify multiple annotations applying to the same position by clicking on "Add" multiple times. Clicking on "Clear" will delete the values in the node. 
+To search for word forms, simply leave the field name on the left empty and type directly on the right under "Value". A node with no data entered will match any node, that is an underspecified token or non-terminal node or annotation.</p>
+<img src="node.gif" alt="Query Builder node">
+<p>
+To specify the relationship between nodes, first click on the "Edge" button at the top left of one node, and then click the "Dock" button which becomes available on the other nodes. 
+An edge will connect the nodes with an extra box from which operators may be selected (see below). For operators allowing additional labels (e.g. the dominance operator <tt>&gt;</tt> allows edge labels to be specified), 
+you may type directly into the edge's operator box, as in the example with "func" label in the image below. Note that the node clicked on first (where the "Edge" button was clicked) will be the first node in the resulting
+quey, i.e. if this is the first node it will dominate the second node (<tt>#1 > #2</tt>) and not the other way around.</p>
+<img src="edge.gif" alt="Connecting nodes with an edge">
+</div>
+
+</body>
+</html>
