@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+// just a build bot test (I need a commit)
+
 // CONF
 def svnDir = new File('/home/annis/svn/')
 def contextFile = new File('/etc/jetty/contexts/annis-dev.xml')
