@@ -4,8 +4,8 @@ import sys
 
 #conf
 context_file_path=sys.argv[1]
-path_to_app=sys.argv[1]
-context=sys.argv[1]
+path_to_app=sys.argv[2]
+context=sys.argv[3]
 
 #code
 f = open(context_file_path, 'w')
