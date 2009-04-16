@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #conf
-ANNIS_WEBAPP_HOME=/srv/jetty/annis-trunk
+ANNIS_WEBAPP_HOME=/srv/jetty/Annis-trunk
 
 #code
 rm -R $ANNIS_WEBAPP_HOME/*
