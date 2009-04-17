@@ -60,7 +60,8 @@ Ext.onReady(function()
   // create the Data Store
   var tokenLevels = [];
   var storeSearchResult = new Ext.data.JsonStore({
-    url: conf_context + '/secure/SearchResult',
+    proxy: new Ext.data.HttpProxy({ url: conf_context + '/secure/SearchResult', timeout: 180000 }),
+
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
