@@ -1,5 +1,6 @@
 package annis.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,7 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AnnotationGraph extends DataObject {
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class AnnotationGraph implements Serializable {
 
 	// this class is sent to the front end
 	private static final long serialVersionUID = -1525612317405210436L;
@@ -57,14 +61,6 @@ public class AnnotationGraph extends DataObject {
 		return edges.add(o);
 	}
 
-	public List<AnnisNode> getNodes() {
-		return nodes;
-	}
-
-	public List<Edge> getEdges() {
-		return edges;
-	}
-	
 	public List<AnnisNode> getTokens() {
 		List<AnnisNode> tokens = new ArrayList<AnnisNode>();
 		for (AnnisNode node : nodes) {
@@ -80,7 +76,36 @@ public class AnnotationGraph extends DataObject {
 		});
 		return tokens;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof AnnotationGraph))
+			return false;
 
+		AnnotationGraph other = (AnnotationGraph) obj;
+		
+		return new EqualsBuilder()
+			.append(this.nodes, other.nodes)
+			.append(this.edges, other.edges)
+			.append(this.matchedNodeIds, other.matchedNodeIds)
+			.isEquals();
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(nodes).append(edges).append(matchedNodeIds).toHashCode();
+	}
+
+	///// Getter / Setter
+	
+	public List<AnnisNode> getNodes() {
+		return nodes;
+	}
+
+	public List<Edge> getEdges() {
+		return edges;
+	}
+	
 	public Set<Long> getMatchedNodeIds() {
 		return matchedNodeIds;
 	}

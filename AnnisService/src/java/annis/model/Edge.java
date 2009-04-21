@@ -1,9 +1,13 @@
 package annis.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Edge extends DataObject {
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class Edge implements Serializable {
 
 	// this class is sent to the front end
 	private static final long serialVersionUID = 3127054835526596882L;
@@ -89,15 +93,36 @@ public class Edge extends DataObject {
 	public String getQualifiedName() {
 		return AnnisNode.qName(namespace, name);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Edge))
+			return false;
+
+		Edge other = (Edge) obj;
+		
+		return new EqualsBuilder()
+			.append(this.source, other.source)
+			.append(this.destination, other.destination)
+			.append(this.pre, other.pre)
+			.append(this.post, other.post)
+			.append(this.component, other.component)
+			.append(this.edgeType, other.edgeType)
+			.append(this.name, other.name)
+			.append(this.namespace, other.namespace)
+			.append(this.level, other.level)
+			.isEquals();
+	}
 	
-//	// custom hashCode function to break object cycle that causes StackOverFlow on DataObject.hashCode
-//	@Override
-//	public int hashCode() {
-//		return new HashCodeBuilder()
-//			.append(pre).append(post).append(component).append(edgeType)
-//			.append(getQualifiedName()).append(level).append(annotations)
-//			.toHashCode();
-//	}
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(source).append(destination)
+			.append(pre).append(post).append(component).append(edgeType)
+			.append(getQualifiedName()).append(annotations)
+			.append(level)
+			.toHashCode();
+	}
 	
 	///// Getters / Setters
 	

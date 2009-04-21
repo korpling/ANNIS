@@ -1,11 +1,14 @@
 package annis.service.objects;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import annis.model.DataObject;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import annis.service.ifaces.AnnisAttribute;
 
-public class AnnisAttributeImpl extends DataObject implements AnnisAttribute {
+public class AnnisAttributeImpl implements AnnisAttribute, Serializable {
 	
 	private static final long serialVersionUID = 4786862953057862936L;
 
@@ -50,4 +53,19 @@ public class AnnisAttributeImpl extends DataObject implements AnnisAttribute {
 		return name + " " + distinctValues;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == null || ! (obj instanceof AnnisAttributeImpl) )
+			return false;
+		
+		AnnisAttributeImpl other = (AnnisAttributeImpl) obj;
+		
+		return new EqualsBuilder().append(this.name, other.name).append(this.distinctValues, other.distinctValues).isEquals();
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(name).append(distinctValues).toHashCode();
+	}
+	
 }

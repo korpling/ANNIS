@@ -1,8 +1,13 @@
 package annis.model;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import annis.model.AnnisNode.TextMatching;
 
-public class Annotation extends DataObject implements Comparable<Annotation> {
+public class Annotation implements Comparable<Annotation>, Serializable {
 	
 	// this class is sent to the front end
 	private static final long serialVersionUID = -7594536903324312228L;
@@ -40,6 +45,34 @@ public class Annotation extends DataObject implements Comparable<Annotation> {
 		return sb.toString();
 	}
 
+	public int compareTo(Annotation o) {
+		String name1 = getQualifiedName();
+		String name2 = o.getQualifiedName();
+		return name1.compareTo(name2);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Annotation))
+			return false;
+
+		Annotation other = (Annotation) obj;
+		
+		return new EqualsBuilder()
+			.append(this.namespace, other.namespace)
+			.append(this.name, other.name)
+			.append(this.value, other.value)
+			.append(this.textMatching, other.textMatching)
+			.isEquals();
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(namespace).append(name).append(value).append(textMatching).toHashCode();
+	}
+	
+	///// Getter / Setter
+	
 	public String getValue() {
 		return value;
 	}
@@ -76,9 +109,4 @@ public class Annotation extends DataObject implements Comparable<Annotation> {
 		return AnnisNode.qName(namespace, name);
 	}
 	
-	public int compareTo(Annotation o) {
-		String name1 = getQualifiedName();
-		String name2 = o.getQualifiedName();
-		return name1.compareTo(name2);
-	}
 }
