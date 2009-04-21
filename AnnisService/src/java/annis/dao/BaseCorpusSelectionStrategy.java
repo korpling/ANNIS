@@ -65,7 +65,7 @@ public class BaseCorpusSelectionStrategy implements CorpusSelectionStrategy {
 
 		for (int i = 1; i <= annotations.size(); ++i) {
 			sb.append(", ");
-			sb.append("corpus_meta_attribute AS corpus_meta_attribute");
+			sb.append("corpus_annotation AS corpus_annotation");
 			sb.append(i);
 		}
 		
@@ -82,11 +82,11 @@ public class BaseCorpusSelectionStrategy implements CorpusSelectionStrategy {
 		for (int i = 1; i <= annotations.size(); ++i) {
 			Annotation annotation = annotations.get(i - 1);
 			if (annotation.getNamespace() != null)
-				conditions.add("corpus_meta_attribute" + i + ".namespace = '" + annotation.getNamespace() + "'");
-			conditions.add("corpus_meta_attribute" + i + ".name = '" + annotation.getName() + "'");
+				conditions.add("corpus_annotation" + i + ".namespace = '" + annotation.getNamespace() + "'");
+			conditions.add("corpus_annotation" + i + ".name = '" + annotation.getName() + "'");
 			if (annotation.getValue() != null)
-				conditions.add("corpus_meta_attribute" + i + ".value " + annotation.getTextMatching().sqlOperator() + " '" + annotation.getValue() + "'");
-			conditions.add("corpus_meta_attribute" + i + ".corpus_ref = c1.id");
+				conditions.add("corpus_annotation" + i + ".value " + annotation.getTextMatching().sqlOperator() + " '" + annotation.getValue() + "'");
+			conditions.add("corpus_annotation" + i + ".corpus_ref = c1.id");
 		}
 		
 		sb.append(StringUtils.join(conditions, " AND "));

@@ -48,18 +48,18 @@ public class TestBaseCorpusStrategy {
 		String expected = "" +
 		"IN ( " +
 			"SELECT DISTINCT c1.id " +
-			"FROM corpus AS c1, corpus_meta_attribute AS corpus_meta_attribute1, corpus_meta_attribute AS corpus_meta_attribute2, corpus_meta_attribute AS corpus_meta_attribute3 " +
-			"WHERE corpus_meta_attribute1.namespace = 'namespace1' " +
-			"AND corpus_meta_attribute1.name = 'name1' " +
-			"AND corpus_meta_attribute1.corpus_ref = c1.id " +
-			"AND corpus_meta_attribute2.namespace = 'namespace2' " +
-			"AND corpus_meta_attribute2.name = 'name2' " +
-			"AND corpus_meta_attribute2.value = 'value2' " +
-			"AND corpus_meta_attribute2.corpus_ref = c1.id " +
-			"AND corpus_meta_attribute3.namespace = 'namespace3' " +
-			"AND corpus_meta_attribute3.name = 'name3' " +
-			"AND corpus_meta_attribute3.value ~ 'value3' " +
-			"AND corpus_meta_attribute3.corpus_ref = c1.id " +
+			"FROM corpus AS c1, corpus_annotation AS corpus_annotation1, corpus_annotation AS corpus_annotation2, corpus_annotation AS corpus_annotation3 " +
+			"WHERE corpus_annotation1.namespace = 'namespace1' " +
+			"AND corpus_annotation1.name = 'name1' " +
+			"AND corpus_annotation1.corpus_ref = c1.id " +
+			"AND corpus_annotation2.namespace = 'namespace2' " +
+			"AND corpus_annotation2.name = 'name2' " +
+			"AND corpus_annotation2.value = 'value2' " +
+			"AND corpus_annotation2.corpus_ref = c1.id " +
+			"AND corpus_annotation3.namespace = 'namespace3' " +
+			"AND corpus_annotation3.name = 'name3' " +
+			"AND corpus_annotation3.value ~ 'value3' " +
+			"AND corpus_annotation3.corpus_ref = c1.id " +
 		")";
 		
 		Annotation annotation1 = new Annotation("namespace1", "name1");
@@ -76,21 +76,21 @@ public class TestBaseCorpusStrategy {
 		String expected = "" +
 		"IN ( " +
 			"SELECT DISTINCT c1.id " +
-			"FROM corpus AS c1, corpus AS c2, corpus_meta_attribute AS corpus_meta_attribute1, corpus_meta_attribute AS corpus_meta_attribute2, corpus_meta_attribute AS corpus_meta_attribute3 " +
+			"FROM corpus AS c1, corpus AS c2, corpus_annotation AS corpus_annotation1, corpus_annotation AS corpus_annotation2, corpus_annotation AS corpus_annotation3 " +
 			"WHERE c1.pre >= c2.pre " +
 			"AND c1.post <= c2.post " +
 			"AND c2.id IN ( 23, 42, 69 ) " +
-			"AND corpus_meta_attribute1.namespace = 'namespace1' " +
-			"AND corpus_meta_attribute1.name = 'name1' " +
-			"AND corpus_meta_attribute1.corpus_ref = c1.id " +
-			"AND corpus_meta_attribute2.namespace = 'namespace2' " +
-			"AND corpus_meta_attribute2.name = 'name2' " +
-			"AND corpus_meta_attribute2.value = 'value2' " +
-			"AND corpus_meta_attribute2.corpus_ref = c1.id " +
-			"AND corpus_meta_attribute3.namespace = 'namespace3' " +
-			"AND corpus_meta_attribute3.name = 'name3' " +
-			"AND corpus_meta_attribute3.value ~ 'value3' " +
-			"AND corpus_meta_attribute3.corpus_ref = c1.id " +
+			"AND corpus_annotation1.namespace = 'namespace1' " +
+			"AND corpus_annotation1.name = 'name1' " +
+			"AND corpus_annotation1.corpus_ref = c1.id " +
+			"AND corpus_annotation2.namespace = 'namespace2' " +
+			"AND corpus_annotation2.name = 'name2' " +
+			"AND corpus_annotation2.value = 'value2' " +
+			"AND corpus_annotation2.corpus_ref = c1.id " +
+			"AND corpus_annotation3.namespace = 'namespace3' " +
+			"AND corpus_annotation3.name = 'name3' " +
+			"AND corpus_annotation3.value ~ 'value3' " +
+			"AND corpus_annotation3.corpus_ref = c1.id " +
 		")";
 		
 		Annotation annotation1 = new Annotation("namespace1", "name1");
