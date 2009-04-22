@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Peper_version1/src"
-    modelPluginID="Peper_version1" modelName="Peper" importerID="org.eclipse.emf.importer.ecore"
-    complianceLevel="6.0" copyrightFields="false">
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Peper/src"
+    editDirectory="/Peper.edit/src" editorDirectory="/Peper.editor/src" modelPluginID="Peper"
+    modelName="Peper" featureMapWrapperClass="" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false" language="">
   <foreignModel>peper.ecore</foreignModel>
   <genPackages prefix="Peper" basePackage="de.corpling" disposableProviderFactory="true"
       ecorePackage="peper.ecore#/">
@@ -18,19 +19,23 @@
     <genClasses ecoreClass="peper.ecore#//ImportSet"/>
     <genClasses ecoreClass="peper.ecore#//Importer">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Importer/inputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Importer/settingDir"/>
       <genOperations ecoreOperation="peper.ecore#//Importer/importCorpusStructure"/>
       <genOperations ecoreOperation="peper.ecore#//Importer/importDocument">
         <genParameters ecoreParameter="peper.ecore#//Importer/importDocument/sDocument"/>
       </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//Importer/close"/>
     </genClasses>
     <genClasses ecoreClass="peper.ecore#//Exporter">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Exporter/outputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Exporter/settingDir"/>
       <genOperations ecoreOperation="peper.ecore#//Exporter/export">
         <genParameters ecoreParameter="peper.ecore#//Exporter/export/sCorpus"/>
       </genOperations>
       <genOperations ecoreOperation="peper.ecore#//Exporter/export.1">
         <genParameters ecoreParameter="peper.ecore#//Exporter/export.1/sDocument"/>
       </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//Exporter/close"/>
     </genClasses>
     <genClasses image="false" ecoreClass="peper.ecore#//ImExporter">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ImExporter/supportedFormats"/>
@@ -72,7 +77,12 @@
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference peper.ecore#//ExportObject/convertJob"/>
     </genClasses>
     <genClasses ecoreClass="peper.ecore#//PeperConverter">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//PeperConverter/convertProjects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//PeperConverter/convertJobs"/>
+      <genOperations ecoreOperation="peper.ecore#//PeperConverter/start"/>
+      <genOperations ecoreOperation="peper.ecore#//PeperConverter/addJob">
+        <genParameters ecoreParameter="peper.ecore#//PeperConverter/addJob/importDescription"/>
+        <genParameters ecoreParameter="peper.ecore#//PeperConverter/addJob/exportDescription"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="peper.ecore#//PorterEmitter">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//PorterEmitter/props"/>
@@ -261,6 +271,21 @@
         <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/getSRelationsByStereotype/sStereotype"/>
       </genOperations>
       <genOperations ecoreOperation="../../Salt_version1/model/SaltModel.ecore#//SGraph/getSRoots"/>
+      <genOperations ecoreOperation="../../Salt_version1/model/SaltModel.ecore#//SGraph/getSRootsBySStereotypeRelation">
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/getSRootsBySStereotypeRelation/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph">
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph/traversalMode"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph/startNodes"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph/traversalObject"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph.1">
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph.1/traversalMode"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph.1/startNode"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph.1/traversalObject"/>
+        <genParameters ecoreParameter="../../Salt_version1/model/SaltModel.ecore#//SGraph/traverseSGraph.1/sStereotype"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="../../Salt_version1/model/SaltModel.ecore#//SCoreProject">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Salt_version1/model/SaltModel.ecore#//SCoreProject/sGraphs"/>
