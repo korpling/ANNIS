@@ -153,7 +153,7 @@ public abstract class AnnisBaseRunner {
 		PropertyConfigurator.configure(annisHomePath + "/conf/logging.properties");
 
 		if (console)
-			Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("%d{HH:MM:ss.SSS} %C{1} %p: %m\n")));
+			Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
 	}
 	
 	///// Getter / Setter

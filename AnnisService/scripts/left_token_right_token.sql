@@ -17,7 +17,7 @@ WHERE r.node_ref = s.id AND r.component_ref = c.id AND c.type IN ('c', 'd');
 ANALYZE _tmp_spanned_tokens;
 
 CREATE INDEX idx_tmp__pre_post ON _tmp_spanned_tokens (pre, post);
-CREATE INDEX idx_tmp__id__non_terminals ON _tmp_spanned_tokens (id) WHERE token_index IS NOT NULL;
+CREATE INDEX idx_tmp__id ON _tmp_spanned_tokens (id);
 
 -- SAVEPOINT init;
 
