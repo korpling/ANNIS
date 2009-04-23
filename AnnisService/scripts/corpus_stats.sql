@@ -18,16 +18,17 @@ CREATE TABLE _corpus_stats AS SELECT
     (select id from _corpus where top_level = 't') as corpus_ref,
     
     -- row counts
-    (select count(*) from _node ) as node,    
-    (select count(*) from _node_annotation ) as annotation,
-    (select count(*) from _rank ) as rank,    
-    (select count(*) from _edge_annotation ) as edge_annotation,    
-    (select count(*) from _text ) as text,
-    (select count(*) from _corpus ) as corpus,    
+    (select count(*) from _corpus) as corpus,    
     (select count(*) from _corpus_annotation) as corpus_annotation,
+    (select count(*) from _text) as text,
+    (select count(*) from _node) as node,    
+    (select count(*) from _node_annotation) as node_annotation,
+    (select count(*) from _rank) as rank,
+    (select count(*) from _component) as component,
+    (select count(*) from _edge_annotation) as edge_annotation,    
     
     -- # tokens
-    (SELECT count(*) FROM (SELECT count(*) FROM _rank WHERE pre = post - 1 GROUP BY node_ref) AS tmp) as n_tokens,
+    (SELECT count(*) FROM _node WHERE token_index IS NOT NULL) as n_tokens,
 
     -- # root elements
     (SELECT count(*) FROM _rank WHERE level = 0) as n_roots,

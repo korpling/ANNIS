@@ -97,12 +97,12 @@ CREATE TABLE corpus_stats
 (
 	corpus_ref			numeric(38) NOT NULL REFERENCES corpus (id),
 	corpus				numeric(38),
+	corpus_annotation	numeric(38),
 	text				numeric(38),
 	node				numeric(38),
-	component			numeric(38),
-	rank				numeric(38),
-	corpus_annotation	numeric(38),
 	node_annotation		numeric(38),
+	rank				numeric(38),
+	component			numeric(38),
 	edge_annotation		numeric(38),
 	n_tokens			numeric(38),
 	n_roots				numeric(38),
@@ -128,20 +128,17 @@ WHERE
 	
 CREATE VIEW table_stats AS select
 	(select count(*) from corpus ) as corpus,	
+	(select count(*) from corpus_annotation) as corpus_annotation,
 	(select count(*) from text ) as text,
 	(select count(*) from node ) as node,
-	(select count(*) from component) as component,
-	(select count(*) from rank ) as rank,	
-	(select count(*) from corpus_annotation) as corpus_annotation,
 	(select count(*) from node_annotation ) as node_annotation,
+	(select count(*) from rank ) as rank,	
+	(select count(*) from component) as component,
 	(select count(*) from edge_annotation ) as edge_annotation,	
 --	(select count(*) from corp_2_viz) as corp_2_viz,
 --	(select count(*) from xcorp_2_viz) as xcorp_2_viz,
 	(select count(*) from extdata) as extdata
 ;
-
-
-
 
 --- Resolver
 CREATE TABLE corp_2_viz
