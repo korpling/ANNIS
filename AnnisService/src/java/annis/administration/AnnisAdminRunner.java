@@ -199,7 +199,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 	}
 
 	private void usage(String error) {
-		Resource resource = new ClassPathResource("annisservice/administration/usage.txt");
+		Resource resource = new ClassPathResource("annis/administration/usage.txt");
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
 			for (String line = reader.readLine(); line != null; line = reader.readLine())
