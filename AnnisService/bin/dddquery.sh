@@ -11,4 +11,4 @@ classpath=`$ANNIS_HOME/bin/classpath.sh`
 # class with Java entry point
 class=de.deutschdiachrondigital.dddquery.DddQueryRunner
 
-java -cp $classpath -Dannis.home=$ANNIS_HOME $class "$@"
+java -cp $classpath -Dfile.encoding="utf-8" -Dannis.home=$ANNIS_HOME $class "$@"
