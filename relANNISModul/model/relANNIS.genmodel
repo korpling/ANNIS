@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/relANNISModul/src"
+    modelPluginID="relANNISModul" modelName="RelANNIS" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>file:/E:/Test/relANNISModul/model/relANNIS.ecore</foreignModel>
+  <genPackages prefix="RelANNIS" basePackage="de.corpling.peper.modules" disposableProviderFactory="true"
+      ecorePackage="relANNIS.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="relANNIS.ecore#//RA_CORPUS_TYPE">
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//RA_CORPUS_TYPE/CORPUS"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//RA_CORPUS_TYPE/DOCUMENT"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="relANNIS.ecore#//EXPORT_FILE">
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//EXPORT_FILE/CORPUS"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="relANNIS.ecore#//DAOOBJECT">
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/CORPUS"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/CORPUS_ANNOTATION"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/TEXT"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/NODE"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/EDGE"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/COMPONENT"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/EDGE_ANNOTATION"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/NODE_ANNOTATION"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//DAOOBJECT/ANNOTATION_META_ATTRIBUTE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="relANNIS.ecore#//UNIQUE_VALUES">
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/CORP_STRUCT_PPORDER"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/CORPUS_ID"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/TEXT_ID"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/STRUCT_ID"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/RANK_PPORDER"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/ANNO_ID"/>
+      <genEnumLiterals ecoreEnumLiteral="relANNIS.ecore#//UNIQUE_VALUES/RANK_TYPE_ID"/>
+    </genEnums>
+    <genDataTypes ecoreDataType="relANNIS.ecore#//SaltProject"/>
+    <genDataTypes ecoreDataType="relANNIS.ecore#//File"/>
+    <genDataTypes ecoreDataType="relANNIS.ecore#//TupleWriter"/>
+    <genDataTypes ecoreDataType="relANNIS.ecore#//SElement"/>
+    <genClasses ecoreClass="relANNIS.ecore#//RAExporter">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RAExporter/raMapper"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RAExporter/raDAO"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAExporter/export">
+        <genParameters ecoreParameter="relANNIS.ecore#//RAExporter/export/sCorpus"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAExporter/export.1">
+        <genParameters ecoreParameter="relANNIS.ecore#//RAExporter/export.1/sDocument"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RAMapper">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RAMapper/raDAO"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAMapper/currTaId"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RAMapper/raExporter"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAMapper/coherentComponents"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAMapper/subConnectedComponents"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAMapper/init">
+        <genParameters ecoreParameter="relANNIS.ecore#//RAMapper/init/document"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAMapper/close"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RADAO">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RADAO/outputDir"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RADAO/tupleWriterEntries"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RADAO/taEntries"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//RADAO/uniqueValues"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write/raCorpus"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/beginTA"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/commitTA">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/commitTA/taId"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/addTupleWriter">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/addTupleWriter/daoObject"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/addTupleWriter/tupleWriter"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/reSetTupleWriter">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/reSetTupleWriter/daoObject"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/reSetTupleWriter/tupleWriter"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/getTupleWriter">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/getTupleWriter/daoObject"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.1">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.1/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.1/raCorpusMetaAttribute"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/getUniqueValue">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/getUniqueValue/uniqueValue"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.2">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.2/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.2/raText"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.3">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.3/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.3/raStruct"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.4">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.4/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.4/raRank"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.5">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.5/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.5/raAnno"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.6">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.6/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.6/raRankType"/>
+      </genOperations>
+      <genOperations ecoreOperation="relANNIS.ecore#//RADAO/write.7">
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.7/taId"/>
+        <genParameters ecoreParameter="relANNIS.ecore#//RADAO/write.7/raEdgeAnnotation"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RACorpus">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/version"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/pre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpus/post"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RACorpus/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//TupleWriterEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//TupleWriterEntry/key"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//TupleWriterEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//TupleWriterContainer">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//TupleWriterContainer/tupleWriter"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//TaEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//TaEntry/key"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference relANNIS.ecore#//TaEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//TAObject">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//TAObject/taId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//TAObject/twWriterKey"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RACorpusAnnotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpusAnnotation/corpus_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpusAnnotation/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpusAnnotation/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RACorpusAnnotation/value"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RACorpusAnnotation/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//UniqueValueEntry">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference relANNIS.ecore#//UniqueValueEntry/value"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//UniqueValueEntry/key"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//UniqueValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//UniqueValue/value"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RAText">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAText/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAText/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAText/text"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAText/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RANode">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/text_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/corpus_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/right"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/token_index"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/continuous"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANode/span"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RANode/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RAEdge">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdge/pre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdge/post"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdge/node_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdge/component_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdge/parent"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAEdge/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RANodeAnnotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANodeAnnotation/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANodeAnnotation/node_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANodeAnnotation/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANodeAnnotation/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RANodeAnnotation/value"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RANodeAnnotation/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RAComponent">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAComponent/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAComponent/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAComponent/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAComponent/name"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAComponent/toStringList"/>
+    </genClasses>
+    <genClasses ecoreClass="relANNIS.ecore#//RAEdgeAnnotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdgeAnnotation/edge_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdgeAnnotation/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdgeAnnotation/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute relANNIS.ecore#//RAEdgeAnnotation/value"/>
+      <genOperations ecoreOperation="relANNIS.ecore#//RAEdgeAnnotation/toStringList"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Salt" basePackage="de.corpling.salt.model" disposableProviderFactory="true"
+      ecorePackage="Salt.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Salt.ecore#//SSTEREOTYPES">
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/STOKEN"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SDATASOURCE"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/STEXTUAL_DATASOURCE"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/STEXTUAL_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SCORPUS"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SDOCUMENT"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SCORPUS_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SCORPDOC_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SSPAN_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SDOMINANCE_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SPOINTING_RELATION"/>
+      <genEnumLiterals ecoreEnumLiteral="Salt.ecore#//SSTEREOTYPES/SSTRUCTURE"/>
+    </genEnums>
+    <genClasses ecoreClass="Salt.ecore#//SToken">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//SToken/sLeft"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//SToken/sRight"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//SToken/sDocumentGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SDataSource">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//SDataSource/sDataSource"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//STextualDataSource">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//STextualDataSource/sText"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//STextualDataSource/sDocumentGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SDocumentGraph">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/sTokens"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/sTextualRelations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/sTextualDataSources"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/sStructures"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/SpanRelations"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//SDocumentGraph/sDocument"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//STextualRelation">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//STextualRelation/sToken"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//STextualRelation/sTextualDataSource"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//STextualRelation/sLeftPos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Salt.ecore#//STextualRelation/sRightPos"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//STextualRelation/sDocumentGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SStructure">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//SStructure/sDocumentGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SSpanRelation">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//SSpanRelation/sDocumentGraph"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SSpanRelation/sStructure"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SSpanRelation/sToken"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SProject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SProject/sCorpusGraphs"/>
+      <genOperations ecoreOperation="Salt.ecore#//SProject/getSStereotypeByEnum">
+        <genParameters ecoreParameter="Salt.ecore#//SProject/getSStereotypeByEnum/sStereotypeEnum"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SCorpus"/>
+    <genClasses ecoreClass="Salt.ecore#//SCorpusGraph">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpusGraph/sCorpora"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpusGraph/sDocuments"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpusGraph/sCorpusRelations"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SDocument">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Salt.ecore#//SDocument/sDocumentGraph"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Salt.ecore#//SDocument/sCorpusGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SCorpusRelation">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpusRelation/sSuperCorpus"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpusRelation/sSubCorpus"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SCorpDocRelation">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpDocRelation/sCorpus"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Salt.ecore#//SCorpDocRelation/sDocument"/>
+    </genClasses>
+    <genClasses ecoreClass="Salt.ecore#//SDominanceRelation"/>
+    <genClasses ecoreClass="Salt.ecore#//SPointingRelation"/>
+  </genPackages>
+  <genPackages prefix="SaltCore" basePackage="de.corpling.salt.model" disposableProviderFactory="true"
+      ecorePackage="SaltCore.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="SaltCore.ecore#//SELEMENT_TYPE">
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/CORPUS"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/DOCUMENT"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/DATASOURCE"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/TOKEN"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/STRUCTURE"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//SELEMENT_TYPE/ANNOTATION"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="SaltCore.ecore#//STRAVERSAL_MODE">
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//STRAVERSAL_MODE/DEPTH_FIRST"/>
+      <genEnumLiterals ecoreEnumLiteral="SaltCore.ecore#//STRAVERSAL_MODE/BOTTOM_UP"/>
+    </genEnums>
+    <genDataTypes ecoreDataType="SaltCore.ecore#//Properties"/>
+    <genClasses ecoreClass="SaltCore.ecore#//SElementPath">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SElementPath/parentPath"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SElementPath/sElement"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SElementPath/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SElementPath/elementType"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SIdentifiableElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SIdentifiableElement/sElementPath"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SElement/sSterotypeableElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SElement/sAnnotatableElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SElement/sProcessingAnnotatableElement"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SElement/sGraph"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SAnnotation"/>
+    <genClasses ecoreClass="SaltCore.ecore#//SAnnotatableElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SAnnotatableElement/sAnnotations"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SAnnotatableElement/addSAnnotation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SAnnotatableElement/addSAnnotation/sAnnotation"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SAnnotatableElement/getSAnnotation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SAnnotatableElement/getSAnnotation/fullName"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SRelation">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sSourceElement"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sDestinationElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sStereotypableElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sAnnotatableElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sProcessingAnnotatableElement"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SRelation/sGraph"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SRelation/sType"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SNamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SNamedElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//STypedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//STypedElement/type"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SStereotypeableElement">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotypeableElement/sStereotype"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotypeableElement/sFeatures"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeableElement/addSFeature">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeableElement/addSFeature/featureName"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeableElement/addSFeature/featureValue"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeableElement/getSFeature">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeableElement/getSFeature/featureName"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeableElement/removeSFeature">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeableElement/removeSFeature/featureName"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeableElement/addSFeature.1">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeableElement/addSFeature.1/feature"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SFeature"/>
+    <genClasses ecoreClass="SaltCore.ecore#//SStereotype">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SStereotype/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotype/sFeatureDescriptions"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotype/sSuperStereotype"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotype/sProject"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SFeatureDescription">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute SaltCore.ecore#//SFeatureDescription/name"/>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SGraph">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SGraph/sElements"/>
+      <genFeatures property="None" children="true" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SGraph/sRelations"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference SaltCore.ecore#//SGraph/sCoreProject"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/addSElement">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/addSElement/sElement"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSElementById">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/getSElementById/sElementId"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSElementsByStereotype">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/getSElementsByStereotype/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/addSRelation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/addSRelation/sRelation"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSRelationById">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/getSRelationById/sRelationId"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSRelationsByStereotype">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/getSRelationsByStereotype/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSRoots"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/getSRootsBySStereotypeRelation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/getSRootsBySStereotypeRelation/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/traverseSGraph">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph/sTraversalMode"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph/startSElements"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph/sTraversalObject"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph/sStereotype"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SGraph/traverseSGraph.1">
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph.1/sTraversalMode"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph.1/startSElements"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph.1/sTraversalObject"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//SGraph/traverseSGraph.1/sStereotype"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SCoreProject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SCoreProject/sGraphs"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SCoreProject/sStereotypeContainer"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SCoreProject/addSGraph">
+        <genParameters ecoreParameter="SaltCore.ecore#//SCoreProject/addSGraph/sGraph"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SCoreProject/getSGraphById">
+        <genParameters ecoreParameter="SaltCore.ecore#//SCoreProject/getSGraphById/sGraphId"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SStereotypeContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SStereotypeContainer/sStereotypes"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeContainer/getSStereotypeByName">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeContainer/getSStereotypeByName/sStereotypeName"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SStereotypeContainer/setSStereotypes">
+        <genParameters ecoreParameter="SaltCore.ecore#//SStereotypeContainer/setSStereotypes/properties"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SProcessingAnnotatableElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference SaltCore.ecore#//SProcessingAnnotatableElement/sProcessingAnnotations"/>
+      <genOperations ecoreOperation="SaltCore.ecore#//SProcessingAnnotatableElement/addSProcessingAnnotation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SProcessingAnnotatableElement/addSProcessingAnnotation/sProcessingAnnotation"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//SProcessingAnnotatableElement/getSProcessingAnnotation">
+        <genParameters ecoreParameter="SaltCore.ecore#//SProcessingAnnotatableElement/getSProcessingAnnotation/fullName"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="SaltCore.ecore#//SProcessingAnnotation"/>
+    <genClasses image="false" ecoreClass="SaltCore.ecore#//STraversalObject">
+      <genOperations ecoreOperation="SaltCore.ecore#//STraversalObject/sElementReached">
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementReached/traversalMode"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementReached/currSElement"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementReached/sRelation"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementReached/fromSElement"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementReached/order"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//STraversalObject/sElementLeft">
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementLeft/traversalMode"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementLeft/currSElement"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementLeft/sRelation"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementLeft/fromSElement"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/sElementLeft/order"/>
+      </genOperations>
+      <genOperations ecoreOperation="SaltCore.ecore#//STraversalObject/checkConstraint">
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/checkConstraint/traversalMode"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/checkConstraint/sRelation"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/checkConstraint/currSElement"/>
+        <genParameters ecoreParameter="SaltCore.ecore#//STraversalObject/checkConstraint/order"/>
+      </genOperations>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Graph" basePackage="de.util" disposableProviderFactory="true"
+      ecorePackage="Graph.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Graph.ecore#//TRAVERSAL_MODE">
+      <genEnumLiterals ecoreEnumLiteral="Graph.ecore#//TRAVERSAL_MODE/DEPTH_FIRST"/>
+      <genEnumLiterals ecoreEnumLiteral="Graph.ecore#//TRAVERSAL_MODE/BOTTOM_UP"/>
+    </genEnums>
+    <genClasses ecoreClass="Graph.ecore#//IdentifiableElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//IdentifiableElement/id"/>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//Graph">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Graph/nodes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Graph/edges"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Graph/numOfNodes"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Graph/numOfEdges"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Graph/labelableElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Graph/indexMgr"/>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/addNode">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/addNode/node"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getNode">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getNode/nodeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/removeNodeById">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/removeNodeById/nodeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/removeNodes"/>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/addEdge">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/addEdge/edge"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getEdge">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getEdge/edgeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getEdges">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getEdges/nodeId1"/>
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getEdges/nodeId2"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getInEdges">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getInEdges/nodeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getOutEdges">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/getOutEdges/nodeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/removeEdgeById">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/removeEdgeById/edgeId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/removeEdges"/>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/traverseGraph">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph/traversalMode"/>
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph/startNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph/traversalObject"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/traverseGraph.1">
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph.1/traversalMode"/>
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph.1/startNodes"/>
+        <genParameters ecoreParameter="Graph.ecore#//Graph/traverseGraph.1/traversalObject"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Graph/getRoots"/>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//Node">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Node/graph"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Node/labelableElement"/>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//Edge">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Edge/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Graph.ecore#//Edge/destination"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Edge/graph"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//Edge/labelableElement"/>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//LabelableElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//LabelableElement/labels"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//LabelableElement/numOfLabels"/>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/addLabel">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/addLabel/label"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/getLabel">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/getLabel/fullName"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/getLabel.1">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/getLabel.1/namespace"/>
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/getLabel.1/name"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/removeLabel">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/removeLabel/fullName"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/removeLabel.1">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/removeLabel.1/namespace"/>
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/removeLabel.1/name"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/hasLabel">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/hasLabel/fullName"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/hasLabel.1">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/hasLabel.1/namespace"/>
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/hasLabel.1/name"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/removeAll"/>
+      <genOperations ecoreOperation="Graph.ecore#//LabelableElement/getLabelsByNamespace">
+        <genParameters ecoreParameter="Graph.ecore#//LabelableElement/getLabelsByNamespace/namespace"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//Label">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Label/namespace"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Label/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Label/fullName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Label/value"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Graph.ecore#//Label/labelOwner"/>
+      <genOperations ecoreOperation="Graph.ecore#//Label/getNSSeperator"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="Graph.ecore#//TraversalObject">
+      <genOperations ecoreOperation="Graph.ecore#//TraversalObject/nodeReached">
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeReached/traversalMode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeReached/currNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeReached/edge"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeReached/fromNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeReached/order"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//TraversalObject/nodeLeft">
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeLeft/traversalMode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeLeft/currNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeLeft/edge"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeLeft/fromNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/nodeLeft/order"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//TraversalObject/checkConstraint">
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/checkConstraint/traversalMode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/checkConstraint/edge"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/checkConstraint/currNode"/>
+        <genParameters ecoreParameter="Graph.ecore#//TraversalObject/checkConstraint/order"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="Graph.ecore#//Index">
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//Index/numOfElements"/>
+      <genOperations ecoreOperation="Graph.ecore#//Index/addElement">
+        <genParameters ecoreParameter="Graph.ecore#//Index/addElement/elementId"/>
+        <genParameters ecoreParameter="Graph.ecore#//Index/addElement/element"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Index/hasElement">
+        <genParameters ecoreParameter="Graph.ecore#//Index/hasElement/elementId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Index/removeElement">
+        <genParameters ecoreParameter="Graph.ecore#//Index/removeElement/elementId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//Index/removeAll"/>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//SimpleIndex">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//SimpleIndex/idxTable"/>
+      <genOperations ecoreOperation="Graph.ecore#//SimpleIndex/getElement">
+        <genParameters ecoreParameter="Graph.ecore#//SimpleIndex/getElement/elementId"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//IndexMgr">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Graph.ecore#//IndexMgr/indexes"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//IndexMgr/numOfIndexes"/>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/addIndex">
+        <genParameters ecoreParameter="Graph.ecore#//IndexMgr/addIndex/index"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/hasIndex">
+        <genParameters ecoreParameter="Graph.ecore#//IndexMgr/hasIndex/indexId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/getIndex">
+        <genParameters ecoreParameter="Graph.ecore#//IndexMgr/getIndex/indexId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/removeIndex">
+        <genParameters ecoreParameter="Graph.ecore#//IndexMgr/removeIndex/indexId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/removeAll"/>
+      <genOperations ecoreOperation="Graph.ecore#//IndexMgr/removeElement">
+        <genParameters ecoreParameter="Graph.ecore#//IndexMgr/removeElement/element"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//ComplexIndex">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//ComplexIndex/idxTable"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Graph.ecore#//ComplexIndex/numOfSlots"/>
+      <genOperations ecoreOperation="Graph.ecore#//ComplexIndex/hasSlot">
+        <genParameters ecoreParameter="Graph.ecore#//ComplexIndex/hasSlot/slotId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//ComplexIndex/getSlot">
+        <genParameters ecoreParameter="Graph.ecore#//ComplexIndex/getSlot/slotId"/>
+      </genOperations>
+      <genOperations ecoreOperation="Graph.ecore#//ComplexIndex/getSlotIds"/>
+      <genOperations ecoreOperation="Graph.ecore#//ComplexIndex/removeSlot">
+        <genParameters ecoreParameter="Graph.ecore#//ComplexIndex/removeSlot/slotId"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="Graph.ecore#//IndexableElement"/>
+  </genPackages>
+  <genPackages prefix="Peper" basePackage="de.corpling" ecorePackage="../../Peper/model/peper.ecore#/">
+    <genDataTypes ecoreDataType="../../Peper/model/peper.ecore#//File"/>
+    <genDataTypes ecoreDataType="../../Peper/model/peper.ecore#//Properties"/>
+    <genDataTypes ecoreDataType="../../Peper/model/peper.ecore#//SaltProject"/>
+    <genDataTypes ecoreDataType="../../Peper/model/peper.ecore#//SCorpus"/>
+    <genDataTypes ecoreDataType="../../Peper/model/peper.ecore#//SDocument"/>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ImExportSet">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//ImExportSet/dataSourcePath"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ImExportSet/formatDefinition"/>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ExportSet"/>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ImportSet"/>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//Importer">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//Importer/inputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//Importer/settingDir"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Importer/importCorpusStructure"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Importer/importDocument">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//Importer/importDocument/sDocument"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Importer/close"/>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//Exporter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//Exporter/outputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//Exporter/settingDir"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Exporter/export">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//Exporter/export/sCorpus"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Exporter/export.1">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//Exporter/export.1/sDocument"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//Exporter/close"/>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ImExporter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ImExporter/supportedFormats"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//ImExporter/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//ImExporter/saltProject"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//ImExporter/isSupported">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//ImExporter/isSupported/ImExportSet"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//FormatDefinition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//FormatDefinition/formatName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//FormatDefinition/formatVersion"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//FormatDefinition/formatReference"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//FormatDefinition/equals">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//FormatDefinition/equals/otherObject"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ConvertJob">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ConvertJob/importObjects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ConvertJob/exportObjects"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//ConvertJob/saltProject"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ConvertJob/porterEmitter"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//ConvertJob/start"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//ConvertJob/addImportSet">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//ConvertJob/addImportSet/importSet"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//ConvertJob/addExportSet">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//ConvertJob/addExportSet/exportSet"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ImportObject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ImportObject/importer"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ImportObject/importSet"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ImportObject/convertJob"/>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//ExportObject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ExportObject/exportSet"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ExportObject/exporter"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//ExportObject/convertJob"/>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//PeperConverter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ../../Peper/model/peper.ecore#//PeperConverter/convertJobs"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//PeperConverter/start"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//PeperConverter/addJob">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//PeperConverter/addJob/importDescription"/>
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//PeperConverter/addJob/exportDescription"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="../../Peper/model/peper.ecore#//PorterEmitter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ../../Peper/model/peper.ecore#//PorterEmitter/props"/>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//PorterEmitter/emitImporter">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//PorterEmitter/emitImporter/formatDefinition"/>
+      </genOperations>
+      <genOperations ecoreOperation="../../Peper/model/peper.ecore#//PorterEmitter/emitExporter">
+        <genParameters ecoreParameter="../../Peper/model/peper.ecore#//PorterEmitter/emitExporter/formatDefinition"/>
+      </genOperations>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

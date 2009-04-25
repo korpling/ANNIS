@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="saltCore"
+    nsURI="www.corpling.de/salt/saltCore" nsPrefix="saltCore">
+  <eClassifiers xsi:type="ecore:EClass" name="SElementPath">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="parentPath" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sElement" lowerBound="1"
+        eType="#//SIdentifiableElement" eOpposite="#//SIdentifiableElement/sElementPath"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        volatile="true" transient="true" defaultValueLiteral="" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementType" eType="#//SELEMENT_TYPE"
+        volatile="true" transient="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SIdentifiableElement" eSuperTypes="#//SNamedElement #//STypedElement Graph.ecore#//IdentifiableElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sElementPath" lowerBound="1"
+        eType="#//SElementPath" containment="true" eOpposite="#//SElementPath/sElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SELEMENT_TYPE">
+    <eLiterals name="CORPUS"/>
+    <eLiterals name="DOCUMENT" value="1"/>
+    <eLiterals name="DATASOURCE" value="2"/>
+    <eLiterals name="TOKEN" value="3"/>
+    <eLiterals name="STRUCTURE" value="4"/>
+    <eLiterals name="ANNOTATION" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SElement" eSuperTypes="#//SIdentifiableElement #//SAnnotatableElement #//SStereotypeableElement #//SProcessingAnnotatableElement Graph.ecore#//Node">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sSterotypeableElement"
+        lowerBound="1" eType="#//SStereotypeableElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sAnnotatableElement" eType="#//SAnnotatableElement"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sProcessingAnnotatableElement"
+        eType="#//SProcessingAnnotatableElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sGraph" eType="#//SGraph"
+        volatile="true" transient="true" derived="true" eOpposite="#//SGraph/sElements"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SAnnotation" eSuperTypes="Graph.ecore#//Label"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SAnnotatableElement" eSuperTypes="Graph.ecore#//LabelableElement">
+    <eOperations name="addSAnnotation">
+      <eParameters name="sAnnotation" eType="#//SAnnotation"/>
+    </eOperations>
+    <eOperations name="getSAnnotation" eType="#//SAnnotation">
+      <eParameters name="fullName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sAnnotations" upperBound="-1"
+        eType="#//SAnnotation" volatile="true" derived="true" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SRelation" eSuperTypes="Graph.ecore#//Edge #//SIdentifiableElement #//SAnnotatableElement #//SStereotypeableElement #//SProcessingAnnotatableElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sSourceElement" eType="#//SElement"
+        volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sDestinationElement" eType="#//SElement"
+        volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sStereotypableElement"
+        lowerBound="1" eType="#//SStereotypeableElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sAnnotatableElement" eType="#//SAnnotatableElement"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sProcessingAnnotatableElement"
+        eType="#//SProcessingAnnotatableElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sGraph" eType="#//SGraph"
+        volatile="true" transient="true" derived="true" eOpposite="#//SGraph/sRelations"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SNamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="STypedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//SELEMENT_TYPE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SStereotypeableElement" eSuperTypes="Graph.ecore#//LabelableElement">
+    <eOperations name="addSFeature">
+      <eParameters name="featureName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eParameters name="featureValue" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    </eOperations>
+    <eOperations name="getSFeature" eType="#//SFeature">
+      <eParameters name="featureName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eOperations name="removeSFeature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+      <eParameters name="featureName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eOperations name="addSFeature">
+      <eParameters name="feature" eType="#//SFeature"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sStereotype" lowerBound="1"
+        eType="#//SStereotype"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sFeatures" upperBound="-1"
+        eType="#//SFeature" volatile="true" transient="true" derived="true" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SFeature" eSuperTypes="Graph.ecore#//Label"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SStereotype">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sFeatureDescriptions" eType="#//SFeatureDescription"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sSuperStereotype" eType="#//SStereotype"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sProject" eType="#//SStereotypeContainer"
+        eOpposite="#//SStereotypeContainer/sStereotypes"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SFeatureDescription">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SGraph" eSuperTypes="Graph.ecore#//Graph">
+    <eOperations name="addSElement">
+      <eParameters name="sElement" eType="#//SElement"/>
+    </eOperations>
+    <eOperations name="getSElementById" eType="#//SElement">
+      <eParameters name="sElementId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    </eOperations>
+    <eOperations name="getSElementsByStereotype" upperBound="-1" eType="#//SElement">
+      <eParameters name="sStereotype" eType="#//SStereotype"/>
+    </eOperations>
+    <eOperations name="addSRelation">
+      <eParameters name="sRelation" eType="#//SRelation"/>
+    </eOperations>
+    <eOperations name="getSRelationById" eType="#//SRelation">
+      <eParameters name="sRelationId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    </eOperations>
+    <eOperations name="getSRelationsByStereotype" upperBound="-1" eType="#//SRelation">
+      <eParameters name="sStereotype" eType="#//SStereotype"/>
+    </eOperations>
+    <eOperations name="getSRoots" upperBound="-1" eType="#//SElement"/>
+    <eOperations name="getSRootsBySStereotypeRelation" upperBound="-1" eType="#//SElement">
+      <eParameters name="sStereotype" eType="#//SStereotype"/>
+    </eOperations>
+    <eOperations name="traverseSGraph">
+      <eParameters name="sTraversalMode" eType="#//STRAVERSAL_MODE"/>
+      <eParameters name="startSElements" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EEList"/>
+      <eParameters name="sTraversalObject" eType="#//STraversalObject"/>
+      <eParameters name="sStereotype" eType="#//SStereotype"/>
+    </eOperations>
+    <eOperations name="traverseSGraph">
+      <eParameters name="sTraversalMode" eType="#//STRAVERSAL_MODE"/>
+      <eParameters name="startSElements" eType="#//SElement"/>
+      <eParameters name="sTraversalObject" eType="#//STraversalObject"/>
+      <eParameters name="sStereotype" eType="#//SStereotype"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sElements" upperBound="-1"
+        eType="#//SElement" volatile="true" transient="true" derived="true" containment="true"
+        eOpposite="#//SElement/sGraph"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sRelations" upperBound="-1"
+        eType="#//SRelation" changeable="false" volatile="true" transient="true" derived="true"
+        containment="true" eOpposite="#//SRelation/sGraph"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sCoreProject" eType="#//SCoreProject"
+        eOpposite="#//SCoreProject/sGraphs"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SCoreProject" eSuperTypes="#//SStereotypeContainer">
+    <eOperations name="addSGraph">
+      <eParameters name="sGraph" eType="#//SGraph"/>
+    </eOperations>
+    <eOperations name="getSGraphById" eType="#//SGraph">
+      <eParameters name="sGraphId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sGraphs" upperBound="-1"
+        eType="#//SGraph" containment="true" eOpposite="#//SGraph/sCoreProject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sStereotypeContainer" eType="#//SStereotypeContainer"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SStereotypeContainer">
+    <eOperations name="getSStereotypeByName" eType="#//SStereotype">
+      <eParameters name="sStereotypeName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eOperations name="setSStereotypes">
+      <eParameters name="properties" eType="#//Properties"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sStereotypes" upperBound="-1"
+        eType="#//SStereotype" containment="true" eOpposite="#//SStereotype/sProject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SProcessingAnnotatableElement" eSuperTypes="Graph.ecore#//LabelableElement">
+    <eOperations name="addSProcessingAnnotation">
+      <eParameters name="sProcessingAnnotation" eType="#//SProcessingAnnotation"/>
+    </eOperations>
+    <eOperations name="getSProcessingAnnotation" eType="#//SProcessingAnnotation">
+      <eParameters name="fullName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sProcessingAnnotations"
+        upperBound="-1" eType="#//SProcessingAnnotation" volatile="true" transient="true"
+        derived="true" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SProcessingAnnotation" eSuperTypes="Graph.ecore#//Label"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="Properties" instanceClassName="java.util.Properties"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="STRAVERSAL_MODE">
+    <eLiterals name="DEPTH_FIRST"/>
+    <eLiterals name="BOTTOM_UP" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="STraversalObject" abstract="true" interface="true">
+    <eOperations name="sElementReached">
+      <eParameters name="traversalMode" eType="#//STRAVERSAL_MODE"/>
+      <eParameters name="currSElement" eType="#//SElement"/>
+      <eParameters name="sRelation" eType="#//SRelation"/>
+      <eParameters name="fromSElement" eType="#//SElement"/>
+      <eParameters name="order" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    </eOperations>
+    <eOperations name="sElementLeft">
+      <eParameters name="traversalMode" eType="#//STRAVERSAL_MODE"/>
+      <eParameters name="currSElement" eType="#//SElement"/>
+      <eParameters name="sRelation" eType="#//SRelation"/>
+      <eParameters name="fromSElement" eType="#//SElement"/>
+      <eParameters name="order" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    </eOperations>
+    <eOperations name="checkConstraint" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+      <eParameters name="traversalMode" eType="#//STRAVERSAL_MODE"/>
+      <eParameters name="sRelation" eType="#//SRelation"/>
+      <eParameters name="currSElement" eType="#//SElement"/>
+      <eParameters name="order" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    </eOperations>
+  </eClassifiers>
+</ecore:EPackage>
