@@ -1,0 +1,14 @@
+0	0	0	UNKNOWN	tok6	24	30	5	true	sample
+1	0	0	UNKNOWN	tok1	0	5	0	true	Hello
+2	0	0	UNKNOWN	struct1	0	5	NULL	true	NULL
+3	0	0	UNKNOWN	span1	0	10	NULL	true	NULL
+4	0	0	UNKNOWN	span2	6	17	NULL	true	NULL
+5	0	0	UNKNOWN	struct2	0	17	NULL	true	NULL
+6	0	0	UNKNOWN	span3	18	23	NULL	true	NULL
+7	0	0	UNKNOWN	tok7	31	36	6	true	text.
+8	0	0	UNKNOWN	struct3	18	36	NULL	false	NULL
+9	0	0	UNKNOWN	struct4	0	36	NULL	false	NULL
+10	0	0	UNKNOWN	tok2	6	10	1	true	this
+11	0	0	UNKNOWN	tok3	11	13	2	true	is
+12	0	0	UNKNOWN	tok4	14	17	3	true	the
+13	0	0	UNKNOWN	tok5	18	23	4	true	first

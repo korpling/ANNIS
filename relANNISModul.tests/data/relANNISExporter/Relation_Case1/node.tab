@@ -1,0 +1,7 @@
+0	0	0	UNKNOWN	tok1	0	5	0	true	Hello
+1	0	0	UNKNOWN	tok2	6	7	1	true	a
+2	0	0	UNKNOWN	tok3	8	13	2	true	text.
+3	0	0	UNKNOWN	node4	0	13	NULL	true	NULL
+4	0	0	UNKNOWN	node1	0	13	NULL	true	NULL
+5	0	0	UNKNOWN	node2	0	13	NULL	true	NULL
+6	0	0	UNKNOWN	node3	0	13	NULL	true	NULL

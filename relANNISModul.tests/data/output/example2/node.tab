@@ -1,0 +1,11 @@
+0	0	0	UNKNOWN	tok1	0	5	0	true	Hello
+1	0	0	UNKNOWN	tok2	6	10	1	true	this
+2	0	0	UNKNOWN	tok3	11	13	2	true	is
+3	0	0	UNKNOWN	tok4	14	15	3	true	a
+4	0	0	UNKNOWN	tok5	16	22	4	true	sample
+5	0	0	UNKNOWN	tok6	23	25	5	true	of
+6	0	0	UNKNOWN	tok7	26	33	6	true	storing
+7	0	0	UNKNOWN	tok8	34	38	7	true	just
+8	0	0	UNKNOWN	tok9	39	45	8	true	tokens
+9	0	0	UNKNOWN	tok10	46	48	9	true	in
+10	0	0	UNKNOWN	tok11	49	58	10	true	relANNIS.

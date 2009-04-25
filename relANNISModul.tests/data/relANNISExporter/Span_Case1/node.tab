@@ -1,0 +1,9 @@
+0	0	0	UNKNOWN	tok1	0	5	0	true	Hello
+1	0	0	UNKNOWN	tok2	6	10	1	true	this
+2	0	0	UNKNOWN	tok3	11	13	2	true	is
+3	0	0	UNKNOWN	span1	0	13	NULL	true	NULL
+4	0	0	UNKNOWN	tok4	14	15	3	true	a
+5	0	0	UNKNOWN	span2	14	15	NULL	true	NULL
+6	0	0	UNKNOWN	tok5	16	22	4	true	sample
+7	0	0	UNKNOWN	tok6	23	28	5	true	text.
+8	0	0	UNKNOWN	span3	16	28	NULL	true	NULL
