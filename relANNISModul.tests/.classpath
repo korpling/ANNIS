@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/de.corpling.peper.jar"/>
 	<classpathentry kind="lib" path="lib/de.util.graph.jar"/>
 	<classpathentry kind="lib" path="lib/de.dataconnector.tuplewriter_noDep.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Salt"/>
+	<classpathentry kind="lib" path="lib/de.corpling.salt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
