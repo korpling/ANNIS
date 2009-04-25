@@ -1,4 +1,0 @@
-<!ENTITY % sfb632_header SYSTEM "sfb632_header.dtd">
-%sfb632_header;
-
-<!ELEMENT body (#PCDATA)>
