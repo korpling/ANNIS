@@ -19,6 +19,7 @@ public final class AuthenticationFilter implements Filter
   private Properties props;
   public static final String KEY_SECURITY_MANAGER = "securityManager";
   public static final String KEY_USER = "user";
+  public static final String KEY_LOGIN_ALREADY_TRIED = "loginAlreadyTried";
   
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
   {
@@ -67,7 +68,12 @@ public final class AuthenticationFilter implements Filter
         }
         else
         {
+          session.setAttribute(KEY_LOGIN_ALREADY_TRIED, new Boolean(true));
+          
           AnnisUser user = manager.login(userName, password);
+         
+          // we have been successfull
+          session.removeAttribute(KEY_LOGIN_ALREADY_TRIED);
           session.setAttribute(KEY_USER, user);
           chain.doFilter(request, response);
         }
@@ -85,6 +91,11 @@ public final class AuthenticationFilter implements Filter
           out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
           out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/extjs/ext-all.js\"></script>");
           out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/annis/windowLogin.js\"></script>");
+          if(session.getAttribute(KEY_LOGIN_ALREADY_TRIED) != null)
+          {
+            out.println("<script type=\"text/javascript\" src=\"" + 
+              cp + "/javascript/annis/loginErrorMessage.js\"></script>");
+          }
           out.println("	<body>");
           out.println("	</body>");
           out.println("</html>");

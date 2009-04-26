@@ -1,12 +1,4 @@
 
-/*
- * Ext JS Library 2.0.1
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.onReady(function(){
   //The Search Window
 
@@ -22,28 +14,39 @@ Ext.onReady(function(){
     header: false,
     bodyStyle:'padding:5px 5px 0',
     width: 350,
-    defaults: {width: 250},
+    defaults: {
+      width: 250
+    },
     defaultType: 'textfield',
     items: [{
-        id: 'username',
-        fieldLabel: 'User Name',
-        name: 'user',
-        allowBlank:true
-      },{
-        id: 'password',
-        fieldLabel: 'Password',
-        name: 'password',
-        inputType: 'password',
-        allowBlank:true
-      }],
-    buttons: [{
-        id: 'btnLogin',
-        text: 'Login',
-        handler: function() {
-          formPanelLogin.getForm().getEl().dom.submit();
+      id: 'username',
+      fieldLabel: 'User Name',
+      name: 'user',
+      allowBlank:true
+    },{
+      id: 'password',
+      fieldLabel: 'Password',
+      name: 'password',
+      inputType: 'password',
+      allowBlank:true,
+      listeners:{
+        specialkey:function(f,o){
+          if(o.getKey()==13)
+          {
+            formPanelLogin.getForm().getEl().dom.submit();
+          }
         }
+      }
+
+    }],
+    buttons: [{
+      id: 'btnLogin',
+      text: 'Login',
+      handler: function() {
+        formPanelLogin.getForm().getEl().dom.submit();
+      }
             		
-      }],
+    }],
     onSubmit: Ext.emptyFn,
     submit: function() {
       this.getForm().getEl().dom.submit();
