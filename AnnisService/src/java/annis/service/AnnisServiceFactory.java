@@ -23,11 +23,11 @@ public class AnnisServiceFactory {
 			try {
 				service = (AnnisService) Naming.lookup(url);
 			} catch (MalformedURLException e1) {
-				throw new AnnisServiceFactoryException("Wrong Annis Config.");
+				throw new AnnisServiceFactoryException("Wrong Annis Config.", e1);
 			} catch (RemoteException e1) {
-				throw new AnnisServiceFactoryException("Annis Service not available.");
+				throw new AnnisServiceFactoryException("Annis Service not available.", e1);
 			} catch (NotBoundException e1) {
-				throw new AnnisServiceFactoryException("Annis Service not bound.");
+				throw new AnnisServiceFactoryException("Annis Service not bound.", e1);
 			}
 		}
 		

@@ -14,9 +14,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +38,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
 
   public final static String CONFIG_PATH = "config_path";
   private Properties properties;
-
+  
   public AnnisUser login(String userName, String password) throws NamingException, AuthenticationException
   {
     if(properties == null || !properties.containsKey(CONFIG_PATH))
@@ -85,7 +87,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                     if("*".equals(g))
                     {
                       // superuser, has all available corpora
-                      userCorpora.addAll(getAllAvailableCorpora());
+                      userCorpora.addAll(getAllAvailableCorpora().values());
 
                       break;
                     }
@@ -94,12 +96,17 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                       String groupCorporaAsString = groupProps.getProperty(g, "");
                       String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
 
+                      Map<String,Long> name2ID = getAllAvailableCorpora();
+
                       for(String c : corporaOfGroup)
                       {
                         try
                         {
-                          long cID = Long.parseLong(c);
-                          userCorpora.add(cID);
+                          Long cID = name2ID.get(c);
+                          if(cID != null)
+                          {
+                            userCorpora.add(cID);
+                          }
                         }
                         catch(NumberFormatException ex)
                         {
@@ -140,18 +147,17 @@ public class SimpleSecurityManager implements AnnisSecurityManager
     throw new AuthenticationException();
   }
 
-  private List<Long> getAllAvailableCorpora()
+  private Map<String,Long> getAllAvailableCorpora()
   {
-    LinkedList<Long> result = new LinkedList();
+    HashMap<String,Long> result = new HashMap<String, Long>();
     try
     {
       String url = properties.getProperty("AnnisRemoteService.URL", "rmi://localhost:4711/AnnisService");
       AnnisService service = AnnisServiceFactory.getClient(url);
       AnnisCorpusSet corpusSet = service.getCorpusSet();
-      int i = 0;
       for(AnnisCorpus corpus : corpusSet)
       {
-        result.add(corpus.getId());
+        result.put(corpus.getName(), corpus.getId());
       }
     }
     catch(Exception e)
@@ -159,7 +165,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
       // fallback...
       for(long i = 1; i <= 100; i++)
       {
-        result.add(i);
+        result.put("" + i, i);
       }
     }
     return result;

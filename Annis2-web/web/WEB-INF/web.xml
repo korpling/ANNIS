@@ -114,6 +114,7 @@
   <filter>
     <filter-name>AuthenticationFilter</filter-name>
     <filter-class>annis.frontend.filters.AuthenticationFilter</filter-class>
+
     <init-param>
       <param-name>managerClassName</param-name>
       <param-value>annis.security.SimpleSecurityManager</param-value>
@@ -129,7 +130,7 @@
       <!-- only needed if simple authentification or demo is used -->
     <init-param>
       <param-name>config_path</param-name>
-      <param-value>/etc/annis/user_config_dev/</param-value>
+      <param-value>/etc/annis/user_config_trunk/</param-value>
     </init-param>
       
       

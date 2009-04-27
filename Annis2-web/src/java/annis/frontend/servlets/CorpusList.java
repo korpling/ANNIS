@@ -62,7 +62,17 @@ public class CorpusList extends HttpServlet {
 			int i = 0;
 			StringBuffer favoritesString = new StringBuffer();
 			for(String id : favoritesSet)
-				favoritesString.append(((i++ > 0) ? "," : "") + id);
+      {
+        if(id != null && !"".equals(id))
+        {
+          if(i > 0)
+          {
+            favoritesString.append(",");
+          }
+          favoritesString.append(id);
+          i++;
+        }
+      }
 			user.put(KEY_CORPUS_FAVORITES, favoritesString.toString());
 			AnnisSecurityManager manager = (AnnisSecurityManager) request.getSession().getAttribute(AuthenticationFilter.KEY_SECURITY_MANAGER);
 			try {
