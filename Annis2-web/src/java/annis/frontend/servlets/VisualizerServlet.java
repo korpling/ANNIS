@@ -47,6 +47,12 @@ public class VisualizerServlet extends HttpServlet
     String spanId = request.getParameter("spanId");
     String textId = request.getParameter("textId");
 
+    String path2Dot = getInitParameter("DotPath");
+    if(path2Dot == null || "".equals(path2Dot))
+    {
+      path2Dot = "dot";
+    }
+
     if(spanId == null)
     {
       throw new NullPointerException("Parameter 'spanId' must no be null.");
@@ -125,7 +131,7 @@ public class VisualizerServlet extends HttpServlet
       visualizer.setNamespace(namespace);
       visualizer.setMarkableMap(markableMap);
       visualizer.setContextPath(getServletContext().getContextPath());
-        
+      visualizer.setDotPath(path2Dot);
       
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());

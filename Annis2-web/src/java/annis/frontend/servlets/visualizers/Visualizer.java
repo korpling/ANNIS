@@ -18,6 +18,7 @@ public abstract class Visualizer
   protected Map<String, String> markableMap = new HashMap<String, String>();
   protected String id = "";
   protected String contextPath;
+  protected String dotPath;
   private Document paulaJDOM = null;
 
   /**
@@ -29,6 +30,13 @@ public abstract class Visualizer
     this.paula = paula;
     this.paulaJDOM = null;
   }
+
+  public void setDotPath(String dotPath)
+  {
+    this.dotPath = dotPath;
+  }
+
+  
 
   /** Get a JDOM Document representing paula. Will be generated only once. */
   protected Document getPaulaJDOM()

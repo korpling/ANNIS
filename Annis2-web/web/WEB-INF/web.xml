@@ -16,7 +16,12 @@
     <description>URL of the AnnisResolverService</description>
     <param-name>AnnisResolverService.URL</param-name>
     <param-value>rmi://localhost:4711/AnnisResolverService</param-value>
-  </context-param> 
+  </context-param>
+  <context-param>
+    <description>Path (or command) of the "dot" programm</description>
+    <param-name>DotPath</param-name>
+    <param-value>dot</param-value>
+  </context-param>
 	<!-- END Application Configuration -->
 	  
 	<!-- USED -->

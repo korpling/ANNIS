@@ -460,7 +460,7 @@ public class TreeVisualizer extends Visualizer {
 		public void writeOutput(Writer writer) {
 			try {
 				//Initiating External Process
-				String cmd = "dot -s" + scale + ".0 -T" + outputFormat;
+				String cmd = dotPath + " -s" + scale + ".0 -T" + outputFormat;
 				Runtime runTime = Runtime.getRuntime();
 				
 				//check if neato exists
