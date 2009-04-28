@@ -1,0 +1,23 @@
+<project name="Peper" basedir="." default="all">
+	<path id="lib">
+		<fileset dir="${basedir}/lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${basedir}/lib/ext">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<property name="destDir" value="bin" />
+	
+	<!--
+		================================= target: all
+		=================================
+	-->
+	<target name="all" description="--> description">
+		<delete dir="${destDir}"/>
+		<mkdir dir="${destDir}"/>
+		<javac srcdir="${basedir}/src" destdir="${destDir}" debug="on">
+			<classpath refid="lib" />
+		</javac>
+	</target>
+</project>

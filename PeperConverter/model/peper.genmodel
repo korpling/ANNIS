@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Peper/src"
+    modelPluginID="Peper" modelName="Peper" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>peper.ecore</foreignModel>
+  <genPackages prefix="Peper" basePackage="de.corpling" disposableProviderFactory="true"
+      ecorePackage="peper.ecore#/">
+    <genDataTypes ecoreDataType="peper.ecore#//File"/>
+    <genDataTypes ecoreDataType="peper.ecore#//Properties"/>
+    <genDataTypes ecoreDataType="peper.ecore#//SaltProject"/>
+    <genDataTypes ecoreDataType="peper.ecore#//SCorpus"/>
+    <genDataTypes ecoreDataType="peper.ecore#//SDocument"/>
+    <genClasses ecoreClass="peper.ecore#//ImExportSet">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//ImExportSet/dataSourcePath"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ImExportSet/formatDefinition"/>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//ExportSet"/>
+    <genClasses ecoreClass="peper.ecore#//ImportSet"/>
+    <genClasses ecoreClass="peper.ecore#//Importer">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Importer/inputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Importer/settingDir"/>
+      <genOperations ecoreOperation="peper.ecore#//Importer/importCorpusStructure"/>
+      <genOperations ecoreOperation="peper.ecore#//Importer/importDocument">
+        <genParameters ecoreParameter="peper.ecore#//Importer/importDocument/sDocument"/>
+      </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//Importer/close"/>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//Exporter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Exporter/outputDir"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//Exporter/settingDir"/>
+      <genOperations ecoreOperation="peper.ecore#//Exporter/export">
+        <genParameters ecoreParameter="peper.ecore#//Exporter/export/sCorpus"/>
+      </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//Exporter/export.1">
+        <genParameters ecoreParameter="peper.ecore#//Exporter/export.1/sDocument"/>
+      </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//Exporter/close"/>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//ImExporter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ImExporter/supportedFormats"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//ImExporter/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//ImExporter/saltProject"/>
+      <genOperations ecoreOperation="peper.ecore#//ImExporter/isSupported">
+        <genParameters ecoreParameter="peper.ecore#//ImExporter/isSupported/ImExportSet"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//FormatDefinition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//FormatDefinition/formatName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//FormatDefinition/formatVersion"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//FormatDefinition/formatReference"/>
+      <genOperations ecoreOperation="peper.ecore#//FormatDefinition/equals">
+        <genParameters ecoreParameter="peper.ecore#//FormatDefinition/equals/otherObject"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//ConvertJob">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ConvertJob/importObjects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ConvertJob/exportObjects"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//ConvertJob/saltProject"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference peper.ecore#//ConvertJob/porterEmitter"/>
+      <genOperations ecoreOperation="peper.ecore#//ConvertJob/start"/>
+      <genOperations ecoreOperation="peper.ecore#//ConvertJob/addImportSet">
+        <genParameters ecoreParameter="peper.ecore#//ConvertJob/addImportSet/importSet"/>
+      </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//ConvertJob/addExportSet">
+        <genParameters ecoreParameter="peper.ecore#//ConvertJob/addExportSet/exportSet"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//ImportObject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ImportObject/importer"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ImportObject/importSet"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference peper.ecore#//ImportObject/convertJob"/>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//ExportObject">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ExportObject/exportSet"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//ExportObject/exporter"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference peper.ecore#//ExportObject/convertJob"/>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//PeperConverter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference peper.ecore#//PeperConverter/convertJobs"/>
+      <genOperations ecoreOperation="peper.ecore#//PeperConverter/start"/>
+      <genOperations ecoreOperation="peper.ecore#//PeperConverter/addJob">
+        <genParameters ecoreParameter="peper.ecore#//PeperConverter/addJob/importDescription"/>
+        <genParameters ecoreParameter="peper.ecore#//PeperConverter/addJob/exportDescription"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="peper.ecore#//PorterEmitter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute peper.ecore#//PorterEmitter/props"/>
+      <genOperations ecoreOperation="peper.ecore#//PorterEmitter/emitImporter">
+        <genParameters ecoreParameter="peper.ecore#//PorterEmitter/emitImporter/formatDefinition"/>
+      </genOperations>
+      <genOperations ecoreOperation="peper.ecore#//PorterEmitter/emitExporter">
+        <genParameters ecoreParameter="peper.ecore#//PorterEmitter/emitExporter/formatDefinition"/>
+      </genOperations>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
