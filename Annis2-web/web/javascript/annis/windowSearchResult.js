@@ -34,7 +34,7 @@ function waitForIFrame(id) {
       try 
       {
         elem.height = doc.body.scrollHeight;
-        elem.width = doc.body.scrollWidth ;
+        elem.width = doc.body.scrollWidth;
       } 
       catch (e) 
       {
@@ -123,7 +123,7 @@ Ext.onReady(function()
           var cell = gridView.getCell(j, i);
           var divs = Ext.DomQuery.select("div.token", cell);
           var divWidth = 0;
-          if(divs != null)
+          if(divs !== null)
           {
             Ext.each(divs, function(div)
             {
@@ -163,8 +163,8 @@ Ext.onReady(function()
       text:'Token Annotations',
       iconCls: 'windowSearchResult menu tokenAnnotations',
       menu: tokenLevelSelectionMenu
-    }
-    ,{
+    },
+    {
       id: 'btnShowCitation',
       text: 'Show Citation URL',
       disabled: false,

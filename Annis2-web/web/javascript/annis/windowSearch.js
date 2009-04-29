@@ -250,8 +250,8 @@ Ext.onReady(function()
       {
         this.fireEvent(e.type, this, e);
       }
-    }
-    , initEvents : function() 
+    },
+    initEvents : function()
     {
       //                this.el.on(Ext.isIE ? "keydown" : "keypress", this.fireKey,  this);
       this.el.on("focus", this.onFocus,  this);
@@ -601,7 +601,7 @@ Ext.onReady(function()
     });
   }
   
-})
+});
 
 // end onReady
 
