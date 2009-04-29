@@ -1,6 +1,7 @@
 package annis.frontend.servlets;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -38,12 +39,10 @@ public class MetaDataServlet extends HttpServlet
     resp.setCharacterEncoding("UTF-8");
     resp.setContentType("application/x-json");
 
-    ServletOutputStream out = resp.getOutputStream();
-
-    StringWriter writer = new StringWriter();
-    JSONWriter json = new JSONWriter(writer);
-
-
+    OutputStreamWriter outWriter = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
+    
+    JSONWriter json = new JSONWriter(outWriter);
+    
     String idAsString = req.getParameter("tokID");
     if(idAsString != null)
     {
@@ -93,10 +92,7 @@ public class MetaDataServlet extends HttpServlet
       {
       }
     }
-
-    out.print(writer.toString());
-
-
+    outWriter.flush();
   }
 
   private List<SortedMap<String, String>> createDummyData(long id)
@@ -117,3 +113,4 @@ public class MetaDataServlet extends HttpServlet
     return result;
   }
 }
+
