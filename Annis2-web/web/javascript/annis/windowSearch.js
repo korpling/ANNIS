@@ -77,7 +77,8 @@ Ext.onReady(function()
   function updateStatus()
   {
     delayKeyTask.cancel();
-    
+   setSearchButtonDisabled(false);
+
     if(!corpusListSelectionModel.hasSelection()) 
     {
       formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");

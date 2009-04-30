@@ -188,7 +188,7 @@ Ext.onReady(function()
     '                           {[values == "" ? "undefined" : values]}' +
     '						</div>' +
     '						<div id="annotation-{[this.cleanId(parent._id)]}-{.}-body" class="annis-level-body">' +
-    '								<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.jsp" annis:src=' + conf_context + '/secure/Visualizer?spanId={parent._id}&textId={parent._textId}&namespace={.}&mark:red=<tpl for="parent._markedObjects">{.},</tpl>"></iframe>' +
+    '								<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src=' + conf_context + '/secure/Visualizer?spanId={parent._id}&textId={parent._textId}&namespace={.}&mark:red=<tpl for="parent._markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
@@ -199,7 +199,7 @@ Ext.onReady(function()
     '							Paula' +
     '						</div>' +
     '						<div id="annotation-{[this.cleanId(values._id)]}-paula-body" class="annis-level-body">' +
-    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.jsp" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
@@ -209,7 +209,7 @@ Ext.onReady(function()
     '							Paula Text' +
     '						</div>' +
     '						<div id="annotation-{[this.cleanId(values._id)]}-paulatext-body" class="annis-level-body">' +
-    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.jsp" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +                    					
@@ -427,8 +427,8 @@ function toggleRowBody(id) {
   var elemBody = Ext.get('annotation-'+ id + '-body');
   var elemSelector = Ext.get('annotation-'+ id + '-selector');
   try {
-    var elem = elemBody.child('*[src=' + conf_context + '/empty.jsp]');
-    var dom = elemBody.child('*[src=' + conf_context + '/empty.jsp]', true);
+    var elem = elemBody.child('*[src=' + conf_context + '/empty.html]');
+    var dom = elemBody.child('*[src=' + conf_context + '/empty.html]', true);
     dom.src = elem.getAttributeNS('annis', 'src');
     waitForIFrame(dom.id);
   } catch (e) {
