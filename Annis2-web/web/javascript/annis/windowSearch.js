@@ -510,7 +510,7 @@ Ext.onReady(function()
     items: [formPanelSearch, panelSearchModes]
   });
 	
-  var queryBuilderURL = conf_context + '/queryBuilder.jsp';
+  var queryBuilderURL = conf_context + '/queryBuilder.html';
 
   var panelQueryBuilder = new Ext.Panel({
     id: 'panelQueryBuilder',
