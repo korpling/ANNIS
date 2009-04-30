@@ -10,7 +10,9 @@ var Citation = {
     citation += "AQL(" + Url.encode(formPanelSearch.getComponent('queryAnnisQL').getValue()) + ")";
     citation += ",CIDS(";
     for(i=0;i<selections.length;i++) {
-      if(i>0) { citation += ","; }
+      if(i>0) { 
+        citation += ",";
+      }
       citation += selections[i].id;
     }
     citation += ")";
@@ -56,12 +58,15 @@ var Citation = {
     document.cookie = "citation=; path=/;-1";
   }
 };
+// end Citation
 
 Ext.onReady(function()
 {	
 
   Ext.Ajax.defaultHeaders = 
-    { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"};
+  {
+    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+  };
 
   var delayKeyTask = new Ext.util.DelayedTask();
   var windowSearchFormWidth = 347;
@@ -86,7 +91,9 @@ Ext.onReady(function()
     Ext.Ajax.request({
       url: conf_context + '/secure/ValidateQuery',
       method: 'GET',
-      params: {'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue()},
+      params: {
+        'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue()
+        },
       success: function(response) {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
       },
@@ -138,7 +145,12 @@ Ext.onReady(function()
     Ext.Ajax.request({
       url: conf_context + '/secure/SubmitQuery',
       method: 'GET',
-      params: {'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue(), 'corpusIds': corpusIdString, 'padLeft': formPanelSimpleSearch.getComponent('padLeft').getValue(), 'padRight': formPanelSimpleSearch.getComponent('padRight').getValue()},
+      params: {
+        'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue(),
+        'corpusIds': corpusIdString,
+        'padLeft': formPanelSimpleSearch.getComponent('padLeft').getValue(),
+        'padRight': formPanelSimpleSearch.getComponent('padRight').getValue()
+        },
       success: function(response) {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
         //the submit button
@@ -186,7 +198,12 @@ Ext.onReady(function()
     windowSearchResult.setTitle('Search Result - ' + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' (' + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', ' + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
     windowSearchResult.show();
     windowSearchResult.alignTo('windowSearchForm', 'tl', [windowSearchFormWidth + 5,0]);
-    storeSearchResult.load({params:{start:0, limit:25}});
+    storeSearchResult.load({
+      params:{
+        start:0,
+        limit:25
+      }
+      });
 
   }
   // end showWindowSearchResult
@@ -277,10 +294,20 @@ Ext.onReady(function()
     root: 'list',
     id: 'id',
     fields: [
-      {name:'id', type:'int'},
-      'name',
-      {name:'textCount', type:'int'}, 
-      {name:'tokenCount', type:'int'} 
+    {
+      name:'id',
+      type:'int'
+    },
+    'name',
+    {
+      name:'textCount',
+      type:'int'
+    },
+
+    {
+      name:'tokenCount',
+      type:'int'
+    }
     ],
     // turn on remote sorting
     remoteSort: false,
@@ -307,7 +334,7 @@ Ext.onReady(function()
       }    
     }
   }
-);
+  );
 		
   var corpusListCm = new Ext.grid.ColumnModel([
     corpusListSelectionModel, 
@@ -329,7 +356,7 @@ Ext.onReady(function()
       //width: 65,
       align: 'right'
     }
-  ]);
+    ]);
   corpusListCm.defaultSortable = true;
 		
   // create the Grid
@@ -352,21 +379,21 @@ Ext.onReady(function()
     header: false,
     tbar: new Ext.Toolbar({
       items: [
-        new Ext.Toolbar.Button({
-          text: 'More Corpora',
-          handler: function() {
-            var windowCorpusList = Ext.WindowMgr.get('windowCorpusList');
-            windowCorpusList.show();
-            windowCorpusList.alignTo('windowSearchForm', 'tr', [10,0]);
-          },
-          disabled: false,
-          tooltip: {
-            text:'Click here to open the corpus selection Window.', 
-            title:'More Corpora',
-            autoHide:true
+      new Ext.Toolbar.Button({
+        text: 'More Corpora',
+        handler: function() {
+          var windowCorpusList = Ext.WindowMgr.get('windowCorpusList');
+          windowCorpusList.show();
+          windowCorpusList.alignTo('windowSearchForm', 'tr', [10,0]);
+        },
+        disabled: false,
+        tooltip: {
+          text:'Click here to open the corpus selection Window.',
+          title:'More Corpora',
+          autoHide:true
 															
-          }
-        })
+        }
+      })
       ]
     })
   });
@@ -377,17 +404,17 @@ Ext.onReady(function()
     title: 'Simple Search',
     height: 200,
     items: [ 
-      padLeftComboBox,
-      padRightComboBox
+    padLeftComboBox,
+    padRightComboBox
     ],
     buttons: [{
-        id: 'btnSimpleSearch',
-        text: 'Show Result',
-        disabled: false,
-        listeners: {
-          click: getResult
-        }
-      }]
+      id: 'btnSimpleSearch',
+      text: 'Show Result',
+      disabled: false,
+      listeners: {
+        click: getResult
+      }
+    }]
   });
 		
   var formPanelSearch = new Ext.FormPanel({
@@ -400,30 +427,30 @@ Ext.onReady(function()
     defaultType: 'textfield',
     monitorValid: true,
     items: [{
-        id: 'queryAnnisQL',
-        width: 200,
-        fieldLabel: 'AnnisQL',
-        name: 'queryAnnisQL',
-        allowBlank:true,
-        xtype: 'textarea',
-        listeners: {
-          'keyup': {
-            fn: function() {
-              formPanelSearch.getComponent('matchCount').setValue("Delay...");
-              delayKeyTask.delay(keyDelay, updateStatus);
-            },
-            scope: this
-          }
+      id: 'queryAnnisQL',
+      width: 200,
+      fieldLabel: 'AnnisQL',
+      name: 'queryAnnisQL',
+      allowBlank:true,
+      xtype: 'textarea',
+      listeners: {
+        'keyup': {
+          fn: function() {
+            formPanelSearch.getComponent('matchCount').setValue("Delay...");
+            delayKeyTask.delay(keyDelay, updateStatus);
+          },
+          scope: this
         }
-      },{
-        id: 'matchCount',
-        width: 200,
-        fieldLabel: 'Match Count',
-        name: 'matchCount',
-        allowBlank:true,
-        readOnly: true
-      },
-      corpusGrid
+      }
+    },{
+      id: 'matchCount',
+      width: 200,
+      fieldLabel: 'Match Count',
+      name: 'matchCount',
+      allowBlank:true,
+      readOnly: true
+    },
+    corpusGrid
     ]
 	           	
   });
@@ -446,21 +473,21 @@ Ext.onReady(function()
       }
     },
     items: [{
-        id: 'blaa',
-        width: 200,
-        fieldLabel: 'Match Count',
-        name: 'matchCount',
-        allowBlank:true,
-        readOnly: true
-      }],
+      id: 'blaa',
+      width: 200,
+      fieldLabel: 'Match Count',
+      name: 'matchCount',
+      allowBlank:true,
+      readOnly: true
+    }],
     buttons: [{
-        id: 'btnQueryBuilder',
-        text: 'Show Result',
-        disabled: false,
-        listeners: {
-          click: getResult
-        }
-      }]
+      id: 'btnQueryBuilder',
+      text: 'Show Result',
+      disabled: false,
+      listeners: {
+        click: getResult
+      }
+    }]
   });
 		    
   var panelSearchModes = new Ext.TabPanel({
@@ -468,12 +495,12 @@ Ext.onReady(function()
     height: 270,
     activeTab: 0,
     items: [
-      formPanelSimpleSearch,
-      formPanelQueryBuilder,
-      {
-        title: 'Statistics',
-        frame:true
-      }]
+    formPanelSimpleSearch,
+    formPanelQueryBuilder,
+    {
+      title: 'Statistics',
+      frame:true
+    }]
   });
 
 			
@@ -493,22 +520,23 @@ Ext.onReady(function()
     },
     tbar: new Ext.Toolbar({
       items: [
-        new Ext.Toolbar.Button({
-          text: 'Create Node',
-          handler: function() {
-            window.frames.iframeQueryBuilder.createNodeWindow();
-          },
-          tooltip: {
-            text:'Click here to add a new node specification window.', 
-            title:'Create Node',
-            autoHide:true
+      new Ext.Toolbar.Button({
+        text: 'Create Node',
+        handler: function() {
+          window.frames.iframeQueryBuilder.createNodeWindow();
+        },
+        tooltip: {
+          text:'Click here to add a new node specification window.',
+          title:'Create Node',
+          autoHide:true
 															
-          }
-        })
+        }
+      })
       ]
     })
   });
 
+ // the main window
   var windowSearchForm = new Ext.Window({
     title: 'Search Form',
     id: 'windowSearchForm',
@@ -523,8 +551,8 @@ Ext.onReady(function()
     closeAction: 'hide',
     layout: 'border',
     items: [
-      panelSearch,
-      panelQueryBuilder
+    panelSearch,
+    panelQueryBuilder
     ],
     listeners: {
       'showQueryBuilder': {
@@ -577,14 +605,16 @@ Ext.onReady(function()
         method: 'post',
         //success: someFn,
         //failure: otherFn,
-        params: { add: addedIds.join(",") }
+        params: { 
+          add: addedIds.join(",")
+        }
       });			
       return true;
     }
-    //,
-    //notifyOver: function(dd, e, data) { 
-    //   //check if the row is allowed, return true or false 
-    //}
+  //,
+  //notifyOver: function(dd, e, data) {
+  //   //check if the row is allowed, return true or false
+  //}
   });
   
   // we may have serious problems when using not Firefox
@@ -593,9 +623,9 @@ Ext.onReady(function()
     Ext.MessageBox.show({
       title: 'WARNING - Unsupported Browser',
       msg: 'You are not using Firefox as your webbrowser. This may cause ' +
-        'serious problems when using Annis&sup2;. If you don\'t have Firefox yet, ' +
-        'you can download it from <a href="http://mozilla.com/firefox">http://mozilla.com/firefox</a>.<br /><br />' +
-        'Click on "OK" to proceed, but Annis&sup2; will probably not work as expected.',
+      'serious problems when using Annis&sup2;. If you don\'t have Firefox yet, ' +
+      'you can download it from <a href="http://mozilla.com/firefox">http://mozilla.com/firefox</a>.<br /><br />' +
+      'Click on "OK" to proceed, but Annis&sup2; will probably not work as expected.',
       icon: Ext.MessageBox.WARNING,
       buttons: Ext.MessageBox.OK
     });
