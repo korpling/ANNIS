@@ -222,7 +222,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 			columnSize.put(column, column.length());
 		for (Map<String, Object> row : table) {
 			for (String column : row.keySet()) {
-				int length = row.get(column).toString().length();
+				final Object value = row.get(column);
+				if (value == null)
+					continue;
+				int length = value.toString().length();
 				if (columnSize.get(column) < length)
 					columnSize.put(column, length);
 			}
