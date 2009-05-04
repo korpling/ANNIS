@@ -253,7 +253,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 	}
 	
 	private String pad(Object o, int length) {
-		String s = o.toString();
+		String s = o != null ? o.toString() : "";
 		if (s.length() > length)
 			return s;
 
