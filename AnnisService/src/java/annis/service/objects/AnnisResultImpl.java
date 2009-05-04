@@ -25,6 +25,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
+import annis.model.Edge.EdgeType;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisToken;
 
@@ -148,6 +149,7 @@ public class AnnisResultImpl implements AnnisResult {
 			Element root = paulaDom.createElement("RESULT");
 			for (String namespace : namespaces)
 				root.setAttribute("xmlns:" + namespace, namespace);
+			root.setAttribute("xmlns:annis", "annis");
 			paulaDom.appendChild(root);
 			Element paula = paulaDom.createElement("paula");
 			root.appendChild(paula);
@@ -184,13 +186,17 @@ public class AnnisResultImpl implements AnnisResult {
 			for (Edge edge : graph.getEdges()) {
 				if (edge.getSource() == null)
 					continue;
-				if (edge.getAnnotations().isEmpty())
+				if (edge.getAnnotations().isEmpty() && edge.getEdgeType() != EdgeType.POINTING_RELATION)
 					continue;
 				Element rel = paulaDom.createElement("_rel");
 				rel.setAttribute("_src", String.valueOf(edge.getSource().getId()));
 				rel.setAttribute("_dst", String.valueOf(edge.getDestination().getId()));
 				for (Annotation annotation : edge.getAnnotations())
 					rel.setAttribute(annotation.getQualifiedName(), annotation.getValue());
+				if (edge.getEdgeType() == EdgeType.POINTING_RELATION) {
+					rel.setAttribute("annis:type", "p");
+					rel.setAttribute("annis:subtype", edge.getQualifiedName());
+				}
 				inline.appendChild(rel);
 
 			}
