@@ -195,7 +195,7 @@ public class AnnisResultImpl implements AnnisResult {
 					rel.setAttribute(annotation.getQualifiedName(), annotation.getValue());
 				if (edge.getEdgeType() == EdgeType.POINTING_RELATION) {
 					rel.setAttribute("annis:type", "p");
-					rel.setAttribute("annis:subtype", edge.getQualifiedName());
+					rel.setAttribute("annis:subtype", edge.getQualifiedName() + "_" + edge.getComponent());
 				}
 				inline.appendChild(rel);
 
