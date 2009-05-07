@@ -10,7 +10,6 @@ CREATE TABLE _corpus
 	pre			numeric(38)	NOT NULL,		-- pre and post order of the corpus tree
 	post		numeric(38)	NOT NULL
 );
-CREATE TRIGGER unique_toplevel_corpus_name BEFORE UPDATE ON _corpus FOR EACH ROW EXECUTE PROCEDURE unique_toplevel_corpus_name();
 
 -- corpus annotations
 -- unique combinantion of corpus_ref, namespace and name
