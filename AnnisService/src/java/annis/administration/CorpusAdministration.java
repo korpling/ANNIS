@@ -40,6 +40,7 @@ public class CorpusAdministration {
 		administrationDao.installPlPgSql();
 		administrationDao.createFunctionComputeRankLevel();
 		administrationDao.createFunctionComputeSpannedTokens();
+		administrationDao.createFunctionUniqueToplevelCorpusName();
 		
 		// switch to new database as new user for the rest
 		administrationDao.setDataSource(createDataSource(host, port, database, user, password));
@@ -62,6 +63,7 @@ public class CorpusAdministration {
 			
 			administrationDao.createStagingArea();
 			administrationDao.bulkImport(path);
+			administrationDao.computeTopLevelCorpus();
 			administrationDao.importBinaryData(path);
 //			// finish transaction here to debug computation of left|right-token
 //			if (true) return;

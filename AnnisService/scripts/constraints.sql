@@ -1,6 +1,6 @@
 -- _corpus
 ALTER TABLE _corpus ADD CONSTRAINT "_PK__corpus" PRIMARY KEY (id);
-ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_name" UNIQUE (name);
+-- ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_name" UNIQUE (name);
 ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_pre" UNIQUE (pre);
 ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_post" UNIQUE (post);
 

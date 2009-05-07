@@ -124,6 +124,11 @@ public class SpringAnnisAdministrationDao {
 		executeSqlFromScript("compute_spanned_tokens.sql");
 	}
 	
+	void createFunctionUniqueToplevelCorpusName() {
+		log.info("creating trigger function: unique_toplevel_corpus_name");
+		executeSqlFromScript("unique_toplevel_corpus_name.sql");
+	}
+	
 	void createSchema() {
 		log.info("creating Annis database schema");
 		executeSqlFromScript("schema.sql");
@@ -153,6 +158,11 @@ public class SpringAnnisAdministrationDao {
 		log.info("bulk-loading data");
 		for (String table : importedTables)
 			bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
+	}
+	
+	void computeTopLevelCorpus() {
+		log.info("computing top-level corpus");
+		executeSqlFromScript("toplevel_corpus.sql");
 	}
 
 	void importBinaryData(String path) {

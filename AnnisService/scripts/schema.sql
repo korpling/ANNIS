@@ -2,7 +2,7 @@
 CREATE TABLE corpus
 (
 	id			numeric(38) PRIMARY KEY,
-	name		varchar(100) NOT NULL UNIQUE,
+	name		varchar(100) NOT NULL, -- UNIQUE,
 	type		varchar(100) NOT NULL,
 	version 	varchar(100),
 	pre			numeric(38) NOT NULL UNIQUE,

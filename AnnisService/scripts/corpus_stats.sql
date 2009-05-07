@@ -1,8 +1,3 @@
--- find the top-level corpus
-ALTER TABLE _corpus ADD top_level boolean;
-UPDATE _corpus SET top_level = 'n';
-UPDATE _corpus SET top_level = 'y' WHERE pre = (SELECT min(pre) FROM _corpus);
-
 -- replace foreign key corpus_id from corpus.timestamp to corpus.id
 ALTER TABLE _corp_2_viz ADD corpus_ref numeric(38);
 UPDATE _corp_2_viz SET corpus_ref = _corpus.id from _corpus WHERE _corpus.top_level = 't';
