@@ -5,5 +5,5 @@ export ANNIS_HOME=$1
 
 #code
 cp AnnisService/annis.jar $ANNIS_HOME/lib/
-cp AnnisService/scripts/* $ANNIS_HOME/scripts/
-cp AnnisService/bin/* $ANNIS_HOME/bin/
+cp -R AnnisService/scripts/* $ANNIS_HOME/scripts/
+cp -R AnnisService/bin/* $ANNIS_HOME/bin/
