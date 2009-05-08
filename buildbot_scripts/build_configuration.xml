@@ -1,0 +1,63 @@
+<build 
+       xmlns:sh="http://bitten.cmlenz.net/tools/sh"
+       xmlns:python="http://bitten.cmlenz.net/tools/python" 
+       xmlns:svn="http://bitten.cmlenz.net/tools/svn"
+       xmlns:java="http://bitten.cmlenz.net/tools/java">
+
+  <step id="checkout" description="Checkout source from repository">
+    <svn:checkout url="file:///srv/svn/annis/"
+        path="${path}" revision="${revision}" />
+  </step>
+
+
+  <step id="build parser" description="Build the parsers">
+    <java:ant file="AnnisService/build.xml" target="build-parsers"/>
+  </step>
+
+  <step id="build service" description="Build and package the AnnisService">
+    <java:ant file="AnnisService/build.xml" target="dist"/>
+  </step>
+
+  <step id="build webapp" description="Build and package the Annis2-webapp">
+    <java:ant file="Annis2-web/build.xml" 
+              target="dist" 
+              args="-Dj2ee.platform.classpath=/opt/jetty/lib/servlet-api-2.5-6.1.14.jar"/>
+  </step>
+
+  <step id="stop webapp" description="Stop the Annis2-webapp">
+    <python:exec file="buildbot_scripts/webappChangeContext.py" args="/etc/jetty/contexts/annis-trunk.xml /srv/jetty/offline Annis-trunk"/>
+  </step>
+
+  <step id="stop service" description="Stop the AnnisService">
+    <sh:exec file="chmod" args="u+x buildbot_scripts/stopService.sh" />
+    <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis-trunk" />
+  </step>
+
+  
+  <step id="copy webapp" description="Copy the Annis2-webapp">
+   <sh:exec file="chmod" args="u+x buildbot_scripts/copyWebapp.sh" /> 
+   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/jetty/Annis-trunk"/>
+  </step>
+
+  <step id="patch webapp" description="Patch the Annis2-webapp with some korpling relative configuration">
+    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/jetty/Annis-trunk ${revision} /etc/annis/user_config_trunk"/>
+  </step>
+
+  <step id="copy service" description="Copy the AnnisService">
+    <sh:exec file="chmod" args="u+x buildbot_scripts/copyService.sh" />
+    <sh:exec file="buildbot_scripts/copyService.sh" args="/opt/annis-trunk"/>
+  </step>
+
+  <step id="start service" description="Start the AnnisService">
+    <sh:exec file="chmod" args="u+x buildbot_scripts/startService.sh" />
+    <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis-trunk" />
+  </step>
+
+  <step id="start webapp" description="Start the Annis2-webapp">
+    <python:exec file="buildbot_scripts/webappChangeContext.py" args="/etc/jetty/contexts/annis-trunk.xml /srv/jetty/Annis-trunk Annis-trunk"/>
+  </step>
+
+
+
+</build>
+
