@@ -10,7 +10,8 @@ ALTER TABLE _xcorp_2_viz DROP corpus_id;
 
 -- statistics
 CREATE TABLE _corpus_stats AS SELECT
-    (select id from _corpus where top_level = 't') as corpus_ref,
+	(select name from _corpus where top_level = 't') as name,
+	(select id from _corpus where top_level = 't') as id,
     
     -- row counts
     (select count(*) from _corpus) as corpus,    

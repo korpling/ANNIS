@@ -1,67 +1,145 @@
-create temporary table __delete_doc_2_corp as
-    select distinct doc_2_corp.doc_id as id from doc_2_corp, __delete_corpus where doc_2_corp.corpus_ref = __delete_corpus.id;
-create index idx__delete_doc_2_corp on __delete_doc_2_corp(id);
+---
+--- drop foreign key constraints on affected tables
+--- (otherwise, calls to trigger functions dominate the execution time by a few magnitudes)
+---
 
-create temporary table __delete_struct as
-    select distinct struct.id as id from struct, __delete_doc_2_corp where struct.doc_ref = __delete_doc_2_corp.id;
-create index idx__delete_struct on __delete_struct(id);
+ALTER TABLE rank DROP CONSTRAINT "rank_component_ref_fkey";
+ALTER TABLE rank DROP CONSTRAINT "rank_parent_fkey";
+ALTER TABLE edge_annotation DROP CONSTRAINT "edge_annotation_rank_ref_fkey";
 
-create temporary table __delete_text as
-    select distinct struct.text_ref as id from struct, __delete_struct where struct.id = __delete_struct.id;
-create index dix__delete_text on __delete_text(id);
+ALTER TABLE node DROP CONSTRAINT "node_text_ref_fkey";
+ALTER TABLE struct_annotation DROP CONSTRAINT "FK_struct_annotation_2_text";
+ALTER TABLE rank DROP CONSTRAINT "rank_node_ref_fkey";
+ALTER TABLE node_annotation DROP CONSTRAINT "node_annotation_node_ref_fkey";
 
-create temporary table __delete_rank as
-    select distinct rank.pre as id from rank, __delete_struct where rank.struct_ref = __delete_struct.id;
-create index idx__delete_rank on __delete_rank(id);
+ALTER TABLE corpus_annotation DROP CONSTRAINT "corpus_annotation_corpus_ref_fkey";
+ALTER TABLE node DROP CONSTRAINT "node_corpus_ref_fkey";
+ALTER TABLE corpus_stats DROP CONSTRAINT "corpus_stats_id_fkey";
+ALTER TABLE corp_2_viz DROP CONSTRAINT "FK_corp_2_viz_2_corpus";
+ALTER TABLE xcorp_2_viz DROP CONSTRAINT "FK_xcorp_2_viz_2_corpus";
 
-create temporary table __delete_anno as
-    select distinct anno.id as id from anno, __delete_struct where anno.struct_ref = __delete_struct.id;
-create index idx__delete_anno on __delete_anno(id);
+--- 
+--- delete entries from materialized tables
+---
 
-create temporary table __delete_extdata as
-    select distinct anno_attribute.value as id from __delete_anno, anno_attribute where anno_attribute.anno_ref = __delete_anno.id and lower(anno_attribute.attribute) = 'AUDIO';
-create index idx__delete_extdata on __delete_extdata(id);
+-- edges
+-- explain analyze
+DELETE FROM edges
+USING corpus toplevel, corpus child, node, rank
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id AND edges.pre = rank.pre;
 
-create temporary table __delete_collection as
-    select distinct collection.id from collection where collection.id in ( 
-        select col_ref from struct, __delete_struct where struct.id = __delete_struct.id union
-        select col_ref from anno, __delete_anno where anno.id = __delete_anno.id union
-        select col_ref from text, __delete_text where text.id = __delete_text.id 
-    );
-create index idx__delete_collection on __delete_collection(id);
-    
+-- rank_annotations
+-- explain analyze
+DELETE FROM rank_annotations
+USING corpus toplevel, corpus child, node, rank
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id AND rank_annotations.pre = rank.pre;
 
--- delete entries from tables
-DELETE FROM rank_anno USING __delete_rank WHERE rank_anno.rank_ref = __delete_rank.id;
-DELETE FROM rank USING __delete_rank WHERE pre = __delete_rank.id;
-delete from rank_annotation using __delete_rank where pre = __delete_rank.id;
-delete from rank_text_ref using __delete_text where text_ref = __delete_text.id;
-DELETE FROM anno_attribute using __delete_anno where anno_ref = __delete_anno.id;
-delete from anno using __delete_anno where anno.id = __delete_anno.id;
-delete from annotation using __delete_struct where annotation.struct_ref = __delete_struct.id;
-delete from struct using __delete_struct where struct.id = __delete_struct.id;
-delete from struct_annotation using __delete_struct where struct_annotation.id = __delete_struct.id;
-delete from text using __delete_text where text.id = __delete_text.id;
-delete from col_rank using __delete_collection where col_rank.col_ref = __delete_collection.id;
-delete from meta_attribute using __delete_collection where meta_attribute.col_ref = __delete_collection.id;
-delete from collection using __delete_collection where collection.id = __delete_collection.id;
-delete from doc_2_corp using __delete_corpus where doc_2_corp.corpus_ref = __delete_corpus.id;
-delete from document using __delete_doc_2_corp where document.id = __delete_doc_2_corp.id;
-delete from corp_2_viz using __delete_corpus where corp_2_viz.corpus_ref = __delete_corpus.id;
-delete from xcorp_2_viz using __delete_corpus where xcorp_2_viz.corpus_ref = __delete_corpus.id;
-delete from corpus_stats using __delete_corpus where corpus_stats.corpus_ref = __delete_corpus.id;
-delete from corpus using __delete_corpus where corpus.id = __delete_corpus.id;
+-- rank_text_ref
+-- explain analyze
+DELETE FROM rank_text_ref
+USING corpus toplevel, corpus child, node, rank
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id AND rank_text_ref.pre = rank.pre;
 
--- FIXME: delete external file
-delete from extdata using __delete_extdata where extdata.id = __delete_extdata.id::numeric;
+-- struct_annotation
+-- explain analyze
+DELETE FROM struct_annotation
+USING corpus toplevel, corpus child
+WHERE toplevel.id IN ( :ids ) 
+AND toplevel.pre < child.pre AND toplevel.post >= child.pre 
+AND struct_annotation.corpus_ref = child.id;
 
--- drop tables
-drop table __delete_extdata;
-drop table __delete_corpus; 
-drop table __delete_doc_2_corp; 
-drop table __delete_collection; 
-drop table __delete_text;
-drop table __delete_struct; 
-drop table __delete_rank; 
-drop table __delete_anno; 
+---
+--- delete table entries for this corpus for each table seperately
+--- :ids is replaced by a list of IDs in code
+--- XXX: SQL-Injection möglich, wenn IDs als String übergeben
+---
 
+-- component
+-- explain analyze
+DELETE FROM component
+USING corpus toplevel, corpus child, node, rank
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id AND rank.component_ref = component.id;
+
+-- edge_annotation
+-- explain analyze
+DELETE FROM edge_annotation
+USING corpus toplevel, corpus child, node, rank
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id AND edge_annotation.rank_ref = rank.pre;
+
+-- explain analyze
+DELETE FROM rank
+USING corpus toplevel, corpus child, node
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND rank.node_ref = node.id;
+
+-- node_annotation
+-- explain analyze
+DELETE FROM node_annotation
+USING corpus toplevel, corpus child, node
+WHERE toplevel.id IN (:ids) AND toplevel.top_level = 'y'
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
+AND node.corpus_ref = child.id AND node_annotation.node_ref = node.id;
+
+-- text
+-- explain analyze
+DELETE FROM text 
+USING corpus toplevel, corpus child, node 
+WHERE toplevel.id IN ( :ids ) 
+AND toplevel.pre < child.pre AND toplevel.post >= child.pre 
+AND node.corpus_ref = child.id AND node.text_ref = text.id;
+
+-- node
+-- explain analyze
+DELETE FROM node
+USING corpus toplevel, corpus child
+WHERE toplevel.id IN ( :ids ) 
+AND toplevel.pre < child.pre AND toplevel.post >= child.pre 
+AND node.corpus_ref = child.id;
+
+-- corpus_annotation
+-- explain analyze
+DELETE FROM corpus_annotation
+USING corpus toplevel, corpus child
+WHERE toplevel.id IN ( :ids ) 
+AND toplevel.pre < child.pre AND toplevel.post >= child.pre 
+AND corpus_annotation.corpus_ref = child.id;
+
+-- corpus_stats
+-- explain analyze
+DELETE FROM corpus_stats WHERE id IN ( :ids );
+
+-- corpus
+-- explain analyze
+DELETE FROM corpus child 
+USING corpus toplevel 
+WHERE toplevel.id IN ( :ids ) 
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre;
+
+---
+--- recreate foreign key constraints
+---
+ALTER TABLE rank ADD CONSTRAINT "rank_component_ref_fkey" FOREIGN KEY (component_ref) REFERENCES component (id);
+ALTER TABLE rank ADD CONSTRAINT "rank_parent_fkey" FOREIGN KEY (parent) REFERENCES rank (pre);
+ALTER TABLE edge_annotation ADD CONSTRAINT "edge_annotation_rank_ref_fkey" FOREIGN KEY (rank_ref) REFERENCES rank (pre);
+
+ALTER TABLE node ADD CONSTRAINT "node_text_ref_fkey" FOREIGN KEY (text_ref) REFERENCES text (id);
+ALTER TABLE struct_annotation ADD CONSTRAINT "FK_struct_annotation_2_text" FOREIGN KEY (text_ref) REFERENCES text (id);;
+ALTER TABLE rank ADD CONSTRAINT "rank_node_ref_fkey" FOREIGN KEY (node_ref) REFERENCES node (id);
+ALTER TABLE node_annotation ADD CONSTRAINT "node_annotation_node_ref_fkey" FOREIGN KEY (node_ref) REFERENCES node (id);
+
+ALTER TABLE corpus_annotation ADD CONSTRAINT "corpus_annotation_corpus_ref_fkey" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
+ALTER TABLE node ADD CONSTRAINT "node_corpus_ref_fkey" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
+ALTER TABLE corpus_stats ADD CONSTRAINT "corpus_stats_id_fkey" FOREIGN KEY (id) REFERENCES corpus (id);
+ALTER TABLE corp_2_viz ADD CONSTRAINT "FK_corp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
+ALTER TABLE xcorp_2_viz ADD CONSTRAINT "FK_xcorp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);

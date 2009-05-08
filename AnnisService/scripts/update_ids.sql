@@ -45,7 +45,7 @@ UPDATE _corpus SET id = id + (SELECT corpus_id FROM _max);
 UPDATE _corpus SET pre = pre + (SELECT corpus_post FROM _max);
 UPDATE _corpus SET post = post + (SELECT corpus_post FROM _max);
 
-UPDATE _corpus_stats SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
+UPDATE _corpus_stats SET id = id + (SELECT corpus_id FROM _max);
 
 UPDATE _corpus_annotation SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
 

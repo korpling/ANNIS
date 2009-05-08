@@ -12,7 +12,7 @@ CREATE TABLE corpus
 
 CREATE TABLE corpus_annotation
 (
-	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id),
+	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	namespace	varchar(100),
 	name		varchar(1000) NOT NULL,
 	value		varchar(2000),
@@ -29,8 +29,8 @@ CREATE TABLE text
 CREATE TABLE node
 (
 	id			numeric(38)	PRIMARY KEY,
-	text_ref	numeric(38) NOT NULL REFERENCES text (id),
-	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id),
+	text_ref	numeric(38) NOT NULL REFERENCES text (id) ON DELETE CASCADE,
+	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	namespace	varchar(100),
 	name		varchar(100) NOT NULL,
 	"left"		integer NOT NULL,
@@ -54,15 +54,15 @@ CREATE TABLE rank
 (
 	pre				numeric(38)	PRIMARY KEY,
 	post			numeric(38)	NOT NULL UNIQUE,
-	node_ref		numeric(38)	NOT NULL REFERENCES node (id),
-	component_ref	numeric(38) NOT NULL REFERENCES component (id),
-	parent			numeric(38) NULL REFERENCES rank (pre),
+	node_ref		numeric(38)	NOT NULL REFERENCES node (id) ON DELETE CASCADE,
+	component_ref	numeric(38) NOT NULL REFERENCES component (id) ON DELETE CASCADE,
+	parent			numeric(38) NULL REFERENCES rank (pre) ON DELETE CASCADE,
 	level			numeric(38) NOT NULL	-- depth of the node in the annotation graph
 );
 
 CREATE TABLE node_annotation
 (
-	node_ref	numeric(38) REFERENCES node (id),
+	node_ref	numeric(38) REFERENCES node (id) ON DELETE CASCADE,
 	namespace	varchar(150),
 	name		varchar(150) NOT NULL,
 	value		varchar(1500),
@@ -71,7 +71,7 @@ CREATE TABLE node_annotation
 
 CREATE TABLE edge_annotation
 (
-	rank_ref	numeric(38)	REFERENCES rank (pre),
+	rank_ref	numeric(38)	REFERENCES rank (pre) ON DELETE CASCADE,
 	namespace	varchar(150),
 	name		varchar(150) NOT NULL,
 	value		varchar(1500),
@@ -95,7 +95,8 @@ CREATE TABLE extData
 -- stats
 CREATE TABLE corpus_stats
 (
-	corpus_ref			numeric(38) NOT NULL REFERENCES corpus (id),
+	name				varchar,
+	id					numeric(38) NOT NULL REFERENCES corpus ON DELETE CASCADE,
 	corpus				numeric(38),
 	corpus_annotation	numeric(38),
 	text				numeric(38),
@@ -113,8 +114,8 @@ CREATE TABLE corpus_stats
 );
 
 CREATE VIEW corpus_info AS SELECT 
-	id,
 	name,
+	id, 
 	n_tokens,
 	n_roots,
 	depth,
@@ -122,9 +123,7 @@ CREATE VIEW corpus_info AS SELECT
 	to_char(avg_children, '990.99') as avg_children,
 	to_char(avg_duplicates, '990.99') as avg_duplicates
 FROM 
-	corpus, corpus_stats
-WHERE
-	corpus_stats.corpus_ref = corpus.id;
+	corpus_stats;
 	
 CREATE VIEW table_stats AS select
 	(select count(*) from corpus ) as corpus,	

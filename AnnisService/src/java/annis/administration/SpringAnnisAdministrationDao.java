@@ -9,12 +9,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import annis.externalFiles.ExternalFileMgrDAO;
  * - Skripte in $ANNIS_HOME/scripts
  * - COPY mechanism for PostgreSQL, see http://kato.iki.fi/sw/db/postgresql/jdbc/copy/
  */
+// FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class SpringAnnisAdministrationDao {
 
 	private Logger log = Logger.getLogger(this.getClass());
@@ -295,21 +298,9 @@ public class SpringAnnisAdministrationDao {
 		return simpleJdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
 	}
 	
-	// XXX: not all collections are deleted
 	void deleteCorpora(List<Long> ids) {
-		// select this corpus and subcorpara for deletions
-		log.debug("marking corpora for deletion");
-		String sql = "" +
-				"CREATE TEMPORARY TABLE __delete_corpus AS " +
-				"SELECT DISTINCT c1.id AS id " +
-				"FROM corpus c1, corpus c2 " +
-				"WHERE c1.pre >= c2.pre AND c1.post <= c2.post " +
-				"AND c2.id IN ( :ids )";
-		SqlParameterSource args = makeArgs().addValue("ids", ids);
-		simpleJdbcTemplate.update(sql, args);
-		
-		// the rest is done in a script
-		executeSqlFromScript("delete_corpus.sql");
+		log.debug("recursivly deleting corpora: " + ids);
+		executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids", StringUtils.join(ids, ", ")));
 	}
 	
 	List<Map<String, Object>> listCorpusStats() {
@@ -361,24 +352,37 @@ public class SpringAnnisAdministrationDao {
 	}
 
 	// reads the content from a resource into a string
-	private String readSqlFromResource(Resource resource) {
+	private String readSqlFromResource(Resource resource, MapSqlParameterSource args) {
+		// XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
+		Map parameters = args != null ? args.getValues() : new HashMap();
 		try {
 			String sql = "";
 			BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()));
 			for (String line = reader.readLine(); line != null; line = reader.readLine())
 				sql += line + "\n";
+			for (Object placeHolder : parameters.keySet()) {
+				String key = placeHolder.toString();
+				String value = parameters.get(placeHolder).toString();
+				log.debug("substitution for parameter '" + key + "' in SQL script: " + value);
+				sql = sql.replaceAll(key, value);
+			}
 			return sql;
 		} catch (IOException e) {
-			log.error("Couldn't read SQL schema from resource file.", e);
-			throw new FileAccessException("Couldn't read SQL schema from resource file.", e);
+			log.error("Couldn't read SQL script from resource file.", e);
+			throw new FileAccessException("Couldn't read SQL script from resource file.", e);
 		}
 	}
 	
 	// executes an SQL script from $ANNIS_HOME/scripts
 	private void executeSqlFromScript(String script) {
+		executeSqlFromScript(script, null);
+	}
+
+	// executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
+	private void executeSqlFromScript(String script, MapSqlParameterSource args) {
 		Resource resource = new FileSystemResource(new File(scriptPath, script));
 		log.debug("executing SQL script: " + resource.getFilename());
-		String sql = readSqlFromResource(resource);
+		String sql = readSqlFromResource(resource, args);
 		jdbcOperations.execute(sql);
 	}
 

@@ -11,7 +11,7 @@ import org.mockito.Mock;
 
 public class TestCorpusAdministration {
 
-	@Mock private SpringAnnisAdministrationDao databaseUtils;
+	@Mock private SpringAnnisAdministrationDao administrationDao;
 	private CorpusAdministration administration;
 	
 	@Before
@@ -19,7 +19,7 @@ public class TestCorpusAdministration {
 		initMocks(this);
 
 		administration = new CorpusAdministration();
-		administration.setAdministrationDao(databaseUtils);
+		administration.setAdministrationDao(administrationDao);
 	}
 	
 	@Test
@@ -29,7 +29,7 @@ public class TestCorpusAdministration {
 		administration.importCorpora(path);
 		
 		// insertion of a corpus needs to follow an exact order
-		InOrder inOrder = inOrder(databaseUtils);
+		InOrder inOrder = inOrder(administrationDao);
 		
 		verifyPreImport(inOrder);
 
@@ -39,7 +39,7 @@ public class TestCorpusAdministration {
 		verifyPostImport(inOrder);
 
 		// that should be it
-		verifyNoMoreInteractions(databaseUtils);
+		verifyNoMoreInteractions(administrationDao);
 	}
 	
 	@Test
@@ -50,7 +50,7 @@ public class TestCorpusAdministration {
 		administration.importCorpora(path1, path2, path3);
 		
 		// insertion of a corpus needs to follow an exact order
-		InOrder inOrder = inOrder(databaseUtils);
+		InOrder inOrder = inOrder(administrationDao);
 		
 		// drop indexes only once
 		verifyPreImport(inOrder);
@@ -64,49 +64,52 @@ public class TestCorpusAdministration {
 		verifyPostImport(inOrder);
 
 		// that should be it
-		verifyNoMoreInteractions(databaseUtils);
+		verifyNoMoreInteractions(administrationDao);
 	}
 
 	private void verifyPreImport(InOrder inOrder) {
-		inOrder.verify(databaseUtils).dropIndexes();
+		inOrder.verify(administrationDao).dropIndexes();
 	}
 
 	private void verifyPostImport(InOrder inOrder) {
-		inOrder.verify(databaseUtils).dropMaterializedTables();
-		inOrder.verify(databaseUtils).createMaterializedTables();
-		inOrder.verify(databaseUtils).rebuildIndexes();
+		inOrder.verify(administrationDao).dropMaterializedTables();
+		inOrder.verify(administrationDao).createMaterializedTables();
+		inOrder.verify(administrationDao).rebuildIndexes();
 	}
 
 	// a correct import requires this order
 	private void verifyImport(InOrder inOrder, String path) {
 		// create the staging area
-		inOrder.verify(databaseUtils).createStagingArea();
+		inOrder.verify(administrationDao).createStagingArea();
 		
 		// bulk import the data
-		inOrder.verify(databaseUtils).bulkImport(path);
+		inOrder.verify(administrationDao).bulkImport(path);
+		
+		// compute and verify top-level corpus
+		inOrder.verify(administrationDao).computeTopLevelCorpus();
 		
 		// import binaries
-		inOrder.verify(databaseUtils).importBinaryData(path);
+		inOrder.verify(administrationDao).importBinaryData(path);
 		
 		// post-process the data to speed up queries
-		inOrder.verify(databaseUtils).computeLeftTokenRightToken();
-		inOrder.verify(databaseUtils).computeComponents();
-		inOrder.verify(databaseUtils).computeLevel();
+		inOrder.verify(administrationDao).computeLeftTokenRightToken();
+		inOrder.verify(administrationDao).computeComponents();
+		inOrder.verify(administrationDao).computeLevel();
 		
 		// gather statistics about this corpus
-		inOrder.verify(databaseUtils).computeCorpusStatistics();
+		inOrder.verify(administrationDao).computeCorpusStatistics();
 		
 		// update IDs in staging area
-		inOrder.verify(databaseUtils).updateIds();
+		inOrder.verify(administrationDao).updateIds();
 		
 		// apply constraints to ensure data integrity
-		inOrder.verify(databaseUtils).applyConstraints();
+		inOrder.verify(administrationDao).applyConstraints();
 		
 		// insert the corpus from the staging area to the main db
-		inOrder.verify(databaseUtils).insertCorpus();
+		inOrder.verify(administrationDao).insertCorpus();
 		
 		// drop the staging area
-		inOrder.verify(databaseUtils).dropStagingArea();
+		inOrder.verify(administrationDao).dropStagingArea();
 	}
 	
 }
