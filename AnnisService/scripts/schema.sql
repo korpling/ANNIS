@@ -57,6 +57,7 @@ CREATE TABLE rank
 	node_ref		numeric(38)	NOT NULL REFERENCES node (id) ON DELETE CASCADE,
 	component_ref	numeric(38) NOT NULL REFERENCES component (id) ON DELETE CASCADE,
 	parent			numeric(38) NULL REFERENCES rank (pre) ON DELETE CASCADE,
+	root			boolean,
 	level			numeric(38) NOT NULL	-- depth of the node in the annotation graph
 );
 
@@ -96,18 +97,22 @@ CREATE TABLE extData
 CREATE TABLE corpus_stats
 (
 	name				varchar,
-	id					numeric(38) NOT NULL REFERENCES corpus ON DELETE CASCADE,
-	corpus				numeric(38),
-	corpus_annotation	numeric(38),
-	text				numeric(38),
-	node				numeric(38),
-	node_annotation		numeric(38),
-	rank				numeric(38),
-	component			numeric(38),
-	edge_annotation		numeric(38),
-	n_tokens			numeric(38),
-	n_roots				numeric(38),
-	depth				numeric(38),
+	id					numeric NOT NULL REFERENCES corpus ON DELETE CASCADE,
+	corpus				numeric,
+	text				numeric,
+	node				numeric,
+	rank				numeric,
+	component			numeric,
+	corpus_annotation	numeric,
+	node_annotation		numeric,
+	edge_annotation		numeric,
+	tokens				numeric,
+	roots				numeric,
+	depth				numeric,
+	c					numeric,
+	d					numeric,
+	p					numeric,
+	u					numeric,
 	avg_level			real,
 	avg_children		real,
 	avg_duplicates		real
@@ -116,8 +121,8 @@ CREATE TABLE corpus_stats
 CREATE VIEW corpus_info AS SELECT 
 	name,
 	id, 
-	n_tokens,
-	n_roots,
+	tokens,
+	roots,
 	depth,
 	to_char(avg_level, '990.99') as avg_level,
 	to_char(avg_children, '990.99') as avg_children,

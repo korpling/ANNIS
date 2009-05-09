@@ -15,22 +15,28 @@ CREATE TABLE _corpus_stats AS SELECT
     
     -- row counts
     (select count(*) from _corpus) as corpus,    
-    (select count(*) from _corpus_annotation) as corpus_annotation,
     (select count(*) from _text) as text,
     (select count(*) from _node) as node,    
-    (select count(*) from _node_annotation) as node_annotation,
     (select count(*) from _rank) as rank,
     (select count(*) from _component) as component,
+    (select count(*) from _corpus_annotation) as corpus_annotation,
+    (select count(*) from _node_annotation) as node_annotation,
     (select count(*) from _edge_annotation) as edge_annotation,    
     
     -- # tokens
-    (SELECT count(*) FROM _node WHERE token_index IS NOT NULL) as n_tokens,
+    (SELECT count(*) FROM _node WHERE token_index IS NOT NULL) as tokens,
 
     -- # root elements
-    (SELECT count(*) FROM _rank WHERE level = 0) as n_roots,
+    (SELECT count(distinct node_ref) FROM _rank WHERE root) as roots,
 
     -- max depth
     (SELECT max(level) FROM _rank) as depth,
+    
+    -- distinct edge types
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'c') AS dictinct_edge_types) as c,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'd') AS dictinct_edge_types) as d,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'p') AS dictinct_edge_types) as p,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type NOT IN ('c', 'p', 'u')) AS dictinct_edge_types) as u,
 
     -- avg depth
     (select sum(count * level) / sum (count) from (select count(*), level from _rank group by level) as tmp) as avg_level,

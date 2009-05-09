@@ -304,7 +304,7 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	List<Map<String, Object>> listCorpusStats() {
-		return simpleJdbcTemplate.queryForList("SELECT * FROM corpus_info");
+		return simpleJdbcTemplate.queryForList("SELECT * FROM corpus_info ORDER BY name");
 	}
 	
 	List<Map<String, Object>> listTableStats() {
