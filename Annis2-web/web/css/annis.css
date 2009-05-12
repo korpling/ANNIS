@@ -4,7 +4,7 @@
 }
 
 .windowSearchResult.token.prematch {
-	float: right;	
+	float: right;
 	margin-left: 5px;
 	white-space: nowrap;
 }
@@ -26,7 +26,7 @@
 }
 
 .windowSearchResult.annotation {
-	color: grey;
+	color: gray;
 	text-align: center;	
 }
 

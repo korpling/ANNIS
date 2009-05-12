@@ -60,7 +60,10 @@ Ext.onReady(function()
   // create the Data Store
   var tokenLevels = [];
   var storeSearchResult = new Ext.data.JsonStore({
-    proxy: new Ext.data.HttpProxy({ url: conf_context + '/secure/SearchResult', timeout: 180000 }),
+    proxy: new Ext.data.HttpProxy({
+      url: conf_context + '/secure/SearchResult',
+      timeout: 180000
+    }),
 
     id: 'storeSearchResult',
     root: 'resultSet',
@@ -71,9 +74,34 @@ Ext.onReady(function()
     remoteSort: true,
     listeners : {
     
-      'load' : function() {
+      'load' : function() 
+      {
+        var isRTL = false;
+
         //lets update the token level selection button
-        this.each(function(record) {
+        this.each(function(record) 
+        {
+          // check if left to right or right to left text order
+          for(var i=0;!isRTL && i < record.data._text.length; i++)
+          {
+            var cc = record.data._text.charCodeAt(i);
+            // hebrew extended and basic, arabic basic and extendend
+            if(cc >= 1425 && cc <=1785)
+            {
+              isRTL = true;
+            }
+            // alphabetic presentations forms (hebrwew) to arabic presentation forms A
+            else if(cc >= 64286 && cc <= 65019)
+            {
+              isRTL = true;
+            }
+            // arabic presentation forms B
+            else if(cc >= 65136 && cc <= 65276)
+            {
+              isRTL = true;
+            }
+          }
+          
           Ext.each(record.data._tokenLevels, function(item) {
             if(tokenLevels.indexOf(item) == -1) {
               tokenLevelSelectionMenu.addItem(new Ext.menu.CheckItem({
@@ -85,8 +113,12 @@ Ext.onReady(function()
               tokenLevels.push(item);
             }
           });
+        });
+
+        if(isRTL)
+        {
+          alert("Arabic or Hebrew text detected");
         }
-        );
       }
     }
   });
