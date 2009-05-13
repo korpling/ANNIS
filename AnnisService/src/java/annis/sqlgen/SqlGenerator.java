@@ -20,7 +20,7 @@ public class SqlGenerator {
 	private ClauseAnalysis clauseAnalysis;
 	private ClauseSqlAdapter clauseSqlAdapter;
 	
-	public String toSql(Start statement, CorpusSelectionStrategy corpusSelectionStrategy) {
+	public String toSql(Start statement, CorpusSelectionStrategy corpusSelectionStrategy, SelectClauseSqlAdapter selectClauseSqlAdapter) {
 		// split statement into list of clauses
 		statement.apply(disjunctiveNormalForm);
 		List<PExpr> clauses = disjunctiveNormalForm.listClauses(statement);
@@ -44,7 +44,7 @@ public class SqlGenerator {
 		List<String> subQueries = new ArrayList<String>();
 		for (ClauseAnalysis clauseAnalysis : analysis) {
 			corpusSelectionStrategy.addMetaAnnotations(clauseAnalysis.getMetaAnnotations());
-			String clauseSql = clauseSqlAdapter.toSql(clauseAnalysis.getNodes(), maxWidth, corpusSelectionStrategy);
+			String clauseSql = clauseSqlAdapter.toSql(clauseAnalysis.getNodes(), maxWidth, corpusSelectionStrategy, selectClauseSqlAdapter);
 			subQueries.add(clauseSql);
 		}
 		String sql = StringUtils.join(subQueries, "\n\nUNION ");

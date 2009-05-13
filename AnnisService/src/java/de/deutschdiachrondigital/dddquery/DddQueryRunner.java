@@ -21,6 +21,8 @@ import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisResultImpl;
+import annis.sqlgen.CountSpansSelectClauseSqlAdapter;
+import annis.sqlgen.CoveredTokensSelectClauseSqlAdapter;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
@@ -44,6 +46,9 @@ public class DddQueryRunner extends AnnisBaseRunner {
 
 	private AnnotationGraphDotExporter annotationGraphDotExporter;
 	private TableFormatter tableFormatter;
+	
+	private CountSpansSelectClauseSqlAdapter countSpansSelectClauseSqlAdapter;
+	private CoveredTokensSelectClauseSqlAdapter coveredTokensSelectClauseSqlAdapter;
 	
 	// settings
 	private int matchLimit;
@@ -73,7 +78,7 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		// sql query
 		Start statement = dddQueryParser.parse(dddQuery);
 		CorpusSelectionStrategy corpusSelectionStrategy = corpusSelectionStrategyFactory.createCorpusSelectionStrategy(getCorpusList());
-		String sql = sqlGenerator.toSql(statement, corpusSelectionStrategy);
+		String sql = sqlGenerator.toSql(statement, corpusSelectionStrategy, coveredTokensSelectClauseSqlAdapter);
 
 		// corpus selection view
 		String createViewSql = corpusSelectionStrategy.createViewSql();
@@ -274,6 +279,24 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	public void setAnnotationGraphDotExporter(
 			AnnotationGraphDotExporter annotationGraphDotExporter) {
 		this.annotationGraphDotExporter = annotationGraphDotExporter;
+	}
+
+	public CountSpansSelectClauseSqlAdapter getCountSpansSelectClauseSqlAdapter() {
+		return countSpansSelectClauseSqlAdapter;
+	}
+
+	public void setCountSpansSelectClauseSqlAdapter(
+			CountSpansSelectClauseSqlAdapter countSpansSelectClauseSqlAdapter) {
+		this.countSpansSelectClauseSqlAdapter = countSpansSelectClauseSqlAdapter;
+	}
+
+	public CoveredTokensSelectClauseSqlAdapter getCoveredTokensSelectClauseSqlAdapter() {
+		return coveredTokensSelectClauseSqlAdapter;
+	}
+
+	public void setCoveredTokensSelectClauseSqlAdapter(
+			CoveredTokensSelectClauseSqlAdapter coveredTokensSelectClauseSqlAdapter) {
+		this.coveredTokensSelectClauseSqlAdapter = coveredTokensSelectClauseSqlAdapter;
 	}
 
 }

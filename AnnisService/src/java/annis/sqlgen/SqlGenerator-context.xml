@@ -14,6 +14,14 @@
 		<property name="precedenceBound" value="0"/>
 	</bean>
 	
+	<bean id="coveredTokensSelectClauseSqlAdapter" class="annis.sqlgen.CoveredTokensSelectClauseSqlAdapter">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+	
+	<bean id="countSpansSelectClauseSqlAdapter" class="annis.sqlgen.CountSpansSelectClauseSqlAdapter">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+	
 	<!-- generates a SQL statement for a single clause -->
 	<bean id="clauseSqlAdapter" class="annis.sqlgen.ClauseSqlAdapter">
 		<property name="nodeSqlAdapterFactory" ref="nodeSqlAdapterFactory"/>

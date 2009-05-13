@@ -106,7 +106,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setTransactionManager(transactionManager);
 
 		when(dddQueryParser.parse(DDDQUERY)).thenReturn(STATEMENT);
-		when(sqlGenerator.toSql(STATEMENT, corpusSelectionStrategy)).thenReturn(SQL);
+		when(sqlGenerator.toSql(STATEMENT, corpusSelectionStrategy, null)).thenReturn(SQL);
 		when(corpusSelectionStrategyFactory.createCorpusSelectionStrategy(CORPUS_LIST)).thenReturn(corpusSelectionStrategy);
 		when(corpusSelectionStrategyFactory.createCorpusSelectionStrategy(anyList())).thenReturn(corpusSelectionStrategy);
 		TransactionStatus status = mock(TransactionStatus.class);
@@ -141,7 +141,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.findMatches(CORPUS_LIST, DDDQUERY);
 		
 		InOrder inOrder = inOrder(sqlGenerator, corpusSelectionStrategy, jdbcTemplate);
-		inOrder.verify(sqlGenerator).toSql(STATEMENT, corpusSelectionStrategy);
+		inOrder.verify(sqlGenerator).toSql(STATEMENT, corpusSelectionStrategy, null);
 		inOrder.verify(corpusSelectionStrategy).usesViews();
 		inOrder.verify(jdbcTemplate).query(SQL, matchRowMapper);
 		verifyNoMoreInteractions(jdbcTemplate);
@@ -161,7 +161,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.findMatches(CORPUS_LIST, DDDQUERY);
 		
 		InOrder inOrder = inOrder(sqlGenerator, corpusSelectionStrategy, jdbcTemplate);
-		inOrder.verify(sqlGenerator).toSql(STATEMENT, corpusSelectionStrategy);
+		inOrder.verify(sqlGenerator).toSql(STATEMENT, corpusSelectionStrategy, null);
 		inOrder.verify(corpusSelectionStrategy).usesViews();
 		inOrder.verify(corpusSelectionStrategy).createViewSql();
 		inOrder.verify(jdbcTemplate).update(CREATE_VIEW);

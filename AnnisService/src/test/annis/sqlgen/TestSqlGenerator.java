@@ -46,6 +46,7 @@ public class TestSqlGenerator {
 	
 	// SqlGenerator that is managed by Spring (has ClauseAnalyzer injected)
 	@Autowired private SqlGenerator springManagedSqlGenerator;
+	@Autowired private CoveredTokensSelectClauseSqlAdapter coveredTokensSelectClauseSqlAdapter;
 	@Autowired private DddQueryParser parser;
 
 	@Before
@@ -88,10 +89,10 @@ public class TestSqlGenerator {
 		final String sql2 = "SELECT 2";
 		final String sql3 = "SELECT 3";
 		sqlGenerator.setClauseSqlAdapter(clauseSqlAdapter);
-		when(clauseSqlAdapter.toSql(clauseAnalysis.getNodes(), COLUMN_WIDTH, corpusSelectionStrategy)).thenReturn(sql1, sql2, sql3);
+		when(clauseSqlAdapter.toSql(clauseAnalysis.getNodes(), COLUMN_WIDTH, corpusSelectionStrategy, null)).thenReturn(sql1, sql2, sql3);
 		
 		// convert statement to SQL
-		String sql = sqlGenerator.toSql(statement, corpusSelectionStrategy);
+		String sql = sqlGenerator.toSql(statement, corpusSelectionStrategy, null);
 		
 		// verify flow control
 		InOrder inOrder = inOrder(dnfTransformer, clauseAnalysis, clauseSqlAdapter);
@@ -110,7 +111,7 @@ public class TestSqlGenerator {
 		
 		// then each clause is transformed to SQL with correct width
 		// XXX: 2nd parameter COLUMN_WIDTH + 5 should cause a failure, why does it pass???
-		inOrder.verify(clauseSqlAdapter, times(3)).toSql(clauseAnalysis.getNodes(), COLUMN_WIDTH + 5, corpusSelectionStrategy);
+		inOrder.verify(clauseSqlAdapter, times(3)).toSql(clauseAnalysis.getNodes(), COLUMN_WIDTH + 5, corpusSelectionStrategy, null);
 
 		// check for correct SQL
 		assertEquals(sql1 + "\n\nUNION " + sql2 + "\n\nUNION " + sql3, sql);
@@ -143,7 +144,7 @@ public class TestSqlGenerator {
 
 	private void dumpSql(String input) {
 		System.out.println("-- " + input);
-		System.out.println(springManagedSqlGenerator.toSql(parser.parse((input)), corpusSelectionStrategy));
+		System.out.println(springManagedSqlGenerator.toSql(parser.parse((input)), corpusSelectionStrategy, coveredTokensSelectClauseSqlAdapter));
 		System.out.println();
 	}
 

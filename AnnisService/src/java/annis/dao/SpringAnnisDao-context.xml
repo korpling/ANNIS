@@ -84,6 +84,8 @@
 		<property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
 		<property name="corpusSelectionStrategyFactory" ref="corpusSelectionStrategyFactory"/>
 		<property name="transactionManager" ref="transactionManager"/>
+		<property name="coveredTokensSelectClauseSqlAdapter" ref="coveredTokensSelectClauseSqlAdapter"/>
+		<property name="countSpansSelectClauseSqlAdapter" ref="countSpansSelectClauseSqlAdapter"/>
 	</bean>
 	
 	<util:list id="springAnnisDaoMatchFilters">

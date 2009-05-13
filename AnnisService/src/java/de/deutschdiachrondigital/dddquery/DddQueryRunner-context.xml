@@ -48,6 +48,9 @@
 		<property name="annotationGraphDotExporter" ref="annotationGraphDotExporter"/>
 		
 		<property name="tableFormatter"><bean class="annis.TableFormatter"/></property>
+		
+		<property name="coveredTokensSelectClauseSqlAdapter" ref="coveredTokensSelectClauseSqlAdapter"/>
+		<property name="countSpansSelectClauseSqlAdapter" ref="countSpansSelectClauseSqlAdapter"/>
 			
 		<property name="matchLimit" value="100"/>
 		<property name="helloMessage" value="DddQuery Interactive shell"/>

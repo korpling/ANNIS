@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -23,6 +25,11 @@ import org.mockito.Mock;
 import annis.dao.CorpusSelectionStrategy;
 import annis.dao.CorpusSelectionStrategy1;
 import annis.model.AnnisNode;
+import annis.sqlgen.AbstractNodeSqlAdapter;
+import annis.sqlgen.CoveredTokensSelectClauseSqlAdapter;
+import annis.sqlgen.ClauseSqlAdapter;
+import annis.sqlgen.NodeSqlAdapter;
+import annis.sqlgen.NodeSqlAdapterFactory;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.PointingRelation;
 
@@ -30,7 +37,7 @@ import annis.sqlgen.model.PointingRelation;
 public class TestClauseSqlAdapter {
 
 	// class under test
-	private ClauseSqlAdapter clauseSqlGenerator;
+	private ClauseSqlAdapter clauseSqlAdapter;
 
 	// two example nodes in a list
 	private List<AnnisNode> nodes;
@@ -65,8 +72,8 @@ public class TestClauseSqlAdapter {
 		adapter42 = createNodeSqlAdapter(node42);
 		
 		// create object under test and wire dependencies
-		clauseSqlGenerator = new ClauseSqlAdapter();
-		clauseSqlGenerator.setNodeSqlAdapterFactory(nodeSqlAdapterFactory);
+		clauseSqlAdapter = new ClauseSqlAdapter();
+		clauseSqlAdapter.setNodeSqlAdapterFactory(nodeSqlAdapterFactory);
 	}
 
 	// create a node and add it to default nodes list
@@ -89,13 +96,13 @@ public class TestClauseSqlAdapter {
 	// nodes must not be empty
 	@Test(expected=IllegalArgumentException.class)
 	public void toSqlNodesSizeZero() {
-		clauseSqlGenerator.toSql(new ArrayList<AnnisNode>(), 1, corpusSelectionStragegy);
+		clauseSqlAdapter.toSql(new ArrayList<AnnisNode>(), 1, corpusSelectionStragegy, null);
 	}
 	
 	// maxWidth must be at least the number of nodes
 	@Test(expected=IllegalArgumentException.class)
 	public void toSqlMaxWidthLessThanNodesSize() {
-		clauseSqlGenerator.toSql(nodes, nodes.size() - 1, corpusSelectionStragegy);
+		clauseSqlAdapter.toSql(nodes, nodes.size() - 1, corpusSelectionStragegy, null);
 	}
 	
 	///// flow control
@@ -130,7 +137,7 @@ public class TestClauseSqlAdapter {
 			
 			@Override
 			void appendSelectClause(StringBuffer sb, List<AnnisNode> nodes,
-					Map<AnnisNode, NodeSqlAdapter> adapters, int maxWidth) {
+					CorpusSelectionStrategy corpusSelectionStrategy, int maxWidth, SelectClauseSqlAdapter selectClauseSqlAdapter) {
 				assertThat(nodes, is(sameInstance(aliasedNodes)));
 				sb.append(selectClause);
 			}
@@ -150,15 +157,30 @@ public class TestClauseSqlAdapter {
 			}
 		};
 
-		String sql = stubbedClauseSqlGenerator.toSql(aliasedNodes, MAX_WIDTH, corpusSelectionStragegy);
+		String sql = stubbedClauseSqlGenerator.toSql(aliasedNodes, MAX_WIDTH, corpusSelectionStragegy, null);
 		assertThat(sql, is(selectClause + fromClause + whereClause));
 	}
 	
 	///// SELECT clause
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void appendSelectClause() {
+		SelectClauseSqlAdapter adapter = mock(CoveredTokensSelectClauseSqlAdapter.class);
+		final String SELECT_CLAUSE_FOR_ALL_NODES = "SELECT CLAUSE FOR ALL NODES";
+		when(adapter.selectClause(anyList(), any(CorpusSelectionStrategy.class)))
+			.thenReturn(SELECT_CLAUSE_FOR_ALL_NODES);
+		
+		String expected = "SELECT " + SELECT_CLAUSE_FOR_ALL_NODES + "\n";
+		
+		StringBuffer sb = new StringBuffer();
+		clauseSqlAdapter.appendSelectClause(sb, nodes, corpusSelectionStragegy, MAX_WIDTH, adapter);
+		assertEquals(expected, sb.toString());
+	}
+	
 	// SELECT clause for a node (maxWidth = nodes.size())
 	@Test
-	public void appendSelectClauseNodesSizeEqualsMaxWidth() {
+	public void XappendSelectClauseNodesSizeEqualsMaxWidth() {
 		// stub SELECT clause of adapter for node 23
 		final String SELECT_CLAUSE_FOR_NODE_23 = "SELECT CLAUSE FOR NODE 23";
 		when(adapter23.selectClause()).thenReturn(SELECT_CLAUSE_FOR_NODE_23);
@@ -173,13 +195,13 @@ public class TestClauseSqlAdapter {
 				"\t" + SELECT_CLAUSE_FOR_NODE_42 + "\n";
 
 		StringBuffer sb = new StringBuffer();
-		clauseSqlGenerator.appendSelectClause(sb, nodes, adapters, MAX_WIDTH);
+		clauseSqlAdapter.appendSelectClause(sb, nodes, corpusSelectionStragegy, MAX_WIDTH, null);
 		assertEquals(expected, sb.toString());
 	}
 	
 	// maxWidth > nodes.size(): append NULLs to SELECT clause
 	@Test
-	public void appendSelectClauseNodesLessThanMaxWidth() {
+	public void XappendSelectClauseNodesLessThanMaxWidth() {
 		// stub SELECT clauses
 		final String SELECT_CLAUSE = "SELECT CLAUSE";
 		when(adapter23.selectClause()).thenReturn(SELECT_CLAUSE);
@@ -199,7 +221,7 @@ public class TestClauseSqlAdapter {
 			"\t" + NULLS + "\n";
 
 		StringBuffer sb = new StringBuffer();
-		clauseSqlGenerator.appendSelectClause(sb, nodes, adapters, MAX_WIDTH + 2);
+		clauseSqlAdapter.appendSelectClause(sb, nodes, corpusSelectionStragegy, MAX_WIDTH + 2, null);
 		assertEquals(expected, sb.toString());
 	}
 	
@@ -224,7 +246,7 @@ public class TestClauseSqlAdapter {
 		
 		// test
 		StringBuffer sb = new StringBuffer();
-		clauseSqlGenerator.appendFromClause(sb, nodes, adapters);
+		clauseSqlAdapter.appendFromClause(sb, nodes, adapters);
 		assertEquals(expected, sb.toString());
 	}
 	
@@ -233,7 +255,7 @@ public class TestClauseSqlAdapter {
 	@Test
 	public void sqlTableAdapters() {
 		// test call
-		Map<AnnisNode, NodeSqlAdapter> adapters = clauseSqlGenerator.sqlAdaptersForNodes(nodes, corpusSelectionStragegy);
+		Map<AnnisNode, NodeSqlAdapter> adapters = clauseSqlAdapter.sqlAdaptersForNodes(nodes, corpusSelectionStragegy);
 		
 		// verify the returned map
 		assertThat(adapters, allOf(hasEntry(node23, adapter23), hasEntry(node42, adapter42)));
@@ -243,7 +265,7 @@ public class TestClauseSqlAdapter {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void computeUsedRankTablesFalse() {
-		Map<AnnisNode, Boolean> usedRankTables = clauseSqlGenerator.computeNodesInDominanceJoin(nodes);
+		Map<AnnisNode, Boolean> usedRankTables = clauseSqlAdapter.computeNodesInDominanceJoin(nodes);
 		assertThat(usedRankTables, allOf(hasEntry(node23, false), hasEntry(node42, false)));
 	}
 	
@@ -252,7 +274,7 @@ public class TestClauseSqlAdapter {
 	@Test
 	public void computeUsedRankTablesTrueDominance() {
 		node23.addJoin(new Dominance(node42));
-		Map<AnnisNode, Boolean> usedRankTables = clauseSqlGenerator.computeNodesInDominanceJoin(nodes);
+		Map<AnnisNode, Boolean> usedRankTables = clauseSqlAdapter.computeNodesInDominanceJoin(nodes);
 		assertThat(usedRankTables, allOf(hasEntry(node23, true), hasEntry(node42, true)));
 	}
 		
@@ -261,7 +283,7 @@ public class TestClauseSqlAdapter {
 	@Test
 	public void computeUsedRankTablesTruePointingRelation() {
 		node23.addJoin(new PointingRelation(node42, "name"));
-		Map<AnnisNode, Boolean> usedRankTables = clauseSqlGenerator.computeNodesInDominanceJoin(nodes);
+		Map<AnnisNode, Boolean> usedRankTables = clauseSqlAdapter.computeNodesInDominanceJoin(nodes);
 		assertThat(usedRankTables, allOf(hasEntry(node23, true), hasEntry(node42, true)));
 	}
 		
@@ -281,7 +303,7 @@ public class TestClauseSqlAdapter {
 		
 		// test
 		StringBuffer sb = new StringBuffer();
-		clauseSqlGenerator.appendWhereClause(sb, nodes, adapters);
+		clauseSqlAdapter.appendWhereClause(sb, nodes, adapters);
 		assertEquals(expected, sb.toString());
 	}
 	
@@ -298,7 +320,7 @@ public class TestClauseSqlAdapter {
 
 		// test call
 		StringBuffer sb = new StringBuffer();
-		clauseSqlGenerator.appendWhereClause(sb, nodes, adapters);
+		clauseSqlAdapter.appendWhereClause(sb, nodes, adapters);
 		
 		String expected = "" +
 				"WHERE\n" +						// prepend WHERE

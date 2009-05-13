@@ -18,14 +18,14 @@ public class ClauseSqlAdapter {
 	// pluggable factory that creates objects for SQL table representation of a node
 	private NodeSqlAdapterFactory nodeSqlAdapterFactory;
 	
-	public String toSql(List<AnnisNode> nodes, int maxWidth, CorpusSelectionStrategy corpusSelectionStrategy) {
+	public String toSql(List<AnnisNode> nodes, int maxWidth, CorpusSelectionStrategy corpusSelectionStrategy, SelectClauseSqlAdapter selectClauseSqlAdapter) {
 		Assert.notEmpty(nodes, "empty node list");
 		Assert.isTrue(maxWidth >= nodes.size(), "maxWidth < nodes.size()");
 		
 		Map<AnnisNode, NodeSqlAdapter> sqlAdapters = sqlAdaptersForNodes(nodes, corpusSelectionStrategy);
 		
 		StringBuffer sb = new StringBuffer();
-		appendSelectClause(sb, nodes, sqlAdapters, maxWidth);
+		appendSelectClause(sb, nodes, corpusSelectionStrategy, maxWidth, selectClauseSqlAdapter);
 		appendFromClause(sb, nodes, sqlAdapters);
 		appendWhereClause(sb, nodes, sqlAdapters);
 		
@@ -34,27 +34,10 @@ public class ClauseSqlAdapter {
 	
 	///// SELECT clause generation
 
-	void appendSelectClause(StringBuffer sb, List<AnnisNode> nodes, Map<AnnisNode, NodeSqlAdapter> adapters, int maxWidth) {
-		List<String> selectedFields = new ArrayList<String>();
-
-		// add fields to SELECT clause
-		for (AnnisNode node : nodes) {
-			NodeSqlAdapter adapter = adapters.get(node);
-			selectedFields.add(adapter.selectClause());
-		}
-		
-		// pad SELECT clause with NULLs if nodes.size() < maxWidth
-		if (nodes.size() < maxWidth) {
-			NodeSqlAdapter nullAdapter = nodeSqlAdapterFactory.createNodeSqlAdapter();
-			for (int j = nodes.size(); j < maxWidth; ++j) {
-				selectedFields.add(nullAdapter.selectClauseNullValues());
-			}
-		}
-		
+	void appendSelectClause(StringBuffer sb, List<AnnisNode> nodes, CorpusSelectionStrategy corpusSelectionStrategy, int maxWidth, SelectClauseSqlAdapter selectClauseSqlAdapter) {
 		// create SELECT clause
-		sb.append("SELECT DISTINCT");
-		sb.append("\n\t");
-		sb.append(StringUtils.join(selectedFields, ",\n\t"));
+		sb.append("SELECT ");
+		sb.append(selectClauseSqlAdapter.selectClause(nodes, corpusSelectionStrategy));
 		sb.append("\n");
 	}
 	

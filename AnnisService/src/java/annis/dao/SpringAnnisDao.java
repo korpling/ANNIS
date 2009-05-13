@@ -23,6 +23,8 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.CountSpansSelectClauseSqlAdapter;
+import annis.sqlgen.CoveredTokensSelectClauseSqlAdapter;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
@@ -48,6 +50,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	private ListCorpusSqlHelper listCorpusSqlHelper;
 	private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
+	
+	private CoveredTokensSelectClauseSqlAdapter coveredTokensSelectClauseSqlAdapter;
+	private CountSpansSelectClauseSqlAdapter countSpansSelectClauseSqlAdapter;
 
 	private CorpusSelectionStrategyFactory corpusSelectionStrategyFactory;
 	private PlatformTransactionManager transactionManager;
@@ -99,7 +104,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 
 							// generate sql query
 							String sqlQuery = sqlGenerator.toSql(
-									parsedStatement, corpusSelectionStrategy);
+									parsedStatement, corpusSelectionStrategy, coveredTokensSelectClauseSqlAdapter);
 							if (prefix != null) // XXX: ugly
 								sqlQuery = prefix + " " + sqlQuery;
 
@@ -140,8 +145,46 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return matches;
 	}
 
-	public int countMatches(List<Long> corpusList, String dddQuery) {
-		return findMatches(corpusList, dddQuery).size();
+	public int countMatches(final List<Long> corpusList, final String dddQuery) {
+		TransactionTemplate transactionTemplate = new TransactionTemplate(
+				transactionManager);
+		return (Integer) transactionTemplate
+				.execute(new TransactionCallback() {
+
+					public Object doInTransaction(TransactionStatus status) {
+						// roll back the transaction at the end
+						status.setRollbackOnly();
+
+						// parse query
+						Start parsedStatement = dddQueryParser
+								.parse(dddQuery);
+
+						// create corpus selection strategy
+						CorpusSelectionStrategy corpusSelectionStrategy = corpusSelectionStrategyFactory
+								.createCorpusSelectionStrategy(corpusList);
+
+						// generate sql query
+						String sqlQuery = sqlGenerator.toSql(parsedStatement, corpusSelectionStrategy, countSpansSelectClauseSqlAdapter);
+
+						// optional view creation
+						if (corpusSelectionStrategy.usesViews())
+							getSimpleJdbcTemplate()
+									.update(
+											corpusSelectionStrategy
+													.createViewSql());
+
+						// optional timeout
+						if (timeout > 0)
+							getSimpleJdbcTemplate().update(
+									"SET statement_timeout TO " + timeout);
+
+						// execute sql
+						int results = getSimpleJdbcTemplate().queryForInt(sqlQuery);
+
+						return results;
+					}
+
+				});
 	}
 
 	@Deprecated
@@ -355,6 +398,24 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	public void setListCorpusAnnotationsSqlHelper(
 			ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper) {
 		this.listCorpusAnnotationsSqlHelper = listCorpusAnnotationsHelper;
+	}
+
+	public CoveredTokensSelectClauseSqlAdapter getCoveredTokensSelectClauseSqlAdapter() {
+		return coveredTokensSelectClauseSqlAdapter;
+	}
+
+	public void setCoveredTokensSelectClauseSqlAdapter(
+			CoveredTokensSelectClauseSqlAdapter coveredTokensSelectClauseSqlAdapter) {
+		this.coveredTokensSelectClauseSqlAdapter = coveredTokensSelectClauseSqlAdapter;
+	}
+
+	public CountSpansSelectClauseSqlAdapter getCountSpansSelectClauseSqlAdapter() {
+		return countSpansSelectClauseSqlAdapter;
+	}
+
+	public void setCountSpansSelectClauseSqlAdapter(
+			CountSpansSelectClauseSqlAdapter countSpansSelectClauseSqlAdapter) {
+		this.countSpansSelectClauseSqlAdapter = countSpansSelectClauseSqlAdapter;
 	}
 
 }
