@@ -29,21 +29,48 @@ CREATE TABLE _corpus_stats AS SELECT
     -- # root elements
     (SELECT count(distinct node_ref) FROM _rank WHERE root) as roots,
 
+    -- # actual edges
+    (SELECT sum(parents) FROM (
+		SELECT DISTINCT 
+			n_this.name,
+			count(DISTINCT r_parent.node_ref) AS parents
+		FROM 
+			_node n_this 
+			JOIN _rank r_this ON (r_this.node_ref = n_this.id)
+			LEFT JOIN _rank r_parent ON (r_parent.pre = r_this.parent)
+		GROUP BY n_this.name
+		) t
+	) AS edges,
+	
     -- max depth
     (SELECT max(level) FROM _rank) as depth,
     
     -- distinct edge types
-    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'c') AS dictinct_edge_types) as c,
-    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'd') AS dictinct_edge_types) as d,
-    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'p') AS dictinct_edge_types) as p,
-    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type NOT IN ('c', 'p', 'u')) AS dictinct_edge_types) as u,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'c') AS dictinct_edge_types) as coverage_components,
+    (SELECT count(pre) FROM _rank JOIN _component ON (component_ref = id) WHERE type = 'c') as coverage_edges,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'd') AS dictinct_edge_types) as dominance_components,
+    (SELECT count(pre) FROM _rank JOIN _component ON (component_ref = id) WHERE type = 'd') as dominance_edges,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type = 'p') AS dictinct_edge_types) as pointing_components,
+    (SELECT count(pre) FROM _rank JOIN _component ON (component_ref = id) WHERE type = 'p') as pointing_edges,
+    (SELECT count(*) FROM (SELECT DISTINCT namespace, name FROM _component WHERE type NOT IN ('c', 'd', 'p') OR type IS NULL) AS dictinct_edge_types) as unknown_components,
+    (SELECT count(pre) FROM _rank JOIN _component ON (component_ref = id) WHERE type NOT IN ('c', 'd', 'p') OR type IS NULL) as unknown_edges,
 
     -- avg depth
-    (select sum(count * level) / sum (count) from (select count(*), level from _rank group by level) as tmp) as avg_level,
+    (SELECT avg(level) FROM _rank) AS avg_level,
 
     -- avg children per node
-    (select avg(count) from (select count(pre) from _rank where parent is not null group by parent) as tmp) as avg_children,
+    (SELECT avg(parents) FROM (
+		SELECT DISTINCT 
+			n_this.name,
+			count(DISTINCT r_parent.node_ref) AS parents
+		FROM 
+			_node n_this 
+			JOIN _rank r_this ON (r_this.node_ref = n_this.id)
+			LEFT JOIN _rank r_parent ON (r_parent.pre = r_this.parent)
+		GROUP BY n_this.name
+		) t
+	) AS avg_children,
 
-    -- avg copies in rank per node
-    (select avg(count) from (select count(pre), node_ref from _rank group by node_ref) as tmp) as avg_duplicates
+    -- avg duplicates in rank per node
+    (SELECT avg(count - 1) FROM (SELECT count(pre) FROM _rank GROUP BY node_ref) t) AS avg_duplicates
 ;
