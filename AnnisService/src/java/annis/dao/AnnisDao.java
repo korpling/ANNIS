@@ -3,6 +3,7 @@ package annis.dao;
 import java.util.List;
 
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
@@ -27,5 +28,7 @@ public interface AnnisDao {
 	List<AnnisCorpus> listCorpora();
 	
 	List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, boolean listValues);
+	
+	List<Annotation> listCorpusAnnotations(long id);
 	
 }

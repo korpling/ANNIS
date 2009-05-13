@@ -16,6 +16,7 @@ import annis.dao.CorpusSelectionStrategy;
 import annis.dao.CorpusSelectionStrategyFactory;
 import annis.dao.Match;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
@@ -161,6 +162,11 @@ public class DddQueryRunner extends AnnisBaseRunner {
 			out.println("PAULA-Unart of annotation graph for nodes: " + StringUtils.join(graph.getMatchedNodeIds(), ", "));
 			out.println(annisResultImpl.getPaula());
 		}
+	}
+	
+	public void doMeta(String corpusId) {
+		List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
+		printAsTable(corpusAnnotations, "namespace", "name", "value");
 	}
 	
 	///// Helper

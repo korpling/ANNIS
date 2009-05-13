@@ -54,6 +54,9 @@
 	<!-- Helper for nodeAnnotations command -->
 	<bean id="listNodeAnnotationsSqlHelper" class="annis.sqlgen.ListNodeAnnotationsSqlHelper"/>
 		
+	<!-- Helper for listCorpusAnnotations command -->
+	<bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
+		
 	<!-- DddQueryParser -->
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
 	
@@ -78,6 +81,7 @@
 		<property name="wekaSqlHelper" ref="wekaDaoHelper"/>
 		<property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
 		<property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
+		<property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
 		<property name="corpusSelectionStrategyFactory" ref="corpusSelectionStrategyFactory"/>
 		<property name="transactionManager" ref="transactionManager"/>
 	</bean>

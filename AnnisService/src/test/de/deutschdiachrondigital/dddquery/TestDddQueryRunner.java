@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,7 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotationGraphDaoHelper;
 import annis.dao.Match;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
@@ -307,5 +309,22 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		dddQueryRunner.doDot(DDDQUERY);
 		verify(annotationGraphDotExporter, times(3)).writeDotFile(GRAPH);
 		verify(out).println(message);
+	}
+	
+	@Test
+	public void doMeta() {
+		// stub a dummy list of corpus annotations
+		List<Annotation> ANNOTATIONS = mock(List.class);
+		when(annisDao.listCorpusAnnotations(anyLong())).thenReturn(ANNOTATIONS);
+		
+		// stub TableFormatter for this test (http://code.google.com/p/mockito/issues/detail?id=62)
+		when(tableFormatter.formatAsTable(anyList(), anyString(), anyString(), anyString())).thenReturn(TABLE);
+		
+		// call and verify
+		final long ID = 42L;
+		dddQueryRunner.doMeta(String.valueOf(ID));
+		verify(annisDao).listCorpusAnnotations(ID);
+		verify(tableFormatter).formatAsTable(ANNOTATIONS, "namespace", "name", "value");
+		verify(out).println(TABLE);
 	}
 }

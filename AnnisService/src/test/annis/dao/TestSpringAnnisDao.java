@@ -12,6 +12,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -43,9 +45,11 @@ import test.TestHelper;
 import annis.AnnisHomeTest;
 import annis.WekaDaoHelper;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
@@ -71,6 +75,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	@Mock private WekaDaoHelper wekaHelper;
 	@Mock private ListCorpusSqlHelper listCorpusHelper;
 	@Mock private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+	@Mock private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
 	@Mock private CorpusSelectionStrategyFactory corpusSelectionStrategyFactory;
 	@Mock private CorpusSelectionStrategy corpusSelectionStrategy;
 	@Mock private PlatformTransactionManager transactionManager;
@@ -96,6 +101,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setWekaSqlHelper(wekaHelper);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
 		annisDao.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
+		annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
 		annisDao.setCorpusSelectionStrategyFactory(corpusSelectionStrategyFactory);
 		annisDao.setTransactionManager(transactionManager);
 
@@ -119,6 +125,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getAnnotationGraphDaoHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
+		assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getCorpusSelectionStrategyFactory(), is(not(nullValue())));
 		assertThat(springAnnisDao.getTransactionManager(), is(not(nullValue())));
 		assertThat(springAnnisDao.getWekaSqlHelper(), is(not(nullValue())));
@@ -251,8 +258,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.retrieveAnnotationGraph(0);
 	}
 	
-	
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void annotateMatches() {
@@ -282,6 +287,23 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// call and test
 		assertThat(annisDao.listCorpora(), is(CORPORA));
 		verify(jdbcTemplate).query(SQL, listCorpusHelper);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void listCorpusAnnotations() {
+		// stub JdbcTemplate to return a list of Annotation
+		final List<Annotation> ANNOTATIONS = mock(List.class);
+		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(ANNOTATIONS);
+		
+		// stub SQL query
+		final long ID = 42L;
+		when(listCorpusAnnotationsHelper.createSqlQuery(anyLong())).thenReturn(SQL);
+		
+		// call and test
+		assertThat(annisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
+		verify(listCorpusAnnotationsHelper).createSqlQuery(ID);
+		verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
 	}
 
 	@SuppressWarnings("unchecked")

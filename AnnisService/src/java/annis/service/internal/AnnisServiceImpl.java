@@ -15,6 +15,7 @@ import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.externalFiles.ExternalFileMgr;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
@@ -123,6 +124,10 @@ public class AnnisServiceImpl implements AnnisService {
 		throw new AnnisException("not implemented");
 	}
 
+	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException {
+		return annisDao.listCorpusAnnotations(corpusId);
+	}
+	
 	///// Getter / Setter
 	
 	public ExternalFileMgr getExternalFileMgr() {

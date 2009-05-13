@@ -8,6 +8,7 @@ import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.Annotation;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisContingencyTable;
@@ -88,4 +89,6 @@ public interface AnnisService extends Remote {
 	
 	public boolean isValidQuery(String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException;
 
+	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException;
+	
 }

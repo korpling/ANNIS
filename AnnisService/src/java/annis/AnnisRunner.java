@@ -90,6 +90,10 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doPaula(translate(annisQuery));
 	}
 	
+	public void doMeta(String corpusId) {
+		dddQueryRunner.doMeta(corpusId);
+	}
+	
 	///// Delegates for convenience
 	
 	private String translate(String annisQuery) {

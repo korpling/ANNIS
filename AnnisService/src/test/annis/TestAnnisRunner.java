@@ -191,4 +191,12 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
 		verify(dddQueryRunner).doDot(DDD_QUERY);
 	}
+
+	// doMeta translates and delegates to DddQueryRunner.doMeta()
+	@Test
+	public void doMeta() {
+		final String ID = "ID";
+		annisRunner.doMeta(ID);
+		verify(dddQueryRunner).doMeta(ID);
+	}
 }

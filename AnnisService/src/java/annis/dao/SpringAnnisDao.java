@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
@@ -18,9 +19,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import annis.WekaDaoHelper;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
@@ -44,6 +47,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	private WekaDaoHelper wekaSqlHelper;
 	private ListCorpusSqlHelper listCorpusSqlHelper;
 	private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+	private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
 
 	private CorpusSelectionStrategyFactory corpusSelectionStrategyFactory;
 	private PlatformTransactionManager transactionManager;
@@ -209,7 +213,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return graphs.get(0);
 	}
 
-	// /// private helper
+	@SuppressWarnings("unchecked")
+	public List<Annotation> listCorpusAnnotations(long corpusId) {
+		final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
+		final List<Annotation> corpusAnnotations = 
+			(List<Annotation>) getJdbcTemplate().query(sql, listCorpusAnnotationsSqlHelper);
+		return corpusAnnotations;
+	}
+	
+	///// private helper
 
 	private void filter(List<Match> matches) {
 		for (MatchFilter filter : matchFilters) {
@@ -333,6 +345,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	public void setListNodeAnnotationsSqlHelper(
 			ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper) {
 		this.listNodeAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
+	}
+
+	
+	public ListCorpusAnnotationsSqlHelper getListCorpusAnnotationsSqlHelper() {
+		return listCorpusAnnotationsSqlHelper;
+	}
+
+	public void setListCorpusAnnotationsSqlHelper(
+			ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper) {
+		this.listCorpusAnnotationsSqlHelper = listCorpusAnnotationsHelper;
 	}
 
 }
