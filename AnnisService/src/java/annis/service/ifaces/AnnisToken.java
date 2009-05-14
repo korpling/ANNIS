@@ -34,6 +34,19 @@ public interface AnnisToken extends Map<String, String>, JSONAble, Serializable 
 	 * @param Source text (word, etc.) of this token.
 	 */
 	public abstract void setText(String text);
+
+  /**
+	 *
+	 * @return Corpus id  of this token.
+	 */
+	public abstract long getCorpusId();
+
+	/**
+	 *
+	 * @param corpusId Corpus id of this token.
+	 */
+	public abstract void setCorpusId(long corpusId);
+
 	
 	long getLeft();
 	long getRight();
