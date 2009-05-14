@@ -17,7 +17,7 @@ Ext.onReady(function()
 
     // get datastore
     var storeMeta = new Ext.data.JsonStore({
-      url: conf_context + '/secure/MetaData?tokID=' + id,
+      url: conf_context + '/secure/MetaData?mID=' + id,
       totalProperty: 'size',
       root: 'metadata',
       id: 'id',

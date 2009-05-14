@@ -358,7 +358,7 @@ public class AnnisResultImpl implements AnnisResult
       String marker = jsonHasNodeMarker(token.getId()) ? getMarkerId(token.getId()) : "";
       json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
         + ", '_text':'" + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
-        + "', '_marker':'" + marker + "'" + ", '_corpusId':'" + token.getCorpusId());
+        + "', '_marker':'" + marker + "'" + ", '_corpusId':'" + token.getCorpusId() + "'");
       for(Map.Entry<String, String> annotation : token.entrySet())
       {
         json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
