@@ -57,6 +57,8 @@ Ext.onReady(function()
     storeMeta.load();
 
     config.items = [grid];
+    config.autoScroll = true;
+    config.layout = 'fit';
 
     MetaDataWindow.superclass.constructor.call(this, config);
   };
