@@ -87,9 +87,9 @@ public class TestAnnisResultImpl {
 	public void getTokenList() {
 		// expected
 		List<AnnisToken> expected = new ArrayList<AnnisToken>();
-		expected.add(new AnnisTokenImpl(ID1, TEXT1, LEFT, RIGHT, TOKEN_INDEX1));
-		expected.add(new AnnisTokenImpl(ID2, TEXT2, LEFT, RIGHT, TOKEN_INDEX2));
-		expected.add(new AnnisTokenImpl(ID3, TEXT3, LEFT, RIGHT, TOKEN_INDEX3));
+		expected.add(new AnnisTokenImpl(ID1, TEXT1, LEFT, RIGHT, TOKEN_INDEX1, 1L));
+		expected.add(new AnnisTokenImpl(ID2, TEXT2, LEFT, RIGHT, TOKEN_INDEX2, 1L));
+		expected.add(new AnnisTokenImpl(ID3, TEXT3, LEFT, RIGHT, TOKEN_INDEX3, 1L));
 
 		// wrap and test
 		AnnisResult annisResult = new AnnisResultImpl(graph);

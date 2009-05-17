@@ -96,13 +96,11 @@ public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToke
     return "token: '" + text + "' " + super.toString();
   }
 
-  @Override
   public long getCorpusId()
   {
     return this.corpusId;
   }
 
-  @Override
   public void setCorpusId(long corpusId)
   {
     this.corpusId = corpusId;

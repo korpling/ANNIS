@@ -14,17 +14,16 @@ import annis.service.objects.AnnisCorpusImpl;
 public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus> {
 
 	public String createSqlQuery() {
-		return 	"SELECT id, name, text as n_texts, n_tokens " +
-				"FROM corpus, corpus_stats " +
-				"WHERE corpus_stats.corpus_ref = corpus.id and corpus.top_level = 'y'";
+		return 	"SELECT id, name, text, tokens " +
+				"FROM corpus_stats";
 	}
 	
 	public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException {
 		AnnisCorpusImpl corpus = new AnnisCorpusImpl();
 		corpus.setId(rs.getLong("id"));
 		corpus.setName(rs.getString("name"));
-		corpus.setTextCount(rs.getInt("n_texts"));
-		corpus.setTokenCount(rs.getInt("n_tokens"));
+		corpus.setTextCount(rs.getInt("text"));
+		corpus.setTokenCount(rs.getInt("tokens"));
 		return corpus;
 	}
 	
