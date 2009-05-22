@@ -34,18 +34,19 @@
 	text-align: center;	
 }
 
-//.windowSearchResult.token.marker1 { 
-//	color: red;
-//	font-weight: bold;
-//}
-//.windowSearchResult.token.marker2 { 
-//	color: green;
-//	font-weight: bold;
-//}
-//.windowSearchResult.token.marker3 { 
-//	color: blue;
-//	font-weight: bold;
-//}
+/*.windowSearchResult.token.marker1 {
+	color: red;
+	font-weight: bold;
+}
+.windowSearchResult.token.marker2 { 
+	color: green;
+	font-weight: bold;
+}
+.windowSearchResult.token.marker3 { 
+	color: blue;
+	font-weight: bold;
+}
+*/
 			
 body {
 	text.align: center;
