@@ -77,7 +77,7 @@ Ext.onReady(function()
   function updateStatus()
   {
     delayKeyTask.cancel();
-   setSearchButtonDisabled(false);
+    setSearchButtonDisabled(false);
 
     if(!corpusListSelectionModel.hasSelection()) 
     {
@@ -94,7 +94,7 @@ Ext.onReady(function()
       method: 'GET',
       params: {
         'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue()
-        },
+      },
       success: function(response) {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
       },
@@ -142,7 +142,7 @@ Ext.onReady(function()
       corpusIdString += selections[i].id;
     }
 				
-    //Retrieving matchCount from Server
+    // submitting query to Server
     Ext.Ajax.request({
       url: conf_context + '/secure/SubmitQuery',
       method: 'GET',
@@ -151,34 +151,34 @@ Ext.onReady(function()
         'corpusIds': corpusIdString,
         'padLeft': formPanelSimpleSearch.getComponent('padLeft').getValue(),
         'padRight': formPanelSimpleSearch.getComponent('padRight').getValue()
-        },
-      success: function(response) {
-        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
-        //the submit button
-        setSearchButtonDisabled(false);
-        var windowSearchResult =  Ext.WindowMgr.get('windowSearchResult');
-        windowSearchResult.hide();
-        if((response.responseText*1) > 0 )
-        {
-          showWindowSearchResult();
-        }
-        else
-        {
-          Ext.MessageBox.show({
-            title: 'Info',
-            msg: 'No search results',
-            icon: Ext.MessageBox.INFO,
-            buttons: Ext.MessageBox.OK
-          });
-        }
       },
-      failure: function() {
-        formPanelSearch.getComponent('matchCount').setValue("FATAL ERROR: Unable to fetch match Count.");
+      success: function(response) 
+      {
+        var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
+        // reset data (or at least the count)
+        if(storeSearchResult.getTotalCount() > 0)
+        {
+          storeSearchResult.data.totalCount = 0;
+        }
+        showCount();
+        showWindowSearchResult();
+      },
+      failure: function() 
+      {
+        Ext.MessageBox.show({
+          title: 'FATAL ERROR',
+          msg: 'Unable to submit query. This may be caused by a connection problem.',
+          icon: Ext.MessageBox.ERROR,
+          buttons: Ext.MessageBox.OK
+        });
+        formPanelSearch.getComponent('matchCount').setValue("");
         setSearchButtonDisabled(false);
       },
       autoAbort: true,
-      timeout: 60000
+      timeout: global_timeout
     });
+
+    
   }
   // end getResult
    		
@@ -188,12 +188,72 @@ Ext.onReady(function()
     Ext.ComponentMgr.get('btnQueryBuilder').setDisabled(disabled);
   }
   // end setSearchButtonDisabled
-   		
-  //A function that displays or updates the search result window
+
+  /** A function that displays or updated the count for a search (after submitting it) */
+  function showCount()
+  {
+    // submitting query to Server
+    Ext.Ajax.request({
+      url: conf_context + '/secure/SearchResult',
+      method: 'GET',
+      params: {
+        'count' : '1'
+      },
+      success: function(response)
+      {
+        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
+        //the submit button
+        setSearchButtonDisabled(false);
+        if((response.responseText*1) <= 0 )
+        {
+          Ext.MessageBox.show({
+            title: 'Info',
+            msg: 'No search results',
+            icon: Ext.MessageBox.INFO,
+            buttons: Ext.MessageBox.OK
+          });
+        }
+        else
+        {
+          
+          var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
+          if(storeSearchResult.getTotalCount() <= 0)
+          {
+            // update existing search result window totalCount
+            var windowSearchResult = Ext.WindowMgr.get('windowSearchResult');
+            windowSearchResult.hide();
+            storeSearchResult.data.totalCount = (response.responseText*1);
+            windowSearchResult.show();
+          }
+        }
+      },
+      failure: function()
+      {
+        Ext.MessageBox.show({
+          title: 'FATAL ERROR',
+          msg: 'Unable to fetch match count. This may be caused by a timeout or connection problem.',
+          icon: Ext.MessageBox.ERROR,
+          buttons: Ext.MessageBox.OK
+        });
+        formPanelSearch.getComponent('matchCount').setValue("");
+        setSearchButtonDisabled(false);
+      },
+      autoAbort: true,
+      timeout: global_timeout
+    });
+  }
+
+  /** A function that displays or updates the search result window */
   function showWindowSearchResult() 
   {
     var windowSearchResult = Ext.WindowMgr.get('windowSearchResult');
     var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
+
+    var myLimit = 10;
+    if("" !== resultLengthComboBox.getValue())
+    {
+      myLimit = (resultLengthComboBox.getValue()*1);
+    }
 
     //open result window and update data store
     windowSearchResult.setTitle('Search Result - ' + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' (' + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', ' + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
@@ -202,9 +262,9 @@ Ext.onReady(function()
     storeSearchResult.load({
       params:{
         start:0,
-        limit:25
+        limit:myLimit
       }
-      });
+    });
 
   }
   // end showWindowSearchResult
@@ -252,6 +312,24 @@ Ext.onReady(function()
         scope: this
       }
     }
+  });
+
+  var resultLengthStore = new Ext.data.SimpleStore({
+    fields: ['pad'],
+    data : [[1], [2], [5], [10], [15], [20], [25]]
+  });
+
+  var resultLengthComboBox = new Ext.form.ComboBox({
+    store: resultLengthStore,
+    name: 'resultLength',
+    id: 'resultLength',
+    fieldLabel: 'Results per page',
+    displayField:'pad',
+    mode: 'local',
+    triggerAction: 'all',
+    value: '10',
+    selectOnFocus:true,
+    editable: false
   });
 
   //The Search Window
@@ -406,7 +484,8 @@ Ext.onReady(function()
     height: 200,
     items: [ 
     padLeftComboBox,
-    padRightComboBox
+    padRightComboBox,
+    resultLengthComboBox
     ],
     buttons: [{
       id: 'btnSimpleSearch',
@@ -537,7 +616,7 @@ Ext.onReady(function()
     })
   });
 
- // the main window
+  // the main window
   var windowSearchForm = new Ext.Window({
     title: 'Search Form',
     id: 'windowSearchForm',

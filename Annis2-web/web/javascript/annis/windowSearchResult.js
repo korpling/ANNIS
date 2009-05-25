@@ -63,7 +63,7 @@ Ext.onReady(function()
   var storeSearchResult = new Ext.data.JsonStore({
     proxy: new Ext.data.HttpProxy({
       url: conf_context + '/secure/SearchResult',
-      timeout: 180000
+      timeout: global_timeout
     }),
 
     id: 'storeSearchResult',
@@ -79,7 +79,6 @@ Ext.onReady(function()
       {
         var isRTL = false;
 
-        //lets update the token level selection button
         this.each(function(record)
         {
           // check if left to right or right to left text order
@@ -103,6 +102,7 @@ Ext.onReady(function()
             }
           }
 
+          //lets update the token level selection button
           Ext.each(record.data._tokenLevels, function(item) {
             if(tokenLevels.indexOf(item) == -1) {
               tokenLevelSelectionMenu.addItem(new Ext.menu.CheckItem({
