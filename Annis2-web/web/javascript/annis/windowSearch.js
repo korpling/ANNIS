@@ -128,7 +128,7 @@ Ext.onReady(function()
     setSearchButtonDisabled(true);
 
     //set info box to something neutral
-    formPanelSearch.getComponent('matchCount').setValue("Calculating...");
+    formPanelSearch.getComponent('matchCount').setValue("Submitting query...");
 			
     //Gather selections
     var selections = corpusListSelectionModel.getSelections();
@@ -192,6 +192,7 @@ Ext.onReady(function()
   /** A function that displays or updated the count for a search (after submitting it) */
   function showCount()
   {
+    formPanelSearch.getComponent('matchCount').setValue("Getting match count...");
     // submitting query to Server
     Ext.Ajax.request({
       url: conf_context + '/secure/SearchResult',
@@ -255,10 +256,16 @@ Ext.onReady(function()
       myLimit = (resultLengthComboBox.getValue()*1);
     }
 
+    // adjust page size
+    var gridSearchResult = windowSearchResult.getComponent('gridSearchResult');
+    gridSearchResult.getTopToolbar().pageSize = myLimit;
+
     //open result window and update data store
     windowSearchResult.setTitle('Search Result - ' + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' (' + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', ' + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
     windowSearchResult.show();
     windowSearchResult.alignTo('windowSearchForm', 'tl', [windowSearchFormWidth + 5,0]);
+    
+
     storeSearchResult.load({
       params:{
         start:0,
