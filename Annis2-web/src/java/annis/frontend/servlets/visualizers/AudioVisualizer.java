@@ -38,10 +38,31 @@ public class AudioVisualizer extends Visualizer
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
       {
-        if(qName.equalsIgnoreCase("audio:audioFileSeg"))
+        if(audioID < 0)
         {
-          String s = attributes.getValue("exmaralda:AUDIO");
-          audioID = Long.parseLong(s);
+          if(qName.equalsIgnoreCase("audio:audioFileSeg"))
+          {
+            String s = attributes.getValue("exmaralda:AUDIO");
+            try
+            {
+              audioID = Long.parseLong(s);
+            }
+            catch(NumberFormatException ex)
+            {
+
+            }
+          }
+          else if(attributes.getValue("audio:audioFile") != null)
+          {
+            try
+            {
+              audioID = Long.parseLong(attributes.getValue("audio:audioFile"));
+            }
+            catch(NumberFormatException ex)
+            {
+              
+            }
+          }
         }
       }
       
