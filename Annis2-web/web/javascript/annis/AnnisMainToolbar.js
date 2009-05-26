@@ -63,6 +63,7 @@ Ext.onReady(function()
         menu: menuAnnis
       },
       {
+        id: "tutorial",
         text: 'Tutorial',
         handler: this.showTutorial,
         scope: this

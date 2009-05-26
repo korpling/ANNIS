@@ -82,6 +82,7 @@ Ext.onReady(function()
     if(!corpusListSelectionModel.hasSelection()) 
     {
       formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");
+      corpusGrid.getEl().frame('ff0000', 1);
       return;
     }
 
@@ -198,11 +199,8 @@ Ext.onReady(function()
       success: function(response)
       {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
-        formPanelSearch.getComponent('matchCount').getEl().highlight('ff0000',
-        {
-          attr: 'color',
-          duration: 2
-        });
+        formPanelSearch.getComponent('matchCount').getEl().
+          frame('ff0000', 1, {duration:3});
 
         //the submit button
         setSearchButtonDisabled(false);
@@ -729,6 +727,10 @@ Ext.onReady(function()
       buttons: Ext.MessageBox.OK
     });
   }
+
+
+  // highlight tutorial
+  Ext.get('tutorial').frame('ff0000', 2);
   
 });
 
