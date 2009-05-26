@@ -315,7 +315,7 @@ Ext.onReady(function()
   });
 
   var resultLengthStore = new Ext.data.SimpleStore({
-    fields: ['pad'],
+    fields: ['length'],
     data : [[1], [2], [5], [10], [15], [20], [25]]
   });
 
@@ -324,7 +324,7 @@ Ext.onReady(function()
     name: 'resultLength',
     id: 'resultLength',
     fieldLabel: 'Results per page',
-    displayField:'pad',
+    displayField:'length',
     mode: 'local',
     triggerAction: 'all',
     value: '10',
@@ -479,7 +479,11 @@ Ext.onReady(function()
 		
   var formPanelSimpleSearch = new Ext.FormPanel({
     id: 'formPanelSimpleSearch',
-    frame:true,
+    frame:false,
+    bodyStyle:
+      {background:'#DFE8F6'},
+    style:
+      {background:'#DFE8F6'},
     title: 'Simple Search',
     height: 200,
     items: [ 
