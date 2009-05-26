@@ -198,6 +198,12 @@ Ext.onReady(function()
       success: function(response)
       {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
+        formPanelSearch.getComponent('matchCount').getEl().highlight('ff0000',
+        {
+          attr: 'color',
+          duration: 2
+        });
+
         //the submit button
         setSearchButtonDisabled(false);
         if((response.responseText*1) <= 0 )
