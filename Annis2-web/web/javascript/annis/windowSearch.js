@@ -154,12 +154,7 @@ Ext.onReady(function()
       },
       success: function(response) 
       {
-        var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
-        // reset data (or at least the count)
-        if(storeSearchResult.getTotalCount() > 0)
-        {
-          storeSearchResult.data.totalCount = 0;
-        }
+        isLoadingSearchResult = true;
         showCount();
         showWindowSearchResult();
       },
@@ -217,14 +212,14 @@ Ext.onReady(function()
         else
         {
           
-          var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
-          if(storeSearchResult.getTotalCount() <= 0)
+          if(!isLoadingSearchResult)
           {
             // update existing search result window totalCount
-            var windowSearchResult = Ext.WindowMgr.get('windowSearchResult');
-            windowSearchResult.hide();
-            storeSearchResult.data.totalCount = (response.responseText*1);
-            windowSearchResult.show();
+            var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
+            
+            storeSearchResult.reader.jsonData.totalCount  = (response.responseText*1);
+            // load the slightly changed data (and don't ask the server again)
+            storeSearchResult.loadData(storeSearchResult.reader.jsonData, false);
           }
         }
       },
@@ -264,7 +259,6 @@ Ext.onReady(function()
     windowSearchResult.setTitle('Search Result - ' + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' (' + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', ' + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
     windowSearchResult.show();
     windowSearchResult.alignTo('windowSearchForm', 'tl', [windowSearchFormWidth + 5,0]);
-    
 
     storeSearchResult.load({
       params:{
@@ -625,6 +619,14 @@ Ext.onReady(function()
       })
       ]
     })
+  });
+
+  var isLoadingSearchResult = false;
+  // add listener
+  var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
+  storeSearchResult.addListener("load", function(store, records, options)
+  {
+    isLoadingSearchResult = false;
   });
 
   // the main window

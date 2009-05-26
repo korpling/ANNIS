@@ -58,7 +58,6 @@ public class SearchResultServlet extends HttpServlet
 
   private void writeCount(HttpSession session, HttpServletResponse response) throws IOException
   {
-    
     response.setContentType("text/plain");
 
     ServletOutputStream out = response.getOutputStream();

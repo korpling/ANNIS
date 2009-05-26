@@ -1,22 +1,16 @@
 package annis.frontend.servlets;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisServiceFactoryException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import annis.security.AnnisUser;
-import annis.service.AnnisService;
-import annis.service.AnnisServiceException;
-import annis.service.AnnisServiceFactory;
 
 /**
  * This Servlet recieves an ANNIS query encoded in GET parameters. These Parameters are.
