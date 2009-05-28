@@ -82,7 +82,6 @@ Ext.onReady(function()
     if(!corpusListSelectionModel.hasSelection()) 
     {
       formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");
-      corpusGrid.getEl().frame('ff0000', 1);
       return;
     }
 
