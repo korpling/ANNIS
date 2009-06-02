@@ -313,9 +313,6 @@ Ext.onReady(function()
 
     var output = '<a href="#" onclick="' + action + '"><img src="' + conf_context + '/images/info.gif"></a>';
 
-
-
-    //var output = '';
     return output;
   }
 

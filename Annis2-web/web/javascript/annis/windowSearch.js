@@ -438,6 +438,12 @@ Ext.onReady(function()
       dataIndex: 'tokenCount',
       //width: 65,
       align: 'right'
+    },
+    {
+      header: "",
+      dataIndex:'id',
+      align: 'right',
+      renderer: renderCorpusInfo
     }
     ]);
   corpusListCm.defaultSortable = true;
