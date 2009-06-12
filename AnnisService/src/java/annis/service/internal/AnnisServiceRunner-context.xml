@@ -6,17 +6,37 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
+	<!-- Properties configuration -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${annis.home}/conf/annis-service.properties</value>
+			</list>
+		</property>
+	</bean>
+
 	<!-- DddQueryMapper -->
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 	
 	<!-- AnnisDao -->
 	<import resource="classpath:annis/dao/SpringAnnisDao-context.xml"/>
 
+	<!-- External File Manager -->
+	<bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
+		<property name="externalFileMgrDao" ref="externalFileManagerDao"/>
+		<property name="externalDataFolder" value="${annis.external-data-path}"/>
+	</bean>
+
 	<!-- AnnisService -->
 	<bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
 		<property name="dddQueryParser" ref="dddQueryParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="annisDao" ref="springAnnisDao"/>
+		<property name="externalFileMgr" ref="externalFileManager"/>
 	</bean>
 
 	<!-- Exception handling aspect for AnnisService -->
@@ -28,14 +48,5 @@
 		<property name="serviceInterface" value="annis.service.AnnisService"/>
 		<property name="registryPort" value="4711"/>
 	</bean>
-	
-	<!-- XXX: wird eigentlich nicht benötigt, da der importer direkt auf den ExternalFileManager zugreift 
-	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
-		<property name="serviceName" value="ExternalFileMananger"/>
-		<property name="service" ref="externalFileManager"/>
-		<property name="serviceInterface" value="annisservice.extFiles.ExternalFileMgr"/>
-		<property name="registryPort" value="4711"/>
-	</bean>
-	-->
-	
+		
 </beans>
