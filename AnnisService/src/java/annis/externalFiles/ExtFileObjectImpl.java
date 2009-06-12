@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * This class contains a reference to a file object and metainformations of it.
@@ -13,6 +15,8 @@ import java.io.IOException;
  */
 public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO  
 {
+	private Logger log = Logger.getLogger(this.getClass());
+	
 	private static final String TOOLNAME=	"ExtFileObjectImpl"; 
 	private static final long serialVersionUID = 1678615866336637980L;
 	
@@ -157,8 +161,9 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 	 */
 	public File getFile(String fName)
 	{
-		File retFile= null;
-		retFile= new File(fName);
+		log.debug("Reading binary file: " + fName);
+		
+		File retFile = new File(fName);
 		
 		try {
 			FileOutputStream fos = new FileOutputStream(retFile);
