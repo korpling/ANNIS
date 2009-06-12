@@ -180,30 +180,8 @@ CREATE VIEW table_stats AS select
 	(select count(*) from rank ) as rank,	
 	(select count(*) from component) as component,
 	(select count(*) from edge_annotation ) as edge_annotation,	
---	(select count(*) from corp_2_viz) as corp_2_viz,
---	(select count(*) from xcorp_2_viz) as xcorp_2_viz,
 	(select count(*) from extdata) as extdata
 ;
-
---- Resolver
-CREATE TABLE corp_2_viz
-(
-	"corpus_name"	character varying(100) NOT NULL,
-	"level"			character varying(100) NOT NULL,
-	"type_ref"		character varying(100) NOT NULL,
-	"corpus_ref"	numeric(38) NOT NULL
-);
-ALTER TABLE corp_2_viz ADD CONSTRAINT "FK_corp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
-
-CREATE TABLE xcorp_2_viz
-(
-	"corpus_name"	character varying(100) NOT NULL,
-	"level"			character varying(100) NOT NULL,
-	"annotation"	character varying(100) NOT NULL,
-	"type_ref"		character varying(100) NOT NULL,
-	"corpus_ref"	numeric(38) NOT NULL
-);
-ALTER TABLE xcorp_2_viz ADD CONSTRAINT "FK_xcorp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
 
 CREATE TABLE viz_type
 (

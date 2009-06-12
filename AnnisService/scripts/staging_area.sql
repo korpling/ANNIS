@@ -91,21 +91,3 @@ CREATE TABLE _edge_annotation
 	name			varchar(1000) NOT NULL,
 	value			varchar(1000)
 );
-
---- annotation visualisation (not used)
-CREATE TABLE _corp_2_viz
-(
-	"corpus_id"		character varying(100) NOT NULL,
-	"corpus_name"	character varying(100) NOT NULL,
-	"level"			character varying(100) NOT NULL,
-	"type_ref"		numeric(38) NOT NULL
-);
-
-CREATE TABLE _xcorp_2_viz
-(
-	"corpus_id"		character varying(100) NOT NULL,
-	"corpus_name"	character varying(100) NOT NULL,
-	"level"			character varying(100) NOT NULL,
-	"annotation"	character varying(100) NOT NULL,
-	"type_ref"		numeric(38) NOT NULL
-);

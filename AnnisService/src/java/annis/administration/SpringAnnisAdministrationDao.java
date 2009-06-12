@@ -65,7 +65,8 @@ public class SpringAnnisAdministrationDao {
 			"corpus", "corpus_annotation",
 			"text", "node", "node_annotation", 
 			"component", "rank", "edge_annotation", 
-			"corp_2_viz", "xcorp_2_viz"
+			// Resolver erst einmal rausnehmen
+			// "corp_2_viz", "xcorp_2_viz"
 	};
 	
 	// tables created during import

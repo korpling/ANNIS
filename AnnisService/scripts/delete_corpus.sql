@@ -14,7 +14,7 @@ ALTER TABLE node_annotation DROP CONSTRAINT "node_annotation_node_ref_fkey";
 
 ALTER TABLE corpus_annotation DROP CONSTRAINT "corpus_annotation_corpus_ref_fkey";
 ALTER TABLE node DROP CONSTRAINT "node_corpus_ref_fkey";
-ALTER TABLE corpus_stats DROP CONSTRAINT "corpus_stats_id_fkey";
+-- ALTER TABLE corpus_stats DROP CONSTRAINT "corpus_stats_id_fkey";
 ALTER TABLE corp_2_viz DROP CONSTRAINT "FK_corp_2_viz_2_corpus";
 ALTER TABLE xcorp_2_viz DROP CONSTRAINT "FK_xcorp_2_viz_2_corpus";
 

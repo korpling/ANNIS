@@ -49,7 +49,4 @@ UPDATE _corpus_stats SET id = id + (SELECT corpus_id FROM _max);
 
 UPDATE _corpus_annotation SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
 
-UPDATE _corp_2_viz SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
-UPDATE _xcorp_2_viz SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
-
 DROP TABLE _max;
