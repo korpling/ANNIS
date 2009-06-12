@@ -262,50 +262,9 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 		}
 		catch (Exception e)
 		{
-			logger.error(e.getMessage());
+			logger.error("Exception while reading binary file", e);
 			throw new ExternalFileMgrException(e);
 		}
-		/* old Kartsens implementation
-		AnnisBinary binary = new AnnisBinaryImpl();
-		binary.setId(id);
-		binary.setFileName("Nr. 14 c#, op.27 nr 2, presto.mp3");
-		binary.setMimeType("audio/mp3");
-
-		try {
-		 File file = new File("sample.mp3");
-		 long length = file.length();
-
-
-		 FileInputStream fis = new FileInputStream(file);
-
-
-		 byte[] bytes = new byte[(int)length];
-
-
-		     int offset = 0;
-		         int numRead = 0;
-		         while (offset < bytes.length
-		               && (numRead=fis.read(bytes, offset, bytes.length-offset)) >= 0) 
-		         {
-		             offset += numRead;
-		         }
-
-		    
-		         // Ensure all the bytes have been read in
-		         if (offset < bytes.length) {
-		             throw new IOException("Could not completely read file "+file.getName());
-		         }
-
-		        
-		 fis.close();
-		 binary.setBytes(bytes);
-		 } catch (IOException e) {
-		 e.printStackTrace();
-		 } catch (NegativeArraySizeException e) {
-		 e.printStackTrace();
-		 }
-		 return binary;
-		 */
 	}
 	
 	/**
