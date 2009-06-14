@@ -206,17 +206,18 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	 */
 	public ExtFileObjectCom getExtFileObj(Long id)
 	{ 
-		if (this.logger!= null) 
-			logger.debug("calling getFile("+id+") was called...");
+		logger.debug("Retrieving binary file with ID = " + id);
 		
-		ExtFileObjectDAO extFileDao= null;
-		extFileDao= externalFileMgrDao.getExtFileObj(id);
+		ExtFileObjectDAO extFileDao = externalFileMgrDao.getExtFileObj(id);
 		
-		String fileSrc= this.externalDataFolder + "/"+ extFileDao.getBranch() + "/"+ extFileDao.getFileName();
-		
+		String branch = extFileDao.getBranch();
+		String filename = extFileDao.getFileName();
+		String path= this.externalDataFolder + "/"+ branch + "/"+ filename;
+		logger.debug("Binary file: ID = " + id + "; branch = " + branch + "; filename = " + filename + "; path = " + path);
+				
 		//ExtFileObjectCom extFileCom= new ExtFileObjectImpl();
 		//extFileCom.setFile(new File(fileSrc));
-		ExtFileObjectCom extFileCom= new ExtFileObjectImpl(extFileDao, new File(fileSrc));
+		ExtFileObjectCom extFileCom= new ExtFileObjectImpl(extFileDao, new File(path));
 		return(extFileCom); 
 	}
 	
@@ -262,7 +263,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 		}
 		catch (Exception e)
 		{
-			logger.error("Exception while reading binary file", e);
+			logger.error("Could not read binary file", e);
 			throw new ExternalFileMgrException(e);
 		}
 	}
