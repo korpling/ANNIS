@@ -209,7 +209,7 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 
 			fis.close();
 			this.bytes= bytes;
-			this.setFileName(file.getName());
+			this.setFileName(file.getAbsolutePath());
 		} catch (IOException e) {
 			throw new ExternalFileMgrException(e);
 		}

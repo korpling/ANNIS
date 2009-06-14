@@ -218,7 +218,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 		//ExtFileObjectCom extFileCom= new ExtFileObjectImpl();
 		//extFileCom.setFile(new File(fileSrc));
 		ExtFileObjectCom extFileCom= new ExtFileObjectImpl(extFileDao, new File(path));
-		return(extFileCom); 
+		return extFileCom; 
 	}
 	
 	/**
