@@ -13,7 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.media.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
-import de.hu_berlin.german.korpling.annis.PlayerStage;
+import de.hu_berlin.german.korpling.annis.AnnisPlayerUI;
 
 var myMedia = Media {
   source:"file:///home/thomas/Desktop/wikinews.ogg"
@@ -24,7 +24,7 @@ var player = MediaPlayer {
   autoPlay:false
 }
 
-var playerUI = PlayerUI{}
+var playerUI = AnnisPlayerUI{}
 
 Stage {
     title: "Annis Media Player"
