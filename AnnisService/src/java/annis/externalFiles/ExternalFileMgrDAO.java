@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -20,7 +21,7 @@ import org.springframework.util.Assert;
  */
 public class ExternalFileMgrDAO
 {
-//	private Logger logger = Logger.getLogger(this.getClass());
+	private Logger log = Logger.getLogger(this.getClass());
 	
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
@@ -97,7 +98,9 @@ public class ExternalFileMgrDAO
 	 * @throws Exception
 	 */
 	public ExtFileObjectDAO getExtFileObj(long id)
-	{		
+	{
+		log.debug("Looking for binary file with id = " + id);
+		
 		String sql = "SELECT * FROM extData WHERE id = :id";
 		SqlParameterSource args = new MapSqlParameterSource().addValue("id", id);
 		ParameterizedRowMapper<ExtFileObjectDAO> rowMapper = new ParameterizedRowMapper<ExtFileObjectDAO>() {

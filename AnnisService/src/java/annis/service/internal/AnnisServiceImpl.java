@@ -108,6 +108,8 @@ public class AnnisServiceImpl implements AnnisService {
 
 	// TODO: test getBinary
 	public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException {
+		log.debug("Retrieving binary file with id = " + id);
+		
 		try {
 			return externalFileMgr.getBinary(id);
 		} catch (Exception e) {

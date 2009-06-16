@@ -205,10 +205,10 @@ public class SpringAnnisAdministrationDao {
 			long id = externalFileMgrDao.putExtFile(name, branch, "audio/x-mp3");
 			log.debug("external file '" + filename + "' inserted with id " + id);
 			
-			// update annotation value
-			String updateSql = "UPDATE _node_annotation SET value = :id WHERE value = :externalData";
+			// update annotation value, set name to audio:audioFile
+			String updateValueSql = "UPDATE _node_annotation SET value = :id, name = 'audioFile', namespace = 'audio' WHERE value = :externalData";
 			SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue("externalData", externalData);
-			simpleJdbcTemplate.update(updateSql, updateArgs);
+			simpleJdbcTemplate.update(updateValueSql, updateArgs);
 		}
 		
 		// FIXME: should be done in the converter

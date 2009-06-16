@@ -46,7 +46,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	 */
 	public ExternalFileMgrImpl()
 	{
-		logger.debug("external data folder: "+ this.externalDataFolder);
+		
 	}
 //	 ============================================== �ffentliche Methoden ==============================================	
 	//---------------------- start: branch management --------------------------------
@@ -230,6 +230,8 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	 */
 	public AnnisBinary getBinary(Long id)
 	{
+		logger.debug("Looking for binary file with id = " + id);
+		
 		try
 		{
 			ExtFileObjectCom extFile= this.getExtFileObj(id);

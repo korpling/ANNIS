@@ -181,8 +181,12 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 	public void setFile(File file)
 	{
 		try {
+			String path = file.getAbsolutePath();
+
+			// kinda unnecessary in try-catch
 			if (!file.exists())
-				throw new ExternalFileMgrException(ERR_FILE_NOT_EXISTS + file.getCanonicalPath());
+				throw new ExternalFileMgrException("No such file: " + path);
+			
 			//this.file= file; 
 			long length = file.length();
 
@@ -209,7 +213,7 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 
 			fis.close();
 			this.bytes= bytes;
-			this.setFileName(file.getAbsolutePath());
+			this.setFileName(path);
 		} catch (IOException e) {
 			throw new ExternalFileMgrException(e);
 		}
