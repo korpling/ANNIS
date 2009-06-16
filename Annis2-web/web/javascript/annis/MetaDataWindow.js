@@ -12,7 +12,7 @@ Ext.onReady(function()
 
     // init config
     config.title = 'Meta Data for id ' + id;
-    config.width = 200;
+    config.width = 400;
     config.height = 200;
 
     // get datastore
