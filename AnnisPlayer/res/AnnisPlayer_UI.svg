@@ -22,9 +22,13 @@
     <linearGradient
        id="linearGradient3233">
       <stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#7a7a7a;stop-opacity:1;"
          offset="0"
          id="stop3235" />
+      <stop
+         id="stop3285"
+         offset="0.44062591"
+         style="stop-color:#000000;stop-opacity:1;" />
       <stop
          style="stop-color:#7a7a7a;stop-opacity:1;"
          offset="1"
@@ -34,12 +38,12 @@
        inkscape:collect="always"
        xlink:href="#linearGradient3233"
        id="linearGradient3243"
-       x1="142.14285"
-       y1="16.000002"
-       x2="142.02031"
-       y2="37.097874"
+       x1="140.12254"
+       y1="-10.101524"
+       x2="141.01016"
+       y2="49.172596"
        gradientUnits="userSpaceOnUse"
-       spreadMethod="reflect"
+       spreadMethod="pad"
        gradientTransform="translate(0.3571429,0.6530097)" />
   </defs>
   <sodipodi:namedview
@@ -75,7 +79,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="opacity:1;fill:url(#linearGradient3243);fill-opacity:1;fill-rule:nonzero;stroke:#212121;stroke-width:1.13909793;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:url(#linearGradient3243);fill-opacity:1;fill-rule:nonzero;stroke:#212121;stroke-width:1.13909792999999993;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="JFX:background"
        width="318.8609"
        height="30.860903"
