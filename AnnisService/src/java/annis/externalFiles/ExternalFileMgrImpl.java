@@ -198,7 +198,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	}
 	
 	/**
-	 * Returns a ExtFileObject-object which corresponds to the given reference. If there�s
+	 * Returns a ExtFileObject-object which corresponds to the given reference. If there's
 	 * no file to the given reference null will be returned.
 	 * @param id Long - reference to the needed file 
 	 * @return ExtFileObject which corresponds to the given reference
