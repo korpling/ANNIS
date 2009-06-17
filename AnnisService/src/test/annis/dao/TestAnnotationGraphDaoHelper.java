@@ -117,6 +117,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		assertEquals(expected, stubbedAnnotateMatchesQueryHelper.createSqlQuery(MATCHES, 1, 1));
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void tokenRelation() {
 		// setup a list of matches
@@ -260,7 +261,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		Edge edge2 = newEdge(null, newNode(2), 3, 4);
 		
 		// test and call
-		assertThat(annotationGraphDaoHelper.extractData(resultSet), graph(0, nodes(node1, node2), edges(edge1, edge2)));
+		assertThat(annotationGraphDaoHelper.extractData(resultSet), containsGraph(0, withNodes(node1, node2), withEdges(edge1, edge2)));
 	}
 
 	// assume that result set is sorted by key, pre
@@ -270,7 +271,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		// 3 rows: new graph, same node, same edge
 		stubRowCount(3);
 		when(matchGroupRowMapper.mapRow(any(ResultSet.class), anyInt())).thenReturn("1", "2", "3");
-		when(annisNodeRowMapper.mapRow(any(ResultSet.class), anyInt())).thenReturn(newNode(1));
+		when(annisNodeRowMapper.mapRow(any(ResultSet.class), anyInt())).thenReturn(newNode(1), newNode(1), newNode(1));
 		when(edgeRowMapper.mapRow(any(ResultSet.class), anyInt())).thenReturn(newEdge(null, newNode(1), 1, 2));
 		
 		// expected graph
@@ -279,9 +280,9 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		
 		// test and call
 		List<AnnotationGraph> graphs = annotationGraphDaoHelper.extractData(resultSet);
-		assertThat(graphs, graph(2, nodes(node), edges(edge)));
-		assertThat(graphs, graph(1, nodes(node), edges(edge)));
-		assertThat(graphs, graph(0, nodes(node), edges(edge)));
+		assertThat(graphs, containsGraph(0, withNodes(node), withEdges(edge)));
+		assertThat(graphs, containsGraph(1, withNodes(node), withEdges(edge)));
+		assertThat(graphs, containsGraph(2, withNodes(node), withEdges(edge)));
 	}
 	
 	// same key, node, different node annotation -> annotations added to node
@@ -297,7 +298,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		node.addNodeAnnotation(ANNOTATION2);
 		
 		// test and call
-		assertThat(annotationGraphDaoHelper.extractData(resultSet), graph(0, nodes(node), null));
+		assertThat(annotationGraphDaoHelper.extractData(resultSet), containsGraph(0, withNodes(node), null));
 	}
 
 	// same key, node, different edge annotation -> annotations added to edges
@@ -314,7 +315,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		edge.addAnnotation(ANNOTATION2);
 		
 		// test and call
-		assertThat(annotationGraphDaoHelper.extractData(resultSet), graph(0, null, edges(edge)));
+		assertThat(annotationGraphDaoHelper.extractData(resultSet), containsGraph(0, null, withEdges(edge)));
 	}
 	
 	private final static long NODE_REF1 = 1;
@@ -406,9 +407,9 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		Edge edge3 = newEdge(node1, node3, PRE3, POST3);
 		Edge edge4 = newEdge(null, node4, PRE4, POST4);
 		
-		assertThat(annotationGraphDaoHelper.extractData(resultSet), graph(0,
-				nodes(node1, node2, node3, node4),
-				edges(edge1, edge2, edge3, edge4)));
+		assertThat(annotationGraphDaoHelper.extractData(resultSet), containsGraph(0,
+				withNodes(node1, node2, node3, node4),
+				withEdges(edge1, edge2, edge3, edge4)));
 	}
 	
 	// column key contains ids of matched nodes => mark these in the graph
@@ -466,19 +467,19 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		return newEdge(null, null, pre, post);
 	}
 
-	private List<AnnisNode> nodes(AnnisNode... nodes) {
+	private List<AnnisNode> withNodes(AnnisNode... nodes) {
 		if (nodes.length == 0)
 			return Arrays.asList(newNode(1));
 		return Arrays.asList(nodes);
 	}
 
-	private List<Edge> edges(Edge... edges) {
+	private List<Edge> withEdges(Edge... edges) {
 		if (edges.length == 0)
 			return Arrays.asList(newEdge(1, 2));
 		return Arrays.asList(edges);
 	}
 
-	private Matcher<List<AnnotationGraph>> graph(final int index, final List<AnnisNode> _nodes, final List<Edge> _edges) {
+	private Matcher<List<AnnotationGraph>> containsGraph(final int index, final List<AnnisNode> _nodes, final List<Edge> _edges) {
 		return new TypeSafeMatcher<List<AnnotationGraph>>() {
 	
 			@Override
@@ -511,6 +512,10 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 				// all edge destinations in nodes
 				for (AnnisNode node : destNodes)
 					assertThat(nodes, hasItem(node));
+				
+				// nodes are linked to graph
+				for (AnnisNode node : nodes)
+					assertThat("node not linked to graph", node.getGraph(), is(graph));
 				
 				return true;
 			}

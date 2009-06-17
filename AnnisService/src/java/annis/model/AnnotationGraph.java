@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -23,6 +26,9 @@ public class AnnotationGraph implements Serializable {
 	// annotation graph for nodes with these ids
 	private Set<Long> matchedNodeIds;
 	
+	// fn: token index -> token
+	private Map<Long, AnnisNode> tokenByIndex;
+	
 	public AnnotationGraph() {
 		this(new ArrayList<AnnisNode>(), new ArrayList<Edge>());
 	}
@@ -31,6 +37,7 @@ public class AnnotationGraph implements Serializable {
 		this.nodes = nodes;
 		this.edges = edges;
 		this.matchedNodeIds = new HashSet<Long>();
+		this.tokenByIndex = new HashMap<Long, AnnisNode>();
 	}
 
 	@Override
@@ -46,19 +53,31 @@ public class AnnotationGraph implements Serializable {
 			String name = edge.getQualifiedName();
 			_edges.add(src + "->" + dst + " " + name + " " + edgeType);
 		}
-		return "nodes: " + ids + "; edges: " + _edges;
+		return "match: " + StringUtils.join(matchedNodeIds, "-") + "; nodes: " + ids + "; edges: " + _edges;
 	}
 	
 	public void addMatchedNodeId(Long id) {
 		matchedNodeIds.add(id);
 	}
 	
-	public boolean addNode(AnnisNode o) {
-		return nodes.add(o);
+	public boolean addNode(AnnisNode node) {
+		// save the graph in node
+		node.setGraph(this);
+		
+		// save tokens
+		if (node.isToken())
+			tokenByIndex.put(node.getTokenIndex(), node);
+		
+		// add node to graph	
+		return nodes.add(node);
 	}
 	
-	public boolean addEdge(Edge o) {
-		return edges.add(o);
+	public boolean addEdge(Edge edge) {
+		return edges.add(edge);
+	}
+	
+	public AnnisNode getToken(long tokenIndex) {
+		return tokenByIndex.get(tokenIndex);
 	}
 
 	public List<AnnisNode> getTokens() {

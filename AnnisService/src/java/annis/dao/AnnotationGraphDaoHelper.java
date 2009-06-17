@@ -135,8 +135,11 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		// fn: node id -> node
 		Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
 		
-		// fn: edge pre order -> edge
+		// fn: edge pre order value -> edge
 		Map<Long, Edge> edgeByPre = new HashMap<Long, Edge>();
+		
+		// funktion result
+		List<AnnotationGraph> graphs = new ArrayList<AnnotationGraph>();
 		
 		int rowNum = 0;
 		while (resultSet.next()) {
@@ -147,6 +150,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 			if ( ! graphByMatchGroup.containsKey(key) ) {
 				log.debug("starting annotation graph for match: " + key);
 				AnnotationGraph graph = new AnnotationGraph();
+				graphs.add(graph);
 				graphByMatchGroup.put(key, graph);
 				
 				// add matched node ids to the graph
@@ -154,7 +158,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 					graph.addMatchedNodeId(Long.parseLong(id));
 				
 				// clear mapping functions for this graph
-				// assumes the result set is sorted by key, pre
+				// assumes that the result set is sorted by key, pre
 				nodeById.clear();
 				edgeByPre.clear();
 			}
@@ -205,7 +209,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 				edge.addAnnotation(edgeAnnotation);
 		}
 		
-		ArrayList<AnnotationGraph> graphs = new ArrayList<AnnotationGraph>(graphByMatchGroup.values());
+//		ArrayList<AnnotationGraph> graphs = new ArrayList<AnnotationGraph>(graphByMatchGroup.values());
 	
 		return graphs;
 	}

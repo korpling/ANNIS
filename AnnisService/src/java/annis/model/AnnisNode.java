@@ -31,6 +31,9 @@ public class AnnisNode implements Serializable {
 	private long rightToken;
 	private Set<Annotation> nodeAnnotations;
 
+	// annotation graph
+	private AnnotationGraph graph;
+	
 	// node position in annotation graph
 	private Set<Edge> incomingEdges;
 	private Set<Edge> outgoingEdges;
@@ -415,6 +418,14 @@ public class AnnisNode implements Serializable {
 
 	public void setOutgoingEdges(Set<Edge> outgoingEdges) {
 		this.outgoingEdges = outgoingEdges;
+	}
+
+	public AnnotationGraph getGraph() {
+		return graph;
+	}
+
+	public void setGraph(AnnotationGraph graph) {
+		this.graph = graph;
 	}
 
 }

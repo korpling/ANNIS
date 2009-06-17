@@ -8,15 +8,22 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestAnnotationGraph {
 
+	// object under test
+	private AnnotationGraph graph;
+	
+	@Before
+	public void setup() {
+		graph = new AnnotationGraph();
+	}
+	
 	// getTokens() returns tokens in order
 	@Test
 	public void addNodeToken() {
-		AnnotationGraph graph = new AnnotationGraph();
-		
 		// a few tokens
 		AnnisNode token1 = newMockedToken(1);
 		AnnisNode token2 = newMockedToken(2);
@@ -36,6 +43,26 @@ public class TestAnnotationGraph {
 		// test
 		List<AnnisNode> expected = Arrays.asList(token1, token2, token3);
 		assertThat(graph.getTokens(), is(expected));
+	}
+	
+	// addNode() stores graph in AnnisNode
+	@Test
+	public void addNodeStoresGraphInNode() {
+		AnnisNode node = new AnnisNode(1);
+		graph.addNode(node);
+		assertThat(node.getGraph(), is(graph));
+	}
+	
+	// addNode() stores tokens by tokenIndex
+	@Test
+	public void addNodeStoresTokenByIndex() {
+		// create a token and add it to the graph
+		final long TOKEN_INDEX = 23L;
+		AnnisNode token = newMockedToken(TOKEN_INDEX);
+		graph.addNode(token);
+		
+		// query the token by its token index
+		assertThat(graph.getToken(TOKEN_INDEX), is(token));
 	}
 	
 	private AnnisNode newMockedToken(long tokenIndex) {

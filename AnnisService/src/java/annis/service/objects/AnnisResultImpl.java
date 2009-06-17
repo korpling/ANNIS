@@ -38,6 +38,7 @@ public class AnnisResultImpl implements AnnisResult
 
   // the wrapped graph object
   private AnnotationGraph graph;
+  
   // cache paula string
   private String paulaString = null;
 
@@ -402,4 +403,12 @@ public class AnnisResultImpl implements AnnisResult
   {
     return isMarked(id);
   }
+
+public AnnotationGraph getGraph() {
+	return graph;
+}
+
+public void setGraph(AnnotationGraph graph) {
+	this.graph = graph;
+}
 }
