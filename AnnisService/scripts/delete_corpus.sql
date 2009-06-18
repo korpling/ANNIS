@@ -15,8 +15,8 @@ ALTER TABLE node_annotation DROP CONSTRAINT "node_annotation_node_ref_fkey";
 ALTER TABLE corpus_annotation DROP CONSTRAINT "corpus_annotation_corpus_ref_fkey";
 ALTER TABLE node DROP CONSTRAINT "node_corpus_ref_fkey";
 -- ALTER TABLE corpus_stats DROP CONSTRAINT "corpus_stats_id_fkey";
-ALTER TABLE corp_2_viz DROP CONSTRAINT "FK_corp_2_viz_2_corpus";
-ALTER TABLE xcorp_2_viz DROP CONSTRAINT "FK_xcorp_2_viz_2_corpus";
+-- ALTER TABLE corp_2_viz DROP CONSTRAINT "FK_corp_2_viz_2_corpus";
+-- ALTER TABLE xcorp_2_viz DROP CONSTRAINT "FK_xcorp_2_viz_2_corpus";
 
 --- 
 --- delete entries from materialized tables
@@ -140,6 +140,6 @@ ALTER TABLE node_annotation ADD CONSTRAINT "node_annotation_node_ref_fkey" FOREI
 
 ALTER TABLE corpus_annotation ADD CONSTRAINT "corpus_annotation_corpus_ref_fkey" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
 ALTER TABLE node ADD CONSTRAINT "node_corpus_ref_fkey" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
-ALTER TABLE corpus_stats ADD CONSTRAINT "corpus_stats_id_fkey" FOREIGN KEY (id) REFERENCES corpus (id);
-ALTER TABLE corp_2_viz ADD CONSTRAINT "FK_corp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
-ALTER TABLE xcorp_2_viz ADD CONSTRAINT "FK_xcorp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
+-- ALTER TABLE corpus_stats ADD CONSTRAINT "corpus_stats_id_fkey" FOREIGN KEY (id) REFERENCES corpus (id);
+-- ALTER TABLE corp_2_viz ADD CONSTRAINT "FK_corp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
+-- ALTER TABLE xcorp_2_viz ADD CONSTRAINT "FK_xcorp_2_viz_2_corpus" FOREIGN KEY (corpus_ref) REFERENCES corpus (id);
