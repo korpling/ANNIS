@@ -38,6 +38,18 @@
 		<property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy"/>
 	</bean>
 	
+	<bean id="countClauseSqlGenerator" parent="findClauseSqlGenerator">
+		<property name="selectClauseSqlGenerators">
+			<util:list>
+				<ref bean="countMatchesSelectClauseSqlGenerator"/>
+			</util:list>
+		</property>
+	</bean>
+	
+	<bean id="countMatchesSelectClauseSqlGenerator" class="annis.sqlgen.CountMatchesSelectClauseSqlGenerator">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+	
 	<!-- generates a SQL statement for a single clause -->
 	<bean id="findClauseSqlGenerator" class="annis.sqlgen.ClauseSqlGenerator">
 		<property name="selectClauseSqlGenerators">
@@ -127,6 +139,12 @@
 	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
 	<bean id="findSqlGenerator" class="annis.sqlgen.SqlGenerator">
 		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
+		<property name="queryAnalysis" ref="queryAnalysis"/>
+	</bean>
+	
+	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
+	<bean id="countSqlGenerator" class="annis.sqlgen.SqlGenerator">
+		<property name="clauseSqlGenerator" ref="countClauseSqlGenerator"/>
 		<property name="queryAnalysis" ref="queryAnalysis"/>
 	</bean>
 	

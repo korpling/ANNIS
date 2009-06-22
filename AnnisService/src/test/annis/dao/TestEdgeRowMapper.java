@@ -68,7 +68,7 @@ public class TestEdgeRowMapper extends ModelRowMapperTestCase<Edge> {
 		stubLongColumn("post", POST);
 		stubLongColumn("node_ref", NODE_REF);
 		when(resultSet.wasNull()).thenReturn(true);
-		stubLongColumn("component", COMPONENT);
+		stubLongColumn("component_id", COMPONENT);
 		stubStringColumn("edge_type", EDGETYPE.getTypeChar());
 		stubStringColumn("namespace", NAMESPACE);
 		stubStringColumn("name", NAME);

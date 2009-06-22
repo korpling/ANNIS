@@ -102,6 +102,7 @@
 		<property name="findRowMapper" ref="matchRowMapper"/>
 		<property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
 		<property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
+		<property name="countSqlGenerator" ref="countSqlGenerator"/>
 	</bean>
 	
 	<bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">

@@ -31,7 +31,7 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	
 	// dependencies
 	private DddQueryParser dddQueryParser;
-	private SqlGenerator sqlGenerator;
+	private SqlGenerator findSqlGenerator;
 	private AnnisDao annisDao;
 	
 	private AnnotationGraphDaoHelper annotationGraphDaoHelper;
@@ -70,7 +70,7 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	public void doSql(String dddQuery) {
 		// sql query
 		Start statement = dddQueryParser.parse(dddQuery);
-		String sql = sqlGenerator.toSql(statement, corpusList);
+		String sql = findSqlGenerator.toSql(statement, corpusList);
 
 		out.println(sql);
 	}
@@ -180,12 +180,12 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		this.dddQueryParser = dddQueryParser;
 	}
 	
-	public SqlGenerator getSqlGenerator() {
-		return sqlGenerator;
+	public SqlGenerator getFindSqlGenerator() {
+		return findSqlGenerator;
 	}
 	
-	public void setSqlGenerator(SqlGenerator sqlGenerator) {
-		this.sqlGenerator = sqlGenerator;
+	public void setFindSqlGenerator(SqlGenerator sqlGenerator) {
+		this.findSqlGenerator = sqlGenerator;
 	}
 	
 	public AnnisDao getAnnisDao() {

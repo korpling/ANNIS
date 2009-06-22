@@ -55,6 +55,7 @@ public class TestCorpusSelectionByViewByDocumentTableAccessStrategy {
 		corpusSelectionByViewByDocumentTableAccessStrategy.setNodeTableViewName(VIEW_NAME);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void modifySqlSessionWithCorpusSelection() {
 		// make sure the correct table and column alias is used

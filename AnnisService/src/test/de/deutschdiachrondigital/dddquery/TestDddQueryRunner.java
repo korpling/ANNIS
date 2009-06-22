@@ -107,7 +107,7 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 	public void springManagedInstanceHasAllDependencies() {
 		assertThat(springManagedDddQueryRunner.getAnnisDao(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getDddQueryParser(), is(not(nullValue())));
-		assertThat(springManagedDddQueryRunner.getSqlGenerator(), is(not(nullValue())));
+		assertThat(springManagedDddQueryRunner.getFindSqlGenerator(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getAnnotationGraphDaoHelper(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getWekaDaoHelper(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getListCorpusHelper(), is(not(nullValue())));

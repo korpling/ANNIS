@@ -1,5 +1,9 @@
 package annis.benchmarking;
 
+import static annis.utils.Utils.avg;
+import static annis.utils.Utils.max;
+import static annis.utils.Utils.min;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -229,27 +233,6 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 		}
 	}
 	
-	private String min(List<Long> runtimeList) {
-		long min = Long.MAX_VALUE;
-		for (long value : runtimeList)
-			min = Math.min(min, value);
-		return String.valueOf(min);
-	}
-
-	private String max(List<Long> runtimeList) {
-		long max = Long.MIN_VALUE;
-		for (long value : runtimeList)
-			max = Math.max(max, value);
-		return String.valueOf(max);
-	}
-	
-	private String avg(List<Long> runtimeList) {
-		long sum = 0;
-		for (long value : runtimeList)
-			sum += value;
-		return String.valueOf(sum / runtimeList.size());
-	}
-
 	private void printLine(String... fields) {
 		List<String> quoted = new ArrayList<String>();
 		for (String field : fields)

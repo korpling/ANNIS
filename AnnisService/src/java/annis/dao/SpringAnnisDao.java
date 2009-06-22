@@ -1,11 +1,14 @@
 package annis.dao;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -50,6 +53,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	
 	private List<SqlSessionModifier> sqlSessionModifiers;
 	private SqlGenerator findSqlGenerator;
+	private SqlGenerator countSqlGenerator;
 	private MatchRowMapper findRowMapper;
 	private QueryAnalysis queryAnalysis;
 	private DddQueryParser dddQueryParser;
@@ -107,7 +111,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	}
 
 	public int countMatches(final List<Long> corpusList, final String dddQuery) {
-		return findMatches(corpusList, dddQuery).size();
+//		return findMatches(corpusList, dddQuery).size();
+
+		// parse the query
+		Start statement = dddQueryParser.parse(dddQuery);
+		
+		// analyze it
+		QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+		
+		// execute session modifiers
+		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
+		
+		return getSimpleJdbcTemplate().queryForInt(countSqlGenerator.toSql(statement, corpusList));
 	}
 
 	@Deprecated
@@ -119,7 +135,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	public String plan(String dddQuery, List<Long> corpusList, boolean analyze) {
 		Validate.notNull(corpusList, "corpusList=null passed as argument");
 		
-		return new QueryTemplate().explain(corpusList, dddQuery, findSqlGenerator, analyze);
+		return new QueryTemplate().explain(corpusList, dddQuery, countSqlGenerator, analyze);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -349,6 +365,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	public void setListCorpusByNameDaoHelper(
 			ListCorpusByNameDaoHelper listCorpusByNameDaoHelper) {
 		this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
+	}
+
+	public SqlGenerator getCountSqlGenerator() {
+		return countSqlGenerator;
+	}
+
+	public void setCountSqlGenerator(SqlGenerator countSqlGenerator) {
+		this.countSqlGenerator = countSqlGenerator;
 	}
 
 }

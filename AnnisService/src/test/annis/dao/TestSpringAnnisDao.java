@@ -121,6 +121,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getWekaSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListNodeAnnotationsSqlHelper(), is(not(nullValue())));
+		assertThat(springAnnisDao.getCountSqlGenerator(), is(not(nullValue())));
 		
 		// new
 		assertThat(springAnnisDao.getQueryAnalysis(), is(not(nullValue())));
