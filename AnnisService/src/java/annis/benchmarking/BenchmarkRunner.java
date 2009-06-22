@@ -137,24 +137,31 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			
 			// each line is a test query (with test corpus)
 			Task task = new Task();
-			tasks.add(task);
 
 			// first word ist token name, then comes the query
 			int spacePos = line.indexOf(" ");
 			String corpusName = line.substring(0, spacePos);
 			String annisQuery = line.substring(spacePos + 1);
-			task.setCorpusName(corpusName);
-			task.setAnnisQuery(annisQuery);
-			task.setDddQuery(dddQueryMapper.translate(annisQuery));
+
+			// look corpus id
+			try {
+				Long corpusId = convertCorpusNameToId(corpusName);
+				task.setCorpusId(corpusId);
+				task.setCorpusName(corpusName);
+				task.setAnnisQuery(annisQuery);
+				task.setDddQuery(dddQueryMapper.translate(annisQuery));
+				tasks.add(task);
+			} catch (IndexOutOfBoundsException e) {
+				log.info("no corpus found with name: " + corpusName + "; skipping line");
+				continue;
+			}
 		}
 		
 		// convert corpus name to id, also get query plans and match count
 		log.info("computing matchcount and plan for test queries...");
 		for (Task task : tasks) {
-			// corpus id
 			String corpusName = task.getCorpusName();
-			Long corpusId = convertCorpusNameToId(corpusName);
-			task.setCorpusId(corpusId);
+			Long corpusId = task.getCorpusId();
 			
 			// run query once to load changes into db
 			String query = task.getDddQuery();
