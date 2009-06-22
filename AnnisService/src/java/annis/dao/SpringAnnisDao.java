@@ -123,7 +123,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
 			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
 		
-		return getSimpleJdbcTemplate().queryForInt(countSqlGenerator.toSql(statement, corpusList));
+		return getSimpleJdbcTemplate().query(countSqlGenerator.toSql(statement, corpusList), findRowMapper).size();
 	}
 
 	@Deprecated

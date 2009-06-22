@@ -6,27 +6,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 import annis.model.AnnisNode;
 
-public class CountMatchesSelectClauseSqlGenerator 
+public class CountMatchesSelectClauseSqlGenerator
 	extends BaseNodeSqlGenerator
 	implements SelectClauseSqlGenerator {
 
 	public String selectClause(List<AnnisNode> nodes, int maxWidth) {
-		StringBuffer sb = new StringBuffer();
-		sb.append("count(DISTINCT ");
+		Validate.isTrue(nodes.size() <= maxWidth, "BUG: nodes.size() > maxWidth");
 		
-		List<String> selectedFields = new ArrayList<String>();
-
-		// count all distinct node id combinations
-		for (AnnisNode node : nodes) {
-			selectedFields.add(tables(node).aliasedColumn(NODE_TABLE, "id"));
+		List<String> nodeColumns = new ArrayList<String>();
+		
+		// columns for nodes
+		for (int i = 0; i < nodes.size(); ++i) {
+			nodeColumns.add(selectClauseForNode(nodes.get(i), i + 1));
 		}
-		sb.append(StringUtils.join(selectedFields, " || '-' || "));
-
-		sb.append(")");
-		return sb.toString();
+		
+		// pad select clause with NULL values, so all queries in UNION have same cardinality
+		for (int i = nodes.size(); i < maxWidth; ++i)
+			nodeColumns.add(selectClauseForNode(null, i + 1));
+		
+		return "DISTINCT\n" + StringUtils.join(nodeColumns, ",\n");
+	}
+	
+	private String selectClauseForNode(AnnisNode node, int index) {
+		String[] columns = { "id" };
+		for (int i = 0; i < columns.length; ++i) {
+			columns[i] = (node == null ? "NULL" : tables(node).aliasedColumn(NODE_TABLE, columns[i])) + " AS " + columns[i] + index;
+		}
+		return "\t" + StringUtils.join(columns, ", ");
 	}
 
 }
