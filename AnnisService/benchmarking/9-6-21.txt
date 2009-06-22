@@ -1,0 +1,267 @@
+- Korpus-Selektion als View, top-level Korpus gegeben
+- DB auf kenny, viele Korpora
+- Faktentabelle
+- einfache Indizes auf Fakten-Attribute
+
+23:54:01.168 BenchmarkRunner INFO: test runs for each query: 5
+23:54:01.170 BenchmarkRunner INFO: reading benchmark file...
+23:54:01.171 BenchmarkRunner DEBUG: pcc3 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+23:54:01.337 BenchmarkRunner DEBUG: tiger2.2 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+23:54:01.349 BenchmarkRunner DEBUG: ONTONOTES_v1.6_small mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1 
+23:54:01.353 BenchmarkRunner INFO: computing matchcount and plan for test queries...
+23:54:06.387 BenchmarkRunner INFO: test query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus 3666 (pcc3) has 1 matches
+23:54:06.388 BenchmarkRunner INFO: plan:
+Unique  (cost=104171.96..104172.01 rows=1 width=88) (actual time=1440.568..1440.653 rows=1 loops=1)
+  ->  Sort  (cost=104171.96..104171.97 rows=1 width=88) (actual time=1440.564..1440.577 rows=18 loops=1)
+        Sort Key: public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token
+        Sort Method:  quicksort  Memory: 27kB
+        ->  Nested Loop IN Join  (cost=27122.98..104171.95 rows=1 width=88) (actual time=796.124..1440.424 rows=18 loops=1)
+              Join Filter: (public.facts.corpus_ref = c1.id)
+              ->  Nested Loop IN Join  (cost=26985.15..104018.14 rows=1 width=94) (actual time=791.941..1436.056 rows=18 loops=1)
+                    Join Filter: (public.facts.corpus_ref = c1.id)
+                    ->  Nested Loop IN Join  (cost=26847.32..103864.33 rows=1 width=100) (actual time=787.721..1431.644 rows=18 loops=1)
+                          Join Filter: (public.facts.corpus_ref = c1.id)
+                          ->  Nested Loop  (cost=26709.48..103710.53 rows=1 width=106) (actual time=783.481..1427.216 rows=18 loops=1)
+                                Join Filter: ((public.facts.right_token < public.facts.left_token) AND (public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id))
+                                ->  Nested Loop  (cost=26709.48..103699.96 rows=1 width=126) (actual time=783.448..1426.525 rows=27 loops=1)
+                                      Join Filter: ((public.facts.right_token < public.facts.left_token) AND (public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id))
+                                      ->  Nested Loop  (cost=26709.48..103689.39 rows=1 width=82) (actual time=782.315..1425.418 rows=48 loops=1)
+                                            Join Filter: (public.facts.component_id = public.facts.component_id)
+                                            ->  Hash Join  (cost=26709.48..86019.97 rows=1773 width=38) (actual time=782.154..1422.381 rows=111 loops=1)
+                                                  Hash Cond: (public.facts.corpus_ref = c1.id)
+                                                  ->  Bitmap Heap Scan on facts  (cost=26555.68..85793.76 rows=14580 width=44) (actual time=314.593..1188.806 rows=182786 loops=1)
+                                                        Recheck Cond: (((node_annotation_value)::text = 'S'::text) AND ((node_annotation_name)::text = 'cat'::text))
+                                                        Filter: (edge_type = 'd'::bpchar)
+                                                        ->  BitmapAnd  (cost=26555.68..26555.68 rows=18966 width=0) (actual time=294.263..294.263 rows=0 loops=1)
+                                                              ->  Bitmap Index Scan on idx_f_node_anno_value  (cost=0.00..3702.46 rows=193707 width=0) (actual time=43.252..43.252 rows=190125 loops=1)
+                                                                    Index Cond: ((node_annotation_value)::text = 'S'::text)
+                                                              ->  Bitmap Index Scan on idx_f_node_anno_name  (cost=0.00..22845.67 rows=1189867 width=0) (actual time=228.636..228.636 rows=1188265 loops=1)
+                                                                    Index Cond: ((node_annotation_name)::text = 'cat'::text)
+                                                  ->  Hash  (cost=146.55..146.55 rows=581 width=27) (actual time=4.386..4.386 rows=4 loops=1)
+                                                        ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=4.355..4.373 rows=4 loops=1)
+                                                              ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=4.353..4.357 rows=4 loops=1)
+                                                                    Sort Key: c1.id
+                                                                    Sort Method:  quicksort  Memory: 25kB
+                                                                    ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.104..4.326 rows=4 loops=1)
+                                                                          Join Filter: (c1.post <= c2.post)
+                                                                          ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.059..0.060 rows=1 loops=1)
+                                                                                Index Cond: (id = 3666::numeric)
+                                                                          ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.029..2.152 rows=1563 loops=1)
+                                                                                Index Cond: (c1.pre >= c2.pre)
+                                            ->  Index Scan using idx_f_parent on facts  (cost=0.00..9.95 rows=1 width=44) (actual time=0.022..0.024 rows=0 loops=111)
+                                                  Index Cond: (public.facts.parent = public.facts.pre)
+                                                  Filter: (((public.facts.node_annotation_name)::text = 'pos'::text) AND ((public.facts.node_annotation_value)::text = 'VVFIN'::text))
+                                      ->  Index Scan using idx_f_parent on facts  (cost=0.00..10.55 rows=1 width=44) (actual time=0.016..0.019 rows=1 loops=48)
+                                            Index Cond: (public.facts.parent = public.facts.pre)
+                                            Filter: (((public.facts.edge_annotation_namespace)::text = 'tiger'::text) AND ((public.facts.edge_annotation_name)::text = 'func'::text) AND ((public.facts.edge_annotation_value)::text = 'OA'::text))
+                                ->  Index Scan using idx_f_parent on facts  (cost=0.00..10.55 rows=1 width=44) (actual time=0.015..0.020 rows=1 loops=27)
+                                      Index Cond: (public.facts.parent = public.facts.pre)
+                                      Filter: (((public.facts.edge_annotation_namespace)::text = 'tiger'::text) AND ((public.facts.edge_annotation_name)::text = 'func'::text) AND ((public.facts.edge_annotation_value)::text = 'SB'::text))
+                          ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.237..0.240 rows=2 loops=18)
+                                ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.235..0.236 rows=2 loops=18)
+                                      Sort Key: c1.id
+                                      Sort Method:  quicksort  Memory: 25kB
+                                      ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.030..4.183 rows=4 loops=1)
+                                            Join Filter: (c1.post <= c2.post)
+                                            ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.011..0.012 rows=1 loops=1)
+                                                  Index Cond: (id = 3666::numeric)
+                                            ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.008..2.105 rows=1563 loops=1)
+                                                  Index Cond: (c1.pre >= c2.pre)
+                    ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.236..0.239 rows=2 loops=18)
+                          ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.234..0.236 rows=2 loops=18)
+                                Sort Key: c1.id
+                                Sort Method:  quicksort  Memory: 25kB
+                                ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.021..4.176 rows=4 loops=1)
+                                      Join Filter: (c1.post <= c2.post)
+                                      ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.006..0.007 rows=1 loops=1)
+                                            Index Cond: (id = 3666::numeric)
+                                      ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.004..2.066 rows=1563 loops=1)
+                                            Index Cond: (c1.pre >= c2.pre)
+              ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.234..0.237 rows=2 loops=18)
+                    ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.232..0.233 rows=2 loops=18)
+                          Sort Key: c1.id
+                          Sort Method:  quicksort  Memory: 25kB
+                          ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.021..4.145 rows=4 loops=1)
+                                Join Filter: (c1.post <= c2.post)
+                                ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.005..0.006 rows=1 loops=1)
+                                      Index Cond: (id = 3666::numeric)
+                                ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.005..2.026 rows=1563 loops=1)
+                                      Index Cond: (c1.pre >= c2.pre)
+Total runtime: 1442.032 ms
+23:54:59.724 BenchmarkRunner INFO: test query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus 5225 (tiger2.2) has 666 matches
+23:54:59.724 BenchmarkRunner INFO: plan:
+Unique  (cost=104171.96..104172.01 rows=1 width=88) (actual time=37711.763..37723.190 rows=666 loops=1)
+  ->  Sort  (cost=104171.96..104171.97 rows=1 width=88) (actual time=37711.758..37714.464 rows=3182 loops=1)
+        Sort Key: public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token
+        Sort Method:  quicksort  Memory: 544kB
+        ->  Nested Loop IN Join  (cost=27122.98..104171.95 rows=1 width=88) (actual time=810.368..37695.884 rows=3182 loops=1)
+              Join Filter: (public.facts.corpus_ref = c1.id)
+              ->  Nested Loop IN Join  (cost=26985.15..104018.14 rows=1 width=94) (actual time=800.590..26737.573 rows=3182 loops=1)
+                    Join Filter: (public.facts.corpus_ref = c1.id)
+                    ->  Nested Loop IN Join  (cost=26847.32..103864.33 rows=1 width=100) (actual time=790.845..15920.459 rows=3182 loops=1)
+                          Join Filter: (public.facts.corpus_ref = c1.id)
+                          ->  Nested Loop  (cost=26709.48..103710.53 rows=1 width=106) (actual time=780.871..5282.522 rows=3182 loops=1)
+                                Join Filter: ((public.facts.right_token < public.facts.left_token) AND (public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id))
+                                ->  Nested Loop  (cost=26709.48..103699.96 rows=1 width=126) (actual time=777.935..4944.283 rows=13481 loops=1)
+                                      Join Filter: ((public.facts.right_token < public.facts.left_token) AND (public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id))
+                                      ->  Nested Loop  (cost=26709.48..103689.39 rows=1 width=82) (actual time=777.905..3829.359 rows=50614 loops=1)
+                                            Join Filter: (public.facts.component_id = public.facts.component_id)
+                                            ->  Hash Join  (cost=26709.48..86019.97 rows=1773 width=38) (actual time=777.813..1612.168 rows=104576 loops=1)
+                                                  Hash Cond: (public.facts.corpus_ref = c1.id)
+                                                  ->  Bitmap Heap Scan on facts  (cost=26555.68..85793.76 rows=14580 width=44) (actual time=314.913..1183.014 rows=182786 loops=1)
+                                                        Recheck Cond: (((node_annotation_value)::text = 'S'::text) AND ((node_annotation_name)::text = 'cat'::text))
+                                                        Filter: (edge_type = 'd'::bpchar)
+                                                        ->  BitmapAnd  (cost=26555.68..26555.68 rows=18966 width=0) (actual time=294.793..294.793 rows=0 loops=1)
+                                                              ->  Bitmap Index Scan on idx_f_node_anno_value  (cost=0.00..3702.46 rows=193707 width=0) (actual time=43.537..43.537 rows=190125 loops=1)
+                                                                    Index Cond: ((node_annotation_value)::text = 'S'::text)
+                                                              ->  Bitmap Index Scan on idx_f_node_anno_name  (cost=0.00..22845.67 rows=1189867 width=0) (actual time=228.855..228.855 rows=1188265 loops=1)
+                                                                    Index Cond: ((node_annotation_name)::text = 'cat'::text)
+                                                  ->  Hash  (cost=146.55..146.55 rows=581 width=27) (actual time=16.994..16.994 rows=1559 loops=1)
+                                                        ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=10.091..14.923 rows=1559 loops=1)
+                                                              ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=10.089..11.546 rows=1559 loops=1)
+                                                                    Sort Key: c1.id
+                                                                    Sort Method:  quicksort  Memory: 122kB
+                                                                    ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.174..5.810 rows=1559 loops=1)
+                                                                          Join Filter: (c1.post <= c2.post)
+                                                                          ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.073..0.074 rows=1 loops=1)
+                                                                                Index Cond: (id = 5225::numeric)
+                                                                          ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.085..2.370 rows=1559 loops=1)
+                                                                                Index Cond: (c1.pre >= c2.pre)
+                                            ->  Index Scan using idx_f_parent on facts  (cost=0.00..9.95 rows=1 width=44) (actual time=0.016..0.018 rows=0 loops=104576)
+                                                  Index Cond: (public.facts.parent = public.facts.pre)
+                                                  Filter: (((public.facts.node_annotation_name)::text = 'pos'::text) AND ((public.facts.node_annotation_value)::text = 'VVFIN'::text))
+                                      ->  Index Scan using idx_f_parent on facts  (cost=0.00..10.55 rows=1 width=44) (actual time=0.016..0.018 rows=1 loops=50614)
+                                            Index Cond: (public.facts.parent = public.facts.pre)
+                                            Filter: (((public.facts.edge_annotation_namespace)::text = 'tiger'::text) AND ((public.facts.edge_annotation_name)::text = 'func'::text) AND ((public.facts.edge_annotation_value)::text = 'OA'::text))
+                                ->  Index Scan using idx_f_parent on facts  (cost=0.00..10.55 rows=1 width=44) (actual time=0.013..0.020 rows=2 loops=13481)
+                                      Index Cond: (public.facts.parent = public.facts.pre)
+                                      Filter: (((public.facts.edge_annotation_namespace)::text = 'tiger'::text) AND ((public.facts.edge_annotation_name)::text = 'func'::text) AND ((public.facts.edge_annotation_value)::text = 'SB'::text))
+                          ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.006..2.376 rows=790 loops=3182)
+                                ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.004..0.730 rows=790 loops=3182)
+                                      Sort Key: c1.id
+                                      Sort Method:  quicksort  Memory: 122kB
+                                      ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.124..5.704 rows=1559 loops=1)
+                                            Join Filter: (c1.post <= c2.post)
+                                            ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.041..0.042 rows=1 loops=1)
+                                                  Index Cond: (id = 5225::numeric)
+                                            ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.066..2.228 rows=1559 loops=1)
+                                                  Index Cond: (c1.pre >= c2.pre)
+                    ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.006..2.457 rows=790 loops=3182)
+                          ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.004..0.797 rows=790 loops=3182)
+                                Sort Key: c1.id
+                                Sort Method:  quicksort  Memory: 122kB
+                                ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.060..5.471 rows=1559 loops=1)
+                                      Join Filter: (c1.post <= c2.post)
+                                      ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.006..0.008 rows=1 loops=1)
+                                            Index Cond: (id = 5225::numeric)
+                                      ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.047..2.046 rows=1559 loops=1)
+                                            Index Cond: (c1.pre >= c2.pre)
+              ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.006..2.495 rows=790 loops=3182)
+                    ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.004..0.832 rows=790 loops=3182)
+                          Sort Key: c1.id
+                          Sort Method:  quicksort  Memory: 122kB
+                          ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.059..5.484 rows=1559 loops=1)
+                                Join Filter: (c1.post <= c2.post)
+                                ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.006..0.008 rows=1 loops=1)
+                                      Index Cond: (id = 5225::numeric)
+                                ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.047..2.033 rows=1559 loops=1)
+                                      Index Cond: (c1.pre >= c2.pre)
+Total runtime: 37725.148 ms
+23:55:17.299 BenchmarkRunner INFO: test query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus 602 (ONTONOTES_v1.6_small) has 1002 matches
+23:55:17.300 BenchmarkRunner INFO: plan:
+Unique  (cost=4706.41..4706.45 rows=1 width=66) (actual time=6156.483..6167.093 rows=1002 loops=1)
+  ->  Sort  (cost=4706.41..4706.42 rows=1 width=66) (actual time=6156.480..6159.530 rows=3006 loops=1)
+        Sort Key: public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token
+        Sort Method:  quicksort  Memory: 519kB
+        ->  Nested Loop IN Join  (cost=3001.37..4706.40 rows=1 width=66) (actual time=1017.619..6146.030 rows=3006 loops=1)
+              Join Filter: (public.facts.corpus_ref = c1.id)
+              ->  Nested Loop IN Join  (cost=2863.54..4552.59 rows=1 width=72) (actual time=1005.343..6092.603 rows=3006 loops=1)
+                    Join Filter: (public.facts.corpus_ref = c1.id)
+                    ->  Nested Loop  (cost=2725.71..4398.79 rows=1 width=78) (actual time=992.944..6038.838 rows=3006 loops=1)
+                          Join Filter: ((public.facts.right_token < public.facts.left_token) AND (public.facts.right_token < public.facts.left_token))
+                          ->  Nested Loop IN Join  (cost=2725.71..4245.59 rows=1 width=50) (actual time=957.986..972.470 rows=222 loops=1)
+                                Join Filter: (public.facts.corpus_ref = c1.id)
+                                ->  Nested Loop  (cost=2587.88..4091.78 rows=1 width=56) (actual time=39.067..553.509 rows=15551 loops=1)
+                                      Join Filter: ((public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id))
+                                      ->  Bitmap Heap Scan on facts  (cost=2587.88..4081.21 rows=1 width=44) (actual time=38.956..176.109 rows=25033 loops=1)
+                                            Recheck Cond: (((edge_name)::text = 'IDENT_relation'::text) AND ((node_annotation_value)::text = 'IDENT'::text))
+                                            Filter: (((node_annotation_namespace)::text = 'mmax'::text) AND ((node_annotation_name)::text = 'TYPE'::text) AND (edge_type = 'p'::bpchar))
+                                            ->  BitmapAnd  (cost=2587.88..2587.88 rows=382 width=0) (actual time=34.510..34.510 rows=0 loops=1)
+                                                  ->  Bitmap Index Scan on idx_f_edge_name  (cost=0.00..1130.82 rows=60964 width=0) (actual time=14.902..14.902 rows=59548 loops=1)
+                                                        Index Cond: ((edge_name)::text = 'IDENT_relation'::text)
+                                                  ->  Bitmap Index Scan on idx_f_node_anno_value  (cost=0.00..1456.81 rows=76154 width=0) (actual time=15.191..15.191 rows=75099 loops=1)
+                                                        Index Cond: ((node_annotation_value)::text = 'IDENT'::text)
+                                      ->  Index Scan using idx_f_parent on facts  (cost=0.00..10.55 rows=1 width=44) (actual time=0.010..0.011 rows=1 loops=25033)
+                                            Index Cond: (public.facts.parent = public.facts.pre)
+                                            Filter: (((public.facts.node_annotation_namespace)::text = 'mmax'::text) AND ((public.facts.node_annotation_name)::text = 'TYPE'::text) AND ((public.facts.node_annotation_value)::text = 'IDENT'::text))
+                                ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.004..0.019 rows=5 loops=15551)
+                                      ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.002..0.007 rows=5 loops=15551)
+                                            Sort Key: c1.id
+                                            Sort Method:  quicksort  Memory: 25kB
+                                            ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.112..12.692 rows=5 loops=1)
+                                                  Join Filter: (c1.post <= c2.post)
+                                                  ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.055..0.057 rows=1 loops=1)
+                                                        Index Cond: (id = 602::numeric)
+                                                  ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.043..6.325 rows=4628 loops=1)
+                                                        Index Cond: (c1.pre >= c2.pre)
+                          ->  Index Scan using idx_f_text_ref on facts  (cost=0.00..153.18 rows=1 width=28) (actual time=0.387..22.380 rows=358 loops=222)
+                                Index Cond: (public.facts.text_ref = public.facts.text_ref)
+                                Filter: (((public.facts.node_annotation_namespace)::text = 'mmax'::text) AND ((public.facts.node_annotation_name)::text = 'TYPE'::text) AND ((public.facts.node_annotation_value)::text = 'IDENT'::text))
+                    ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.007..0.012 rows=3 loops=3006)
+                          ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.005..0.007 rows=3 loops=3006)
+                                Sort Key: c1.id
+                                Sort Method:  quicksort  Memory: 25kB
+                                ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.052..12.352 rows=5 loops=1)
+                                      Join Filter: (c1.post <= c2.post)
+                                      ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.010..0.012 rows=1 loops=1)
+                                            Index Cond: (id = 602::numeric)
+                                      ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.023..6.132 rows=4628 loops=1)
+                                            Index Cond: (c1.pre >= c2.pre)
+              ->  Unique  (cost=137.83..140.74 rows=581 width=6) (actual time=0.007..0.012 rows=3 loops=3006)
+                    ->  Sort  (cost=137.83..139.28 rows=581 width=6) (actual time=0.005..0.007 rows=3 loops=3006)
+                          Sort Key: c1.id
+                          Sort Method:  quicksort  Memory: 25kB
+                          ->  Nested Loop  (cost=0.00..111.16 rows=581 width=6) (actual time=0.037..12.244 rows=5 loops=1)
+                                Join Filter: (c1.post <= c2.post)
+                                ->  Index Scan using corpus_pkey on corpus c2  (cost=0.00..8.27 rows=1 width=14) (actual time=0.006..0.007 rows=1 loops=1)
+                                      Index Cond: (id = 602::numeric)
+                                ->  Index Scan using corpus_pre_key on corpus c1  (cost=0.00..76.76 rows=1742 width=20) (actual time=0.021..6.078 rows=4628 loops=1)
+                                      Index Cond: (c1.pre >= c2.pre)
+Total runtime: 6168.514 ms
+23:55:17.301 BenchmarkRunner INFO: running test queries sequentially...
+23:55:18.709 BenchmarkRunner INFO: runtime: 1407 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:55:20.116 BenchmarkRunner INFO: runtime: 1407 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:55:21.500 BenchmarkRunner INFO: runtime: 1384 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:55:22.895 BenchmarkRunner INFO: runtime: 1394 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:55:24.285 BenchmarkRunner INFO: runtime: 1389 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:55:31.847 BenchmarkRunner INFO: runtime: 7562 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:55:39.449 BenchmarkRunner INFO: runtime: 7602 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:55:47.194 BenchmarkRunner INFO: runtime: 7745 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:55:54.791 BenchmarkRunner INFO: runtime: 7596 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:56:02.447 BenchmarkRunner INFO: runtime: 7656 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:56:08.117 BenchmarkRunner INFO: runtime: 5670 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:13.726 BenchmarkRunner INFO: runtime: 5609 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:19.177 BenchmarkRunner INFO: runtime: 5451 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:24.644 BenchmarkRunner INFO: runtime: 5467 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:30.101 BenchmarkRunner INFO: runtime: 5457 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:30.101 BenchmarkRunner INFO: running test queries randomly...
+23:56:37.768 BenchmarkRunner INFO: runtime: 7667 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:56:45.389 BenchmarkRunner INFO: runtime: 7621 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:56:46.786 BenchmarkRunner INFO: runtime: 1397 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:56:48.183 BenchmarkRunner INFO: runtime: 1397 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:56:53.793 BenchmarkRunner INFO: runtime: 5610 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:56:55.195 BenchmarkRunner INFO: runtime: 1402 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:56:56.582 BenchmarkRunner INFO: runtime: 1387 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:57:02.180 BenchmarkRunner INFO: runtime: 5598 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:57:09.867 BenchmarkRunner INFO: runtime: 7687 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:57:15.585 BenchmarkRunner INFO: runtime: 5717 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:57:23.163 BenchmarkRunner INFO: runtime: 7577 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:57:24.581 BenchmarkRunner INFO: runtime: 1418 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: pcc3
+23:57:30.188 BenchmarkRunner INFO: runtime: 5607 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:57:37.791 BenchmarkRunner INFO: runtime: 7603 ms for query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus: tiger2.2
+23:57:43.430 BenchmarkRunner INFO: runtime: 5638 ms for query: mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1  on corpus: ONTONOTES_v1.6_small
+23:57:43.430 BenchmarkRunner INFO: benchmark results...
+'Query','Corpus','Count','Min seq','Avg seq','Max seq','Min rand','Avg rand','Max rand'
+'node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4','pcc3','1','1384','1396','1407','1387','1400','1418'
+'node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4','tiger2.2','666','7562','7632','7745','7577','7631','7687'
+'mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1 ','ONTONOTES_v1.6_small','1002','5451','5530','5670','5598','5634','5717'

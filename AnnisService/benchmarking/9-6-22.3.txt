@@ -1,0 +1,41 @@
+12:51:36.124 BenchmarkRunner INFO: test runs for each query: 5
+12:51:36.126 BenchmarkRunner INFO: reading benchmark file...
+12:51:36.126 BenchmarkRunner DEBUG: pcc3 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+12:51:36.249 BenchmarkRunner DEBUG: tiger2.2 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+12:51:36.260 BenchmarkRunner DEBUG: ONTONOTES_v1.6_small mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1 
+12:51:36.263 BenchmarkRunner INFO: computing matchcount and plan for test queries...
+12:51:37.535 BenchmarkRunner INFO: test query: node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4 on corpus 3666 (pcc3) has 1 matches
+12:51:37.535 BenchmarkRunner INFO: plan:
+Unique  (cost=850.60..850.64 rows=1 width=88) (actual time=3.836..3.903 rows=1 loops=1)
+  ->  Sort  (cost=850.60..850.60 rows=1 width=88) (actual time=3.833..3.849 rows=18 loops=1)
+        Sort Key: public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.text_ref, public.facts.left_token, public.facts.right_token, public.facts.id, public.facts.left_token, public.facts.right_token
+        Sort Method:  quicksort  Memory: 27kB
+        ->  Nested Loop  (cost=422.97..850.59 rows=1 width=88) (actual time=1.289..3.710 rows=18 loops=1)
+              Join Filter: (public.facts.component_id = public.facts.component_id)
+              ->  Nested Loop  (cost=404.06..827.64 rows=1 width=114) (actual time=1.194..2.973 rows=18 loops=1)
+                    Join Filter: ((public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id) AND (public.facts.right_token <= (public.facts.left_token - 1)) AND (public.facts.right_token >= (public.facts.left_token - 50)))
+                    ->  Hash Join  (cost=385.14..804.67 rows=1 width=76) (actual time=1.067..1.383 rows=27 loops=1)
+                          Hash Cond: ((public.facts.text_ref = public.facts.text_ref) AND (public.facts.component_id = public.facts.component_id) AND (public.facts.parent = public.facts.parent))
+                          Join Filter: ((public.facts.right_token <= (public.facts.left_token - 1)) AND (public.facts.right_token >= (public.facts.left_token - 50)))
+                          ->  Bitmap Heap Scan on facts  (cost=19.92..436.05 rows=41 width=38) (actual time=0.180..0.384 rows=86 loops=1)
+                                Recheck Cond: ((corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND ((edge_annotation_value)::text = 'OA'::text))
+                                Filter: (((edge_annotation_namespace)::text = 'tiger'::text) AND ((edge_annotation_name)::text = 'func'::text))
+                                ->  Bitmap Index Scan on idx_fp_edge_anno_value  (cost=0.00..19.91 rows=105 width=0) (actual time=0.160..0.160 rows=86 loops=1)
+                                      Index Cond: ((corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND ((edge_annotation_value)::text = 'OA'::text))
+                          ->  Hash  (cost=364.87..364.87 rows=20 width=38) (actual time=0.765..0.765 rows=137 loops=1)
+                                ->  Bitmap Heap Scan on facts  (cost=19.83..364.87 rows=20 width=38) (actual time=0.147..0.519 rows=137 loops=1)
+                                      Recheck Cond: ((corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND ((node_annotation_value)::text = 'VVFIN'::text))
+                                      Filter: ((node_annotation_name)::text = 'pos'::text)
+                                      ->  Bitmap Index Scan on idx_fp_node_anno_value  (cost=0.00..19.82 rows=87 width=0) (actual time=0.130..0.130 rows=137 loops=1)
+                                            Index Cond: ((corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND ((node_annotation_value)::text = 'VVFIN'::text))
+                    ->  Bitmap Heap Scan on facts  (cost=18.91..22.94 rows=1 width=38) (actual time=0.046..0.051 rows=1 loops=27)
+                          Recheck Cond: ((public.facts.corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND (public.facts.parent = public.facts.parent))
+                          Filter: (((public.facts.edge_annotation_namespace)::text = 'tiger'::text) AND ((public.facts.edge_annotation_name)::text = 'func'::text) AND ((public.facts.edge_annotation_value)::text = 'SB'::text))
+                          ->  Bitmap Index Scan on idx_fp_parent  (cost=0.00..18.91 rows=1 width=0) (actual time=0.035..0.035 rows=11 loops=27)
+                                Index Cond: ((public.facts.corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND (public.facts.parent = public.facts.parent))
+              ->  Bitmap Heap Scan on facts  (cost=18.91..22.94 rows=1 width=38) (actual time=0.033..0.034 rows=1 loops=18)
+                    Recheck Cond: ((public.facts.corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND (public.facts.pre = public.facts.parent))
+                    Filter: (((public.facts.node_annotation_name)::text = 'cat'::text) AND ((public.facts.node_annotation_value)::text = 'S'::text) AND (public.facts.edge_type = 'd'::bpchar))
+                    ->  Bitmap Index Scan on idx_fp_pre  (cost=0.00..18.91 rows=1 width=0) (actual time=0.029..0.029 rows=1 loops=18)
+                          Index Cond: ((public.facts.corpus_ref = ANY ('{3663,3664,3665,3666}'::numeric[])) AND (public.facts.pre = public.facts.parent))
+Total runtime: 4.202 ms

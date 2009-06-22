@@ -1,0 +1,11 @@
+-- alter table _rank add column edge_type char;
+-- alter table _rank add column name varchar(255);
+-- alter table _rank add column zshg numeric;
+-- update _rank set edge_type = 'd' where dominance = 't';
+-- update _rank set edge_type = 'p', name = value from _rank_anno where _rank.pre = _rank_anno.rank_ref and _rank_anno.edge = 'PR';
+-- update _rank set edge_type = 'p', name = r.name from _rank r where r.parent = _rank.pre and r.edge_type = 'p';
+-- update _rank set edge_type = 'c' where dominance = 'f' and edge_type is null;
+-- update _rank set edge_type = r.edge_type from _rank r where _rank.edge_type is null and r.parent = _rank.pre;
+-- update _rank set zshg = 1 where edge_type = 'c';
+-- update _rank set zshg = 2 where edge_type = 'd';
+-- update _rank set zshg = 3 where edge_type = 'p';

@@ -1,0 +1,3 @@
+pcc3 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+# tiger2.2 node & pos="VVFIN" & cat="S" & node & #3 >[tiger:func="OA"] #1 & #3 > #2 & #3 >[tiger:func="SB"] #4 & #1 .* #2 & #2 .* #4
+# ONTONOTES_v1.6_small mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & mmax:TYPE="IDENT" & #1 ->IDENT_relation #3 & #3 .* #2 & #2 .* #1 
