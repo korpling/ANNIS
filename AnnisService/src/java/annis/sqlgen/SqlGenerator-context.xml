@@ -128,7 +128,7 @@
 	</bean>
 
 	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
-		<lookup-method name="createTableAccessStrategy" bean="corpusSelectionByViewByDocumentTableAccessStrategy"/>
+		<lookup-method name="createTableAccessStrategy" bean="corpusSelectionByViewTableAccessStrategy"/>
 	</bean>
 	
 	<bean id="queryAnalysis" class="annis.ql.parser.QueryAnalysis">

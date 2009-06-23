@@ -483,7 +483,7 @@ public class SpringAnnisAdministrationDao {
 	
 	public boolean resetStatistics() {
 		try {
-			simpleJdbcTemplate.update("SELECT pg_stat_reset()");
+			simpleJdbcTemplate.queryForList("SELECT pg_stat_reset()");
 			return true;
 		} catch (DataAccessException e) {
 			return false;

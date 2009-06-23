@@ -111,7 +111,7 @@
 	
 	<util:list id="sqlSessionModifiers">
 		<ref bean="timeOutSqlSessionModifier"/>
-		<ref bean="corpusSelectionByViewByDocumentTableAccessStrategy"/>
+		<ref bean="corpusSelectionByViewTableAccessStrategy"/>
  	</util:list>
 	
 	<util:list id="springAnnisDaoMatchFilters">

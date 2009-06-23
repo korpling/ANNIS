@@ -30,7 +30,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	private Logger log = Logger.getLogger(this.getClass());
 
 	// constants
-	private static int RUNS = 5;
+	private static int RUNS = 3;
 	
 	// dependencies
 	private AnnisDao annisDao;
@@ -178,16 +178,18 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			// match count
 			long matchCount = annisDao.countMatches(Arrays.asList(corpusId), query);
 			task.setMatchCount(matchCount);
-			log.info("test query: " + task.getAnnisQuery() + " on corpus " + corpusId + " (" + corpusName + ") has " + matchCount + " matches");
-			log.info("plan:\n" + plan);
+			log.info("test query: " + task.getAnnisQuery() + " on corpus " + corpusId + " (" + corpusName + ") has " + matchCount + " matches; plan:\n" + plan);
 		}
 		
 		List<String> indexDefinitions = administrationDao.listIndexDefinitions("facts");
 		log.info("Indices on fact table:");
 		for (String definition : indexDefinitions)
 			log.info(definition);
-		log.info("resetting index and table statistics");
 		boolean reset = administrationDao.resetStatistics();
+		if (reset)
+			log.info("reset index and table statistics");
+		else
+			log.info("index and table statistics could not be reset");
 		
 		log.info("running test queries sequentially...");
 		// run test queries sequentially
@@ -218,9 +220,12 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
 		}
 		List<String> usedIndexes = administrationDao.listUsedIndexes("facts");
-		log.info("Used indices:");
-		if ( ! reset )
-			log.info("Statistics could not be resetted, values below may not be accurate!");
+		
+		if (reset)
+			log.info("Used indexes...");
+		else
+			log.info("Used indexes... (statistics could not be reset, values below may not be accurate!)");
+
 		for (String index : usedIndexes)
 			log.info(index);
 		
