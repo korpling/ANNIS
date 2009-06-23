@@ -127,6 +127,12 @@
 		<property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy"/>
 	</bean>
 
+	<bean id="corpusSelectionByViewOnlyToplevelTableAccessStrategy" class="annis.sqlgen.CorpusSelectionByViewOnlyToplevelTableAccessStrategy">
+		<property name="tableAliases" ref="tableAliases"/>
+		<property name="columnAliases" ref="columnAliases"/>
+		<property name="nodeTableViewName" value="node_v"/>
+	</bean>
+
 	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
 		<lookup-method name="createTableAccessStrategy" bean="corpusSelectionByViewTableAccessStrategy"/>
 	</bean>
