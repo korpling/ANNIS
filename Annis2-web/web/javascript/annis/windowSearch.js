@@ -229,7 +229,7 @@ Ext.onReady(function()
       failure: function()
       {
         Ext.MessageBox.show({
-          title: 'FATAL ERROR',
+          title: 'FATAL ERROR: count',
           msg: 'Unable to fetch match count. This may be caused by a timeout or connection problem.',
           icon: Ext.MessageBox.ERROR,
           buttons: Ext.MessageBox.OK
@@ -267,6 +267,20 @@ Ext.onReady(function()
       params:{
         start:0,
         limit:myLimit
+      },
+      callback: function(r, options, success)
+      {
+        if(!success)
+        {
+          Ext.MessageBox.show({
+            title: 'FATAL ERROR: result',
+            msg: 'Unable to fetch result. This may be caused by a timeout or connection problem.',
+            icon: Ext.MessageBox.ERROR,
+            buttons: Ext.MessageBox.OK
+          });
+          windowSearchResult.hide();
+          setSearchButtonDisabled(false);
+        }
       }
     });
 
