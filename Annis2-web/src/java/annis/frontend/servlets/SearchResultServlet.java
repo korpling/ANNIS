@@ -17,14 +17,21 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.model.AnnisNode;
+import annis.model.AnnotationGraph;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import annis.service.ifaces.AnnisToken;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
+import org.apache.commons.lang.StringUtils;
 
 public class SearchResultServlet extends HttpServlet
 {
@@ -146,7 +153,7 @@ public class SearchResultServlet extends HttpServlet
     try
     {
       queryAnnisQL = session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL).toString();
-        
+
       service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
       AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
       Cache cache = new FilesystemCache("Paula");
@@ -187,7 +194,8 @@ public class SearchResultServlet extends HttpServlet
         {
           json.append("\n,");
         }
-        json.append(result.getJSON());
+        String resultAsJSON = new AnnisResultToJSON(result).getJSON();
+        json.append(resultAsJSON);
       }
       json.append("]}");
       out.append(json.toString());
@@ -233,4 +241,126 @@ public class SearchResultServlet extends HttpServlet
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT);
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
   }
+
+
+  public class AnnisResultToJSON
+  {
+    private AnnisResult annisResult;
+    private StringBuffer json;
+    private AnnotationGraph graph;
+
+    public AnnisResultToJSON(AnnisResult result)
+    {
+      json = new StringBuffer();
+      graph = result.getGraph();
+      this.annisResult = result;
+
+      json.append("{'_id':'" + result.getStartNodeId() + ","
+        + result.getEndNodeId() + "', '_textId': '"
+        + getTextId() + "', '_text':'"
+        + getText().replace("'", "\\'") + "'");
+
+      //add annotation levels
+      json.append(", '_levels': [");
+      int c = 0;
+      for(String level : result.getAnnotationLevelSet())
+      {
+        json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
+      }
+      json.append("]");
+
+      //add a list of marked objects
+      json.append(", '_markedObjects': [");
+      c = 0;
+      for(Long id : markedIds())
+      {
+        if(c++ > 0)
+        {
+          json.append(", ");
+        }
+        json.append(id);
+      }
+      json.append("]");
+
+      //add token annotation levels
+      json.append(", '_tokenLevels': [");
+      c = 0;
+      for(String level : result.getTokenAnnotationLevelSet())
+      {
+        json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
+      }
+      json.append("]");
+
+      int tokenCount = 0;
+
+      List<AnnisToken> tokenList = result.getTokenList();
+      // XXX: Tokens unterhalb eines markierten Knoten werden nicht weiter markiert
+      int matchStart = 0;
+      int matchEnd = tokenList.size() - 1;
+//		int matchStart = tokenList.size() - 1, matchEnd = 0;
+      for(AnnisToken token : tokenList)
+      {
+        if(hasNodeMarker(token.getId()))
+        {
+//				if(tokenCount > matchEnd)
+//					matchEnd = tokenCount;
+//				if(tokenCount < matchStart)
+//					matchStart = tokenCount;
+        }
+        String marker = hasNodeMarker(token.getId()) ? result.getMarkerId(token.getId()) : "";
+        json.append(",'" + tokenCount++ + "':{'_id': " + token.getId() 
+          + ", '_text':'"
+          + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
+          + "', '_marker':'" + marker + "'" + ", '_corpusId':'"
+          + token.getCorpusId() + "'");
+        for(Map.Entry<String, String> annotation : token.entrySet())
+        {
+          json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
+        }
+        json.append("}");
+      }
+      json.append(", '_matchStart' : '" + matchStart + "'");
+      json.append(", '_matchEnd' : '" + matchEnd + "'");
+      json.append("}");
+    }
+
+    public String getJSON()
+    {
+      return json.toString();
+    }
+
+  private Set<Long> markedIds()
+  {
+    return graph.getMatchedNodeIds();
+  }
+
+  private String getText()
+  {
+    List<String> tokenSpans = new ArrayList<String>();
+    for(AnnisNode token : graph.getTokens())
+    {
+      tokenSpans.add(token.getSpannedText());
+    }
+    return StringUtils.join(tokenSpans, " ");
+  }
+
+  private String getTextId()
+  {
+    if(graph.getNodes().isEmpty())
+    {
+      return "1";
+    }
+    else
+    {
+      return String.valueOf(graph.getNodes().get(0).getTextId());
+    }
+  }
+
+  private boolean hasNodeMarker(long id)
+  {
+    return graph.getMatchedNodeIds().contains(id);
+  }
+
+  }
 }
+

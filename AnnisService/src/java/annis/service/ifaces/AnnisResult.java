@@ -1,5 +1,6 @@
 package annis.service.ifaces;
 
+import annis.model.AnnotationGraph;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -10,30 +11,33 @@ import java.util.Set;
  * @author k.huetter
  *
  */
-public interface AnnisResult extends JSONAble, Serializable {
+public interface AnnisResult extends Serializable {
 	
-	// PAULA-Unart representation
-	public abstract String getPaula();
+	/** PAULA-Unart representation */
+	public String getPaula();
 
-	// id of last token
-	public abstract long getEndNodeId();
+	/** id of last token */
+	public long getEndNodeId();
 
-	// id of first token
-	public abstract long getStartNodeId();
+	/** id of first token */
+	public long getStartNodeId();
 
-	// ordered list of tokens
-	public abstract List<AnnisToken> getTokenList();
+	/** ordered list of tokens */
+	public List<AnnisToken> getTokenList();
 	
-	// non-token annotation names
-	public abstract Set<String> getAnnotationLevelSet();
+	/** non-token annotation names */
+	public Set<String> getAnnotationLevelSet();
 	
-	// token annotation names
-	public abstract Set<String> getTokenAnnotationLevelSet();
+	/** token annotation names */
+	public Set<String> getTokenAnnotationLevelSet();
 
-	// get marker for node
-	String getMarkerId(Long nodeId);
+	/** get marker for node */
+	public String getMarkerId(Long nodeId);
 
-	// is there a node with marker markerID
-	boolean hasMarker(String markerId);
+	/** is there a node with marker markerID **/
+	public boolean hasMarker(String markerId);
+
+  /** Get the underlying annotation graph */
+  public AnnotationGraph getGraph();
 	
 }

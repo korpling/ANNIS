@@ -17,7 +17,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -303,112 +302,11 @@ public class AnnisResultImpl implements AnnisResult
     return graph.getMatchedNodeIds().contains(nodeId);
   }
 
-  @Deprecated
-  public String getJSON()
-  {
-    StringBuffer json = new StringBuffer();
-    json.append("{'_id':'" + getStartNodeId() + "," + getEndNodeId() + "', '_textId': '" + jsonGetTextId() + "', '_text':'" + jsonGetText().replace("'", "\\'") + "'");
-
-    //add annotation levels
-    json.append(", '_levels': [");
-    int c = 0;
-    for(String level : this.getAnnotationLevelSet())
-    {
-      json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
-    }
-    json.append("]");
-
-    //add a list of marked objects
-    json.append(", '_markedObjects': [");
-    c = 0;
-    for(Long id : jsonMarkedIds())
-    {
-      if(c++ > 0)
-      {
-        json.append(", ");
-      }
-      json.append(id);
-    }
-    json.append("]");
-
-    //add token annotation levels
-    json.append(", '_tokenLevels': [");
-    c = 0;
-    for(String level : this.getTokenAnnotationLevelSet())
-    {
-      json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
-    }
-    json.append("]");
-
-    int tokenCount = 0;
-
-    List<AnnisToken> tokenList = this.getTokenList();
-    // XXX: Tokens unterhalb eines markierten Knoten werden nicht weiter markiert
-    int matchStart = 0;
-    int matchEnd = tokenList.size() - 1;
-//		int matchStart = tokenList.size() - 1, matchEnd = 0;
-    for(AnnisToken token : tokenList)
-    {
-      if(jsonHasNodeMarker(token.getId()))
-      {
-//				if(tokenCount > matchEnd)
-//					matchEnd = tokenCount;
-//				if(tokenCount < matchStart)
-//					matchStart = tokenCount;
-      }
-      String marker = jsonHasNodeMarker(token.getId()) ? getMarkerId(token.getId()) : "";
-      json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
-        + ", '_text':'" + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
-        + "', '_marker':'" + marker + "'" + ", '_corpusId':'" + token.getCorpusId() + "'");
-      for(Map.Entry<String, String> annotation : token.entrySet())
-      {
-        json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
-      }
-      json.append("}");
-    }
-    json.append(", '_matchStart' : '" + matchStart + "'");
-    json.append(", '_matchEnd' : '" + matchEnd + "'");
-    json.append("}");
-    return json.toString();
+  public AnnotationGraph getGraph() {
+    return graph;
   }
 
-  private Set<Long> jsonMarkedIds()
-  {
-    return graph.getMatchedNodeIds();
+  public void setGraph(AnnotationGraph graph) {
+    this.graph = graph;
   }
-
-  private String jsonGetText()
-  {
-    List<String> tokenSpans = new ArrayList<String>();
-    for(AnnisNode token : graph.getTokens())
-    {
-      tokenSpans.add(token.getSpannedText());
-    }
-    return StringUtils.join(tokenSpans, " ");
-  }
-
-  private String jsonGetTextId()
-  {
-    if(graph.getNodes().isEmpty())
-    {
-      return "1";
-    }
-    else
-    {
-      return String.valueOf(graph.getNodes().get(0).getTextId());
-    }
-  }
-
-  private boolean jsonHasNodeMarker(long id)
-  {
-    return isMarked(id);
-  }
-
-public AnnotationGraph getGraph() {
-	return graph;
-}
-
-public void setGraph(AnnotationGraph graph) {
-	this.graph = graph;
-}
 }
