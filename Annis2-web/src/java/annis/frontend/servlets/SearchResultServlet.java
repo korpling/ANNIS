@@ -26,6 +26,7 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.ifaces.AnnisToken;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -248,12 +249,15 @@ public class SearchResultServlet extends HttpServlet
     private AnnisResult annisResult;
     private StringBuffer json;
     private AnnotationGraph graph;
+    private Set<Long> idsToMark;
 
     public AnnisResultToJSON(AnnisResult result)
     {
-      json = new StringBuffer();
-      graph = result.getGraph();
+      this.json = new StringBuffer();
+      this.graph = result.getGraph();
       this.annisResult = result;
+
+      this.idsToMark = getMarkedIDs();
 
       json.append("{'_id':'" + result.getStartNodeId() + ","
         + result.getEndNodeId() + "', '_textId': '"
@@ -272,7 +276,7 @@ public class SearchResultServlet extends HttpServlet
       //add a list of marked objects
       json.append(", '_markedObjects': [");
       c = 0;
-      for(Long id : markedIds())
+      for(Long id : idsToMark)
       {
         if(c++ > 0)
         {
@@ -329,9 +333,26 @@ public class SearchResultServlet extends HttpServlet
       return json.toString();
     }
 
-  private Set<Long> markedIds()
+  private Set<Long> getMarkedIDs()
   {
-    return graph.getMatchedNodeIds();
+    Set<Long> matchedNodes =  graph.getMatchedNodeIds();
+    Set<Long> matchedAndCovered = new HashSet<Long>(matchedNodes);
+    // add all covered nodes
+    for(AnnisNode n : graph.getNodes())
+    {
+      if(matchedNodes.contains(n.getId()))
+      {
+        long left = n.getLeftToken();
+        long right = n.getRightToken();
+
+        for(long i=left; i <= right; i++)
+        {
+          matchedAndCovered.add(graph.getToken(i).getId());
+        }
+      }
+    }
+
+    return matchedAndCovered;
   }
 
   private String getText()
@@ -358,7 +379,7 @@ public class SearchResultServlet extends HttpServlet
 
   private boolean hasNodeMarker(long id)
   {
-    return graph.getMatchedNodeIds().contains(id);
+    return idsToMark.contains(id);
   }
 
   }

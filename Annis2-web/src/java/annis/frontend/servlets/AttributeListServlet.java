@@ -5,11 +5,15 @@ import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.ifaces.AnnisCorpus;
+import annis.service.ifaces.AnnisCorpusSet;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Vector;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,16 +64,16 @@ public class AttributeListServlet extends HttpServlet {
 		try {
 			AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
 			AnnisAttributeSet attributeList;
-//
-//      // add all corpora if not choosen
-//      if(corpusIdsParam == null)
-//      {
-//        AnnisCorpusSet allCorpora = service.getCorpusSet();
-//        for(AnnisCorpus c : allCorpora)
-//        {
-//          corpusIdList.add(c.getId());
-//        }
-//      }
+
+      // add all corpora if not choosen
+      if(corpusIdsParam == null)
+      {
+        AnnisCorpusSet allCorpora = service.getCorpusSet();
+        for(AnnisCorpus c : allCorpora)
+        {
+          corpusIdList.add(c.getId());
+        }
+      }
       
 			if("edge".equals(request.getParameter("type"))) {
 				// not implemented yet
@@ -92,10 +96,12 @@ public class AttributeListServlet extends HttpServlet {
         
 				out.write(attributeList.getJSON());
 			}
-		} catch (AnnisServiceFactoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+    catch(Exception ex)
+    {
+      Logger.getLogger(AttributeListServlet.class.getName()).log(
+        Level.SEVERE, "could not get attribute list", ex);
+    }
 		
 		
 		
