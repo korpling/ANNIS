@@ -169,7 +169,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		sb.append("SELECT DISTINCT\n");
 		sb.append("\t");
 		sb.append(key);
-		sb.append(", node_v.*\n");
+		sb.append(", facts.*\n");
 		sb.append("FROM\n");
 		sb.append("\t(");
 		sb.append(matchSql);
