@@ -126,7 +126,17 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	// custom run method, no need for interactive commands
 	public void run(String[] args) {
 		log.info("test runs for each query: " + RUNS);
-		
+		List<Task> tasks = readBenchmarkScript();
+		computeTaskInfo(tasks);
+//		listIndexes();
+		boolean reset = resetIndexes();
+		runSequentially(tasks);
+		runRandomly(tasks);
+		listUsedIndexes(reset);
+		printResults(tasks);
+	}
+
+	private List<Task> readBenchmarkScript() {
 		BufferedReader inputFile = new BufferedReader(new InputStreamReader(System.in));
 		
 		// get test queries from input file
@@ -160,8 +170,10 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 				continue;
 			}
 		}
-		
-		// convert corpus name to id, also get query plans and match count
+		return tasks;
+	}
+
+	private void computeTaskInfo(List<Task> tasks) {
 		log.info("computing matchcount and plan for test queries...");
 		for (Task task : tasks) {
 			String corpusName = task.getCorpusName();
@@ -180,29 +192,31 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			task.setMatchCount(matchCount);
 			log.info("test query: " + task.getAnnisQuery() + " on corpus " + corpusId + " (" + corpusName + ") has " + matchCount + " matches; plan:\n" + plan);
 		}
-		
-		List<String> indexDefinitions = administrationDao.listIndexDefinitions("facts");
-		log.info("Indices on fact table:");
-		for (String definition : indexDefinitions)
-			log.info(definition);
-		boolean reset = administrationDao.resetStatistics();
-		if (reset)
-			log.info("reset index and table statistics");
-		else
-			log.info("index and table statistics could not be reset");
-		
-		log.info("running test queries sequentially...");
-		// run test queries sequentially
+	}
+
+	private void printResults(List<Task> tasks) {
+		log.info("benchmark results...");
+		printLine("Query", "Corpus", "Count", "Min seq", "Avg seq", "Max seq", "Min rand", "Avg rand", "Max rand");
 		for (Task task : tasks) {
-			long corpusId = task.getCorpusId();
-			String dddQuery = task.getDddQuery();
-			for (int i = 0; i < RUNS; ++i) {
-				List<Long> runtimeList = task.getSequential();
-				timeCountMatches(corpusId, dddQuery, runtimeList);
-				log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
-			}
+			List<Long> seq = task.getSequential();
+			List<Long> rand = task.getRandom();
+			printLine(task.getAnnisQuery(), task.getCorpusName(), String.valueOf(task.getMatchCount()), min(seq), avg(seq), max(seq), min(rand), avg(rand), max(rand));
 		}
+	}
+
+	private void listUsedIndexes(boolean reset) {
+		List<String> usedIndexes = administrationDao.listUsedIndexes("facts");
 		
+		if (reset)
+			log.info("Used indexes...");
+		else
+			log.info("Used indexes... (statistics could not be reset, values below may not be accurate!)");
+
+		for (String index : usedIndexes)
+			log.info(index);
+	}
+
+	private void runRandomly(List<Task> tasks) {
 		log.info("running test queries randomly...");
 		// run test queries randomly
 		List<Task> random = new ArrayList<Task>();
@@ -219,23 +233,36 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			timeCountMatches(corpusId, query, runtimeList);
 			log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
 		}
-		List<String> usedIndexes = administrationDao.listUsedIndexes("facts");
-		
-		if (reset)
-			log.info("Used indexes...");
-		else
-			log.info("Used indexes... (statistics could not be reset, values below may not be accurate!)");
+	}
 
-		for (String index : usedIndexes)
-			log.info(index);
-		
-		log.info("benchmark results...");
-		printLine("Query", "Corpus", "Count", "Min seq", "Avg seq", "Max seq", "Min rand", "Avg rand", "Max rand");
+	private void runSequentially(List<Task> tasks) {
+		log.info("running test queries sequentially...");
+		// run test queries sequentially
 		for (Task task : tasks) {
-			List<Long> seq = task.getSequential();
-			List<Long> rand = task.getRandom();
-			printLine(task.getAnnisQuery(), task.getCorpusName(), String.valueOf(task.getMatchCount()), min(seq), avg(seq), max(seq), min(rand), avg(rand), max(rand));
+			long corpusId = task.getCorpusId();
+			String dddQuery = task.getDddQuery();
+			for (int i = 0; i < RUNS; ++i) {
+				List<Long> runtimeList = task.getSequential();
+				timeCountMatches(corpusId, dddQuery, runtimeList);
+				log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
+			}
 		}
+	}
+
+	private boolean resetIndexes() {
+		boolean reset = administrationDao.resetStatistics();
+		if (reset)
+			log.info("reset index and table statistics");
+		else
+			log.info("index and table statistics could not be reset");
+		return reset;
+	}
+
+	private void listIndexes() {
+		log.info("Indices on fact table:");
+		List<String> indexDefinitions = administrationDao.listIndexDefinitions("facts");
+		for (String definition : indexDefinitions)
+			log.info(definition);
 	}
 	
 	private void printLine(String... fields) {

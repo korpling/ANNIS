@@ -19,6 +19,9 @@ public class Utils {
 	}
 	
 	public static String avg(List<Long> runtimeList) {
+		if (runtimeList.isEmpty())
+			return "";
+		
 		long sum = 0;
 		for (long value : runtimeList)
 			sum += value;

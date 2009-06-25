@@ -3,7 +3,6 @@ package annis.dao;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import annis.ql.parser.QueryData;
-import annis.sqlgen.SqlSessionModifier;
 
 public class TimeOutSqlSessionModifier implements SqlSessionModifier {
 

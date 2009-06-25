@@ -17,7 +17,7 @@
 	">
 
 	<!-- Enable bean autowiring -->
-	<context:annotation-config/>
+	<context:annotation-config/> 
 	
 	<!-- Enable AspectJ-style AOP annotations -->
 	<aop:aspectj-autoproxy/>
@@ -105,13 +105,24 @@
 		<property name="countSqlGenerator" ref="countSqlGenerator"/>
 	</bean>
 	
+	<bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
+		<property name="scriptFile" value="modify_session.sql"/>
+		<property name="administrationDao">
+			<bean class="annis.administration.SpringAnnisAdministrationDao">
+				<property name="scriptPath" value="/Users/he-sk/Desktop/Annis Benchmarking"/>
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+		</property>
+	</bean>
+	
 	<bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
-		<property name="timeout" value="600000"/>
+		<property name="timeout" value="60000"/>
 	</bean>
 	
 	<util:list id="sqlSessionModifiers">
 		<ref bean="timeOutSqlSessionModifier"/>
-		<ref bean="corpusSelectionByViewTableAccessStrategy"/>
+		<!-- <ref bean="sqlScriptSessionModifier"/> -->
+		<ref bean="corpusSelectionByViewOnlyToplevelTableAccessStrategy"/>
  	</util:list>
 	
 	<util:list id="springAnnisDaoMatchFilters">

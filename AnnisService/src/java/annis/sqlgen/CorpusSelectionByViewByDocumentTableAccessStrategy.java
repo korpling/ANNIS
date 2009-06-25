@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import annis.dao.SqlSessionModifier;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;

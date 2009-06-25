@@ -144,7 +144,7 @@ public class DefaultWhereClauseSqlGenerator
 	}
 
 	private void addEdgeConditions(AnnisNode node, AnnisNode target, List<String> conditions, Join join, final String edgeType) {
-		conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "component_ref"), tables(target).aliasedColumn(RANK_TABLE, "component_ref")));				
+//		conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "component_ref"), tables(target).aliasedColumn(RANK_TABLE, "component_ref")));				
 		conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "edge_type"), sqlString(edgeType)));				
 		
 		RankTableJoin rankTableJoin = (RankTableJoin) join;

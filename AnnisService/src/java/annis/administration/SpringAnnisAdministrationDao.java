@@ -46,7 +46,7 @@ public class SpringAnnisAdministrationDao {
 	private Logger log = Logger.getLogger(this.getClass());
 	
 	// helper object to store external files
-	@Autowired private ExternalFileMgrDAO externalFileMgrDao;
+	private ExternalFileMgrDAO externalFileMgrDao;
 	
 	// external files path
 	private String externalFilesPath;
@@ -379,12 +379,12 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	// executes an SQL script from $ANNIS_HOME/scripts
-	private void executeSqlFromScript(String script) {
+	public void executeSqlFromScript(String script) {
 		executeSqlFromScript(script, null);
 	}
 
 	// executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
-	private void executeSqlFromScript(String script, MapSqlParameterSource args) {
+	public void executeSqlFromScript(String script, MapSqlParameterSource args) {
 		Resource resource = new FileSystemResource(new File(scriptPath, script));
 		log.debug("executing SQL script: " + resource.getFilename());
 		String sql = readSqlFromResource(resource, args);

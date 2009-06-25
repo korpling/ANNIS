@@ -1,4 +1,4 @@
-package annis.sqlgen;
+package annis.dao;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 

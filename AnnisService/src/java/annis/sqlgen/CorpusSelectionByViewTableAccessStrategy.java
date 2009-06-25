@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import annis.dao.SqlSessionModifier;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
