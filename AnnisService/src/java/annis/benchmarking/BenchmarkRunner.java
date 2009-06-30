@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
@@ -205,15 +206,19 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	}
 
 	private void listUsedIndexes(boolean reset) {
-		List<String> usedIndexes = administrationDao.listUsedIndexes("facts");
+		try {
+			List<String> usedIndexes = administrationDao.listUsedIndexes("facts");
 		
-		if (reset)
-			log.info("Used indexes...");
-		else
-			log.info("Used indexes... (statistics could not be reset, values below may not be accurate!)");
+			if (reset)
+				log.info("Used indexes...");
+			else
+				log.info("Used indexes... (statistics could not be reset, values below may not be accurate!)");
 
-		for (String index : usedIndexes)
-			log.info(index);
+			for (String index : usedIndexes)
+				log.info(index);
+		} catch (DataAccessException e) {
+			log.info("Could not access used indices, probably bad postgres superuser password");
+		}
 	}
 
 	private void runRandomly(List<Task> tasks) {
