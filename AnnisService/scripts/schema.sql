@@ -49,11 +49,13 @@ CREATE TABLE node
 	token_index	integer,
 	continuous	boolean,
 	span		varchar(2000),
+	toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	left_token	integer NULL,	-- token_index of left-most token in tree under this node
 	right_token	integer	NULL	-- token_index of right-most token in tree under this node
 );
 COMMENT ON COLUMN node.id IS 'primary key';
 COMMENT ON COLUMN node.corpus_ref IS 'foreign key to corpus.id';
+COMMENT ON COLUMN node.toplevel_corpus IS 'foreign key to toplevel corpus.id';
 COMMENT ON COLUMN node.namespace IS 'optional namespace of the node''s name';
 COMMENT ON COLUMN node.name IS 'name of the node';
 COMMENT ON COLUMN node.text_ref IS 'foreign key to text.id';

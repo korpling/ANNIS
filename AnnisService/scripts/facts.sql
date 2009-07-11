@@ -2,6 +2,7 @@ CREATE TABLE facts AS SELECT DISTINCT
 	node.id AS id,
 	node.text_ref AS text_ref,
 	node.corpus_ref AS corpus_ref,
+	node.toplevel_corpus AS toplevel_corpus,
 	node.namespace AS node_namespace,
 	node.name AS node_name,
 	node."left" AS "left",

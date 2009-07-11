@@ -1,33 +1,55 @@
--- Ursprungstabellen: Suche
-CREATE INDEX idx_corpus__pre_post ON corpus USING btree (pre, post);
-CREATE INDEX idx_s__corpus_ref__istoken ON node USING btree (corpus_ref) WHERE (token_index IS NOT NULL);
-CREATE INDEX idx_struct__token_index ON node USING btree (token_index);
-CREATE INDEX idx_rank_anno__value ON edge_annotation USING btree (value);
-CREATE INDEX idx_annotation__ns_attribute_not_null ON node_annotation USING btree (namespace, name) WHERE (name IS NOT NULL);
+-- Suche kombiniert mit parent
+CREATE INDEX idx_c__parent__node ON facts (toplevel_corpus, parent);
+CREATE INDEX idx_c__parent__token ON facts (toplevel_corpus, parent) WHERE token_index IS NULL;
+CREATE INDEX idx_c__parent__span ON facts (toplevel_corpus, span varchar_pattern_ops, parent);
+CREATE INDEX idx_c__parent__node_anno_ex ON facts (toplevel_corpus, node_annotation_name, parent);
+CREATE INDEX idx_c__parent__node_anno ON facts (toplevel_corpus, node_annotation_name, node_annotation_value varchar_pattern_ops, parent);
+CREATE INDEX idx_c__parent__edge_anno_ex ON facts (toplevel_corpus, edge_annotation_name, parent);
+CREATE INDEX idx_c__parent__edge_anno ON facts (toplevel_corpus, edge_annotation_name, edge_annotation_value varchar_pattern_ops, parent);
+--CREATE INDEX idx_c__parent__node_anno_ns_ex ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, parent);
+--CREATE INDEX idx_c__parent__node_anno_ns ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, node_annotation_value varchar_pattern_ops, parent);
+--CREATE INDEX idx_c__parent__edge_anno_ns_ex ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, parent);
+--CREATE INDEX idx_c__parent__edge_anno_ns ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, edge_annotation_value varchar_pattern_ops, parent);
 
--- Ursprungstabellen: FKs
-CREATE INDEX fk_struct_2_text ON node USING btree (text_ref);
-CREATE INDEX fk_rank_2_rank ON rank USING btree (parent);
-CREATE INDEX fk_rank_2_struct ON rank USING btree (node_ref);
-CREATE INDEX idx_rank__pre ON rank USING btree (pre);
-CREATE INDEX fk_rank_anno_2_rank ON edge_annotation USING btree (rank_ref);
-CREATE INDEX fk_annotation_2_struct ON node_annotation USING btree (node_ref);
+-- Suche kombiniert mit pre WHERE type = d
+CREATE INDEX idx_c__dom__node ON facts (toplevel_corpus, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__token ON facts (toplevel_corpus, pre) WHERE token_index IS NULL AND edge_type = 'd';
+CREATE INDEX idx_c__dom__span ON facts (toplevel_corpus, span varchar_pattern_ops, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__node_anno_ex ON facts (toplevel_corpus, node_annotation_name, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__node_anno ON facts (toplevel_corpus, node_annotation_name, node_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__edge_anno_ex ON facts (toplevel_corpus, edge_annotation_name, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__edge_anno ON facts (toplevel_corpus, edge_annotation_name, edge_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
+--CREATE INDEX idx_c__dom__node_anno_ns_ex ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, pre) WHERE edge_type = 'd';
+--CREATE INDEX idx_c__dom__node_anno_ns ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, node_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
+--CREATE INDEX idx_c__dom__edge_anno_ns_ex ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, pre) WHERE edge_type = 'd';
+--CREATE INDEX idx_c__dom__edge_anno_ns ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, edge_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
 
--- Materialisierungen (Alt)
--- CREATE INDEX idx_s_a__corpus_ref_ns_attribute_not_null_value ON struct_annotation USING btree (corpus_ref, anno_namespace, anno_name, anno_value) WHERE (anno_name IS NOT NULL);
--- CREATE INDEX idx_s_a__text_ref_left_token_minus_1_right_token_value ON struct_annotation USING btree (text_ref, ((left_token - 1)), right_token, anno_value);
--- CREATE INDEX idx_s_a__id_text_ref_left ON struct_annotation USING btree (id, text_ref, "left");
--- CREATE INDEX idx_s_a__id_text_ref_left_token_right_token ON struct_annotation USING btree (id, text_ref, left_token, right_token);
--- CREATE INDEX idx_s_a__left_text_ref ON struct_annotation USING btree ("left", text_ref);
--- CREATE INDEX idx_s_a__text_ref_left_token_minus_1_right_token ON struct_annotation USING btree (text_ref, ((left_token - 1)), right_token);
--- CREATE INDEX idx_s_a__id_value_attribute ON struct_annotation USING btree (id, anno_value, anno_name);
--- CREATE INDEX idx_s_a__attribute_value_id ON struct_annotation USING btree (anno_name, anno_value, id);
--- CREATE INDEX idx_s_a__value_attribute ON struct_annotation USING btree (anno_value, anno_name);
--- CREATE INDEX idx_s_a__attribute ON struct_annotation USING btree (anno_name);
--- CREATE INDEX idx_s_a__span ON struct_annotation USING btree (span);
--- CREATE INDEX fk_struct_annotation_2_text ON struct_annotation USING btree (text_ref);
--- CREATE INDEX idx_s_a__id ON struct_annotation USING btree (id);
--- CREATE INDEX idx_r_a__pre_post ON rank_annotations USING btree (pre, post);
--- CREATE INDEX idx_r_t_r__level_text_ref_pre_post ON rank_text_ref USING btree (level, text_ref, pre, post);
--- CREATE INDEX idx_rank__parent_zshg ON edges (parent, zshg);
--- CREATE INDEX idx_rank__edge_type ON edges (edge_type);
+-- Suche kombiniert mit edge_name, pre WHERE type = p
+CREATE INDEX idx_c__pr__node ON facts (toplevel_corpus, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__token ON facts (toplevel_corpus, edge_name, pre) WHERE token_index IS NULL AND edge_type = 'p';
+CREATE INDEX idx_c__pr__span ON facts (toplevel_corpus, span varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__node_anno_ex ON facts (toplevel_corpus, node_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__node_anno ON facts (toplevel_corpus, node_annotation_name, node_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__edge_anno_ex ON facts (toplevel_corpus, edge_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__edge_anno ON facts (toplevel_corpus, edge_annotation_name, edge_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+--CREATE INDEX idx_c__pr__node_anno_ns_ex ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+--CREATE INDEX idx_c__pr__node_anno_ns ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, node_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+--CREATE INDEX idx_c__pr__edge_anno_ns_ex ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+--CREATE INDEX idx_c__pr__edge_anno_ns ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, edge_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+
+----- Prezedenz
+-- Suche kombiniert mit text_ref
+CREATE INDEX idx_c__text__node ON facts (toplevel_corpus, text_ref);
+CREATE INDEX idx_c__text__token ON facts (toplevel_corpus, text_ref) WHERE token_index IS NULL;
+CREATE INDEX idx_c__text__span ON facts (toplevel_corpus, span varchar_pattern_ops, text_ref);
+CREATE INDEX idx_c__text__node_anno_ex ON facts (toplevel_corpus, node_annotation_name, text_ref);
+CREATE INDEX idx_c__text__node_anno ON facts (toplevel_corpus, node_annotation_name, node_annotation_value varchar_pattern_ops, text_ref);
+CREATE INDEX idx_c__text__edge_anno_ex ON facts (toplevel_corpus, edge_annotation_name, text_ref);
+CREATE INDEX idx_c__text__edge_anno ON facts (toplevel_corpus, edge_annotation_name, edge_annotation_value varchar_pattern_ops, text_ref);
+--CREATE INDEX idx_c__text__node_anno_ns_ex ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, text_ref);
+--CREATE INDEX idx_c__text__node_anno_ns ON facts (toplevel_corpus, node_annotation_namespace, node_annotation_name, node_annotation_value varchar_pattern_ops, text_ref);
+--CREATE INDEX idx_c__text__edge_anno_ns_ex ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, text_ref);
+--CREATE INDEX idx_c__text__edge_anno_ns ON facts (toplevel_corpus, edge_annotation_namespace, edge_annotation_name, edge_annotation_value varchar_pattern_ops, text_ref);
+
+----- _=_
+CREATE INDEX idx__exact_cover ON facts (text_ref, "left", "right");

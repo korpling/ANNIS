@@ -38,6 +38,7 @@ UPDATE _edge_annotation SET rank_ref = rank_ref + (SELECT rank_post FROM _max);
 UPDATE _node SET id = id + (SELECT node_id FROM _max);
 UPDATE _node SET text_ref = text_ref + (SELECT text_id FROM _max);
 UPDATE _node SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
+UPDATE _node SET toplevel_corpus = toplevel_corpus + (SELECT corpus_id FROM _max);
     
 UPDATE _text SET id = id + (SELECT text_id FROM _max);
     
