@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,7 +44,7 @@ public class TestSqlGenerator {
 	private @Mock QueryAnalysis queryAnalysis;
 	
 	// SqlGenerator that is managed by Spring
-	@Autowired private SqlGenerator springManagedSqlGenerator;
+	@Autowired @Qualifier("find") private SqlGenerator springManagedSqlGenerator;
 	@Autowired private DddQueryParser parser;
 
 	@Before

@@ -106,7 +106,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeSpanString() {
 		node23.setSpannedText("string", TextMatching.EXACT);
-		checkWhereCondition(join("=", "_node23.span", "'string'"));
+		checkWhereCondition(join("~=~", "_node23.span", "'string'"));
 	}
 	
 	// WHERE condition for spanned text (regexp) 
@@ -127,7 +127,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_annotation23_1.name", "'name1'"),
 				join("=", "_annotation23_2.namespace", "'namespace2'"),
 				join("=", "_annotation23_2.name", "'name2'"),
-				join("=", "_annotation23_2.value", "'value2'"),
+				join("~=~", "_annotation23_2.value", "'value2'"),
 				join("=", "_annotation23_3.namespace", "'namespace3'"),
 				join("=", "_annotation23_3.name", "'name3'"),
 				join("~", "_annotation23_3.value", "'^value3$'")
@@ -145,7 +145,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_rank_annotation23_1.name", "'name1'"),
 				join("=", "_rank_annotation23_2.namespace", "'namespace2'"),
 				join("=", "_rank_annotation23_2.name", "'name2'"),
-				join("=", "_rank_annotation23_2.value", "'value2'"),
+				join("~=~", "_rank_annotation23_2.value", "'value2'"),
 				join("=", "_rank_annotation23_3.namespace", "'namespace3'"),
 				join("=", "_rank_annotation23_3.name", "'name3'"),
 				join("~", "_rank_annotation23_3.value", "'^value3$'")
@@ -277,7 +277,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeDirectDominance() {
 		node23.addJoin(new Dominance(node42, 1));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'d'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
@@ -288,7 +288,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseDirectDominanceNamed() {
 		node23.addJoin(new Dominance(node42, NAME, 1));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'d'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
@@ -300,7 +300,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeIndirectDominance() {
 		node23.addJoin(new Dominance(node42));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'d'"),
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join(">", "_rank23.post", "_rank42.post")
@@ -312,7 +312,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeExactDominance() {
 		node23.addJoin(new Dominance(node42, 10));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'d'"),
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join(">", "_rank23.post", "_rank42.post"),
@@ -325,7 +325,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeRangedDominance() {
 		node23.addJoin(new Dominance(node42, 10, 20));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'d'"),
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join(">", "_rank23.post", "_rank42.post"),
@@ -353,7 +353,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseDirectPointingRelation() {
 		node23.addJoin(new PointingRelation(node42, NAME, 1));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'p'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
@@ -366,7 +366,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseIndirectPointingRelation() {
 		node23.addJoin(new PointingRelation(node42, NAME));
 		checkWhereCondition(
-				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.edge_type", "'p'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("<", "_rank23.pre", "_rank42.pre"),

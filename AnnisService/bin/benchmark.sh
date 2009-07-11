@@ -10,5 +10,6 @@ classpath=`$ANNIS_HOME/bin/classpath.sh`
 
 # class with Java entry point
 class=annis.benchmarking.BenchmarkRunner
+JAVAOPTS="-Xmx256M"
 
-java -cp $classpath -Dfile.encoding="utf-8" -Dannis.home=$ANNIS_HOME $class "$@"
+java $JAVAOPTS -cp $classpath -Dfile.encoding="utf-8" -Dannis.home=$ANNIS_HOME $class "$@"

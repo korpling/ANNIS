@@ -34,9 +34,10 @@ public class TestCountMatchesSelectClauseSqlGenerator {
 		CountMatchesSelectClauseSqlGenerator generator = new CountMatchesSelectClauseSqlGenerator();
 		generator.setTableAccessStrategyFactory(tableAccessStrategyFactory);
 		
-		String expected = "count(DISTINCT node1.ID || '-' || node2.ID)";
+//		String expected = "count(DISTINCT node1.ID || '-' || node2.ID)";
+		String expected = "DISTINCT\n\tnode1.ID AS id1,\n\tnode2.ID AS id2";
 		
-		assertEquals(expected, generator.selectClause(nodes, 0));
+		assertEquals(expected, generator.selectClause(nodes, 2));
 	}
 	
 }

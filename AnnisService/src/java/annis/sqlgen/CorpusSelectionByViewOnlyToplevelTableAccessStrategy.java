@@ -3,6 +3,7 @@ package annis.sqlgen;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import annis.dao.SqlSessionModifier;
@@ -16,6 +17,8 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 	implements SqlSessionModifier {
 
 	private String nodeTableViewName;
+	
+	private SubQueryCorpusSelectionStrategy subQueryCorpusSelectionStrategy;
 
 	public CorpusSelectionByViewOnlyToplevelTableAccessStrategy() {
 		super();
@@ -31,12 +34,20 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 			.replaceAll(":node_table", originalNodeTable());
 		
 		List<Long> corpusList = queryData.getCorpusList();
-		List<Annotation> metaData = queryData.getMetaData();
 		
 		if ( ! corpusList.isEmpty() ) {
-			viewDefinition += " WHERE :corpus_ref IN ( :corpusSelectionSubQuery )"
-				.replaceAll(":corpus_ref", column(originalNodeTable(), columnName(NODE_TABLE, "toplevel_corpus")))
-				.replaceAll(":corpusSelectionSubQuery", StringUtils.join(corpusList, ", "));
+			viewDefinition += " WHERE :toplevel IN ( :corpusList )"
+				.replaceAll(":toplevel", column(originalNodeTable(), columnName(NODE_TABLE, "toplevel_corpus")))
+				.replaceAll(":corpusList", StringUtils.join(corpusList, ", "));
+
+			List<Annotation> metaData = queryData.getMetaData();
+			if ( ! metaData.isEmpty() ) {
+				String documentsWithMetaDataSql = subQueryCorpusSelectionStrategy.buildSubQuery(corpusList, metaData);
+				List<Long> documents = simpleJdbcTemplate.query(documentsWithMetaDataSql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
+				viewDefinition += " AND :corpus IN ( :documentList )"
+					.replaceAll(":corpus", column(originalNodeTable(), columnName(NODE_TABLE, "corpus_ref")))
+					.replaceAll(":documentList", StringUtils.join(documents, ", "));
+			}
 		}
 			
 		simpleJdbcTemplate.update(viewDefinition);
@@ -50,7 +61,8 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 	@Override
 	public String tableName(String table) {
 		String alias = super.tableName(table);
-		if (alias.equals(originalNodeTable()))
+		String originalNodeTable = originalNodeTable();
+		if (alias.equals(originalNodeTable))
 				return nodeTableViewName;
 		else
 			return alias;
@@ -64,6 +76,16 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 
 	public void setNodeTableViewName(String nodeTableViewName) {
 		this.nodeTableViewName = nodeTableViewName;
+	}
+
+	
+	public SubQueryCorpusSelectionStrategy getSubQueryCorpusSelectionStrategy() {
+		return subQueryCorpusSelectionStrategy;
+	}
+
+	public void setSubQueryCorpusSelectionStrategy(
+			SubQueryCorpusSelectionStrategy subQueryCorpusSelectionStrategy) {
+		this.subQueryCorpusSelectionStrategy = subQueryCorpusSelectionStrategy;
 	}
 
 }

@@ -131,6 +131,7 @@
 		<property name="tableAliases" ref="tableAliases"/>
 		<property name="columnAliases" ref="columnAliases"/>
 		<property name="nodeTableViewName" value="node_v"/>
+		<property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy"/>
 	</bean>
 
 	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
@@ -144,12 +145,14 @@
 	
 	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
 	<bean id="findSqlGenerator" class="annis.sqlgen.SqlGenerator">
+		<qualifier value="find"/>
 		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
 		<property name="queryAnalysis" ref="queryAnalysis"/>
 	</bean>
 	
 	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
 	<bean id="countSqlGenerator" class="annis.sqlgen.SqlGenerator">
+		<qualifier value="count"/>
 		<property name="clauseSqlGenerator" ref="countClauseSqlGenerator"/>
 		<property name="queryAnalysis" ref="queryAnalysis"/>
 	</bean>

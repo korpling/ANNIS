@@ -31,7 +31,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	private Logger log = Logger.getLogger(this.getClass());
 
 	// constants
-	private static int RUNS = 3;
+	private static int RUNS = 2;
 	
 	// dependencies
 	private AnnisDao annisDao;
@@ -175,7 +175,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	}
 
 	private void computeTaskInfo(List<Task> tasks) {
-		log.info("computing matchcount and plan for test queries...");
+		log.info("computing match count and plan for test queries...");
 		for (Task task : tasks) {
 			String corpusName = task.getCorpusName();
 			Long corpusId = task.getCorpusId();

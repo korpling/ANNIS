@@ -121,7 +121,7 @@
 	
 	<util:list id="sqlSessionModifiers">
 		<ref bean="timeOutSqlSessionModifier"/>
-		<!-- <ref bean="sqlScriptSessionModifier"/> -->
+		<ref bean="sqlScriptSessionModifier"/>
 		<ref bean="corpusSelectionByViewOnlyToplevelTableAccessStrategy"/>
  	</util:list>
 	
