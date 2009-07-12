@@ -11,13 +11,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import annis.AnnisBaseRunner;
 import annis.administration.SpringAnnisAdministrationDao;
@@ -31,13 +30,18 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	private Logger log = Logger.getLogger(this.getClass());
 
 	// constants
-	private static int RUNS = 2;
+	private static int RUNS = 5;
+	private static final int OFFSET = 0;
+	private static final int LIMIT = 25;
+	private static final int LEFT = 5;
+	private static final int RIGHT = 5;
+	
 	
 	// dependencies
 	private AnnisDao annisDao;
 	private SpringAnnisAdministrationDao administrationDao;
 	private DddQueryMapper dddQueryMapper;
-	
+
 	public class Task {
 		private String corpusName;
 		private long corpusId;
@@ -45,12 +49,12 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 		private String dddQuery;
 		private String plan;
 		private long matchCount;
-		private List<Long> sequential;
-		private List<Long> random;
+		private LinkedList<Long> sequential;
+		private LinkedList<Long> random;
 		
 		public Task() {
-			sequential = new ArrayList<Long>();
-			random = new ArrayList<Long>();
+			sequential = new LinkedList<Long>();
+			random = new LinkedList<Long>();
 		}
 
 		public String getCorpusName() {
@@ -85,19 +89,19 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			this.matchCount = matchCount;
 		}
 
-		public List<Long> getSequential() {
+		public LinkedList<Long> getSequential() {
 			return sequential;
 		}
 
-		public void setSequential(List<Long> sequential) {
+		public void setSequential(LinkedList<Long> sequential) {
 			this.sequential = sequential;
 		}
 
-		public List<Long> getRandom() {
+		public LinkedList<Long> getRandom() {
 			return random;
 		}
 
-		public void setRandom(List<Long> random) {
+		public void setRandom(LinkedList<Long> random) {
 			this.random = random;
 		}
 
@@ -131,7 +135,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 		computeTaskInfo(tasks);
 //		listIndexes();
 		boolean reset = resetIndexes();
-		runSequentially(tasks);
+//		runSequentially(tasks);
 		runRandomly(tasks);
 		listUsedIndexes(reset);
 		printResults(tasks);
@@ -175,34 +179,57 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	}
 
 	private void computeTaskInfo(List<Task> tasks) {
-		log.info("computing match count and plan for test queries...");
+		log.info("computing match count, plan, uncached and cached runtime for test queries...");
 		for (Task task : tasks) {
 			String corpusName = task.getCorpusName();
 			Long corpusId = task.getCorpusId();
-			
-			// run query once to load changes into db
+			log.info("running query: " + task.getAnnisQuery() + " on corpus " + corpusId + " (" + corpusName + ")");
+
 			String query = task.getDddQuery();
-			countMatches(corpusId, query);
+			LinkedList<Long> runtimes = task.getSequential();
+			
+			// run query once to load data from disk
+			long matchCount = timeCountMatches(corpusId, query, runtimes);
+			logRuntime("query", task, runtimes);
+			task.setMatchCount(matchCount);
+			
+			// run again to see cached performance
+			timeCountMatches(corpusId, query, runtimes);
+			logRuntime("query", task, runtimes);
+			
+			// time retrieval of annotations of the first 25 matches
+			timeAnnotateFirst25(corpusId, query, runtimes);
+			logRuntime("1st 25 matches for query", task, runtimes);
 			
 			// query plan
 			String plan = annisDao.plan(query, Arrays.asList(corpusId), true);
 			task.setPlan(plan);
 			
-			// match count
-			long matchCount = annisDao.countMatches(Arrays.asList(corpusId), query);
-			task.setMatchCount(matchCount);
-			log.info("test query: " + task.getAnnisQuery() + " on corpus " + corpusId + " (" + corpusName + ") has " + matchCount + " matches; plan:\n" + plan);
+			log.info("test query: " + task.getAnnisQuery() + " " + 
+					"on corpus " + corpusId + " (" + corpusName + ")\n" +
+					"has " + matchCount + " matches;\n" +
+					"runtime uncached/cached: " + runtimes.get(0) + " ms / " + runtimes.get(1) + " ms;\n" +
+					"runtime for first 25 annotation graphs: " + runtimes.get(2) + " ms;\n" +
+					"plan:\n" + plan);
 		}
+	}
+
+	private void logRuntime(String msg, Task task, LinkedList<Long> runtimes) {
+		log.debug("runtime: " + runtimes.getLast() + " ms for " + msg + ": " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
 	}
 
 	private void printResults(List<Task> tasks) {
 		log.info("benchmark results...");
-		printLine("Query", "Corpus", "Count", "Min seq", "Avg seq", "Max seq", "Min rand", "Avg rand", "Max rand");
+		printLine("Query", "Corpus", "Count", "Uncached", "Cached", "First 25", "Min rand", "Avg rand", "Max rand");
 		for (Task task : tasks) {
 			List<Long> seq = task.getSequential();
 			List<Long> rand = task.getRandom();
-			printLine(task.getAnnisQuery(), task.getCorpusName(), String.valueOf(task.getMatchCount()), min(seq), avg(seq), max(seq), min(rand), avg(rand), max(rand));
+			printLine(task.getAnnisQuery(), task.getCorpusName(), String.valueOf(task.getMatchCount()), str(seq.get(0)), str(seq.get(1)), str(seq.get(2)), min(rand), avg(rand), max(rand));
 		}
+	}
+
+	private String str(Object obj) {
+		return String.valueOf(obj);
 	}
 
 	private void listUsedIndexes(boolean reset) {
@@ -234,12 +261,13 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 		for (Task task : random) {
 			long corpusId = task.getCorpusId();
 			String query = task.getDddQuery();
-			List<Long> runtimeList = task.getRandom();
+			LinkedList<Long> runtimeList = task.getRandom();
 			timeCountMatches(corpusId, query, runtimeList);
-			log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
+			log.info("runtime: " + runtimeList.getLast() + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
 		}
 	}
 
+	@Deprecated
 	private void runSequentially(List<Task> tasks) {
 		log.info("running test queries sequentially...");
 		// run test queries sequentially
@@ -247,9 +275,9 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			long corpusId = task.getCorpusId();
 			String dddQuery = task.getDddQuery();
 			for (int i = 0; i < RUNS; ++i) {
-				List<Long> runtimeList = task.getSequential();
+				LinkedList<Long> runtimeList = task.getSequential();
 				timeCountMatches(corpusId, dddQuery, runtimeList);
-				log.info("runtime: " + lastRuntime(runtimeList) + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
+				log.info("runtime: " + runtimeList.getLast() + " ms for query: " + task.getAnnisQuery() + " on corpus: " + task.getCorpusName());
 			}
 		}
 	}
@@ -281,17 +309,22 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 		return "'" + field + "'";
 	}
 
-	private Long lastRuntime(List<Long> runtimeList) {
-		return runtimeList.get(runtimeList.size() - 1);
-	}
-
 	private void countMatches(Long corpusId, String query) {
 		timeCountMatches(corpusId, query, null);
 	}
 
-	private void timeCountMatches(long corpusId, String query, List<Long> times) {
+	private int timeCountMatches(long corpusId, String query, List<Long> times) {
 		long start = new Date().getTime();
-		annisDao.countMatches(Arrays.asList(corpusId), query);
+		int count = annisDao.countMatches(Arrays.asList(corpusId), query);
+		long end = new Date().getTime();
+		if (times != null)
+			times.add(end - start);
+		return count;
+	}
+	
+	private void timeAnnotateFirst25(long corpusId, String query, List<Long> times) {
+		long start = new Date().getTime();
+		annisDao.retrieveAnnotationGraph(Arrays.asList(corpusId), query, OFFSET, LIMIT, LEFT, RIGHT);
 		long end = new Date().getTime();
 		if (times != null)
 			times.add(end - start);

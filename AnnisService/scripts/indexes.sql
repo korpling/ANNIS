@@ -76,3 +76,6 @@ CREATE INDEX idx_c__text__edge_anno ON facts (toplevel_corpus, edge_annotation_n
 
 ----- _=_
 CREATE INDEX idx__exact_cover ON facts (text_ref, "left", "right");
+
+----- 2nd query
+CREATE INDEX idx__2nd_query ON facts (text_ref, left_token, right_token);

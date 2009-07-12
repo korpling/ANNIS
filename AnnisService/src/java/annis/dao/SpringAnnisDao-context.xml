@@ -109,7 +109,7 @@
 		<property name="scriptFile" value="modify_session.sql"/>
 		<property name="administrationDao">
 			<bean class="annis.administration.SpringAnnisAdministrationDao">
-				<property name="scriptPath" value="/Users/he-sk/Desktop/Annis Benchmarking"/>
+				<property name="scriptPath" value="${annis.script-path}"/>
 				<property name="dataSource" ref="dataSource"/>
 			</bean>
 		</property>

@@ -37,3 +37,6 @@ FROM
 	JOIN component ON (rank.component_ref = component.id)
 	LEFT JOIN node_annotation ON (node_annotation.node_ref = node.id)
 	LEFT JOIN edge_annotation ON (edge_annotation.rank_ref = rank.pre);
+
+-- can't be run inside transaction
+-- VACUUM ANALYZE facts;
