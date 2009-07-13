@@ -34,6 +34,7 @@ import annis.ql.node.ALeftOverlapLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
 import annis.ql.node.AOrExpr;
+import annis.ql.node.AOverlapLingOp;
 import annis.ql.node.APointingRelationLingOp;
 import annis.ql.node.APrecedenceLingOp;
 import annis.ql.node.ARangeDominanceSpec;
@@ -42,6 +43,7 @@ import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
 import annis.ql.node.ARightAlignLingOp;
 import annis.ql.node.ARightLeafDominanceSpec;
+import annis.ql.node.ARightOverlapLingOp;
 import annis.ql.node.ARootLingOp;
 import annis.ql.node.ASameAnnotationGroupLingOp;
 import annis.ql.node.ASiblingAndPrecedenceLingOp;
@@ -186,6 +188,22 @@ public class DddQueryMapper {
 		@Override
 		public void caseALeftOverlapLingOp(ALeftOverlapLingOp node) {
 			writeMapping("$n", lhs(node), "/overlapping-following::$n", rhs(node));
+		}
+
+		@Override
+		public void caseARightOverlapLingOp(ARightOverlapLingOp node) {
+			writeMapping("$n", rhs(node), "/overlapping-following::$n", lhs(node));
+		}
+
+		@Override
+		public void caseAOverlapLingOp(AOverlapLingOp node) {
+			writeMapping(
+					"(",
+					"$n", lhs(node), "/overlapping-following::$n", rhs(node),
+					" | ",
+					"$n", rhs(node), "/overlapping-following::$n", lhs(node),
+					")"
+			);
 		}
 
 		@Override

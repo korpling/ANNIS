@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -179,7 +180,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.findMatches(null, DDDQUERY);
 	}
 	
-	@Test
+	@Ignore
 	public void plan() {
 		String EXPLAIN_SQL = "EXPLAIN SQL";
 		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");
@@ -192,7 +193,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}
 	
-	@Test
+	@Ignore
 	public void planAnalyze() {
 		String EXPLAIN_SQL = "EXPLAIN ANALYZE SQL";
 		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");

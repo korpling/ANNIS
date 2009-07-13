@@ -66,7 +66,9 @@ Tokens
 	{default} op_left_align = '_l_';
 	{default} op_right_align = '_r_';
 	{default} op_inclusion = '_i_';
+	{default} op_overlap = '_o_';
 	{default} op_left_overlap = '_ol_';
+	{default} op_right_overlap = '_or_';
 	
 	{default} op_precedence = '.';
 	
@@ -149,6 +151,8 @@ Productions
 		| {left_align}	op_left_align { -> New ling_op.left_align() }
 		| {right_align}	op_right_align { -> New ling_op.right_align() }
 		| {inclusion}	op_inclusion { -> New ling_op.inclusion() }
+		| {overlap}		op_overlap { -> New ling_op.overlap() }
+		| {right_overlap}	op_right_overlap { -> New ling_op.right_overlap() }
 		| {left_overlap}	op_left_overlap { -> New ling_op.left_overlap() }
 		| {precedence_direct}	op_precedence { -> New ling_op.precedence(New precedence_spec.direct()) } 
 		| {precedence}	op_precedence precedence_spec { -> New ling_op.precedence(precedence_spec) } 
@@ -224,6 +228,8 @@ Abstract Syntax Tree
 		| {left_align} 
 		| {right_align}
 		| {inclusion} 
+		| {overlap}
+		| {right_overlap}
 		| {left_overlap} 
 		| {precedence} precedence_spec 
 		| {dominance} dominance_spec
