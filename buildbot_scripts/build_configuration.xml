@@ -19,9 +19,7 @@
   </step>
 
   <step id="build webapp" description="Build and package the Annis2-webapp">
-    <java:ant file="Annis2-web/build.xml" 
-              target="dist" 
-              args="-Dj2ee.platform.classpath=/opt/jetty/lib/servlet-api-2.5-6.1.14.jar"/>
+    <sh:exec file="/opt/ant/bin/ant" args="-Dj2ee.platform.classpath=/opt/jetty/lib/servlet-api-2.5-6.1.14.jar Annis2-web/build.xml  dist" />
   </step>
 
   <step id="stop webapp" description="Stop the Annis2-webapp">
