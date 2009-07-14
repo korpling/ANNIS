@@ -1,5 +1,5 @@
 // the context path used by this installation
-var conf_context='/Annis-trunk';
+var conf_context='/Annis2-web';
 var conf_revision='${SVN_REVISION}';
 var global_timeout=60000;
 Ext.BLANK_IMAGE_URL='images/s.gif';
