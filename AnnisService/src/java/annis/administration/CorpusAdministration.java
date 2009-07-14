@@ -36,7 +36,7 @@ public class CorpusAdministration {
 	
 		// switch to new database, but still as super user to install stored procedure compute_rank_level
 		administrationDao.setDataSource(createDataSource(host, port, database, superUser, superPassword));
-		administrationDao.installPlPython();
+//		administrationDao.installPlPython();
 		administrationDao.installPlPgSql();
 		administrationDao.createFunctionComputeRankLevel();
 		administrationDao.createFunctionComputeSpannedTokens();
