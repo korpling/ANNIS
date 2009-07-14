@@ -29,5 +29,6 @@ List of included software:
  * log4j
  * mockito
  * PostgreSQL JDBC driver
+ * SableCC
  * Spring
  

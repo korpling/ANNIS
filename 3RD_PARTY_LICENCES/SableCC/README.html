@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>SableCC 3.2 - Read Me</title>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<center>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr align="center">
+      <td>
+      <h1><b><i><font size="+4">SableCC</font></i></b> version<!-- --> 3.2</h1>
+      <h2>ReadMe</h2>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<p>Welcome to <b><i><font size="+1">SableCC</font></i></b> version 3.2.</p>
+<p>Please read this document carefully.</p>
+<a name="content"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Content</h2>
+            </td>
+            <td align="right"><a href="#top">top</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+  <li> <a href="#start">Getting Started</a> </li>
+  <li> <a href="#license">License</a> </li>
+  <li> <a href="#documentation">Documentation</a> </li>
+  <li> <a href="#help">Getting Help</a> </li>
+  <li> <a href="#donations">Donations</a> </li>
+</ul>
+<a name="start"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Getting Started</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>Here are the minimal steps to get <b><i><font size="+1">SableCC</font></i></b>
+running.</p>
+<h3>1) If you got <tt>sablecc-3.2.tar.gz</tt> or <tt>sablecc-3.2.zip</tt> (binary packages)</h3>
+<ol>
+  <li> Decompress the file <tt>sablecc-3.2.tar.gz</tt> or <tt>sablecc-3.2.zip</tt>:
+    <tt>
+    <pre>	  tar -xzvf sablecc-3.2.tar.gz<br>	  </pre>
+    </tt> or <tt>
+    <pre>	  jar -xvf sablecc-3.2.zip<br>      </pre>
+    </tt> </li>
+  <li> Go into the in <tt>sablecc-3.2</tt> directory: <tt>
+    <pre>	  cd sablecc-3.2<br>      </pre>
+    </tt> </li>
+  <li> You will find an executable <tt>sablecc.jar</tt> file in the <tt>lib</tt>
+directory: <tt>
+    <pre>	  java -jar lib/sablecc.jar<br>      </pre>
+    </tt> </li>
+</ol>
+<p>This is it. If you have <a href="http://ant.apache.org/">Ant</a>
+installed on your system,
+you can install <b><i><font size="+1">SableCC</font></i></b> with the
+command: <tt>
+<pre>	ant -Dinstall.dir=<i>destination</i> install<br>    </pre>
+</tt> </p>
+<p>Otherwise, you can manually install <b><i><font size="+1">SableCC</font></i></b> as follow: 
+You should first copy (and edit) the files <tt>lib/sablecc.jar</tt> and
+<tt>bin/sablecc</tt> (GNU/Linux, Mac, Unix) or <tt>bin\sablecc.bat</tt> (Windows) to an
+appropriate location, and set your PATH environment variable
+appropriately. </p>
+<h3>2) If you got <tt>sablecc-3.2-src.tar.gz</tt> (source
+package)</h3>
+<ol>
+  <li> Decompress the file <tt>sablecc-3.2-src.tar.gz</tt>: <tt>
+    <pre>	  tar -xzvf sablecc-3.2-src.tar.gz<br>      </pre>
+    </tt> </li>
+  <li> Go into the in <tt>sablecc-3.2</tt> directory: <tt>
+    <pre>	  cd sablecc-3.2<br>      </pre>
+    </tt> </li>
+  <li> If you want an automatic build process, you need to have <a
+ href="http://ant.apache.org/">Ant</a> installed on your system. 
+ Simply type: <tt>
+    <pre>	  ant -Dinstall.dir=<i>destination</i> install<br>      </pre>
+    </tt> </li>
+</ol>
+<a name="license"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>License</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><b><i><font size="+1">SableCC</font></i></b> is covered by the GNU
+Lesser General Public License. You can view the copyright notice and
+the exact terms of the license in the files <a href="LICENSE">LICENSE</a>,
+<a href="AUTHORS">AUTHORS</a> and <a href="COPYING-LESSER">COPYING-LESSER</a>.</p>
+<a name="documentation"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Documentation</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>You can find complete and detailed documentation on the <b><i><font
+ size="+1">SableCC </font></i></b>framework and syntax at the
+site <a href="http://sablecc.org/documentation.html">http://sablecc.org/documentation.html</a> .</p>
+<a name="help"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Getting Help</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>The easiest way of obtaining help is to get on the <i><b><font size="+1">SableCC</font></b> mailing-list</a></i>,
+ by visiting the site
+ <a href="http://sablecc.org/lists/control/listinfo/sablecc-user/">http://sablecc.org/lists/control/listinfo/sablecc-user/</a> .
+Many <b><i><font size="+1">SableCC</font></i></b> users around the
+world are already on this mailing-list. This is the best pool of
+information available to you.</p>
+<p>You can also get professional consulting services from J-Meg inc.  Simply get in touch with Etienne Gagnon
+   (<a href="mailto:egagnon@j-meg.com?subject=SableCC consulting services">egagnon@j-meg.com</a>).</p>
+<a name="donations"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Donations</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>You are very welcome to express your appreciation of <b><i><font
+ size="+1">SableCC</font></i></b>. If you
+ would like to make a financial donation to the SableCC project, you
+ can get in touch with Etienne Gagnon (<a href="mailto:egagnon@sablevm.org?subject=Donation">egagnon@sablevm.org</a>).
+ Thank you in advance. </p>
+</body>
+</html>

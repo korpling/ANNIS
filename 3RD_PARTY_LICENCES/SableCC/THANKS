@@ -1,0 +1,18 @@
+THANKS file.
+
+SableCC has been initially developed by Etienne M. Gagnon as his
+M.Sc. research project.
+
+Many people have contributed to SableCC by reporting problems,
+suggesting various improvements or providing other services.  Here is
+a list of (some of) these people and organizations.  Please help us
+keep it complete and exempt of errors.
+
+Thanks to you
+-------------
+
+* Prof. Laurie J. Hendren <hendren@sable.mcgill.ca>:
+    research advisor
+
+* Will Hartung <willh@msoft.com>
+    small patch for including token in parser exception
