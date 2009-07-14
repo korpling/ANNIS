@@ -14,8 +14,10 @@ fJS = open(config_js_path, "r")
 JSContent = fJS.read();
 fJS.close();
 
+JSContent = JSContent.replace("'/Annis2-web';", "'/Annis-trunk';")
+JSContent = JSContent.replace("${SVN_REVISION}", rev)
 fJS = open(config_js_path, "w")
-fJS.write(JSContent.replace("${SVN_REVISION}", rev))
+fJS.write()
 fJS.close()
 
 web_xml_path=path_to_app + "/WEB-INF/web.xml"
