@@ -295,6 +295,24 @@ public class TestDefaultWhereClauseSqlGenerator {
 		);
 	}
 	
+	// WHERE condition for > name [annotation]
+	@Test
+	public void whereClauseDirectDominanceNamedAndAnnotated() {
+		node23.addJoin(new Dominance(node42, NAME, 1));
+		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP));
+		checkWhereCondition(
+//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
+				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.name", "'" + NAME + "'"),
+				join("=", "_rank23.pre", "_rank42.parent")
+		);
+		checkWhereCondition(node42,
+				join("=", "_annotation42.namespace", "'namespace3'"),
+				join("=", "_annotation42.name", "'name3'"),
+				join("~", "_annotation42.value", "'^value3$'")
+		);
+	}
+	
 	// WHERE condition for >*
 	@Test
 	public void whereClauseForNodeIndirectDominance() {
@@ -383,8 +401,14 @@ public class TestDefaultWhereClauseSqlGenerator {
 	
 	///// Helper
 	
+
+	
 	private void checkWhereCondition(String... expected) {
-		List<String> actual = generator.whereConditions(node23, null, null);
+		checkWhereCondition(node23, expected);
+	}
+
+	private void checkWhereCondition(AnnisNode node, String... expected) {
+		List<String> actual = generator.whereConditions(node, null, null);
 		for (String item : expected)
 			assertThat(actual, hasItem(item));
 		assertThat(actual, is(size(expected.length)));

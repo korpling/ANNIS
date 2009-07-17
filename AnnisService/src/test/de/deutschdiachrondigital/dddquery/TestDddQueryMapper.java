@@ -243,6 +243,11 @@ public class TestDddQueryMapper {
 	}
 	
 	@Test
+	public void directDominanceNamedAndAnnotated() {
+		testBinaryLingOp("#1 > name [annotation] #2", "$n1/child[d, name](annotation)::$n2");
+	}
+	
+	@Test
 	public void indirectDominance() {
 		testBinaryLingOp("#1 >* #2", "$n1/descendant[d]::$n2");
 	}

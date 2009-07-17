@@ -302,7 +302,10 @@ public class DddQueryMapper {
 		@Override
 		public void caseAEdgeDominanceSpec(AEdgeDominanceSpec node) {
 			PLingOp lingOp = (PLingOp) node.parent();
-			writeMapping("$n", lhs(lingOp), "/child[d](");
+			writeMapping("$n", lhs(lingOp), "/child[d");
+			if (node.getName() != null)
+				writeMapping(", ", token(node.getName()));
+			writeMapping("](");
 			List<PEdgeAnnotation> edgeAnnotations = ((AEdgeSpec) node.getEdgeSpec()).getEdgeAnnotation();
 			for (PEdgeAnnotation edgeAnnotation : edgeAnnotations)
 				edgeAnnotation.apply(this);
