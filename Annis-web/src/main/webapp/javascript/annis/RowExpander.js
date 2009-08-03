@@ -1,10 +1,3 @@
-/*
- * Ext JS Library 2.0.1
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
 
 Ext.grid.RowExpander = function(config){
     Ext.apply(this, config);
@@ -92,7 +85,7 @@ Ext.extend(Ext.grid.RowExpander, Ext.util.Observable, {
     beforeExpand : function(record, body, rowIndex){
         if(this.fireEvent('beforeexpand', this, record, body, rowIndex) !== false){
             if(this.tpl && this.lazyRender){
-                body.innerHTML = this.getBodyContent(record, rowIndex);
+                body.update(this.getBodyContent(record, rowIndex));
             }
             return true;
         }else{

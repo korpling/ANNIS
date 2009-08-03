@@ -1,11 +1,3 @@
-/*
- * Ext JS Library 2.0.1
- * Copyright(c) 2006-2008, Ext JS, LLC.
- * licensing@extjs.com
- * 
- * http://extjs.com/license
- */
-
 Ext.onReady(function()
 {
   Ext.QuickTips.init();
@@ -86,12 +78,11 @@ Ext.onReady(function()
       },
       success: function(response)
       {
-
-        labelUser.getEl().innerHTML = 'logged in as \"' + response.responseText + "\"";
+        labelUser.getEl().update('logged in as \"' + response.responseText + "\"");
       },
       failure: function()
       {
-        labelUser.getEl().innerHTML = 'error, maybe you are not logged in properly';
+        labelUser.getEl().update('error, maybe you are not logged in properly');
 
       }
     }
