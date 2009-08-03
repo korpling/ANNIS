@@ -18,6 +18,10 @@
     <java:ant file="AnnisService/build.xml" target="dist"/>
   </step>
 
+  <step id="maven-service-install" description="Two jar files need to be installed to the local maven repository.">
+    <sh:exec file="addServiceJarsToMaven.sh" />
+  </step>
+
   <step id="build webapp" description="Build and package the Annis2-webapp">
     <sh:exec file="/usr/bin/mvn" args="-f Annis-web/pom.xml install" />
   </step>
