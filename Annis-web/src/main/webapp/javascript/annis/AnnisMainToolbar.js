@@ -97,7 +97,7 @@ Ext.onReady(function()
   AnnisMainToolbar.prototype.showTutorial = function()
   {
     var windowTutorial = new Ext.Window({
-      html: '<iframe width="100%" height="100%" src="' + conf_context + '/tutorial/index.html"',
+      html: '<iframe id="iframeTutorial" name="iframeTutorial" width="100%" height="100%" src="' + conf_context + '/tutorial/index.html" frameborder="0"></iframe>',
       layout: 'fit',
       maximizable: true,
       width: 600,
