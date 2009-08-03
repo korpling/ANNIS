@@ -6,7 +6,7 @@
   <artifactId>Annis-web</artifactId>
   <packaging>war</packaging>
   <version>2.1-SNAPSHOT</version>
-  <name>Annis-web JEE5 Webapp</name>
+  <name>Annis-web</name>
   <url>http://maven.apache.org</url>
   <dependencies>
 
@@ -44,7 +44,7 @@
       <version>1.1</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -92,6 +92,8 @@
   <properties>
     <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
   </properties>
+    <description>The web frontend for the Annis Corpus Search</description>
 </project>
+
 
 

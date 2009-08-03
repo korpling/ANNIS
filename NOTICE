@@ -5,10 +5,6 @@ This product includes software developed by others which may have
 separate licenses. Please read the associated license information
 carefully, which is located in the "3RD_PARTY_LICENCES" folder.
 
-Please note that the JavaScript and HTML files in 
-Annis2-web/web/javascript are licensed under the GPLv3 in order
-to be ExtJS compliant.
-
 If you want to include audio or video data and you use the 
 "JW Player" flash plugin you are not allowed to use it commercially 
 (Creative Commons - Attribution-Noncommercial-Share Alike 3.0 Unported).
