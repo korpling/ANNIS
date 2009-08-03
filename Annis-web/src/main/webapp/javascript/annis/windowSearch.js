@@ -581,12 +581,7 @@ Ext.onReady(function()
       }
     },
     items: [{
-      id: 'blaa',
-      width: 200,
-      fieldLabel: 'Match Count',
-      name: 'matchCount',
-      allowBlank:true,
-      readOnly: true
+      // none yet
     }],
     buttons: [{
       id: 'btnQueryBuilder',
