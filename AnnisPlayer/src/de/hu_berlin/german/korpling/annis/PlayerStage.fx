@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import de.hu_berlin.german.korpling.annis.AnnisPlayerUI;
 
 var myMedia = Media {
-  source:"file:///home/thomas/Desktop/wikinews.ogg"
+  source:"http://upload.wikimedia.org/wikipedia/commons/7/7a/One_sparrow_then_another.ogg"
 }
 
 var player = MediaPlayer {
