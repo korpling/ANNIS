@@ -7,7 +7,17 @@
   <packaging>war</packaging>
   <version>2.1-SNAPSHOT</version>
   <name>Annis-web</name>
+  <organization>
+    <name>SFB 632</name>
+    <url>http://www.sfb632.uni-potsdam.de/</url>
+  </organization>
   <url>http://maven.apache.org</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
   <dependencies>
 
     <dependency>
@@ -73,7 +83,31 @@
       <version>6.1.9</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-graph-impl</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-io</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-algorithms</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-visualization</artifactId>
+      <version>2.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -86,14 +120,35 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+
+      <!-- maven configuration -->
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.11</version>
+        <configuration>
+          
+          <systemProperties>
+            <systemProperty>
+              <name>java.security.manager</name>
+            </systemProperty>
+            <systemProperty>
+              <name>java.security.policy</name>
+              <value>all_allowed.policy</value>
+            </systemProperty>
+          </systemProperties>
+        </configuration>
+      </plugin>
+
     </plugins>
     <finalName>Annis-web</finalName>
   </build>
   <properties>
     <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
   </properties>
-    <description>The web frontend for the Annis Corpus Search</description>
+  <description>The web frontend for the Annis Corpus Search</description>
 </project>
+
 
 
 

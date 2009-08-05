@@ -1,0 +1,5 @@
+grant codeBase "file:/-" {
+        // Allow everything for now
+        permission java.security.AllPermission;
+};
+
