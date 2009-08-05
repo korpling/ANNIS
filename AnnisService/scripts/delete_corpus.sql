@@ -56,7 +56,8 @@ AND rank.node_ref = node.id;
 -- explain analyze
 DELETE FROM node_annotation
 USING node
-WHERE node_annotation.node_ref = node.id;
+WHERE node.toplevel_corpus IN ( :ids ) 
+AND node_annotation.node_ref = node.id;
 
 -- text
 -- explain analyze
@@ -68,7 +69,7 @@ AND node.text_ref = text.id;
 -- node
 -- explain analyze
 DELETE FROM node
-WHERE node.id IN ( :ids ) ;
+WHERE node.toplevel_corpus IN ( :ids ) ;
 
 -- corpus_annotation
 -- explain analyze
