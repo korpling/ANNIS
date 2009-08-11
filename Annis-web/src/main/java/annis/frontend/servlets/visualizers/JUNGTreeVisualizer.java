@@ -4,6 +4,7 @@ import edu.uci.ics.jung.algorithms.layout.DAGLayout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 import java.awt.Color;
@@ -61,6 +62,10 @@ public class JUNGTreeVisualizer extends Visualizer
         return input.label;
       }
     });
+    vv.getRenderContext().getEdgeLabelRenderer().setRotateEdgeLabels(false);
+
+    // straight lines
+    vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<PaulaVertex,PaulaEdge>());
 
     // create new image to paint on
     BufferedImage image = new BufferedImage(vv.getWidth(), vv.getHeight(),
