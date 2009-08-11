@@ -16,6 +16,7 @@
 
 package annis.frontend.servlets.visualizers;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -40,8 +41,9 @@ public abstract class WriterVisualizer extends Visualizer
     {
       OutputStreamWriter writer = new OutputStreamWriter(outstream, getCharacterEncoding());
       writeOutput(writer);
+      writer.flush();
     }
-    catch(UnsupportedEncodingException ex)
+    catch(IOException ex)
     {
       ex.printStackTrace(new PrintWriter(outstream));
     }

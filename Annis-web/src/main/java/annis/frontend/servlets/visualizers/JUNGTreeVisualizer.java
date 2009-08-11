@@ -1,18 +1,21 @@
 package annis.frontend.servlets.visualizers;
 
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.filter.ElementFilter;
 
 /**
  *
@@ -25,31 +28,26 @@ public class JUNGTreeVisualizer extends Visualizer
   public void writeOutput(OutputStream outstream)
   {
 
-    Graph<String, String> g = new SparseMultigraph<String, String>();
+    Document doc = getPaulaJDOM();
+    DirectedGraph<PaulaVertex, PaulaEdge> g = generateGraphFromPaula(doc);
 
-    g.addVertex("A");
-    g.addVertex("B");
-    g.addEdge("", "A", "B");
+    DAGLayout<PaulaVertex,PaulaEdge> dagLayout = new DAGLayout<PaulaVertex, PaulaEdge>(g);
 
-    FRLayout<String, String> l = new FRLayout<String, String>(g, new Dimension(100, 100));
-    l.initialize();
+    VisualizationViewer<PaulaVertex,PaulaEdge> vv =
+      new VisualizationViewer<PaulaVertex,PaulaEdge>(dagLayout);
 
-    VisualizationViewer<String, String> vv =
-      new VisualizationViewer<String, String>(l);
-
+    vv.setSize(dagLayout.getSize());
     vv.setBackground(Color.WHITE);
     vv.setDoubleBuffered(false);
+   
     // create new image to paint on
-    BufferedImage image = new BufferedImage(300, 300,
+    BufferedImage image = new BufferedImage(vv.getWidth(), vv.getHeight(),
       BufferedImage.TYPE_INT_RGB);
 
     // paint graph on image
     Graphics2D graphics = image.createGraphics();
-    graphics.setBackground(Color.GRAY);
-    graphics.setPaint(Color.RED);
-    graphics.fillRect(10, 10, 40, 100);
-    //vv.paint(graphics);
-    graphics.dispose();
+    graphics.setBackground(Color.WHITE);
+    vv.paint(graphics);
 
 
     try
@@ -76,4 +74,122 @@ public class JUNGTreeVisualizer extends Visualizer
   {
     return "latin1";
   }
+
+  public DirectedGraph<PaulaVertex, PaulaEdge> generateGraphFromPaula(Document paula)
+  {
+    DirectedGraph<PaulaVertex, PaulaEdge> g = new DirectedSparseMultigraph<PaulaVertex, PaulaEdge>();
+
+    // get all edges
+    Iterator<Element> itRel = paula.getRootElement().getDescendants(new ElementFilter("_rel"));
+    while(itRel.hasNext())
+    {
+      Element el = itRel.next();
+
+      String src = el.getAttributeValue("_src");
+      String dst = el.getAttributeValue("_dst");
+
+      if(src != null && dst != null)
+      {
+        try
+        {
+          long srcL = Long.parseLong(src);
+          long dstL = Long.parseLong(dst);
+
+          PaulaEdge edge = new PaulaEdge();
+          edge.src = srcL;
+          edge.dst = dstL;
+
+          PaulaVertex vSrc = new PaulaVertex();
+          vSrc.id = srcL;
+
+          PaulaVertex vDst = new PaulaVertex();
+          vDst.id = dstL;
+
+          g.addVertex(vSrc);
+          g.addVertex(vDst);
+          g.addEdge(edge, vSrc, vDst);
+
+        }
+        catch(NumberFormatException ex)
+        {
+          // ignore
+        }
+      }
+    }
+
+    return g;
+  }
+
+  public class PaulaEdge
+  {
+    public long src;
+    public long dst;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if(obj == null)
+      {
+        return false;
+      }
+      if(getClass() != obj.getClass())
+      {
+        return false;
+      }
+      final PaulaEdge other = (PaulaEdge) obj;
+      if(this.src != other.src)
+      {
+        return false;
+      }
+      if(this.dst != other.dst)
+      {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 5;
+      hash = 89 * hash + (int) (this.src ^ (this.src >>> 32));
+      hash = 89 * hash + (int) (this.dst ^ (this.dst >>> 32));
+      return hash;
+    }
+
+  }
+
+  public class PaulaVertex
+  {
+    public long id;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if(obj == null)
+      {
+        return false;
+      }
+      if(getClass() != obj.getClass())
+      {
+        return false;
+      }
+      final PaulaVertex other = (PaulaVertex) obj;
+      if(this.id != other.id)
+      {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 3;
+      hash = 79 * hash + (int) (this.id ^ (this.id >>> 32));
+      return hash;
+    }
+    
+  }
+
 }

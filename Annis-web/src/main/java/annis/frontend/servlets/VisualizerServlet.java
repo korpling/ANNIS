@@ -181,6 +181,7 @@ public class VisualizerServlet extends HttpServlet
       }
 
       visualizer.writeOutput(outStream);
+      outStream.flush();
     }
     catch(InstantiationException e1)
     {
