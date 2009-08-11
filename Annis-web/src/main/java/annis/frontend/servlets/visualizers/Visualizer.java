@@ -15,8 +15,8 @@
  */
 package annis.frontend.servlets.visualizers;
 
+import java.io.OutputStream;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -73,12 +73,12 @@ public abstract class Visualizer
     
     return paulaJDOM;
   }
-
+  
   /**
-   * Writes the final output to passed Writer. The writer will remain open.
-   * @param writer the writer to be used
+   * Writes the final output to passed OutputStream. The stream should remain open.
+   * @param outstream the OutputStream to be used
    */
-  public abstract void writeOutput(Writer writer);
+  public abstract void writeOutput(OutputStream outstream);
 
   /**
    * Returns the content-type for this particular Visualizer output. For more information see {@link javax.servlet.ServletResponse#setContentType(String)}.

@@ -34,7 +34,7 @@ import org.jdom.filter.ElementFilter;
  *
  * @author thomas
  */
-public class CorefVisualizer extends Visualizer
+public class CorefVisualizer extends WriterVisualizer
 {
 
   private HashMap<Long, List<PR>> dst2PR;

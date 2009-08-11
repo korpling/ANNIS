@@ -26,6 +26,7 @@ import javax.servlet.http.*;
 import annis.frontend.servlets.visualizers.MarkableVisualizer;
 import annis.frontend.servlets.visualizers.Visualizer;
 
+import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
@@ -44,7 +45,7 @@ public class ExporterServlet extends HttpServlet {
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 			HttpSession session = request.getSession();
 			
-			Visualizer visualizer = new MarkableVisualizer();
+			WriterVisualizer visualizer = new MarkableVisualizer();
 			
 			
 			//depending on parameters recompute result set or take shopping cart items from cache

@@ -1,14 +1,14 @@
 Ext.onReady(function(){
   Ext.QuickTips.init();
 	
-  var toolbarPartiture = new Ext.Toolbar({
-    applyTo: 'toolbar'
-  });
-	
+  
   var menu = new Ext.menu.Menu({
     id: 'levelSelectionMenu'
   });
-	
+
+  var toolbarPartiture = new Ext.Toolbar();
+  toolbarPartiture.render('toolbar');
+  
   Ext.each(levelNames, function(levelName) {
     menu.add({
       text: levelName,
@@ -17,14 +17,15 @@ Ext.onReady(function(){
       checkHandler: onItemCheck
     });
   });
-	
-  toolbarPartiture.add(
-  {
+
+  toolbarPartiture.add({
     text:'Select Displayed Annotation Levels',
     iconCls: 'bmenu',  // <-- icon
     menu: menu  // assign menu by instance
-  }
-);
+  });
+
+
+  toolbarPartiture.doLayout();
 
   function onItemCheck(item, checked){
     var element = Ext.get("level_" + item.getId());
@@ -35,7 +36,7 @@ Ext.onReady(function(){
 });
 
 function toggleAnnotation(element, isOver) {
-//  var extClassOver = "x-grid3-row-over";
+  //  var extClassOver = "x-grid3-row-over";
   var el = Ext.get(element);
   
   var tmpAtt = el.getAttributeNS("annis", "tokenIds");

@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
-public class TreeVisualizer extends Visualizer {
+public class TreeVisualizer extends WriterVisualizer {
 
 	@Override
 	public void writeOutput(Writer writer) {

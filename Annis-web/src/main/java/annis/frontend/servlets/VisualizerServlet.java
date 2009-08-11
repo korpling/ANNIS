@@ -31,6 +31,7 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.ServletOutputStream;
 
 /**
  * This servlet dispatches visualization requests to the according visualizer Classes.<br/><br>
@@ -59,6 +60,8 @@ public class VisualizerServlet extends HttpServlet
   @SuppressWarnings("unchecked")
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
+    OutputStream outStream = response.getOutputStream();
+   
     String spanId = request.getParameter("spanId");
     String textId = request.getParameter("textId");
 
@@ -116,6 +119,7 @@ public class VisualizerServlet extends HttpServlet
       String className = "annis.frontend.servlets.visualizers.partitur.PartiturVisualizer";
       if("tiger".equals(namespace))
       {
+        //className = "annis.frontend.servlets.visualizers.JUNGTreeVisualizer";
         className = "annis.frontend.servlets.visualizers.TreeVisualizer";
       }
       else if("mmax".equals(namespace))
@@ -147,7 +151,7 @@ public class VisualizerServlet extends HttpServlet
       visualizer.setMarkableMap(markableMap);
       visualizer.setContextPath(getServletContext().getContextPath());
       visualizer.setDotPath(path2Dot);
-      
+
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());
 
@@ -176,27 +180,27 @@ public class VisualizerServlet extends HttpServlet
         visualizer.setPaula(cache.get(spanId));
       }
 
-      visualizer.writeOutput(response.getWriter());
+      visualizer.writeOutput(outStream);
     }
     catch(InstantiationException e1)
     {
-      e1.printStackTrace(new PrintStream(response.getOutputStream()));
+      e1.printStackTrace(new PrintWriter(outStream));
     }
     catch(IllegalAccessException e1)
     {
-      e1.printStackTrace(new PrintStream(response.getOutputStream()));
+      e1.printStackTrace(new PrintWriter(outStream));
     }
     catch(CacheInitializationException e)
     {
-      e.printStackTrace(new PrintStream(response.getOutputStream()));
+      e.printStackTrace(new PrintWriter(outStream));
     }
     catch(CacheException e)
     {
-      e.printStackTrace(new PrintStream(response.getOutputStream()));
+      e.printStackTrace(new PrintWriter(outStream));
     }
     catch(ClassNotFoundException e)
     {
-      e.printStackTrace(new PrintStream(response.getOutputStream()));
+      e.printStackTrace(new PrintWriter(outStream));
     }
   }
 }

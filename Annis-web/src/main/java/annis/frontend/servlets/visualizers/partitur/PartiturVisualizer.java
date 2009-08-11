@@ -15,7 +15,7 @@
  */
 package annis.frontend.servlets.visualizers.partitur;
 
-import annis.frontend.servlets.visualizers.Visualizer;
+import annis.frontend.servlets.visualizers.WriterVisualizer;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import org.jdom.Document;
  *
  * @author thomas
  */
-public class PartiturVisualizer extends Visualizer
+public class PartiturVisualizer extends WriterVisualizer
 {
 
   public enum ElementType

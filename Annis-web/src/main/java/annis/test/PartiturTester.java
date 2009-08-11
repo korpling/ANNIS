@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import annis.frontend.servlets.visualizers.Visualizer;
+import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 public class PartiturTester {
 
@@ -56,7 +57,7 @@ public class PartiturTester {
 			markableMap.put("id_20", "red");
 			markableMap.put("257307", "red");
 		
-			Visualizer visualizer = (Visualizer) classLoader.loadClass(visualizerClassName).newInstance();
+			WriterVisualizer visualizer = (WriterVisualizer) classLoader.loadClass(visualizerClassName).newInstance();
 			visualizer.setNamespace(namespace);
 			visualizer.setMarkableMap(markableMap);
 			//response.setCharacterEncoding(visualizer.getCharacterEncoding());

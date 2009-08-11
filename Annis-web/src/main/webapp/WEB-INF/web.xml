@@ -10,7 +10,7 @@
   <context-param>
     <description>URL of the AnnisRMIServer</description>
     <param-name>AnnisRemoteService.URL</param-name>
-    <param-value>rmi://localhost:4711/AnnisService</param-value>
+    <param-value>rmi://korpling.german.hu-berlin.de:4711/AnnisService</param-value>
   </context-param>
   <context-param>
     <description>URL of the AnnisResolverService</description>

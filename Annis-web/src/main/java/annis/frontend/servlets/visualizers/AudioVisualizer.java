@@ -30,7 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author thomas
  */
-public class AudioVisualizer extends Visualizer
+public class AudioVisualizer extends WriterVisualizer
 {
 
   private long audioID = 0;
