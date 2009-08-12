@@ -522,7 +522,8 @@ Ext.onReady(function()
       listeners: {
         click: getResult
       }
-    }]
+    }],
+    buttonAlign:'center'
   });
 		
   var formPanelSearch = new Ext.FormPanel({
@@ -590,7 +591,8 @@ Ext.onReady(function()
       listeners: {
         click: getResult
       }
-    }]
+    }],
+    buttonAlign:'center'
   });
 		    
   var panelSearchModes = new Ext.TabPanel({

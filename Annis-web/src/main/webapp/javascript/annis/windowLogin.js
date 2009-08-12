@@ -47,6 +47,7 @@ Ext.onReady(function(){
       }
             		
     }],
+    buttonAlign:'center',
     onSubmit: Ext.emptyFn,
     submit: function() {
       this.getForm().getEl().dom.submit();
