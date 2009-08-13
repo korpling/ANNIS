@@ -49,7 +49,12 @@
 	<!-- Database API for administration tasks -->
 	<bean id="administrationDao" class="annis.administration.SpringAnnisAdministrationDao">
 		<property name="scriptPath" value="${annis.script-path}"/>
-		<property name="externalFilesPath" value="${annis.external-data-path}"/> 
+		<property name="externalFilesPath" value="${annis.external-data-path}"/>
+		<property name="externalFileMgrDao">
+			<bean class="annis.externalFiles.ExternalFileMgrDAO">
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+		</property>
 	</bean>
 	
 	<!-- Helper object for managing external files -->

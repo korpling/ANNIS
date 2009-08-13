@@ -31,7 +31,9 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
+import annis.externalFiles.ExternalFileMgr;
 import annis.externalFiles.ExternalFileMgrDAO;
+import annis.externalFiles.ExternalFileMgrImpl;
 
 /**
  * - Transaktionen
@@ -205,6 +207,7 @@ public class SpringAnnisAdministrationDao {
 			String name = file.getName();
 			String branch = file.getParent();
 			// FIXME: operates directly on the main database, can result orphaned entries in extdata when import fails
+			log.debug("externalFileMgr: " + externalFileMgrDao);
 			long id = externalFileMgrDao.putExtFile(name, branch, "audio/x-mp3");
 			log.debug("external file '" + filename + "' inserted with id " + id);
 			
@@ -513,6 +516,14 @@ public class SpringAnnisAdministrationDao {
 
 	public void setExternalFilesPath(String externalFilesPath) {
 		this.externalFilesPath = externalFilesPath;
+	}
+
+	public ExternalFileMgrDAO getExternalFileMgrDao() {
+		return externalFileMgrDao;
+	}
+
+	public void setExternalFileMgrDao(ExternalFileMgrDAO externalFileMgrDao) {
+		this.externalFileMgrDao = externalFileMgrDao;
 	}
 
 }
