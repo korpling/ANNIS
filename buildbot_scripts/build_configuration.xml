@@ -32,7 +32,7 @@
 
   <step id="stop service" description="Stop the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/stopService.sh" />
-    <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis-trunk" />
+    <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis/trunk" />
   </step>
 
   
@@ -47,12 +47,12 @@
 
   <step id="copy service" description="Copy the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/copyService.sh" />
-    <sh:exec file="buildbot_scripts/copyService.sh" args="/opt/annis-trunk"/>
+    <sh:exec file="buildbot_scripts/copyService.sh" args="/opt/annis/trunk"/>
   </step>
 
   <step id="start service" description="Start the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/startService.sh" />
-    <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis-trunk" />
+    <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis/trunk" />
   </step>
 
   <step id="start webapp" description="Start the Annis2-webapp">
