@@ -1,3 +1,0 @@
-makeindex Diplomarbeit.glo -s nomencl.ist -o Diplomarbeit.gls 
-makeindex Diplomarbeit 
-bibtex Diplomarbeit

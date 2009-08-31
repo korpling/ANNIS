@@ -129,7 +129,7 @@
         </configuration>
       </plugin>
 
-      <!-- maven configuration -->
+      <!-- jetty configuration -->
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>
