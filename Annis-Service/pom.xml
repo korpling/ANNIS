@@ -109,12 +109,27 @@
     <plugins>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-patch-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>patch</id>
+            <configuration>
+              <patchDirectory>src/main/patches</patchDirectory>
+              <naturalOrderProcessing>true</naturalOrderProcessing>
+            </configuration>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>apply</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>sablecc-maven-plugin</artifactId>
-        <configuration>
-          <sourceDirectory>src/main/java/</sourceDirectory>
-          <outputDirectory>src/main/java/</outputDirectory>
-        </configuration>
         <executions>
           <execution>
             <phase>generate-sources</phase>
