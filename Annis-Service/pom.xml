@@ -106,6 +106,7 @@
 
 
   <build>
+
     <plugins>
 
       <plugin>
@@ -141,6 +142,8 @@
       </plugin>
 
 
+
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -150,6 +153,17 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/annis.xml</descriptor>
+          </descriptors>
+          <finalName></finalName>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
