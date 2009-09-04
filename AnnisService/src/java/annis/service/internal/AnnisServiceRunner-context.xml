@@ -46,7 +46,7 @@
 		<property name="serviceName" value="AnnisService"/>
 		<property name="service" ref="annisService"/>
 		<property name="serviceInterface" value="annis.service.AnnisService"/>
-		<property name="registryPort" value="4711"/>
+		<property name="registryPort" value="${annis.service-port}"/>
 	</bean>
 		
 </beans>
