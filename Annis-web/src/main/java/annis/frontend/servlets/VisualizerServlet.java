@@ -31,7 +31,7 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletOutputStream;
+import java.util.Properties;
 
 /**
  * This servlet dispatches visualization requests to the according visualizer Classes.<br/><br>
@@ -113,37 +113,38 @@ public class VisualizerServlet extends HttpServlet
     try
     {
       ClassLoader classLoader = Visualizer.class.getClassLoader();
+      
+      // load from property file
+      String path = getServletContext().getRealPath("/");
+      Properties propsVisualizers = new Properties();
+      File propVisualizersFile = new File(path + "/WEB-INF/config/visualizers.properties");
+
+      Properties propsUseText = new Properties();
+      File propUseTextFile = new File(path + "/WEB-INF/config/usetext.properties");
+
+      String className = "annis.frontend.servlets.visualizers.partitur.PartiturVisualizer";
       boolean isUseTextId = false;
 
-      //String className = "annis.frontend.servlets.visualizers.PartiturVisualizer";
-      String className = "annis.frontend.servlets.visualizers.partitur.PartiturVisualizer";
-      if("tiger".equals(namespace))
+
+      // class to load
+      if(propVisualizersFile.canRead())
       {
-        //className = "annis.frontend.servlets.visualizers.JUNGTreeVisualizer";
-        className = "annis.frontend.servlets.visualizers.TreeVisualizer";
+        propsVisualizers.load(new FileReader(propVisualizersFile));
+
+        if(propsVisualizers.containsKey(namespace))
+        {
+          className = propsVisualizers.getProperty(namespace);
+        }
       }
-      else if("mmax".equals(namespace))
+
+      // using complete text?
+      if(propUseTextFile.canRead())
       {
-        //className = "annis.frontend.servlets.visualizers.MmaxVisualizer";
-        className = "annis.frontend.servlets.visualizers.CorefVisualizer";
-        isUseTextId = true;
-      }
-      else if("paula".equals(namespace))
-      {
-        className = "annis.frontend.servlets.visualizers.PaulaVisualizer";
-      }
-      else if("paulatext".equals(namespace))
-      {
-        className = "annis.frontend.servlets.visualizers.PaulaVisualizer";
-        isUseTextId = true;
-      }
-      else if("audio".equals(namespace))
-      {
-        className = "annis.frontend.servlets.visualizers.AudioVisualizer";
-      }
-      else if("urml".equals(namespace))
-      {
-        className = "annis.frontend.servlets.visualizers.PartiturVisualizer";
+        propsUseText.load(new FileReader(propUseTextFile));
+        if(propsUseText.containsKey(namespace))
+        {
+          isUseTextId = true;
+        }
       }
 
       Visualizer visualizer = (Visualizer) classLoader.loadClass(className).newInstance();
