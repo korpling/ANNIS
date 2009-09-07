@@ -53,7 +53,7 @@ public class MmaxVisualizer extends WriterVisualizer
     {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
-      Document document = builder.parse(new InputSource(new StringReader(super.paula)));
+      Document document = builder.parse(new InputSource(new StringReader(getPaula())));
 
       PaulaInline2MerkelWriter paula2Merkel = new PaulaInline2MerkelWriter(document, "/RESULT");
       paula2Merkel.run();
@@ -150,9 +150,9 @@ public class MmaxVisualizer extends WriterVisualizer
     {
       buildDefinition(rootNode);
       html.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
-        "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + contextPath + "/javascript/extjs/resources/css/ext-all.css\" />");
-      html.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      html.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/ext-all.js\"></script>");
+        "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" />");
+      html.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      html.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
       html.append("</head><body>");
       html.append("<div id=\"toolbar\"></div><div id=\"mmax\" style=\"font-family: arial,tahoma,helvetica,sans-serif; font-size: 11px;\" style=\"position: absolute; top: 30px; left: 0px;\">\n");
 
@@ -250,7 +250,7 @@ public class MmaxVisualizer extends WriterVisualizer
         }
         html.append("<font id=\"id" + token.id + "\" onmouseover=\"markText(this.id, true)\" onmouseout=\"markText(this.id, false)\" class=\"dummy\">" + token.text + "</font>");
       }
-      html.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/annis/visualizer/MmaxVisualizer.js\"></script>");
+      html.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/MmaxVisualizer.js\"></script>");
       html.append("</div></body></html>");
     }
 

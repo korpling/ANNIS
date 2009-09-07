@@ -53,16 +53,16 @@ public class TreeVisualizer extends WriterVisualizer {
 			//Converting paulaInline to SVG Tree
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
 			DocumentBuilder builder = factory.newDocumentBuilder(); 
-			Document document = builder.parse(new InputSource(new StringReader(super.paula)));
+			Document document = builder.parse(new InputSource(new StringReader(getPaula())));
 			
 			//Using PaulaInline2DotWriter
 			PaulaInline2DotWriter paula2Dot = new PaulaInline2DotWriter(document);
 			
 			Set<String> namespaceSet = new HashSet<String>();
-			namespaceSet.add(super.namespace);
+			namespaceSet.add(getNamespace());
 			
 			paula2Dot.setNamespaceSet(namespaceSet);
-			paula2Dot.setFillMap(this.markableMap);
+			paula2Dot.setFillMap(getMarkableMap());
 			paula2Dot.run();
 			
 			//width: 125 -> 80
@@ -475,7 +475,7 @@ public class TreeVisualizer extends WriterVisualizer {
 		public void writeOutput(Writer writer) {
 			try {
 				//Initiating External Process
-				String cmd = dotPath + " -s" + scale + ".0 -T" + outputFormat;
+				String cmd = getDotPath() + " -s" + scale + ".0 -T" + outputFormat;
 				Runtime runTime = Runtime.getRuntime();
 				
 				//check if neato exists

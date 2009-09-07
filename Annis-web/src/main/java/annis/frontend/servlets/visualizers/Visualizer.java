@@ -15,6 +15,7 @@
  */
 package annis.frontend.servlets.visualizers;
 
+import annis.service.ifaces.AnnisResult;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -28,23 +29,128 @@ import org.xml.sax.InputSource;
 public abstract class Visualizer
 {
 
-  protected String namespace = "";
-  protected String paula = "";
-  protected Map<String, String> markableMap = new HashMap<String, String>();
-  protected String id = "";
-  protected String contextPath;
-  protected String dotPath;
+  private String namespace = "";
+  private String paula = null;
+  private Map<String, String> markableMap = new HashMap<String, String>();
+  private String id = "";
+  private String contextPath;
+  private String dotPath;
   private Document paulaJDOM = null;
+  private AnnisResult result;
+
+  // BEGIN properties
 
   /**
-   * Sets the private paula String property that will be uses by {@link #writeOutput(Writer)}.
-   * @param paula
+   * Gets the namespace to be processed by {@link #writeOutput(Writer)}.
+   * @return
    */
-  public void setPaula(String paula)
+  public String getNamespace()
   {
-    this.paula = paula;
-    this.paulaJDOM = null;
+    return namespace;
   }
+
+  /**
+   * Sets the namespace to be processed by {@link #writeOutput(Writer)}.
+   * @param namespace Namespace to be processed
+   */
+  public void setNamespace(String namespace)
+  {
+    this.namespace = namespace;
+  }
+
+  /**
+   * Gets the context path of this Annis installation.
+   * @return The context path, beginning with an "/" but *not* ending with it.
+   */
+  public String getContextPath()
+  {
+    return contextPath;
+  }
+
+  /**
+   * Sets the context path of this Annis installation.
+   * @param contextPath The context path, beginning with an "/" but *not* ending with it.
+   */
+  public void setContextPath(String contextPath)
+  {
+    this.contextPath = contextPath;
+  }
+
+  
+  /**
+   * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of this map must be the corresponding node id of annotations or tokens.
+   * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
+   * @return
+   */
+  public Map<String, String> getMarkableMap()
+  {
+    return markableMap;
+  }
+
+  /**
+   * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of this map must be the corresponding node id of annotations or tokens.
+   * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
+   * @param markableMap
+   */
+  public void setMarkableMap(Map<String, String> markableMap)
+  {
+    this.markableMap = markableMap;
+  }
+
+  /**
+   * Gets an optional result id to be used by {@link #writeOutput(Writer)}
+   * @return
+   */
+  public String getId()
+  {
+    return id;
+  }
+
+  /**
+   * Sets an optional result id to be used by {@link #writeOutput(Writer)}
+   * @param id result id to be used in output
+   */
+  public void setId(String id)
+  {
+    this.id = id;
+  }
+
+  public AnnisResult getResult()
+  {
+    return result;
+  }
+
+  public void setResult(AnnisResult result)
+  {
+    this.result = result;
+  }
+
+  /**
+   * Gets the private paula String property that will be uses by {@link #writeOutput(Writer)}.
+   * @return
+   * @deprecated
+   */
+  @Deprecated
+  public String getPaula()
+  {
+    if(paula == null)
+    {
+      // construct Paula from result
+      paula = result.getPaula();
+    }
+    return paula;
+  }
+
+//  /**
+//   * Sets the private paula String property that will be uses by {@link #writeOutput(Writer)}.
+//   * @param paula
+//   */
+//  public void setPaula(String paula)
+//  {
+//    this.paula = paula;
+//    this.paulaJDOM = null;
+//  }
+
 
   public void setDotPath(String dotPath)
   {
@@ -54,13 +160,14 @@ public abstract class Visualizer
   
 
   /** Get a JDOM Document representing paula. Will be generated only once. */
+  @Deprecated
   protected Document getPaulaJDOM()
   {
     if(paulaJDOM == null)
     {
       try
       {
-        paulaJDOM = new SAXBuilder().build(new InputSource(new StringReader(paula)));
+        paulaJDOM = new SAXBuilder().build(new InputSource(new StringReader(getPaula())));
       }
       catch(Exception ex)
       {
@@ -73,7 +180,16 @@ public abstract class Visualizer
     
     return paulaJDOM;
   }
-  
+
+  public String getDotPath()
+  {
+    return dotPath;
+  }
+
+
+
+  // END properties
+
   /**
    * Writes the final output to passed OutputStream. The stream should remain open.
    * @param outstream the OutputStream to be used
@@ -100,44 +216,7 @@ public abstract class Visualizer
   {
     return "utf-8";
   }
-  ;
-
-  /**
-   * Sets the namespace to be processed by {@link #writeOutput(Writer)}.
-   * @param namespace Namespace to be processed
-   */
-  public void setNamespace(String namespace)
-  {
-    this.namespace = namespace;
-  }
-
-  /**
-   * Sets the context path of this Annis installation.
-   * @param contextPath The context path, beginning with an "/" but *not* ending with it.
-   */
-  public void setContextPath(String contextPath)
-  {
-    this.contextPath = contextPath;
-  }
-
-  /**
-   * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of this map must be the corresponding node id of annotations or tokens.
-   * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
-   * @param markableMap
-   */
-  public void setMarkableMap(Map<String, String> markableMap)
-  {
-    this.markableMap = markableMap;
-  }
-
-  /**
-   * Sets an optional result id to be used by {@link #writeOutput(Writer)}
-   * @param id result id to be used in output
-   */
-  public void setId(String id)
-  {
-    this.id = id;
-  }
+  
 
   /**
    * Returns additional CSS to be linked from output generated by {@link #writeOutput(Writer)}.

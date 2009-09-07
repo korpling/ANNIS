@@ -109,12 +109,12 @@ public class MarkableVisualizer extends WriterVisualizer
   {
     try
     {
-      writer.append("<result id=\"" + super.id + "\">\n");
+      writer.append("<result id=\"" + getId() + "\">\n");
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
 
-      DefaultHandler handler = new MarkableHandler(writer, super.markableMap.keySet());
-      saxParser.parse(new ByteArrayInputStream(super.paula.getBytes()), handler);
+      DefaultHandler handler = new MarkableHandler(writer, getMarkableMap().keySet());
+      saxParser.parse(new ByteArrayInputStream(getPaula().getBytes()), handler);
       writer.append("</result>\n");
       writer.flush();
     }

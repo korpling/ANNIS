@@ -39,7 +39,7 @@ public class ExampleVisualizer extends WriterVisualizer
       //Retrieve DOM-Document for PAULA
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
-      Document document = builder.parse(new InputSource(new StringReader(this.paula)));
+      Document document = builder.parse(new InputSource(new StringReader(getPaula())));
 
       //Use XPath API to retrieve all token from document
       NodeList tokenNodeList = XPathAPI.selectNodeList(document, ".//tok");
@@ -54,7 +54,7 @@ public class ExampleVisualizer extends WriterVisualizer
 
         //Use markableMap to set the color for this token
         String tokenId = tokenNode.getAttributes().getNamedItem("_id").getNodeValue();
-        String color = this.markableMap.containsKey(tokenId) ? this.markableMap.get(tokenId) : "";
+        String color = getMarkableMap().containsKey(tokenId) ? getMarkableMap().get(tokenId) : "";
 
         writer.append("<font color=\"" + color + "\">" + tokenNode.getTextContent() + "</font> ");
       }

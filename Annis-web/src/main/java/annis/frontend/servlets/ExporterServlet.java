@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 import annis.frontend.servlets.visualizers.MarkableVisualizer;
-import annis.frontend.servlets.visualizers.Visualizer;
 
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.service.AnnisService;
@@ -68,8 +67,9 @@ public class ExporterServlet extends HttpServlet {
 					AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, totalCount, 0, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
 					Writer writer = response.getWriter();
 					
-					for(AnnisResult result : resultSet) {
-						visualizer.setPaula(result.getPaula());
+					for(AnnisResult result : resultSet)
+          {
+            visualizer.setResult(result);
 						Map<String,String> markableMap = new HashMap<String,String>();
 						//Todo change annis Result -> add getMarkerSet();
 						for(int i=1; i<15; i++) {

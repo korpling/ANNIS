@@ -27,6 +27,7 @@ import annis.frontend.servlets.visualizers.Visualizer;
 
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
+import annis.service.ifaces.AnnisResult;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -162,7 +163,8 @@ public class VisualizerServlet extends HttpServlet
         try
         {
           AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-          visualizer.setPaula(service.getPaula(Long.parseLong(textId)));
+          AnnisResult r = service.getAnnisResult(Long.parseLong(textId));
+          visualizer.setResult(r);
         }
         catch(AnnisServiceFactoryException e)
         {
@@ -177,8 +179,12 @@ public class VisualizerServlet extends HttpServlet
       else
       {
         //we can use the cached span for visualization
-        Cache cache = new FilesystemCache("Paula");
-        visualizer.setPaula(cache.get(spanId));
+        Cache cacheAnnisResult = new FilesystemCache("AnnisResult");
+
+        byte[] resultAsBytes = cacheAnnisResult.getBytes(spanId);
+        ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
+
+        visualizer.setResult((AnnisResult) inStream.readObject());
       }
 
       visualizer.writeOutput(outStream);

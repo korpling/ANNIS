@@ -69,7 +69,7 @@ public class JUNGTreeVisualizer extends Visualizer
       }
     });
 
-    final Map<String, String> markableMapFinal = this.markableMap;
+    final Map<String, String> markableMapFinal = getMarkableMap();
 
     vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<PaulaVertex, Paint>()
     {
@@ -152,7 +152,7 @@ public class JUNGTreeVisualizer extends Visualizer
       new DirectedOrderedSparseMultigraph<PaulaVertex, PaulaEdge>();
 
     // matching namespace
-    Namespace nsTree = Namespace.getNamespace(this.namespace, this.namespace);
+    Namespace nsTree = Namespace.getNamespace(getNamespace(), getNamespace());
 
     // get all token (so that they have the right order)
     Iterator<Element> itToken = paula.getRootElement().getDescendants(new ElementFilter("tok"));

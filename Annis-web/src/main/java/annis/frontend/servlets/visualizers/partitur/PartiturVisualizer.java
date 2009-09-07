@@ -49,16 +49,16 @@ public class PartiturVisualizer extends WriterVisualizer
     {
       // get partitur
       Document jdomDoc = getPaulaJDOM();
-      PartiturParser partitur = new PartiturParser(jdomDoc, namespace);
+      PartiturParser partitur = new PartiturParser(jdomDoc, getNamespace());
 
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
 
       writer.append("<html><head>");
-      writer.append("<link href=\"" + contextPath + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + contextPath + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/ext-all.js\"></script>");
+      writer.append("<link href=\"" + getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -67,7 +67,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
 
       writer.append("</head>");
       writer.append("<body>\n");
@@ -117,9 +117,9 @@ public class PartiturVisualizer extends WriterVisualizer
             }
 
             color = "black";
-            if(markableMap.containsKey("" + event.getId()))
+            if(getMarkableMap().containsKey("" + event.getId()))
             {
-              color = markableMap.get("" + event.getId());
+              color = getMarkableMap().get("" + event.getId());
             }
             val = event.getValue();
           
@@ -176,9 +176,9 @@ public class PartiturVisualizer extends WriterVisualizer
       {
         String color = "black";
 
-        if(markableMap.containsKey("" + token.getId()))
+        if(getMarkableMap().containsKey("" + token.getId()))
         {
-          color = markableMap.get("" + token.getId());
+          color = getMarkableMap().get("" + token.getId());
         }
         writer.append("<td class=\"tok\" style=\"color:" + color + ";\" " +
           "id=\"token_" + token.getId() + "\" " +

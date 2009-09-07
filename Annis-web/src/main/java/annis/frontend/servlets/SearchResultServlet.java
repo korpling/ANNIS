@@ -40,6 +40,8 @@ import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.ifaces.AnnisToken;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
@@ -172,7 +174,7 @@ public class SearchResultServlet extends HttpServlet
 
       service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
       AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
-      Cache cache = new FilesystemCache("Paula");
+      Cache cacheAnnisResult = new FilesystemCache("AnnisResult");
 
       // check whether match count retrieval has finished
       try
@@ -205,7 +207,15 @@ public class SearchResultServlet extends HttpServlet
       int count = 0;
       for(AnnisResult result : resultSet)
       {
-        cache.put(result.getStartNodeId() + "," + result.getEndNodeId(), result.getPaula());
+        // construct byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
+        // serialize result
+        objectOutput.writeObject(result);
+        // copy to cache
+        cacheAnnisResult.put(result.getStartNodeId() + "," + result.getEndNodeId(),
+          bos.toByteArray());
+
         if(count++ != 0)
         {
           json.append("\n,");

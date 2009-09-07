@@ -81,7 +81,7 @@ public class AudioVisualizer extends WriterVisualizer
     try
     {
       saxParser = factory.newSAXParser();
-      saxParser.parse(new ByteArrayInputStream(super.paula.getBytes()), handler);
+      saxParser.parse(new ByteArrayInputStream(getPaula().getBytes()), handler);
 
     }
     catch(Exception ex)
@@ -93,9 +93,9 @@ public class AudioVisualizer extends WriterVisualizer
     {
 
       writer.append(
-        "<embed src=\"" + contextPath + "/mediaplayer/mediaplayer.swf\" " +
+        "<embed src=\"" + getContextPath() + "/mediaplayer/mediaplayer.swf\" " +
         "width=\"400\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" " +
-        "flashvars=\"width=400&height=300&file=" + contextPath + "/secure/Binary/" + audioID + ".mp3\"	/>");
+        "flashvars=\"width=400&height=300&file=" + getContextPath() + "/secure/Binary/" + audioID + ".mp3\"	/>");
 
     }
     catch(IOException ex)

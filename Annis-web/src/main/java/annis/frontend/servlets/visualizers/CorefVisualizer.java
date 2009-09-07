@@ -53,11 +53,11 @@ public class CorefVisualizer extends WriterVisualizer
       writer.append("<html>");
       writer.append("<head>");
 
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/extjs/ext-all.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
 
-      writer.append("<link href=\"" + contextPath + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + contextPath + "/javascript/annis/visualizer/CorefVisualizer.js\"></script>");
+      writer.append("<link href=\"" + getContextPath() + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/CorefVisualizer.js\"></script>");
 
       writer.append("</head>");
       writer.append("<body>");
@@ -210,7 +210,7 @@ public class CorefVisualizer extends WriterVisualizer
   {
 
     String style = "";
-    if(markableMap.containsKey("" + id))
+    if(getMarkableMap().containsKey("" + id))
     {
       style += "color:red; ";
     }
