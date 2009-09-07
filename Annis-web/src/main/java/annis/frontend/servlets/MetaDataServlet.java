@@ -130,24 +130,5 @@ public class MetaDataServlet extends HttpServlet
 
     return md;
   }
-
-//
-//  private List<SortedMap<String, String>> createDummyData(long id)
-//  {
-//    LinkedList<SortedMap<String, String>> result = new LinkedList<SortedMap<String, String>>();
-//
-//    TreeMap<String, String> map1 = new TreeMap<String, String>();
-//    map1.put("author", "Thomas Krause");
-//    map1.put("language", "de-DE");
-//
-//    TreeMap<String, String> map2 = new TreeMap<String, String>();
-//    map2.put("organization", "Lehrstuhl für Korpuslinguistik");
-//    map2.put("type", "Essay");
-//
-//    result.add(map1);
-//    result.add(map2);
-//
-//    return result;
-//  }
 }
 

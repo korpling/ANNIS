@@ -28,7 +28,7 @@ public interface Cache {
 	public abstract void put(String key, byte[] value);
 
 	public abstract void invalidateAll();
-
+  
 	public abstract void invalidate();
 
 }
