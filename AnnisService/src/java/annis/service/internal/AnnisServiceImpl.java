@@ -23,6 +23,7 @@ import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisContingencyTable;
 import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSetImpl;
@@ -100,11 +101,17 @@ public class AnnisServiceImpl implements AnnisService {
 		return new AnnisAttributeSetImpl(annisDao.listNodeAnnotations(corpusList, fetchValues));
 	}
 	
-	// TODO: implement getPaula
 	public String getPaula(Long textId) throws RemoteException {
 		AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
 		if (graph != null)
 			return new AnnisResultImpl(graph).getPaula();
+		throw new AnnisServiceException("no text found with id = " + textId);
+	}
+	
+	public AnnisResult getAnnisResult(Long textId) throws RemoteException {
+		AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
+		if (graph != null)
+			return new AnnisResultImpl(graph);
 		throw new AnnisServiceException("no text found with id = " + textId);
 	}
 

@@ -9,10 +9,12 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
+import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisContingencyTable;
 import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 
 public interface AnnisService extends Remote {
@@ -69,7 +71,16 @@ public interface AnnisService extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
+	@Deprecated
 	public String getPaula(Long textId) throws RemoteException;
+	
+	/**
+	 * 
+	 * @param textId The id of the text to get the annotation graph from.
+	 * @return
+	 * @throws RemoteException
+	 */
+	public AnnisResult getAnnisResult(Long textId) throws RemoteException;
 	
 	/**
 	 * Get an Annis Binary object identified by its id.
