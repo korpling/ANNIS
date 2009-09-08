@@ -746,7 +746,7 @@ Ext.onReady(function()
 
 
   // highlight tutorial
-  Ext.get('tutorial').frame('ff0000', 2);
+  Ext.get('tutorial').frame('ff0000', 5);
   
 });
 
