@@ -1,5 +1,9 @@
 package annis.frontend.servlets.visualizers;
 
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
 import edu.uci.ics.jung.algorithms.layout.DAGLayout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedOrderedSparseMultigraph;
@@ -11,18 +15,11 @@ import java.awt.Paint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.apache.commons.collections15.Transformer;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
-import org.jdom.xpath.XPath;
 
 /**
  *
@@ -34,50 +31,61 @@ public class JUNGTreeVisualizer extends Visualizer
   @Override
   public void writeOutput(OutputStream outstream)
   {
-    final Document doc = getPaulaJDOM();
-    DirectedGraph<PaulaVertex, PaulaEdge> g = generateGraphFromPaula(doc);
+    DirectedGraph<AnnisNode, Edge> g = generateGraphFromModel(getResult().getGraph());
 
-    DAGLayout<PaulaVertex, PaulaEdge> dagLayout = new DAGLayout<PaulaVertex, PaulaEdge>(g);
+    DAGLayout<AnnisNode, Edge> dagLayout = new DAGLayout<AnnisNode, Edge>(g);
     dagLayout.initialize();
     dagLayout.done();
 
-    VisualizationViewer<PaulaVertex, PaulaEdge> vv =
-      new VisualizationViewer<PaulaVertex, PaulaEdge>(dagLayout);
+    VisualizationViewer<AnnisNode, Edge> vv =
+      new VisualizationViewer<AnnisNode, Edge>(dagLayout);
 
     vv.setSize(dagLayout.getSize().width, dagLayout.getSize().height);
     vv.setBackground(Color.WHITE);
     vv.setDoubleBuffered(false);
 
-    // use id as vertex label (just as a test)
-    vv.getRenderContext().setVertexLabelTransformer(new Transformer<PaulaVertex, String>()
+    // vertex label
+    vv.getRenderContext().setVertexLabelTransformer(new Transformer<AnnisNode, String>()
     {
 
-      public String transform(PaulaVertex input)
+      @Override
+      public String transform(AnnisNode input)
       {
-        if(input.cat != null)
+        StringBuilder result = new StringBuilder();
+        
+        // add annotations
+        if(input.getNodeAnnotations().size() > 0)
         {
-          return input.cat;
-        }
-        else if(input.value != null)
-        {
-          return input.value;
+          for(Annotation a : input.getNodeAnnotations())
+          {
+            if(getNamespace().equals(a.getNamespace()))
+            {
+              result.append(a.getName());
+              result.append(":");
+              result.append(a.getValue());
+              result.append("\n");
+            }
+          }
         }
         else
         {
-          return Long.toString(input.id);
+          // use ID as fallback
+          result.append(input.getId());
         }
+        return result.toString();
       }
     });
 
     final Map<String, String> markableMapFinal = getMarkableMap();
 
-    vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<PaulaVertex, Paint>()
+    vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<AnnisNode, Paint>()
     {
 
-      public Paint transform(PaulaVertex input)
+      @Override
+      public Paint transform(AnnisNode input)
       {
-        String idAsString = Long.toString(input.id);
-
+        String idAsString = Long.toString(input.getId());
+        
         if(markableMapFinal.containsKey(idAsString))
         {
           String markerColor = markableMapFinal.get(idAsString);
@@ -98,18 +106,29 @@ public class JUNGTreeVisualizer extends Visualizer
     });
 
     // render edge labels
-    vv.getRenderContext().setEdgeLabelTransformer(new Transformer<PaulaEdge, String>()
+    vv.getRenderContext().setEdgeLabelTransformer(new Transformer<Edge, String>()
     {
 
-      public String transform(PaulaEdge input)
+      @Override
+      public String transform(Edge input)
       {
-        return input.label;
+        StringBuilder result = new StringBuilder();
+
+        for(Annotation a : input.getAnnotations())
+        {
+          result.append(a.getName());
+          result.append(":");
+          result.append(a.getValue());
+          result.append("\n");
+        }
+
+        return result.toString();
       }
     });
     vv.getRenderContext().getEdgeLabelRenderer().setRotateEdgeLabels(false);
 
     // straight lines
-    vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<PaulaVertex, PaulaEdge>());
+    vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<AnnisNode, Edge>());
 
     // create new image to paint on
     BufferedImage image = new BufferedImage(vv.getWidth(), vv.getHeight(),
@@ -146,170 +165,41 @@ public class JUNGTreeVisualizer extends Visualizer
     return "latin1";
   }
 
-  public DirectedGraph<PaulaVertex, PaulaEdge> generateGraphFromPaula(Document paula)
+  public DirectedGraph<AnnisNode, Edge> generateGraphFromModel(AnnotationGraph annoGraph)
   {
-    DirectedGraph<PaulaVertex, PaulaEdge> g = 
-      new DirectedOrderedSparseMultigraph<PaulaVertex, PaulaEdge>();
-
-    // matching namespace
-    Namespace nsTree = Namespace.getNamespace(getNamespace(), getNamespace());
+    DirectedGraph<AnnisNode, Edge> g =
+      new DirectedOrderedSparseMultigraph<AnnisNode, Edge>();
 
     // get all token (so that they have the right order)
-    Iterator<Element> itToken = paula.getRootElement().getDescendants(new ElementFilter("tok"));
-    while(itToken.hasNext())
+    for(AnnisNode tok : annoGraph.getTokens())
     {
-      Element e = itToken.next();
-      PaulaVertex v = new PaulaVertex();
-      String idAsString = e.getAttributeValue("_id");
-      if(idAsString != null)
-      {
-        try
-        {
-          v.id = Long.parseLong(idAsString);
-          g.addVertex(v);
-        }
-        catch(NumberFormatException ex)
-        {
-          // ignore
-        }
-      }
+      g.addVertex(tok);
     }
-
-    // get all edges (and other nodes that you may find on your way)
-    Iterator<Element> itRel = paula.getRootElement().getDescendants(new ElementFilter("_rel"));
-    while(itRel.hasNext())
+    
+    // get all dominance edges (and other nodes that you may find on your way)
+    for(Edge e : annoGraph.getEdges())
     {
-      Element el = itRel.next();
-
-      String func = el.getAttributeValue("func", nsTree); // only get the one with the right namespace
-      String src = el.getAttributeValue("_src");
-      String dst = el.getAttributeValue("_dst");
-
-      if(func != null && src != null && dst != null)
+      // filter  namespace
+      boolean nsFound = false;
+      for(Annotation a : e.getAnnotations())
       {
-        try
+        if(getNamespace().equals(a.getNamespace()))
         {
-          long srcL = Long.parseLong(src);
-          long dstL = Long.parseLong(dst);
-
-          PaulaEdge edge = new PaulaEdge();
-          edge.src = srcL;
-          edge.dst = dstL;
-          edge.label = func;
-
-          PaulaVertex vSrc = new PaulaVertex();
-          vSrc.id = srcL;
-
-          PaulaVertex vDst = new PaulaVertex();
-          vDst.id = dstL;
-
-          g.addVertex(vSrc);
-          g.addVertex(vDst);
-          g.addEdge(edge, vSrc, vDst);
-
-        }
-        catch(NumberFormatException ex)
-        {
-          // ignore
+          nsFound = true;
+          break;
         }
       }
-    }
 
-    // find cat or value for every node
-    for(PaulaVertex v : g.getVertices())
-    {
-      try
+      if(nsFound)
       {
-        // try to find element with that id
-        XPath p = XPath.newInstance("//*[@_id=" + v.id + "]");
-        Element e = (Element) p.selectSingleNode(paula);
-        if(e != null)
-        {
-          v.cat = e.getAttributeValue("cat", nsTree);
-          v.value = e.getTextTrim();
-        }
-      }
-      catch(JDOMException ex)
-      {
-        Logger.getLogger(JUNGTreeVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+        g.addVertex(e.getDestination());
+        g.addVertex(e.getSource());
+        g.addEdge(e, e.getSource(), e.getDestination());
       }
     }
 
     return g;
   }
 
-  public class PaulaEdge
-  {
 
-    public long src;
-    public long dst;
-    public String label;
-
-    @Override
-    public boolean equals(Object obj)
-    {
-      if(obj == null)
-      {
-        return false;
-      }
-      if(getClass() != obj.getClass())
-      {
-        return false;
-      }
-      final PaulaEdge other = (PaulaEdge) obj;
-      if(this.src != other.src)
-      {
-        return false;
-      }
-      if(this.dst != other.dst)
-      {
-        return false;
-      }
-      return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-      int hash = 5;
-      hash = 89 * hash + (int) (this.src ^ (this.src >>> 32));
-      hash = 89 * hash + (int) (this.dst ^ (this.dst >>> 32));
-      return hash;
-    }
-  }
-
-  public class PaulaVertex
-  {
-
-    public long id;
-    public String cat;
-    public String value;
-
-    @Override
-    public boolean equals(Object obj)
-    {
-      if(obj == null)
-      {
-        return false;
-      }
-      if(getClass() != obj.getClass())
-      {
-        return false;
-      }
-      final PaulaVertex other = (PaulaVertex) obj;
-      if(this.id != other.id)
-      {
-        return false;
-      }
-      return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-      int hash = 3;
-      hash = 79 * hash + (int) (this.id ^ (this.id >>> 32));
-      return hash;
-    }
-  }
 }
