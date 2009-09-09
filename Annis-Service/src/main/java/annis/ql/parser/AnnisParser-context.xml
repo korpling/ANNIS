@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	">
+	
+	<!-- Annis QL Parser -->
+	<bean id="annisParser" class="annis.ql.parser.AnnisParser">
+		<lookup-method name="getInternalParser" bean="annisInternalParser"/>
+		<lookup-method name="getPostProcessors" bean="annisParserPostProcessors"/>
+	</bean>
+	
+	<!-- internal SableCC parser -->
+	<bean id="annisInternalParser" class="annis.ql.parser.AnnisParser$InternalParser" scope="prototype"/>
+		
+	<!-- default post-processors -->
+	<util:list id="annisParserPostProcessors" value-type="annis.ql.analysis.DepthFirstAdapter" scope="prototype">
+		<bean class="annis.ql.parser.NodeSearchNormalizer" scope="prototype" />
+		<bean class="annis.ql.parser.TokenSearchNormalizer" scope="prototype" />
+		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
+	</util:list>
+
+</beans>
