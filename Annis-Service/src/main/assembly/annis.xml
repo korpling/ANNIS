@@ -2,7 +2,7 @@
 <assembly>
   <id>distribution</id>
   <formats>
-    <format>tar.bz2</format>
+    <format>dir</format>
     <format>tar.gz</format>
     <format>zip</format>
   </formats>
