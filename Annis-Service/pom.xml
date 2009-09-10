@@ -85,7 +85,8 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.4</version>
-      <scope>compile</scope> <!-- this should be "test" -->
+      <scope>test</scope>
+      
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
