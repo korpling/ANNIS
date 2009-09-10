@@ -1,6 +1,8 @@
 package test;
 
+import org.junit.Ignore;
 
+@Ignore
 public class TestConsole {
 
 	public static void main(String[] args) {

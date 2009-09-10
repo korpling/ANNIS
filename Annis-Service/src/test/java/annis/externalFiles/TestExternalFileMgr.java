@@ -17,6 +17,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 // FIXME: test ExternalFileMgr
 @SuppressWarnings("all")
+@Ignore
 public class TestExternalFileMgr
 {
 	private static final String MSG_STD=		"TestEdgeIndex> ";

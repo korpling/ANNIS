@@ -2,6 +2,9 @@ package annis.resolver;
 
 import java.rmi.RMISecurityManager;
 
+import org.junit.Ignore;
+
+@Ignore
 public class AnnisServiceTest {
 	
 	/**

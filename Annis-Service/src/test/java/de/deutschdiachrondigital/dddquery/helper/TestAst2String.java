@@ -8,6 +8,7 @@ import org.junit.Ignore;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
+@Ignore
 public class TestAst2String {
 
 	@Ignore

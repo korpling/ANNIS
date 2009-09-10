@@ -2,9 +2,11 @@ package annis;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 // annis.home sollte nicht im Test, sondern außerhalb gesetzt werden
 @Deprecated
+@Ignore
 public class AnnisHomeTest {
 
 	@BeforeClass

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 
 // FIXME: test AnnisVizDao
+@Ignore
 public class TestAnnisVizDao
 {
 //	 ============================================== private Variablen ==============================================

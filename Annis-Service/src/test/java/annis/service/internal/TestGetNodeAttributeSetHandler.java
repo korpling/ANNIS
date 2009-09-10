@@ -14,6 +14,7 @@ import org.junit.Ignore;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Deprecated
+@Ignore
 public class TestGetNodeAttributeSetHandler {
 
 	@Ignore
