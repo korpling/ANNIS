@@ -11,6 +11,11 @@
       <directory>src/main/dist/</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>src/main/scripts/</directory>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0774</fileMode>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
