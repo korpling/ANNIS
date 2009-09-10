@@ -9,8 +9,12 @@
         path="${path}" revision="${revision}" />
   </step>
 
-  <step id="build" description="Build and package all maven based annis projects">
+  <step id="build all" description="Build all maven based annis projects">
     <sh:exec file="/usr/bin/mvn" args="-f pom.xml -Dmaven.test.skip=true install" />
+  </step>
+
+  <step id="service distribution" description="Package the service distribution">
+    <sh:exec file="/usr/bin/mvn" args="-f Annis-Service/pom.xml -Dmaven.test.skip=true assembly:assembly" />
   </step>
 
   <step id="stop webapp" description="Stop the Annis2-webapp">
