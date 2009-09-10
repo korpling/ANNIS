@@ -142,6 +142,8 @@
         <version>6.1.11</version>
         <configuration>
           
+          <contextPath>Annis-web</contextPath>
+
           <systemProperties>
             <systemProperty>
               <name>java.security.manager</name>
