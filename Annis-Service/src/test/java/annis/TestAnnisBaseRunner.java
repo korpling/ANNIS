@@ -38,32 +38,14 @@ public class TestAnnisBaseRunner {
 		
 	};
 	
-	// annis.home is the current directory
-	private final static String ANNIS_HOME = ".";
-	
 	// object under test
 	private MockAnnisRunner instance;
-	
-	// setup annis.home property once
-	@BeforeClass
-	public static void setupAnnisHome() {
-		// set annis.home property
-		System.setProperty("annis.home", ANNIS_HOME);
-	}
 	
 	// create a fresh instance for each test
 	@Before
 	public void setupRunnerInstance() {
 		// create an instance
 		instance = (MockAnnisRunner) MockAnnisRunner.getInstance("mockAnnisRunner", false, "annis/TestAnnisBaseRunner-context.xml");
-	}
-	
-	// an Annis program has access to the ANNIS_HOME path via the annis.home property
-	// opposite case could be test with Aspect-J AOP, but not Spring AOP
-	@Test
-	public void getAnnisHome() {
-		// test access to ANNIS_HOME path
-		assertThat(MockAnnisRunner.getAnnisHome(), is(ANNIS_HOME));
 	}
 	
 	// a fresh instance has out set to System.out
