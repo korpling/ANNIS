@@ -48,10 +48,11 @@
 
     <dependency>
       <groupId>postgresql</groupId>
-      <artifactId>postgresql-copy</artifactId>
-      <version>8.2-505.jdbc3</version>
+      <artifactId>postgresql</artifactId>
+      <version>8.4-701.jdbc4</version>
       <scope>compile</scope>
     </dependency>
+   
 
     <dependency>
       <groupId>org.aspectj</groupId>

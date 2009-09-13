@@ -10,13 +10,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
 import org.postgresql.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 
 import annis.AnnisRunnerException;
+import org.apache.log4j.Logger;
 
 public class CorpusAdministration {
 
@@ -142,9 +142,9 @@ public class CorpusAdministration {
 
 		// DriverManagerDataSource is deprecated
 		// return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
-		
+
 		// why is this better?
-		// XXX: how to construct the datasource?
+		// XXX: how to construct the datasource?    
 		return new SimpleDriverDataSource(new Driver(), url, user, password);
 	}
 	

@@ -34,6 +34,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import annis.externalFiles.ExternalFileMgr;
 import annis.externalFiles.ExternalFileMgrDAO;
 import annis.externalFiles.ExternalFileMgrImpl;
+import org.postgresql.Driver;
 
 /**
  * - Transaktionen
@@ -402,9 +403,13 @@ public class SpringAnnisAdministrationDao {
 		try {
 			// retrieve the currently open connection if running inside a transaction
 			Connection con = DataSourceUtils.getConnection(dataSource);
-			
-			// COPY mechanism for PostgreSQL, see http://kato.iki.fi/sw/db/postgresql/jdbc/copy/
-			((PGConnection) con).getCopyAPI().copyIntoDB(sql, resource.getInputStream());
+
+      // Postgres JDBC4 8.4 driver now supports the copy API
+      PGConnection pgCon = (PGConnection) con;
+      pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
+      
+//			// COPY mechanism for PostgreSQL, see http://kato.iki.fi/sw/db/postgresql/jdbc/copy/
+//			((PGConnection) con).getCopyAPI().copyIntoDB(sql, resource.getInputStream());
 			
 			// XXX: does this connection leak when it is not transaction managed?
 			// can't close it, otherwise the next time it is used in code that does run
