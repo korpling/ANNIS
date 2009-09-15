@@ -205,7 +205,6 @@ public abstract class Visualizer
   {
     return "text/html";
   }
-  ;
 
   /**
    * Returns the character endocing for this particular Visualizer output. For more information see {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}.
