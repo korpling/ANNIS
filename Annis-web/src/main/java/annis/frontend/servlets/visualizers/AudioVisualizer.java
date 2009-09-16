@@ -93,9 +93,13 @@ public class AudioVisualizer extends WriterVisualizer
     {
 
       writer.append(
-        "<embed src=\"" + getContextPath() + "/mediaplayer/mediaplayer.swf\" " +
-        "width=\"400\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" " +
-        "flashvars=\"width=400&height=300&file=" + getContextPath() + "/secure/Binary/" + audioID + ".mp3\"	/>");
+        "<object type=\"application/x-shockwave-flash\" data=\"" + getContextPath() + "/mediaplayer/player_mp3_maxi.swf\" width=\"200\" height=\"20\">\n"
+       + "<param name=\"movie\" value=\"" + getContextPath() + "/secure/Binary/" + audioID + ".mp3\" />\n"
+       + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
+       + "<param name=\"FlashVars\" value=\"mp3=" 
+        + getContextPath() + "/secure/Binary/" + audioID + ".mp3"
+        + "&amp;width=85&amp;showstop=1&amp;showvolume=1&amp;showslider=0&amp;bgcolor1=dfe8f6&amp;bgcolor2=bad0ee&amp;sliderovercolor=ffffff&amp;buttoncolor=000000&amp;buttonovercolor=ffffff&amp;textcolor=000000\" />\n"
+       + "</object>");
 
     }
     catch(IOException ex)
