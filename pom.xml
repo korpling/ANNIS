@@ -20,6 +20,11 @@
   <version>2.1-SNAPSHOT</version>
   
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
+
+  <scm>
+    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/annis/trunk</developerConnection>
+  </scm>
+
   <organization>
     <name>SFB 632</name>
     <url>http://www.sfb632.uni-potsdam.de/</url>
