@@ -145,6 +145,7 @@ public class VisualizerServlet extends HttpServlet
         if(propsUseText.containsKey(namespace))
         {
           isUseTextId = true;
+          
         }
       }
 

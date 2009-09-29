@@ -222,35 +222,123 @@ public class AnnisNode implements Serializable {
 		return qName(namespace, name);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof AnnisNode))
-			return false;
+  @Override
+  public boolean equals(Object obj)
+  {
+    if(obj == null)
+    {
+      return false;
+    }
+    if(getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final AnnisNode other = (AnnisNode) obj;
+    if(this.id != other.id)
+    {
+      return false;
+    }
+    if(this.corpus != other.corpus)
+    {
+      return false;
+    }
+    if(this.textId != other.textId)
+    {
+      return false;
+    }
+    if(this.left != other.left)
+    {
+      return false;
+    }
+    if(this.right != other.right)
+    {
+      return false;
+    }
+    if((this.spannedText == null) ? (other.spannedText != null) : !this.spannedText.equals(other.spannedText))
+    {
+      return false;
+    }
+    if(this.leftToken != other.leftToken)
+    {
+      return false;
+    }
+    if(this.nodeAnnotations != other.nodeAnnotations && (this.nodeAnnotations == null || !this.nodeAnnotations.equals(other.nodeAnnotations)))
+    {
+      return false;
+    }
+    if((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
+    {
+      return false;
+    }
+    if((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+    {
+      return false;
+    }
+    if(this.partOfEdge != other.partOfEdge)
+    {
+      return false;
+    }
+    if(this.root != other.root)
+    {
+      return false;
+    }
+    if(this.token != other.token)
+    {
+      return false;
+    }
+    if(this.spanTextMatching != other.spanTextMatching)
+    {
+      return false;
+    }
+    if(this.joins != other.joins && (this.joins == null || !this.joins.equals(other.joins)))
+    {
+      return false;
+    }
+    if((this.variable == null) ? (other.variable != null) : !this.variable.equals(other.variable))
+    {
+      return false;
+    }
+    if(this.edgeAnnotations != other.edgeAnnotations && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
+    {
+      return false;
+    }
+    if((this.marker == null) ? (other.marker != null) : !this.marker.equals(other.marker))
+    {
+      return false;
+    }
+    return true;
+  }
+  
 
-		AnnisNode other = (AnnisNode) obj;
-
-		return new EqualsBuilder()
-			.append(this.id, other.id)
-			.append(this.corpus, other.corpus)
-			.append(this.textId, other.textId)
-			.append(this.left, other.left)
-			.append(this.right, other.right)
-			.append(this.spannedText, other.spannedText)
-			.append(this.leftToken, other.leftToken)
-			.append(this.nodeAnnotations, other.nodeAnnotations)
-			.append(this.name, other.name)
-			.append(this.namespace, other.namespace)
-			.append(this.partOfEdge, other.partOfEdge)
-			.append(this.root, other.root)
-			.append(this.token, other.token)
-			.append(this.spanTextMatching, other.spanTextMatching)
-			.append(this.joins, other.joins)
-			.append(this.variable, other.variable)
-			.append(this.edgeAnnotations, other.edgeAnnotations)
-			.append(this.marker, other.marker)
-			.isEquals();
-	}
-
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (obj == null || !(obj instanceof AnnisNode))
+//			return false;
+//
+//		AnnisNode other = (AnnisNode) obj;
+//
+//		return new EqualsBuilder()
+//			.append(this.id, other.id)
+//			.append(this.corpus, other.corpus)
+//			.append(this.textId, other.textId)
+//			.append(this.left, other.left)
+//			.append(this.right, other.right)
+//			.append(this.spannedText, other.spannedText)
+//			.append(this.leftToken, other.leftToken)
+//			.append(this.nodeAnnotations, other.nodeAnnotations)
+//			.append(this.name, other.name)
+//			.append(this.namespace, other.namespace)
+//			.append(this.partOfEdge, other.partOfEdge)
+//			.append(this.root, other.root)
+//			.append(this.token, other.token)
+//			.append(this.spanTextMatching, other.spanTextMatching)
+//			.append(this.joins, other.joins)
+//			.append(this.variable, other.variable)
+//			.append(this.edgeAnnotations, other.edgeAnnotations)
+//			.append(this.marker, other.marker)
+//			.isEquals();
+//	}
+//
 	@Override
 	public int hashCode() {
 		return (int) id;
@@ -429,3 +517,4 @@ public class AnnisNode implements Serializable {
 	}
 
 }
+
