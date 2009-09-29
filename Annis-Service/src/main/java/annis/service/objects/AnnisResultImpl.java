@@ -27,6 +27,7 @@ import annis.model.Edge;
 import annis.model.Edge.EdgeType;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisToken;
+import java.util.LinkedHashSet;
 
 @Deprecated
 public class AnnisResultImpl implements AnnisResult
@@ -161,11 +162,13 @@ public class AnnisResultImpl implements AnnisResult
 
       // fn: token -> nodes above that token
       Map<AnnisNode, List<AnnisNode>> nodesAboveToken = new HashMap<AnnisNode, List<AnnisNode>>();
+
       for(AnnisNode token : graph.getTokens())
       {
 
         // collect tokens above a node using breadth-first search, to minimize bugs in PAULA-Unart
-        List<AnnisNode> nodesAboveCurrentToken = new ArrayList<AnnisNode>();
+        LinkedHashSet<AnnisNode> nodesAboveCurrentToken = new LinkedHashSet<AnnisNode>();
+
         LinkedList<AnnisNode> queue = new LinkedList<AnnisNode>();
 
         for(Edge edge : token.getIncomingEdges())
@@ -193,8 +196,10 @@ public class AnnisResultImpl implements AnnisResult
         }
 
         // reverse order, so it goes from the roots to the token
-        Collections.reverse(nodesAboveCurrentToken);
-        nodesAboveToken.put(token, nodesAboveCurrentToken);
+        List<AnnisNode> nodeAboveCurrentTokenAsList =
+          new LinkedList<AnnisNode>(nodesAboveCurrentToken);
+        Collections.reverse(nodeAboveCurrentTokenAsList);
+        nodesAboveToken.put(token, nodeAboveCurrentTokenAsList);
       }
 
       // xml header
