@@ -15,20 +15,18 @@
  */
 package annis.frontend.servlets.visualizers;
 
+import annis.model.AnnisNode;
+import annis.model.Edge;
+import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jdom.Attribute;
-import org.jdom.DataConversionException;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
 
 /**
  *
@@ -70,39 +68,24 @@ public class CorefVisualizer extends WriterVisualizer
 
       tokenList = new LinkedList<Long>();
 
-      Iterator<Element> itElements = getPaulaJDOM().getDescendants(new ElementFilter());
-
-      while(itElements.hasNext())
+      // all token
+      for(AnnisToken tok : getResult().getTokenList())
       {
-        Element e = itElements.next();
+        handleTok(tok);
+      }
 
-        if("_rel".equals(e.getName()))
-        {
-          handleRel(e);
-        }
-        else if("tok".equals(e.getName()))
-        {
-          handleTok(e);
-        }
-        else
-        {
-          // collect span->tok
-          Iterator<Element> itTokChild = e.getDescendants(new ElementFilter("tok"));
-          if(itTokChild.hasNext())
-          {
-            Element tok = itTokChild.next();
-            if(e.getAttribute("_id") != null && tok.getAttribute("_id") != null)
-            {
-              long spanID = Long.parseLong(e.getAttributeValue("_id"));
-              long tokID = Long.parseLong(tok.getAttributeValue("_id"));
-              if(span2tok.get(spanID) == null)
-              {
-                span2tok.put(spanID, new HashSet<Long>());
-              }
+      // all edges
+      for(Edge e : getResult().getGraph().getEdges())
+      {
+        handleRel(e);
+      }
 
-              span2tok.get(spanID).add(tokID);
-            }
-          }
+      // for all nodes collect span->tok
+      for(AnnisNode n : getResult().getGraph().getNodes())
+      {
+        if(!n.isToken())
+        {
+          recursiveSpan2Tok(n, n.getId());
         }
       }
 
@@ -149,51 +132,53 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
-  private void handleRel(Element e)
+  private void recursiveSpan2Tok(AnnisNode n, long spanID)
   {
-    Namespace annisNS = Namespace.getNamespace("annis", "annis");
-
-    Attribute srcAtt = e.getAttribute("_src");
-    Attribute dstAtt = e.getAttribute("_dst");
-
-    Attribute typeAtt = e.getAttribute("type", annisNS);
-    if(srcAtt != null && dstAtt != null &&
-      typeAtt != null && "p".equals(typeAtt.getValue()))
+    for(Edge e : n.getOutgoingEdges())
     {
-      Attribute subtypeAtt = e.getAttribute("subtype", annisNS);
-      if(subtypeAtt != null)
+      AnnisNode descendant = e.getDestination();
+      if(descendant.isToken())
       {
-        try
+        if(span2tok.get(spanID) == null)
         {
-          PR pr = new PR(dstAtt.getLongValue(), srcAtt.getLongValue(), subtypeAtt.getValue());
-
-          if(!dst2PR.containsKey(pr.dst))
-          {
-            dst2PR.put(pr.dst, new LinkedList<PR>());
-          }
-          dst2PR.get(pr.dst).add(pr);
-
-          if(!src2PR.containsKey(pr.src))
-          {
-            src2PR.put(pr.src, new LinkedList<PR>());
-          }
-          src2PR.get(pr.src).add(pr);
-
-
-        }
-        catch(DataConversionException ex)
-        {
-          Logger.getLogger(CorefVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+          span2tok.put(spanID, new HashSet<Long>());
         }
 
+        span2tok.get(spanID).add(descendant.getId());
+      }
+      else
+      {
+        recursiveSpan2Tok(descendant, spanID);
       }
     }
-
   }
 
-  private void handleTok(Element e)
+  private void handleRel(Edge e)
   {
-    long elementID = Long.parseLong(e.getAttributeValue("_id"));
+    if(e.getEdgeType() == Edge.EdgeType.POINTING_RELATION &&
+      e.getSource() != null && e.getDestination() != null)
+    {
+
+      PR pr = new PR(e.getDestination().getId(), e.getSource().getId());
+
+      if(!dst2PR.containsKey(pr.dst))
+      {
+        dst2PR.put(pr.dst, new LinkedList<PR>());
+      }
+      dst2PR.get(pr.dst).add(pr);
+
+      if(!src2PR.containsKey(pr.src))
+      {
+        src2PR.put(pr.src, new LinkedList<PR>());
+      }
+      src2PR.get(pr.src).add(pr);
+
+    }
+  }
+
+  void handleTok(AnnisToken t)
+  {
+    long elementID = t.getId();
     tokenList.add(elementID);
 
     if(span2tok.get(elementID) == null)
@@ -202,7 +187,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
     span2tok.get(elementID).add(elementID);
 
-    id2Text.put(elementID, e.getTextNormalize());
+    id2Text.put(elementID, t.getText());
 
   }
 
@@ -275,12 +260,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
 
 
-    writer.append("<span id=\"tok_" + id + "\" " 
-      + "style=\"" + style
-      + "\" onmouseover=\"" + onmouseover
-      + "\" onmouseout=\"" + onmouseout
-      + "\" onclick=\"" + onclick
-      + "\" annis:pr_left=\"" + left + "\" annis:pr_right=\"" + right + "\" >");
+    writer.append("<span id=\"tok_" + id + "\" " + "style=\"" + style + "\" onmouseover=\"" + onmouseover + "\" onmouseout=\"" + onmouseout + "\" onclick=\"" + onclick + "\" annis:pr_left=\"" + left + "\" annis:pr_right=\"" + right + "\" >");
     writer.append(id2Text.get(id));
     writer.append(" ");
     writer.append("</span>");
@@ -291,13 +271,11 @@ public class CorefVisualizer extends WriterVisualizer
 
     public long dst;
     public long src;
-    public String name;
 
-    public PR(long dst, long src, String name)
+    public PR(long dst, long src)
     {
       this.dst = dst;
       this.src = src;
-      this.name = name;
     }
 
     @Override
@@ -320,21 +298,17 @@ public class CorefVisualizer extends WriterVisualizer
       {
         return false;
       }
-      if(this.name != other.name && (this.name == null || !this.name.equals(other.name)))
-      {
-        return false;
-      }
       return true;
     }
 
     @Override
     public int hashCode()
     {
-      int hash = 5;
-      hash = 17 * hash + (int) (this.dst ^ (this.dst >>> 32));
-      hash = 17 * hash + (int) (this.src ^ (this.src >>> 32));
-      hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+      int hash = 3;
+      hash = 47 * hash + (int) (this.dst ^ (this.dst >>> 32));
+      hash = 47 * hash + (int) (this.src ^ (this.src >>> 32));
       return hash;
     }
+
   }
 }
