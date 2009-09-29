@@ -81,12 +81,11 @@ public class CorefVisualizer extends WriterVisualizer
       }
 
       // for all nodes collect span->tok
-      for(AnnisNode n : getResult().getGraph().getNodes())
+      for(AnnisNode n : getResult().getGraph().getTokens())
       {
-        if(!n.isToken())
-        {
-          recursiveSpan2Tok(n, n.getId());
-        }
+        span2tok.put(n.getId(), new HashSet<Long>());
+        span2tok.get(n.getId()).add(n.getId());
+        recursiveSpan2Tok(n, n.getId());
       }
 
       dst2PR_tok = new HashMap<Long, List<PR>>();
@@ -132,24 +131,23 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
-  private void recursiveSpan2Tok(AnnisNode n, long spanID)
+  private void recursiveSpan2Tok(AnnisNode n, long tokenID)
   {
-    for(Edge e : n.getOutgoingEdges())
+    for(Edge e : n.getIncomingEdges())
     {
-      AnnisNode descendant = e.getDestination();
-      if(descendant.isToken())
+      AnnisNode pre = e.getSource();
+
+      if(pre != null)
       {
-        if(span2tok.get(spanID) == null)
+        if(span2tok.get(pre.getId()) == null)
         {
-          span2tok.put(spanID, new HashSet<Long>());
+          span2tok.put(pre.getId(), new HashSet<Long>());
         }
 
-        span2tok.get(spanID).add(descendant.getId());
+        span2tok.get(pre.getId()).add(tokenID);
+        recursiveSpan2Tok(pre, tokenID);
       }
-      else
-      {
-        recursiveSpan2Tok(descendant, spanID);
-      }
+      
     }
   }
 
@@ -309,6 +307,5 @@ public class CorefVisualizer extends WriterVisualizer
       hash = 47 * hash + (int) (this.src ^ (this.src >>> 32));
       return hash;
     }
-
   }
 }
