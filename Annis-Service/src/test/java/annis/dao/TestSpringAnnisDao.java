@@ -347,6 +347,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
+        @Ignore
 	public void listCorpusByName() {
 		final List<String> CORPUS_NAMES = mock(List.class);
 		
