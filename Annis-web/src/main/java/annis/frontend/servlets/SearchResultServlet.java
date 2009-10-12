@@ -327,6 +327,9 @@ public class SearchResultServlet extends HttpServlet
       int matchStart = 0;
       int matchEnd = tokenList.size() - 1;
 //		int matchStart = tokenList.size() - 1, matchEnd = 0;
+
+      long lastTokenIndex = -1;
+
       for(AnnisToken token : tokenList)
       {
         if(hasNodeMarker(token.getId()))
@@ -336,17 +339,39 @@ public class SearchResultServlet extends HttpServlet
 //				if(tokenCount < matchStart)
 //					matchStart = tokenCount;
         }
-        String marker = hasNodeMarker(token.getId()) ? result.getMarkerId(token.getId()) : "";
-        json.append(",'" + tokenCount++ + "':{'_id': " + token.getId() 
-          + ", '_text':'"
-          + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
-          + "', '_marker':'" + marker + "'" + ", '_corpusId':'"
-          + token.getCorpusId() + "'");
-        for(Map.Entry<String, String> annotation : token.entrySet())
+        
+        if(lastTokenIndex == -1)
         {
-          json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
+          lastTokenIndex = token.getTokenIndex();
         }
-        json.append("}");
+        
+        if(token.getTokenIndex() - lastTokenIndex > 1)
+        {
+          // insert empty token (...)
+          json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
+          + ", '_text':'"
+          + "(...)"
+          + "', '_marker':''" + ", '_corpusId':'"
+          + token.getCorpusId() + "'");
+          json.append("}");
+        }
+        else
+        {
+
+          String marker = hasNodeMarker(token.getId()) ? result.getMarkerId(token.getId()) : "";
+          json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
+            + ", '_text':'"
+            + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
+            + "', '_marker':'" + marker + "'" + ", '_corpusId':'"
+            + token.getCorpusId() + "'");
+          for(Map.Entry<String, String> annotation : token.entrySet())
+          {
+            json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
+          }
+          json.append("}");
+        }
+
+        lastTokenIndex = token.getTokenIndex();
       }
       json.append(", '_matchStart' : '" + matchStart + "'");
       json.append(", '_matchEnd' : '" + matchEnd + "'");
