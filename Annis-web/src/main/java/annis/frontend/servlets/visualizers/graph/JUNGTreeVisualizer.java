@@ -1,5 +1,6 @@
-package annis.frontend.servlets.visualizers;
+package annis.frontend.servlets.visualizers.graph;
 
+import annis.frontend.servlets.visualizers.*;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -33,7 +34,7 @@ public class JUNGTreeVisualizer extends Visualizer
   {
     DirectedGraph<AnnisNode, Edge> g = generateGraphFromModel(getResult().getGraph());
 
-    DAGLayout<AnnisNode, Edge> dagLayout = new DAGLayout<AnnisNode, Edge>(g);
+    SuperDAGLayout dagLayout = new SuperDAGLayout(g);
     dagLayout.initialize();
     dagLayout.done();
 
