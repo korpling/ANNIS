@@ -61,8 +61,9 @@ COMMENT ON COLUMN node.name IS 'name of the node';
 COMMENT ON COLUMN node.text_ref IS 'foreign key to text.id';
 COMMENT ON COLUMN node."left" IS 'left text span border (inclusive)';
 COMMENT ON COLUMN node."right" IS 'right text span border (inclusive)';
-COMMENT ON COLUMN node.continuous IS 'true if the span (text ref, left, right) is gap-free, otherwise false';
-COMMENT ON COLUMN node.token_index IS 'token position if the span (text ref, left, right) is a token, otherwise NULL';
+COMMENT ON COLUMN node.continuous IS 'true if the span (text_ref, left, right) is gap-free, otherwise false';
+COMMENT ON COLUMN node.token_index IS 'token position if the span (text_ref, left, right) is a token, otherwise NULL';
+COMMENT ON COLUMN node.span IS 'the covered text if the span is a token, otherwise NULL';
 
 CREATE TABLE component
 (
@@ -90,6 +91,7 @@ COMMENT ON COLUMN rank.pre IS 'pre-order value and primary key';
 COMMENT ON COLUMN rank.post IS 'post-order value';
 COMMENT ON COLUMN rank.node_ref IS 'foreign key to node.id';
 COMMENT ON COLUMN rank.component_ref IS 'foreign key to component.id';
+COMMENT ON COLUMN rank.parent IS 'foreign key to rank.pre of the parent node, or NULL for roots';
 
 CREATE TABLE node_annotation
 (
