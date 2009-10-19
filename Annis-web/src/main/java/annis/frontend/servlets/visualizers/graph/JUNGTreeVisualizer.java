@@ -5,17 +5,20 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import edu.uci.ics.jung.algorithms.layout.DAGLayout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedOrderedSparseMultigraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,18 +55,21 @@ public class JUNGTreeVisualizer extends Visualizer
       public String transform(AnnisNode input)
       {
         StringBuilder result = new StringBuilder();
-        
-        // add annotations
-        if(input.getNodeAnnotations().size() > 0)
+
+        if(input.isToken())
         {
-          for(Annotation a : input.getNodeAnnotations())
+          result.append(input.getSpannedText());
+        }
+        else if(input.getNodeAnnotations().size() > 0)
+        {
           {
-            if(getNamespace().equals(a.getNamespace()))
+            for(Annotation a : input.getNodeAnnotations())
             {
-              result.append(a.getName());
-              result.append(":");
-              result.append(a.getValue());
-              result.append("\n");
+              if(getNamespace().equals(a.getNamespace()))
+              {
+                result.append(a.getValue());
+                result.append("\n");
+              }
             }
           }
         }
@@ -78,6 +84,10 @@ public class JUNGTreeVisualizer extends Visualizer
 
     final Map<String, String> markableMapFinal = getMarkableMap();
 
+    VertexLabelAsShapeRenderer<AnnisNode, Edge> vertexTrans =
+      new VertexLabelAsShapeRenderer<AnnisNode, Edge>(vv.getRenderContext());
+    vv.getRenderContext().setVertexShapeTransformer(vertexTrans);
+    vv.getRenderer().setVertexLabelRenderer(vertexTrans);
     vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<AnnisNode, Paint>()
     {
 
@@ -85,7 +95,7 @@ public class JUNGTreeVisualizer extends Visualizer
       public Paint transform(AnnisNode input)
       {
         String idAsString = Long.toString(input.getId());
-        
+
         if(markableMapFinal.containsKey(idAsString))
         {
           String markerColor = markableMapFinal.get(idAsString);
@@ -100,8 +110,17 @@ public class JUNGTreeVisualizer extends Visualizer
         }
         else
         {
-          return Color.lightGray;
+          return Color.white;
         }
+      }
+    });
+    vv.getRenderContext().setVertexDrawPaintTransformer(new Transformer<AnnisNode, Paint>()
+    {
+
+      @Override
+      public Paint transform(AnnisNode input)
+      {
+        return new Color(255, 255, 255, 0);
       }
     });
 
@@ -116,16 +135,18 @@ public class JUNGTreeVisualizer extends Visualizer
 
         for(Annotation a : input.getAnnotations())
         {
-          result.append(a.getName());
-          result.append(":");
-          result.append(a.getValue());
-          result.append("\n");
+          if(getNamespace().equals(a.getNamespace())
+            && !"--".equals(a.getValue()))
+          {
+            result.append(a.getValue());
+            result.append("\n");
+          }
         }
 
         return result.toString();
       }
     });
-    vv.getRenderContext().getEdgeLabelRenderer().setRotateEdgeLabels(false);
+    vv.getRenderContext().getEdgeLabelRenderer().setRotateEdgeLabels(true);
 
     // straight lines
     vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<AnnisNode, Edge>());
@@ -175,7 +196,7 @@ public class JUNGTreeVisualizer extends Visualizer
     {
       g.addVertex(tok);
     }
-    
+
     // get all dominance edges (and other nodes that you may find on your way)
     for(Edge e : annoGraph.getEdges())
     {
@@ -192,6 +213,7 @@ public class JUNGTreeVisualizer extends Visualizer
 
       if(nsFound)
       {
+        // check if already existing
         if(e.getDestination() != null)
         {
           g.addVertex(e.getDestination());
@@ -200,7 +222,9 @@ public class JUNGTreeVisualizer extends Visualizer
         {
           g.addVertex(e.getSource());
         }
-        if(e.getDestination() != null && e.getSource() != null)
+        // don't add null and only if not already existing
+        if(e.getDestination() != null && e.getSource() != null
+          && g.findEdge(e.getSource(), e.getDestination()) == null)
         {
           g.addEdge(e, e.getSource(), e.getDestination());
         }
@@ -209,6 +233,4 @@ public class JUNGTreeVisualizer extends Visualizer
 
     return g;
   }
-
-
 }
