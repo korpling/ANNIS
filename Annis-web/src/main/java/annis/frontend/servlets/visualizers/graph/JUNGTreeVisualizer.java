@@ -36,7 +36,6 @@ public class JUNGTreeVisualizer extends Visualizer
 
     SuperDAGLayout dagLayout = new SuperDAGLayout(g);
     dagLayout.initialize();
-    dagLayout.done();
 
     VisualizationViewer<AnnisNode, Edge> vv =
       new VisualizationViewer<AnnisNode, Edge>(dagLayout);
@@ -193,9 +192,18 @@ public class JUNGTreeVisualizer extends Visualizer
 
       if(nsFound)
       {
-        g.addVertex(e.getDestination());
-        g.addVertex(e.getSource());
-        g.addEdge(e, e.getSource(), e.getDestination());
+        if(e.getDestination() != null)
+        {
+          g.addVertex(e.getDestination());
+        }
+        if(e.getSource() != null)
+        {
+          g.addVertex(e.getSource());
+        }
+        if(e.getDestination() != null && e.getSource() != null)
+        {
+          g.addEdge(e, e.getSource(), e.getDestination());
+        }
       }
     }
 
