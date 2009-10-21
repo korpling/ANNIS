@@ -597,16 +597,18 @@ Ext.onReady(function()
 
   var btnQueryBuilder = new Ext.Button({
     id: 'btnQueryBuilder',
-    text: 'Query builder',
-    fieldLabel: ' ',
+    text: 'Show >>',
+    fieldLabel: 'Query Builder',
     enableToggle: true,
     toggleHandler: function(button, state) {
       if(state)
       {
+        button.setText('Hide <<');
         windowSearchForm.fireEvent('showQueryBuilder');
       }
       else
       {
+        button.setText('Show >>');
         windowSearchForm.fireEvent('hideQueryBuilder');
       }
     }
@@ -645,7 +647,7 @@ Ext.onReady(function()
       width: 200,
       height: 40,
       xtype: 'textarea',
-      fieldLabel: 'Match Count / Status',
+      fieldLabel: 'Result',
       name: 'matchCount',
       allowBlank:true,
       readOnly: true
