@@ -516,7 +516,7 @@ Ext.onReady(function()
     cm: corpusListCm,
     sm: corpusListSelectionModel,
     //width: 330,
-    height: 195,
+    height: 255,
     stripeRows: true,
     title:'Available Corpora',
     header: false,
@@ -618,12 +618,13 @@ Ext.onReady(function()
     title: 'AnnisQL',
     header: false,
     width: 330,
-    height: 300,
+    height: 420,
     defaultType: 'textfield',
     monitorValid: true,
     items: [{
       id: 'queryAnnisQL',
       width: 200,
+      height: 80,
       fieldLabel: 'AnnisQL',
       name: 'queryAnnisQL',
       allowBlank:true,
@@ -642,7 +643,9 @@ Ext.onReady(function()
     {
       id: 'matchCount',
       width: 200,
-      fieldLabel: 'Match Count',
+      height: 40,
+      xtype: 'textarea',
+      fieldLabel: 'Match Count / Status',
       name: 'matchCount',
       allowBlank:true,
       readOnly: true
@@ -655,7 +658,7 @@ Ext.onReady(function()
 		    
   var panelSearchModes = new Ext.TabPanel({
     width: 330,
-    height: 270,
+    height: 150,
     activeTab: 0,
     items: [
       formPanelSimpleSearch,
