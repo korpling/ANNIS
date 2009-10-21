@@ -18,7 +18,7 @@ public class AnnisServiceExceptionHandler {
 	public void convertException(Exception e) throws AnnisServiceException {
 		StringWriter stackTrace = new StringWriter();
 		e.printStackTrace(new PrintWriter(stackTrace));
-		throw new AnnisServiceException(stackTrace.toString());
+		throw new AnnisServiceException(e.getLocalizedMessage());
 	}
 	
 }

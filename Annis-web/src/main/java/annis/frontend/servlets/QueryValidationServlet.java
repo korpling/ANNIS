@@ -16,6 +16,8 @@
 package annis.frontend.servlets;
 
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.exceptions.ParseException;
+import annis.ql.parser.ParserException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
@@ -67,13 +69,9 @@ public class QueryValidationServlet extends HttpServlet
         out.println("Invalid Query");
       }
     }
-    catch(AnnisServiceFactoryException e)
+    catch(Exception e)
     {
-      out.println("ERROR: " + e.getMessage());
-    }
-    catch(AnnisServiceException e)
-    {
-      out.println(e.getMessage());
+      out.println(e.getLocalizedMessage());
     }
 
   }

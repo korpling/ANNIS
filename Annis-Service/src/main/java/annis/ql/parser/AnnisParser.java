@@ -61,10 +61,10 @@ public class AnnisParser {
 
 		} catch (ParserException e) {
 			log.warn("an exception occured on the query: " + annisQuery, e);
-			throw new ParseException("error parsing: " + annisQuery + "; " + e.getMessage(), e);
+      throw new ParseException(e.getLocalizedMessage(), e);
 		} catch (LexerException e) {
 			log.warn("an exception occured on the query: " + annisQuery, e);
-			throw new ParseException(e);
+			throw new ParseException(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
 			log.warn("an exception occured on the query: " + annisQuery, e);
 			throw new ParseException(e);
