@@ -98,8 +98,13 @@ public class WekaDaoHelper implements ResultSetExtractor {
 				AnnisNode annisNode = nodeById.get(span.getStructId());
 				if (columnsByNodePos.get(j) == null)
 					columnsByNodePos.put(j, new TreeSet<String>());
-				for (Annotation annotation : annisNode.getNodeAnnotations())
-					columnsByNodePos.get(j).add(annotation.getQualifiedName());
+        if(annisNode != null && annisNode.getNodeAnnotations() != null)
+        {
+          for (Annotation annotation : annisNode.getNodeAnnotations())
+          {
+            columnsByNodePos.get(j).add(annotation.getQualifiedName());
+          }
+        }
 			}
 		}
 		
