@@ -176,10 +176,50 @@ Ext.onReady(function()
     
   }
   // end getResult
+
+  function showWeka()
+  {
+    if("" === formPanelSearch.getComponent('queryAnnisQL').getValue())
+    {
+      Ext.MessageBox.show({
+        title: 'ERROR',
+        msg: 'Empty query',
+        icon: Ext.MessageBox.ERROR,
+        buttons: Ext.MessageBox.OK
+      });
+      Ext.Msg.alert('ERROR', 'Empty query');
+      return;
+    }
+
+    if(!corpusListSelectionModel.hasSelection())
+    {
+      formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");
+      return;
+    }
+
+    //Gather selections
+    var selections = corpusListSelectionModel.getSelections();
+    var corpusIdString = "";
+    for(var i=0;i<selections.length;i++)
+    {
+      if(i !== 0)
+      {
+        corpusIdString += ",";
+      }
+      corpusIdString += selections[i].id;
+    }
+
+    // open a new browser window/tab
+    var url = conf_context + '/secure/WekaExporter?queryAnnisQL='
+      + Url.encode(formPanelSearch.getComponent('queryAnnisQL').getValue())
+      + '&corpusIds=' + corpusIdString;
+    window.open(url, 'WekaExport');
+  }
    		
   function setSearchButtonDisabled(disabled) 
   {
     Ext.ComponentMgr.get('btnSearch').setDisabled(disabled);
+    Ext.ComponentMgr.get('btnWeka').setDisabled(disabled);
   }
   // end setSearchButtonDisabled
 
@@ -531,6 +571,31 @@ Ext.onReady(function()
     buttonAlign:'center'
   });
 
+  var formPanelStatistics = new Ext.FormPanel({
+    id: 'formPanelStatistics',
+    frame:false,
+    bodyStyle:
+    {
+      background:'#DFE8F6'
+    },
+    style:
+    {
+      background:'#DFE8F6'
+    },
+    title: 'Statistics',
+    height: 200,
+    items: [],
+    buttons: [{
+      id: 'btnWeka',
+      text: 'Weka Export',
+      disabled: false,
+      listeners: {
+        click: showWeka
+      }
+    }],
+    buttonAlign:'center'
+  });
+
   var btnQueryBuilder = new Ext.Button({
     id: 'btnQueryBuilder',
     text: 'Query builder',
@@ -594,11 +659,9 @@ Ext.onReady(function()
     height: 270,
     activeTab: 0,
     items: [
-    formPanelSimpleSearch,
-    {
-      title: 'Statistics',
-      frame:true
-    }]
+      formPanelSimpleSearch,
+      formPanelStatistics
+    ]
   });
 
 			
