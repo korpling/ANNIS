@@ -81,8 +81,12 @@ public class WekaDaoHelper implements ResultSetExtractor {
 		
 		// fn: id -> AnnisNode
 		Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
-		for (AnnisNode node : annotatedNodes) {
-			nodeById.put(node.getId(), node);
+		for (AnnisNode node : annotatedNodes) 
+    {
+      if(node != null)
+      {
+        nodeById.put(node.getId(), node);
+      }
 		}
 		
 		// header: relation name (unused)
@@ -132,9 +136,10 @@ public class WekaDaoHelper implements ResultSetExtractor {
           for (Annotation annotation : annisNode.getNodeAnnotations()) {
             valueByName.put(annotation.getQualifiedName(), annotation.getValue());
           }
+          line.add("'" + annisNode.getId() + "'");
+          line.add("'" + (annisNode.isToken() ? annisNode.getSpannedText() : "NULL") + "'");
         }
-				line.add("'" + annisNode.getId() + "'");
-				line.add("'" + (annisNode.isToken() ? annisNode.getSpannedText() : "NULL") + "'");
+				
 				for (String name : columnsByNodePos.get(k)) {
 					if (valueByName.containsKey(name))
 						line.add("'" + valueByName.get(name) + "'");
