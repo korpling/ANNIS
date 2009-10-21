@@ -179,8 +179,7 @@ Ext.onReady(function()
    		
   function setSearchButtonDisabled(disabled) 
   {
-    Ext.ComponentMgr.get('btnSimpleSearch').setDisabled(disabled);
-    Ext.ComponentMgr.get('btnQueryBuilder').setDisabled(disabled);
+    Ext.ComponentMgr.get('btnSearch').setDisabled(disabled);
   }
   // end setSearchButtonDisabled
 
@@ -199,7 +198,9 @@ Ext.onReady(function()
       {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
         formPanelSearch.getComponent('matchCount').getEl().
-          frame('ff0000', 1, {duration:3});
+        frame('ff0000', 1, {
+          duration:3
+        });
 
         //the submit button
         setSearchButtonDisabled(false);
@@ -505,10 +506,14 @@ Ext.onReady(function()
     id: 'formPanelSimpleSearch',
     frame:false,
     bodyStyle:
-      {background:'#DFE8F6'},
+    {
+      background:'#DFE8F6'
+    },
     style:
-      {background:'#DFE8F6'},
-    title: 'Simple Search',
+    {
+      background:'#DFE8F6'
+    },
+    title: 'Search',
     height: 200,
     items: [ 
     padLeftComboBox,
@@ -516,7 +521,7 @@ Ext.onReady(function()
     resultLengthComboBox
     ],
     buttons: [{
-      id: 'btnSimpleSearch',
+      id: 'btnSearch',
       text: 'Show Result',
       disabled: false,
       listeners: {
@@ -524,6 +529,22 @@ Ext.onReady(function()
       }
     }],
     buttonAlign:'center'
+  });
+
+  var btnQueryBuilder = new Ext.Button({
+    id: 'btnQueryBuilder',
+    text: 'Query builder',
+    enableToggle: true,
+    toggleHandler: function(button, state) {
+      if(state)
+      {
+        windowSearchForm.fireEvent('showQueryBuilder');
+      }
+      else
+      {
+        windowSearchForm.fireEvent('hideQueryBuilder');
+      }
+    }
   });
 		
   var formPanelSearch = new Ext.FormPanel({
@@ -551,7 +572,9 @@ Ext.onReady(function()
           scope: this
         }
       }
-    },{
+    },
+    btnQueryBuilder,
+    {
       id: 'matchCount',
       width: 200,
       fieldLabel: 'Match Count',
@@ -564,36 +587,6 @@ Ext.onReady(function()
 	           	
   });
 
-  var formPanelQueryBuilder = new Ext.FormPanel({
-    title : 'Query Builder',
-    frame: true,
-    listeners: {
-      'activate': {
-        fn: function() {
-          windowSearchForm.fireEvent('showQueryBuilder');
-        },
-        scope: this
-      },
-      'deactivate': {
-        fn: function() {
-          windowSearchForm.fireEvent('hideQueryBuilder');
-        },
-        scope: this
-      }
-    },
-    items: [{
-      // none yet
-    }],
-    buttons: [{
-      id: 'btnQueryBuilder',
-      text: 'Show Result',
-      disabled: false,
-      listeners: {
-        click: getResult
-      }
-    }],
-    buttonAlign:'center'
-  });
 		    
   var panelSearchModes = new Ext.TabPanel({
     width: 330,
@@ -601,7 +594,6 @@ Ext.onReady(function()
     activeTab: 0,
     items: [
     formPanelSimpleSearch,
-    formPanelQueryBuilder,
     {
       title: 'Statistics',
       frame:true
