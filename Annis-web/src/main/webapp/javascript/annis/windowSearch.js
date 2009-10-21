@@ -187,7 +187,6 @@ Ext.onReady(function()
         icon: Ext.MessageBox.ERROR,
         buttons: Ext.MessageBox.OK
       });
-      Ext.Msg.alert('ERROR', 'Empty query');
       return;
     }
 
