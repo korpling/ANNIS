@@ -127,9 +127,12 @@ public class WekaDaoHelper implements ResultSetExtractor {
 				Span span = match.get(k);
 				AnnisNode annisNode = nodeById.get(span.getStructId());
 				Map<String, String> valueByName = new HashMap<String, String>();
-				for (Annotation annotation : annisNode.getNodeAnnotations()) {
-					valueByName.put(annotation.getQualifiedName(), annotation.getValue());
-				}
+        if(annisNode != null && annisNode.getNodeAnnotations() != null)
+        {
+          for (Annotation annotation : annisNode.getNodeAnnotations()) {
+            valueByName.put(annotation.getQualifiedName(), annotation.getValue());
+          }
+        }
 				line.add("'" + annisNode.getId() + "'");
 				line.add("'" + (annisNode.isToken() ? annisNode.getSpannedText() : "NULL") + "'");
 				for (String name : columnsByNodePos.get(k)) {
