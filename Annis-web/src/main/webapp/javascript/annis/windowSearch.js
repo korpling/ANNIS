@@ -534,6 +534,7 @@ Ext.onReady(function()
   var btnQueryBuilder = new Ext.Button({
     id: 'btnQueryBuilder',
     text: 'Query builder',
+    fieldLabel: ' ',
     enableToggle: true,
     toggleHandler: function(button, state) {
       if(state)
