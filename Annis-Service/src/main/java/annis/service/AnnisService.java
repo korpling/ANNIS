@@ -9,7 +9,6 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisContingencyTable;
@@ -55,7 +54,19 @@ public interface AnnisService extends Remote {
 	 * @throws AnnisCorpusAccessException
 	 */
 	public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL, int limit, int offset, int contextLeft, int contextRight) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException;
-   
+
+  /**
+	 * Get result in WEKA format
+	 * @param corpusList
+	 * @param annisQL
+	 * @return The WEKA result
+	 * @throws RemoteException
+	 * @throws AnnisQLSemanticsException
+	 * @throws AnnisQLSyntaxException
+	 * @throws AnnisCorpusAccessException
+	 */
+  public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException;
+
 	/**
 	 * 
 	 * @param corpusList

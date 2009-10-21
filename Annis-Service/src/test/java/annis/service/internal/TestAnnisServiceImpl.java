@@ -32,6 +32,7 @@ public class TestAnnisServiceImpl extends AnnisHomeTest {
 		assertThat(annisServiceImpl.getDddQueryParser(), is(not(nullValue())));
 		assertThat(annisServiceImpl.getAnnisDao(), is(not(nullValue())));
 		assertThat(annisServiceImpl.getExternalFileMgr(), is(not(nullValue())));
+    assertThat(annisServiceImpl.getWekaDaoHelper(), is(not(nullValue())));
 		
 		// dependencies for ExternalFileManager
 		ExternalFileMgrImpl externalFileMgrImpl = (ExternalFileMgrImpl) annisServiceImpl.getExternalFileMgr();

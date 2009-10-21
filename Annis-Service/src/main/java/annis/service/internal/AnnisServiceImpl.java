@@ -1,5 +1,6 @@
 package annis.service.internal;
 
+import annis.WekaDaoHelper;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.externalFiles.ExternalFileMgr;
+import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.AnnisService;
@@ -42,6 +44,7 @@ public class AnnisServiceImpl implements AnnisService {
 	private DddQueryMapper dddQueryMapper;
 	private DddQueryParser dddQueryParser;
 	private AnnisDao annisDao;
+  private WekaDaoHelper wekaDaoHelper;
 	private ExternalFileMgr externalFileMgr;
 
 	/**
@@ -147,6 +150,21 @@ public class AnnisServiceImpl implements AnnisService {
 	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException {
 		return annisDao.listCorpusAnnotations(corpusId);
 	}
+
+  @Override
+  public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
+  {
+    StringBuilder out = new StringBuilder();
+    List<Match> matches = annisDao.findMatches(corpusList, translate(annisQL));
+		if ( ! matches.isEmpty() ) {
+			List<AnnisNode> annotatedNodes = annisDao.annotateMatches(matches);
+      out.append(wekaDaoHelper.exportAsWeka(annotatedNodes, matches));
+      out.append("\n");
+		} else
+			out.append("(empty)\n");
+
+    return out.toString();
+  }
 	
 	///// Getter / Setter
 	
@@ -182,4 +200,15 @@ public class AnnisServiceImpl implements AnnisService {
 		this.dddQueryParser = dddQueryParser;
 	}
 
+  public WekaDaoHelper getWekaDaoHelper()
+  {
+    return wekaDaoHelper;
+  }
+
+  public void setWekaDaoHelper(WekaDaoHelper wekaDaoHelper)
+  {
+    this.wekaDaoHelper = wekaDaoHelper;
+  }
+
+  
 }

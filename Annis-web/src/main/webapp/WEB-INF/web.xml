@@ -26,12 +26,12 @@
 	  
 	<!-- USED -->
   <servlet>
-    <servlet-name>ExporterServlet</servlet-name>
-    <servlet-class>annis.frontend.servlets.ExporterServlet</servlet-class>
+    <servlet-name>WekaExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.WekaExporterServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ExporterServlet</servlet-name>
-    <url-pattern>/secure/Exporter</url-pattern>
+    <servlet-name>WekaExporterServlet</servlet-name>
+    <url-pattern>/secure/WekaExporter</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>SearchResultServlet</servlet-name>

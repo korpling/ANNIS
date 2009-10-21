@@ -37,6 +37,7 @@
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="annisDao" ref="springAnnisDao"/>
 		<property name="externalFileMgr" ref="externalFileManager"/>
+    <property name="wekaDaoHelper" ref="wekaDaoHelper"/>
 	</bean>
 
 	<!-- Exception handling aspect for AnnisService -->
