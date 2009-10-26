@@ -22,10 +22,9 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.AnnisBaseRunner;
-import annis.administration.AnnisAdminRunner;
 import annis.administration.CorpusAdministration;
 import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -47,7 +46,7 @@ public class InitDialog extends javax.swing.JDialog
 
     ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("annis/administration/AnnisAdminRunner-context.xml");
     corpusAdministration = (CorpusAdministration) ctx.getBean("corpusAdministration");
-
+    
   }
 
   /** This method is called from within the constructor to
@@ -123,11 +122,11 @@ public class InitDialog extends javax.swing.JDialog
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(jLabel2)
           .addComponent(txtAdminPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(btOk)
           .addComponent(btCancel))
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap())
     );
 
     pack();
@@ -143,16 +142,22 @@ public class InitDialog extends javax.swing.JDialog
     private void btOkActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btOkActionPerformed
     {//GEN-HEADEREND:event_btOkActionPerformed
 
-      if(txtAdminPassword.getPassword() == null)
+      try
       {
-        JOptionPane.showMessageDialog(this, "No password entered", "ERROR", JOptionPane.ERROR_MESSAGE);
-        return;
-      }
+        corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
+          "anniskickstart", "annisKickstartPassword", "postgres",
+          txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
 
-      corpusAdministration.initializeDatabase("localhost", "5432", "annisKickstart",
-        "annisKickstartUser", "annisKickstartPassword", "postgres",
-        txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
-      setVisible(false);
+        JOptionPane.showMessageDialog(null, "Database initialized.", "INFO",
+          JOptionPane.INFORMATION_MESSAGE);
+
+        setVisible(false);
+      }
+      catch(Exception ex)
+      {
+        ExceptionDialog dlg = new ExceptionDialog(null, ex);
+        dlg.setVisible(true);
+      }
 
     }//GEN-LAST:event_btOkActionPerformed
 
