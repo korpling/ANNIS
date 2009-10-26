@@ -91,6 +91,11 @@ public class MainFrame extends javax.swing.JFrame
     btImport.setMnemonic('i');
     btImport.setText("Import corpus");
     btImport.setName("btImport"); // NOI18N
+    btImport.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btImportActionPerformed(evt);
+      }
+    });
 
     btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/RowInsertBefore24.gif"))); // NOI18N
     btList.setMnemonic('l');
@@ -149,6 +154,14 @@ public class MainFrame extends javax.swing.JFrame
     {//GEN-HEADEREND:event_btStartStopActionPerformed
       // TODO add your handling code here:
     }//GEN-LAST:event_btStartStopActionPerformed
+
+    private void btImportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btImportActionPerformed
+    {//GEN-HEADEREND:event_btImportActionPerformed
+
+      ImportDialog dlg = new ImportDialog(this,true, corpusAdministration);
+      dlg.setVisible(true);
+
+    }//GEN-LAST:event_btImportActionPerformed
 
   /**
    * @param args the command line arguments
