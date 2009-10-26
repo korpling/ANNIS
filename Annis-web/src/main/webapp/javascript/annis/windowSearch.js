@@ -543,7 +543,7 @@ Ext.onReady(function()
 		
   var formPanelSimpleSearch = new Ext.FormPanel({
     id: 'formPanelSimpleSearch',
-    frame:false,
+    frame:true,
     bodyStyle:
     {
       background:'#DFE8F6'
@@ -553,7 +553,7 @@ Ext.onReady(function()
       background:'#DFE8F6'
     },
     title: 'Search',
-    height: 200,
+    height: 210,
     items: [ 
     padLeftComboBox,
     padRightComboBox,
@@ -582,7 +582,7 @@ Ext.onReady(function()
       background:'#DFE8F6'
     },
     title: 'Statistics',
-    height: 200,
+    height: 210,
     items: [],
     buttons: [{
       id: 'btnWeka',
@@ -660,7 +660,7 @@ Ext.onReady(function()
 		    
   var panelSearchModes = new Ext.TabPanel({
     width: 330,
-    height: 150,
+    height: 160,
     activeTab: 0,
     items: [
       formPanelSimpleSearch,
