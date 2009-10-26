@@ -40,7 +40,8 @@ public class InitDialog extends javax.swing.JDialog
     initComponents();
 
     this.corpusAdministration = corpusAdministration;
-  
+
+    Helper.centerWindow(this);
   }
 
   /** This method is called from within the constructor to

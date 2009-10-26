@@ -55,6 +55,9 @@ public class MainFrame extends javax.swing.JFrame
     }
 
     initComponents();
+
+    // position window at the center of the screen
+    Helper.centerWindow(this);
   }
 
   /** This method is called from within the constructor to
