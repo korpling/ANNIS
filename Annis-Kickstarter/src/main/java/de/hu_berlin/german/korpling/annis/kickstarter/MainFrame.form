@@ -23,13 +23,13 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="btStartStop" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="btImport" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="btInit" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="btList" alignment="0" pref="376" max="32767" attributes="0"/>
-                  <Component id="btStartStop" alignment="0" pref="376" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -54,6 +54,9 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="btInit">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/New24.gif"/>
+        </Property>
         <Property name="mnemonic" type="int" value="100"/>
         <Property name="text" type="java.lang.String" value="Init database"/>
         <Property name="name" type="java.lang.String" value="btInit" noResource="true"/>
@@ -64,6 +67,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="btImport">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/Import24.gif"/>
+        </Property>
         <Property name="mnemonic" type="int" value="105"/>
         <Property name="text" type="java.lang.String" value="Import corpus"/>
         <Property name="name" type="java.lang.String" value="btImport" noResource="true"/>
@@ -71,6 +77,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="btList">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/RowInsertBefore24.gif"/>
+        </Property>
         <Property name="mnemonic" type="int" value="108"/>
         <Property name="text" type="java.lang.String" value="List imported corpora"/>
         <Property name="name" type="java.lang.String" value="btList" noResource="true"/>
@@ -78,10 +87,16 @@
     </Component>
     <Component class="javax.swing.JButton" name="btStartStop">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/Play24.gif"/>
+        </Property>
         <Property name="mnemonic" type="int" value="115"/>
         <Property name="text" type="java.lang.String" value="Start Annis"/>
         <Property name="name" type="java.lang.String" value="btStartStop" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btStartStopActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
