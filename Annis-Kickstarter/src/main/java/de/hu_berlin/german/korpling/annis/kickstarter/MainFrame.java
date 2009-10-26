@@ -24,9 +24,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -38,6 +36,8 @@ public class MainFrame extends javax.swing.JFrame
   /** Creates new form MainFrame */
   public MainFrame()
   {
+    System.setProperty("annis.home", ".");
+
     try
     {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -129,7 +129,10 @@ public class MainFrame extends javax.swing.JFrame
 
     private void btInitActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btInitActionPerformed
     {//GEN-HEADEREND:event_btInitActionPerformed
-      // TODO: init dialog
+
+      InitDialog dlg = new InitDialog(this, true);
+      dlg.setVisible(true);
+
     }//GEN-LAST:event_btInitActionPerformed
 
     private void btStartStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btStartStopActionPerformed
