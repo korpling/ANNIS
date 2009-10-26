@@ -24,9 +24,6 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
 import javax.swing.JOptionPane;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
@@ -34,19 +31,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class InitDialog extends javax.swing.JDialog
 {
-
-  @Autowired
-  CorpusAdministration corpusAdministration;
+  private CorpusAdministration corpusAdministration;
 
   /** Creates new form InitDialog */
-  public InitDialog(java.awt.Frame parent, boolean modal)
+  public InitDialog(java.awt.Frame parent, boolean modal, CorpusAdministration corpusAdministration)
   {
     super(parent, modal);
     initComponents();
 
-    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("annis/administration/AnnisAdminRunner-context.xml");
-    corpusAdministration = (CorpusAdministration) ctx.getBean("corpusAdministration");
-    
+    this.corpusAdministration = corpusAdministration;
+  
   }
 
   /** This method is called from within the constructor to
@@ -161,29 +155,7 @@ public class InitDialog extends javax.swing.JDialog
 
     }//GEN-LAST:event_btOkActionPerformed
 
-  /**
-   * @param args the command line arguments
-   */
-  public static void main(String args[])
-  {
-    java.awt.EventQueue.invokeLater(new Runnable()
-    {
-
-      public void run()
-      {
-        InitDialog dialog = new InitDialog(new javax.swing.JFrame(), true);
-        dialog.addWindowListener(new java.awt.event.WindowAdapter()
-        {
-
-          public void windowClosing(java.awt.event.WindowEvent e)
-          {
-            System.exit(0);
-          }
-        });
-        dialog.setVisible(true);
-      }
-    });
-  }
+  
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btCancel;
   private javax.swing.JButton btOk;

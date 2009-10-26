@@ -22,9 +22,11 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.CorpusAdministration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
@@ -33,10 +35,15 @@ import javax.swing.UIManager;
 public class MainFrame extends javax.swing.JFrame
 {
 
+  private CorpusAdministration corpusAdministration;
+
   /** Creates new form MainFrame */
   public MainFrame()
   {
+    // init corpusAdministration
     System.setProperty("annis.home", ".");
+    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("annis/administration/AnnisAdminRunner-context.xml");
+    this.corpusAdministration = (CorpusAdministration) ctx.getBean("corpusAdministration");
 
     try
     {
@@ -130,7 +137,7 @@ public class MainFrame extends javax.swing.JFrame
     private void btInitActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btInitActionPerformed
     {//GEN-HEADEREND:event_btInitActionPerformed
 
-      InitDialog dlg = new InitDialog(this, true);
+      InitDialog dlg = new InitDialog(this, true, corpusAdministration);
       dlg.setVisible(true);
 
     }//GEN-LAST:event_btInitActionPerformed
