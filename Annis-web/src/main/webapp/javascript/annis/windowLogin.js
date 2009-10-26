@@ -7,7 +7,29 @@ Ext.onReady(function(){
 
   // turn on validation errors beside the field globally
   Ext.form.Field.prototype.msgTarget = 'side';
-		
+
+  var loginSubmitConfig = {
+    method:'POST',
+    waitTitle:'please wait',
+    waitMsg:'login data is send to server',
+    success: function(f,o)
+    {
+      // redirect to index.html
+      window.location = 'search.html';
+            
+    },
+    failure:function(f,o)
+    {
+      Ext.MessageBox.show(
+      {
+        title: 'Login error',
+        msg: 'Wrong username or password.',
+        icon: Ext.MessageBox.ERROR,
+        buttons: Ext.MessageBox.OK
+      });
+    }
+  };
+	
   var formPanelLogin = new Ext.FormPanel({
     labelWidth: 75, // label settings here cascade unless overridden
     frame:true,
@@ -33,7 +55,7 @@ Ext.onReady(function(){
         specialkey:function(f,o){
           if(o.getKey()==13)
           {
-            formPanelLogin.getForm().getEl().dom.submit();
+            formPanelLogin.getForm().submit(loginSubmitConfig);
           }
         }
       }
@@ -43,15 +65,12 @@ Ext.onReady(function(){
       id: 'btnLogin',
       text: 'Login',
       handler: function() {
-        formPanelLogin.getForm().getEl().dom.submit();
+        formPanelLogin.getForm().submit(loginSubmitConfig);
       }
             		
     }],
     buttonAlign:'center',
-    onSubmit: Ext.emptyFn,
-    submit: function() {
-      this.getForm().getEl().dom.submit();
-    }
+    url: conf_context + '/LoginLogout'
   });
 
   var windowLoginForm = new Ext.Window({

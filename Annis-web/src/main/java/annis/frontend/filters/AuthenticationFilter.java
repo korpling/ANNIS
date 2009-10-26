@@ -19,7 +19,8 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.naming.AuthenticationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -35,89 +36,61 @@ public final class AuthenticationFilter implements Filter
   public static final String KEY_SECURITY_MANAGER = "securityManager";
   public static final String KEY_USER = "user";
   public static final String KEY_LOGIN_ALREADY_TRIED = "loginAlreadyTried";
-  
+
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
   {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-    
-    String userName = httpRequest.getParameter("user");
-    String password = httpRequest.getParameter("password");
-    boolean logout = httpRequest.getParameter("logout") != null;
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
 
     HttpSession session = httpRequest.getSession();
-    
-    String cp = httpRequest.getContextPath();
-    
+
     //store security manger in session
     if(session.getAttribute(KEY_SECURITY_MANAGER) == null)
     {
       session.setAttribute(KEY_SECURITY_MANAGER, this.manager);
     }
-    if(logout)
+
+    // check if logged in
+    if(session.getAttribute(KEY_USER) != null)
     {
-      session.removeAttribute(KEY_USER);
-      ((HttpServletResponse) response).sendRedirect(((HttpServletRequest) request).getRequestURI());
+      chain.doFilter(request, response);
     }
     else
     {
-      try
+      String demoEnabled = props.getProperty("enableDemo", "false");
+      if(!request.isSecure() && "true".equalsIgnoreCase(demoEnabled))
       {
-        if(session.getAttribute(KEY_USER) != null)
+        // show demo account
+        AnnisUser demoUser;
+        try
         {
+          demoUser = manager.login("demo", "demo");
+
+          session.setAttribute(KEY_USER, demoUser);
           chain.doFilter(request, response);
         }
-        else if(userName == null || password == null)
+        catch(NamingException ex)
         {
-          String demoEnabled = props.getProperty("enableDemo", "false");
-          if(!request.isSecure() && "true".equalsIgnoreCase(demoEnabled))
+          try
           {
-            // show demo account
-            AnnisUser demoUser = manager.login("demo", "demo");
-            session.setAttribute(KEY_USER, demoUser);
-            chain.doFilter(request, response);
+            httpResponse.sendError(403, "{success: false, " +
+              "errors: { reason: 'No demo account available' }}");
           }
-          else
-          {         
-            throw new AuthenticationException("Insufficient Credentials Provided");
+          catch(IOException e1)
+          {
+            e1.printStackTrace();
           }
-        }
-        else
-        {
-          session.setAttribute(KEY_LOGIN_ALREADY_TRIED, new Boolean(true));
-          
-          AnnisUser user = manager.login(userName, password);
-         
-          // we have been successfull
-          session.removeAttribute(KEY_LOGIN_ALREADY_TRIED);
-          session.setAttribute(KEY_USER, user);
-          chain.doFilter(request, response);
         }
       }
-      catch(NamingException e)
+      else
       {
         try
         {
-          response.setContentType("text/html");
-          PrintWriter out = response.getWriter();
-          out.println("<html debug=\"true\">");
-          out.println("	<head>");
-          out.println("		<title>Annis&sup2; - Login</title>");
-          out.println("		<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cp + "/javascript/extjs/resources/css/ext-all.css\" />");
-          out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-          out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/extjs/ext-all.js\"></script>");
-          out.println("		<script type=\"text/javascript\" src=\"" + cp + "/javascript/annis/windowLogin.js\"></script>");
-          if(session.getAttribute(KEY_LOGIN_ALREADY_TRIED) != null)
-          {
-            out.println("<script type=\"text/javascript\" src=\"" + 
-              cp + "/javascript/annis/loginErrorMessage.js\"></script>");
-          }
-          out.println("	<body>");
-          out.println("	</body>");
-          out.println("</html>");
+          httpResponse.sendError(403, "{success: false, errors: { reason: 'Not logged in and no demo account available' }}");
         }
-        catch(IllegalStateException e1)
+        catch(IOException e1)
         {
-          //ignore
+          e1.printStackTrace();
         }
       }
     }
@@ -140,14 +113,13 @@ public final class AuthenticationFilter implements Filter
         String name = parameterNames.nextElement();
         properties.put(name, filterConfig.getInitParameter(name));
       }
-      
+
       // copy annis-service url from context
       properties.put("AnnisRemoteService.URL",
-        filterConfig.getServletContext().getInitParameter("AnnisRemoteService.URL")
-      );
-      
+        filterConfig.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+
       this.props = properties;
-      
+
       this.manager.setProperties(properties);
     }
     catch(InstantiationException e)

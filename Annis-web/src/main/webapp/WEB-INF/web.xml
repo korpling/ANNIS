@@ -113,6 +113,15 @@
     <servlet-name>MetaDataServlet</servlet-name>
     <url-pattern>/secure/MetaData</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>LoginLogoutServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.LoginLogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginLogoutServlet</servlet-name>
+    <url-pattern>/LoginLogout</url-pattern>
+  </servlet-mapping>
 	<!-- END USED -->
   
   <!-- FILTER -->
@@ -175,11 +184,7 @@
   </filter>
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>
-    <url-pattern>/index.html</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>AuthenticationFilter</filter-name>
-    <url-pattern>/</url-pattern>
+    <url-pattern>/search.html</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>

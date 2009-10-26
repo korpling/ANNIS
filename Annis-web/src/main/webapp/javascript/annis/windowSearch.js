@@ -790,21 +790,6 @@ Ext.onReady(function()
   //}
   });
   
-  // we may have serious problems when using not Firefox
-  if(Ext.isIE)
-  { 
-    Ext.MessageBox.show({
-      title: 'WARNING - Unsupported Browser',
-      msg: 'You are not using Firefox as your webbrowser. This may cause ' +
-      'serious problems when using Annis&sup2;. If you don\'t have Firefox yet, ' +
-      'you can download it from <a href="http://mozilla.com/firefox">http://mozilla.com/firefox</a>.<br /><br />' +
-      'Click on "OK" to proceed, but Annis&sup2; will probably not work as expected.',
-      icon: Ext.MessageBox.WARNING,
-      buttons: Ext.MessageBox.OK
-    });
-  }
-
-
   // highlight tutorial
   Ext.get('tutorial').frame('ff0000', 5);
   
