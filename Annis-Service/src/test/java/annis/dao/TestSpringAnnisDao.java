@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -346,8 +347,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Test
-        @Ignore
+	@Ignore
 	public void listCorpusByName() {
 		final List<String> CORPUS_NAMES = mock(List.class);
 		
@@ -358,7 +358,8 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 //		String sql = "SELECT id FROM corpus WHERE name IN (?) AND top_level = 't'";
 		
 		// must use expected values here, otherwise the verify below breaks because it is operating on a spy
-		when(simpleJdbcTemplate.query(SQL, listCorpusByNameDaoHelper)).thenReturn(CORPUS_LIST);
+		List<Long> wtf = simpleJdbcTemplate.query(anyString(), any(ListCorpusByNameDaoHelper.class));
+		when(wtf).thenReturn(CORPUS_LIST);
 		
 		assertThat(annisDao.listCorpusByName(CORPUS_NAMES), is(CORPUS_LIST));
 		
