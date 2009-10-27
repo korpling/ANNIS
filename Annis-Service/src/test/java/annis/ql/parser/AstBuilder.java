@@ -3,6 +3,9 @@ package annis.ql.parser;
 import java.util.Arrays;
 import java.util.List;
 
+import de.deutschdiachrondigital.dddquery.node.ACommonAncestorAxis;
+import de.deutschdiachrondigital.dddquery.node.ASiblingAxis;
+
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
@@ -11,7 +14,6 @@ import annis.ql.node.ADirectDominanceSpec;
 import annis.ql.node.ADirectPrecedenceSpec;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AEdgeAnnotation;
-import annis.ql.node.AEdgeDominanceSpec;
 import annis.ql.node.AEdgeSpec;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AImplicitAndExpr;
@@ -19,7 +21,6 @@ import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
 import annis.ql.node.ALeftAlignLingOp;
-import annis.ql.node.ALeftLeafDominanceSpec;
 import annis.ql.node.ALeftOverlapLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
@@ -30,10 +31,8 @@ import annis.ql.node.ARangePrecedenceSpec;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
 import annis.ql.node.ARightAlignLingOp;
-import annis.ql.node.ARightLeafDominanceSpec;
 import annis.ql.node.ARootLingOp;
 import annis.ql.node.ASameAnnotationGroupLingOp;
-import annis.ql.node.ASiblingAndPrecedenceLingOp;
 import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATokenArityLingOp;
@@ -211,12 +210,6 @@ public class AstBuilder {
 		return n;
 	}
 	
-	public static AEdgeDominanceSpec newEdgeDominanceSpec(PEdgeAnnotation... edgeAnnotations) {
-		AEdgeDominanceSpec n = new AEdgeDominanceSpec();
-		n.setEdgeSpec(newEdgeSpec(edgeAnnotations));
-		return n;
-	}
-	
 	public static AEdgeAnnotation newEdgeAnnotation(String namespace, String name, PTextSpec value) {
 		AEdgeAnnotation n = new AEdgeAnnotation();
 		n.setNamespace(newTId(namespace));
@@ -239,10 +232,6 @@ public class AstBuilder {
 	
 	public static ASiblingLingOp newSiblingLingOp() {
 		return new ASiblingLingOp();
-	}
-	
-	public static ASiblingAndPrecedenceLingOp newSiblingAndPrecedenceLingOp() {
-		return new ASiblingAndPrecedenceLingOp();
 	}
 	
 	public static ASameAnnotationGroupLingOp newSameAnnotationGroupLingOp() {
@@ -301,13 +290,15 @@ public class AstBuilder {
 		
 		return n;
 	}
-	
-	public static ALeftLeafDominanceSpec newLeftLeafDominanceSpec() {
-		return new ALeftLeafDominanceSpec();
-	}
 
-	public static ARightLeafDominanceSpec newRightLeafDominanceSpec() {
-		return new ARightLeafDominanceSpec();
+	public static ASiblingAxis newSiblingAxis() {
+		ASiblingAxis n = new ASiblingAxis();
+		return n;
+	}
+	
+	public static ACommonAncestorAxis newCommonAncestorAxis() {
+		ACommonAncestorAxis n = new ACommonAncestorAxis();
+		return n;
 	}
 	
 }

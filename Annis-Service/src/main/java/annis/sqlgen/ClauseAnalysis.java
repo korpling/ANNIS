@@ -2,13 +2,16 @@ package annis.sqlgen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
 import annis.sqlgen.Expression.Type;
+import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.LeftAlignment;
@@ -27,6 +30,7 @@ import de.deutschdiachrondigital.dddquery.node.AAbsolutePathType;
 import de.deutschdiachrondigital.dddquery.node.AAndExpr;
 import de.deutschdiachrondigital.dddquery.node.AAttributeNodeTest;
 import de.deutschdiachrondigital.dddquery.node.AChildAxis;
+import de.deutschdiachrondigital.dddquery.node.ACommonAncestorAxis;
 import de.deutschdiachrondigital.dddquery.node.AComparisonExpr;
 import de.deutschdiachrondigital.dddquery.node.AContainingAxis;
 import de.deutschdiachrondigital.dddquery.node.ADescendantAxis;
@@ -36,14 +40,13 @@ import de.deutschdiachrondigital.dddquery.node.AEqComparison;
 import de.deutschdiachrondigital.dddquery.node.AExactEdgeAnnotation;
 import de.deutschdiachrondigital.dddquery.node.AExistanceEdgeAnnotation;
 import de.deutschdiachrondigital.dddquery.node.AFollowingAxis;
-import de.deutschdiachrondigital.dddquery.node.AFollowingSiblingAxis;
 import de.deutschdiachrondigital.dddquery.node.AFunctionExpr;
 import de.deutschdiachrondigital.dddquery.node.AImmediatelyFollowingAxis;
 import de.deutschdiachrondigital.dddquery.node.ALeftAlignAxis;
-import de.deutschdiachrondigital.dddquery.node.ALeftChildAxis;
 import de.deutschdiachrondigital.dddquery.node.AMarkerSpec;
 import de.deutschdiachrondigital.dddquery.node.AMatchingElementAxis;
 import de.deutschdiachrondigital.dddquery.node.AMetaNodeTest;
+import de.deutschdiachrondigital.dddquery.node.ANumberLiteralExpr;
 import de.deutschdiachrondigital.dddquery.node.AOrExpr;
 import de.deutschdiachrondigital.dddquery.node.AOverlappingAxis;
 import de.deutschdiachrondigital.dddquery.node.AOverlappingFollowingAxis;
@@ -55,7 +58,6 @@ import de.deutschdiachrondigital.dddquery.node.ARegexpEdgeAnnotation;
 import de.deutschdiachrondigital.dddquery.node.ARegexpLiteralExpr;
 import de.deutschdiachrondigital.dddquery.node.ARegexpQuotedText;
 import de.deutschdiachrondigital.dddquery.node.ARightAlignAxis;
-import de.deutschdiachrondigital.dddquery.node.ARightChildAxis;
 import de.deutschdiachrondigital.dddquery.node.ASiblingAxis;
 import de.deutschdiachrondigital.dddquery.node.AStep;
 import de.deutschdiachrondigital.dddquery.node.AStringLiteralExpr;
@@ -78,6 +80,7 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 	private boolean topLevel;
 	private Expression.Type textValue;
 	private Annotation annotation;
+	boolean inSibling = false;
 	
 	private List<Annotation> metaAnnotations;
 	
@@ -185,6 +188,10 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		
 		if ("d".equals(type))
 			context.addJoin(new Dominance(target, name, 1));
+		else if ("l".equals(type))
+			context.addJoin(new LeftDominance(target, name));
+		else if ("r".equals(type))
+			context.addJoin(new RightDominance(target, name));
 		else if ("p".equals(type))
 			context.addJoin(new PointingRelation(target, name, 1));
 		else 
@@ -192,22 +199,25 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 	}
 	
 	// XXX: change to isLeftChild(), isRightChild()?
-	@Override
-	public void inALeftChildAxis(ALeftChildAxis node) {
-		context.addJoin(new LeftDominance(target));
-	}
-	
-	@Override
-	public void inARightChildAxis(ARightChildAxis node) {
-//		context.addJoinX(new NumberJoin(context.postRank(), target.postRank(), +1));
-		context.addJoin(new RightDominance(target));
-	}
+//	@Override
+//	public void inALeftChildAxis(ALeftChildAxis node) {
+//		context.addJoin(new LeftDominance(target));
+//	}
+//	
+//	@Override
+//	public void inARightChildAxis(ARightChildAxis node) {
+////		context.addJoinX(new NumberJoin(context.postRank(), target.postRank(), +1));
+//		context.addJoin(new RightDominance(target));
+//	}
 	
 	@Override
 	public void inAExistanceEdgeAnnotation(AExistanceEdgeAnnotation node) {
 		String namespace = token(node.getNamespace());
 		String name = token(node.getType());
 		target.addEdgeAnnotation(new Annotation(namespace, name));
+		if (inSibling)
+			context.addEdgeAnnotation(new Annotation(namespace, name));
+		inSibling = false;
 	}
 	
 	@Override
@@ -216,6 +226,9 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		String name = token(node.getType());
 		String value = token(node.getValue());
 		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT));
+		if (inSibling)
+			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT));
+		inSibling = false;
 	}
 	
 	@Override
@@ -224,6 +237,9 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		String name = token(node.getType());
 		String value = token(node.getValue());
 		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP));
+		if (inSibling)
+			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP));
+		inSibling = false;
 	}
 	
 	// FIXME: namespaces in node name
@@ -259,10 +275,14 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 				ARangeSpec rangeSpec = (ARangeSpec) node.getRangeSpec();
 				if (rangeSpec.getMax() == null) {
 					int distance = number(rangeSpec.getMin());
+					if (distance == 0)
+						throw new AnnisQLSyntaxException("Distance can't be 0");
 					context.addJoin(new Dominance(target, name, distance));
 				} else {
 					int min = number(rangeSpec.getMin());
 					int max = number(rangeSpec.getMax());
+					if (min == 0 || max == 0)
+						throw new AnnisQLSyntaxException("Distance can't be 0");
 					context.addJoin(new Dominance(target, name, min, max));
 				}
 			}
@@ -319,10 +339,15 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		} else {
 			ARangeSpec rangeSpec = (ARangeSpec) node.getRangeSpec();
 			int min = number(rangeSpec.getMin());
-			if (rangeSpec.getMax() == null)
+			if (min == 0)
+				throw new AnnisQLSyntaxException("Distance can't be 0");
+			if (rangeSpec.getMax() == null) {
+				// FIXME: test
 				context.addJoin(new Precedence(target, min));
-			else {
+			} else {
 				int max = number(rangeSpec.getMax());
+				if (max == 0)
+					throw new AnnisQLSyntaxException("Distance can't be 0");
 				context.addJoin(new Precedence(target, min, max));
 			}
 		}
@@ -371,14 +396,22 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 	
 	@Override
 	public void inASiblingAxis(ASiblingAxis node) {
-		context.addJoin(new Sibling(target));
+		String name = null;
+		if (node.getEdgeTypeSpec() != null) {
+			name = token(((AEdgeTypeSpec) node.getEdgeTypeSpec()).getName());
+		}
+		context.addJoin(new Sibling(target, name));
+		inSibling = true;
 	}
 	
 	@Override
-	public void inAFollowingSiblingAxis(AFollowingSiblingAxis node) {
-		context.addJoin(new Sibling(target));
-		context.addJoin(precedenceBound == 0 ? new Precedence(target) : new Precedence(target, 1, precedenceBound));
-	}
+		public void inACommonAncestorAxis(ACommonAncestorAxis node) {
+			String name = null;
+			if (node.getEdgeTypeSpec() != null) {
+				name = token(((AEdgeTypeSpec) node.getEdgeTypeSpec()).getName());
+			}
+			context.addJoin(new CommonAncestor(target, name));
+		}
 	
 	@Override
 	public void inAFunctionExpr(AFunctionExpr node) {
@@ -386,6 +419,42 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 
 		if ("isToken".equals(name))
 			target.setToken(true);
+		
+		if ("isRoot".equals(name))
+			target.setRoot(true);
+		
+		if ("arity".equals(name)) {
+			target.setArity(convertArgListToRange(node.getArgs(), "arity"));
+		}
+		
+		if ("tokenArity".equals(name)) {
+			target.setTokenArity(convertArgListToRange(node.getArgs(), "tokenarity"));
+		}
+	}
+	
+	// FIXME: test
+	private AnnisNode.Range convertArgListToRange(LinkedList<PExpr> args, String function) {
+		int min = 0;
+		int max = 0;
+		if (args.size() == 0 || args.size() > 2)
+			throw new IllegalArgumentException("need 1 or 2 arguments for :" + function);
+		PExpr arg0 = args.get(0);
+		if (arg0 instanceof ANumberLiteralExpr) {
+			min = Integer.parseInt(((ANumberLiteralExpr) arg0).getNumber().getText());
+			if (args.size() == 2) {
+				PExpr arg1 = args.get(1);
+				if (arg1 instanceof ANumberLiteralExpr) {
+					max = Integer.parseInt(((ANumberLiteralExpr) arg1).getNumber().getText());
+				} else {
+					throw new IllegalArgumentException(function + " requires a number as argument");
+				}
+			} else {
+				max = min;
+			}
+		} else {
+			throw new IllegalArgumentException(function + " requires a number as argument");
+		}
+		return new AnnisNode.Range(min, max);
 	}
 	
 	@Override

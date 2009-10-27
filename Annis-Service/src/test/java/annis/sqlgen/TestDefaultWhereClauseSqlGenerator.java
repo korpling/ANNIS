@@ -39,6 +39,10 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 
+/*
+ * FIXME: refactor tests, so they use the same condition constants everywhere
+ * also, get rid of stupid helper functions like join (dup code)
+ */
 public class TestDefaultWhereClauseSqlGenerator {
 
 	// an example node
@@ -85,7 +89,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeRoot() {
 		node23.setRoot(true);
-		checkWhereCondition("_rank23.parent IS NULL");
+		checkWhereCondition("_rank23.root IS TRUE");
 	}
 
 	// WHERE condition for namespace
@@ -208,28 +212,33 @@ public class TestDefaultWhereClauseSqlGenerator {
 		checkWhereCondition(
 				join("=", "_node23.text_ref", "_node42.text_ref"),
 				join("<=", "_node23.left", "_node42.left"),
-				join("<", "_node23.left", "_node42.right"),
-				join("<", "_node23.right", "_node42.right")
+				join("<=", "_node42.left", "_node23.right"),
+				join("<=", "_node23.right", "_node42.right")
 		);
 	}
 	
 	// WHERE condition for _or_
+	// FIXME: unnecessary, is exchanged for #2 _ol_ #2
 	@Test
 	public void whereClauseForNodeRightOverlap() {
 		node23.addJoin(new RightOverlap(node42));
 		checkWhereCondition(
 				join("=", "_node23.text_ref", "_node42.text_ref"),
-				join("<", "_node23.left", "_node42.left"),
-				join("<=", "_node23.left", "_node42.right"),
-				join(">=", "_node23.right", "_node42.right")
+				join(">=", "_node23.right", "_node42.right"),
+				join(">=", "_node42.right", "_node23.left"),
+				join(">=", "_node23.left", "_node42.left")
 		);
 	}
 	
 	// WHERE condition for _o_
-	@Test(expected=NotImplementedException.class)	// FIXME: geht das ohne ODER
+	@Test
 	public void whereClauseForNodeOverlap() {
 		node23.addJoin(new Overlap(node42));
-		checkWhereCondition();
+		checkWhereCondition(
+				join("=", "_node23.text_ref", "_node42.text_ref"),
+				join("<=", "_node23.left", "_node42.right"),
+				join("<=", "_node42.left", "_node23.right")
+		);
 	}
 	
 	// WHERE condition for .
@@ -267,8 +276,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Precedence(node42, 10, 20));
 		checkWhereCondition(
 				join("=", "_node23.text_ref", "_node42.text_ref"),
-				join("<=", "_node23.right_token", "_node42.left_token", -10),
-				join(">=", "_node23.right_token", "_node42.left_token", -20)
+				"_node23.right_token BETWEEN SYMMETRIC _node42.left_token - 10 AND _node42.left_token - 20"
 		);
 	}
 	
@@ -278,7 +286,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42, 1));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL",
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
 	}
@@ -289,7 +298,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42, NAME, 1));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
@@ -302,7 +311,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
@@ -319,9 +328,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
-				join(">", "_rank23.post", "_rank42.post")
+				join("<", "_rank42.pre", "_rank23.post")
 		);
 	}
 	
@@ -331,9 +341,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42, 10));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
-				join(">", "_rank23.post", "_rank42.post"),
+				join("<", "_rank42.pre", "_rank23.post"),
 				join("=", "_rank23.level", "_rank42.level", -10)
 		);
 	}
@@ -344,11 +355,12 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42, 10, 20));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'d'"),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
-				join(">", "_rank23.post", "_rank42.post"),
-				join("<=", "_rank23.level", "_rank42.level", -10),
-				join(">=", "_rank23.level", "_rank42.level", -20)
+				join("<", "_rank42.pre", "_rank23.post"),
+				"_rank23.level BETWEEN SYMMETRIC _rank42.level - 10 AND _rank42.level - 20"
+
 		);
 	}
 	
@@ -356,14 +368,22 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeLeftDominance() {
 		node23.addJoin(new LeftDominance(node42));
-		checkWhereCondition(join("=", "_rank23.pre", "_rank42.pre", -1));
+		checkWhereCondition(
+				join("=", "_rank23.pre", "_rank42.pre", -1),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL"
+		);
 	}
 	
 	// WHERE condition for >@r
 	@Test
 	public void whereClauseForNodeRightDominance() {
 		node23.addJoin(new RightDominance(node42));
-		checkWhereCondition(join("=", "_rank23.post", "_rank42.post", 1));
+		checkWhereCondition(
+				join("=", "_rank23.post", "_rank42.post", 1),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL"
+		);
 	}
 	
 	// WHERE condition for ->
@@ -372,7 +392,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new PointingRelation(node42, NAME, 1));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'p'"),
+				join("=", "_component23.type", "'p'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 
@@ -385,10 +405,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new PointingRelation(node42, NAME));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.edge_type", "'p'"),
+				join("=", "_component23.type", "'p'"),
 				join("=", "_component23.name", "'" + NAME + "'"),
 				join("<", "_rank23.pre", "_rank42.pre"),
-				join(">", "_rank23.post", "_rank42.post")
+				join("<", "_rank42.pre", "_rank23.post")
 		);
 	}
 	
@@ -396,7 +416,11 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeSibling() {
 		node23.addJoin(new Sibling(node42));
-		checkWhereCondition(join("=", "_rank23.parent", "_rank42.parent"));
+		checkWhereCondition(
+				join("=", "_rank23.parent", "_rank42.parent"),
+				join("=", "_component23.type", "'d'"),
+				"_component23.name IS NULL"
+		);
 	}
 	
 	///// Helper

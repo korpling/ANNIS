@@ -24,11 +24,10 @@ public class TableJoinsInFromClauseSqlGenerator
 		}
 		
 		// component table
-		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(COMPONENT_TABLE, RANK_TABLE)) {
+		if (tables(node).usesComponentTable() && ! tables(node).isMaterialized(COMPONENT_TABLE, RANK_TABLE)) {
 			sb.append(" ");
 			sb.append(joinDefinition(node, COMPONENT_TABLE, "id", RANK_TABLE, "component_ref"));
 		}
-		
 		
 		// node annotations
 		if (tables(node).usesNodeAnnotationTable()) {

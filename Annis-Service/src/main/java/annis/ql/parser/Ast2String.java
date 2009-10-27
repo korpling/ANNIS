@@ -8,15 +8,12 @@ import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AArityLingOp;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AEdgeAnnotation;
-import annis.ql.node.AEdgeDominanceSpec;
-import annis.ql.node.AEdgeSpec;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AGroupedExpr;
 import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
 import annis.ql.node.ALeftAlignLingOp;
-import annis.ql.node.ALeftLeafDominanceSpec;
 import annis.ql.node.ALeftOverlapLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AOrExpr;
@@ -24,9 +21,7 @@ import annis.ql.node.APrecedenceLingOp;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
 import annis.ql.node.ARightAlignLingOp;
-import annis.ql.node.ARightLeafDominanceSpec;
 import annis.ql.node.ARootLingOp;
-import annis.ql.node.ASiblingAndPrecedenceLingOp;
 import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.AWildTextSpec;
@@ -93,12 +88,12 @@ public class Ast2String extends DepthFirstAdapter {
 		annotation(node.getNamespace(), node.getType(), node.getValue());
 	}
 	
-	@Override
-	public void caseAEdgeDominanceSpec(AEdgeDominanceSpec node) {
-		sb.append("[");
-		expressionList(((AEdgeSpec) node.getEdgeSpec()).getEdgeAnnotation(), " ");
-		sb.append("]");
-	}
+//	@Override
+//	public void caseAEdgeDominanceSpec(AEdgeDominanceSpec node) {
+//		sb.append("[");
+//		expressionList(((AEdgeSpec) node.getEdgeSpec()).getEdgeAnnotation(), " ");
+//		sb.append("]");
+//	}
 	
 	@Override
 	public void caseAExactOverlapLingOp(AExactOverlapLingOp node) {
@@ -132,10 +127,10 @@ public class Ast2String extends DepthFirstAdapter {
 		sb.append("_l_");
 	}
 	
-	@Override
-	public void caseALeftLeafDominanceSpec(ALeftLeafDominanceSpec node) {
-		sb.append("@l");
-	}
+//	@Override
+//	public void caseALeftLeafDominanceSpec(ALeftLeafDominanceSpec node) {
+//		sb.append("@l");
+//	}
 	
 	@Override
 	public void caseALeftOverlapLingOp(ALeftOverlapLingOp node) {
@@ -186,20 +181,20 @@ public class Ast2String extends DepthFirstAdapter {
 		sb.append("_r_");
 	}
 	
-	@Override
-	public void caseARightLeafDominanceSpec(ARightLeafDominanceSpec node) {
-		sb.append("@r");
-	}
+//	@Override
+//	public void caseARightLeafDominanceSpec(ARightLeafDominanceSpec node) {
+//		sb.append("@r");
+//	}
 	
 	@Override
 	public void caseARootLingOp(ARootLingOp node) {
 		sb.append(":root");
 	}
 	
-	@Override
-	public void caseASiblingAndPrecedenceLingOp(ASiblingAndPrecedenceLingOp node) {
-		sb.append("$.*");
-	}
+//	@Override
+//	public void caseASiblingAndPrecedenceLingOp(ASiblingAndPrecedenceLingOp node) {
+//		sb.append("$.*");
+//	}
 	
 	@Override
 	public void caseASiblingLingOp(ASiblingLingOp node) {

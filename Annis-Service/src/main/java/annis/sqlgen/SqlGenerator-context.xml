@@ -6,12 +6,21 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 	
+	<!-- Properties configuration -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${annis.home}/conf/annis-service.properties</value>
+			</list>
+		</property>
+	</bean>
+	
 	<!-- transforms a DDDquery into its disjunctive normal form -->	
 	<bean id="dnfTransformer" class="annis.sqlgen.DnfTransformer"/>
 	
 	<!-- analyzes a single clause of a DDDquery -->
 	<bean id="clauseAnalysis" class="annis.sqlgen.ClauseAnalysis" scope="prototype">
-		<property name="precedenceBound" value="50"/>
+		<property name="precedenceBound" value="${annis.precedence-restriction}"/>
 	</bean>
 	
 	<!-- SELECT clause generator -->
@@ -94,6 +103,7 @@
 		<entry key="component">
 			<util:map>
 				<entry key="name" value="edge_name"/>
+				<entry key="type" value="edge_type"/>
 				<entry key="namespace" value="edge_namespace"/>
 			</util:map>
 		</entry>

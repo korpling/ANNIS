@@ -113,7 +113,11 @@ public class TableAccessStrategy {
 	}
 	
 	public boolean usesRankTable() {
-		return node.isPartOfEdge() || node.isRoot() || usesEdgeAnnotationTable();
+		return usesComponentTable() || node.isRoot() || node.getArity() != null;
+	}
+	
+	public boolean usesComponentTable() {
+		return node.isPartOfEdge() || usesEdgeAnnotationTable();
 	}
 	
 	public boolean usesEdgeAnnotationTable() {

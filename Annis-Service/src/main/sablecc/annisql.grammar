@@ -156,10 +156,9 @@ Productions
 		| {left_overlap}	op_left_overlap { -> New ling_op.left_overlap() }
 		| {precedence_direct}	op_precedence { -> New ling_op.precedence(New precedence_spec.direct()) } 
 		| {precedence}	op_precedence precedence_spec { -> New ling_op.precedence(precedence_spec) } 
-		| {dominance_direct}	op_dominance [name]:id? { -> New ling_op.dominance(New dominance_spec.direct(name)) }
 		| {dominance}	op_dominance dominance_spec { -> New ling_op.dominance(dominance_spec) }
-		| {sibling}	op_sibling { -> New ling_op.sibling() }
-		| {sibling_and_precedence}	op_sibling_and_precedence { -> New ling_op.sibling_and_precedence() }
+		| {sibling}	op_sibling sibling_spec { -> New ling_op.sibling(sibling_spec) }
+/*		| {sibling_and_precedence}	op_sibling_and_precedence { -> New ling_op.sibling_and_precedence() } */
 		| {same_annotation_group}	op_same_annotation_group { -> New ling_op.same_annotation_group() }
 		| {pointing_relation_direct}	op_pointing_relation [name]:id edge_spec? { -> New ling_op.pointing_relation( New pointing_relation_spec.direct(name, edge_spec) ) }
 		| {poinging_relation_indirect}	op_pointing_relation [name]:id star { -> New ling_op.pointing_relation( New pointing_relation_spec.indirect(name) ) }
@@ -182,11 +181,19 @@ Productions
 		;
 
 	dominance_spec { -> dominance_spec } = 
-		  {range}	[name]:id? range_spec { -> New dominance_spec.range(name, range_spec) } 
+		  {direct}		[name]:id? left_or_right? edge_spec? { -> New dominance_spec.direct(name, left_or_right, edge_spec) }
+		| {range}		[name]:id? range_spec { -> New dominance_spec.range(name, range_spec) } 
 		| {indirect}	[name]:id? star { -> New dominance_spec.indirect(name) }
-		| {edge}	[name]:id? edge_spec { -> New dominance_spec.edge(name, edge_spec) }
-		| {left_leaf}	left_dominance { -> New dominance_spec.left_leaf() }
-		| {right_leaf}	right_dominance { -> New dominance_spec.right_leaf() }
+		;
+		
+	sibling_spec { -> sibling_spec } =
+	      {direct}		[name]:id? edge_spec? { -> New sibling_spec.direct(name, edge_spec) }
+	    | {indirect}	[name]:id? star { -> New sibling_spec.indirect(name) }
+	    ;
+		
+	left_or_right { -> left_or_right } =
+		  {left} 		left_dominance { -> New left_or_right.left() }
+		| {right}		right_dominance { -> New left_or_right.right() }
 		;
 		
 	edge_spec { -> edge_spec } =
@@ -233,8 +240,7 @@ Abstract Syntax Tree
 		| {left_overlap} 
 		| {precedence} precedence_spec 
 		| {dominance} dominance_spec
-		| {sibling} 
-		| {sibling_and_precedence} 
+		| {sibling} sibling_spec
 		| {same_annotation_group} 
 		| {pointing_relation} pointing_relation_spec
 		;
@@ -248,14 +254,21 @@ Abstract Syntax Tree
 		;
 		
 	dominance_spec = 
-		  {direct} [name]:id?
+		  {direct} [name]:id? left_or_right? edge_spec?
 		| {indirect} [name]:id?
 		| {range} [name]:id? range_spec
-		| {edge} [name]:id? edge_spec
-		| {left_leaf}
-		| {right_leaf}
+		;
+		
+	left_or_right =
+		  {left}
+		| {right}
 		;
 	
+	sibling_spec = 
+		  {direct} [name]:id? edge_spec?
+		| {indirect} [name]:id?
+		;
+		
 	pointing_relation_spec =
 		  {direct} [name]:id edge_spec?
 		| {indirect} [name]:id

@@ -277,12 +277,12 @@ public class TestDddQueryMapper {
 		testBinaryLingOp("#1 > name 10,20 #2", "$n1/descendant[d, name](10, 20)::$n2");
 	}
 	
-	@Test
+	@Ignore // We're getting rid of that mapping anyway
 	public void leftDominance() {
 		testBinaryLingOp("#1 >@l #2", "$n1/left-child::$n2");
 	}
 	
-	@Test
+	@Ignore // We're getting rid of that mapping anyway
 	public void rightDominance() {
 		testBinaryLingOp("#1 >@r #2", "$n1/right-child::$n2");
 	}
@@ -290,11 +290,6 @@ public class TestDddQueryMapper {
 	@Test
 	public void sibling() {
 		testBinaryLingOp("#1 $ #2", "$n1/sibling::$n2");
-	}
-	
-	@Test
-	public void siblingAndPrecedence() {
-		testBinaryLingOp("#1 $.* #2", "$n1/following-sibling::$n2");
 	}
 	
 	///// boolean combinations and grouping
@@ -305,19 +300,17 @@ public class TestDddQueryMapper {
 				"element()#(n1)$n1 & ( ( element()#(n2)$n2 & $n1/child[d]::$n2 ) | ( element()#(n3)$n3 & $n1/child[d]::$n3 ) )");
 	}
 	
-	///// not yet implemented
-	
-	@Test(expected=AnnisMappingException.class)
+	@Ignore // We're getting rid of that mapping anyway
 	public void root() {
 		mapper.translate("tok & #1:root");
 	}
 	
-	@Test(expected=AnnisMappingException.class)
+	@Ignore // We're getting rid of that mapping anyway
 	public void tokenArity() {
 		mapper.translate("tok & #1:tokenarity=1");
 	}
 	
-	@Test(expected=AnnisMappingException.class)
+	@Ignore // We're getting rid of that mapping anyway
 	public void arity() {
 		mapper.translate("tok & #1:arity=1");
 	}

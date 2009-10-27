@@ -1,6 +1,8 @@
 package annis.sqlgen;
 
 
+import static annis.ql.parser.AstBuilder.newCommonAncestorAxis;
+import static annis.ql.parser.AstBuilder.newSiblingAxis;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newAbsolutePathType;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newAndExpr;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newAttributeAxis;
@@ -43,11 +45,13 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
+import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -119,7 +123,7 @@ public class TestClauseAnalysis {
 	}
 	
 	// #i >@l #j, $i/left-child::$j
-	@Test
+	@Ignore // We're getting rid of the DDDquery mapping anyway
 	public void caseALeftChildAxis() {
 		setContext();
 		setTarget();
@@ -128,12 +132,12 @@ public class TestClauseAnalysis {
 	}
 	
 	// #i >@r #j, $i/right-child::$j
-	@Test
+	@Ignore // We're getting rid of the DDDquery mapping anyway
 	public void caseARightChildAxis() {
 		setContext();
 		setTarget();
 		clauseAnalysis.caseARightChildAxis(null);
-		assertThat(context(), hasJoin(new RightDominance(target())));
+//		assertThat(context(), hasJoin(new RightDominance(target())));
 	}
 	
 	@Test
@@ -542,37 +546,20 @@ public class TestClauseAnalysis {
 	public void caseASiblingAxis() {
 		setContext();
 		setTarget();
-		clauseAnalysis.caseASiblingAxis(null);
+		clauseAnalysis.caseASiblingAxis(newSiblingAxis());
 		assertThat(context(), hasJoin(new Sibling(target())));
 	}
 	
-	// #i $.* #j, $i/following-sibling::$j
+	// #i $* #j, $i/common-ancestor::$j
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAFollowingSiblingAxis() {
 		setContext();
 		setTarget();
-		clauseAnalysis.caseAFollowingSiblingAxis(null);
-		assertThat(context(), allOf(
-				hasJoin(new Sibling(target())), 
-				hasJoin(new Precedence(target()))));
+		clauseAnalysis.caseACommonAncestorAxis(newCommonAncestorAxis());
+		assertThat(context(), hasJoin(new CommonAncestor(target())));
 	}
 
-	// FIXME: duplicate code, refactor creation of Precedence objects
-	// #i $.* #j, $i/following-sibling::$j
-	@SuppressWarnings("unchecked")
-	@Test
-	public void caseAFollowingSiblingAxisPrecedenceLimited() {
-		setContext();
-		setTarget();
-		final int PRECEDENCE_BOUND = 50;
-		clauseAnalysis.setPrecedenceBound(PRECEDENCE_BOUND);
-		clauseAnalysis.caseAFollowingSiblingAxis(null);
-		assertThat(context(), allOf(
-				hasJoin(new Sibling(target())), 
-				hasJoin(new Precedence(target(), 1, 50))));
-	}
-	
 	@Test
 	public void nodesCount() {
 		final int COUNT = 3;

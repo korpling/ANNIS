@@ -33,6 +33,16 @@ public class BaseNodeSqlGenerator {
 				String plus = offset >= 0 ? " + " : " - ";
 				return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
 			}
+	
+	protected String between(String lhs, String rhs, int min, int max) {
+		String minPlus = min >= 0 ? " + " : " - ";
+		String maxPlus = max >= 0 ? " + " : " - ";
+		return lhs + " BETWEEN SYMMETRIC " + rhs + minPlus + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus + String.valueOf(Math.abs(max));
+	}
+
+	protected String between(String lhs, int min, int max) {
+		return lhs + " BETWEEN SYMMETRIC " + min + " AND " + max;
+	}
 
 	protected String sqlString(String string) {
 		return "'" + string + "'";

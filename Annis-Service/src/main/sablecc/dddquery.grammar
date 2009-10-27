@@ -70,9 +70,10 @@ Tokens
 	{default} axis_parent = 'parent';
 	{default} axis_descendant = 'descendant';
 	{default} axis_ancestor = 'ancestor';
+	{default} axis_sibling = 'sibling';
+	{default} axis_common_ancestor = 'common-ancestor';
 
 	// Horizontale Navigation
-	{default} axis_sibling = 'sibling';
 	{default} axis_following = 'following';
 	{default} axis_preceding = 'preceding';
 	{default} axis_following_sibling = 'following-sibling';
@@ -237,7 +238,7 @@ Productions
 	step { -> step } =
 		  {abbr_parent} abbr_parent node_test marker_spec? predicate* variable_binding? { -> New step(New axis.parent(), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
 		| {abbr_ancestor} abbr_ancestor node_test marker_spec? predicate* variable_binding? { -> New step(New axis.ancestor(), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
-		| {abbr_sibling} abbr_sibling node_test marker_spec? predicate* variable_binding? { -> New step(New axis.sibling(), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
+		| {abbr_sibling} abbr_sibling node_test marker_spec? predicate* variable_binding? { -> New step(New axis.sibling(Null, []), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
 		| {abbr_following} abbr_following node_test marker_spec? predicate* variable_binding? { -> New step(New axis.following(Null), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
 		| {abbr_preceding} abbr_preceding node_test marker_spec? predicate* variable_binding? { -> New step(New axis.preceding(), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
 		| {abbr_following_sibling} abbr_following_sibling node_test marker_spec? predicate* variable_binding? { -> New step(New axis.following_sibling(), node_test, marker_spec, [ predicate.expr ], variable_binding.id ) }
@@ -260,7 +261,8 @@ Productions
 		| {parent} axis_parent { -> New axis.parent() }
 		| {descendant} axis_descendant edge_type_spec? range_spec? { -> New axis.descendant(edge_type_spec, range_spec) }
 		| {ancestor} axis_ancestor { -> New axis.ancestor() }
-		| {sibling} axis_sibling { -> New axis.sibling() }
+		| {sibling} axis_sibling sibling_spec? edge_spec? { -> New axis.sibling(sibling_spec.edge_type_spec, [ edge_spec.edge_annotation ] ) }
+		| {common_ancestor} axis_common_ancestor sibling_spec? { -> New axis.common_ancestor(sibling_spec.edge_type_spec) }
 		| {following} axis_following range_spec? { -> New axis.following(range_spec) }
 		| {preceding} axis_preceding { -> New axis.preceding() }
 		| {following_sibling} axis_following_sibling { -> New axis.following_sibling() }
@@ -306,6 +308,10 @@ Productions
 		  {full} [role1]:id [c1]:comma [role2]:id [c2]:comma [greed1]:id [c3]:comma [greed2]:id { -> New alignment_spec(role1, role2, greed1, greed2) }
 		| {same_greed} [role1]:id [c1]:comma [role2]:id [c2]:comma [greed1]:id { -> New alignment_spec(role1, role2, greed1, Null) }
 		| {no_greed} [role1]:id [c1]:comma [role2]:id { -> New alignment_spec(role1, role2, Null, Null) }
+		;
+		
+	sibling_spec { -> edge_type_spec } =
+		  {named} lbracket [name]:id rbracket { -> New edge_type_spec(Null, name) }
 		;
 		
 	edge_type_spec { -> edge_type_spec } = 
@@ -418,7 +424,8 @@ Abstract Syntax Tree
 		| {parent} 
 		| {descendant} edge_type_spec? range_spec?
 		| {ancestor}
-		| {sibling}
+		| {sibling} edge_type_spec? edge_annotation*
+		| {common_ancestor} edge_type_spec?
 		| {following} range_spec?
 		| {preceding}
 		| {following_sibling}
@@ -457,7 +464,9 @@ Abstract Syntax Tree
 		| {regexp} [namespace]:id? [type]:id [value]:pattern
 		;
 		
-	edge_type_spec = [edge_type]:id [name]:id?;
+	edge_type_spec = [edge_type]:id? [name]:id?;
+	
+	sibling_spec = [name]:id;
 			
 	alignment_spec = 
 	    [role1]:id [role2]:id [greed1]:id? [greed2]:id?

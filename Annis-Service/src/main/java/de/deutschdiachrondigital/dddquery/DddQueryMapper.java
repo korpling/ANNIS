@@ -18,9 +18,9 @@ import annis.ql.node.AArityLingOp;
 import annis.ql.node.ADirectDominanceSpec;
 import annis.ql.node.ADirectPointingRelationSpec;
 import annis.ql.node.ADirectPrecedenceSpec;
+import annis.ql.node.ADirectSiblingSpec;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AEdgeAnnotation;
-import annis.ql.node.AEdgeDominanceSpec;
 import annis.ql.node.AEdgeSpec;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AImplicitAndExpr;
@@ -28,8 +28,9 @@ import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
 import annis.ql.node.AIndirectPointingRelationSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
+import annis.ql.node.AIndirectSiblingSpec;
 import annis.ql.node.ALeftAlignLingOp;
-import annis.ql.node.ALeftLeafDominanceSpec;
+import annis.ql.node.ALeftLeftOrRight;
 import annis.ql.node.ALeftOverlapLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
@@ -42,12 +43,10 @@ import annis.ql.node.ARangePrecedenceSpec;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
 import annis.ql.node.ARightAlignLingOp;
-import annis.ql.node.ARightLeafDominanceSpec;
+import annis.ql.node.ARightLeftOrRight;
 import annis.ql.node.ARightOverlapLingOp;
 import annis.ql.node.ARootLingOp;
 import annis.ql.node.ASameAnnotationGroupLingOp;
-import annis.ql.node.ASiblingAndPrecedenceLingOp;
-import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.AWildTextSpec;
@@ -77,17 +76,29 @@ public class DddQueryMapper {
 
 		@Override
 		public void caseARootLingOp(ARootLingOp node) {
-			throw new AnnisMappingException("can't map :root lingop");
+			writeMapping("$n", lhs(node), "[isRoot()]");
 		}
 
 		@Override
 		public void caseATokenArityLingOp(ATokenArityLingOp node) {
-			throw new AnnisMappingException("can't map :tokenarity lingop");
+			writeMapping("$n", lhs(node), "[tokenArity(");
+			node.getRangeSpec().apply(this);
+			writeMapping(")]");
 		}
 
 		@Override
 		public void caseAArityLingOp(AArityLingOp node) {
-			throw new AnnisMappingException("can't map :arity lingop");
+			writeMapping("$n", lhs(node), "[arity(");
+			node.getRangeSpec().apply(this);
+			writeMapping(")]");
+		}
+		
+		@Override
+		public void caseARangeSpec(ARangeSpec node) {
+			writeMapping(token(node.getMin()));
+			if (node.getMax() != null) {
+				writeMapping(", ", token(node.getMax()));
+			}
 		}
 
 		@Override
@@ -197,13 +208,14 @@ public class DddQueryMapper {
 
 		@Override
 		public void caseAOverlapLingOp(AOverlapLingOp node) {
-			writeMapping(
-					"(",
-					"$n", lhs(node), "/overlapping-following::$n", rhs(node),
-					" | ",
-					"$n", rhs(node), "/overlapping-following::$n", lhs(node),
-					")"
-			);
+//			writeMapping(
+//					"(",
+//					"$n", lhs(node), "/overlapping-following::$n", rhs(node),
+//					" | ",
+//					"$n", rhs(node), "/overlapping-following::$n", lhs(node),
+//					")"
+//			);
+			writeMapping("$n", lhs(node), "/overlapping::$n", rhs(node));
 		}
 
 		@Override
@@ -284,10 +296,29 @@ public class DddQueryMapper {
 		@Override
 		public void caseADirectDominanceSpec(ADirectDominanceSpec node) {
 			PLingOp lingOp = (PLingOp) node.parent();
-			writeMapping("$n", lhs(lingOp), "/child[d");
-			if (node.getName() != null)
+			writeMapping("$n", lhs(lingOp), "/child[");
+			if (node.getLeftOrRight() != null) {
+				node.getLeftOrRight().apply(this);
+			} else {
+				writeMapping("d");
+			}
+			if (node.getName() != null) {
 				writeMapping(", ", token(node.getName()));
-			writeMapping("]::$n", rhs(lingOp));
+			}
+			writeMapping("]");
+			if (node.getEdgeSpec() != null)
+				node.getEdgeSpec().apply(this);
+			writeMapping("::$n", rhs(lingOp));
+		}
+		
+		@Override
+		public void caseALeftLeftOrRight(ALeftLeftOrRight node) {
+			writeMapping("l");
+		}
+		
+		@Override
+		public void caseARightLeftOrRight(ARightLeftOrRight node) {
+			writeMapping("r");
 		}
 
 		@Override
@@ -300,18 +331,14 @@ public class DddQueryMapper {
 		}
 
 		@Override
-		public void caseAEdgeDominanceSpec(AEdgeDominanceSpec node) {
-			PLingOp lingOp = (PLingOp) node.parent();
-			writeMapping("$n", lhs(lingOp), "/child[d");
-			if (node.getName() != null)
-				writeMapping(", ", token(node.getName()));
-			writeMapping("](");
-			List<PEdgeAnnotation> edgeAnnotations = ((AEdgeSpec) node.getEdgeSpec()).getEdgeAnnotation();
+		public void caseAEdgeSpec(AEdgeSpec node) {
+			writeMapping("(");
+			List<PEdgeAnnotation> edgeAnnotations = node.getEdgeAnnotation();
 			for (PEdgeAnnotation edgeAnnotation : edgeAnnotations)
 				edgeAnnotation.apply(this);
 			if (edgeAnnotations.size() > 0)
 				dddQuery.setLength(dddQuery.length() - " ".length());
-			writeMapping(")::$n", rhs(lingOp));
+			writeMapping(")");
 		}
 
 		@Override
@@ -326,17 +353,17 @@ public class DddQueryMapper {
 			writeMapping(" ");
 		}
 
-		@Override
-		public void caseALeftLeafDominanceSpec(ALeftLeafDominanceSpec node) {
-			PLingOp lingOp = (PLingOp) node.parent();
-			writeMapping("$n", lhs(lingOp), "/left-child::$n", rhs(lingOp));
-		}
+//		@Override
+//		public void caseALeftLeafDominanceSpec(ALeftLeafDominanceSpec node) {
+//			PLingOp lingOp = (PLingOp) node.parent();
+//			writeMapping("$n", lhs(lingOp), "/left-child::$n", rhs(lingOp));
+//		}
 
-		@Override
-		public void caseARightLeafDominanceSpec(ARightLeafDominanceSpec node) {
-			PLingOp lingOp = (PLingOp) node.parent();
-			writeMapping("$n", lhs(lingOp), "/right-child::$n", rhs(lingOp));
-		}
+//		@Override
+//		public void caseARightLeafDominanceSpec(ARightLeafDominanceSpec node) {
+//			PLingOp lingOp = (PLingOp) node.parent();
+//			writeMapping("$n", lhs(lingOp), "/right-child::$n", rhs(lingOp));
+//		}
 
 		@Override
 		public void caseARangeDominanceSpec(ARangeDominanceSpec node) {
@@ -346,14 +373,31 @@ public class DddQueryMapper {
 		}
 
 		@Override
-		public void caseASiblingLingOp(ASiblingLingOp node) {
-			writeMapping("$n", lhs(node), "/sibling::$n", rhs(node));
+		public void caseADirectSiblingSpec(ADirectSiblingSpec node) {
+			PLingOp lingOp = (PLingOp) node.parent();
+			writeMapping("$n", lhs(lingOp), "/sibling");
+			if (node.getName() != null) {
+				writeMapping("[", token(node.getName()), "]");
+			}
+			if (node.getEdgeSpec() != null)
+				node.getEdgeSpec().apply(this);
+			writeMapping("::$n", rhs(lingOp));
 		}
-
+		
 		@Override
-		public void caseASiblingAndPrecedenceLingOp(ASiblingAndPrecedenceLingOp node) {
-			writeMapping("$n", lhs(node), "/following-sibling::$n", rhs(node));
+		public void caseAIndirectSiblingSpec(AIndirectSiblingSpec node) {
+			PLingOp lingOp = (PLingOp) node.parent();
+			writeMapping("$n", lhs(lingOp), "/common-ancestor");
+			if (node.getName() != null) {
+				writeMapping("[", token(node.getName()), "]");
+			}
+			writeMapping("::$n", rhs(lingOp));
 		}
+		
+//		@Override
+//		public void caseASiblingAndPrecedenceLingOp(ASiblingAndPrecedenceLingOp node) {
+//			writeMapping("$n", lhs(node), "/following-sibling::$n", rhs(node));
+//		}
 
 		@Override
 		public void caseAOrExpr(AOrExpr node) {

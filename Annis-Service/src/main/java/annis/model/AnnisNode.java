@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
@@ -49,6 +50,8 @@ public class AnnisNode implements Serializable {
 	private List<Join> joins;
 	private String variable;
 	private Set<Annotation> edgeAnnotations;
+	private Range arity;
+	private Range tokenArity;
 
 	// for sql generation
 	private String marker;
@@ -77,6 +80,39 @@ public class AnnisNode implements Serializable {
 		}
 	};
 
+	public static class Range {
+		private int min;
+		private int max;
+		
+		public Range(int _min, int _max) {
+			min = _min;
+			max = _max;
+		}
+		
+		public int getMin() {
+			return min;
+		}
+		
+		public int getMax() {
+			return max;
+		}
+		
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder().append(min).append(max).toHashCode();
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Range) {
+				Range other = (Range) obj;
+				
+				return new EqualsBuilder().append(min, other.min).append(max, other.max).isEquals();
+			}
+			return false;
+		}
+	};
+	
 	public AnnisNode() {
 		nodeAnnotations = new TreeSet<Annotation>();
 		edgeAnnotations = new TreeSet<Annotation>();
@@ -306,6 +342,15 @@ public class AnnisNode implements Serializable {
     {
       return false;
     }
+    if((this.arity == null) ? (other.arity != null) : !this.arity.equals(other.arity))
+    {
+      return false;
+    }
+    if((this.tokenArity == null) ? (other.tokenArity != null) : !this.tokenArity.equals(other.tokenArity))
+    {
+      return false;
+    }
+    
     return true;
   }
   
@@ -514,6 +559,22 @@ public class AnnisNode implements Serializable {
 
 	public void setGraph(AnnotationGraph graph) {
 		this.graph = graph;
+	}
+
+	public Range getArity() {
+		return arity;
+	}
+
+	public void setArity(Range arity) {
+		this.arity = arity;
+	}
+
+	public Range getTokenArity() {
+		return tokenArity;
+	}
+
+	public void setTokenArity(Range tokenArity) {
+		this.tokenArity = tokenArity;
 	}
 
 }

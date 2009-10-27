@@ -63,10 +63,22 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 		assertFromClause(expected);
 	}
 
-	// if the node is part of a dominance join, use the rank and component table
+	// if the node is root, use the rank table
 	@Test
 	public void fromClauseUsesRank() {
 		node23.setRoot(true);
+
+		String expected = 
+			"_node AS _node23" + 
+			" " +
+			"JOIN _rank AS _rank23 ON (_rank23.node_ref = _node23.id)";		
+		assertFromClause(expected);
+	}
+	
+	// if the node is part of a dominance join, use the rank and component table
+	@Test
+	public void fromClauseUsesComponent() {
+		node23.setPartOfEdge(true);
 
 		String expected = 
 			"_node AS _node23" + 

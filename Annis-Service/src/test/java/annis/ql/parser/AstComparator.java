@@ -7,7 +7,6 @@ import java.util.List;
 
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAnnotationSearchExpr;
-import annis.ql.node.AEdgeDominanceSpec;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
@@ -86,11 +85,6 @@ public class AstComparator extends DepthFirstAdapter {
 		checkTerminals(node, terminals);
 	}
 	
-	@Override
-	public void inAEdgeDominanceSpec(AEdgeDominanceSpec node) {
-		checkTerminal(node, "edge");
-	}
-
 	/*
 	 * Pusht alle Knoten des Template-Baumes auf einen Stack.  Der Template-Baum wird depth-first
 	 * durchwandert.
