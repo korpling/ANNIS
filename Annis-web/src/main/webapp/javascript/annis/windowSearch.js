@@ -572,7 +572,7 @@ Ext.onReady(function()
 
   var formPanelStatistics = new Ext.FormPanel({
     id: 'formPanelStatistics',
-    frame:false,
+    frame:true,
     bodyStyle:
     {
       background:'#DFE8F6'
