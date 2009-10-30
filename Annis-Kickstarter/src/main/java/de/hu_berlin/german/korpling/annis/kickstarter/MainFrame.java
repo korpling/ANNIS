@@ -28,6 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -71,9 +76,8 @@ public class MainFrame extends javax.swing.JFrame
       {
         try
         {
-          // starts RMI service at bean creation
-          new ClassPathXmlApplicationContext(
-            "annis/service/internal/AnnisServiceRunner-context.xml");
+          startService();
+          startJetty();
         }
         catch(Exception ex)
         {
@@ -89,15 +93,13 @@ public class MainFrame extends javax.swing.JFrame
         {
           if("".equals(this.get()))
           {
-            lblStatusService.setText("Service started");
-            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
-              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
+            lblStatusService.setText("Annis started");
+            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           }
           else
           {
-            lblStatusService.setText("Service start failed: " + this.get());
-            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
-              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
+            lblStatusService.setText("Annis start failed: " + this.get());
+            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
           }
         }
         catch(Exception ex)
@@ -203,6 +205,27 @@ public class MainFrame extends javax.swing.JFrame
       dlg.setVisible(true);
 
     }//GEN-LAST:event_btImportActionPerformed
+
+  private void startService() throws Exception
+  {
+
+    // starts RMI service at bean creation
+    new ClassPathXmlApplicationContext(
+      "annis/service/internal/AnnisServiceRunner-context.xml");
+  }
+
+  private void startJetty() throws Exception
+  {
+    Server jetty = new Server(8080);
+    
+    // add context for our bundled webapp
+    WebAppContext context = new WebAppContext("./webapp/", "/Annis-web");
+    jetty.setHandler(context);
+
+    // start
+    jetty.start();
+
+  }
 
   /**
    * @param args the command line arguments

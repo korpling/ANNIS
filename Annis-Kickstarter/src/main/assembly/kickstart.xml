@@ -6,9 +6,15 @@
     <format>zip</format>
   </formats>
   <fileSets>
+    <!-- we need all the config files of the service -->
     <fileSet>
       <directory>../Annis-Service/src/main/dist/</directory>
       <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <!-- copy (hopefully compiled, TODO) web application -->
+    <fileSet>
+      <directory>../Annis-web/target/Annis-web/</directory>
+      <outputDirectory>/webapp/</outputDirectory>
     </fileSet>
   </fileSets>
   <dependencySets>
