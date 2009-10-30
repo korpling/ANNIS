@@ -23,8 +23,10 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -36,6 +38,8 @@ public class MainFrame extends javax.swing.JFrame
 {
 
   private CorpusAdministration corpusAdministration;
+  private SwingWorker<String, String> serviceWorker;
+  private boolean isStopped = true;
 
   /** Creates new form MainFrame */
   public MainFrame()
@@ -58,6 +62,52 @@ public class MainFrame extends javax.swing.JFrame
 
     // position window at the center of the screen
     Helper.centerWindow(this);
+
+    serviceWorker = new SwingWorker<String, String>()
+    {
+
+      @Override
+      protected String doInBackground() throws Exception
+      {
+        try
+        {
+          // starts RMI service at bean creation
+          new ClassPathXmlApplicationContext(
+            "annis/service/internal/AnnisServiceRunner-context.xml");
+        }
+        catch(Exception ex)
+        {
+          return ex.getLocalizedMessage();
+        }
+        return "";
+      }
+
+      @Override
+      protected void done()
+      {
+        try
+        {
+          if("".equals(this.get()))
+          {
+            lblStatusService.setText("Service started");
+            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
+              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.gif")));
+          }
+          else
+          {
+            lblStatusService.setText("Service start failed: " + this.get());
+            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
+              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.gif")));
+          }
+        }
+        catch(Exception ex)
+        {
+          new ExceptionDialog(null, ex).setVisible(true);
+        }
+      }
+    };
+
+    serviceWorker.run();
   }
 
   /** This method is called from within the constructor to
@@ -72,12 +122,12 @@ public class MainFrame extends javax.swing.JFrame
     btInit = new javax.swing.JButton();
     btImport = new javax.swing.JButton();
     btList = new javax.swing.JButton();
-    btStartStop = new javax.swing.JButton();
+    lblStatusService = new javax.swing.JLabel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Annis² Kickstarter");
 
-    btInit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/New24.gif"))); // NOI18N
+    btInit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_comit.png"))); // NOI18N
     btInit.setMnemonic('d');
     btInit.setText("Init database");
     btInit.setName("btInit"); // NOI18N
@@ -87,7 +137,7 @@ public class MainFrame extends javax.swing.JFrame
       }
     });
 
-    btImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/Import24.gif"))); // NOI18N
+    btImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_add.png"))); // NOI18N
     btImport.setMnemonic('i');
     btImport.setText("Import corpus");
     btImport.setName("btImport"); // NOI18N
@@ -97,32 +147,28 @@ public class MainFrame extends javax.swing.JFrame
       }
     });
 
-    btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/RowInsertBefore24.gif"))); // NOI18N
+    btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/month.png"))); // NOI18N
     btList.setMnemonic('l');
     btList.setText("List imported corpora");
     btList.setName("btList"); // NOI18N
 
-    btStartStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/jlfgr/Play24.gif"))); // NOI18N
-    btStartStop.setMnemonic('s');
-    btStartStop.setText("Start Annis");
-    btStartStop.setName("btStartStop"); // NOI18N
-    btStartStop.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btStartStopActionPerformed(evt);
-      }
-    });
+    lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
+    lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
+    lblStatusService.setText("Service stopped");
+    lblStatusService.setName("lblStatusService"); // NOI18N
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+      .addGroup(layout.createSequentialGroup()
         .addContainerGap()
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-          .addComponent(btStartStop, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btImport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btInit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btList, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(btImport, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btInit, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btList, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(lblStatusService, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -135,7 +181,7 @@ public class MainFrame extends javax.swing.JFrame
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(btList)
         .addGap(18, 18, 18)
-        .addComponent(btStartStop)
+        .addComponent(lblStatusService)
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
@@ -150,15 +196,10 @@ public class MainFrame extends javax.swing.JFrame
 
     }//GEN-LAST:event_btInitActionPerformed
 
-    private void btStartStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btStartStopActionPerformed
-    {//GEN-HEADEREND:event_btStartStopActionPerformed
-      // TODO add your handling code here:
-    }//GEN-LAST:event_btStartStopActionPerformed
-
     private void btImportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btImportActionPerformed
     {//GEN-HEADEREND:event_btImportActionPerformed
 
-      ImportDialog dlg = new ImportDialog(this,true, corpusAdministration);
+      ImportDialog dlg = new ImportDialog(this, true, corpusAdministration);
       dlg.setVisible(true);
 
     }//GEN-LAST:event_btImportActionPerformed
@@ -181,6 +222,6 @@ public class MainFrame extends javax.swing.JFrame
   private javax.swing.JButton btImport;
   private javax.swing.JButton btInit;
   private javax.swing.JButton btList;
-  private javax.swing.JButton btStartStop;
+  private javax.swing.JLabel lblStatusService;
   // End of variables declaration//GEN-END:variables
 }
