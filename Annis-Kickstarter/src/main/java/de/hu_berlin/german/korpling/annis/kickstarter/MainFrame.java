@@ -91,13 +91,13 @@ public class MainFrame extends javax.swing.JFrame
           {
             lblStatusService.setText("Service started");
             lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
-              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.gif")));
+              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           }
           else
           {
             lblStatusService.setText("Service start failed: " + this.get());
             lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
-              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.gif")));
+              .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
           }
         }
         catch(Exception ex)
