@@ -80,7 +80,6 @@ public class MainFrame extends javax.swing.JFrame
           startService();
           setProgress(2);
           startJetty();
-          setProgress(3);
         }
         catch(Exception ex)
         {

@@ -23,12 +23,10 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 /**
  *
@@ -149,33 +147,40 @@ public class ListDialog extends javax.swing.JDialog
 
   private void updateTable()
   {
-    tableModel = new DefaultTableModel(new String[]
-      {
-        "name", "id", "node", "rank", "text", "tokens", "roots", "depth"
-      }, 0);
-    tableList.setModel(tableModel);
-
-    List<Map<String, Object>> stats = corpusAdmin.listCorpusStats();
-
-    int row = 0;
-    for(Map<String, Object> map : stats)
+    try
     {
-      String[] rowData = new String[tableModel.getColumnCount()];
-      for(int j = 0; j < rowData.length; j++)
-      {
-        String cName = tableList.getColumnName(j);
-        if(map.containsKey(cName))
+      tableModel = new DefaultTableModel(new String[]
         {
-          rowData[j] = map.get(cName).toString();
-        }
-        else
-        {
-          rowData[j] = "";
-        }
-      }
+          "name", "id", "node", "rank", "text", "tokens", "roots", "depth"
+        }, 0);
+      tableList.setModel(tableModel);
 
-      tableModel.addRow(rowData);
-      row++;
+      List<Map<String, Object>> stats = corpusAdmin.listCorpusStats();
+
+      int row = 0;
+      for(Map<String, Object> map : stats)
+      {
+        String[] rowData = new String[tableModel.getColumnCount()];
+        for(int j = 0; j < rowData.length; j++)
+        {
+          String cName = tableList.getColumnName(j);
+          if(map.containsKey(cName))
+          {
+            rowData[j] = map.get(cName).toString();
+          }
+          else
+          {
+            rowData[j] = "";
+          }
+        }
+
+        tableModel.addRow(rowData);
+        row++;
+      }
+    }
+    catch(Exception ex)
+    {
+      new ExceptionDialog(null, ex).setVisible(true);
     }
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables
