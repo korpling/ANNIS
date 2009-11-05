@@ -23,15 +23,14 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
-import java.util.concurrent.ExecutionException;
+import java.rmi.RMISecurityManager;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -215,11 +214,14 @@ public class MainFrame extends javax.swing.JFrame
   }
 
   private void startJetty() throws Exception
-  {
+  {    
     Server jetty = new Server(8080);
-    
     // add context for our bundled webapp
     WebAppContext context = new WebAppContext("./webapp/", "/Annis-web");
+    Map<String,String> initParams = new HashMap<String, String>();
+    initParams.put("managerClassName", "annis.security.TestSecurityManager");
+    context.setInitParams(initParams);
+
     jetty.setHandler(context);
 
     // start
