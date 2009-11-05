@@ -1,0 +1,137 @@
+/**
+ * 
+ */
+package annis.frontend.servlets.visualizers.tree;
+
+
+class NodeStructureData {
+	private int height;
+	private final NodeStructureData parent;
+	private boolean isContinuous;
+	private long leftCorner;
+	private long rightCorner;
+	private long leftmostImmediate = -1;
+	private long rightmostImmediate = -1;
+	private long arity = 0;
+	private long tokenArity;
+	private int step = 0;
+	
+	public NodeStructureData(NodeStructureData parent_) {
+		parent = parent_;
+	}
+	
+	public long getLeftCorner() {
+		return leftCorner;
+	}
+
+	public void setLeftCorner(long leftCorner) {
+		this.leftCorner = leftCorner;
+	}
+
+	public long getRightCorner() {
+		return rightCorner;
+	}
+
+	public void setRightCorner(long rightCorner) {
+		this.rightCorner = rightCorner;
+	}
+
+	public long getLeftmostImmediate() {
+		return leftmostImmediate;
+	}
+
+	public void setLeftmostImmediate(long leftmostImmediate) {
+		this.leftmostImmediate = leftmostImmediate;
+	}
+
+	public long getRightmostImmediate() {
+		return rightmostImmediate;
+	}
+
+	public void setRightmostImmediate(long rightmostImmediate) {
+		this.rightmostImmediate = rightmostImmediate;
+	}
+
+	public long getArity() {
+		return arity;
+	}
+
+	public void setArity(long arity) {
+		this.arity = arity;
+	}
+
+	public long getTokenArity() {
+		return tokenArity;
+	}
+
+	public void setTokenArity(long tokenArity) {
+		this.tokenArity = tokenArity;
+	}
+
+	public NodeStructureData getParent() {
+		return parent;
+	}
+
+	public int getHeight() {
+		return height + step;
+	}
+
+	public void setChildHeight(int height) {
+		this.height = height;
+	}
+
+	public boolean isContinuous() {
+		return isContinuous;
+	}
+
+	public void setContinuous(boolean isContinuous) {
+		this.isContinuous = isContinuous;
+	}
+
+	public boolean encloses(NodeStructureData other) {
+		return leftCorner < other.leftCorner && rightCorner > other.rightCorner; 
+	}
+
+	public void increaseStep() {
+		step += 1;
+		parent.newChildHeight(getHeight());
+	}
+	
+	public void setStep(int newValue) {
+		step = newValue;
+	}
+
+	private void newChildHeight(int newHeight) {
+		if (newHeight > this.height) {
+			setChildHeight(newHeight);
+			if (parent != null) {
+				parent.newChildHeight(getHeight());
+			}
+		}
+	}
+
+	public boolean canHaveVerticalOverlap() {
+		if (arity == 0) {
+			return getHeight() + 1 < parent.getHeight();
+		} else {
+			return isContinuous;
+		}
+	}
+	public boolean hasPredecessor(NodeStructureData node) {
+		if (node == parent) {
+			return true;
+		} else if (parent == null) {
+			return false;
+		} else {
+			return parent.hasPredecessor(node);
+		}
+	}
+	
+	public boolean hasVerticalEdgeConflict(NodeStructureData nodeStructureData) {
+		if (nodeStructureData.hasPredecessor(this)) {
+			return false;
+		} else {
+			return hasPredecessor(nodeStructureData.parent);
+		}
+	}
+}
