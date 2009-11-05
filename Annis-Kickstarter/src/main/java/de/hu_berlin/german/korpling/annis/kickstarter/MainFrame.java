@@ -23,7 +23,8 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
-import java.rmi.RMISecurityManager;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -43,7 +44,6 @@ public class MainFrame extends javax.swing.JFrame
 
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, String> serviceWorker;
-  private boolean isStopped = true;
 
   /** Creates new form MainFrame */
   public MainFrame()
@@ -73,10 +73,13 @@ public class MainFrame extends javax.swing.JFrame
       @Override
       protected String doInBackground() throws Exception
       {
+        setProgress(1);
         try
         {
           startService();
+          setProgress(2);
           startJetty();
+          setProgress(3);
         }
         catch(Exception ex)
         {
@@ -107,8 +110,20 @@ public class MainFrame extends javax.swing.JFrame
         }
       }
     };
+    serviceWorker.addPropertyChangeListener(new PropertyChangeListener()
+    {
 
-    serviceWorker.run();
+      public void propertyChange(PropertyChangeEvent evt)
+      {
+        if(serviceWorker.getProgress() == 1)
+        {
+          lblStatusService.setText("Starting Annis...");
+          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
+        }
+      }
+    });
+
+    serviceWorker.execute();
   }
 
   /** This method is called from within the constructor to
@@ -156,7 +171,7 @@ public class MainFrame extends javax.swing.JFrame
     lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
     lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
-    lblStatusService.setText("Service stopped");
+    lblStatusService.setText("Annis stopped");
     lblStatusService.setName("lblStatusService"); // NOI18N
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -214,11 +229,11 @@ public class MainFrame extends javax.swing.JFrame
   }
 
   private void startJetty() throws Exception
-  {    
+  {
     Server jetty = new Server(8080);
     // add context for our bundled webapp
     WebAppContext context = new WebAppContext("./webapp/", "/Annis-web");
-    Map<String,String> initParams = new HashMap<String, String>();
+    Map<String, String> initParams = new HashMap<String, String>();
     initParams.put("managerClassName", "annis.security.TestSecurityManager");
     context.setInitParams(initParams);
 
@@ -228,7 +243,6 @@ public class MainFrame extends javax.swing.JFrame
     jetty.start();
 
   }
-
   /**
    * @param args the command line arguments
    */
@@ -239,7 +253,8 @@ public class MainFrame extends javax.swing.JFrame
 
       public void run()
       {
-        new MainFrame().setVisible(true);
+        MainFrame frame = new MainFrame();
+        frame.setVisible(true);
       }
     });
   }

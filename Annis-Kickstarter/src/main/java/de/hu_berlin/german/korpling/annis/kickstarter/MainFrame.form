@@ -97,7 +97,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Service stopped"/>
+        <Property name="text" type="java.lang.String" value="Annis stopped"/>
         <Property name="name" type="java.lang.String" value="lblStatusService" noResource="true"/>
       </Properties>
     </Component>
