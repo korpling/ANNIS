@@ -26,10 +26,12 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btImport" alignment="0" pref="376" max="32767" attributes="0"/>
-                  <Component id="btInit" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="btInit" alignment="1" pref="376" max="32767" attributes="0"/>
+                  <Component id="btImport" alignment="1" pref="376" max="32767" attributes="0"/>
                   <Component id="btList" alignment="0" pref="376" max="32767" attributes="0"/>
-                  <Component id="lblStatusService" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="lblStatusService" alignment="1" pref="376" max="32767" attributes="0"/>
+                  <Component id="pbStart" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="btLaunch" alignment="0" pref="376" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -46,6 +48,10 @@
               <Component id="btList" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="lblStatusService" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="pbStart" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btLaunch" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -72,6 +78,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="105"/>
         <Property name="text" type="java.lang.String" value="Import corpus"/>
+        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="btImport" noResource="true"/>
       </Properties>
       <Events>
@@ -85,6 +92,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="108"/>
         <Property name="text" type="java.lang.String" value="List imported corpora"/>
+        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="btList" noResource="true"/>
       </Properties>
       <Events>
@@ -102,6 +110,25 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Annis stopped"/>
         <Property name="name" type="java.lang.String" value="lblStatusService" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btLaunch">
+      <Properties>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="c0" green="c0" id="lightGray" palette="1" red="c0" type="palette"/>
+        </Property>
+        <Property name="mnemonic" type="int" value="117"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;u&gt;Launch Annis frontend&lt;/u&gt;&lt;/html&gt;"/>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="name" type="java.lang.String" value="btLaunch" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btLaunchActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JProgressBar" name="pbStart">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="pbStart" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

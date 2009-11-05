@@ -23,13 +23,16 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import java.awt.Color;
+import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.eclipse.jetty.server.Server;
@@ -93,10 +96,14 @@ public class MainFrame extends javax.swing.JFrame
       {
         try
         {
+          pbStart.setIndeterminate(false);
+          pbStart.setValue(100);
           if("".equals(this.get()))
           {
             lblStatusService.setText("Annis started");
             lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
+            btLaunch.setEnabled(true);
+            btLaunch.setForeground(Color.blue);
           }
           else
           {
@@ -117,13 +124,20 @@ public class MainFrame extends javax.swing.JFrame
       {
         if(serviceWorker.getProgress() == 1)
         {
+          pbStart.setIndeterminate(true);
           lblStatusService.setText("Starting Annis...");
           lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
         }
       }
     });
 
-    serviceWorker.execute();
+
+    if(isInitialized())
+    {
+      btImport.setEnabled(true);
+      btList.setEnabled(true);
+      serviceWorker.execute();
+    }
   }
 
   /** This method is called from within the constructor to
@@ -139,6 +153,8 @@ public class MainFrame extends javax.swing.JFrame
     btImport = new javax.swing.JButton();
     btList = new javax.swing.JButton();
     lblStatusService = new javax.swing.JLabel();
+    btLaunch = new javax.swing.JButton();
+    pbStart = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Annis² Kickstarter");
@@ -156,6 +172,7 @@ public class MainFrame extends javax.swing.JFrame
     btImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_add.png"))); // NOI18N
     btImport.setMnemonic('i');
     btImport.setText("Import corpus");
+    btImport.setEnabled(false);
     btImport.setName("btImport"); // NOI18N
     btImport.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -166,6 +183,7 @@ public class MainFrame extends javax.swing.JFrame
     btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/month.png"))); // NOI18N
     btList.setMnemonic('l');
     btList.setText("List imported corpora");
+    btList.setEnabled(false);
     btList.setName("btList"); // NOI18N
     btList.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -173,11 +191,24 @@ public class MainFrame extends javax.swing.JFrame
       }
     });
 
-    lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
+    lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18));
     lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
     lblStatusService.setText("Annis stopped");
     lblStatusService.setName("lblStatusService"); // NOI18N
+
+    btLaunch.setForeground(java.awt.Color.lightGray);
+    btLaunch.setMnemonic('u');
+    btLaunch.setText("<html><u>Launch Annis frontend</u></html>");
+    btLaunch.setEnabled(false);
+    btLaunch.setName("btLaunch"); // NOI18N
+    btLaunch.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btLaunchActionPerformed(evt);
+      }
+    });
+
+    pbStart.setName("pbStart"); // NOI18N
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -186,10 +217,12 @@ public class MainFrame extends javax.swing.JFrame
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addComponent(btImport, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btInit, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btInit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btImport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(btList, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(lblStatusService, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+          .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -203,6 +236,10 @@ public class MainFrame extends javax.swing.JFrame
         .addComponent(btList)
         .addGap(18, 18, 18)
         .addComponent(lblStatusService)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(pbStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(btLaunch)
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
@@ -233,6 +270,23 @@ public class MainFrame extends javax.swing.JFrame
 
     }//GEN-LAST:event_btListActionPerformed
 
+    private void btLaunchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btLaunchActionPerformed
+    {//GEN-HEADEREND:event_btLaunchActionPerformed
+    try
+    {
+      JOptionPane.showMessageDialog(this,
+        "Use username \"test\" and password \"test\" in order to login.",
+        "INFO", JOptionPane.INFORMATION_MESSAGE);
+      
+      Desktop.getDesktop().browse(new URI("http://localhost:8080/Annis-web"));
+    }
+    catch(Exception ex)
+    {
+      new ExceptionDialog(this, ex).setVisible(true);
+    }
+
+    }//GEN-LAST:event_btLaunchActionPerformed
+
   private void startService() throws Exception
   {
 
@@ -256,6 +310,22 @@ public class MainFrame extends javax.swing.JFrame
     jetty.start();
 
   }
+
+  private boolean isInitialized()
+  {
+    // hack, just try to list corpora
+    try
+    {
+      corpusAdministration.listCorpusStats();
+    }
+    catch(Exception ex)
+    {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * @param args the command line arguments
    */
@@ -274,7 +344,9 @@ public class MainFrame extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btImport;
   private javax.swing.JButton btInit;
+  private javax.swing.JButton btLaunch;
   private javax.swing.JButton btList;
   private javax.swing.JLabel lblStatusService;
+  private javax.swing.JProgressBar pbStart;
   // End of variables declaration//GEN-END:variables
 }
