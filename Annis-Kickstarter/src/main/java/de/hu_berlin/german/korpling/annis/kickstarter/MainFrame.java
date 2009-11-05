@@ -26,6 +26,7 @@ import annis.administration.CorpusAdministration;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,6 +168,11 @@ public class MainFrame extends javax.swing.JFrame
     btList.setMnemonic('l');
     btList.setText("List imported corpora");
     btList.setName("btList"); // NOI18N
+    btList.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btListActionPerformed(evt);
+      }
+    });
 
     lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
     lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -219,6 +225,14 @@ public class MainFrame extends javax.swing.JFrame
       dlg.setVisible(true);
 
     }//GEN-LAST:event_btImportActionPerformed
+
+    private void btListActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btListActionPerformed
+    {//GEN-HEADEREND:event_btListActionPerformed
+
+      ListDialog dlg = new ListDialog(this, true, corpusAdministration);
+      dlg.setVisible(true);      
+
+    }//GEN-LAST:event_btListActionPerformed
 
   private void startService() throws Exception
   {

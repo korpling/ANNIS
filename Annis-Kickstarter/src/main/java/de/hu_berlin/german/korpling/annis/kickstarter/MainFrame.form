@@ -87,6 +87,9 @@
         <Property name="text" type="java.lang.String" value="List imported corpora"/>
         <Property name="name" type="java.lang.String" value="btList" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btListActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblStatusService">
       <Properties>
