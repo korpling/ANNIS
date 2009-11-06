@@ -26,6 +26,7 @@ import annis.administration.CorpusAdministration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -63,6 +64,7 @@ public class ListDialog extends javax.swing.JDialog
     tableList = new javax.swing.JTable();
     btClose = new javax.swing.JButton();
     btDelete = new javax.swing.JButton();
+    pbDelete = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("List corpora - Annis² Kickstarter");
@@ -101,19 +103,25 @@ public class ListDialog extends javax.swing.JDialog
       .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
         .addContainerGap()
-        .addComponent(btDelete)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 369, Short.MAX_VALUE)
+        .addComponent(btDelete, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+        .addGap(368, 368, 368)
         .addComponent(btClose)
         .addContainerGap())
+      .addGroup(layout.createSequentialGroup()
+        .addContainerGap()
+        .addComponent(pbDelete, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+        .addGap(427, 427, 427))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addGap(7, 7, 7)
+        .addComponent(pbDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(btClose)
-          .addComponent(btDelete))
+          .addComponent(btDelete)
+          .addComponent(btClose))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
@@ -135,13 +143,37 @@ public class ListDialog extends javax.swing.JDialog
       if(row > -1 && col > -1)
       {
         Object value = tableModel.getValueAt(row, col);
-        LinkedList<Long> corpusListToDelete = new LinkedList<Long>();
+        final LinkedList<Long> corpusListToDelete = new LinkedList<Long>();
         long l = Long.parseLong(value.toString());
-
         corpusListToDelete.add(l);
-        corpusAdmin.deleteCorpora(corpusListToDelete);
 
-        updateTable();
+        pbDelete.setIndeterminate(true);
+        btClose.setEnabled(false);
+        btDelete.setEnabled(false);
+
+        SwingWorker<String, Void> worker = new SwingWorker<String, Void>()
+        {
+
+          @Override
+          protected String doInBackground() throws Exception
+          {
+            corpusAdmin.deleteCorpora(corpusListToDelete);
+            updateTable();
+            return "";
+          }
+
+          @Override
+          protected void done()
+          {
+            pbDelete.setIndeterminate(false);
+            pbDelete.setValue(100);
+            btClose.setEnabled(true);
+            btDelete.setEnabled(true);
+          }
+        };
+
+        worker.execute();
+
       }
 
     }//GEN-LAST:event_btDeleteActionPerformed
@@ -188,6 +220,7 @@ public class ListDialog extends javax.swing.JDialog
   private javax.swing.JButton btClose;
   private javax.swing.JButton btDelete;
   private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JProgressBar pbDelete;
   private javax.swing.JTable tableList;
   // End of variables declaration//GEN-END:variables
 }
