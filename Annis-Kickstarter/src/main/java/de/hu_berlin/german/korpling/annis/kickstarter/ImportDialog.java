@@ -40,6 +40,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, Void> worker;
+  private boolean isImporting;
 
   /** Creates new form ImportDialog */
   public ImportDialog(java.awt.Frame parent, boolean modal, CorpusAdministration corpusAdmin)
@@ -50,6 +51,7 @@ public class ImportDialog extends javax.swing.JDialog
 
     initComponents();
 
+    isImporting = false;
     worker = new SwingWorker<String, Void>()
     {
 
@@ -70,6 +72,7 @@ public class ImportDialog extends javax.swing.JDialog
       @Override
       protected void done()
       {
+        isImporting = false;
         btOk.setEnabled(true);
         btSearchInputDir.setEnabled(true);
         txtInputDir.setEnabled(true);
@@ -188,7 +191,7 @@ public class ImportDialog extends javax.swing.JDialog
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btCancelActionPerformed
     {//GEN-HEADEREND:event_btCancelActionPerformed
 
-      if(!worker.isDone())
+      if(isImporting)
       {
         worker.cancel(true);
       }
@@ -204,12 +207,22 @@ public class ImportDialog extends javax.swing.JDialog
 
       pbImport.setIndeterminate(true);
 
+      isImporting = true;
       worker.execute();
 
     }//GEN-LAST:event_btOkActionPerformed
 
     private void btSearchInputDirActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btSearchInputDirActionPerformed
     {//GEN-HEADEREND:event_btSearchInputDirActionPerformed
+
+      if(!"".equals(txtInputDir.getText()))
+      {
+        File dir = new File(txtInputDir.getText());
+        if(dir.exists() && dir.isDirectory())
+        {
+          fileChooser.setSelectedFile(dir);
+        }
+      }
 
       if(fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION)
       {
