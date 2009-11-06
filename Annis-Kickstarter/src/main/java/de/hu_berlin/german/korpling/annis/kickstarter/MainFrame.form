@@ -32,6 +32,7 @@
                   <Component id="lblStatusService" alignment="1" pref="376" max="32767" attributes="0"/>
                   <Component id="pbStart" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="btLaunch" alignment="0" pref="376" max="32767" attributes="0"/>
+                  <Component id="btExit" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -52,7 +53,9 @@
               <Component id="pbStart" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btLaunch" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="34" max="32767" attributes="0"/>
+              <Component id="btExit" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -130,6 +133,19 @@
       <Properties>
         <Property name="name" type="java.lang.String" value="pbStart" noResource="true"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btExit">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/exit.png"/>
+        </Property>
+        <Property name="mnemonic" type="int" value="101"/>
+        <Property name="text" type="java.lang.String" value="Exit"/>
+        <Property name="name" type="java.lang.String" value="btExit" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btExitActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

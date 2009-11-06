@@ -155,6 +155,7 @@ public class MainFrame extends javax.swing.JFrame
     lblStatusService = new javax.swing.JLabel();
     btLaunch = new javax.swing.JButton();
     pbStart = new javax.swing.JProgressBar();
+    btExit = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Annis² Kickstarter");
@@ -210,6 +211,16 @@ public class MainFrame extends javax.swing.JFrame
 
     pbStart.setName("pbStart"); // NOI18N
 
+    btExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/exit.png"))); // NOI18N
+    btExit.setMnemonic('e');
+    btExit.setText("Exit");
+    btExit.setName("btExit"); // NOI18N
+    btExit.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btExitActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -222,7 +233,8 @@ public class MainFrame extends javax.swing.JFrame
           .addComponent(btList, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+          .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+          .addComponent(btExit, javax.swing.GroupLayout.Alignment.TRAILING))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -240,7 +252,9 @@ public class MainFrame extends javax.swing.JFrame
         .addComponent(pbStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(btLaunch)
-        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+        .addComponent(btExit)
+        .addContainerGap())
     );
 
     pack();
@@ -286,6 +300,13 @@ public class MainFrame extends javax.swing.JFrame
     }
 
     }//GEN-LAST:event_btLaunchActionPerformed
+
+    private void btExitActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btExitActionPerformed
+    {//GEN-HEADEREND:event_btExitActionPerformed
+
+      System.exit(0);
+
+    }//GEN-LAST:event_btExitActionPerformed
 
   private void startService() throws Exception
   {
@@ -342,6 +363,7 @@ public class MainFrame extends javax.swing.JFrame
     });
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton btExit;
   private javax.swing.JButton btImport;
   private javax.swing.JButton btInit;
   private javax.swing.JButton btLaunch;
