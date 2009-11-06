@@ -31,19 +31,20 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="pbImport" alignment="0" pref="484" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtInputDir" pref="311" max="32767" attributes="0"/>
+                      <Component id="txtInputDir" pref="305" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btSearchInputDir" min="-2" pref="36" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btCancel" min="-2" pref="105" max="-2" attributes="0"/>
-                      <EmptySpace pref="280" max="32767" attributes="0"/>
+                      <EmptySpace pref="274" max="32767" attributes="0"/>
                       <Component id="btOk" min="-2" pref="105" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -60,7 +61,9 @@
                   <Component id="txtInputDir" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btSearchInputDir" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="pbImport" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btOk" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -103,6 +106,8 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btSearchInputDirActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JProgressBar" name="pbImport">
     </Component>
   </SubComponents>
 </Form>

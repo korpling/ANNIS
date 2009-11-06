@@ -66,8 +66,9 @@ public class MainFrame extends javax.swing.JFrame
     {
       Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
-
+    
     initComponents();
+
 
     serviceWorker = new SwingWorker<String, String>()
     {

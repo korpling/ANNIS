@@ -86,6 +86,7 @@ public class ListDialog extends javax.swing.JDialog
       }
     });
 
+    btDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/edit_remove.png"))); // NOI18N
     btDelete.setText("Delete selected corpus");
     btDelete.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -99,8 +100,9 @@ public class ListDialog extends javax.swing.JDialog
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
       .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addContainerGap()
         .addComponent(btDelete)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 409, Short.MAX_VALUE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 369, Short.MAX_VALUE)
         .addComponent(btClose)
         .addContainerGap())
     );
