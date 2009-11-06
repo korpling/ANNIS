@@ -40,8 +40,6 @@ public class InitDialog extends javax.swing.JDialog
     initComponents();
 
     this.corpusAdministration = corpusAdministration;
-
-    Helper.centerWindow(this);
   }
 
   /** This method is called from within the constructor to
@@ -62,6 +60,7 @@ public class InitDialog extends javax.swing.JDialog
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Init - Annis² Kickstarter");
+    setLocationByPlatform(true);
 
     jLabel1.setText("Postgres-Admin username:");
 

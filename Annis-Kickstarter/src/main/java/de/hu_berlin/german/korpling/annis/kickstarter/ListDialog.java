@@ -47,8 +47,6 @@ public class ListDialog extends javax.swing.JDialog
 
     initComponents();
 
-    Helper.centerWindow(this);
-
     updateTable();
   }
 
@@ -68,6 +66,7 @@ public class ListDialog extends javax.swing.JDialog
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("List corpora - Annis² Kickstarter");
+    setLocationByPlatform(true);
 
     tableList.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {

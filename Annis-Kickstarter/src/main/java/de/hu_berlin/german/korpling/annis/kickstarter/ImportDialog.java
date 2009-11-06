@@ -45,7 +45,6 @@ public class ImportDialog extends javax.swing.JDialog
 
     initComponents();
 
-    Helper.centerWindow(this);
   }
 
   /** This method is called from within the constructor to
@@ -68,6 +67,7 @@ public class ImportDialog extends javax.swing.JDialog
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Import - Annis² Kickstarter");
+    setLocationByPlatform(true);
 
     jLabel1.setText("Directory to import:");
 

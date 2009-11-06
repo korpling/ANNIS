@@ -4,6 +4,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="Annis&#xb2; Kickstarter"/>
+    <Property name="locationByPlatform" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -68,6 +69,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="100"/>
         <Property name="text" type="java.lang.String" value="Init database"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Before you can use Annis the very first time&lt;br&gt;&#xa;you have to initialize the database. &lt;br&gt;&lt;br&gt;&#xa;&#xa;Please note that if you initialize a database that was&lt;br&gt;&#xa;already in use you will delete all imported corpora&lt;br&gt;&#xa;of this database.&#xa;&lt;/html&gt;"/>
         <Property name="name" type="java.lang.String" value="btInit" noResource="true"/>
       </Properties>
       <Events>
@@ -81,6 +83,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="105"/>
         <Property name="text" type="java.lang.String" value="Import corpus"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Import a new corpus to Annis.&#xa;&lt;/html&gt;"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="btImport" noResource="true"/>
       </Properties>
@@ -95,6 +98,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="108"/>
         <Property name="text" type="java.lang.String" value="List imported corpora"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;List all existing corpora of the database.&lt;br&gt;&#xa;You can delete copora here as well.&#xa;&lt;/html&gt;"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="btList" noResource="true"/>
       </Properties>
@@ -126,6 +130,8 @@
         <Property name="name" type="java.lang.String" value="btLaunch" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btLaunchMouseEntered"/>
+        <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btLaunchMouseExited"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btLaunchActionPerformed"/>
       </Events>
     </Component>
@@ -141,6 +147,7 @@
         </Property>
         <Property name="mnemonic" type="int" value="101"/>
         <Property name="text" type="java.lang.String" value="Exit"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;This will terminate the application.&#xa;&lt;/html&gt;"/>
         <Property name="name" type="java.lang.String" value="btExit" noResource="true"/>
       </Properties>
       <Events>

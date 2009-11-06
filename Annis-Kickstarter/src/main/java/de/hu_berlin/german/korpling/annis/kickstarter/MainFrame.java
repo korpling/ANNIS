@@ -24,6 +24,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -67,9 +68,6 @@ public class MainFrame extends javax.swing.JFrame
     }
 
     initComponents();
-
-    // position window at the center of the screen
-    Helper.centerWindow(this);
 
     serviceWorker = new SwingWorker<String, String>()
     {
@@ -159,10 +157,12 @@ public class MainFrame extends javax.swing.JFrame
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("Annis² Kickstarter");
+    setLocationByPlatform(true);
 
     btInit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_comit.png"))); // NOI18N
     btInit.setMnemonic('d');
     btInit.setText("Init database");
+    btInit.setToolTipText("<html>\nBefore you can use Annis the very first time<br>\nyou have to initialize the database. <br><br>\n\nPlease note that if you initialize a database that was<br>\nalready in use you will delete all imported corpora<br>\nof this database.\n</html>");
     btInit.setName("btInit"); // NOI18N
     btInit.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -173,6 +173,7 @@ public class MainFrame extends javax.swing.JFrame
     btImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_add.png"))); // NOI18N
     btImport.setMnemonic('i');
     btImport.setText("Import corpus");
+    btImport.setToolTipText("<html>\nImport a new corpus to Annis.\n</html>");
     btImport.setEnabled(false);
     btImport.setName("btImport"); // NOI18N
     btImport.addActionListener(new java.awt.event.ActionListener() {
@@ -184,6 +185,7 @@ public class MainFrame extends javax.swing.JFrame
     btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/month.png"))); // NOI18N
     btList.setMnemonic('l');
     btList.setText("List imported corpora");
+    btList.setToolTipText("<html>\nList all existing corpora of the database.<br>\nYou can delete copora here as well.\n</html>");
     btList.setEnabled(false);
     btList.setName("btList"); // NOI18N
     btList.addActionListener(new java.awt.event.ActionListener() {
@@ -203,6 +205,14 @@ public class MainFrame extends javax.swing.JFrame
     btLaunch.setText("<html><u>Launch Annis frontend</u></html>");
     btLaunch.setEnabled(false);
     btLaunch.setName("btLaunch"); // NOI18N
+    btLaunch.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseEntered(java.awt.event.MouseEvent evt) {
+        btLaunchMouseEntered(evt);
+      }
+      public void mouseExited(java.awt.event.MouseEvent evt) {
+        btLaunchMouseExited(evt);
+      }
+    });
     btLaunch.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         btLaunchActionPerformed(evt);
@@ -214,6 +224,7 @@ public class MainFrame extends javax.swing.JFrame
     btExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/exit.png"))); // NOI18N
     btExit.setMnemonic('e');
     btExit.setText("Exit");
+    btExit.setToolTipText("<html>\nThis will terminate the application.\n</html>");
     btExit.setName("btExit"); // NOI18N
     btExit.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -307,6 +318,20 @@ public class MainFrame extends javax.swing.JFrame
       System.exit(0);
 
     }//GEN-LAST:event_btExitActionPerformed
+
+    private void btLaunchMouseEntered(java.awt.event.MouseEvent evt)//GEN-FIRST:event_btLaunchMouseEntered
+    {//GEN-HEADEREND:event_btLaunchMouseEntered
+
+      this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+    }//GEN-LAST:event_btLaunchMouseEntered
+
+    private void btLaunchMouseExited(java.awt.event.MouseEvent evt)//GEN-FIRST:event_btLaunchMouseExited
+    {//GEN-HEADEREND:event_btLaunchMouseExited
+
+      this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+    }//GEN-LAST:event_btLaunchMouseExited
 
   private void startService() throws Exception
   {
