@@ -45,6 +45,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,6 +56,7 @@ public class SearchResultServlet extends HttpServlet
 {
 
   private static final long serialVersionUID = 7180460653219721099L;
+  private Random rand = new Random();
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse rep) throws ServletException, IOException
@@ -128,7 +130,6 @@ public class SearchResultServlet extends HttpServlet
     int offset = 0;
     int limit = 50;
 
-
     try
     {
       offset = Integer.parseInt(request.getParameter("start"));
@@ -145,7 +146,6 @@ public class SearchResultServlet extends HttpServlet
     {
       //ignore
     }
-
 
     /* Required Stuff */
     boolean scriptTag = false;
@@ -188,7 +188,6 @@ public class SearchResultServlet extends HttpServlet
         {
           totalCount = (Integer) session.getAttribute(SubmitQueryServlet.KEY_TOTAL_COUNT);
         }
-
       }
       catch(NullPointerException e)
       {
@@ -207,20 +206,21 @@ public class SearchResultServlet extends HttpServlet
       int count = 0;
       for(AnnisResult result : resultSet)
       {
+        long generatedID = rand.nextLong();
         // construct byte array
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
         // serialize result
         objectOutput.writeObject(result);
         // copy to cache
-        cacheAnnisResult.put(result.getStartNodeId() + "," + result.getEndNodeId(),
+        cacheAnnisResult.put("" + generatedID,
           bos.toByteArray());
 
         if(count++ != 0)
         {
           json.append("\n,");
         }
-        String resultAsJSON = new AnnisResultToJSON(result).getJSON();
+        String resultAsJSON = new AnnisResultToJSON(result, generatedID).getJSON();
         json.append(resultAsJSON);
       }
       json.append("]}");
@@ -271,21 +271,19 @@ public class SearchResultServlet extends HttpServlet
 
   public class AnnisResultToJSON
   {
-    private AnnisResult annisResult;
     private StringBuffer json;
     private AnnotationGraph graph;
     private Set<Long> idsToMark;
 
-    public AnnisResultToJSON(AnnisResult result)
+    public AnnisResultToJSON(AnnisResult result, long generatedID)
     {
       this.json = new StringBuffer();
       this.graph = result.getGraph();
-      this.annisResult = result;
 
       this.idsToMark = getMarkedIDs();
 
-      json.append("{'_id':'" + result.getStartNodeId() + ","
-        + result.getEndNodeId() + "', '_textId': '"
+      json.append("{'_id':'" + generatedID + "', "
+        + "'_textId': '"
         + getTextId() + "', '_text':'"
         + getText().replace("'", "\\'") + "'");
 

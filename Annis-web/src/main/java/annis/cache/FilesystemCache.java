@@ -38,7 +38,7 @@ public class FilesystemCache implements Cache {
 			return file;
 		file = File.createTempFile("anniscache_" + this.namespace + "_", key + ".cache");
 		System.out.println("using file: " + file.getAbsolutePath());
-		//file.deleteOnExit();
+		file.deleteOnExit();
 		fileMap.put(key, file);
 		return file;
 	}
