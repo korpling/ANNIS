@@ -206,7 +206,7 @@ public class SearchResultServlet extends HttpServlet
       int count = 0;
       for(AnnisResult result : resultSet)
       {
-        long generatedID = rand.nextLong();
+        long generatedID = Math.abs(rand.nextLong());
         // construct byte array
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
