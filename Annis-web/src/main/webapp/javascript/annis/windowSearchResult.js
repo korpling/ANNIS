@@ -286,9 +286,10 @@ Ext.onReady(function()
     }
     var output = '';
     output += '<div class="windowSearchResult text">' + value._text + '</div>';
-    Ext.each(rowData._tokenLevels, function(tokenLevel) {
+    Ext.each(rowData._tokenLevels, function(tokenLevel)
+    {
       var t = value[tokenLevel] + "";
-      if(t == 'undefined')
+      if(t == null || t == "" || t == 'undefined')
       {
         t = '&nbsp;';
       }
