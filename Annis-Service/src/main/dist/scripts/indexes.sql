@@ -79,3 +79,5 @@ CREATE INDEX idx__exact_cover ON facts (text_ref, "left", "right");
 
 ----- 2nd query
 CREATE INDEX idx__2nd_query ON facts (text_ref, left_token, right_token);
+----- needed for getNodeAttributeSet
+CREATE INDEX node_annotation_namespace ON node_annotation(namespace,name,value);
