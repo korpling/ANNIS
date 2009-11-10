@@ -38,7 +38,7 @@ function waitForIFrame(id) {
       }
       catch (e)
       {
-        console.warn(e);
+        //alert('waitForIFrame: ' + e);
       }
     }
   }
@@ -269,15 +269,6 @@ Ext.onReady(function()
       }
     });
 
-  function getRowExpander() {
-    return new Ext.grid.RowExpander({
-      enableCaching: false,
-      tpl : rowBodyTemplate
-    });
-  }
-
-  var selectionModel = new Ext.grid.CheckboxSelectionModel();
-
   function renderToken(value, type, rowData) {
     if(typeof value != 'object')
     {
@@ -367,12 +358,7 @@ Ext.onReady(function()
     return output;
   }
 
-
-  var textExpanders = [getRowExpander()];
-
   var cmItems = 	[];
-
-  //Ext.each(textExpanders, function(item) { cmItems.push(item); });
 
   cmItems.push({
     id: 'actions',
@@ -405,7 +391,6 @@ Ext.onReady(function()
     store: storeSearchResult,
     id: 'gridSearchResult',
     cm: cm,
-    //sm: selectionModel,
     viewConfig: {
       //	           forceFit:true,
       //	           autofill: true,
@@ -438,14 +423,12 @@ Ext.onReady(function()
       }
     },
     loadMask: true,
-    //plugins: textExpanders,
     collapsible: true,
     animCollapse: false,
     trackMouseOver:false,
     enableColumnMove: false,
     autoScroll : true,
     autoExpandColumn: 'postmatch',
-    //sm: new Ext.grid.RowSelectionModel({selectRow:Ext.emptyFn}),
     tbar: pagingToolbar
   });
 
@@ -477,7 +460,9 @@ function toggleRowBody(id) {
     var dom = elemBody.child('*[src=' + conf_context + '/empty.html]', true);
     dom.src = elem.getAttributeNS('annis', 'src');
     waitForIFrame(dom.id);
-  } catch (e) {
+  } catch (e) 
+  {
+    //alert('toggleRowBody: ' + e);
   //ignore
   }
   elemBody.setDisplayed(elemBody.isDisplayed() ? false : 'block');
