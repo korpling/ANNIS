@@ -38,7 +38,7 @@ function waitForIFrame(id) {
       }
       catch (e)
       {
-        //alert('waitForIFrame: ' + e);
+        alert('waitForIFrame (id=' + id + '): ' + e);
       }
     }
   }
@@ -456,14 +456,18 @@ function toggleRowBody(id) {
   var elemBody = Ext.get('annotation-'+ id + '-body');
   var elemSelector = Ext.get('annotation-'+ id + '-selector');
   try {
-    var elem = elemBody.child('*[src=' + conf_context + '/empty.html]');
-    var dom = elemBody.child('*[src=' + conf_context + '/empty.html]', true);
-    dom.src = elem.getAttributeNS('annis', 'src');
-    waitForIFrame(dom.id);
+    var elem = elemBody.child('iframe');
+    var dom = elemBody.child('iframe', true);
+    // only re-set source if not already loaded
+    if(dom.src.match("empty.html$") == "empty.html") // ends with
+    {
+      dom.src = elem.getAttributeNS('annis', 'src');
+      waitForIFrame(dom.id);
+    }
+    
   } catch (e) 
   {
-    //alert('toggleRowBody: ' + e);
-  //ignore
+    alert('toggleRowBody (id=' + id + '): ' + e);
   }
   elemBody.setDisplayed(elemBody.isDisplayed() ? false : 'block');
   elemSelector.toggleClass('annis-level-selector-expanded');
