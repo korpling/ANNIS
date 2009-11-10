@@ -393,7 +393,7 @@ Ext.onReady(function()
     cm: cm,
     viewConfig: {
       //	           forceFit:true,
-      //	           autofill: true,
+      //             autofill: true,
       enableRowBody: true,
       showPreview: true,
       getRowClass : function(record, rowIndex, p, store) {
@@ -429,7 +429,8 @@ Ext.onReady(function()
     enableColumnMove: false,
     autoScroll : true,
     autoExpandColumn: 'postmatch',
-    tbar: pagingToolbar
+    tbar: pagingToolbar,
+    disableSelection: true
   });
 
 
