@@ -10,7 +10,7 @@ function waitForIFrame(id) {
     setTimeout('waitForIFrame("' + id + '")', 500);
   }
   // mime type starts with "image/"?
-  else if(doc.contentType.match("^image/") == "image/")
+  else if(doc.contentType != null && doc.contentType.match("^image/") == "image/")
   {
     if(doc.getElementsByTagName('img').length === 0)
     {
