@@ -44,6 +44,6 @@ public class CitationServlet extends HttpServlet {
 			citationCookie.setPath("/");
 			response.addCookie(citationCookie);
 		}
-		response.sendRedirect(getServletContext().getContextPath());
+		response.sendRedirect(getServletContext().getContextPath() + "/search.html");
 	}
 }
