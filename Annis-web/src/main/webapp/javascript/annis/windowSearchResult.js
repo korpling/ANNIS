@@ -19,7 +19,6 @@ function waitForIFrame(id) {
     {
       var img = doc.getElementsByTagName('img')[0];
       elem.height = img.naturalHeight;
-      elem.width = img.naturalWidth;
     }
   }
   else
@@ -34,7 +33,6 @@ function waitForIFrame(id) {
       try
       {
         elem.height = doc.body.scrollHeight;
-        elem.width = doc.body.scrollWidth;
       }
       catch (e)
       {
@@ -247,7 +245,7 @@ Ext.onReady(function()
     '							Paula' +
     '						</div>' +
     '						<div id="annotation-{[this.cleanId(values._id)]}-paula-body" class="annis-level-body">' +
-    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '							<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
@@ -257,7 +255,7 @@ Ext.onReady(function()
     '							Paula Text' +
     '						</div>' +
     '						<div id="annotation-{[this.cleanId(values._id)]}-paulatext-body" class="annis-level-body">' +
-    '							<iframe width="100%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '							<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
