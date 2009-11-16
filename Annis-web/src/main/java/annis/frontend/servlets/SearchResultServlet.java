@@ -55,6 +55,8 @@ import org.apache.commons.lang.StringUtils;
 public class SearchResultServlet extends HttpServlet
 {
 
+
+  public static final String FILESYSTEM_CACHE_RESULT = "FileSystemCacheResult";
   private static final long serialVersionUID = 7180460653219721099L;
   private Random rand = new Random();
 
@@ -174,8 +176,15 @@ public class SearchResultServlet extends HttpServlet
 
       service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
       AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
-      Cache cacheAnnisResult = new FilesystemCache("AnnisResult");
 
+
+      if(session.getAttribute(FILESYSTEM_CACHE_RESULT) == null)
+      {
+        Cache newCache = new FilesystemCache("AnnisResult");
+        session.setAttribute(FILESYSTEM_CACHE_RESULT, newCache);
+      }
+      Cache cacheAnnisResult = (Cache) session.getAttribute(FILESYSTEM_CACHE_RESULT);
+      
       // check whether match count retrieval has finished
       try
       {

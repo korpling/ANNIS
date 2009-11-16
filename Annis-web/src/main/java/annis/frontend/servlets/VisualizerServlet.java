@@ -61,29 +61,30 @@ public class VisualizerServlet extends HttpServlet
   @SuppressWarnings("unchecked")
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
+    HttpSession session = request.getSession();
     OutputStream outStream = response.getOutputStream();
-   
+
     String spanId = request.getParameter("spanId");
     String textId = request.getParameter("textId");
 
     String path2Dot = getInitParameter("DotPath");
-    if(path2Dot == null || "".equals(path2Dot))
+    if (path2Dot == null || "".equals(path2Dot))
     {
       path2Dot = "dot";
     }
 
-    if(spanId == null)
+    if (spanId == null)
     {
       throw new NullPointerException("Parameter 'spanId' must no be null.");
     }
 
     String namespace = request.getParameter("namespace");
-    if(namespace == null)
+    if (namespace == null)
     {
       throw new NullPointerException("Parameter 'namespace' must no be null.");
     }
 
-    if(textId == null)
+    if (textId == null)
     {
       throw new NullPointerException("Parameter 'textId' must no be null.");
     }
@@ -92,17 +93,17 @@ public class VisualizerServlet extends HttpServlet
 
     //fetching node marker properties from query string to set up fill/colorMap
     Enumeration<String> parameterNamesEnum = request.getParameterNames();
-    while(parameterNamesEnum.hasMoreElements())
+    while (parameterNamesEnum.hasMoreElements())
     {
       String parameterName = parameterNamesEnum.nextElement();
       String parameterValue = request.getParameter(parameterName);
       String color = parameterName.replaceFirst("^.*?:", "");
-      if(parameterValue != null)
+      if (parameterValue != null)
       {
         String[] elementNames = parameterValue.split(",");
-        for(String elementName : elementNames)
+        for (String elementName : elementNames)
         {
-          if(parameterName.startsWith("mark:"))
+          if (parameterName.startsWith("mark:"))
           {
             //set up colorMap
             markableMap.put(elementName, color);
@@ -114,7 +115,7 @@ public class VisualizerServlet extends HttpServlet
     try
     {
       ClassLoader classLoader = Visualizer.class.getClassLoader();
-      
+
       // load from property file
       String path = getServletContext().getRealPath("/");
       Properties propsVisualizers = new Properties();
@@ -128,24 +129,24 @@ public class VisualizerServlet extends HttpServlet
 
 
       // class to load
-      if(propVisualizersFile.canRead())
+      if (propVisualizersFile.canRead())
       {
         propsVisualizers.load(new FileReader(propVisualizersFile));
 
-        if(propsVisualizers.containsKey(namespace))
+        if (propsVisualizers.containsKey(namespace))
         {
           className = propsVisualizers.getProperty(namespace);
         }
       }
 
       // using complete text?
-      if(propUseTextFile.canRead())
+      if (propUseTextFile.canRead())
       {
         propsUseText.load(new FileReader(propUseTextFile));
-        if(propsUseText.containsKey(namespace))
+        if (propsUseText.containsKey(namespace))
         {
           isUseTextId = true;
-          
+
         }
       }
 
@@ -158,7 +159,7 @@ public class VisualizerServlet extends HttpServlet
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());
 
-      if(isUseTextId)
+      if (isUseTextId)
       {
         //gather whole text from backend an use this for visualization
         try
@@ -166,48 +167,43 @@ public class VisualizerServlet extends HttpServlet
           AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
           AnnisResult r = service.getAnnisResult(Long.parseLong(textId));
           visualizer.setResult(r);
-        }
-        catch(AnnisServiceFactoryException e)
+        } catch (AnnisServiceFactoryException e)
         {
           // TODO Auto-generated catch block
           e.printStackTrace();
-        }
-        catch(Exception e)
+        } catch (Exception e)
         {
           e.printStackTrace();
         }
-      }
-      else
+      } else
       {
         //we can use the cached span for visualization
-        Cache cacheAnnisResult = new FilesystemCache("AnnisResult");
+        if (session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT) != null)
+        {
+          Cache cacheAnnisResult =  (Cache) session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT);
 
-        byte[] resultAsBytes = cacheAnnisResult.getBytes(spanId);
-        ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
+          byte[] resultAsBytes = cacheAnnisResult.getBytes(spanId);
+          ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
 
-        visualizer.setResult((AnnisResult) inStream.readObject());
+          visualizer.setResult((AnnisResult) inStream.readObject());
+        }
       }
 
       visualizer.writeOutput(outStream);
       outStream.flush();
-    }
-    catch(InstantiationException e1)
+    } catch (InstantiationException e1)
     {
       e1.printStackTrace(new PrintWriter(outStream));
-    }
-    catch(IllegalAccessException e1)
+    } catch (IllegalAccessException e1)
     {
       e1.printStackTrace(new PrintWriter(outStream));
-    }
-    catch(CacheInitializationException e)
+    } catch (CacheInitializationException e)
     {
       e.printStackTrace(new PrintWriter(outStream));
-    }
-    catch(CacheException e)
+    } catch (CacheException e)
     {
       e.printStackTrace(new PrintWriter(outStream));
-    }
-    catch(ClassNotFoundException e)
+    } catch (ClassNotFoundException e)
     {
       e.printStackTrace(new PrintWriter(outStream));
     }
