@@ -125,4 +125,27 @@ public class FilesystemCache implements Cache {
 			e.printStackTrace();
 		}
 	}
+
+  @Override
+  protected void finalize() throws Throwable
+  {
+    super.finalize();
+
+    for(File f : fileMap.values())
+    {
+      try
+      {
+        if(f.exists() && f.canWrite())
+        {
+          f.delete();
+        }
+      }
+      catch(Exception ex)
+      {
+        
+      }
+    }
+  }
+
+
 }
