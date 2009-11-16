@@ -1,43 +1,26 @@
 
+function checkIFrameLoaded(id)
+{
+  var elemBody = Ext.get(id);
+  var dom = elemBody.child('iframe', true);
+  if(dom != null)
+  {
+    if(dom.src.match("empty.html$") !== "empty.html") // does not end with
+    {
+      var doc = dom.contentWindow.document;
 
-//todo the loading frame might want to be masked
-function waitForIFrame(id) {
-  var elem = document.getElementById(id);
-  var doc = elem.contentWindow.document;
-
-  if(!doc.body)
-  {
-    setTimeout('waitForIFrame("' + id + '")', 500);
-  }
-  // mime type starts with "image/"?
-  else if(doc.contentType != null && doc.contentType.match("^image/") == "image/")
-  {
-    if(doc.getElementsByTagName('img').length === 0)
-    {
-      setTimeout('waitForIFrame("' + id + '")', 500);
-    }
-    else
-    {
-      var img = doc.getElementsByTagName('img')[0];
-      elem.height = img.naturalHeight;
-    }
-  }
-  else
-  {
-    if(doc.body.scrollHeight <= 20)
-    {
-      setTimeout('waitForIFrame("' + id + '")', 500);
-    }
-    else
-    {
-      //adjust iframe size
-      try
+      if(doc.contentType != null &&doc.contentType.match("^image/") == "image/")
       {
-        elem.height = doc.body.scrollHeight;
+        if(doc.getElementsByTagName('img').length !== 0)
+        {
+          var img = doc.getElementsByTagName('img')[0];
+          dom.height = img.naturalHeight;
+        }
       }
-      catch (e)
+      else if(doc.body.scrollHeight > 20)
       {
-        alert('waitForIFrame (id=' + id + '): ' + e);
+        //adjust iframe size
+        dom.height = doc.body.scrollHeight;
       }
     }
   }
@@ -231,42 +214,37 @@ Ext.onReady(function()
     '			<tpl for="_namespaces">' +
     '				<li>' +
     '					<div>' +
-    '						<div id="annotation-{[this.cleanId(parent._id)]}-{.}-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{[this.cleanId(parent._id)]}-{.}\');">' +
+    '						<div id="annotation-{parent._id}-{.}-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{parent._id}-{.}\');">' +
     '                           {[values == "" ? "undefined" : values]}' +
     '						</div>' +
-    '						<div id="annotation-{[this.cleanId(parent._id)]}-{.}-body" class="annis-level-body">' +
-    '								<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src=' + conf_context + '/secure/Visualizer?spanId={parent._id}&textId={parent._textId}&namespace={.}&mark:red=<tpl for="parent._markedObjects">{.},</tpl>"></iframe>' +
+    '						<div id="annotation-{parent._id}-{.}-body" class="annis-level-body">' +
+    '								<iframe onload="checkIFrameLoaded(\'annotation-{parent._id}-{.}-body\')" width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src=' + conf_context + '/secure/Visualizer?spanId={parent._id}&textId={parent._textId}&namespace={.}&mark:red=<tpl for="parent._markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
     '			</tpl>' +
     '				<li>' +
     '					<div>' +
-    '						<div id="annotation-{[this.cleanId(values._id)]}-paula-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{[this.cleanId(values._id)]}-paula\');">' +
+    '						<div id="annotation-{values._id}-paula-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{values._id}-paula\');">' +
     '							Paula' +
     '						</div>' +
-    '						<div id="annotation-{[this.cleanId(values._id)]}-paula-body" class="annis-level-body">' +
-    '							<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '						<div id="annotation-{values._id}-paula-body" class="annis-level-body">' +
+    '							<iframe onload="checkIFrameLoaded(\'annotation-{values._id}-paula-body\')" width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paula&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
     '				<li>' +
     '					<div>' +
-    '						<div id="annotation-{[this.cleanId(values._id)]}-paulatext-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{[this.cleanId(values._id)]}-paulatext\');">' +
+    '						<div id="annotation-{values._id}-paulatext-selector" class="annis-level-selector-collapsed" onclick="toggleRowBody(\'{values._id}-paulatext\');">' +
     '							Paula Text' +
     '						</div>' +
-    '						<div id="annotation-{[this.cleanId(values._id)]}-paulatext-body" class="annis-level-body">' +
-    '							<iframe width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
+    '						<div id="annotation-{values._id}-paulatext-body" class="annis-level-body">' +
+    '							<iframe onload="checkIFrameLoaded(\'annotation-{values._id}-paulatext-body\')" width="95%" height="20px" frameborder="0" src="' + conf_context + '/empty.html" annis:src="' + conf_context + '/secure/Visualizer?spanId={_id}&textId={_textId}&namespace=paulatext&mark:red=<tpl for="_markedObjects">{.},</tpl>"></iframe>' +
     '						</div>' +
     '					</div>' +
     '				</li>' +
     '		</ul>' +
-    '</div>',
-    {
-      cleanId: function(id){
-        return id.replace(',', '_');
-      }
-    });
+    '</div>');
 
   function renderToken(value, type, rowData) {
     if(typeof value != 'object')
@@ -463,7 +441,6 @@ function toggleRowBody(id) {
     if(dom.src.match("empty.html$") == "empty.html") // ends with
     {
       dom.src = elem.getAttributeNS('annis', 'src');
-      waitForIFrame(dom.id);
     }
     
   } catch (e) 
