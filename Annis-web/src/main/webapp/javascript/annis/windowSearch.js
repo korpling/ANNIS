@@ -488,7 +488,7 @@ Ext.onReady(function()
       align: 'right'
     },
     {
-      header: "Token",
+      header: "Tokens",
       dataIndex: 'tokenCount',
       //width: 65,
       align: 'right'
