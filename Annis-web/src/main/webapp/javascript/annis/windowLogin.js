@@ -11,7 +11,7 @@ Ext.onReady(function(){
   var loginSubmitConfig = {
     method:'POST',
     waitTitle:'please wait',
-    waitMsg:'login data is send to server',
+    waitMsg:'login data is being sent to server',
     success: function(f,o)
     {
       // redirect to index.html
