@@ -121,7 +121,14 @@ public class SpringAnnisAdministrationDao {
 
 	void installPlPgSql() {
 		log.info("installing stored procedure language plpgsql");
-		jdbcOperations.execute("CREATE LANGUAGE plpgsql");
+    try
+    {
+      jdbcOperations.execute("CREATE LANGUAGE plpgsql");
+    }
+    catch(Exception ex)
+    {
+      log.warn("plpqsql was already installed: " + ex.getMessage());
+    }
 	}
 
 	void createFunctionComputeRankLevel() {

@@ -48,6 +48,8 @@ public class LoginLogoutServlet extends HttpServlet
     if(logout)
     {
       session.removeAttribute(AuthenticationFilter.KEY_USER);
+      // delete cache
+      session.removeAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT);
       response.getWriter().print("logged out");
     }
     else

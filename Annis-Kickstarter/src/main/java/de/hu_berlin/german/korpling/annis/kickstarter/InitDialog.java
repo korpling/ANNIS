@@ -23,7 +23,11 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -31,15 +35,70 @@ import javax.swing.JOptionPane;
  */
 public class InitDialog extends javax.swing.JDialog
 {
+
   private CorpusAdministration corpusAdministration;
+  private SwingWorker<String, Void> initWorker;
 
   /** Creates new form InitDialog */
-  public InitDialog(java.awt.Frame parent, boolean modal, CorpusAdministration corpusAdministration)
+  public InitDialog(java.awt.Frame parent, boolean modal, final CorpusAdministration corpusAdministration)
   {
     super(parent, modal);
     initComponents();
 
     this.corpusAdministration = corpusAdministration;
+
+    initWorker = new SwingWorker<String, Void>()
+    {
+
+      @Override
+      protected String doInBackground() throws Exception
+      {
+        try
+        {
+          corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
+            "anniskickstart", "annisKickstartPassword", "postgres",
+            txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
+
+          return "";
+        } catch (Exception ex)
+        {
+          ExceptionDialog dlg = new ExceptionDialog(null, ex);
+          dlg.setVisible(true);
+        }
+
+        return "ERROR";
+      }
+
+      @Override
+      protected void done()
+      {
+        pbInit.setIndeterminate(false);
+        btOk.setEnabled(true);
+        btCancel.setEnabled(true);
+        try
+        {
+          if ("".equals(this.get()))
+          {
+            pbInit.setValue(100);
+            JOptionPane.showMessageDialog(null, "Database initialized.", "INFO",
+              JOptionPane.INFORMATION_MESSAGE);
+            setVisible(false);
+          }
+          else
+          {
+            pbInit.setValue(0);
+          }
+        }
+        catch (InterruptedException ex)
+        {
+          Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex)
+        {
+          Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+    };
+
   }
 
   /** This method is called from within the constructor to
@@ -57,6 +116,7 @@ public class InitDialog extends javax.swing.JDialog
     btCancel = new javax.swing.JButton();
     txtAdminUsername = new javax.swing.JTextField();
     txtAdminPassword = new javax.swing.JPasswordField();
+    pbInit = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Init - Annis² Kickstarter");
@@ -91,17 +151,18 @@ public class InitDialog extends javax.swing.JDialog
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(pbInit, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
           .addGroup(layout.createSequentialGroup()
             .addComponent(jLabel1)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(txtAdminUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+            .addComponent(txtAdminUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))
           .addGroup(layout.createSequentialGroup()
             .addComponent(jLabel2)
             .addGap(18, 18, 18)
-            .addComponent(txtAdminPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
+            .addComponent(txtAdminPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE))
           .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 186, Short.MAX_VALUE)
             .addComponent(btOk, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
         .addContainerGap())
     );
@@ -117,6 +178,8 @@ public class InitDialog extends javax.swing.JDialog
           .addComponent(jLabel2)
           .addComponent(txtAdminPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(pbInit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(btOk)
           .addComponent(btCancel))
@@ -135,32 +198,20 @@ public class InitDialog extends javax.swing.JDialog
 
     private void btOkActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btOkActionPerformed
     {//GEN-HEADEREND:event_btOkActionPerformed
-
-      try
-      {
-        corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
-          "anniskickstart", "annisKickstartPassword", "postgres",
-          txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
-
-        JOptionPane.showMessageDialog(null, "Database initialized.", "INFO",
-          JOptionPane.INFORMATION_MESSAGE);
-
-        setVisible(false);
-      }
-      catch(Exception ex)
-      {
-        ExceptionDialog dlg = new ExceptionDialog(null, ex);
-        dlg.setVisible(true);
-      }
+      
+      pbInit.setIndeterminate(true);
+      btOk.setEnabled(false);
+      btCancel.setEnabled(false);
+      initWorker.execute();
 
     }//GEN-LAST:event_btOkActionPerformed
 
-  
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btCancel;
   private javax.swing.JButton btOk;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
+  private javax.swing.JProgressBar pbInit;
   private javax.swing.JPasswordField txtAdminPassword;
   private javax.swing.JTextField txtAdminUsername;
   // End of variables declaration//GEN-END:variables
