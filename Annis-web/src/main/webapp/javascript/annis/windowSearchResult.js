@@ -262,7 +262,12 @@ Ext.onReady(function()
     //ignore
     }
     var output = '';
-    output += '<div class="windowSearchResult text">' + value._text + '</div>';
+    var text = value._text;
+    if(text == null || text == "")
+    {
+      text = "&nbsp;";
+    }
+    output += '<div class="windowSearchResult text">' + text + '</div>';
     Ext.each(rowData._tokenLevels, function(tokenLevel)
     {
       var t = value[tokenLevel] + "";
