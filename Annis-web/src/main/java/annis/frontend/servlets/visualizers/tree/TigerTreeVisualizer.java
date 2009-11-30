@@ -116,9 +116,17 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public String getLabel(AnnisNode n) {
-			if (n.isToken()) {
-				return n.getSpannedText();
-			} else {
+			if (n.isToken()) 
+      {
+        String spannedText = n.getSpannedText();
+        if(spannedText == null || "".equals(spannedText))
+        {
+          spannedText = " ";
+        }
+				return spannedText;
+			} 
+      else
+      {
 				return extractAnnotation(n.getNodeAnnotations(), VISUALIZER_NAMESPACE, "cat");
 			}
 		}
