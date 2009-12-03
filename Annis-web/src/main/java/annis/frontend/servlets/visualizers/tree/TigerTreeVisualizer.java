@@ -112,7 +112,7 @@ public class TigerTreeVisualizer extends Visualizer {
 		}
 	}
 	
-	private static class DefaultLabeler implements TreeElementLabeler {
+	public static class DefaultLabeler implements TreeElementLabeler {
 
 		@Override
 		public String getLabel(AnnisNode n) {
@@ -136,7 +136,7 @@ public class TigerTreeVisualizer extends Visualizer {
 			return extractAnnotation(e.getAnnotations(), VISUALIZER_NAMESPACE, "func");
 		}
 
-		private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName) {
+		public String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName) {
 			for (Annotation a: annotations) {
 				if (a.getNamespace().equals(namespace) && a.getName().equals(featureName)) {
 					return a.getValue();
@@ -194,14 +194,24 @@ public class TigerTreeVisualizer extends Visualizer {
 		return isDominanceEdge(e) && e.getNamespace() != null;
 	}
 
+  public DefaultLabeler createNewLabeler()
+  {
+    return new DefaultLabeler();
+  }
+
+  public DefaultStyler createNewStyler(Java2dBackend backend)
+  {
+    return new DefaultStyler(backend);
+  }
+
 	@Override
 	public void writeOutput(OutputStream outstream) {
 		AnnisResult result = getResult();
 		List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 		
 		Java2dBackend backend = new Java2dBackend();
-		DefaultLabeler labeler = new DefaultLabeler();
-		DefaultStyler styler = new DefaultStyler(backend);
+		DefaultLabeler labeler = createNewLabeler();
+		DefaultStyler styler = createNewStyler(backend);
 		
 		double width = 0;
 		double maxheight = 0;
