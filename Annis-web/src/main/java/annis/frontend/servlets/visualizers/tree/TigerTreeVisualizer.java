@@ -33,7 +33,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 
 public class TigerTreeVisualizer extends Visualizer {
-	private static final String VISUALIZER_NAMESPACE = "tiger";
+	public static final String VISUALIZER_NAMESPACE = "tiger";
 	private static final int SIDE_MARGIN = 20;
 	private static final int TOP_MARGIN = 40;
 	private static final int TREE_DISTANCE = 40;
