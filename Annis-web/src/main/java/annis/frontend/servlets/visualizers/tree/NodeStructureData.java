@@ -127,11 +127,16 @@ class NodeStructureData {
 		}
 	}
 	
-	public boolean hasVerticalEdgeConflict(NodeStructureData nodeStructureData) {
-		if (nodeStructureData.hasPredecessor(this)) {
-			return false;
-		} else {
-			return hasPredecessor(nodeStructureData.parent);
-		}
+	/**
+	 * Tests if the incoming edge of other can conflict (visually overlap) with the incoming edge of this node.
+	 * 
+	 * Two vertical dominance edges can only conflict if other's parent node is a predecessor of 
+	 * this node.
+	 * 
+	 * @param other some other node.
+	 * @return true iff the incoming vertical dominance edges can conflict.
+	 */
+	public boolean hasVerticalEdgeConflict(NodeStructureData other) {
+		return hasPredecessor(other.parent);
 	}
 }

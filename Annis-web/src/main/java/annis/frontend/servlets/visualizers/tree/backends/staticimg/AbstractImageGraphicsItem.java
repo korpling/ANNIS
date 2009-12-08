@@ -34,4 +34,11 @@ public abstract class AbstractImageGraphicsItem implements GraphicsItem {
 	public Collection<AbstractImageGraphicsItem> getChildren() {
 		return children;
 	}
+
+	public void getAllChildren(List<AbstractImageGraphicsItem> outputList) {
+		outputList.addAll(children);
+		for (AbstractImageGraphicsItem child: children) {
+			child.getAllChildren(outputList);
+		}
+	}
 }

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -31,14 +32,16 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 
-
 public class TigerTreeVisualizer extends Visualizer {
-	public static final String VISUALIZER_NAMESPACE = "tiger";
+	private static final String PRIMEDGE_SUBTYPE = "edge";
+	private static final String SECEDGE_SUBTYPE = "secedge";
+	
 	private static final int SIDE_MARGIN = 20;
 	private static final int TOP_MARGIN = 40;
 	private static final int TREE_DISTANCE = 40;
 	
-	public static class DefaultStyler implements TreeElementStyler {
+	public class DefaultStyler implements TreeElementStyler {
+		private final BasicStroke DEFAULT_PEN_STYLE = new BasicStroke(1);
 		public static final int LABEL_PADDING = 2;
 		public static final int HEIGHT_STEP = 40;
 		public static final int TOKEN_SPACING = 15;
@@ -69,21 +72,41 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public Shape getShape(AnnisNode n) {
-			if (n.isToken()) {
-				return new Shape.Invisible(getLabelPadding());
+			if (isQueryMatch(n)) {
+				if (n.isToken()) {
+					return new Shape.Rectangle(Color.WHITE, Color.RED, DEFAULT_PEN_STYLE, getLabelPadding());
+				} else {
+					return new Shape.Ellipse(Color.WHITE, Color.RED, DEFAULT_PEN_STYLE, getLabelPadding());
+				}				
 			} else {
-				return new Shape.Ellipse(Color.BLACK, Color.WHITE, new BasicStroke(1), getLabelPadding());
+				if (n.isToken()) {
+					return new Shape.Invisible(getLabelPadding());
+				} else {
+					return new Shape.Ellipse(Color.BLACK, Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
+				}
 			}
+		}
+
+		private boolean isQueryMatch(AnnisNode n) {
+			return getMarkableMap().containsKey(Long.toString(n.getId()));
 		}
 
 		@Override
 		public Shape getShape(Edge e) {
-			return new Shape.Rectangle(new Color(0.4f, 0.4f, 0.4f), Color.WHITE, new BasicStroke(1), getLabelPadding());
+			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+				return new Shape.Rectangle(getEdgeColor(e), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
+			} else {
+				return new Shape.Rectangle(new Color(0.4f, 0.4f, 0.4f), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
+			}
 		}
 
 		@Override
 		public Color getTextBrush(AnnisNode n) {
-			return Color.BLACK;
+			if (isQueryMatch(n)) {
+				return Color.WHITE;
+			} else {
+				return Color.BLACK;
+			}
 		}
 
 		@Override
@@ -97,8 +120,12 @@ public class TigerTreeVisualizer extends Visualizer {
 		}
 
 		@Override
-		public Color getEdgePen(Edge n) {
-			return new Color(0.3f, 0.3f, 0.3f);
+		public Color getEdgeColor(Edge e) {
+			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+				return new Color(0.5f, 0.5f, 0.8f, 0.7f);
+			} else {
+				return new Color(0.3f, 0.3f, 0.3f);
+			}
 		}
 
 		@Override
@@ -110,33 +137,38 @@ public class TigerTreeVisualizer extends Visualizer {
 		public int getVEdgeOverlapThreshold() {
 			return VEDGE_OVERLAP_THRESHOLD;
 		}
+
+		@Override
+		public Stroke getStroke(Edge e) {
+			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+				return new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[] {2, 2}, 0);
+			} else {
+				return new BasicStroke(2);
+			}
+		}
 	}
 	
-	public static class DefaultLabeler implements TreeElementLabeler {
+	private class DefaultLabeler implements TreeElementLabeler {
 
 		@Override
 		public String getLabel(AnnisNode n) {
-			if (n.isToken()) 
-      {
-        String spannedText = n.getSpannedText();
-        if(spannedText == null || "".equals(spannedText))
-        {
-          spannedText = " ";
-        }
+			if (n.isToken()) {
+				String spannedText = n.getSpannedText();
+				if(spannedText == null || "".equals(spannedText)) {
+					spannedText = " ";
+				}
 				return spannedText;
-			} 
-      else
-      {
-				return extractAnnotation(n.getNodeAnnotations(), VISUALIZER_NAMESPACE, "cat");
+			} else {
+				return extractAnnotation(n.getNodeAnnotations(), getNamespace(), "cat");
 			}
 		}
 
 		@Override
 		public String getLabel(Edge e) {
-			return extractAnnotation(e.getAnnotations(), VISUALIZER_NAMESPACE, "func");
+			return extractAnnotation(e.getAnnotations(), getNamespace(), "func");
 		}
 
-		public String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName) {
+		private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName) {
 			for (Annotation a: annotations) {
 				if (a.getNamespace().equals(namespace) && a.getName().equals(featureName)) {
 					return a.getValue();
@@ -151,16 +183,16 @@ public class TigerTreeVisualizer extends Visualizer {
 			return false;
 		}
 		for (Edge e: n.getIncomingEdges()) {
-			if (isDominanceEdge(e) && e.getSource() != null) {
+			if (hasEdgeSubtype(e, PRIMEDGE_SUBTYPE) && e.getSource() != null) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private boolean isDominanceEdge(Edge e) {
+	private boolean hasEdgeSubtype(Edge e, String edgeSubtype) {
 		String name = e.getName();
-		return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.equals("edge");
+		return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.equals(edgeSubtype);
 	}
 	
 	public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(AnnotationGraph ag) {
@@ -177,6 +209,13 @@ public class TigerTreeVisualizer extends Visualizer {
 			AnnisNode n) {
 		DirectedGraph<AnnisNode, Edge> graph = new DirectedSparseGraph<AnnisNode, Edge>();
 		copyNode(graph, n);
+		for (Edge e: ag.getEdges()) {
+			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE) && 
+					graph.containsVertex(e.getDestination()) &&
+					graph.containsVertex(e.getSource())) {
+				graph.addEdge(e, e.getSource(), e.getDestination());
+			}
+		}
 		return graph;
 	}
 	
@@ -191,18 +230,8 @@ public class TigerTreeVisualizer extends Visualizer {
 	}
 
 	private boolean includeEdge(Edge e) {
-		return isDominanceEdge(e) && e.getNamespace() != null;
+		return hasEdgeSubtype(e, PRIMEDGE_SUBTYPE) && e.getNamespace() != null;
 	}
-
-  public DefaultLabeler createNewLabeler()
-  {
-    return new DefaultLabeler();
-  }
-
-  public DefaultStyler createNewStyler(Java2dBackend backend)
-  {
-    return new DefaultStyler(backend);
-  }
 
 	@Override
 	public void writeOutput(OutputStream outstream) {
@@ -210,8 +239,8 @@ public class TigerTreeVisualizer extends Visualizer {
 		List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 		
 		Java2dBackend backend = new Java2dBackend();
-		DefaultLabeler labeler = createNewLabeler();
-		DefaultStyler styler = createNewStyler(backend);
+		DefaultLabeler labeler = new DefaultLabeler();
+		DefaultStyler styler = new DefaultStyler(backend);
 		
 		double width = 0;
 		double maxheight = 0;
@@ -242,18 +271,16 @@ public class TigerTreeVisualizer extends Visualizer {
 			xOffset += bounds.getWidth() + TREE_DISTANCE; 
 			canvas.setTransform(t);
 		}
-		
 		try {
 			ImageIO.write(image, "png", outstream);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
 	private void renderTree(AbstractImageGraphicsItem item, Graphics2D canvas) {
 		List<AbstractImageGraphicsItem> allItems = new ArrayList<AbstractImageGraphicsItem>();
-		
-		allItems.addAll(item.getChildren());
+		item.getAllChildren(allItems);
 		
 		Collections.sort(allItems, new Comparator<AbstractImageGraphicsItem>() {
 			@Override

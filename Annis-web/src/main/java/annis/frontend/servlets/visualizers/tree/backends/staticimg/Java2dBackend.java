@@ -1,12 +1,14 @@
 package annis.frontend.servlets.visualizers.tree.backends.staticimg;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.CubicCurve2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -28,8 +30,12 @@ public class Java2dBackend implements GraphicsBackend<AbstractImageGraphicsItem>
 		
 		@Override
 		public Rectangle2D extents(String string) {
-			TextLayout tl = new TextLayout(string, awtFont, FRC);
-			return tl.getBounds();
+			if (string.isEmpty()) {
+				return new Rectangle2D.Double(0, 0, 0, 0); 
+			} else {
+				TextLayout tl = new TextLayout(string, awtFont, FRC);
+				return tl.getBounds();
+			}
 		}
 		
 		public java.awt.Font getAwtFont() {
@@ -68,7 +74,7 @@ public class Java2dBackend implements GraphicsBackend<AbstractImageGraphicsItem>
 	}
 
 	@Override
-	public AbstractImageGraphicsItem makeLines(final Collection<Line2D> lines, final Color color) {
+	public AbstractImageGraphicsItem makeLines(final Collection<Line2D> lines, final Color color, final Stroke stroke) {
 		return new AbstractImageGraphicsItem() {
 			
 			@Override
@@ -79,10 +85,75 @@ public class Java2dBackend implements GraphicsBackend<AbstractImageGraphicsItem>
 			@Override
 			public void draw(Graphics2D canvas) {
 				canvas.setColor(color);
-				canvas.setStroke(new BasicStroke(2));
+				canvas.setStroke(stroke);
 				for (Line2D l: lines) {
 					canvas.draw(l);
 				}
+			}
+		};
+	}
+
+	private double getRotationAngle(Point2D origin, Point2D target) {
+		double l = Math.hypot(origin.getX() - target.getX(), origin.getY() - target.getY());
+		double x = Math.acos((origin.getX() - target.getX()) * Math.signum(origin.getX() - target.getX()) / l);
+		
+		if (origin.getX() > target.getX()) {
+			if (origin.getY() < target.getY()) {
+				x = -x;
+			}
+			x += Math.PI;
+		} else {
+			if (origin.getY() > target.getY()) {
+				x = -x;
+			}
+			
+		}
+		return x;
+	}
+
+	@Override
+	public AbstractImageGraphicsItem arrow(final Point2D tip, Point2D fromPoint,
+			Rectangle2D dimensions, final Color color) {
+		
+		final GeneralPath path = new GeneralPath();
+		path.moveTo(0, 0);
+		path.lineTo(dimensions.getHeight(), dimensions.getWidth() / 2);
+		path.lineTo(dimensions.getHeight(), -dimensions.getWidth() / 2);
+		path.closePath();
+		final double angle = getRotationAngle(tip, fromPoint);
+
+		return new AbstractImageGraphicsItem() {
+			@Override
+			public Rectangle2D getBounds() {
+				return new Rectangle2D.Double(0, 0, 0, 0);
+			}
+			
+			@Override
+			public void draw(Graphics2D canvas) {
+				AffineTransform t = canvas.getTransform();
+				canvas.setColor(color);
+				canvas.translate(tip.getX(), tip.getY());
+				canvas.rotate(angle);
+				canvas.fill(path);
+				canvas.setTransform(t);
+			}
+		};
+	}
+
+	@Override
+	public AbstractImageGraphicsItem cubicCurve(final CubicCurve2D curveData,
+			final Stroke strokeStyle, final Color color) {
+		return new AbstractImageGraphicsItem() {
+			@Override
+			public Rectangle2D getBounds() {
+				return curveData.getBounds2D();
+			}
+			
+			@Override
+			public void draw(Graphics2D canvas) {
+				canvas.setStroke(strokeStyle);
+				canvas.setColor(color);
+				canvas.draw(curveData);
 			}
 		};
 	}

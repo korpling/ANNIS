@@ -1,6 +1,8 @@
 package annis.frontend.servlets.visualizers.tree;
 
 import java.awt.Color;
+import java.awt.Stroke;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -53,6 +55,40 @@ public interface GraphicsBackend<T extends GraphicsItem> {
 	 * @return a new grouping item.
 	 */
 	T group();
-	T makeLabel(String label, Point2D pos, Font font, Color color, Alignment centered, Shape shape);
-	T makeLines(Collection<Line2D> lines, Color color);
+	
+	/**
+	 * Creates a new label item.
+	 * 
+	 * @param label The label string.
+	 * @param pos The label position.
+	 * @param font Font to be used for rendering.
+	 * @param color The text color. 
+	 * @param alignment Alignment of the label string with regard to <code>pos</code>.
+	 * @param shape The shape surrounding the label string (border, background color)
+	 * @return a new label item
+	 */
+	T makeLabel(String label, Point2D pos, Font font, Color color, Alignment alignment, Shape shape);
+	T makeLines(Collection<Line2D> lines, Color color, Stroke strokeStyle);
+
+	/**
+	 * Creates a new item that draws a cubic curve.
+	 * 
+	 * @param curveData The curve data.
+	 * @param strokeStyle The stroking style for the curve.
+	 * @param color The stroke color. 
+	 * @return a new graphics item.
+	 */
+	T cubicCurve(CubicCurve2D curveData, Stroke strokeStyle, Color color);
+
+	/**
+	 * Creates a new arrow item.
+	 * 
+	 * @param tip The point of the arrow's tip.
+	 * @param fromDirection The point that specifies the direction from which the arrow is pointing.
+	 * @param dimensions The dimensions (width, height) of the arrow.
+	 * @param fillColor The fill color.
+	 * 
+	 * @return a new graphics item.
+	 */
+	T arrow(Point2D tip, Point2D fromDirection, Rectangle2D dimensions, Color fillColor);
 }

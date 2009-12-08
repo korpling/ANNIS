@@ -1,5 +1,6 @@
 package annis.frontend.servlets.visualizers.tree;
 
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -14,7 +15,8 @@ import annis.frontend.servlets.visualizers.tree.GraphicsBackend.Alignment;
 import annis.model.AnnisNode;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
-	
+import edu.uci.ics.jung.graph.util.Pair;
+
 
 public class ConstituentLayouter<T extends GraphicsItem> {
 	private class TreeLayoutData {
@@ -27,6 +29,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		private final VerticalOrientation orientation;
 		private final List<Line2D> lines = new ArrayList<Line2D>(); 
 		private final OrderedNodeList nodeList = new OrderedNodeList(styler.getVEdgeOverlapThreshold());
+		private final Map<AnnisNode, Rectangle2D> rectangles = new HashMap<AnnisNode, Rectangle2D>();
 		
 		public void setBaseline(double baseline) {
 			this.baseline = baseline;
@@ -35,6 +38,10 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		public TreeLayoutData(VerticalOrientation orientation_, Map<AnnisNode, Double> positions_) {
 			positions = positions_;
 			orientation = orientation_;
+		}
+
+		public VerticalOrientation getOrientation() {
+			return orientation;
 		}
 
 		public double getYPosition(AnnisNode node) {
@@ -47,6 +54,10 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 		public void addEdge(Point2D from, Point2D to) {
 			getLines().add(new Line2D.Double(from, to));
+		}
+		
+		public void addNodeRect(AnnisNode node, Rectangle2D nodeRect) {
+			rectangles.put(node, nodeRect);
 		}
 		
 		public Point2D getDominanceConnector(AnnisNode node, Rectangle2D bounds) {
@@ -79,6 +90,10 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		
 		public OrderedNodeList getNodeList() {
 			return nodeList;
+		}
+
+		public Rectangle2D getRect(AnnisNode source) {
+			return rectangles.get(source);
 		}
 	}
 	
@@ -209,7 +224,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 				}});
 			int d = findFirstContinuous(levelNodes);
 			/* d is either the index of the first continuous node,
-		     * or len(level_nodes), if there are only discontinuous
+		     * or levelNodes.size(), if there are only discontinuous
 		     * nodes.
 		     * In any case, each combination of 2 nodes with at least
 		     * one discontinuous node is checked exactly once. 
@@ -268,7 +283,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 				return n;
 			}
 		}
-		throw new RuntimeException();
+		// This state is impossible to reach given graphs that are created by the TigerTreeVisualizer.
+		throw new RuntimeException("Cannot find a root for the graph.");
 	}
 
 	private double computeTreeHeight() {
@@ -310,45 +326,27 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		TreeLayoutData treeLayout = new TreeLayoutData(options.getOrientation(), computeTokenPositions(options, 5));
 		
 		treeLayout.setParentItem(backend.group());
-		/* extra_count = self._labeler.extra_label_count(self._graph.id[0], NodeType.TERMINAL)
-        tree_layout.extra_label_height = \
-                   self._font(EXTRA_LABEL).height + 2 * TreeElements.LABEL_PADDING
-		 */	
 		if (options.getOrientation() == VerticalOrientation.TOP_ROOT) {
 			treeLayout.setNtStart(computeTreeHeight());
 			treeLayout.setBaseline(treeLayout.getNtStart() + styler.getFont(TOKEN_NODE).getLineHeight());
 		} else {
-			throw new RuntimeException();
-			/*
-            tree_layout.extra_start = 0
-            tree_layout.baseline = extra_count * tree_layout.extra_label_height + self._font(NodeType.TERMINAL).height
-            tree_layout.nt_start = tree_layout.baseline
-			 */
+			treeLayout.setBaseline(styler.getFont(TOKEN_NODE).getLineHeight());
+			treeLayout.setNtStart(styler.getFont(TOKEN_NODE).getLineHeight());
 		}
 		calculateNodePosition(root, treeLayout, options);
-		GraphicsItem edges = backend.makeLines(treeLayout.getLines(), styler.getEdgePen(null));
+		Edge e = getOutgoingEdges(root).get(0);
+		GraphicsItem edges = backend.makeLines(treeLayout.getLines(), styler.getEdgeColor(e), styler.getStroke(e));
 		edges.setZValue(-4);
 		edges.setParentItem(treeLayout.getParentItem());
-		//self._add_secedges(tree_layout, options)
+		addSecEdges(treeLayout, options);
 		return treeLayout.getParentItem();
 	}
 
 	private Point2D calculateNodePosition(final AnnisNode current, TreeLayoutData treeLayout, LayoutOptions options) {
 		double y = treeLayout.getYPosition(current);
 		
-		List<Edge> outEdges = new ArrayList<Edge>();
-		outEdges.addAll(graph.getOutEdges(current));
-		Collections.sort(outEdges, new Comparator<Edge>()  {
-			@Override
-			public int compare(Edge o1, Edge o2) {
-				int h1 = dataMap.get(graph.getOpposite(current, o1)).getHeight();
-				int h2 = dataMap.get(graph.getOpposite(current, o2)).getHeight();
-				return h1 - h2;
-			}
-		});
-        List<Double> childPositions = new ArrayList<Double>();
-		
-		for (Edge e: outEdges) {
+		List<Double> childPositions = new ArrayList<Double>();
+		for (Edge e: getOutgoingEdges(current)) {
 			AnnisNode child = graph.getOpposite(current, e);
 			Point2D childPos;
 			if (child.isToken()) {
@@ -365,11 +363,11 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 			}
 			treeLayout.addEdge(new Point2D.Double(childPos.getX(), y), childPos);
 			
-			String labelString = labeler.getLabel(e);
-			
 			GraphicsItem label = backend.makeLabel(
-					labelString, new Point2D.Double(childPos.getX(), y + treeLayout.orientation.value * styler.getHeightStep() * 0.5), 
+					labeler.getLabel(e), 
+					new Point2D.Double(childPos.getX(), y + treeLayout.orientation.value * styler.getHeightStep() * 0.5), 
 					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e));
+			
 			label.setZValue(10);
 			label.setParentItem(treeLayout.parentItem);
 		}
@@ -381,61 +379,118 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		GraphicsItem label = backend.makeLabel(
 				labeler.getLabel(current), new Point2D.Double(xCenter, y), 
 				styler.getFont(current), styler.getTextBrush(current), Alignment.CENTERED, styler.getShape(current));
+		treeLayout.addNodeRect(current, label.getBounds());
 		
 		label.setZValue(11);
         label.setParentItem(treeLayout.getParentItem());
         treeLayout.addEdge(new Point2D.Double(Collections.min(childPositions), y), new Point2D.Double(Collections.max(childPositions), y));
 		return treeLayout.getDominanceConnector(current, label.getBounds());
 	}
+
+	private List<Edge> getOutgoingEdges(final AnnisNode current) {
+		List<Edge> outEdges = new ArrayList<Edge>();
+		for (Edge e: graph.getOutEdges(current)) {
+			if (e.getName().equals("edge")) {
+				outEdges.add(e);
+			}
+		}
+		Collections.sort(outEdges, new Comparator<Edge>() {
+			@Override
+			public int compare(Edge o1, Edge o2) {
+				int h1 = dataMap.get(graph.getOpposite(current, o1)).getHeight();
+				int h2 = dataMap.get(graph.getOpposite(current, o2)).getHeight();
+				return h1 - h2;
+			}
+		});
+		return outEdges;
+	}
 	
-/*
-    def _add_secedges(self, tree_layout, options):
-        for origin_id, target_id, edge in self._graph.edges_of(EdgeType.SECONDARY):
-            origin_layout = self.layout_data(origin_id)
-            target_layout = self.layout_data(target_id)
+	private CubicCurve2D secedgeCurve(VerticalOrientation verticalOrientation, Rectangle2D sourceRect, Rectangle2D targetRect) {
+		Pair<RectangleSide> sidePair = findBestConnection(sourceRect, targetRect);
+		
+		Point2D startPoint = sideMidPoint(sourceRect, sidePair.getFirst());
+		Point2D endPoint = sideMidPoint(targetRect, sidePair.getSecond());
+		
+		double middleX = (startPoint.getX() + endPoint.getX()) / 2.0;
+		double middleY = 50 * -verticalOrientation.value + (startPoint.getY() + endPoint.getY()) / 2;
+		return new CubicCurve2D.Double(
+				startPoint.getX(), startPoint.getY(), 
+				middleX, middleY, middleX, middleY, 
+				endPoint.getX(), endPoint.getY());
+	}
+	
+	private Point2D sideMidPoint(Rectangle2D rect, RectangleSide side) {
+		switch (side) {
+		case TOP:
+			return new Point2D.Double(rect.getCenterX(), rect.getMinY());
+		case BOTTOM:
+			return new Point2D.Double(rect.getCenterX(), rect.getMaxY());
+		case LEFT:
+			return new Point2D.Double(rect.getMinX(), rect.getCenterY());
+		case RIGHT:
+			return new Point2D.Double(rect.getMaxX(), rect.getCenterY());
+		default:
+			throw new RuntimeException();
+		}
+	}
 
-            if origin_layout.hidden or target_layout.hidden:
-                continue
+	private Pair<RectangleSide> findBestConnection(Rectangle2D sourceRect,
+			Rectangle2D targetRect) {
+		Pair<RectangleSide> result = null;
+		double minDist = Float.MAX_VALUE;
+		for (RectangleSide orig: RectangleSide.values()) {
+			for (RectangleSide target: RectangleSide.values()) {
+				Point2D o = sideMidPoint(sourceRect, orig);
+				Point2D t = sideMidPoint(targetRect, target);
+				double dist = Math.hypot(o.getX() - t.getX(), t.getY() - t.getY());
+				if (dist < minDist) {
+					result = new Pair<RectangleSide>(orig, target);
+					minDist = dist;
+				}
+			}
+		}
+		return result;
+	}
 
-            curve = graphics.secedge_curve(tree_layout.orientation.value, origin_layout.rect, target_layout.rect)
+	private void addSecEdges(TreeLayoutData treeLayout, LayoutOptions options) {
+		for (Edge e: graph.getEdges()) {
+			if (!e.getName().equals("secedge")) {
+				continue;
+			}
+			Rectangle2D sourceRect = treeLayout.getRect(e.getSource());
+			Rectangle2D targetRect = treeLayout.getRect(e.getDestination());
+			
+			CubicCurve2D curveData = secedgeCurve(treeLayout.getOrientation(), sourceRect, targetRect);
+			T secedgeElem = backend.cubicCurve(curveData, styler.getStroke(e), styler.getEdgeColor(e));
+			secedgeElem.setZValue(-2);
+			
+			T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(), new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e));
+			arrowElem.setZValue(-1);
+			arrowElem.setParentItem(secedgeElem);
+			
+			Point2D labelPos = evaluate(curveData, 0.8);
 
-            secedge = self._backend.cubic_curve(curve, TreeElements.SECEDGE_PEN)
-            secedge.setZValue(-2)
+			T label = backend.makeLabel(
+					labeler.getLabel(e), labelPos, 
+					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e));
+			label.setParentItem(secedgeElem);
+			secedgeElem.setParentItem(treeLayout.getParentItem());
+		}
+	}
 
-            target_arrow = self._backend.arrow(
-                curve[-1], curve[-2],
-                graphics.Pen(graphics.Colors.INVISIBLE, 0, []),
-                graphics.Brush(TreeElements.SECONDARY_EDGE_COLOR),
-                graphics.Rectangle(0, 0, 8, 8))
-            target_arrow.setZValue(-1)
-
-            if options.draw_edge_labels:
-                label_pos = graphics.bezier_point(curve, 0.8)
-                shape, brush = self._label_style(edge)
-                secedge_label = self._backend.label(
-                    self._labeler.label(edge, corpus_id = origin_id[0]), label_pos,
-                    self._font(edge.TYPE), shape, (0.5, 0.5), brush)
-                secedge_label.setParentItem(secedge)
-
-            target_arrow.setParentItem(secedge)
-            secedge.setParentItem(tree_layout.parent_item)
-
- */
+	private Point2D evaluate(CubicCurve2D curveData, double t) {
+		double u = 1 - t;
+		return new Point2D.Double(
+				curveData.getX1()*u*u*u + 3*curveData.getCtrlX1()*t*u*u + 3*curveData.getCtrlX2()*t*t*u + curveData.getX2()*t*t*t,
+				curveData.getY1()*u*u*u + 3*curveData.getCtrlY1()*t*u*u + 3*curveData.getCtrlY2()*t*t*u + curveData.getY2()*t*t*t);
+	}
 
 	private Point2D addTerminalNode(AnnisNode terminal, TreeLayoutData treeLayout) {
 		GraphicsItem label = backend.makeLabel(
 				labeler.getLabel(terminal), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
 				styler.getTextBrush(terminal), Alignment.NONE, styler.getShape(terminal));
 		label.setParentItem(treeLayout.getParentItem());
-		//
-        //    for i, lstr in enumerate(self._labeler.extra_labels(token)[::tree_layout.orientation.value]):
-        //        extra_lbox = self._backend.label(
-        //            lstr,
-        //            (lbox.rect.x_mid, tree_layout.extra_start + (i + 1) * tree_layout.extra_label_height),
-        //            self._font(EXTRA_LABEL),
-        //            TreeElements.ADD_TERMINAL_LABEL_SHAPE, (0.5, 0))
-        //        extra_lbox.setParentItem(tree_layout.parent_item)
-		//child_layout.orientation = tree_layout.orientation
+		treeLayout.addNodeRect(terminal, label.getBounds());
 		return treeLayout.getDominanceConnector(terminal, label.getBounds());
 	}
 }	

@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A class for finding optimal horizontal positions for node labels given
+ * all intervening vertical edges.
+ */
 public class OrderedNodeList {
 	private final double minDistance;
 	private final List<NodeStructureData> nodes = new ArrayList<NodeStructureData>();
