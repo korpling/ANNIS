@@ -387,10 +387,19 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		return treeLayout.getDominanceConnector(current, label.getBounds());
 	}
 
+	private Point2D addTerminalNode(AnnisNode terminal, TreeLayoutData treeLayout) {
+		GraphicsItem label = backend.makeLabel(
+				labeler.getLabel(terminal), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
+				styler.getTextBrush(terminal), Alignment.NONE, styler.getShape(terminal));
+		label.setParentItem(treeLayout.getParentItem());
+		treeLayout.addNodeRect(terminal, label.getBounds());
+		return treeLayout.getDominanceConnector(terminal, label.getBounds());
+	}
+
 	private List<Edge> getOutgoingEdges(final AnnisNode current) {
 		List<Edge> outEdges = new ArrayList<Edge>();
 		for (Edge e: graph.getOutEdges(current)) {
-			if (e.getName().equals("edge")) {
+			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE)) {
 				outEdges.add(e);
 			}
 		}
@@ -454,7 +463,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 	private void addSecEdges(TreeLayoutData treeLayout, LayoutOptions options) {
 		for (Edge e: graph.getEdges()) {
-			if (!e.getName().equals("secedge")) {
+			if (!AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE)) {
 				continue;
 			}
 			Rectangle2D sourceRect = treeLayout.getRect(e.getSource());
@@ -483,14 +492,5 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		return new Point2D.Double(
 				curveData.getX1()*u*u*u + 3*curveData.getCtrlX1()*t*u*u + 3*curveData.getCtrlX2()*t*t*u + curveData.getX2()*t*t*t,
 				curveData.getY1()*u*u*u + 3*curveData.getCtrlY1()*t*u*u + 3*curveData.getCtrlY2()*t*t*u + curveData.getY2()*t*t*t);
-	}
-
-	private Point2D addTerminalNode(AnnisNode terminal, TreeLayoutData treeLayout) {
-		GraphicsItem label = backend.makeLabel(
-				labeler.getLabel(terminal), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
-				styler.getTextBrush(terminal), Alignment.NONE, styler.getShape(terminal));
-		label.setParentItem(treeLayout.getParentItem());
-		treeLayout.addNodeRect(terminal, label.getBounds());
-		return treeLayout.getDominanceConnector(terminal, label.getBounds());
 	}
 }	

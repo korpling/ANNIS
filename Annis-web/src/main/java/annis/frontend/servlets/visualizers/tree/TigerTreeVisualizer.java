@@ -25,20 +25,20 @@ import annis.frontend.servlets.visualizers.tree.backends.staticimg.AbstractImage
 import annis.frontend.servlets.visualizers.tree.backends.staticimg.Java2dBackend;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 
 public class TigerTreeVisualizer extends Visualizer {
-	private static final String PRIMEDGE_SUBTYPE = "edge";
-	private static final String SECEDGE_SUBTYPE = "secedge";
-	
 	private static final int SIDE_MARGIN = 20;
 	private static final int TOP_MARGIN = 40;
 	private static final int TREE_DISTANCE = 40;
+	
+	private final Java2dBackend backend;
+	private final DefaultLabeler labeler;
+	private final DefaultStyler styler;
+	private final AnnisGraphTools graphtools;
 	
 	public class DefaultStyler implements TreeElementStyler {
 		private final BasicStroke DEFAULT_PEN_STYLE = new BasicStroke(1);
@@ -93,7 +93,7 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public Shape getShape(Edge e) {
-			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE)) {
 				return new Shape.Rectangle(getEdgeColor(e), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
 			} else {
 				return new Shape.Rectangle(new Color(0.4f, 0.4f, 0.4f), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
@@ -121,7 +121,7 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public Color getEdgeColor(Edge e) {
-			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE)) {
 				return new Color(0.5f, 0.5f, 0.8f, 0.7f);
 			} else {
 				return new Color(0.3f, 0.3f, 0.3f);
@@ -140,7 +140,7 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public Stroke getStroke(Edge e) {
-			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE)) {
+			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE)) {
 				return new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[] {2, 2}, 0);
 			} else {
 				return new BasicStroke(2);
@@ -178,59 +178,11 @@ public class TigerTreeVisualizer extends Visualizer {
 		}
 	}
 
-	private boolean isRootNode(AnnisNode n) {
-		if (!n.getNamespace().equals(getNamespace())) {
-			return false;
-		}
-		for (Edge e: n.getIncomingEdges()) {
-			if (hasEdgeSubtype(e, PRIMEDGE_SUBTYPE) && e.getSource() != null) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean hasEdgeSubtype(Edge e, String edgeSubtype) {
-		String name = e.getName();
-		return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.equals(edgeSubtype);
-	}
-	
-	public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(AnnotationGraph ag) {
-		List<DirectedGraph<AnnisNode, Edge>> resultGraphs = new ArrayList<DirectedGraph<AnnisNode, Edge>>();
-		for (AnnisNode n: ag.getNodes()) {
-			if (isRootNode(n)) {
-				resultGraphs.add(extractGraph(ag, n));
-			}
-		}
-		return resultGraphs;
-	}
-	
-	private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-			AnnisNode n) {
-		DirectedGraph<AnnisNode, Edge> graph = new DirectedSparseGraph<AnnisNode, Edge>();
-		copyNode(graph, n);
-		for (Edge e: ag.getEdges()) {
-			if (hasEdgeSubtype(e, SECEDGE_SUBTYPE) && 
-					graph.containsVertex(e.getDestination()) &&
-					graph.containsVertex(e.getSource())) {
-				graph.addEdge(e, e.getSource(), e.getDestination());
-			}
-		}
-		return graph;
-	}
-	
-	private void copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n) {
-		graph.addVertex(n);
-		for (Edge e: n.getOutgoingEdges()) {
-			if (includeEdge(e)) {
-				copyNode(graph, e.getDestination());
-				graph.addEdge(e, n, e.getDestination());
-			}
-		}
-	}
-
-	private boolean includeEdge(Edge e) {
-		return hasEdgeSubtype(e, PRIMEDGE_SUBTYPE) && e.getNamespace() != null;
+	public TigerTreeVisualizer() {
+		backend = new Java2dBackend();
+		labeler = new DefaultLabeler();
+		styler = new DefaultStyler(backend);
+		graphtools = new AnnisGraphTools();
 	}
 
 	@Override
@@ -238,18 +190,15 @@ public class TigerTreeVisualizer extends Visualizer {
 		AnnisResult result = getResult();
 		List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 		
-		Java2dBackend backend = new Java2dBackend();
-		DefaultLabeler labeler = new DefaultLabeler();
-		DefaultStyler styler = new DefaultStyler(backend);
-		
 		double width = 0;
 		double maxheight = 0;
 		
-		for (DirectedGraph<AnnisNode, Edge> g: getSyntaxGraphs(result.getGraph())) {
+		for (DirectedGraph<AnnisNode, Edge> g: graphtools.getSyntaxGraphs(result.getGraph(), getNamespace())) {
 			ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
 					g, backend, labeler, styler);
+			
 			AbstractImageGraphicsItem item = cl.createLayout(
-					new LayoutOptions(VerticalOrientation.TOP_ROOT, HorizontalOrientation.LEFT_TO_RIGHT));
+					new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.detectLayoutDirection(result.getGraph())));
 
 			Rectangle2D treeSize = item.getBounds();
 			
