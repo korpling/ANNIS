@@ -131,7 +131,7 @@
 
     <init-param>
       <param-name>managerClassName</param-name>
-      <param-value>annis.security.SimpleSecurityManager</param-value>
+      <param-value>annis.security.TestSecurityManager</param-value>
     </init-param>
       
       <!--

@@ -28,5 +28,7 @@ WebContent = fWeb.read()
 fWeb.close()
 
 fWeb = open(web_xml_path, 'w')
-fWeb.write(WebContent.replace("<param-value>/etc/annis/user_config_dev/</param-value>", "<param-value>%s</param-value>\n" % user_conf_dir))
+WebContent = WebContent.replace("<param-value>/etc/annis/user_config_dev/</param-value>", "<param-value>%s</param-value>\n" % user_conf_dir)
+WebContent = WebContent.replace("<param-value>annis.security.TestSecurityManager</param-value>", "<param-value>annis.security.SimpleSecurityManager</param-value>\n")
+fWeb.write(WebContent)
 fWeb.close()
