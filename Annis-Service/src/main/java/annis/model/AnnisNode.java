@@ -57,7 +57,7 @@ public class AnnisNode implements Serializable {
 	private String marker;
 
 	public enum TextMatching {
-		EXACT("~=~", "\""), REGEXP("~", "/");
+		EXACT("=", "\""), REGEXP("~", "/");
 
 		private String sqlOperator;
 		private String annisQuote;
