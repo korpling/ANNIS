@@ -15,7 +15,7 @@ JSContent = fJS.read();
 fJS.close();
 
 JSContent = JSContent.replace("'/Annis-web';", "'/Annis-trunk';")
-JSContent = JSContent.replace("${SVN_REVISION}", rev)
+JSContent = JSContent.sub("var conf_revision='[^']*';", "var conf_revision='" + rev + " (SVN)';")
 fJS = open(config_js_path, "w")
 fJS.write(JSContent)
 fJS.close()
