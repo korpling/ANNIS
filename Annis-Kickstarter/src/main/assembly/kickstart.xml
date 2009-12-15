@@ -6,6 +6,13 @@
     <format>zip</format>
   </formats>
   <fileSets>
+    <fileSet>
+      <directory>src/main/resources/</directory>
+      <includes>
+        <include>splashscreen.gif</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
     <!-- we need all the config files of the service -->
     <fileSet>
       <directory>../Annis-Service/src/main/dist/</directory>

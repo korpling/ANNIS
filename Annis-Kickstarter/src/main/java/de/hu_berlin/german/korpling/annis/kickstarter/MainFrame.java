@@ -49,6 +49,7 @@ public class MainFrame extends javax.swing.JFrame
 
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, String> serviceWorker;
+  private boolean wasStarted = false;
 
   /** Creates new form MainFrame */
   public MainFrame()
@@ -95,6 +96,7 @@ public class MainFrame extends javax.swing.JFrame
       {
         try
         {
+          wasStarted = true;
           pbStart.setIndeterminate(false);
           pbStart.setValue(100);
           if("".equals(this.get()))
@@ -277,6 +279,13 @@ public class MainFrame extends javax.swing.JFrame
 
       InitDialog dlg = new InitDialog(this, true, corpusAdministration);
       dlg.setVisible(true);
+
+      if(!wasStarted && isInitialized())
+      {
+        btImport.setEnabled(true);
+        btList.setEnabled(true);
+        serviceWorker.execute();
+      }
 
     }//GEN-LAST:event_btInitActionPerformed
 
