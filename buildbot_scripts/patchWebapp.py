@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, sys
+import os, sys, re
 
 #conf
 path_to_app=sys.argv[1]
@@ -15,7 +15,8 @@ JSContent = fJS.read();
 fJS.close();
 
 JSContent = JSContent.replace("'/Annis-web';", "'/Annis-trunk';")
-JSContent = JSContent.sub("var conf_revision='[^']*';", "var conf_revision='" + rev + " (SVN)';")
+regRev = re.compile("var conf_revision='[^']*';")
+JSContent = regRev.sub("var conf_revision='" + rev + " (SVN)';", JSContent)
 fJS = open(config_js_path, "w")
 fJS.write(JSContent)
 fJS.close()
