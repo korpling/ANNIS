@@ -26,14 +26,18 @@ class AnnisGraphTools {
 		return resultGraphs;
 	}
 	
-	private void copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n) {
-		graph.addVertex(n);
+	private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n) {
+		boolean addToGraph = n.isToken();
 		for (Edge e: n.getOutgoingEdges()) {
-			if (includeEdge(e)) {
-				copyNode(graph, e.getDestination());
+			if (includeEdge(e) && copyNode(graph, e.getDestination())) { 
+				addToGraph |= true;
 				graph.addEdge(e, n, e.getDestination());
 			}
 		}
+		if (addToGraph) {
+			graph.addVertex(n);
+		}
+		return addToGraph;
 	}
 
 	private boolean isRootNode(AnnisNode n, String namespace) {
