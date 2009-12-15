@@ -110,7 +110,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeSpanString() {
 		node23.setSpannedText("string", TextMatching.EXACT);
-		checkWhereCondition(join("~=~", "_node23.span", "'string'"));
+		checkWhereCondition(join("=", "_node23.span", "'string'"));
 	}
 	
 	// WHERE condition for spanned text (regexp) 
@@ -131,7 +131,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_annotation23_1.name", "'name1'"),
 				join("=", "_annotation23_2.namespace", "'namespace2'"),
 				join("=", "_annotation23_2.name", "'name2'"),
-				join("~=~", "_annotation23_2.value", "'value2'"),
+				join("=", "_annotation23_2.value", "'value2'"),
 				join("=", "_annotation23_3.namespace", "'namespace3'"),
 				join("=", "_annotation23_3.name", "'name3'"),
 				join("~", "_annotation23_3.value", "'^value3$'")
@@ -149,7 +149,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_rank_annotation23_1.name", "'name1'"),
 				join("=", "_rank_annotation23_2.namespace", "'namespace2'"),
 				join("=", "_rank_annotation23_2.name", "'name2'"),
-				join("~=~", "_rank_annotation23_2.value", "'value2'"),
+				join("=", "_rank_annotation23_2.value", "'value2'"),
 				join("=", "_rank_annotation23_3.namespace", "'namespace3'"),
 				join("=", "_rank_annotation23_3.name", "'name3'"),
 				join("~", "_rank_annotation23_3.value", "'^value3$'")

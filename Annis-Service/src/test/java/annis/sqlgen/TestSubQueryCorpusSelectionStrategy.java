@@ -84,7 +84,7 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation1.corpus_ref = c1.id " +
 			"AND corpus_annotation2.namespace = 'namespace2' " +
 			"AND corpus_annotation2.name = 'name2' " +
-			"AND corpus_annotation2.value ~=~ 'value2' " +
+			"AND corpus_annotation2.value = 'value2' " +
 			"AND corpus_annotation2.corpus_ref = c1.id " +
 			"AND corpus_annotation3.namespace = 'namespace3' " +
 			"AND corpus_annotation3.name = 'name3' " +
@@ -112,7 +112,7 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation1.corpus_ref = c1.id " +
 			"AND corpus_annotation2.namespace = 'namespace2' " +
 			"AND corpus_annotation2.name = 'name2' " +
-			"AND corpus_annotation2.value ~=~ 'value2' " +
+			"AND corpus_annotation2.value = 'value2' " +
 			"AND corpus_annotation2.corpus_ref = c1.id " +
 			"AND corpus_annotation3.namespace = 'namespace3' " +
 			"AND corpus_annotation3.name = 'name3' " +
