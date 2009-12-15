@@ -3,13 +3,15 @@
 		padding: 0px;
 		background-color:#F0F0F0;
 		font-family: Verdana, Arial, Helvetica, sans-serif;
-		font-size:10pt;
-	}
-
+		font-size:14px;
+		 }
+		 
 	.code { font-family:monospace;}
 	.comment {color:#999999;}
 
 	pre {text-indent: 30px}
+
+
 
 	#tabmenu {
 		color: #000000;
@@ -55,8 +57,7 @@
 		background: #D7ECEE;
 		color: #000000; }
 
-	#content {
-    font-family: verdana, sans-serif;
+	#content {font: verdana, sans-serif;
 		text-align: justify;
 		background: #D7ECEE;
 		padding: 20px;
@@ -120,8 +121,7 @@
 		color: #000000; }
 		
 		
-	#tutorialcontent {
-    font-family: verdana, sans-serif;
+	#tutorialcontent {font: verdana, sans-serif;
 		text-align: justify;
 		background: #D7ECEE;
 		padding: 20px;
@@ -132,5 +132,7 @@
 		color: #000099; }
 
 	#tutorialcontent a:hover { color: #0033FF; }
+
+
 
 

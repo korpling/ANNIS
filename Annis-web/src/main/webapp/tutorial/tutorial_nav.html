@@ -4,11 +4,11 @@
 <head>
 <title>ANNIS2 Tutorial Navigation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="ANNIS_site.css" rel="stylesheet" type="text/css">
+<link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-Get help about: <select onChange="parent.tutframe.location.href=this.value;">
+Get help about: <select onChange="window.top.tutframe.location.href=this.value;">
 <optgroup label="ANNIS2 Interface">
 <option selected value="interface.html">Using the ANNIS2 interface</option>
 <option value="query_builder.html">Using the graphical query builder</option>
@@ -17,6 +17,7 @@ Get help about: <select onChange="parent.tutframe.location.href=this.value;">
 <option value="simple.html">Searching for word forms</option>
 <option value="spans.html">Searching for annotations</option>
 <option value="trees.html">Searching for trees</option>
+<option value="PRs.html">Searching for pointing relations</option>
 <option value="operators.html">Operators in AQL (list)</option>
 </optgroup>
 </select>
