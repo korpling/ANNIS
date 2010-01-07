@@ -16,6 +16,7 @@
 package annis.frontend.servlets.visualizers.partitur;
 
 import annis.frontend.servlets.visualizers.WriterVisualizer;
+import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
@@ -35,6 +36,7 @@ public class PartiturVisualizer extends WriterVisualizer
 
   public enum ElementType
   {
+
     begin,
     end,
     middle,
@@ -51,6 +53,9 @@ public class PartiturVisualizer extends WriterVisualizer
       Document jdomDoc = getPaulaJDOM();
       PartiturParser partitur = new PartiturParser(jdomDoc, getNamespace());
 
+      // check right to left
+      boolean isRTL = checkRTL(getResult().getTokenList());
+
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
 
@@ -62,7 +67,7 @@ public class PartiturVisualizer extends WriterVisualizer
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
-      for(String levelName : tierNames)
+      for (String levelName : tierNames)
       {
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
@@ -74,42 +79,51 @@ public class PartiturVisualizer extends WriterVisualizer
 
       writer.append("<div id=\"toolbar\"></div>");
       writer.append("<div id=\"partiture\" style=\"position: absolute; top: 30px; left: 0px;\">");
-      writer.append("<table class=\"partitur_table\">\n");
 
-      for(String tier : tierNames)
+      if (isRTL)
+      {
+        writer.append("<table class=\"partitur_table\" dir=\"rtl\">\n");
+      }
+      else
+      {
+        writer.append("<table class=\"partitur_table\" >\n");
+      }
+
+
+      for (String tier : tierNames)
       {
         writer.append("<tr id=\"level_" + tier + "\">");
 
         writer.append("<th>" + tier + "</th>");
 
         Iterator<PartiturParser.Token> itToken = partitur.getToken().iterator();
-        while(itToken.hasNext())
+        while (itToken.hasNext())
         {
           PartiturParser.Token token = itToken.next();
-          
+
           String val = "";
           String color = "";
           String styleClass = "";
-          
+
           StringBuffer tokenIdsArray = new StringBuffer();
           StringBuffer eventIdsArray = new StringBuffer();
 
           String quicktip = "";
-          int colspan=1;
+          int colspan = 1;
 
           ElementType type = getTypeForToken(token, tier);
           PartiturParser.Event event = token.getTier2Event().get(tier);
 
-          if(event != null && type != ElementType.noEvent)
+          if (event != null && type != ElementType.noEvent)
           {
             styleClass = "single_event";
             quicktip = "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + event.getValue() + "\" ";
-            
+
             // "eat up" token and use this info for colspan
             ElementType tmpType = type;
-            
-            while(itToken.hasNext() &&
-              tmpType != ElementType.end && tmpType != ElementType.single)
+
+            while (itToken.hasNext()
+              && tmpType != ElementType.end && tmpType != ElementType.single)
             {
               PartiturParser.Token tmpToken = itToken.next();
               tmpType = getTypeForToken(tmpToken, tier);
@@ -117,12 +131,12 @@ public class PartiturVisualizer extends WriterVisualizer
             }
 
             color = "black";
-            if(getMarkableMap().containsKey("" + event.getId()))
+            if (getMarkableMap().containsKey("" + event.getId()))
             {
               color = getMarkableMap().get("" + event.getId());
             }
             val = event.getValue();
-          
+
             // token ids containing the same event: for Javascript highlighting
 
             // current token is included in every case
@@ -132,11 +146,11 @@ public class PartiturVisualizer extends WriterVisualizer
             // go to the end of the event
             PartiturParser.Token tmp = token.getAfter();
             boolean proceed = true;
-           
-            while(tmp != null && proceed)
+
+            while (tmp != null && proceed)
             {
               PartiturParser.Event tmpEvent = tmp.getTier2Event().get(tier);
-              if(tmpEvent != null && tmpEvent.getId() == event.getId())
+              if (tmpEvent != null && tmpEvent.getId() == event.getId())
               {
                 tokenIdsArray.append("," + tmp.getId());
                 eventIdsArray.append("," + tier + "_" + tmp.getId());
@@ -159,8 +173,8 @@ public class PartiturVisualizer extends WriterVisualizer
             + "annis:eventIds=\"" + eventIdsArray + "\" "
             + quicktip + " "
             + "onMouseOver=\"toggleAnnotation(this, true);\" "
-            + "onMouseOut=\"toggleAnnotation(this, false);\"" +
-            ">" + val + "</td>");
+            + "onMouseOut=\"toggleAnnotation(this, false);\""
+            + ">" + val + "</td>");
 
         }
         writer.append("</tr>");
@@ -172,17 +186,17 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<tr><th>tok</th>");
 
 
-      for(PartiturParser.Token token : partitur.getToken())
+      for (PartiturParser.Token token : partitur.getToken())
       {
         String color = "black";
 
-        if(getMarkableMap().containsKey("" + token.getId()))
+        if (getMarkableMap().containsKey("" + token.getId()))
         {
           color = getMarkableMap().get("" + token.getId());
         }
-        writer.append("<td class=\"tok\" style=\"color:" + color + ";\" " +
-          "id=\"token_" + token.getId() + "\" " +
-          ">" + token.getValue() + "</td>");
+        writer.append("<td class=\"tok\" style=\"color:" + color + ";\" "
+          + "id=\"token_" + token.getId() + "\" "
+          + ">" + token.getValue() + "</td>");
       }
       writer.append("</tr>");
 
@@ -192,14 +206,14 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("</body></html>");
 
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE, null, ex);
       try
       {
         writer.append("<html><body>Error occured</body></html>");
       }
-      catch(IOException ex1)
+      catch (IOException ex1)
       {
         Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE, null, ex1);
       }
@@ -214,7 +228,7 @@ public class PartiturVisualizer extends WriterVisualizer
 
     PartiturParser.Event event = token.getTier2Event().get(tier);
 
-    if(event != null)
+    if (event != null)
     {
       PartiturParser.Event beforeEvent =
         beforeToken == null ? null : beforeToken.getTier2Event().get(tier);
@@ -225,24 +239,24 @@ public class PartiturVisualizer extends WriterVisualizer
       boolean right = false;
       // check if the events left and right have the same
       // id (and are the same event)
-      if(beforeEvent != null && beforeEvent.getId() == event.getId())
+      if (beforeEvent != null && beforeEvent.getId() == event.getId())
       {
         left = true;
       }
-      if(afterEvent != null && afterEvent.getId() == event.getId())
+      if (afterEvent != null && afterEvent.getId() == event.getId())
       {
         right = true;
       }
 
-      if(left && right)
+      if (left && right)
       {
         return ElementType.middle;
       }
-      else if(left)
+      else if (left)
       {
         return ElementType.end;
       }
-      else if(right)
+      else if (right)
       {
         return ElementType.begin;
       }
@@ -253,6 +267,43 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     return ElementType.noEvent;
+  }
+
+  private boolean checkRTL(List<AnnisToken> tokenList)
+  {
+    boolean result = false;
+    Iterator<AnnisToken> itToken = tokenList.listIterator();
+    while(itToken.hasNext() && !result)
+    {
+      AnnisToken tok = itToken.next();
+      String tokText = tok.getText();
+      for(int i=0; i < tokText.length(); i++)
+      {
+        char cc = tokText.charAt(i);
+        // hebrew extended and basic, arabic basic and extendend
+        if (cc >= 1425 && cc <= 1785)
+        {
+          result = true;
+        }
+        // alphabetic presentations forms (hebrwew) to arabic presentation forms A
+        else if (cc >= 64286 && cc <= 65019)
+        {
+          result = true;
+        }
+        // arabic presentation forms B
+        else if (cc >= 65136 && cc <= 65276)
+        {
+          result = true;
+        }
+
+        if(result)
+        {
+          break;
+        }
+      }
+    }
+    
+    return result;
   }
 }
 
