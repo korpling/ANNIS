@@ -43,7 +43,8 @@ public class TestSecurityManager implements AnnisSecurityManager {
 		
 		String favorites = "";
 		
-		try {
+		try
+    {
       AnnisService service = AnnisServiceFactory.getClient("rmi://localhost:4711/AnnisService");
 			AnnisCorpusSet corpusSet = service.getCorpusSet();
 			int i=0;

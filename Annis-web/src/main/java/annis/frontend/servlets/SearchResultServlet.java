@@ -373,7 +373,12 @@ public class SearchResultServlet extends HttpServlet
             + token.getCorpusId() + "'");
           for(Map.Entry<String, String> annotation : token.entrySet())
           {
-            json.append(", '" + annotation.getKey() + "':'" + annotation.getValue().replace("'", "\\'") + "'");
+            String value = annotation.getValue();
+            if(value == null)
+            {
+              value = "";
+            }
+            json.append(", '" + annotation.getKey() + "':'" + value.replace("'", "\\'") + "'");
           }
           json.append("}");
         }
