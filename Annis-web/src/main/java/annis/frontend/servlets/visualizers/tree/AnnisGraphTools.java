@@ -90,7 +90,7 @@ class AnnisGraphTools {
 	private static boolean isHebrewToken(String text) {
 		for (int i = 0; i < text.length(); ++i) {
 			char c = text.charAt(i);
-			if (c >= 0x0590 && c <= 0x05ff) {
+			if ((c >= 0x0590 && c <= 0x06f9) || (c >= 0xfb1e && c <= 0xfdff) || (c >= 0xfe70 && c <= 0xfeff)) {
 				return true;
 			}
 		}
