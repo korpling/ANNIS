@@ -54,6 +54,11 @@ public class BinaryServlet extends HttpServlet {
 		try {
 			AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
 			AnnisBinary binary = service.getBinary(Long.parseLong(binaryId));
+
+      String mimeType = binary.getMimeType();
+
+
+
 			response.setContentType(binary.getMimeType());
 			response.setContentLength(binary.getBytes().length);
 			out.write(binary.getBytes());

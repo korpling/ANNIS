@@ -133,6 +133,10 @@
           <exclude>**/*.java</exclude>
         </excludes>
       </resource>
+      <resource>
+        <directory>src/main/meta-inf/</directory>
+        <targetPath>META-INF</targetPath>
+      </resource>
 
     </resources>
 

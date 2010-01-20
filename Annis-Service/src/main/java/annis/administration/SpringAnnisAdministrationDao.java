@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,10 +30,8 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-import annis.externalFiles.ExternalFileMgr;
 import annis.externalFiles.ExternalFileMgrDAO;
-import annis.externalFiles.ExternalFileMgrImpl;
-import org.postgresql.Driver;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * - Transaktionen
@@ -213,26 +210,19 @@ public class SpringAnnisAdministrationDao {
 			// store reference in database
 			// XXX: mp3 mime type hard-coded
 			String name = file.getName();
+      String mimeType = new MimetypesFileTypeMap().getContentType(file);
 			String branch = file.getParent();
 			// FIXME: operates directly on the main database, can result orphaned entries in extdata when import fails
 			log.debug("externalFileMgr: " + externalFileMgrDao);
-			long id = externalFileMgrDao.putExtFile(name, branch, "audio/x-mp3");
+			long id = externalFileMgrDao.putExtFile(name, branch, mimeType);
 			log.debug("external file '" + filename + "' inserted with id " + id);
 			
 			// update annotation value, set name to audio:audioFile
-			String updateValueSql = "UPDATE _node_annotation SET value = :id, name = 'audioFile', namespace = 'audio' WHERE value = :externalData";
+			String updateValueSql = "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
 			SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue("externalData", externalData);
 			simpleJdbcTemplate.update(updateValueSql, updateArgs);
 		}
 		
-		// FIXME: should be done in the converter
-		// XXX: set namespace of node or of annotation?
-		log.debug("set namespace of nodes that are annotated with AUDIO to audio");
-		String updateSql = "" +
-				"UPDATE _node SET namespace = 'audio' " +
-				"FROM _node_annotation " +
-				"WHERE _node.id = _node_annotation.node_ref AND _node_annotation.name = 'AUDIO'";
-		simpleJdbcTemplate.update(updateSql);
 	}
 	
 	void computeLeftTokenRightToken() {

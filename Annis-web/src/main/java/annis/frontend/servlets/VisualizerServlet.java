@@ -154,6 +154,7 @@ public class VisualizerServlet extends HttpServlet
       visualizer.setNamespace(namespace);
       visualizer.setMarkableMap(markableMap);
       visualizer.setContextPath(getServletContext().getContextPath());
+      visualizer.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
       visualizer.setDotPath(path2Dot);
 
       response.setCharacterEncoding(visualizer.getCharacterEncoding());

@@ -34,6 +34,7 @@ public abstract class Visualizer
   private Map<String, String> markableMap = new HashMap<String, String>();
   private String id = "";
   private String contextPath;
+  private String annisRemoteServiceURL;
   private String dotPath;
   private Document paulaJDOM = null;
   private AnnisResult result;
@@ -76,7 +77,26 @@ public abstract class Visualizer
     this.contextPath = contextPath;
   }
 
-  
+  /**
+   * Get the URL which is configured for the Annis installation.
+   * @return
+   */
+  public String getAnnisRemoteServiceURL()
+  {
+    return annisRemoteServiceURL;
+  }
+
+  /**
+   * Set the URL which is configured for the Annis installation.
+   * @param annisRemoteServiceURL
+   */
+  public void setAnnisRemoteServiceURL(String annisRemoteServiceURL)
+  {
+    this.annisRemoteServiceURL = annisRemoteServiceURL;
+  }
+
+
+
   /**
    * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of this map must be the corresponding node id of annotations or tokens.
    * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}

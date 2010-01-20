@@ -87,8 +87,9 @@ public class ImportDialog extends javax.swing.JDialog
           }
           else
           {
-            JOptionPane.showMessageDialog(null,
-              "Import failed: " + this.get(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            new  ExceptionDialog(null, new Exception(
+            "Import failed: " + this.get())).setVisible(true);
+            setVisible(false);
           }
         }
         catch(Exception ex)
