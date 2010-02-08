@@ -135,19 +135,24 @@ public class CorefVisualizer extends WriterVisualizer
   {
     for(Edge e : n.getIncomingEdges())
     {
-      AnnisNode pre = e.getSource();
-
-      if(pre != null)
+      if(e.getEdgeType() == Edge.EdgeType.COVERAGE || e.getEdgeType() == Edge.EdgeType.DOMINANCE)
       {
-        if(span2tok.get(pre.getId()) == null)
-        {
-          span2tok.put(pre.getId(), new HashSet<Long>());
-        }
+        AnnisNode pre = e.getSource();
 
-        span2tok.get(pre.getId()).add(tokenID);
-        recursiveSpan2Tok(pre, tokenID);
+        if(pre != null)
+        {
+          if(span2tok.get(pre.getId()) == null)
+          {
+            span2tok.put(pre.getId(), new HashSet<Long>());
+          }
+
+          if(!span2tok.get(pre.getId()).contains(tokenID))
+          {
+            span2tok.get(pre.getId()).add(tokenID);
+            recursiveSpan2Tok(pre, tokenID);
+          }
+        }
       }
-      
     }
   }
 
