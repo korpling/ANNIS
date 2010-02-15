@@ -188,6 +188,10 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>
+    <url-pattern>/LoginLogout</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AuthenticationFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

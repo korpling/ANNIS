@@ -19,8 +19,6 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -55,6 +53,12 @@ public final class AuthenticationFilter implements Filter
     {
       chain.doFilter(request, response);
     }
+    // allow access to LoginLogout servlet without login
+    else if("/LoginLogout".equals(httpRequest.getServletPath()))
+    {
+      chain.doFilter(request, response);
+    }
+    // not logged in or demo account
     else
     {
       String demoEnabled = props.getProperty("enableDemo", "false");
@@ -138,4 +142,7 @@ public final class AuthenticationFilter implements Filter
       e.printStackTrace();
     }
   }
+
 }
+
+

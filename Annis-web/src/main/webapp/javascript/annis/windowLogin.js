@@ -1,24 +1,6 @@
 
 Ext.onReady(function(){
   
-  // HACK make sure the AuthentificationManager is initialized even if this
-  // page is accessed directly
-  // TODO: remove this HACK
-  Ext.Ajax.request(
-  {
-    url: conf_context + '/secure/SessionInfo',
-    method: 'GET',
-    params: {
-      what:'username'
-    },
-    success: function(response)
-    {
-    },
-    failure: function()
-    {
-    }
-  });
-
   //The Search Window
   Ext.QuickTips.init();
 
