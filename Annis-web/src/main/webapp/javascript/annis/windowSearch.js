@@ -73,7 +73,7 @@ Ext.onReady(function()
 
   var delayKeyTask = new Ext.util.DelayedTask();
   var keyDelay = 1000;
-  var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-10;
+  var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-20;
 
   
   function updateStatus()
