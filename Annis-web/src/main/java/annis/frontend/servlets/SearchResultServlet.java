@@ -263,6 +263,12 @@ public class SearchResultServlet extends HttpServlet
         json.putOnce("textId", "" + n.getTextId());
       }
 
+      // put first match corpusId into result
+      if(!json.has("corpusId") && markedIDs.contains(n.getId()))
+      {
+        json.putOnce("corpusId", "" + n.getCorpus());
+      }
+
       JSONObject tok = new JSONObject();
       tok.putOnce("id", "" + n.getId());
       tok.putOnce("textId", "" + n.getTextId());

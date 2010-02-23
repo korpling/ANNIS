@@ -115,7 +115,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'token', 'tokenNamespaces', 'visualizer', 'textId'],
+    fields: ['id', 'callbackId', 'token', 'tokenNamespaces', 'visualizer', 'corpusId'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -457,7 +457,7 @@ Ext.onReady(function() {
       // store row data "manually""
       var row = store.getAt(rowIndex);
       var rowData = row.data; // this is the JSON result set we are sending from the frontend
-      
+
       var id = rowData.corpusId;
       var action = 'new MetaDataWindow(' + id + ').show();';
 
