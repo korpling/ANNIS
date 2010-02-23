@@ -2,8 +2,6 @@ package org.json;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 Copyright (c) 2006 JSON.org
@@ -56,10 +54,10 @@ SOFTWARE.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2
+ * @version 2008-09-22
  */
 public class JSONWriter {
-    private static final int maxdepth = 80; //20
+    private static final int maxdepth = 20;
 
     /**
      * The comma flag determines if a comma should be output before the next
@@ -80,7 +78,7 @@ public class JSONWriter {
     /**
      * The object/array stack.
      */
-    private char stack[];
+    private JSONObject stack[];
 
     /**
      * The stack top index. A value of 0 indicates that the stack is empty.
@@ -98,7 +96,7 @@ public class JSONWriter {
     public JSONWriter(Writer w) {
         this.comma = false;
         this.mode = 'i';
-        this.stack = new char[maxdepth];
+        this.stack = new JSONObject[maxdepth];
         this.top = 0;
         this.writer = w;
     }
@@ -142,7 +140,7 @@ public class JSONWriter {
      */
     public JSONWriter array() throws JSONException {
         if (this.mode == 'i' || this.mode == 'o' || this.mode == 'a') {
-            this.push('a');
+            this.push(null);
             this.append("[");
             this.comma = false;
             return this;
@@ -164,7 +162,7 @@ public class JSONWriter {
         }
         this.pop(m);
         try {
-            this.writer.write(c + "\n");
+            this.writer.write(c);
         } catch (IOException e) {
             throw new JSONException(e);
         }
@@ -206,6 +204,7 @@ public class JSONWriter {
         }
         if (this.mode == 'k') {
             try {
+                stack[top - 1].putOnce(s, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.write(',');
                 }
@@ -218,7 +217,7 @@ public class JSONWriter {
                 throw new JSONException(e);
             }
         }
-        throw new JSONException("Misplaced key: " + s);
+        throw new JSONException("Misplaced key.");
     }
 
 
@@ -237,7 +236,7 @@ public class JSONWriter {
         }
         if (this.mode == 'o' || this.mode == 'a') {
             this.append("{");
-            this.push('k');
+            this.push(new JSONObject());
             this.comma = false;
             return this;
         }
@@ -252,11 +251,15 @@ public class JSONWriter {
      * @throws JSONException If nesting is wrong.
      */
     private void pop(char c) throws JSONException {
-        if (this.top <= 0 || this.stack[this.top - 1] != c) {
+        if (this.top <= 0) {
+            throw new JSONException("Nesting error.");
+        }
+        char m = this.stack[this.top - 1] == null ? 'a' : 'k';
+        if (m != c) {
             throw new JSONException("Nesting error.");
         }
         this.top -= 1;
-        this.mode = this.top == 0 ? 'd' : this.stack[this.top - 1];
+        this.mode = this.top == 0 ? 'd' : this.stack[this.top - 1] == null ? 'a' : 'k';
     }
 
     /**
@@ -264,12 +267,12 @@ public class JSONWriter {
      * @param c The scope to open.
      * @throws JSONException If nesting is too deep.
      */
-    private void push(char c) throws JSONException {
+    private void push(JSONObject jo) throws JSONException {
         if (this.top >= maxdepth) {
             throw new JSONException("Nesting too deep.");
         }
-        this.stack[this.top] = c;
-        this.mode = c;
+        this.stack[this.top] = jo;
+        this.mode = jo == null ? 'a' : 'k';
         this.top += 1;
     }
 

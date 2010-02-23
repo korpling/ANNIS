@@ -1,3 +1,6 @@
+var windowSearchFormWidth = 347;
+
+
 var Citation = {
   generate : function() {
     var formPanelSearch = Ext.ComponentMgr.get('formPanelSearch');
@@ -69,9 +72,8 @@ Ext.onReady(function()
   };
 
   var delayKeyTask = new Ext.util.DelayedTask();
-  var windowSearchFormWidth = 347;
-  var windowSearchFormWidthQueryBuilder = 1000;
   var keyDelay = 1000;
+  var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-10;
 
   
   function updateStatus()
@@ -478,26 +480,24 @@ Ext.onReady(function()
     {
       header: "Name",
       dataIndex: 'name',
-      width: 170,
       align: 'left'
     },
     {
       header: "Texts",
       dataIndex: 'textCount',
-      // width: 60,
       align: 'right'
     },
     {
       header: "Tokens",
       dataIndex: 'tokenCount',
-      //width: 65,
       align: 'right'
     },
     {
       header: "",
       dataIndex:'id',
       align: 'right',
-      renderer: renderCorpusInfo
+      renderer: renderCorpusInfo,
+      width: 25
     }
     ]);
   corpusListCm.defaultSortable = true;
@@ -515,7 +515,7 @@ Ext.onReady(function()
     loadMask: true,
     cm: corpusListCm,
     sm: corpusListSelectionModel,
-    //width: 330,
+    width: 330,
     height: 255,
     stripeRows: true,
     title:'Available Corpora',
@@ -544,16 +544,7 @@ Ext.onReady(function()
   var formPanelSimpleSearch = new Ext.FormPanel({
     id: 'formPanelSimpleSearch',
     frame:true,
-    bodyStyle:
-    {
-      background:'#DFE8F6'
-    },
-    style:
-    {
-      background:'#DFE8F6'
-    },
     title: 'Search',
-    height: 210,
     items: [ 
     padLeftComboBox,
     padRightComboBox,
@@ -573,16 +564,7 @@ Ext.onReady(function()
   var formPanelStatistics = new Ext.FormPanel({
     id: 'formPanelStatistics',
     frame:true,
-    bodyStyle:
-    {
-      background:'#DFE8F6'
-    },
-    style:
-    {
-      background:'#DFE8F6'
-    },
     title: 'Statistics',
-    height: 210,
     items: [],
     buttons: [{
       id: 'btnWeka',
@@ -620,7 +602,7 @@ Ext.onReady(function()
     title: 'AnnisQL',
     header: false,
     width: 330,
-    height: 420,
+    height: 410,
     defaultType: 'textfield',
     monitorValid: true,
     items: [{

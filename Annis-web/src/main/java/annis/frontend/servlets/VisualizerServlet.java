@@ -64,7 +64,7 @@ public class VisualizerServlet extends HttpServlet
     HttpSession session = request.getSession();
     OutputStream outStream = response.getOutputStream();
 
-    String spanId = request.getParameter("spanId");
+    String callbackId = request.getParameter("callbackId");
     String textId = request.getParameter("textId");
 
     String path2Dot = getInitParameter("DotPath");
@@ -73,9 +73,9 @@ public class VisualizerServlet extends HttpServlet
       path2Dot = "dot";
     }
 
-    if (spanId == null)
+    if (callbackId == null)
     {
-      throw new NullPointerException("Parameter 'spanId' must no be null.");
+      throw new NullPointerException("Parameter 'callbackId' must no be null.");
     }
 
     String namespace = request.getParameter("namespace");
@@ -183,7 +183,7 @@ public class VisualizerServlet extends HttpServlet
         {
           Cache cacheAnnisResult =  (Cache) session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT);
 
-          byte[] resultAsBytes = cacheAnnisResult.getBytes(spanId);
+          byte[] resultAsBytes = cacheAnnisResult.getBytes(callbackId);
           ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
 
           visualizer.setResult((AnnisResult) inStream.readObject());

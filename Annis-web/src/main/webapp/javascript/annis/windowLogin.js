@@ -33,7 +33,6 @@ Ext.onReady(function(){
     labelWidth: 75, // label settings here cascade unless overridden
     frame:true,
     header: false,
-    bodyStyle:'padding:5px 5px 0',
     width: 350,
     defaults: {
       width: 250

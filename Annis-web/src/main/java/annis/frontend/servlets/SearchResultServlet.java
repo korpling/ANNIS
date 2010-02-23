@@ -16,7 +16,6 @@
 package annis.frontend.servlets;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -27,12 +26,10 @@ import javax.servlet.http.HttpSession;
 
 import annis.cache.Cache;
 import annis.cache.FilesystemCache;
-import annis.cache.CacheInitializationException;
 import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
@@ -44,17 +41,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SearchResultServlet extends HttpServlet
 {
-
 
   public static final String FILESYSTEM_CACHE_RESULT = "FileSystemCacheResult";
   private static final long serialVersionUID = 7180460653219721099L;
@@ -74,7 +77,7 @@ public class SearchResultServlet extends HttpServlet
     response.setCharacterEncoding("UTF-8");
 
 
-    if(request.getParameter("count") != null)
+    if (request.getParameter("count") != null)
     {
       writeCount(session, response);
     }
@@ -82,7 +85,107 @@ public class SearchResultServlet extends HttpServlet
     {
       writeJSONResult(session, request, response);
     }
+  }
 
+  private void writeJSONResult(HttpSession session, HttpServletRequest request, HttpServletResponse response)
+  {
+    String queryAnnisQL = "";
+    Integer totalCount = 0;
+    List<Long> corpusIdList = (List<Long>) session.getAttribute(SubmitQueryServlet.KEY_CORPUS_ID_LIST);
+
+    int offset = 0;
+    int limit = 50;
+
+    try
+    {
+      offset = Integer.parseInt(request.getParameter("start"));
+    }
+    catch (NumberFormatException e)
+    {
+      //ignore
+    }
+    try
+    {
+      limit = Integer.parseInt(request.getParameter("limit"));
+    }
+    catch (NumberFormatException e)
+    {
+      //ignore
+    }
+
+    //Gather Result Set from RMIService
+    AnnisService service;
+    try
+    {
+      queryAnnisQL = session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL).toString();
+
+      service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+      AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
+
+
+      if (session.getAttribute(FILESYSTEM_CACHE_RESULT) == null)
+      {
+        Cache newCache = new FilesystemCache("AnnisResult");
+        session.setAttribute(FILESYSTEM_CACHE_RESULT, newCache);
+      }
+      Cache cacheAnnisResult = (Cache) session.getAttribute(FILESYSTEM_CACHE_RESULT);
+
+      // check whether match count retrieval has finished
+      try
+      {
+        if (session.getAttribute(SubmitQueryServlet.KEY_TOTAL_COUNT) == null)
+        {
+          // total count not set yet, we use the limit for now
+          totalCount = offset + limit;
+        }
+        else
+        {
+          totalCount = (Integer) session.getAttribute(SubmitQueryServlet.KEY_TOTAL_COUNT);
+        }
+      }
+      catch (NullPointerException e)
+      {
+        //ignore
+      }
+      catch (ClassCastException e)
+      {
+        //ignore
+      }
+
+
+      //NOW WE HAVE TO CREATE THE JSON OUTPUT FROM resultSet
+      JSONObject root = new JSONObject();
+
+      root.putOnce("totalCount", totalCount);
+      LinkedList<JSONObject> jsonResultSet = new LinkedList<JSONObject>();
+      for (AnnisResult r : resultSet)
+      {
+        long generatedID = Math.abs(rand.nextLong());
+        // construct byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
+        // serialize result
+        objectOutput.writeObject(r);
+        // copy to cache
+        cacheAnnisResult.put("" + generatedID,
+          bos.toByteArray());
+
+        // create json
+        JSONObject jsonResult = jsonFromAnnisResult(r);
+        jsonResult.putOnce("callbackId", "" + generatedID);
+        jsonResultSet.add(jsonResult);
+
+      }
+      root.putOnce("resultSet", jsonResultSet);
+
+      response.getWriter().append(root.toString(2));
+
+      response.setContentType("application/x-json");
+    }
+    catch (Exception e)
+    {
+      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, "ooops", e);
+    }
   }
 
   private void writeCount(HttpSession session, HttpServletResponse response) throws IOException
@@ -103,169 +206,24 @@ public class SearchResultServlet extends HttpServlet
       out.println(count);
 
     }
-    catch(AnnisServiceFactoryException e)
+    catch (AnnisServiceFactoryException e)
     {
       this.cleanSession(session);
       out.println("ERROR: " + e.getMessage());
     }
-    catch(AnnisCorpusAccessException e)
+    catch (AnnisCorpusAccessException e)
     {
       this.cleanSession(session);
       out.println("Please select a Corpus.");
 
     }
-    catch(AnnisServiceException e)
+    catch (AnnisServiceException e)
     {
       this.cleanSession(session);
       out.println(e.getMessage());
     }
 
 
-  }
-
-  private void writeJSONResult(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException
-  {
-    String queryAnnisQL = "";
-    Integer totalCount = 0;
-    List<Long> corpusIdList = (List<Long>) session.getAttribute(SubmitQueryServlet.KEY_CORPUS_ID_LIST);
-
-    int offset = 0;
-    int limit = 50;
-
-    try
-    {
-      offset = Integer.parseInt(request.getParameter("start"));
-    }
-    catch(NumberFormatException e)
-    {
-      //ignore
-      }
-    try
-    {
-      limit = Integer.parseInt(request.getParameter("limit"));
-    }
-    catch(NumberFormatException e)
-    {
-      //ignore
-    }
-
-    /* Required Stuff */
-    boolean scriptTag = false;
-    String cb = request.getParameter("callback");
-    if(cb != null)
-    {
-      scriptTag = true;
-      response.setContentType("text/javascript");
-    }
-    else
-    {
-      response.setContentType("application/x-json");
-    }
-    Writer out = response.getWriter();
-    if(scriptTag)
-    {
-      out.write(cb + "(");
-    }
-    /* END Required Stuff */
-
-    //Gather Result Set from RMIService
-    AnnisService service;
-    try
-    {
-      queryAnnisQL = session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL).toString();
-
-      service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-      AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
-
-
-      if(session.getAttribute(FILESYSTEM_CACHE_RESULT) == null)
-      {
-        Cache newCache = new FilesystemCache("AnnisResult");
-        session.setAttribute(FILESYSTEM_CACHE_RESULT, newCache);
-      }
-      Cache cacheAnnisResult = (Cache) session.getAttribute(FILESYSTEM_CACHE_RESULT);
-      
-      // check whether match count retrieval has finished
-      try
-      {
-        if(session.getAttribute(SubmitQueryServlet.KEY_TOTAL_COUNT) == null)
-        {
-          // total count not set yet, we use the limit for now
-          totalCount = offset + limit;
-        }
-        else
-        {
-          totalCount = (Integer) session.getAttribute(SubmitQueryServlet.KEY_TOTAL_COUNT);
-        }
-      }
-      catch(NullPointerException e)
-      {
-        //ignore
-      }
-      catch(ClassCastException e)
-      {
-        //ignore
-      }
-
-      //NOW WE HAVE TO CREATE THE JSON OUTPUT FROM resultSet
-      StringBuffer json = new StringBuffer();
-      json.append("{'totalCount':" + totalCount + ", 'resultSet':[");
-
-      //json.append("{'queryAnnisQL':'" + queryAnnisQL.replace("'", "\\'") + "', 'totalCount':" + totalCount + ", 'resultSet':[");
-      int count = 0;
-      for(AnnisResult result : resultSet)
-      {
-        long generatedID = Math.abs(rand.nextLong());
-        // construct byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
-        // serialize result
-        objectOutput.writeObject(result);
-        // copy to cache
-        cacheAnnisResult.put("" + generatedID,
-          bos.toByteArray());
-
-        if(count++ != 0)
-        {
-          json.append("\n,");
-        }
-        String resultAsJSON = new AnnisResultToJSON(result, generatedID).getJSON();
-        json.append(resultAsJSON);
-      }
-      json.append("]}");
-      out.append(json.toString());
-    }
-    catch(AnnisServiceFactoryException e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, e);
-    }
-    catch(AnnisQLSemanticsException e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, e);
-    }
-    catch(AnnisQLSyntaxException e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, e);
-    }
-    catch(AnnisCorpusAccessException e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, e);
-    }
-    catch(CacheInitializationException e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, e);
-    }
-    catch(Exception e)
-    {
-      Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, "ooops", e);
-    }
-
-    /* Required Stuff */
-    if(scriptTag)
-    {
-      out.write(");");
-    }
-  /* END Required Stuff */
   }
 
   private void cleanSession(HttpSession session)
@@ -277,137 +235,81 @@ public class SearchResultServlet extends HttpServlet
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
   }
 
-
-  public class AnnisResultToJSON
+  public JSONObject jsonFromAnnisResult(AnnisResult result) throws JSONException
   {
-    private StringBuffer json;
-    private AnnotationGraph graph;
-    private Set<Long> idsToMark;
+    JSONObject json = new JSONObject();
 
-    public AnnisResultToJSON(AnnisResult result, long generatedID)
+    json.putOnce("tokenNamespaces", result.getTokenAnnotationLevelSet());
+    LinkedHashSet<String> visusalizer = new LinkedHashSet<String>();
+
+    for (String annoName : result.getAnnotationLevelSet())
     {
-      this.json = new StringBuffer();
-      this.graph = result.getGraph();
-
-      this.idsToMark = getMarkedIDs();
-
-      json.append("{'_id':'" + generatedID + "', "
-        + "'_textId': '"
-        + getTextId() + "', '_text':'"
-        + getText().replace("'", "\\'") + "'");
-
-      //add annotation levels
-      json.append(", '_levels': [");
-      int c = 0;
-      for(String level : result.getAnnotationLevelSet())
+      String[] splitted = annoName.split(":");
+      if (splitted.length > 0)
       {
-        json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
+        visusalizer.add(splitted[0]);
       }
-      json.append("]");
-
-      //add a list of marked objects
-      json.append(", '_markedObjects': [");
-      c = 0;
-      for(Long id : idsToMark)
-      {
-        if(c++ > 0)
-        {
-          json.append(", ");
-        }
-        json.append(id);
-      }
-      json.append("]");
-
-      //add token annotation levels
-      json.append(", '_tokenLevels': [");
-      c = 0;
-      for(String level : result.getTokenAnnotationLevelSet())
-      {
-        json.append(((c++ > 0) ? ", " : "") + "'" + level + "'");
-      }
-      json.append("]");
-
-      int tokenCount = 0;
-
-      List<AnnisToken> tokenList = result.getTokenList();
-      // XXX: Tokens unterhalb eines markierten Knoten werden nicht weiter markiert
-      int matchStart = 0;
-      int matchEnd = tokenList.size() - 1;
-//		int matchStart = tokenList.size() - 1, matchEnd = 0;
-
-      long lastTokenIndex = -1;
-
-      for(AnnisToken token : tokenList)
-      {
-        if(hasNodeMarker(token.getId()))
-        {
-//				if(tokenCount > matchEnd)
-//					matchEnd = tokenCount;
-//				if(tokenCount < matchStart)
-//					matchStart = tokenCount;
-        }
-        
-        if(lastTokenIndex == -1)
-        {
-          lastTokenIndex = token.getTokenIndex();
-        }
-        
-        if(token.getTokenIndex() - lastTokenIndex > 1)
-        {
-          // insert empty token (...)
-          json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
-          + ", '_text':'"
-          + "(...)"
-          + "', '_marker':''" + ", '_corpusId':'"
-          + token.getCorpusId() + "'");
-          json.append("}");
-        }
-        else
-        {
-
-          String marker = hasNodeMarker(token.getId()) ? result.getMarkerId(token.getId()) : "";
-          json.append(",'" + tokenCount++ + "':{'_id': " + token.getId()
-            + ", '_text':'"
-            + (token.getText() != null ? token.getText().replace("'", "\\'") : "")
-            + "', '_marker':'" + marker + "'" + ", '_corpusId':'"
-            + token.getCorpusId() + "'");
-          for(Map.Entry<String, String> annotation : token.entrySet())
-          {
-            String value = annotation.getValue();
-            if(value == null)
-            {
-              value = "";
-            }
-            json.append(", '" + annotation.getKey() + "':'" + value.replace("'", "\\'") + "'");
-          }
-          json.append("}");
-        }
-
-        lastTokenIndex = token.getTokenIndex();
-      }
-      json.append(", '_matchStart' : '" + matchStart + "'");
-      json.append(", '_matchEnd' : '" + matchEnd + "'");
-      json.append("}");
     }
 
-    public String getJSON()
+    // for data debugging
+    visusalizer.add("paula");
+    visusalizer.add("paulatext");
+
+    json.putOnce("visualizer", visusalizer);
+
+    Set<Long> markedIDs = getMarkedIDs(result.getGraph());
+
+    
+    LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
+    for (AnnisNode n : result.getGraph().getTokens())
     {
-      return json.toString();
+      // put first match textId into result
+      if(!json.has("textId") && markedIDs.contains(n.getId()))
+      {
+        json.putOnce("textId", "" + n.getTextId());
+      }
+      JSONObject tok = new JSONObject();
+      tok.putOnce("id", "" + n.getId());
+      tok.putOnce("textId", "" + n.getTextId());
+      tok.putOnce("tokenIndex", n.getTokenIndex());
+
+      tok.putOnce("text", n.getSpannedText());
+
+      TreeMap<String, JSONObject> annotations = new TreeMap<String, JSONObject>();
+      for (Annotation a : n.getNodeAnnotations())
+      {
+        JSONObject jsonAnno = new JSONObject();
+        jsonAnno.putOnce("namespace", a.getNamespace());
+        jsonAnno.putOnce("name", a.getName());
+        jsonAnno.putOnce("value", a.getValue());
+        annotations.put(a.getQualifiedName(), jsonAnno);
+      }
+      tok.putOnce("annotations", annotations);
+
+      tok.putOnce("marker", markedIDs.contains(n.getId()) ? "red" : "");
+
+      tokenList.add(tok);
+
     }
 
-  private Set<Long> getMarkedIDs()
+    json.putOnce("token", tokenList);
+
+    return json;
+  }
+
+  private Set<Long> getMarkedIDs(AnnotationGraph graph)
   {
-    Set<Long> matchedNodes =  graph.getMatchedNodeIds();
+    Set<Long> matchedNodes = graph.getMatchedNodeIds();
     Set<Long> matchedAndCovered = new HashSet<Long>(matchedNodes);
     // add all covered nodes
-    for(AnnisNode n : graph.getNodes())
+    for (AnnisNode n : graph.getNodes())
     {
-      if(matchedNodes.contains(n.getId()))
+      if (matchedNodes.contains(n.getId()))
       {
         long left = n.getLeftToken();
         long right = n.getRightToken();
 
-        for(long i=left; i <= right; i++)
+        for (long i = left; i <= right; i++)
         {
           matchedAndCovered.add(graph.getToken(i).getId());
         }
@@ -415,35 +317,6 @@ public class SearchResultServlet extends HttpServlet
     }
 
     return matchedAndCovered;
-  }
-
-  private String getText()
-  {
-    List<String> tokenSpans = new ArrayList<String>();
-    for(AnnisNode token : graph.getTokens())
-    {
-      tokenSpans.add(token.getSpannedText());
-    }
-    return StringUtils.join(tokenSpans, " ");
-  }
-
-  private String getTextId()
-  {
-    if(graph.getNodes().isEmpty())
-    {
-      return "1";
-    }
-    else
-    {
-      return String.valueOf(graph.getNodes().get(0).getTextId());
-    }
-  }
-
-  private boolean hasNodeMarker(long id)
-  {
-    return idsToMark.contains(id);
-  }
-
   }
 }
 

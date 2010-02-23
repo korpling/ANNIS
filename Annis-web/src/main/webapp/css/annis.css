@@ -3,56 +3,29 @@
 	width: 100%;
 }
 
-.windowSearchResult.token.prematch {
-	float: right;
-	margin-left: 5px;
-	white-space: nowrap;
+.SearchResultWindow.kwic {
+	text-align: center;
+  width: 100%;
+  overflow: hidden;
 }
 
-.windowSearchResult.token.match {
-	float: left;
-	margin-right: 5px;
-	white-space: nowrap;
+.SearchResultWindow.visualizers {
+  clear: both;
+	text-align: left;
 }
 
-.windowSearchResult.token.postmatch {
-	float: left;
-	margin-right: 5px;
-	white-space: nowrap;
-}
 
-.windowSearchResult.token.hit {
-	color: red;	
-}
-
-.windowSearchResult.annotation {
+.SearchResultWindow.annotation {
 	color: gray;
-	text-align: center;	
 }
 
-.windowSearchResult.text {
-	text-align: center;	
-}
-
-/*.windowSearchResult.token.marker1 {
+.SearchResultWindow.token.hit {
 	color: red;
-	font-weight: bold;
 }
-.windowSearchResult.token.marker2 { 
-	color: green;
-	font-weight: bold;
-}
-.windowSearchResult.token.marker3 { 
-	color: blue;
-	font-weight: bold;
-}
-*/
-			
+	
 body {
-	text.align: center;
+	text-align: left;
 	background-color: #FFF;
-	background-repeat: no-repeat;
-	background-position: center 100px;
 }
 #toolbar {
 	margin-bottom: 26px;

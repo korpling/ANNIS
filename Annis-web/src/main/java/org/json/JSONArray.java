@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -52,7 +53,7 @@ import java.util.Map;
  * The generic <code>get()</code> and <code>opt()</code> methods return an
  * object which you can cast or query for type. There are also typed
  * <code>get</code> and <code>opt</code> methods that do type checking and type
- * coersion for you.
+ * coercion for you.
  * <p>
  * The texts produced by the <code>toString</code> methods strictly conform to
  * JSON syntax rules. The constructors are more forgiving in the texts they will
@@ -74,12 +75,10 @@ import java.util.Map;
  *     well as by <code>,</code> <small>(comma)</small>.</li>
  * <li>Numbers may have the <code>0-</code> <small>(octal)</small> or
  *     <code>0x-</code> <small>(hex)</small> prefix.</li>
- * <li>Comments written in the slashshlash, slashstar, and hash conventions
- *     will be ignored.</li>
  * </ul>
 
  * @author JSON.org
- * @version 2
+ * @version 2009-04-13
  */
 public class JSONArray {
 
@@ -104,7 +103,13 @@ public class JSONArray {
      */
     public JSONArray(JSONTokener x) throws JSONException {
         this();
-        if (x.nextClean() != '[') {
+        char c = x.nextClean();
+        char q;
+        if (c == '[') {
+            q = ']';
+        } else if (c == '(') {
+            q = ')';
+        } else {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
         if (x.nextClean() == ']') {
@@ -119,7 +124,8 @@ public class JSONArray {
                 x.back();
                 this.myArrayList.add(x.nextValue());
             }
-            switch (x.nextClean()) {
+            c = x.nextClean();
+            switch (c) {
             case ';':
             case ',':
                 if (x.nextClean() == ']') {
@@ -128,6 +134,10 @@ public class JSONArray {
                 x.back();
                 break;
             case ']':
+            case ')':
+                if (q != c) {
+                    throw x.syntaxError("Expected a '" + new Character(q) + "'");
+                }
                 return;
             default:
                 throw x.syntaxError("Expected a ',' or ']'");
@@ -158,7 +168,31 @@ public class JSONArray {
             new ArrayList(collection);
     }
 
+    /**
+     * Construct a JSONArray from a collection of beans.
+     * The collection should have Java Beans.
+     * 
+     * @throws JSONException If not an array.
+     */
 
+    public JSONArray(Collection collection, boolean includeSuperClass) {
+		this.myArrayList = new ArrayList();
+		if (collection != null) {
+			Iterator iter = collection.iterator();;
+			while (iter.hasNext()) {
+			    Object o = iter.next();
+			    if (o instanceof Map) {
+			    	this.myArrayList.add(new JSONObject((Map)o, includeSuperClass));
+			    } else if (!JSONObject.isStandardProperty(o.getClass())) {
+			    	this.myArrayList.add(new JSONObject(o, includeSuperClass));
+			    } else {
+                    this.myArrayList.add(o);  
+				}
+			}
+		}
+    }
+
+    
     /**
      * Construct a JSONArray from an array
      * @throws JSONException If not an array.
@@ -175,7 +209,31 @@ public class JSONArray {
         }
     }
 
+    /**
+     * Construct a JSONArray from an array with a bean.
+     * The array should have Java Beans.
+     * 
+     * @throws JSONException If not an array.
+     */
+    public JSONArray(Object array,boolean includeSuperClass) throws JSONException {
+        this();
+        if (array.getClass().isArray()) {
+            int length = Array.getLength(array);
+            for (int i = 0; i < length; i += 1) {
+                Object o = Array.get(array, i);
+                if (JSONObject.isStandardProperty(o.getClass())) {
+                    this.myArrayList.add(o);  
+                } else {
+                    this.myArrayList.add(new JSONObject(o,includeSuperClass));  
+                }
+            }
+        } else {
+            throw new JSONException("JSONArray initial value should be a string or collection or array.");
+        }
+    }
 
+    
+    
     /**
      * Get the object value associated with an index.
      * @param index
@@ -747,6 +805,19 @@ public class JSONArray {
             put(value);
         }
         return this;
+    }
+    
+    
+    /**
+     * Remove an index and close the hole.
+     * @param index The index of the element to be removed.
+     * @return The value that was associated with the index,
+     * or null if there was no value.
+     */
+    public Object remove(int index) {
+    	Object o = opt(index);
+        this.myArrayList.remove(index);
+        return o;
     }
 
 
