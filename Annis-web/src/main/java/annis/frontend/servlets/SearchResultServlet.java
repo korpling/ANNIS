@@ -36,23 +36,17 @@ import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
-import annis.service.ifaces.AnnisToken;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -268,9 +262,11 @@ public class SearchResultServlet extends HttpServlet
       {
         json.putOnce("textId", "" + n.getTextId());
       }
+
       JSONObject tok = new JSONObject();
       tok.putOnce("id", "" + n.getId());
       tok.putOnce("textId", "" + n.getTextId());
+      tok.putOnce("corpusId", "" + n.getCorpus());
       tok.putOnce("tokenIndex", n.getTokenIndex());
 
       tok.putOnce("text", n.getSpannedText());
