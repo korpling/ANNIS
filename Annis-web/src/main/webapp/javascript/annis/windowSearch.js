@@ -497,7 +497,7 @@ Ext.onReady(function()
       dataIndex:'id',
       align: 'right',
       renderer: renderCorpusInfo,
-      width: 25
+      width: 30
     }
     ]);
   corpusListCm.defaultSortable = true;
@@ -515,7 +515,7 @@ Ext.onReady(function()
     loadMask: true,
     cm: corpusListCm,
     sm: corpusListSelectionModel,
-    width: 330,
+    width: 310,
     height: 255,
     stripeRows: true,
     title:'Available Corpora',
