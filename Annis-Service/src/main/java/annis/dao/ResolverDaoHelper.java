@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class ResolverDaoHelper implements ResultSetExtractor
 {
 
-  public String createSqlQuery(String corpusName, List<String> namespaces)
+  public String createSqlQuery(long corpusId, List<String> namespaces)
   {
     StringBuilder result = new StringBuilder();
     

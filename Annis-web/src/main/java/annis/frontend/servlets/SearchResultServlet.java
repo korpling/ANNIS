@@ -38,9 +38,7 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
@@ -166,7 +164,7 @@ public class SearchResultServlet extends HttpServlet
           bos.toByteArray());
 
         // create json
-        JSONObject jsonResult = jsonFromAnnisResult(r);
+        JSONObject jsonResult = jsonFromAnnisResult(r, corpusIdList, service);
         jsonResult.putOnce("callbackId", "" + generatedID);
         jsonResultSet.add(jsonResult);
 
@@ -230,11 +228,12 @@ public class SearchResultServlet extends HttpServlet
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
   }
 
-  public JSONObject jsonFromAnnisResult(AnnisResult result) throws JSONException
+  public JSONObject jsonFromAnnisResult(AnnisResult result, List<Long> corpusIdList, AnnisService service) throws JSONException
   {
     JSONObject json = new JSONObject();
 
     json.putOnce("tokenNamespaces", result.getTokenAnnotationLevelSet());
+
     HashSet<String> visSet = new HashSet<String>();
     LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
 

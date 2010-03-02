@@ -210,10 +210,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return result;
 	}
 	
-  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces )
+  public List<ResolverEntry> getResolverEntries(long corpusId, List<String> namespaces )
   {
     List<ResolverEntry> result =
-      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusName, namespaces),
+      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusId, namespaces),
         resolverDaoHelper);
 
     return result;

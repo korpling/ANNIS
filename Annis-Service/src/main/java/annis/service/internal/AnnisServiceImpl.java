@@ -156,10 +156,10 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces)
+  public List<ResolverEntry> getResolverEntries(long corpusId, List<String> namespaces)
     throws RemoteException
   {
-    return annisDao.getResolverEntries(corpusName, namespaces);
+    return annisDao.getResolverEntries(corpusId, namespaces);
   }
 
 

@@ -36,6 +36,6 @@ public interface AnnisDao {
 	
 	List<Annotation> listCorpusAnnotations(long id);
 
-  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces );
+  public List<ResolverEntry> getResolverEntries(long corpusId, List<String> namespaces );
 		
 }
