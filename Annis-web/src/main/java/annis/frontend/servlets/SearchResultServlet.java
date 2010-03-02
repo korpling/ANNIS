@@ -38,6 +38,7 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -234,25 +235,39 @@ public class SearchResultServlet extends HttpServlet
     JSONObject json = new JSONObject();
 
     json.putOnce("tokenNamespaces", result.getTokenAnnotationLevelSet());
-    LinkedHashSet<String> visusalizer = new LinkedHashSet<String>();
+    HashSet<String> visSet = new HashSet<String>();
+    LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
 
     for (String annoName : result.getAnnotationLevelSet())
     {
       String[] splitted = annoName.split(":");
       if (splitted.length > 0)
       {
-        visusalizer.add(splitted[0]);
+        if(!visSet.contains(splitted[0]))
+        {
+          visSet.add(splitted[0]);
+          JSONObject visEntry = new JSONObject();
+          visEntry.putOnce("id", splitted[0]);
+          visEntry.putOnce("name", splitted[0]);
+          visusalizer.add(visEntry);
+        }
       }
     }
 
     // for data debugging
-    visusalizer.add("paula");
-    visusalizer.add("paulatext");
+    JSONObject visEntryPaula = new JSONObject();
+    visEntryPaula.putOnce("id", "paula");
+    visEntryPaula.putOnce("name", "Paula");
+    JSONObject visEntryPaulaText = new JSONObject();
+    visEntryPaulaText.putOnce("id", "paulatext");
+    visEntryPaulaText.putOnce("name", "Paula Text");
+
+    visusalizer.add(visEntryPaula);
+    visusalizer.add(visEntryPaulaText);
 
     json.putOnce("visualizer", visusalizer);
 
     Set<Long> markedIDs = getMarkedIDs(result.getGraph());
-
     
     LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
     for (AnnisNode n : result.getGraph().getTokens())

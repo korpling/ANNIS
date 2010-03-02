@@ -115,7 +115,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'token', 'tokenNamespaces', 'visualizer', 'corpusId'],
+    fields: ['id', 'callbackId', 'textId', 'token', 'tokenNamespaces', 'visualizer', 'corpusId'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -437,16 +437,16 @@ Ext.onReady(function() {
       {
         var vis = rowData.visualizer[i];
 
-        output += '<div id="annotation-' + rowData.callbackId +'-' + vis + '-selector" class="annis-level-selector-collapsed"'
-                + ' onclick="toggleRowBody(\'' + rowData.callbackId + '-' + vis + '\');">'
-                + vis
+        output += '<div id="annotation-' + rowData.callbackId +'-' + vis.id + '-selector" class="annis-level-selector-collapsed"'
+                + ' onclick="toggleRowBody(\'' + rowData.callbackId + '-' + vis.id + '\');">'
+                + vis.name
                 + '</div>';
               
-        output += '<div id="annotation-' + rowData.callbackId + '-' + vis + '-body" class="annis-level-body">';
-        output += '<iframe onload="checkIFrameLoaded(\'annotation-' + rowData.callbackId + '-' + vis + '-body\')" width="100%" height="20px" frameborder="0" src="'
+        output += '<div id="annotation-' + rowData.callbackId + '-' + vis.id + '-body" class="annis-level-body">';
+        output += '<iframe onload="checkIFrameLoaded(\'annotation-' + rowData.callbackId + '-' + vis.id + '-body\')" width="100%" height="20px" frameborder="0" src="'
             + conf_context + '/empty.html" annis:src="'
             + conf_context + '/secure/Visualizer?callbackId=' + rowData.callbackId
-            + '&textId=' + rowData.textId + '&namespace=' + vis + '&mark:red=' + marker + '" ></iframe>' +
+            + '&textId=' + rowData.textId + '&namespace=' + vis.id + '&mark:red=' + marker + '" ></iframe>' +
     '						</div>\n';
       }
       return output;
