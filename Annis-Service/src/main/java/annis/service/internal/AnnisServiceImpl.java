@@ -1,9 +1,9 @@
 package annis.service.internal;
 
 import annis.WekaDaoHelper;
+import annis.resolver.ResolverEntry;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -12,7 +12,6 @@ import annis.dao.AnnotationGraphDaoHelper;
 import annis.dao.Match;
 import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.externalFiles.ExternalFileMgr;
@@ -23,7 +22,6 @@ import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisContingencyTable;
 import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
@@ -152,20 +150,18 @@ public class AnnisServiceImpl implements AnnisService
     }
   }
 
-  // XXX: not implemented
-  public AnnisContingencyTable getContingencyTable(List<Long> corpusList,
-    String annisQL, Map<String, String> attributesMap, boolean desc,
-    int limit, int offset) throws RemoteException,
-    AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException
-  {
-    throw new AnnisException("not implemented");
-  }
-
   public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException
   {
     return annisDao.listCorpusAnnotations(corpusId);
   }
+
+  @Override
+  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces)
+    throws RemoteException
+  {
+    return annisDao.getResolverEntries(corpusName, namespaces);
+  }
+
 
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException

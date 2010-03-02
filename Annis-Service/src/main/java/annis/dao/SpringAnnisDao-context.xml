@@ -82,6 +82,8 @@
 	<bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
 		<property name="requiredType" value="java.lang.Long"/>
 	</bean>
+
+  <bean id="resolverDaoHelper" class="annis.dao.ResolverDaoHelper" />
 	
 	<!-- exported bean: AnnisDao -->
 	<bean id="springAnnisDao" class="annis.dao.SpringAnnisDao">
@@ -95,6 +97,7 @@
 		<property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
 		<property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
 		<property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
+    <property name="resolverDaoHelper" ref="resolverDaoHelper" />
 		
 		<!-- new -->
 		<property name="queryAnalysis" ref="queryAnalysis"/>

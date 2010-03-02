@@ -1,15 +1,11 @@
 package annis.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
@@ -21,6 +17,7 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
+import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
@@ -47,8 +44,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	private ListCorpusSqlHelper listCorpusSqlHelper;
 	private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
-	
-	/// new
+
+  /// new
 	
 	private List<SqlSessionModifier> sqlSessionModifiers;
 	private SqlGenerator findSqlGenerator;
@@ -59,6 +56,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 	private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 	
+  private ResolverDaoHelper resolverDaoHelper;
+
 	public SpringAnnisDao() {
 		planRowMapper = new ParameterizedSingleColumnRowMapper<String>();
 		matchFilters = new ArrayList<MatchFilter>();
@@ -211,6 +210,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return result;
 	}
 	
+  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces )
+  {
+    List<ResolverEntry> result =
+      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusName, namespaces),
+        resolverDaoHelper);
+
+    return result;
+  }
+
 	///// private helper
 
 	private MapSqlParameterSource makeArgs() {
@@ -373,5 +381,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	public void setCountSqlGenerator(SqlGenerator countSqlGenerator) {
 		this.countSqlGenerator = countSqlGenerator;
 	}
+
+  public ResolverDaoHelper getResolverDaoHelper()
+  {
+    return resolverDaoHelper;
+  }
+
+  public void setResolverDaoHelper(ResolverDaoHelper resolverDaoHelper)
+  {
+    this.resolverDaoHelper = resolverDaoHelper;
+  }
 
 }

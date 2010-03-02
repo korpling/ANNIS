@@ -5,6 +5,7 @@ import java.util.List;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 
@@ -34,5 +35,7 @@ public interface AnnisDao {
 	List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, boolean listValues);
 	
 	List<Annotation> listCorpusAnnotations(long id);
+
+  public List<ResolverEntry> getResolverEntries(String corpusName, List<String> namespaces );
 		
 }
