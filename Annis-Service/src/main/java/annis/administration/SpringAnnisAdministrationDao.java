@@ -107,8 +107,8 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	void createDatabase(String database) {
-		log.info("creating database: " + database);
-		jdbcOperations.execute("CREATE DATABASE " + database);
+		log.info("creating database: " + database + " ENCODING = 'UTF8' TEMPLATE template0");
+		jdbcOperations.execute("CREATE DATABASE " + database + " ENCODING = 'UTF8' TEMPLATE template0");
 	}
 
 	void installPlPython() {
