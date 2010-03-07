@@ -7,7 +7,8 @@ CREATE TABLE corpus
 	version 	varchar(100),
 	pre			numeric(38) NOT NULL UNIQUE,
 	post		numeric(38) NOT NULL UNIQUE,
-	top_level	boolean NOT NULL	-- true for roots of the corpus forest
+	top_level	boolean NOT NULL,	-- true for roots of the corpus forest
+  UNIQUE (name,version)
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
@@ -129,7 +130,8 @@ CREATE TABLE extData
 	branch		varchar(100) NOT NULL,
 	mime		varchar(100) NOT NULL,
 	comment		varchar(1500) NOT NULL,
-	UNIQUE (filename, branch) 
+	UNIQUE (filename, branch)
+   
 );
 
 
@@ -187,6 +189,7 @@ CREATE VIEW table_stats AS select
 	(select count(*) from extdata) as extdata
 ;
 
+
 CREATE TABLE viz_type
 (
 	id		numeric(38) NOT NULL,
@@ -202,3 +205,26 @@ CREATE TABLE viz_errors
 	"anno_level"	character varying(100) NOT NULL
 );
 COMMENT ON TABLE viz_errors IS 'Relation viz_errors contains errors of visualization computing';
+
+CREATE TABLE resolver_vis_map
+(
+  "id"   serial PRIMARY KEY,
+	"corpus"   varchar(100),
+  "version" 	varchar(100),
+  "namespace"	varchar(100),
+  "element"    varchar(4),
+  "vis_type"   varchar(100) NOT NULL,
+  "display_name"   varchar(100) NOT NULL,
+  "order" numeric default '0',
+  "mappings" varchar(100)   				    
+);
+ALTER TABLE resolver_vis_map ADD CONSTRAINT fk_corpus FOREIGN KEY (corpus,version) REFERENCES corpus(name,version) ON DELETE CASCADE;
+COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
+COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
+COMMENT ON COLUMN resolver_vis_map.version IS 'the version of the corpus, part of foreign key to corpus.name,corpus.version';
+COMMENT ON COLUMN resolver_vis_map.namespace IS 'the several layers of the corpus';
+COMMENT ON COLUMN resolver_vis_map.element IS 'the type of the entry: node | edge';
+COMMENT ON COLUMN resolver_vis_map.vis_type IS 'the abstract type of visualization: tree, discourse, grid, ...';
+COMMENT ON COLUMN resolver_vis_map.display_name IS 'the name of the layer which shall be shown for display';
+COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
+COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';

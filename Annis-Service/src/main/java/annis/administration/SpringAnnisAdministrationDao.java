@@ -66,7 +66,9 @@ public class SpringAnnisAdministrationDao {
 	private String[] importedTables = {
 			"corpus", "corpus_annotation",
 			"text", "node", "node_annotation", 
-			"component", "rank", "edge_annotation", 
+			"component", "rank", "edge_annotation",
+                        // to add:
+                        //  "resolver_vis_map"
 			// Resolver erst einmal rausnehmen
 			// "corp_2_viz", "xcorp_2_viz"
 	};
@@ -149,8 +151,9 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	void populateSchema() {
-		log.info("populating the schema with default values");
+		log.info("populating the schemas with default values");
 		bulkloadTableFromResource("viz_type", new FileSystemResource(new File(scriptPath, "viz_type.tab")));
+                bulkloadTableFromResource("resolver_vis_map", new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
 	}
 
 	///// Subtasks of importing a corpus
@@ -172,7 +175,7 @@ public class SpringAnnisAdministrationDao {
 		log.info("bulk-loading data");
 		for (String table : importedTables)
 			bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
-	}
+        }
 	
 	void computeTopLevelCorpus() {
 		log.info("computing top-level corpus");
