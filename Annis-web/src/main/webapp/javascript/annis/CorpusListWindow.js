@@ -106,7 +106,7 @@ Ext.onReady(function()
         closable:true,
         maximizable: false,
         width:800,
-        height:605,
+        height:Ext.getBody().getViewSize().height - 35,
         //border:false,
         plain:true,
         layout: 'fit',

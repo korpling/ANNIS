@@ -516,7 +516,7 @@ Ext.onReady(function()
     cm: corpusListCm,
     sm: corpusListSelectionModel,
     width: 310,
-    height: 240,
+    flex: 1,
     stripeRows: true,
     title:'Available Corpora',
     header: false,
@@ -602,7 +602,7 @@ Ext.onReady(function()
     title: 'AnnisQL',
     header: false,
     width: 330,
-    height: 410,
+    height: 165,
     defaultType: 'textfield',
     monitorValid: true,
     items: [{
@@ -633,9 +633,7 @@ Ext.onReady(function()
       name: 'matchCount',
       allowBlank:true,
       readOnly: true
-    },
-    corpusGrid
-    ]
+    }]
 	           	
   });
 
@@ -654,7 +652,8 @@ Ext.onReady(function()
   var panelSearch = new Ext.Panel({
     region: 'west',
     width: 330,
-    items: [formPanelSearch, panelSearchModes]
+    layout: "vbox",
+    items: [formPanelSearch,corpusGrid, panelSearchModes]
   });
 	
   var queryBuilderURL = conf_context + '/queryBuilder.html';
@@ -700,7 +699,7 @@ Ext.onReady(function()
     maximizable: true,
     resizable: false,
     width: windowSearchFormWidth,
-    height:605,
+    height: Math.max(500,Ext.getBody().getViewSize().height - 35),
     //border:false,
     plain:true,
     closeAction: 'hide',
