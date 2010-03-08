@@ -516,7 +516,7 @@ Ext.onReady(function()
     cm: corpusListCm,
     sm: corpusListSelectionModel,
     width: 310,
-    height: 255,
+    height: 240,
     stripeRows: true,
     title:'Available Corpora',
     header: false,
