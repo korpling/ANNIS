@@ -91,14 +91,14 @@ public class ExternalFileVisualizer extends WriterVisualizer
   {
     String template =
         "<object type=\"application/x-shockwave-flash\" data=\"%s/mediaplayer/player_mp3_maxi.swf\" width=\"200\" height=\"20\">\n"
-       + "<param name=\"movie\" value=\"%s/secure/Binary/%d\" />\n"
+       + "<param name=\"movie\" value=\"%s/mediaplayer/player_mp3_maxi.swf\" />\n"
        + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
        + "<param name=\"FlashVars\" value=\"mp3="
        + "%s/secure/Binary/%d"
         + "&amp;width=85&amp;showstop=1&amp;showvolume=1&amp;showslider=0&amp;bgcolor1=dfe8f6&amp;bgcolor2=bad0ee&amp;sliderovercolor=ffffff&amp;buttoncolor=000000&amp;buttonovercolor=ffffff&amp;textcolor=000000\" />\n"
        + "</object>";
 
-    return String.format(template, getContextPath(), getContextPath(), externalID,
+    return String.format(template, getContextPath(), getContextPath(),
       getContextPath(), externalID);
   }
 
@@ -106,14 +106,14 @@ public class ExternalFileVisualizer extends WriterVisualizer
   {
     String template =
         "<object type=\"application/x-shockwave-flash\" data=\"%s/mediaplayer/player_flv_maxi.swf\" width=\"320\" height=\"240\">\n"
-       + "<param name=\"movie\" value=\"%s/secure/Binary/%d\" />\n"
+       + "<param name=\"movie\" value=\"%s/mediaplayer/player_flv_maxi.swf\" />\n"
        + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
        + "<param name=\"FlashVars\" value=\"flv="
         + "%s/secure/Binary/%d"
         + "&amp;showstop=1&amp;showvolume=1&amp;showtime=1&amp;showfullscreen=1\" />\n"
        + "</object>";
 
-    return String.format(template, getContextPath(), getContextPath(), externalID,
+    return String.format(template, getContextPath(), getContextPath(),
       getContextPath(), externalID);
   }
 
