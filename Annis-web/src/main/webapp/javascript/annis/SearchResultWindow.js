@@ -55,14 +55,15 @@ function addNewSliders(rowData)
     hidden: false, // se above
     minValue: 0,
     maxValue: 100, // see above
+    value: 0,
     listeners : {
       drag : function()
       {
-        Ext.get("kwic-" + rowData.callbackId).scrollTo('left', slider.getValue());
+        scrollToSliderPosition(slider, rowData.callbackId);
       },
       changecomplete : function()
       {
-        Ext.get("kwic-" + rowData.callbackId).scrollTo('left', slider.getValue());
+        scrollToSliderPosition(slider, rowData.callbackId);
       }
     }
   });
@@ -81,8 +82,21 @@ function adjustSingleSlider(callbackId, columnWidth)
     
     sliderNode.setWidth(columnWidth);
     sliderNode.setVisible(tableWidth > columnWidth ? true :false);
-    sliderNode.setMaxValue(tableWidth - columnWidth);
+    var maxVal = tableWidth - columnWidth;
+    sliderNode.setMaxValue(maxVal);
+
+    var newSliderVal = sliderNode.getValue;
+    newSliderVal = Math.min(0, newSliderVal);
+    newSliderVal = Math.max(maxVal, newSliderVal);
+
+    sliderNode.setValue(newSliderVal);
+    scrollToSliderPosition(sliderNode, callbackId);
   }
+}
+
+function scrollToSliderPosition(slider, callbackId)
+{
+  Ext.get("kwic-" + callbackId).scrollTo('left', slider.getValue());
 }
 
 Ext.onReady(function() {
@@ -234,7 +248,7 @@ Ext.onReady(function() {
         id: 'actions',
         renderer: this.renderActions,
         scope: this,
-        width: 24
+        width: 30
       }); // end cmItems:match
 
       cmItems.push({
@@ -251,8 +265,9 @@ Ext.onReady(function() {
       });
 
       var gridViewSearchResult = new Ext.grid.GridView({
-        ensureVisible: Ext.emptyFn
+        focusCell: Ext.emptyFn
       });
+
 
       var gridSearchResult = new Ext.grid.GridPanel({
         header: false,
@@ -283,7 +298,7 @@ Ext.onReady(function() {
               var rawId = sliderNodes[i].id;
               var callbackId = rawId.replace("slider-comp-", "");
 
-              adjustSingleSlider(callbackId, width - 50); // 24 is size of the other column
+              adjustSingleSlider(callbackId, width - 50); // 30 is size of the other column
             }
             
           }
