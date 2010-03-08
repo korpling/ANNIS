@@ -250,15 +250,18 @@ Ext.onReady(function() {
         }
       });
 
+      var gridViewSearchResult = new Ext.grid.GridView({
+        ensureVisible: Ext.emptyFn
+      });
 
       var gridSearchResult = new Ext.grid.GridPanel({
         header: false,
         store: storeSearchResult,
         id: 'gridSearchResult',
         cm: cm,
+        view: gridViewSearchResult,
         viewConfig: {
-          enableRowBody: true,
-          showPreview: true
+          enableRowBody: true
         },
         loadMask: true,
         collapsible: true,
