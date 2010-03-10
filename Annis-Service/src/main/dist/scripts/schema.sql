@@ -209,14 +209,15 @@ COMMENT ON TABLE viz_errors IS 'Relation viz_errors contains errors of visualiza
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
-	"corpus"   varchar(100),
+  "corpus"   varchar(100),
   "version" 	varchar(100),
   "namespace"	varchar(100),
-  "element"    varchar(4),
+  "element"    varchar(4) CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar(100) NOT NULL,
   "display_name"   varchar(100) NOT NULL,
   "order" numeric default '0',
-  "mappings" varchar(100)   				    
+  "mappings" varchar(100),
+   UNIQUE (corpus,version,namespace,element,vis_type)  				    
 );
 ALTER TABLE resolver_vis_map ADD CONSTRAINT fk_corpus FOREIGN KEY (corpus,version) REFERENCES corpus(name,version) ON DELETE CASCADE;
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';

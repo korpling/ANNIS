@@ -33,6 +33,14 @@ WHERE toplevel_corpus IN ( :ids );
 ---
 
 -- component
+-- resolver_vis_map
+DELETE FROM resolver_vis_map
+USING corpus toplevel
+WHERE resolver_vis_map.corpus IN ( SELECT toplevel.name WHERE toplevel.id IN (:ids))
+AND (resolver_vis_map.version IN ( SELECT toplevel.version WHERE toplevel.id IN (:ids)) 
+OR resolver_vis_map.version is NULL AND toplevel.version is NULL);
+
+-- component
 -- explain analyze
 DELETE FROM component
 USING node, rank
