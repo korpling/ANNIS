@@ -7,8 +7,7 @@ CREATE TABLE corpus
 	version 	varchar(100),
 	pre			numeric(38) NOT NULL UNIQUE,
 	post		numeric(38) NOT NULL UNIQUE,
-	top_level	boolean NOT NULL,	-- true for roots of the corpus forest
-  UNIQUE (name,version)
+	top_level	boolean NOT NULL	-- true for roots of the corpus forest
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
@@ -219,7 +218,6 @@ CREATE TABLE resolver_vis_map
   "mappings" varchar(100),
    UNIQUE (corpus,version,namespace,element,vis_type)  				    
 );
-ALTER TABLE resolver_vis_map ADD CONSTRAINT fk_corpus FOREIGN KEY (corpus,version) REFERENCES corpus(name,version) ON DELETE CASCADE;
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
 COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
 COMMENT ON COLUMN resolver_vis_map.version IS 'the version of the corpus, part of foreign key to corpus.name,corpus.version';
