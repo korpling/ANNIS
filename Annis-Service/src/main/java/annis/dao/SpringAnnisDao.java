@@ -20,6 +20,7 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
@@ -49,7 +50,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	
 	private List<SqlSessionModifier> sqlSessionModifiers;
 	private SqlGenerator findSqlGenerator;
-	private SqlGenerator countSqlGenerator;
+	private CountSqlGenerator countSqlGenerator;
 	private MatchRowMapper findRowMapper;
 	private QueryAnalysis queryAnalysis;
 	private DddQueryParser dddQueryParser;
@@ -377,11 +378,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
 	}
 
-	public SqlGenerator getCountSqlGenerator() {
+	public CountSqlGenerator getCountSqlGenerator() {
 		return countSqlGenerator;
 	}
 
-	public void setCountSqlGenerator(SqlGenerator countSqlGenerator) {
+	public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator) {
 		this.countSqlGenerator = countSqlGenerator;
 	}
 
