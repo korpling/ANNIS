@@ -108,21 +108,24 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return matches;
 	}
 
-	public int countMatches(final List<Long> corpusList, final String dddQuery) {
-//		return findMatches(corpusList, dddQuery).size();
+  public int countMatches(final List<Long> corpusList, final String dddQuery)
+  {
 
-		// parse the query
-		Start statement = dddQueryParser.parse(dddQuery);
-		
-		// analyze it
-		QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-		
-		// execute session modifiers
-		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
-			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
-		
-		return getSimpleJdbcTemplate().query(findSqlGenerator.toSql(statement, corpusList), findRowMapper).size();
-	}
+    // parse the query
+    Start statement = dddQueryParser.parse(dddQuery);
+
+    // analyze it
+    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+
+    // execute session modifiers
+    for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+    {
+      sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
+    }
+
+    return getSimpleJdbcTemplate().queryForInt(countSqlGenerator.toSql(statement, corpusList));
+
+  }
 
 	@Deprecated
 	public int doWait(final int seconds) {

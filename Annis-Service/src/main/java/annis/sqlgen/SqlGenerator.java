@@ -7,14 +7,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
-import de.deutschdiachrondigital.dddquery.node.PExpr;
 import de.deutschdiachrondigital.dddquery.node.Start;
 
 
-public class SqlGenerator {
+public class SqlGenerator
+{
 
 	private Logger log = Logger.getLogger(this.getClass());
 	
