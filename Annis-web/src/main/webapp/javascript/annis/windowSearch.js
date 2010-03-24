@@ -103,7 +103,7 @@ Ext.onReady(function()
       failure: function() {
         formPanelSearch.getComponent('matchCount').setValue("FATAL ERROR: Unable to validate query.");
       },
-      autoAbort: true,
+      autoAbort: false,
       timeout: 10000
     });
 
