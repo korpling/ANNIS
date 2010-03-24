@@ -1,25 +1,25 @@
 -- Spaltenindizes
-CREATE INDEX idx_f_component_id ON facts (component_id);
-CREATE INDEX idx_f_corpus_ref ON facts (corpus_ref);
-CREATE INDEX idx_f_edge_anno_name ON facts (edge_annotation_name);
-CREATE INDEX idx_f_edge_anno_value ON facts (edge_annotation_value);
-CREATE INDEX idx_f_edge_name ON facts (edge_name);
-CREATE INDEX idx_f_edge_type ON facts (edge_type);
-CREATE INDEX idx_f_left ON facts ("left");
-CREATE INDEX idx_f_left_token ON facts (left_token);
-CREATE INDEX idx_f_level ON facts (level);
-CREATE INDEX idx_f_node_anno_name ON facts (node_annotation_name);
-CREATE INDEX idx_f_node_anno_value ON facts (node_annotation_value);
-CREATE INDEX idx_f_parent ON facts (parent);
-CREATE INDEX idx_f_post ON facts (post);
-CREATE INDEX idx_f_pre ON facts (pre);
-CREATE INDEX idx_f_right ON facts ("right");
-CREATE INDEX idx_f_right_token ON facts (right_token);
-CREATE INDEX idx_f_root ON facts (root);
-CREATE INDEX idx_f_span ON facts (span);
-CREATE INDEX idx_f_text_ref ON facts (text_ref);
-CREATE INDEX idx_f_token_index ON facts (token_index);
-CREATE INDEX idx_f_toplevel_corpus ON facts (toplevel_corpus);
+-- CREATE INDEX idx_f_component_id ON facts (component_id);
+-- CREATE INDEX idx_f_corpus_ref ON facts (corpus_ref);
+-- CREATE INDEX idx_f_edge_anno_name ON facts (edge_annotation_name);
+-- CREATE INDEX idx_f_edge_anno_value ON facts (edge_annotation_value);
+-- CREATE INDEX idx_f_edge_name ON facts (edge_name);
+-- CREATE INDEX idx_f_edge_type ON facts (edge_type);
+-- CREATE INDEX idx_f_left ON facts ("left");
+-- CREATE INDEX idx_f_left_token ON facts (left_token);
+-- CREATE INDEX idx_f_level ON facts (level);
+-- CREATE INDEX idx_f_node_anno_name ON facts (node_annotation_name);
+-- CREATE INDEX idx_f_node_anno_value ON facts (node_annotation_value);
+-- CREATE INDEX idx_f_parent ON facts (parent);
+-- CREATE INDEX idx_f_post ON facts (post);
+-- CREATE INDEX idx_f_pre ON facts (pre);
+-- CREATE INDEX idx_f_right ON facts ("right");
+-- CREATE INDEX idx_f_right_token ON facts (right_token);
+-- CREATE INDEX idx_f_root ON facts (root);
+-- CREATE INDEX idx_f_span ON facts (span);
+-- CREATE INDEX idx_f_text_ref ON facts (text_ref);
+-- CREATE INDEX idx_f_token_index ON facts (token_index);
+-- CREATE INDEX idx_f_toplevel_corpus ON facts (toplevel_corpus);
 
 -- Suche kombiniert mit parent
 CREATE INDEX idx_c__parent__node ON facts (toplevel_corpus, parent);
