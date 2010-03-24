@@ -27,6 +27,7 @@ public class DaoTransactionManagement {
 		return transactionTemplate.execute(new TransactionCallback() {
 
 			public Object doInTransaction(TransactionStatus status) {
+				status.setRollbackOnly();
 				
 				// XXX: ugly, but ProceedingJoinPoint.proceed() and 
 				// TransactionTemplate.doInTransaction() have incompatible
