@@ -16,6 +16,7 @@ import annis.dao.Match;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisResultImpl;
@@ -166,12 +167,9 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		printAsTable(corpusAnnotations, "namespace", "name", "value");
 	}
 	
-  public void doResolvertest(String arg)
+  public void doResolvertest(long corpusID, String namespace, ResolverEntry.ElementType type)
   {
-    Set<String> nsNode = new HashSet<String>();
-    Set<String> nsEdge = new HashSet<String>();
-    
-    annisDao.getResolverEntries(0, nsNode, nsEdge);
+    annisDao.getResolverEntries(corpusID, namespace, type);
   }
 
 	///// Helper

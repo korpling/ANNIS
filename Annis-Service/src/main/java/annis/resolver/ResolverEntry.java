@@ -28,7 +28,7 @@ public class ResolverEntry implements Serializable
 {
   public enum ElementType
   {
-    Node, Edge
+    node, edge
   }
 
   private long id;

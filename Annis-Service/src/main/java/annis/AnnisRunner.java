@@ -2,6 +2,7 @@ package annis;
 
 
 import annis.ql.parser.AnnisParser;
+import annis.resolver.ResolverEntry;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.deutschdiachrondigital.dddquery.DddQueryRunner;
 
@@ -100,7 +101,16 @@ public class AnnisRunner extends AnnisBaseRunner {
 	
   public void doResolvertest(String arg)
   {
-    dddQueryRunner.doResolvertest(arg);
+    String[] args = arg.split("[ ]+");
+    if(args.length == 3)
+    {
+      dddQueryRunner.doResolvertest(Long.parseLong(args[0]), args[1],
+        ResolverEntry.ElementType.valueOf(args[2]));
+    }
+    else
+    {
+      System.err.print("Wrong argument count");
+    }
   }
 
 	///// Delegates for convenience

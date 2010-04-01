@@ -37,6 +37,6 @@ public interface AnnisDao {
 	
 	List<Annotation> listCorpusAnnotations(long id);
 
-  public List<ResolverEntry> getResolverEntries(long corpusId,  Set<String> nsNodes, Set<String> nsEdges);
+  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type);
 		
 }

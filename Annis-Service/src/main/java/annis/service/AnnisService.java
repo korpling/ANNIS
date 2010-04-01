@@ -114,7 +114,7 @@ public interface AnnisService extends Remote {
 
 	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException;
 
-  public List<ResolverEntry> getResolverEntries(long corpusId,  Set<String> nsNodes, Set<String> nsEdges)
+  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
     throws RemoteException;
 
 }

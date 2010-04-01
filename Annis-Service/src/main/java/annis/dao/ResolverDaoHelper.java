@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -33,10 +32,11 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class ResolverDaoHelper implements ResultSetExtractor
 {
 
-  public String createSqlQuery(long corpusId, Set<String> nsNodes, Set<String> nsEdges)
+  public String createSqlQuery(long corpusId, String namespace, ResolverEntry.ElementType type)
   {
     StringBuilder result = new StringBuilder();
-    
+
+
     // TODO: create the sql query for getting the resolver data
     
     return result.toString();

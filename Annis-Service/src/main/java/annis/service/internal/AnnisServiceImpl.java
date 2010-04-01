@@ -31,7 +31,6 @@ import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
-import java.util.Set;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -157,10 +156,10 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public List<ResolverEntry> getResolverEntries(long corpusId,  Set<String> nsNodes, Set<String> nsEdges)
+  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
     throws RemoteException
   {
-    return annisDao.getResolverEntries(corpusId, nsNodes, nsEdges);
+    return annisDao.getResolverEntries(corpusId, namespace, type);
   }
 
 

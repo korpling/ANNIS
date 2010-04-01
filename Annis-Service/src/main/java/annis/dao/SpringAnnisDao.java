@@ -27,7 +27,6 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
-import java.util.Set;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
@@ -215,10 +214,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 		return result;
 	}
 	
-  public List<ResolverEntry> getResolverEntries(long corpusId, Set<String> nsNodes, Set<String> nsEdges)
+  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
   {
     List<ResolverEntry> result =
-      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusId, nsNodes, nsEdges),
+      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusId, namespace, type),
         resolverDaoHelper);
 
     // TODO filtering
