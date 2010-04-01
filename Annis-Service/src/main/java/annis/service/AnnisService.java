@@ -2,7 +2,6 @@ package annis.service;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
 import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -12,10 +11,10 @@ import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisContingencyTable;
 import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import java.util.Set;
 
 public interface AnnisService extends Remote {
 	
@@ -115,7 +114,7 @@ public interface AnnisService extends Remote {
 
 	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException;
 
-  public List<ResolverEntry> getResolverEntries(long corpusId, List<String> namespaces)
+  public List<ResolverEntry> getResolverEntries(long corpusId,  Set<String> nsNodes, Set<String> nsEdges)
     throws RemoteException;
 
 }

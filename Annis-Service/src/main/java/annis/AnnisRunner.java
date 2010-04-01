@@ -98,6 +98,11 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doMeta(corpusId);
 	}
 	
+  public void doResolvertest(String arg)
+  {
+    dddQueryRunner.doResolvertest(arg);
+  }
+
 	///// Delegates for convenience
 	
 	private String translate(String annisQuery) {

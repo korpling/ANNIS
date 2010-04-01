@@ -24,6 +24,8 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DddQueryRunner extends AnnisBaseRunner {
 
@@ -164,6 +166,14 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		printAsTable(corpusAnnotations, "namespace", "name", "value");
 	}
 	
+  public void doResolvertest(String arg)
+  {
+    Set<String> nsNode = new HashSet<String>();
+    Set<String> nsEdge = new HashSet<String>();
+    
+    annisDao.getResolverEntries(0, nsNode, nsEdge);
+  }
+
 	///// Helper
 	
 	private void printAsTable(List<? extends Object> list, String... fields) {
