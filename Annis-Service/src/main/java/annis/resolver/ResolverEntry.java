@@ -145,6 +145,71 @@ public class ResolverEntry implements Serializable
     this.visType = visType;
   }
 
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final ResolverEntry other = (ResolverEntry) obj;
+    if (this.id != other.id)
+    {
+      return false;
+    }
+    if ((this.corpus == null) ? (other.corpus != null) : !this.corpus.equals(other.corpus))
+    {
+      return false;
+    }
+    if ((this.version == null) ? (other.version != null) : !this.version.equals(other.version))
+    {
+      return false;
+    }
+    if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+    {
+      return false;
+    }
+    if (this.element != other.element && (this.element == null || !this.element.equals(other.element)))
+    {
+      return false;
+    }
+    if ((this.visType == null) ? (other.visType != null) : !this.visType.equals(other.visType))
+    {
+      return false;
+    }
+    if ((this.displayName == null) ? (other.displayName != null) : !this.displayName.equals(other.displayName))
+    {
+      return false;
+    }
+    if (this.mappings != other.mappings && (this.mappings == null || !this.mappings.equals(other.mappings)))
+    {
+      return false;
+    }
+    if (this.order != other.order)
+    {
+      return false;
+    }
+    return true;
+  }
 
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 97 * hash + (int) (this.id ^ (this.id >>> 32));
+    hash = 97 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
+    hash = 97 * hash + (this.version != null ? this.version.hashCode() : 0);
+    hash = 97 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+    hash = 97 * hash + (this.element != null ? this.element.hashCode() : 0);
+    hash = 97 * hash + (this.visType != null ? this.visType.hashCode() : 0);
+    hash = 97 * hash + (this.displayName != null ? this.displayName.hashCode() : 0);
+    hash = 97 * hash + (this.mappings != null ? this.mappings.hashCode() : 0);
+    hash = 97 * hash + this.order;
+    return hash;
+  }
 
 }

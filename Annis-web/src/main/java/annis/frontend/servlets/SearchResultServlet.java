@@ -16,6 +16,7 @@
 package annis.frontend.servlets;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -31,6 +32,8 @@ import annis.exceptions.AnnisServiceFactoryException;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.resolver.ResolverEntry;
+import annis.resolver.ResolverEntry.ElementType;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
@@ -38,11 +41,15 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
@@ -228,41 +235,63 @@ public class SearchResultServlet extends HttpServlet
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
   }
 
-  public JSONObject jsonFromAnnisResult(AnnisResult result, List<Long> corpusIdList, AnnisService service) throws JSONException
+  public JSONObject jsonFromAnnisResult(AnnisResult result, 
+    List<Long> corpusIdList, AnnisService service) throws JSONException, RemoteException
   {
     JSONObject json = new JSONObject();
 
     json.putOnce("tokenNamespaces", result.getTokenAnnotationLevelSet());
 
-    HashSet<String> visSet = new HashSet<String>();
+    HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
     LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
 
-    for (String annoName : result.getAnnotationLevelSet())
+    long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
+    for(String annoName : result.getAnnotationLevelSet())
     {
       String[] splitted = annoName.split(":");
-      if (splitted.length > 0)
+      if(splitted.length > 0)
       {
-        if(!visSet.contains(splitted[0]))
-        {
-          visSet.add(splitted[0]);
-          JSONObject visEntry = new JSONObject();
-          visEntry.putOnce("id", splitted[0]);
-          visEntry.putOnce("name", splitted[0]);
-          visusalizer.add(visEntry);
-        }
+        List<ResolverEntry> listNode = service.getResolverEntries(corpusIdFromFirstNode, splitted[0], ElementType.node);
+        List<ResolverEntry> listEdge = service.getResolverEntries(corpusIdFromFirstNode, splitted[0], ElementType.edge);
+
+        visSet.addAll(listNode);
+        visSet.addAll(listEdge);
       }
     }
 
-    // for data debugging
-    JSONObject visEntryPaula = new JSONObject();
-    visEntryPaula.putOnce("id", "paula");
-    visEntryPaula.putOnce("name", "Paula");
-    JSONObject visEntryPaulaText = new JSONObject();
-    visEntryPaulaText.putOnce("id", "paulatext");
-    visEntryPaulaText.putOnce("name", "Paula Text");
+    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);    
+    Arrays.sort(visArray, new Comparator<ResolverEntry>()
+    {
 
-    visusalizer.add(visEntryPaula);
-    visusalizer.add(visEntryPaulaText);
+      @Override
+      public int compare(ResolverEntry o1, ResolverEntry o2)
+      {
+        if(o1.getOrder() < o2.getOrder())
+        {
+          return -1;
+        }
+        else if(o1.getOrder() > o2.getOrder())
+        {
+          return 1;
+        }
+        else
+        {
+          return 0;
+        }
+      }
+      
+    });
+
+    for(int i=0; i < visArray.length; i++)
+    {
+      ResolverEntry e = visArray[i];
+      JSONObject visEntry = new JSONObject();
+      visEntry.putOnce("id", i);
+      visEntry.putOnce("namespace", e.getNamespace());
+      visEntry.putOnce("displayname", e.getDisplayName());
+      visEntry.putOnce("vistype", e.getVisType());
+      visusalizer.add(visEntry);
+    }
 
     json.putOnce("visualizer", visusalizer);
 

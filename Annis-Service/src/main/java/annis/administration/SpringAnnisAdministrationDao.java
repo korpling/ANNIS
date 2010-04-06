@@ -69,8 +69,6 @@ public class SpringAnnisAdministrationDao {
 			"component", "rank", "edge_annotation",
                         // to add:
                         //  "resolver_vis_map"
-			// Resolver erst einmal rausnehmen
-			// "corp_2_viz", "xcorp_2_viz"
 	};
 	
 	// tables created during import
@@ -152,8 +150,7 @@ public class SpringAnnisAdministrationDao {
 	
 	void populateSchema() {
 		log.info("populating the schemas with default values");
-		bulkloadTableFromResource("viz_type", new FileSystemResource(new File(scriptPath, "viz_type.tab")));
-                bulkloadTableFromResource("resolver_vis_map", new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
+		bulkloadTableFromResource("resolver_vis_map", new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
 	}
 
 	///// Subtasks of importing a corpus
@@ -273,6 +270,9 @@ public class SpringAnnisAdministrationDao {
 		
 		for (String table : tables)
 			jdbcOperations.execute("DROP TABLE " + tableInStagingArea(table));
+
+    // drop the resolver temporary table
+    jdbcOperations.execute("DROP TABLE _resolver_vis_map");
 	}
 	
 	void dropMaterializedTables() {
@@ -407,10 +407,7 @@ public class SpringAnnisAdministrationDao {
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
-      
-//			// COPY mechanism for PostgreSQL, see http://kato.iki.fi/sw/db/postgresql/jdbc/copy/
-//			((PGConnection) con).getCopyAPI().copyIntoDB(sql, resource.getInputStream());
-			
+      			
 			// XXX: does this connection leak when it is not transaction managed?
 			// can't close it, otherwise the next time it is used in code that does run
 			// inside a transaction (the usual case during import) will fail

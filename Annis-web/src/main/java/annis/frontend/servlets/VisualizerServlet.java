@@ -78,10 +78,10 @@ public class VisualizerServlet extends HttpServlet
       throw new NullPointerException("Parameter 'callbackId' must no be null.");
     }
 
-    String namespace = request.getParameter("namespace");
-    if (namespace == null)
+    String vistype = request.getParameter("vistype");
+    if (vistype == null)
     {
-      throw new NullPointerException("Parameter 'namespace' must no be null.");
+      throw new NullPointerException("Parameter 'vistype' must no be null.");
     }
 
     if (textId == null)
@@ -133,9 +133,9 @@ public class VisualizerServlet extends HttpServlet
       {
         propsVisualizers.load(new FileReader(propVisualizersFile));
 
-        if (propsVisualizers.containsKey(namespace))
+        if (propsVisualizers.containsKey(vistype))
         {
-          className = propsVisualizers.getProperty(namespace);
+          className = propsVisualizers.getProperty(vistype);
         }
       }
 
@@ -143,15 +143,14 @@ public class VisualizerServlet extends HttpServlet
       if (propUseTextFile.canRead())
       {
         propsUseText.load(new FileReader(propUseTextFile));
-        if (propsUseText.containsKey(namespace))
+        if (propsUseText.containsKey(vistype))
         {
           isUseTextId = true;
-
         }
       }
 
       Visualizer visualizer = (Visualizer) classLoader.loadClass(className).newInstance();
-      visualizer.setNamespace(namespace);
+      visualizer.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
       visualizer.setMarkableMap(markableMap);
       visualizer.setContextPath(getServletContext().getContextPath());
       visualizer.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));

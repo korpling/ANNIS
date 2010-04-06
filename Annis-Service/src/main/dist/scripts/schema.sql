@@ -188,23 +188,6 @@ CREATE VIEW table_stats AS select
 	(select count(*) from extdata) as extdata
 ;
 
-
-CREATE TABLE viz_type
-(
-	id		numeric(38) NOT NULL,
-	"type"	character varying(100) NOT NULL
-);
-ALTER TABLE viz_type ADD CONSTRAINT "PK_viz_type" PRIMARY KEY (id);
-ALTER TABLE viz_type ADD  CONSTRAINT "UNIQUE_type" UNIQUE("type");
-
-CREATE TABLE viz_errors
-(
-	"corpus_id"		character varying(100) NOT NULL,
-	"corpus_name"	character varying(100) NOT NULL,
-	"anno_level"	character varying(100) NOT NULL
-);
-COMMENT ON TABLE viz_errors IS 'Relation viz_errors contains errors of visualization computing';
-
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,

@@ -455,16 +455,22 @@ Ext.onReady(function() {
       {
         var vis = rowData.visualizer[i];
 
-        output += '<div id="annotation-' + rowData.callbackId +'-' + vis.id + '-selector" class="annis-level-selector-collapsed"'
-                + ' onclick="toggleRowBody(\'' + rowData.callbackId + '-' + vis.id + '\');">'
-                + vis.name
+        var idcommon = rowData.callbackId + '-' + vis.id;
+
+        output += '<div id="annotation-' + idcommon + '-selector" class="annis-level-selector-collapsed"'
+                + ' onclick="toggleRowBody(\'' + idcommon + '\');">'
+                + vis.displayname
                 + '</div>';
               
-        output += '<div id="annotation-' + rowData.callbackId + '-' + vis.id + '-body" class="annis-level-body">';
-        output += '<iframe onload="checkIFrameLoaded(\'annotation-' + rowData.callbackId + '-' + vis.id + '-body\')" width="100%" height="20px" frameborder="0" src="'
+        output += '<div id="annotation-' + idcommon + '-body" class="annis-level-body">';
+        output += '<iframe onload="checkIFrameLoaded(\'annotation-' + idcommon + '-body\')" width="100%" height="20px" frameborder="0" src="'
             + conf_context + '/empty.html" annis:src="'
             + conf_context + '/secure/Visualizer?callbackId=' + rowData.callbackId
-            + '&textId=' + rowData.textId + '&namespace=' + vis.id + '&mark:red=' + marker + '" ></iframe>' +
+            + '&textId=' + rowData.textId 
+            + '&namespace=' + vis.namespace
+            + '&vistype=' + vis.vistype
+            + '&mark:red=' + marker
+            + '" ></iframe>' +
     '						</div>\n';
       }
       return output;
