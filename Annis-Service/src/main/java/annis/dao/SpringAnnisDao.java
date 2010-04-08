@@ -1,5 +1,7 @@
 package annis.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
@@ -216,11 +219,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao {
 	
   public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
   {
-    List<ResolverEntry> result =
-      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper.createSqlQuery(corpusId, namespace, type),
-        resolverDaoHelper);
+    final long corpusIdFinal = corpusId;
+    final String namespaceFinal = namespace;
+    final String typeFinal = type.name();
+    PreparedStatementSetter setter = new PreparedStatementSetter() {
 
-    // TODO filtering
+      @Override
+      public void setValues(PreparedStatement ps) throws SQLException
+      {
+        ps.setLong(1, corpusIdFinal);
+        ps.setString(2, namespaceFinal);
+        ps.setString(3, namespaceFinal);
+        ps.setString(4, namespaceFinal);
+        ps.setString(5, typeFinal);
+        ps.setLong(6, corpusIdFinal);
+      }
+    };
+    List<ResolverEntry> result =
+      (List<ResolverEntry>) getJdbcTemplate().query(resolverDaoHelper,
+        setter,
+        resolverDaoHelper);
 
     return result;
   }
