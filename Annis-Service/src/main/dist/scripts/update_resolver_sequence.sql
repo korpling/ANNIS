@@ -1,0 +1,1 @@
+SELECT setval('resolver_vis_map_id_seq', (select max(id) from resolver_vis_map)+1);

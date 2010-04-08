@@ -151,6 +151,8 @@ public class SpringAnnisAdministrationDao {
 	void populateSchema() {
 		log.info("populating the schemas with default values");
 		bulkloadTableFromResource("resolver_vis_map", new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
+    // update the sequence
+    executeSqlFromScript("update_resolver_sequence.sql");
 	}
 
 	///// Subtasks of importing a corpus
