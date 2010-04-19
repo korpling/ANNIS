@@ -42,14 +42,12 @@ import annis.service.ifaces.AnnisResultSet;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
@@ -246,7 +244,8 @@ public class SearchResultServlet extends HttpServlet
     LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
 
     long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
-    for(String annoName : result.getAnnotationLevelSet())
+    Set<String> annotationLevelSet = result.getAnnotationLevelSet();
+    for(String annoName : annotationLevelSet)
     {
       String[] splitted = annoName.split(":");
       if(splitted.length > 0)
@@ -296,7 +295,8 @@ public class SearchResultServlet extends HttpServlet
     json.putOnce("visualizer", visusalizer);
 
     Set<Long> markedIDs = getMarkedIDs(result.getGraph());
-    
+
+    HashSet<Long> corpusIdListFromResult = new HashSet<Long>();
     LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
     for (AnnisNode n : result.getGraph().getTokens())
     {
@@ -306,12 +306,8 @@ public class SearchResultServlet extends HttpServlet
         json.putOnce("textId", "" + n.getTextId());
       }
 
-      // put first match corpusId into result
-      if(!json.has("corpusId") && markedIDs.contains(n.getId()))
-      {
-        json.putOnce("corpusId", "" + n.getCorpus());
-      }
-
+      corpusIdListFromResult.add(n.getCorpus());
+      
       JSONObject tok = new JSONObject();
       tok.putOnce("id", "" + n.getId());
       tok.putOnce("textId", "" + n.getTextId());
@@ -330,13 +326,12 @@ public class SearchResultServlet extends HttpServlet
         annotations.put(a.getQualifiedName(), jsonAnno);
       }
       tok.putOnce("annotations", annotations);
-
       tok.putOnce("marker", markedIDs.contains(n.getId()) ? "red" : "");
-
       tokenList.add(tok);
 
     }
 
+    json.putOnce("corpusIdList", corpusIdListFromResult);
     json.putOnce("token", tokenList);
 
     return json;
