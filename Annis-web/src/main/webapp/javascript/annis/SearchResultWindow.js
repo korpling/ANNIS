@@ -94,6 +94,24 @@ function adjustSingleSlider(callbackId, columnWidth)
   }
 }
 
+function adjustAllSliders(width)
+{
+  // adjust all sliders
+  var sliderNodes = Ext.query("*[id^=slider-comp-]");
+  for(var i=0; i < sliderNodes.length; i++)
+  {
+    var rawId = sliderNodes[i].id;
+    var callbackId = rawId.replace("slider-comp-", "");
+
+    if(width == null)
+    {
+      width = Ext.get("gridSearchResult").getWidth();
+    }
+
+    adjustSingleSlider(callbackId, width - 50); // 30 is size of the other column
+  }
+}
+
 function scrollToSliderPosition(slider, callbackId)
 {
   Ext.get("kwic-" + callbackId).scrollTo('left', slider.getValue());
@@ -105,6 +123,7 @@ Ext.onReady(function() {
   function onTokenLevelCheck(item, checked) {
     setKWICTokenLevelVisibility(item.getItemId(), checked)
     tokenLevelCheckstate[item.getItemId()] = checked;
+    adjustAllSliders(null);
   }
   function setKWICTokenLevelVisibility(id, checked)
   {
@@ -289,18 +308,8 @@ Ext.onReady(function() {
         tbar: pagingToolbar,
         disableSelection: true,
         listeners : {
-          bodyresize : function(p, width, height)
-          {
-            // adjust all sliders
-            var sliderNodes = Ext.query("*[id^=slider-comp-]");
-            for(var i=0; i < sliderNodes.length; i++)
-            {
-              var rawId = sliderNodes[i].id;
-              var callbackId = rawId.replace("slider-comp-", "");
-
-              adjustSingleSlider(callbackId, width - 50); // 30 is size of the other column
-            }
-            
+          bodyresize : function(p, width, height) {
+            adjustAllSliders(width);
           }
         }
       }); // end gridSearchResult
