@@ -297,17 +297,17 @@ public class SearchResultServlet extends HttpServlet
 
     Set<Long> markedIDs = getMarkedIDs(result.getGraph());
 
-    HashSet<Long> corpusIdListFromResult = new HashSet<Long>();
+    HashSet<Long> textIdListFromResult = new HashSet<Long>();
     LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
     for (AnnisNode n : result.getGraph().getTokens())
     {
-      // put first match textId into result
-      if(!json.has("textId") && markedIDs.contains(n.getId()))
+      // put first match corpus id into result
+      if(!json.has("corpusId") && markedIDs.contains(n.getId()))
       {
-        json.putOnce("textId", "" + n.getTextId());
+        json.putOnce("corpusId", "" + n.getTextId());
       }
 
-      corpusIdListFromResult.add(n.getCorpus());
+      textIdListFromResult.add(n.getTextId());
       
       JSONObject tok = new JSONObject();
       tok.putOnce("id", "" + n.getId());
@@ -339,7 +339,7 @@ public class SearchResultServlet extends HttpServlet
     }
 
     json.putOnce("marker", markerAsMap);
-    json.putOnce("corpusIdList", corpusIdListFromResult);
+    json.putOnce("textIdList", textIdListFromResult);
     json.putOnce("token", tokenList);
 
     return json;

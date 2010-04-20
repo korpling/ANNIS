@@ -148,7 +148,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'textId', 'token', 'tokenNamespaces', 'visualizer', 'corpusIdList', 'marker'],
+    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -350,8 +350,13 @@ Ext.onReady(function() {
       output += '<div id="kwic-' + rowData.callbackId + '" class="SearchResultWindow kwic">\n';
       output += '<table id="table-' + rowData.callbackId + '">\n';
 
-      output += this.appendAllToken(rowData);
-      output += this.appendAllAnnotations(rowData);
+      for(var i=0; i < rowData.textIdList.length; i++)
+      {
+        var tid = rowData.textIdList[i];
+
+        output += this.appendAllToken(rowData, tid);
+        output += this.appendAllAnnotations(rowData, tid);
+      }
 
       output += '</table>\n'
       output += '</div>\n'
@@ -364,7 +369,7 @@ Ext.onReady(function() {
 
       return output;
     },
-    appendAllToken : function(rowData)
+    appendAllToken : function(rowData, textId)
     {
       var lastTokenIndex;
       var lastTokenIndexWasSet = false;
@@ -372,17 +377,20 @@ Ext.onReady(function() {
       var output = '<tr>\n'
       for(var i=0; i < rowData.token.length; i++)
       {
-        var tokenIndex = rowData.token[i].tokenIndex;
-        if(lastTokenIndexWasSet && (lastTokenIndex - tokenIndex) > 1)
+        if(rowData.token[i].textId == textId)
         {
-          // insert empty token as an indicator for "match islands"
-          output += this.appendPlaceholder(rowData.tokenNamespaces.length);
+          var tokenIndex = rowData.token[i].tokenIndex;
+          if(lastTokenIndexWasSet && (lastTokenIndex - tokenIndex) > 1)
+          {
+            // insert empty token as an indicator for "match islands"
+            output += this.appendPlaceholder(rowData.tokenNamespaces.length);
+          }
+
+          lastTokenIndex = tokenIndex;
+          lastTokenIndexWasSet = true;
+
+          output += this.appendSingleToken(rowData.token[i], rowData.marker);
         }
-
-        lastTokenIndex = tokenIndex;
-        lastTokenIndexWasSet = true;
-
-        output += this.appendSingleToken(rowData.token[i], rowData.marker);
       }
       output += '</tr>';
       return output;
@@ -409,23 +417,26 @@ Ext.onReady(function() {
     {
       return '<td rowspan=\"' + (annotationCount+1) + "\">(...)</td>\n";
     },
-    appendAllAnnotations : function(rowData)
+    appendAllAnnotations : function(rowData, textId)
     {
       var output = '';
       for(var i=0; i < rowData.tokenNamespaces.length; i++)
       {
         var key = rowData.tokenNamespaces[i];
-        output += this.appendAnnotationType(key, rowData);
+        output += this.appendAnnotationType(key, rowData, textId);
       }
 
       return output;
     },
-    appendAnnotationType : function(key, rowData)
+    appendAnnotationType : function(key, rowData, textId)
     {
       var output = '<tr class="' + key.replace(':', '_') + '" >\n';
       for(var i=0; i < rowData.token.length; i++)
       {
-        output += this.appendSingleAnnotation(rowData.token[i].annotations[key], key);
+        if(rowData.token[i].textId == textId)
+        {
+          output += this.appendSingleAnnotation(rowData.token[i].annotations[key], key);
+        }
       }
       output += '</tr>\n';
       return output;
@@ -475,7 +486,7 @@ Ext.onReady(function() {
         output += '<iframe onload="checkIFrameLoaded(\'annotation-' + idcommon + '-body\')" width="100%" height="20px" frameborder="0" src="'
             + conf_context + '/empty.html" annis:src="'
             + conf_context + '/secure/Visualizer?callbackId=' + rowData.callbackId
-            + '&textId=' + rowData.textId 
+            + '&textId=' + rowData.textIdList[0]
             + '&namespace=' + vis.namespace
             + '&vistype=' + vis.vistype
             + '&mark:red=' + markerString
@@ -491,8 +502,7 @@ Ext.onReady(function() {
       var row = store.getAt(rowIndex);
       var rowData = row.data; // this is the JSON result set we are sending from the frontend
 
-      // TODO: handle multiple corpora in meta data window
-      var id = rowData.corpusIdList[0];
+      var id = rowData.corpusId;
       var action = 'new MetaDataWindow(' + id + ').show();';
 
       var output = '<a href="#" onclick="' + action + '"><img src="' + conf_context + '/images/info.gif"></a>';
