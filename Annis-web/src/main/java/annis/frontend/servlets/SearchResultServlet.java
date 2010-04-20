@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -326,11 +327,18 @@ public class SearchResultServlet extends HttpServlet
         annotations.put(a.getQualifiedName(), jsonAnno);
       }
       tok.putOnce("annotations", annotations);
-      tok.putOnce("marker", markedIDs.contains(n.getId()) ? "red" : "");
       tokenList.add(tok);
 
     }
 
+    Map<String,String> markerAsMap = new TreeMap<String, String>();
+
+    for(long l : markedIDs)
+    {
+      markerAsMap.put("" + l, "red");
+    }
+
+    json.putOnce("marker", markerAsMap);
     json.putOnce("corpusIdList", corpusIdListFromResult);
     json.putOnce("token", tokenList);
 
@@ -341,6 +349,7 @@ public class SearchResultServlet extends HttpServlet
   {
     Set<Long> matchedNodes = graph.getMatchedNodeIds();
     Set<Long> matchedAndCovered = new HashSet<Long>(matchedNodes);
+
     // add all covered nodes
     for (AnnisNode n : graph.getNodes())
     {

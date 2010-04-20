@@ -148,7 +148,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'textId', 'token', 'tokenNamespaces', 'visualizer', 'corpusIdList'],
+    fields: ['id', 'callbackId', 'textId', 'token', 'tokenNamespaces', 'visualizer', 'corpusIdList', 'marker'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -382,15 +382,15 @@ Ext.onReady(function() {
         lastTokenIndex = tokenIndex;
         lastTokenIndexWasSet = true;
 
-        output += this.appendSingleToken(rowData.token[i]);
+        output += this.appendSingleToken(rowData.token[i], rowData.marker);
       }
       output += '</tr>';
       return output;
     },
-    appendSingleToken : function(token)
+    appendSingleToken : function(token, marker)
     {
-      var output =  ''
-      if(token.marker == null || token.marker == "")
+      var output =  '';
+      if(marker[token.id] == null || marker[token.id] == "")
       {
         output += '<td>';
       }
@@ -444,19 +444,19 @@ Ext.onReady(function() {
     {
       var output = '';
 
-      var marker = '';
+      var markerString = '';
       var first = true;
-      for(var j=0; j < rowData.token.length; j++)
+      for(key in rowData.marker)
       {
-        if(rowData.token[j].marker != null && rowData.token[j].marker != '')
+        if(rowData.marker[key] != null && rowData.marker[key] != '')
         {
           if(!first)
           {
-            marker += ',';
+            markerString += ',';
           }
           first = false;
           
-          marker += rowData.token[j].id;
+          markerString += key;
         }
       }
       
@@ -478,7 +478,7 @@ Ext.onReady(function() {
             + '&textId=' + rowData.textId 
             + '&namespace=' + vis.namespace
             + '&vistype=' + vis.vistype
-            + '&mark:red=' + marker
+            + '&mark:red=' + markerString
             + '" ></iframe>' +
     '						</div>\n';
       }

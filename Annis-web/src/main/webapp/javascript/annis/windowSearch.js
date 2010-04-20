@@ -478,21 +478,27 @@ Ext.onReady(function()
   var corpusListCm = new Ext.grid.ColumnModel([
     corpusListSelectionModel, 
     {
+      id: "name",
       header: "Name",
       dataIndex: 'name',
       align: 'left'
     },
     {
+      id: "texts",
       header: "Texts",
       dataIndex: 'textCount',
-      align: 'right'
+      align: 'right',
+      width: 60
     },
     {
+      id: "tokens",
       header: "Tokens",
       dataIndex: 'tokenCount',
-      align: 'right'
+      align: 'right',
+      width: 60
     },
     {
+      id: "id",
       header: "",
       dataIndex:'id',
       align: 'right',
@@ -505,17 +511,17 @@ Ext.onReady(function()
   // create the Grid
   var corpusGrid = new Ext.grid.GridPanel({
     id: 'gridPanelCorpus',
+    autoExpandColumn: 'name',
     enableDragDrop:true,
     ddGroup: 'corpusList',
     store: storeFavoriteCorpusList,
     viewConfig: {
-      forceFit:true,
+      //forceFit:true
       autoFill: true
     },
     loadMask: true,
     cm: corpusListCm,
     sm: corpusListSelectionModel,
-    width: 310,
     flex: 1,
     stripeRows: true,
     title:'Available Corpora',
