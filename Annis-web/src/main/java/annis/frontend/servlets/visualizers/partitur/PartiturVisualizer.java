@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jdom.Document;
 
 /**
  *
@@ -50,8 +49,7 @@ public class PartiturVisualizer extends WriterVisualizer
     try
     {
       // get partitur
-      Document jdomDoc = getPaulaJDOM();
-      PartiturParser partitur = new PartiturParser(jdomDoc, getNamespace());
+      PartiturParser partitur = new PartiturParser(getResult().getGraph(), getNamespace());
 
       // check right to left
       boolean isRTL = checkRTL(getResult().getTokenList());
