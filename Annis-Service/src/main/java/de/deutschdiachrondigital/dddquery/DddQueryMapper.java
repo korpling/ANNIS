@@ -270,9 +270,9 @@ public class DddQueryMapper {
 			PLingOp lingOp = (PLingOp) node.parent();
 			String name = token(node.getName());
 			if (node.getEdgeSpec() != null) {
-				writeMapping("$n", lhs(lingOp), "/child[p,", name, "](");
+				writeMapping("$n", lhs(lingOp), "/child[p,", name, "]");
 				node.getEdgeSpec().apply(this);
-				writeMapping(")::$n", rhs(lingOp));
+				writeMapping("::$n", rhs(lingOp));
 			} else
 				writeMapping("$n", lhs(lingOp), "/child[p,", name, "]::$n", rhs(lingOp));
 		}
