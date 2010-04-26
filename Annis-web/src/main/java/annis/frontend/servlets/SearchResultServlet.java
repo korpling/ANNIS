@@ -34,6 +34,7 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
+import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
@@ -246,19 +247,23 @@ public class SearchResultServlet extends HttpServlet
 
     long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
     Set<String> annotationLevelSet = result.getAnnotationLevelSet();
+
+    // create a request for resolver entries
+    LinkedList<SingleResolverRequest> request = new LinkedList<SingleResolverRequest>();
     for(String annoName : annotationLevelSet)
     {
       String[] splitted = annoName.split(":");
       if(splitted.length > 0)
       {
-        List<ResolverEntry> listNode = service.getResolverEntries(corpusIdFromFirstNode, splitted[0], ElementType.node);
-        List<ResolverEntry> listEdge = service.getResolverEntries(corpusIdFromFirstNode, splitted[0], ElementType.edge);
-
-        visSet.addAll(listNode);
-        visSet.addAll(listEdge);
+        request.add(new SingleResolverRequest(corpusIdFromFirstNode, splitted[0], ElementType.node));
+        request.add(new SingleResolverRequest(corpusIdFromFirstNode, splitted[0], ElementType.edge));
       }
     }
 
+    // query with this resolver request and make sure it is unique
+    visSet.addAll(service.getResolverEntries(request.toArray(new SingleResolverRequest[0])));
+
+    // sort everything
     ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);    
     Arrays.sort(visArray, new Comparator<ResolverEntry>()
     {

@@ -9,6 +9,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpusSet;
@@ -114,7 +115,7 @@ public interface AnnisService extends Remote {
 
 	public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException;
 
-  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
     throws RemoteException;
 
 }

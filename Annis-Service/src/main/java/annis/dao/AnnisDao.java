@@ -6,6 +6,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import java.util.Set;
@@ -37,6 +38,6 @@ public interface AnnisDao {
 	
 	List<Annotation> listCorpusAnnotations(long id);
 
-  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type);
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 		
 }

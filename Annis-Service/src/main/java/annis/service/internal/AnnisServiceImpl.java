@@ -18,6 +18,7 @@ import annis.externalFiles.ExternalFileMgr;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
@@ -156,10 +157,10 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public List<ResolverEntry> getResolverEntries(long corpusId, String namespace, ResolverEntry.ElementType type)
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
     throws RemoteException
   {
-    return annisDao.getResolverEntries(corpusId, namespace, type);
+    return annisDao.getResolverEntries(request);
   }
 
 

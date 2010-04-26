@@ -166,12 +166,6 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
 		printAsTable(corpusAnnotations, "namespace", "name", "value");
 	}
-	
-  public void doResolvertest(long corpusID, String namespace, ResolverEntry.ElementType type)
-  {
-    annisDao.getResolverEntries(corpusID, namespace, type);
-  }
-
 	///// Helper
 	
 	private void printAsTable(List<? extends Object> list, String... fields) {

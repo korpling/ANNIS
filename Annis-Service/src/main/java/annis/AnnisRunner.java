@@ -99,20 +99,6 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doMeta(corpusId);
 	}
 	
-  public void doResolvertest(String arg)
-  {
-    String[] args = arg.split("[ ]+");
-    if(args.length == 3)
-    {
-      dddQueryRunner.doResolvertest(Long.parseLong(args[0]), args[1],
-        ResolverEntry.ElementType.valueOf(args[2]));
-    }
-    else
-    {
-      System.err.print("Wrong argument count");
-    }
-  }
-
 	///// Delegates for convenience
 	
 	private String translate(String annisQuery) {

@@ -17,6 +17,7 @@
 package annis.dao;
 
 import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +35,13 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  */
 public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementCreator
 {
+
+  private int requestCount;
+
+  public ResolverDaoHelper(int requestCount)
+  {
+    this.requestCount = requestCount;
+  }
 
   @Override
   public PreparedStatement createPreparedStatement(Connection cnctn) throws SQLException
@@ -72,35 +80,42 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
       select
       + " FROM resolver_vis_map LEFT OUTER JOIN corpus ON (resolver_vis_map.corpus = corpus.name) WHERE namespace IS NULL AND corpus IN (SELECT name from corpus WHERE id = "
       + "?" //corpusId
-      + ") ORDER BY \"order\";";
+      + ")";
 
-    String result = 
-      firstUnion 
-      + " UNION "
-      + secondUnion
-      + " UNION "
-      + thirdUnion
-      + " UNION "
-      + fourthUnion;
+    StringBuffer result = new StringBuffer();
+    for(int i=0; i < requestCount; i++)
+    {
+      if(i > 0)
+      {
+        result.append(" \nUNION \n");
+      }
+      result.append(firstUnion);
+      result.append(" \nUNION \n");
+      result.append(secondUnion);
+      result.append(" \nUNION \n");
+      result.append(thirdUnion);
+      result.append(" \nUNION \n");
+      result.append(fourthUnion);
+    }
+    result.append(" \nORDER BY \"order\" ;");
 
-    return cnctn.prepareStatement(result);
+    return cnctn.prepareStatement(result.toString());
   }
 
-  public String createSqlQuery(long corpusId, String namespace, ResolverEntry.ElementType type)
+  public void fillPreparedStatement(SingleResolverRequest[] resolverRequest, PreparedStatement stmt) throws SQLException
   {
-
-    String select = "SELECT corpus.id, corpus.name, "
-      + "corpus.version, "
-      + "resolver_vis_map.namespace, "
-      + "resolver_vis_map.element, "
-      + "resolver_vis_map.vis_type, "
-      + "resolver_vis_map.display_name, "
-      + "resolver_vis_map.order, "
-      + "resolver_vis_map.mappings";
-
-    String result = select + " FROM resolver_vis_map, corpus WHERE corpus.id = " + corpusId + " AND corpus is NULL AND namespace is NULL AND element is NULL UNION " + select + " FROM resolver_vis_map  LEFT OUTER JOIN corpus ON (resolver_vis_map.corpus = corpus.name) WHERE corpus is NULL AND namespace = '" + namespace + "' AND namespace NOT IN (SELECT namespace FROM resolver_vis_map WHERE namespace = '" + namespace + "' AND corpus IS NOT NULL) UNION " + select + " FROM resolver_vis_map LEFT OUTER JOIN corpus ON (resolver_vis_map.corpus = corpus.name) WHERE corpus = corpus.name AND namespace = '" + namespace + "' AND element = '" + type + "' UNION " + select + " FROM resolver_vis_map LEFT OUTER JOIN corpus ON (resolver_vis_map.corpus = corpus.name) WHERE namespace IS NULL AND corpus IN (SELECT name from corpus WHERE id = '" + corpusId + "') ORDER BY \"order\";";
-
-    return result;
+    for(int offset=0; offset < requestCount; offset++)
+    {
+      if(offset < resolverRequest.length)
+      {
+         stmt.setLong((offset*6) + 1, resolverRequest[offset].getCorpusId());
+         stmt.setString((offset*6) + 2, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*6) + 3, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*6) + 4, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*6) + 5, resolverRequest[offset].getType().name());
+         stmt.setLong((offset*6) + 6, resolverRequest[offset].getCorpusId());
+      }
+    }
   }
 
   @Override
