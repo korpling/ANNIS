@@ -16,7 +16,18 @@
     <!-- we need all the config files of the service -->
     <fileSet>
       <directory>../Annis-Service/src/main/dist/</directory>
+      <excludes>
+        <exclude>conf/database.properties</exclude>
+      </excludes>
       <outputDirectory>/</outputDirectory>
+    </fileSet>
+     <!-- overwrite the database.properties -->
+    <fileSet>
+      <directory>src/main/resources/</directory>
+      <includes>
+        <include>database.properties</include>
+      </includes>
+      <outputDirectory>/conf/</outputDirectory>
     </fileSet>
     <!-- start scripts -->
     <fileSet>

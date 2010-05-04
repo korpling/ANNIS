@@ -13,12 +13,9 @@ import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +26,7 @@ import org.apache.commons.collections15.Transformer;
  *
  * @author thomas
  */
-public class JUNGTreeVisualizer extends Visualizer
+public class GraphVisualizer extends Visualizer
 {
 
   @Override
@@ -168,7 +165,7 @@ public class JUNGTreeVisualizer extends Visualizer
     }
     catch(IOException ex)
     {
-      Logger.getLogger(JUNGTreeVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
     }
 
 
