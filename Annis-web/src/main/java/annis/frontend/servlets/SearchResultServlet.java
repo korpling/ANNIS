@@ -309,7 +309,7 @@ public class SearchResultServlet extends HttpServlet
       // put first match corpus id into result
       if(!json.has("corpusId") && markedIDs.contains(n.getId()))
       {
-        json.putOnce("corpusId", "" + n.getTextId());
+        json.putOnce("corpusId", "" + n.getCorpus());
       }
 
       textIdListFromResult.add(n.getTextId());
