@@ -371,16 +371,17 @@ Ext.onReady(function() {
     },
     appendAllToken : function(rowData, textId)
     {
-      var lastTokenIndex;
+      var lastTokenIndex = -1;
       var lastTokenIndexWasSet = false;
 
       var output = '<tr>\n'
       for(var i=0; i < rowData.token.length; i++)
       {
-        if(rowData.token[i].textId == textId)
+        if((rowData.token[i].textId*1) == textId)
         {
           var tokenIndex = rowData.token[i].tokenIndex;
-          if(lastTokenIndexWasSet && (lastTokenIndex - tokenIndex) > 1)
+          
+          if(lastTokenIndexWasSet && ((tokenIndex - lastTokenIndex) > 1))
           {
             // insert empty token as an indicator for "match islands"
             output += this.appendPlaceholder(rowData.tokenNamespaces.length);
