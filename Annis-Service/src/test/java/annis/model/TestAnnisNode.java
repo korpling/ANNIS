@@ -19,7 +19,7 @@ public class TestAnnisNode {
 	private AnnisNode node;
 	
 	// arbitrary TextMatching value
-	private static final TextMatching TEXT_MATCHING = TextMatching.EXACT;
+	private static final TextMatching TEXT_MATCHING = TextMatching.EXACT_EQUAL;
 
 	@Before
 	public void setup() {

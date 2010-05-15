@@ -151,14 +151,14 @@ public class TestClauseAnalysis {
 	public void caseAExactEdgeAnnotation() {
 		setTarget();
 		clauseAnalysis.caseAExactEdgeAnnotation(newExactEdgeAnnotation(NAMESPACE, NAME, VALUE));
-		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.EXACT));
+		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.EXACT_EQUAL));
 	}
 	
 	@Test
 	public void caseARegexpEdgeAnnotation() {
 		setTarget();
 		clauseAnalysis.caseARegexpEdgeAnnotation(newRegexpEdgeAnnotation(NAMESPACE, NAME, VALUE));
-		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.REGEXP));
+		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.REGEXP_EQUAL));
 	}
 	
 	@Test
@@ -327,7 +327,7 @@ public class TestClauseAnalysis {
 	public void caseAComparisonExpr1() {
 		AnnisNode oldTarget = setTarget();
 		testCompare(EQ, newRegexpLiteralExpr("regexp"), newPathExpr(newRelativePathType()));
-		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP), is(oldTarget)));
+		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP_EQUAL), is(oldTarget)));
 	}
 	
 	// Text search (regexp), kommutativ
@@ -336,7 +336,7 @@ public class TestClauseAnalysis {
 	public void caseAComparsionExpr2() {
 		AnnisNode oldTarget = setTarget();
 		testCompare(EQ, newPathExpr(newRelativePathType()), newRegexpLiteralExpr("regexp"));
-		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP), is(oldTarget)));
+		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP_EQUAL), is(oldTarget)));
 	}
 	
 	// Text search (string)
@@ -345,7 +345,7 @@ public class TestClauseAnalysis {
 	public void caseAComparisonExpr3() {
 		AnnisNode oldTarget = setTarget();
 		testCompare(EQ, newPathExpr(newRelativePathType()), newStringLiteralExpr("string"));
-		assertThat(target(), allOf(spans("string", TextMatching.EXACT), is(oldTarget)));
+		assertThat(target(), allOf(spans("string", TextMatching.EXACT_EQUAL), is(oldTarget)));
 	}
 	
 	// Annotation search (string) 
@@ -357,7 +357,7 @@ public class TestClauseAnalysis {
 				newPathExpr(newRelativePathType(), newStep(newAttributeAxis(), newAttributeNodeTest(NAMESPACE, NAME))), 
 				newStringLiteralExpr("string"));
 		assertThat(target().getNodeAnnotations(), size(1));
-		assertThat(target(), allOf(hasAnnotation(NAMESPACE, NAME, "string", TextMatching.EXACT), is(oldTarget)));
+		assertThat(target(), allOf(hasAnnotation(NAMESPACE, NAME, "string", TextMatching.EXACT_EQUAL), is(oldTarget)));
 	}
 	
 	// Annotation search (regexp)
@@ -369,7 +369,7 @@ public class TestClauseAnalysis {
 				newRegexpLiteralExpr("regexp"),
 				newPathExpr(newRelativePathType(), newStep(newAttributeAxis(), newAttributeNodeTest(NAMESPACE, NAME))));
 		assertThat(target().getNodeAnnotations(), size(1));
-		assertThat(target(), allOf(hasAnnotation(NAMESPACE, NAME, "regexp", TextMatching.REGEXP), is(oldTarget)));
+		assertThat(target(), allOf(hasAnnotation(NAMESPACE, NAME, "regexp", TextMatching.REGEXP_EQUAL), is(oldTarget)));
 	}
 	
 	// Annotation search (existence)
@@ -428,7 +428,7 @@ public class TestClauseAnalysis {
 		assertThat(nodes(), size(2));
 		assertThat(context(), hasJoin(new Dominance(target(), 1)));
 //		assertThat(context(), hasJoin(context().preRank(), target().parent()));
-		assertThat(target(), hasAnnotation("tiger", "pos", "VVFIN", TextMatching.REGEXP));
+		assertThat(target(), hasAnnotation("tiger", "pos", "VVFIN", TextMatching.REGEXP_EQUAL));
 	}
 	
 	// #i .* #j, a/following::b
@@ -587,7 +587,7 @@ public class TestClauseAnalysis {
 	// meta::namespace:name="value"
 	@Test
 	public void metaAnnotation() {
-		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.EXACT);
+		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.EXACT_EQUAL);
 
 		Start start = newStart(newPathExpr(newStep(newChildAxis(), newMetaNodeTest(NAMESPACE, NAME, newQuotedText(VALUE)))));
 		clauseAnalysis.caseStart(start);
@@ -599,7 +599,7 @@ public class TestClauseAnalysis {
 	// meta::namespace:name=/value/
 	@Test
 	public void metaAnnotationRegexp() {
-		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.REGEXP);
+		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.REGEXP_EQUAL);
 
 		Start start = newStart(newPathExpr(newStep(newChildAxis(), newMetaNodeTest(NAMESPACE, NAME, newRegexpQuotedText(VALUE)))));
 		clauseAnalysis.caseStart(start);

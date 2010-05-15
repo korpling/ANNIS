@@ -15,6 +15,7 @@ import annis.ql.node.ADirectPrecedenceSpec;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AEdgeAnnotation;
 import annis.ql.node.AEdgeSpec;
+import annis.ql.node.AEqualAnnoValue;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
@@ -36,8 +37,10 @@ import annis.ql.node.ASameAnnotationGroupLingOp;
 import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATokenArityLingOp;
+import annis.ql.node.AUnequalAnnoValue;
 import annis.ql.node.AWildTextSpec;
 import annis.ql.node.EOF;
+import annis.ql.node.PAnnoValue;
 import annis.ql.node.PDominanceSpec;
 import annis.ql.node.PEdgeAnnotation;
 import annis.ql.node.PExpr;
@@ -66,7 +69,7 @@ public class AstBuilder {
 		AMetaConstraintExpr n = new AMetaConstraintExpr();
 		n.setNamespace(newTId(namespace));
 		n.setName(newTId(name));
-		n.setValue(newWildTextSpec(value));
+		n.setValue(newEqualAnnoValue(newWildTextSpec(value)));
 		return n;
 	}
 	
@@ -74,7 +77,7 @@ public class AstBuilder {
 		return new AAnyNodeSearchExpr();
 	}
 	
-	public static AAnnotationSearchExpr newAnnotationSearchExpr(String type, PTextSpec value) {
+	public static AAnnotationSearchExpr newAnnotationSearchExpr(String type, PAnnoValue value) {
 		AAnnotationSearchExpr n = new AAnnotationSearchExpr();
 		
 		n.setAnnoType(newTId(type));
@@ -149,6 +152,18 @@ public class AstBuilder {
 		
 		return n;
 	}
+
+  public static AEqualAnnoValue newEqualAnnoValue(PTextSpec text) {
+		AEqualAnnoValue n = new AEqualAnnoValue();
+    n.setTextSpec(text);
+	  return n;
+	}
+
+  public static AUnequalAnnoValue newUnequalAnnoValue(PTextSpec text) {
+		AUnequalAnnoValue n = new AUnequalAnnoValue();
+    n.setTextSpec(text);
+	  return n;
+	}
 	
 	public static ARootLingOp newRootLingOp() {
 		return new ARootLingOp();
@@ -210,7 +225,7 @@ public class AstBuilder {
 		return n;
 	}
 	
-	public static AEdgeAnnotation newEdgeAnnotation(String namespace, String name, PTextSpec value) {
+	public static AEdgeAnnotation newEdgeAnnotation(String namespace, String name, PAnnoValue value) {
 		AEdgeAnnotation n = new AEdgeAnnotation();
 		n.setNamespace(newTId(namespace));
 		n.setType(newTId(name));
@@ -218,7 +233,7 @@ public class AstBuilder {
 		return n;
 	}
 	
-	public static AEdgeAnnotation newEdgeAnnotation(String name, PTextSpec value) {
+	public static AEdgeAnnotation newEdgeAnnotation(String name, PAnnoValue value) {
 		return newEdgeAnnotation(null, name, value);
 	}
 	

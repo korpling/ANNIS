@@ -49,7 +49,7 @@ public class BaseNodeSqlGenerator {
 	}
 
 	protected String sqlString(String string, TextMatching textMatching) {
-		if (textMatching == TextMatching.REGEXP)
+		if (textMatching == TextMatching.REGEXP_EQUAL)
 			string = "^" + string + "$";
 		return sqlString(string);
 	}

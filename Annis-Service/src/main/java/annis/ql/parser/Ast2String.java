@@ -26,6 +26,7 @@ import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.AWildTextSpec;
 import annis.ql.node.Node;
+import annis.ql.node.PAnnoValue;
 import annis.ql.node.PTextSpec;
 import annis.ql.node.TDigits;
 import annis.ql.node.TId;
@@ -59,7 +60,7 @@ public class Ast2String extends DepthFirstAdapter {
 		annotation(node.getAnnoNamespace(), node.getAnnoType(), node.getAnnoValue());
 	}
 
-	private void annotation(TId namespace, TId type, PTextSpec value) {
+	private void annotation(TId namespace, TId type, PAnnoValue value) {
 		if (namespace != null) {
 			sb.append(token(namespace));
 			sb.append(":");

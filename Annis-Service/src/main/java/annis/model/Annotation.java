@@ -22,7 +22,7 @@ public class Annotation implements Comparable<Annotation>, Serializable {
 	}
 	
 	public Annotation(String namespace, String name, String value) {
-		this(namespace, name, value, TextMatching.EXACT);
+		this(namespace, name, value, TextMatching.EXACT_EQUAL);
 	}
 	
 	public Annotation(String namespace, String name, String value, TextMatching textMatching) {

@@ -57,6 +57,7 @@ Tokens
 	{default} hash = '#';
 	{default} digits = digit+;
 	{default} equal = '=';
+  {default} unequal = '!=';
 	{default} comma = ',';
 	{default} star = '*';	
 	{default} colon = ':';
@@ -111,7 +112,7 @@ Productions
 	term { -> expr } = 
 		  {search}	search_term { -> search_term.expr } 
 		| {document_constraint} doc equal text_spec { -> New expr.document_constraint(text_spec) }
-		| {meta_constraint} meta doublecolon anno_namespace? [anno_type]:id anno_value { -> New expr.meta_constraint(anno_namespace.id, anno_type, anno_value.text_spec) }
+		| {meta_constraint} meta doublecolon anno_namespace? [anno_type]:id anno_value { -> New expr.meta_constraint(anno_namespace.id, anno_type, anno_value) }
 		| {linguistic_term}	linguistic_term { -> linguistic_term.expr } 
 		| {grouped} grouped { -> grouped.expr }
 		| {implicit_and} [head]:grouped [tail]:grouped+ { -> New expr.implicit_and( [ head.expr, tail.expr ] ) } 
@@ -121,7 +122,7 @@ Productions
 		l_par expr r_par { -> expr } ;
 
 	search_term { -> expr } = 
-		  {annotation} anno_namespace? [anno_type]:id anno_value?  { -> New expr.annotation_search(anno_namespace.id, anno_type, anno_value.text_spec) } 
+		  {annotation} anno_namespace? [anno_type]:id anno_value?  { -> New expr.annotation_search(anno_namespace.id, anno_type, anno_value) } 
 		| {text} text_spec { -> New expr.text_search(text_spec) } 
 		;
 	
@@ -129,8 +130,9 @@ Productions
 		  [namespace]:id colon { -> namespace }
 		;
 		
-	anno_value { -> text_spec } = 
-		  equal [anno_value]:text_spec { -> anno_value }
+	anno_value { -> anno_value } =
+		  {equal} equal [anno_value]:text_spec { -> New anno_value.equal(anno_value.text_spec) }
+    | {unequal} unequal [anno_value]:text_spec { -> New anno_value.unequal(anno_value.text_spec) }
 		;
 		
 	text_spec { -> text_spec } = 
@@ -201,24 +203,29 @@ Productions
 		;
 		
 	edge_annotation { -> edge_annotation } = 
-		  anno_namespace? [anno_type]:id anno_value? { -> New edge_annotation(anno_namespace.id, anno_type, anno_value.text_spec) }
+		  anno_namespace? [anno_type]:id anno_value? { -> New edge_annotation(anno_namespace.id, anno_type, anno_value) }
 		;
 		
 Abstract Syntax Tree
 
 	expr =
-		  {annotation_search} [anno_namespace]:id? [anno_type]:id [anno_value]:text_spec? 
-		| {text_search} text_spec 
+		  {annotation_search} [anno_namespace]:id? [anno_type]:id [anno_value]:anno_value?
+		| {text_search} text_spec
 		| {any_node_search}
 		| {grouped} expr
 		| {implicit_and} expr*
 		| {linguistic_constraint} ling_op [lhs]:digits [rhs]:digits? 
 		| {document_constraint} [name]:text_spec
-		| {meta_constraint} [namespace]:id? [name]:id [value]:text_spec
+		| {meta_constraint} [namespace]:id? [name]:id [value]:anno_value
 		| {or} expr+
 		| {and} expr+
 		;
-		
+
+  anno_value =
+      {unequal} text_spec
+    | {equal} text_spec
+    ;
+	
 	text_spec = 
 		  {wild} text 
 		| {regexp} regexp 
@@ -276,4 +283,4 @@ Abstract Syntax Tree
 		
 	edge_spec = edge_annotation+ ;
 	
-	edge_annotation =  [namespace]:id? [type]:id [value]:text_spec? ;
+	edge_annotation =  [namespace]:id? [type]:id [value]:anno_value? ;

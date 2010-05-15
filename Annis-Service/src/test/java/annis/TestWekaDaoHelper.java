@@ -54,9 +54,9 @@ public class TestWekaDaoHelper {
 	private static final String VALUE2 = "VALUE2";
 	private static final String VALUE3 = "VALUE3";
 	
-	private static final Annotation annotation1 = new Annotation(NAMESPACE1, NAME1, VALUE1, TextMatching.EXACT);
-	private static final Annotation annotation2 = new Annotation(NAMESPACE2, NAME2, VALUE2, TextMatching.EXACT);
-	private static final Annotation annotation3 = new Annotation(NAMESPACE3, NAME3, VALUE3, TextMatching.EXACT);
+	private static final Annotation annotation1 = new Annotation(NAMESPACE1, NAME1, VALUE1, TextMatching.EXACT_EQUAL);
+	private static final Annotation annotation2 = new Annotation(NAMESPACE2, NAME2, VALUE2, TextMatching.EXACT_EQUAL);
+	private static final Annotation annotation3 = new Annotation(NAMESPACE3, NAME3, VALUE3, TextMatching.EXACT_EQUAL);
 
 	private static final String NULL = "NULL";
 	

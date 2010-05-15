@@ -23,7 +23,7 @@ public class AnnisNodeRowMapper extends AbstractModelRowMapper<AnnisNode> {
 		annisNode.setTokenIndex(longValue(resultSet, "token_index"));
 		if (resultSet.wasNull())
 			annisNode.setTokenIndex(null);
-		annisNode.setSpannedText(stringValue(resultSet, "span"), TextMatching.EXACT);
+		annisNode.setSpannedText(stringValue(resultSet, "span"), TextMatching.EXACT_EQUAL);
 		annisNode.setLeftToken(longValue(resultSet, "left_token"));
 		annisNode.setRightToken(longValue(resultSet, "right_token"));
 		

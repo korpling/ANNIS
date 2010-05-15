@@ -14,346 +14,381 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 
-public class AnnisNode implements Serializable {
+public class AnnisNode implements Serializable
+{
 
-	// this class is send to the front end
-	private static final long serialVersionUID = 6376277416278198776L;
+  // this class is send to the front end
+  private static final long serialVersionUID = 6376277416278198776L;
+  // node object in database
+  private long id;
+  private long corpus; // FIXME: Corpus object with annotations or move to
+  // graph?
+  private long textId;
+  private long left;
+  private long right;
+  private String spannedText;
+  private Long tokenIndex;
+  private long leftToken;
+  private long rightToken;
+  private Set<Annotation> nodeAnnotations;
+  // annotation graph
+  private AnnotationGraph graph;
+  // node position in annotation graph
+  private Set<Edge> incomingEdges;
+  private Set<Edge> outgoingEdges;
+  private String name;
+  private String namespace;
+  // node constraints
+  private boolean partOfEdge;
+  private boolean root;
+  private boolean token;
+  private TextMatching spanTextMatching;
+  private List<Join> joins;
+  private String variable;
+  private Set<Annotation> edgeAnnotations;
+  private Range arity;
+  private Range tokenArity;
+  // for sql generation
+  private String marker;
 
-	// node object in database
-	private long id;
-	private long corpus; // FIXME: Corpus object with annotations or move to
-							// graph?
-	private long textId;
-	private long left;
-	private long right;
-	private String spannedText;
-	private Long tokenIndex;
-	private long leftToken;
-	private long rightToken;
-	private Set<Annotation> nodeAnnotations;
+  public enum TextMatching
+  {
 
-	// annotation graph
-	private AnnotationGraph graph;
-	
-	// node position in annotation graph
-	private Set<Edge> incomingEdges;
-	private Set<Edge> outgoingEdges;
+    EXACT_EQUAL("=", "\""), REGEXP_EQUAL("~", "/"),
+    EXACT_NOT_EQUAL("<>", "\""), REGEXP_NOT_EQUAL("!~", "/");
+    private String sqlOperator;
+    private String annisQuote;
 
-	private String name;
-	private String namespace;
+    private TextMatching(String sqlOperator, String annisQuote)
+    {
+      this.sqlOperator = sqlOperator;
+      this.annisQuote = annisQuote;
+    }
 
-	// node constraints
-	private boolean partOfEdge;
-	private boolean root;
-	private boolean token;
-	private TextMatching spanTextMatching;
-	private List<Join> joins;
-	private String variable;
-	private Set<Annotation> edgeAnnotations;
-	private Range arity;
-	private Range tokenArity;
+    public String toString()
+    {
+      return sqlOperator;
+    }
 
-	// for sql generation
-	private String marker;
+    public String sqlOperator()
+    {
+      return sqlOperator;
+    }
 
-	public enum TextMatching {
-		EXACT("=", "\""), REGEXP("~", "/");
+    public String quote()
+    {
+      return annisQuote;
+    }
+  };
 
-		private String sqlOperator;
-		private String annisQuote;
+  public static class Range
+  {
 
-		private TextMatching(String sqlOperator, String annisQuote) {
-			this.sqlOperator = sqlOperator;
-			this.annisQuote = annisQuote;
-		}
+    private int min;
+    private int max;
 
-		public String toString() {
-			return sqlOperator;
-		}
+    public Range(int _min, int _max)
+    {
+      min = _min;
+      max = _max;
+    }
 
-		public String sqlOperator() {
-			return sqlOperator;
-		}
+    public int getMin()
+    {
+      return min;
+    }
 
-		public String quote() {
-			return annisQuote;
-		}
-	};
+    public int getMax()
+    {
+      return max;
+    }
 
-	public static class Range {
-		private int min;
-		private int max;
-		
-		public Range(int _min, int _max) {
-			min = _min;
-			max = _max;
-		}
-		
-		public int getMin() {
-			return min;
-		}
-		
-		public int getMax() {
-			return max;
-		}
-		
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder().append(min).append(max).toHashCode();
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof Range) {
-				Range other = (Range) obj;
-				
-				return new EqualsBuilder().append(min, other.min).append(max, other.max).isEquals();
-			}
-			return false;
-		}
-	};
-	
-	public AnnisNode() {
-		nodeAnnotations = new TreeSet<Annotation>();
-		edgeAnnotations = new TreeSet<Annotation>();
-		incomingEdges = new HashSet<Edge>();
-		outgoingEdges = new HashSet<Edge>();
-		joins = new ArrayList<Join>();
-	}
+    @Override
+    public int hashCode()
+    {
+      return new HashCodeBuilder().append(min).append(max).toHashCode();
+    }
 
-	public AnnisNode(long id) {
-		this();
-		this.id = id;
-	}
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (obj instanceof Range)
+      {
+        Range other = (Range) obj;
 
-	public AnnisNode(long id, long corpusRef, long textRef, long left,
-			long right, String namespace, String name, long tokenIndex,
-			String span, long leftToken, long rightToken) {
-		this(id);
+        return new EqualsBuilder().append(min, other.min).append(max, other.max).isEquals();
+      }
+      return false;
+    }
+  };
 
-		this.corpus = corpusRef;
-		this.textId = textRef;
-		this.left = left;
-		this.right = right;
-		this.leftToken = leftToken;
-		this.rightToken = rightToken;
+  public AnnisNode()
+  {
+    nodeAnnotations = new TreeSet<Annotation>();
+    edgeAnnotations = new TreeSet<Annotation>();
+    incomingEdges = new HashSet<Edge>();
+    outgoingEdges = new HashSet<Edge>();
+    joins = new ArrayList<Join>();
+  }
 
-		setNamespace(namespace);
-		setName(name);
-		setTokenIndex(tokenIndex);
+  public AnnisNode(long id)
+  {
+    this();
+    this.id = id;
+  }
 
-		setSpannedText(span, TextMatching.EXACT);
-	}
+  public AnnisNode(long id, long corpusRef, long textRef, long left,
+    long right, String namespace, String name, long tokenIndex,
+    String span, long leftToken, long rightToken)
+  {
+    this(id);
 
-	public static String qName(String namespace, String name) {
-		return name == null ? null : (namespace == null ? name : namespace
-				+ ":" + name);
-	}
+    this.corpus = corpusRef;
+    this.textId = textRef;
+    this.left = left;
+    this.right = right;
+    this.leftToken = leftToken;
+    this.rightToken = rightToken;
 
-	public void setSpannedText(String span) {
-		setSpannedText(span, TextMatching.EXACT);
-	}
+    setNamespace(namespace);
+    setName(name);
+    setTokenIndex(tokenIndex);
 
-	public void setSpannedText(String spannedText, TextMatching textMatching) {
-		if (spannedText != null)
-			Validate.notNull(textMatching);
-		this.spannedText = spannedText;
-		this.spanTextMatching = textMatching;
-	}
+    setSpannedText(span, TextMatching.EXACT_EQUAL);
+  }
 
-	public void clearSpannedText() {
-		this.spannedText = null;
-		this.spanTextMatching = null;
-	}
+  public static String qName(String namespace, String name)
+  {
+    return name == null ? null : (namespace == null ? name : namespace
+      + ":" + name);
+  }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
+  public void setSpannedText(String span)
+  {
+    setSpannedText(span, TextMatching.EXACT_EQUAL);
+  }
 
-		sb.append("node ");
-		sb.append(id);
+  public void setSpannedText(String spannedText, TextMatching textMatching)
+  {
+    if (spannedText != null)
+    {
+      Validate.notNull(textMatching);
+    }
+    this.spannedText = spannedText;
+    this.spanTextMatching = textMatching;
+  }
 
-		if (marker != null) {
-			sb.append("; marked '");
-			sb.append(marker);
-			sb.append("'");
-		}
+  public void clearSpannedText()
+  {
+    this.spannedText = null;
+    this.spanTextMatching = null;
+  }
 
-		if (variable != null) {
-			sb.append("; bound to '");
-			sb.append(variable);
-			sb.append("'");
-		}
+  @Override
+  public String toString()
+  {
+    StringBuffer sb = new StringBuffer();
 
-		if (name != null) {
-			sb.append("; named '");
-			sb.append(qName(namespace, name));
-			sb.append("'");
-		}
+    sb.append("node ");
+    sb.append(id);
 
-		if (token) {
-			sb.append("; is a token");
-		}
+    if (marker != null)
+    {
+      sb.append("; marked '");
+      sb.append(marker);
+      sb.append("'");
+    }
 
-		if (spannedText != null) {
-			sb.append("; spans ");
-			String quote = spanTextMatching != null ? spanTextMatching.quote()
-					: "?";
-			sb.append(quote);
-			sb.append(spannedText);
-			sb.append(quote);
-		}
+    if (variable != null)
+    {
+      sb.append("; bound to '");
+      sb.append(variable);
+      sb.append("'");
+    }
 
-		if (isRoot())
-			sb.append("; root node");
+    if (name != null)
+    {
+      sb.append("; named '");
+      sb.append(qName(namespace, name));
+      sb.append("'");
+    }
 
-		if (!nodeAnnotations.isEmpty()) {
-			sb.append("; node labels: ");
-			sb.append(nodeAnnotations);
-		}
+    if (token)
+    {
+      sb.append("; is a token");
+    }
 
-		if (!edgeAnnotations.isEmpty()) {
-			sb.append("; edge labes: ");
-			sb.append(edgeAnnotations);
-		}
+    if (spannedText != null)
+    {
+      sb.append("; spans ");
+      String quote = spanTextMatching != null ? spanTextMatching.quote()
+        : "?";
+      sb.append(quote);
+      sb.append(spannedText);
+      sb.append(quote);
+    }
 
-		for (Join join : joins) {
-			sb.append("; ");
-			sb.append(join);
-		}
+    if (isRoot())
+    {
+      sb.append("; root node");
+    }
 
-		return sb.toString();
-	}
+    if (!nodeAnnotations.isEmpty())
+    {
+      sb.append("; node labels: ");
+      sb.append(nodeAnnotations);
+    }
 
-	public boolean addIncomingEdge(Edge edge) {
-		return incomingEdges.add(edge);
-	}
+    if (!edgeAnnotations.isEmpty())
+    {
+      sb.append("; edge labes: ");
+      sb.append(edgeAnnotations);
+    }
 
-	public boolean addOutgoingEdge(Edge edge) {
-		return outgoingEdges.add(edge);
-	}
+    for (Join join : joins)
+    {
+      sb.append("; ");
+      sb.append(join);
+    }
 
-	public boolean addEdgeAnnotation(Annotation annotation) {
-		return edgeAnnotations.add(annotation);
-	}
+    return sb.toString();
+  }
 
-	public boolean addNodeAnnotation(Annotation annotation) {
-		return nodeAnnotations.add(annotation);
-	}
+  public boolean addIncomingEdge(Edge edge)
+  {
+    return incomingEdges.add(edge);
+  }
 
-	public boolean addJoin(Join join) {
-		boolean result = joins.add(join);
+  public boolean addOutgoingEdge(Edge edge)
+  {
+    return outgoingEdges.add(edge);
+  }
 
-		if (join instanceof RankTableJoin) {
-			this.setPartOfEdge(true);
+  public boolean addEdgeAnnotation(Annotation annotation)
+  {
+    return edgeAnnotations.add(annotation);
+  }
 
-			AnnisNode target = join.getTarget();
-			target.setPartOfEdge(true);
-		}
+  public boolean addNodeAnnotation(Annotation annotation)
+  {
+    return nodeAnnotations.add(annotation);
+  }
 
-		return result;
-	}
+  public boolean addJoin(Join join)
+  {
+    boolean result = joins.add(join);
 
-	public String getQualifiedName() {
-		return qName(namespace, name);
-	}
+    if (join instanceof RankTableJoin)
+    {
+      this.setPartOfEdge(true);
+
+      AnnisNode target = join.getTarget();
+      target.setPartOfEdge(true);
+    }
+
+    return result;
+  }
+
+  public String getQualifiedName()
+  {
+    return qName(namespace, name);
+  }
 
   @Override
   public boolean equals(Object obj)
   {
-    if(obj == null)
+    if (obj == null)
     {
       return false;
     }
-    if(getClass() != obj.getClass())
+    if (getClass() != obj.getClass())
     {
       return false;
     }
     final AnnisNode other = (AnnisNode) obj;
-    if(this.id != other.id)
+    if (this.id != other.id)
     {
       return false;
     }
-    if(this.corpus != other.corpus)
+    if (this.corpus != other.corpus)
     {
       return false;
     }
-    if(this.textId != other.textId)
+    if (this.textId != other.textId)
     {
       return false;
     }
-    if(this.left != other.left)
+    if (this.left != other.left)
     {
       return false;
     }
-    if(this.right != other.right)
+    if (this.right != other.right)
     {
       return false;
     }
-    if((this.spannedText == null) ? (other.spannedText != null) : !this.spannedText.equals(other.spannedText))
+    if ((this.spannedText == null) ? (other.spannedText != null) : !this.spannedText.equals(other.spannedText))
     {
       return false;
     }
-    if(this.leftToken != other.leftToken)
+    if (this.leftToken != other.leftToken)
     {
       return false;
     }
-    if(this.nodeAnnotations != other.nodeAnnotations && (this.nodeAnnotations == null || !this.nodeAnnotations.equals(other.nodeAnnotations)))
+    if (this.nodeAnnotations != other.nodeAnnotations && (this.nodeAnnotations == null || !this.nodeAnnotations.equals(other.nodeAnnotations)))
     {
       return false;
     }
-    if((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
+    if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
     {
       return false;
     }
-    if((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+    if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
     {
       return false;
     }
-    if(this.partOfEdge != other.partOfEdge)
+    if (this.partOfEdge != other.partOfEdge)
     {
       return false;
     }
-    if(this.root != other.root)
+    if (this.root != other.root)
     {
       return false;
     }
-    if(this.token != other.token)
+    if (this.token != other.token)
     {
       return false;
     }
-    if(this.spanTextMatching != other.spanTextMatching)
+    if (this.spanTextMatching != other.spanTextMatching)
     {
       return false;
     }
-    if(this.joins != other.joins && (this.joins == null || !this.joins.equals(other.joins)))
+    if (this.joins != other.joins && (this.joins == null || !this.joins.equals(other.joins)))
     {
       return false;
     }
-    if((this.variable == null) ? (other.variable != null) : !this.variable.equals(other.variable))
+    if ((this.variable == null) ? (other.variable != null) : !this.variable.equals(other.variable))
     {
       return false;
     }
-    if(this.edgeAnnotations != other.edgeAnnotations && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
+    if (this.edgeAnnotations != other.edgeAnnotations && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
     {
       return false;
     }
-    if((this.marker == null) ? (other.marker != null) : !this.marker.equals(other.marker))
+    if ((this.marker == null) ? (other.marker != null) : !this.marker.equals(other.marker))
     {
       return false;
     }
-    if((this.arity == null) ? (other.arity != null) : !this.arity.equals(other.arity))
+    if ((this.arity == null) ? (other.arity != null) : !this.arity.equals(other.arity))
     {
       return false;
     }
-    if((this.tokenArity == null) ? (other.tokenArity != null) : !this.tokenArity.equals(other.tokenArity))
+    if ((this.tokenArity == null) ? (other.tokenArity != null) : !this.tokenArity.equals(other.tokenArity))
     {
       return false;
     }
-    
+
     return true;
   }
-  
 
 //	@Override
 //	public boolean equals(Object obj) {
@@ -384,198 +419,243 @@ public class AnnisNode implements Serializable {
 //			.isEquals();
 //	}
 //
-	@Override
-	public int hashCode() {
-		return (int) id;
-	}
+  @Override
+  public int hashCode()
+  {
+    return (int) id;
+  }
 
-	// /// Getter / Setter
+  // /// Getter / Setter
+  public Set<Annotation> getEdgeAnnotations()
+  {
+    return edgeAnnotations;
+  }
 
-	public Set<Annotation> getEdgeAnnotations() {
-		return edgeAnnotations;
-	}
+  public void setEdgeAnnotations(Set<Annotation> edgeAnnotations)
+  {
+    this.edgeAnnotations = edgeAnnotations;
+  }
 
-	public void setEdgeAnnotations(Set<Annotation> edgeAnnotations) {
-		this.edgeAnnotations = edgeAnnotations;
-	}
+  public boolean isRoot()
+  {
+    return root;
+  }
 
-	public boolean isRoot() {
-		return root;
-	}
+  public void setRoot(boolean root)
+  {
+    this.root = root;
+  }
 
-	public void setRoot(boolean root) {
-		this.root = root;
-	}
+  public String getMarker()
+  {
+    return marker;
+  }
 
-	public String getMarker() {
-		return marker;
-	}
+  public void setMarker(String marker)
+  {
+    this.marker = marker;
+  }
 
-	public void setMarker(String marker) {
-		this.marker = marker;
-	}
+  public String getName()
+  {
+    return name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setName(String name)
+  {
+    this.name = name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getNamespace()
+  {
+    return namespace;
+  }
 
-	public String getNamespace() {
-		return namespace;
-	}
+  public void setNamespace(String namespace)
+  {
+    this.namespace = namespace;
+  }
 
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
+  public String getSpannedText()
+  {
+    return spannedText;
+  }
 
-	public String getSpannedText() {
-		return spannedText;
-	}
+  public TextMatching getSpanTextMatching()
+  {
+    return spanTextMatching;
+  }
 
-	public TextMatching getSpanTextMatching() {
-		return spanTextMatching;
-	}
+  public Set<Annotation> getNodeAnnotations()
+  {
+    return nodeAnnotations;
+  }
 
-	public Set<Annotation> getNodeAnnotations() {
-		return nodeAnnotations;
-	}
+  public void setNodeAnnotations(Set<Annotation> nodeAnnotations)
+  {
+    this.nodeAnnotations = nodeAnnotations;
+  }
 
-	public void setNodeAnnotations(Set<Annotation> nodeAnnotations) {
-		this.nodeAnnotations = nodeAnnotations;
-	}
+  public String getVariable()
+  {
+    return variable;
+  }
 
-	public String getVariable() {
-		return variable;
-	}
+  public void setVariable(String variable)
+  {
+    this.variable = variable;
+  }
 
-	public void setVariable(String variable) {
-		this.variable = variable;
-	}
+  public long getId()
+  {
+    return id;
+  }
 
-	public long getId() {
-		return id;
-	}
+  public List<Join> getJoins()
+  {
+    return joins;
+  }
 
-	public List<Join> getJoins() {
-		return joins;
-	}
+  public boolean isToken()
+  {
+    return token;
+  }
 
-	public boolean isToken() {
-		return token;
-	}
+  public void setToken(boolean token)
+  {
+    this.token = token;
+  }
 
-	public void setToken(boolean token) {
-		this.token = token;
-	}
+  public boolean isPartOfEdge()
+  {
+    return partOfEdge;
+  }
 
-	public boolean isPartOfEdge() {
-		return partOfEdge;
-	}
+  public void setPartOfEdge(boolean partOfEdge)
+  {
+    this.partOfEdge = partOfEdge;
+  }
 
-	public void setPartOfEdge(boolean partOfEdge) {
-		this.partOfEdge = partOfEdge;
-	}
+  public long getCorpus()
+  {
+    return corpus;
+  }
 
-	public long getCorpus() {
-		return corpus;
-	}
+  public void setCorpus(long corpus)
+  {
+    this.corpus = corpus;
+  }
 
-	public void setCorpus(long corpus) {
-		this.corpus = corpus;
-	}
+  public long getTextId()
+  {
+    return textId;
+  }
 
-	public long getTextId() {
-		return textId;
-	}
+  public void setTextId(long textIndex)
+  {
+    this.textId = textIndex;
+  }
 
-	public void setTextId(long textIndex) {
-		this.textId = textIndex;
-	}
+  public long getLeft()
+  {
+    return left;
+  }
 
-	public long getLeft() {
-		return left;
-	}
+  public void setLeft(long left)
+  {
+    this.left = left;
+  }
 
-	public void setLeft(long left) {
-		this.left = left;
-	}
+  public long getRight()
+  {
+    return right;
+  }
 
-	public long getRight() {
-		return right;
-	}
+  public void setRight(long right)
+  {
+    this.right = right;
+  }
 
-	public void setRight(long right) {
-		this.right = right;
-	}
+  public Long getTokenIndex()
+  {
+    return tokenIndex;
+  }
 
-	public Long getTokenIndex() {
-		return tokenIndex;
-	}
+  public void setTokenIndex(Long tokenIndex)
+  {
+    this.tokenIndex = tokenIndex;
+    // FIXME: vermengung von node und constraint semantik
+    setToken(tokenIndex != null);
+  }
 
-	public void setTokenIndex(Long tokenIndex) {
-		this.tokenIndex = tokenIndex;
-		// FIXME: vermengung von node und constraint semantik
-		setToken(tokenIndex != null);
-	}
+  public long getLeftToken()
+  {
+    return leftToken;
+  }
 
-	public long getLeftToken() {
-		return leftToken;
-	}
+  public void setLeftToken(long leftToken)
+  {
+    this.leftToken = leftToken;
+  }
 
-	public void setLeftToken(long leftToken) {
-		this.leftToken = leftToken;
-	}
+  public long getRightToken()
+  {
+    return rightToken;
+  }
 
-	public long getRightToken() {
-		return rightToken;
-	}
+  public void setRightToken(long rightToken)
+  {
+    this.rightToken = rightToken;
+  }
 
-	public void setRightToken(long rightToken) {
-		this.rightToken = rightToken;
-	}
+  public Set<Edge> getIncomingEdges()
+  {
+    return incomingEdges;
+  }
 
-	public Set<Edge> getIncomingEdges() {
-		return incomingEdges;
-	}
+  public void setIncomingEdges(Set<Edge> incomingEdges)
+  {
+    this.incomingEdges = incomingEdges;
+  }
 
-	public void setIncomingEdges(Set<Edge> incomingEdges) {
-		this.incomingEdges = incomingEdges;
-	}
+  public Set<Edge> getOutgoingEdges()
+  {
+    return outgoingEdges;
+  }
 
-	public Set<Edge> getOutgoingEdges() {
-		return outgoingEdges;
-	}
+  public void setOutgoingEdges(Set<Edge> outgoingEdges)
+  {
+    this.outgoingEdges = outgoingEdges;
+  }
 
-	public void setOutgoingEdges(Set<Edge> outgoingEdges) {
-		this.outgoingEdges = outgoingEdges;
-	}
+  public AnnotationGraph getGraph()
+  {
+    return graph;
+  }
 
-	public AnnotationGraph getGraph() {
-		return graph;
-	}
+  public void setGraph(AnnotationGraph graph)
+  {
+    this.graph = graph;
+  }
 
-	public void setGraph(AnnotationGraph graph) {
-		this.graph = graph;
-	}
+  public Range getArity()
+  {
+    return arity;
+  }
 
-	public Range getArity() {
-		return arity;
-	}
+  public void setArity(Range arity)
+  {
+    this.arity = arity;
+  }
 
-	public void setArity(Range arity) {
-		this.arity = arity;
-	}
+  public Range getTokenArity()
+  {
+    return tokenArity;
+  }
 
-	public Range getTokenArity() {
-		return tokenArity;
-	}
-
-	public void setTokenArity(Range tokenArity) {
-		this.tokenArity = tokenArity;
-	}
-
+  public void setTokenArity(Range tokenArity)
+  {
+    this.tokenArity = tokenArity;
+  }
 }
 

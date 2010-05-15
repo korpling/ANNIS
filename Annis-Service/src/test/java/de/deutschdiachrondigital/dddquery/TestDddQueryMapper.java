@@ -323,9 +323,15 @@ public class TestDddQueryMapper {
 	///// meta data
 	
 	@Test
-	public void metadata() {
-		testMapping("meta::namespace:name=/value/", "meta(namespace:name=r\"value\")");
+	public void metadataEqual() {
+		testMapping("meta::namespace:name=/value/", "meta(namespace:name = r\"value\")");
 	}
+
+  @Test
+	public void metadataUnequal() {
+    testMapping("meta::namespace:name!=/value/", "meta(namespace:name != r\"value\")");
+	}
+
 	
 	///// Helper
 	

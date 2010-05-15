@@ -92,8 +92,8 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation3.corpus_ref = c1.id";
 		
 		Annotation annotation1 = new Annotation("namespace1", "name1");
-		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT);
-		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP);
+		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
+		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
 		
 		metaData = Arrays.asList(annotation1, annotation2, annotation3);
 		assertEquals(expected, strategy.buildSubQuery(corpusList, metaData));
@@ -120,8 +120,8 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation3.corpus_ref = c1.id";
 		
 		Annotation annotation1 = new Annotation("namespace1", "name1");
-		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT);
-		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP);
+		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
+		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
 		
 		corpusList = Arrays.asList(23L, 42L, 69L);
 		metaData = Arrays.asList(annotation1, annotation2, annotation3);

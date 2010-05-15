@@ -22,6 +22,7 @@ import annis.ql.node.ADirectSiblingSpec;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AEdgeAnnotation;
 import annis.ql.node.AEdgeSpec;
+import annis.ql.node.AEqualAnnoValue;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
@@ -49,7 +50,9 @@ import annis.ql.node.ARootLingOp;
 import annis.ql.node.ASameAnnotationGroupLingOp;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATokenArityLingOp;
+import annis.ql.node.AUnequalAnnoValue;
 import annis.ql.node.AWildTextSpec;
+import annis.ql.node.PAnnoValue;
 import annis.ql.node.PEdgeAnnotation;
 import annis.ql.node.PExpr;
 import annis.ql.node.PLingOp;
@@ -148,6 +151,20 @@ public class DddQueryMapper {
 			writeMapping("r\"", token(node.getRegexp()), "\"");
 		}
 
+    @Override
+    public void caseAEqualAnnoValue(AEqualAnnoValue node)
+    {
+      writeMapping(" = ");
+      node.getTextSpec().apply(this);
+    }
+    
+    @Override
+    public void caseAUnequalAnnoValue(AUnequalAnnoValue node)
+    {
+      writeMapping(" != ");
+      node.getTextSpec().apply(this);
+    }
+
 		// FIXME: Wert als Regexp
 		@Override
 		public void caseAAnnotationSearchExpr(AAnnotationSearchExpr node) {
@@ -158,9 +175,9 @@ public class DddQueryMapper {
 
 			writeMapping(token(node.getAnnoType()));
 
-			PTextSpec annoValue = node.getAnnoValue();
-			if (annoValue != null) {
-				writeMapping(" = ");
+      PAnnoValue annoValue = node.getAnnoValue();
+			if (annoValue != null)
+      {
 				annoValue.apply(this);
 			}
 
@@ -427,7 +444,7 @@ public class DddQueryMapper {
 			if (node.getNamespace() != null) {
 				writeMapping(token(node.getNamespace()), ":");
 			}
-			writeMapping(token(node.getName()), "=");
+			writeMapping(token(node.getName()));
 			node.getValue().apply(this);
 			writeMapping(")");
 		}

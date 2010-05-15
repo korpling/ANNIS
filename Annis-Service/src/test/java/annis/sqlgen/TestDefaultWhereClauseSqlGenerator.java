@@ -109,14 +109,14 @@ public class TestDefaultWhereClauseSqlGenerator {
 	// WHERE condition for spanned text (string)
 	@Test
 	public void whereClauseForNodeSpanString() {
-		node23.setSpannedText("string", TextMatching.EXACT);
+		node23.setSpannedText("string", TextMatching.EXACT_EQUAL);
 		checkWhereCondition(join("=", "_node23.span", "'string'"));
 	}
 	
 	// WHERE condition for spanned text (regexp) 
 	@Test
 	public void whereClauseForNodeSpanRegexp() {
-		node23.setSpannedText("regexp", TextMatching.REGEXP);
+		node23.setSpannedText("regexp", TextMatching.REGEXP_EQUAL);
 		checkWhereCondition(join("~", "_node23.span", "'^regexp$'"));
 	}
 	
@@ -124,8 +124,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeAnnotation() {
 		node23.addNodeAnnotation(new Annotation("namespace1", "name1"));
-		node23.addNodeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT));
-		node23.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP));
+		node23.addNodeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
+		node23.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 				join("=", "_annotation23_1.namespace", "'namespace1'"),
 				join("=", "_annotation23_1.name", "'name1'"),
@@ -142,8 +142,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeEdgeAnnotation() {
 		node23.addEdgeAnnotation(new Annotation("namespace1", "name1"));
-		node23.addEdgeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT));
-		node23.addEdgeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP));
+		node23.addEdgeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
+		node23.addEdgeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 				join("=", "_rank_annotation23_1.namespace", "'namespace1'"),
 				join("=", "_rank_annotation23_1.name", "'name1'"),
@@ -308,7 +308,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseDirectDominanceNamedAndAnnotated() {
 		node23.addJoin(new Dominance(node42, NAME, 1));
-		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP));
+		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 //				join("=", "_rank23.component_ref", "_rank42.component_ref"),
 				join("=", "_component23.type", "'d'"),

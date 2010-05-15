@@ -70,7 +70,7 @@ public class WekaDaoHelper implements ResultSetExtractor {
 			String name = resultSet.getString("name");
 			String value = resultSet.getString("value");
 			annisNode.addNodeAnnotation(
-					new Annotation(namespace, name, value, TextMatching.EXACT));
+					new Annotation(namespace, name, value, TextMatching.EXACT_EQUAL));
 		}
 		
 		return new ArrayList<AnnisNode>(nodesById.values());

@@ -225,9 +225,9 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		String namespace = token(node.getNamespace());
 		String name = token(node.getType());
 		String value = token(node.getValue());
-		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT));
+		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT_EQUAL));
 		if (inSibling)
-			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT));
+			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT_EQUAL));
 		inSibling = false;
 	}
 	
@@ -236,9 +236,9 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 		String namespace = token(node.getNamespace());
 		String name = token(node.getType());
 		String value = token(node.getValue());
-		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP));
+		target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP_EQUAL));
 		if (inSibling)
-			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP));
+			context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP_EQUAL));
 		inSibling = false;
 	}
 	
@@ -320,7 +320,8 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 //	}
 	
 	@Override
-	public void caseAComparisonExpr(AComparisonExpr node) {
+	public void caseAComparisonExpr(AComparisonExpr node)
+  {
 		AEqComparison comp = (AEqComparison) node.getComparison();
 		
 		Expression lhs = evaluate(node.getLhs());
@@ -471,13 +472,13 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 	@Override
 	public void caseAQuotedText(AQuotedText node) {
 		annotation.setValue(token(node.getString()));
-		annotation.setTextMatching(TextMatching.EXACT);
+		annotation.setTextMatching(TextMatching.EXACT_EQUAL);
 	}
 	
 	@Override
 	public void caseARegexpQuotedText(ARegexpQuotedText node) {
 		annotation.setValue(token(node.getRegexp()));
-		annotation.setTextMatching(TextMatching.REGEXP);
+		annotation.setTextMatching(TextMatching.REGEXP_EQUAL);
 	}
 
 	///// Private Helper
@@ -561,8 +562,8 @@ public class ClauseAnalysis extends DepthFirstAdapter {
 					
 					TextMatching textMatching = null;
 					switch (rhs.getType()) {
-					case STRING: textMatching = TextMatching.EXACT; break;
-					case REGEXP: textMatching = TextMatching.REGEXP; break;
+					case STRING: textMatching = TextMatching.EXACT_EQUAL; break;
+					case REGEXP: textMatching = TextMatching.REGEXP_EQUAL; break;
 					default: unsupported(
 							"unsupported operation on node span: expected '=' or '~'; was " + rhs.getType());
 					}

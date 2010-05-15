@@ -129,9 +129,10 @@ public class DnfTransformer extends DepthFirstAdapter {
 				PExpr clone = (PExpr) expr.clone();
 				if (clone instanceof AAndExpr) {
 					AAndExpr clonedAnd = (AAndExpr) clone;
-					for (int i = 0; i < clonedAnd.getExpr().size(); ++i) {
-						PExpr original = ((AAndExpr) expr).getExpr().get(i);
-						counter.mapSearchExpressionClone(clonedAnd.getExpr().get(i), original);
+					for (int i = 0; i < clonedAnd.getExpr().size(); ++i) 
+          {
+            PExpr original = ((AAndExpr) expr).getExpr().get(i);
+            counter.mapSearchExpressionClone(clonedAnd.getExpr().get(i), original);
 					}
 				}
 				counter.mapSearchExpressionClone(clone, expr);
