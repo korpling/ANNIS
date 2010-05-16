@@ -364,7 +364,6 @@ public class DddQueryMapper {
 				writeMapping(token(node.getNamespace()), ":");
 			writeMapping(token(node.getType()));
 			if (node.getValue() != null) {
-				writeMapping("=");
 				node.getValue().apply(this);
 			}
 			writeMapping(" ");
