@@ -1,8 +1,8 @@
 <build 
-       xmlns:sh="http://bitten.cmlenz.net/tools/sh"
-       xmlns:python="http://bitten.cmlenz.net/tools/python" 
-       xmlns:svn="http://bitten.cmlenz.net/tools/svn"
-       xmlns:java="http://bitten.cmlenz.net/tools/java">
+       xmlns:sh="http://bitten.edgewall.org/tools/sh"
+       xmlns:python="http://bitten.edgewall.org/tools/python" 
+       xmlns:svn="http://bitten.edgewall.org/tools/svn"
+       xmlns:java="http://bitten.edgewall.org/tools/java">
 
   <step id="checkout" description="Checkout source from repository">
     <svn:checkout url="file:///srv/svn/annis/"
@@ -17,10 +17,6 @@
     <sh:exec file="/usr/bin/mvn" args="-f Annis-Service/pom.xml -Dmaven.test.skip=true assembly:assembly" />
   </step>
 
-  <step id="stop webapp" description="Stop the Annis2-webapp">
-    <python:exec file="buildbot_scripts/webappChangeContext.py" args="/etc/jetty/contexts/annis-trunk.xml /srv/jetty/offline Annis-trunk"/>
-  </step>
-
   <step id="stop service" description="Stop the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/stopService.sh" />
     <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis/trunk" />
@@ -29,11 +25,11 @@
   
   <step id="copy webapp" description="Copy the Annis2-webapp">
    <sh:exec file="chmod" args="u+x buildbot_scripts/copyWebapp.sh" /> 
-   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/jetty/Annis-trunk"/>
+   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/tomcat/Annis-trunk"/>
   </step>
 
   <step id="patch webapp" description="Patch the Annis2-webapp with some korpling relative configuration">
-    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/jetty/Annis-trunk ${revision} /etc/annis/user_config_trunk"/>
+    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/tomcat/Annis-trunk ${revision} /etc/annis/user_config_trunk"/>
   </step>
 
   <step id="copy service" description="Copy the AnnisService">
@@ -45,12 +41,6 @@
     <sh:exec file="chmod" args="u+x buildbot_scripts/startService.sh" />
     <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis/trunk" />
   </step>
-
-  <step id="start webapp" description="Start the Annis2-webapp">
-    <python:exec file="buildbot_scripts/webappChangeContext.py" args="/etc/jetty/contexts/annis-trunk.xml /srv/jetty/Annis-trunk Annis-trunk"/>
-  </step>
-
-
 
 </build>
 
