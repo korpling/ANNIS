@@ -1,6 +1,7 @@
 -- corpora
 -- each corpus has a unique name
 -- corpora are ordered in a tree
+DROP TABLE IF EXISTS _corpus;
 CREATE TABLE _corpus
 (
 	id 			numeric(38) NOT NULL,		-- primary key
@@ -13,6 +14,7 @@ CREATE TABLE _corpus
 
 -- corpus annotations
 -- unique combinantion of corpus_ref, namespace and name
+DROP TABLE IF EXISTS _corpus_annotation;
 CREATE TABLE _corpus_annotation
 (
 	corpus_ref	numeric(38) NOT NULL,		-- foreign key to _corpus.id
@@ -23,6 +25,7 @@ CREATE TABLE _corpus_annotation
 
 -- source texts
 -- stores each source text in its entirety
+DROP TABLE IF EXISTS _text;
 CREATE TABLE _text
 (
 	id 		numeric(38) NOT NULL,			-- primary key
@@ -35,6 +38,7 @@ CREATE TABLE _text
 -- are part of a corpus and reference a text
 -- cover a span of the text
 -- can be tokens (token_index NOT NULL, span NOT NULL)
+DROP TABLE IF EXISTS _node;
 CREATE TABLE _node
 (
 	id 				numeric(38)	NOT NULL,	-- primary key
@@ -52,6 +56,7 @@ CREATE TABLE _node
 -- connected components of the annotation graph
 -- are of a type: Coverage, Dominance, Pointing relation or NULL for root nodes
 -- have a name
+DROP TABLE IF EXISTS _component;
 CREATE TABLE _component
 (
 	id			numeric(38) NOT NULL,		-- primary key
@@ -63,6 +68,7 @@ CREATE TABLE _component
 -- pre and post order of the annotation graph
 -- root nodes: parent IS NULL
 -- component and rank together model edges in the annotation graph
+DROP TABLE IF EXISTS _rank;
 CREATE TABLE _rank
 (
 	pre				numeric(38)	NOT NULL,	-- pre and post order of the annotation ODAG
@@ -74,6 +80,7 @@ CREATE TABLE _rank
 
 -- node annotations
 -- unique combinantion of node_ref, namespace and name
+DROP TABLE IF EXISTS _node_annotation;
 CREATE TABLE _node_annotation
 (
 	node_ref	numeric(38)	NOT NULL,		-- foreign key to _node.id
@@ -84,6 +91,7 @@ CREATE TABLE _node_annotation
 
 -- edge annotations
 -- unique combinantion of node_ref, namespace and name
+DROP TABLE IF EXISTS _edge_annotation;
 CREATE TABLE _edge_annotation
 (
 	rank_ref		numeric(38)	NOT NULL,	-- foreign key to _rank.pre
@@ -94,6 +102,7 @@ CREATE TABLE _edge_annotation
 
 -- resolver visualization mappings
 -- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from relANNIS format
+DROP TABLE IF EXISTS _resolver_vis_map;
 CREATE TABLE _resolver_vis_map
 (
   "corpus"   varchar(100), -- the name of the supercorpus
