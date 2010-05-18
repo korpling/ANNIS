@@ -33,6 +33,17 @@
     <servlet-name>WekaExporterServlet</servlet-name>
     <url-pattern>/secure/WekaExporter</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TextExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.TextExporterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TextExporterServlet</servlet-name>
+    <url-pattern>/secure/TextExporter</url-pattern>
+  </servlet-mapping>
+
+
   <servlet>
     <servlet-name>SearchResultServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.SearchResultServlet</servlet-class>

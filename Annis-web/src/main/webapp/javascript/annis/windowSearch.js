@@ -179,7 +179,7 @@ Ext.onReady(function()
   }
   // end getResult
 
-  function showWeka()
+  function doExport()
   {
     if("" === formPanelSearch.getComponent('queryAnnisQL').getValue())
     {
@@ -210,17 +210,21 @@ Ext.onReady(function()
       corpusIdString += selections[i].id;
     }
 
+    var exporterSelection = formPanelExporter.getComponent("exportSelection").getValue();
+
     // open a new browser window/tab
-    var url = conf_context + '/secure/WekaExporter?queryAnnisQL='
+    var url = conf_context + '/secure/' + exporterSelection + '?queryAnnisQL='
       + Url.encode(formPanelSearch.getComponent('queryAnnisQL').getValue())
-      + '&corpusIds=' + corpusIdString;
-    window.open(url, 'WekaExport');
+      + '&corpusIds=' + corpusIdString
+      + '&padLeft=' + formPanelExporter.getComponent('padLeftExport').getValue()
+      + '&padRight=' + formPanelExporter.getComponent('padRightExport').getValue();
+    window.open(url, 'Export');
   }
    		
   function setSearchButtonDisabled(disabled) 
   {
     Ext.ComponentMgr.get('btnSearch').setDisabled(disabled);
-    Ext.ComponentMgr.get('btnWeka').setDisabled(disabled);
+    Ext.ComponentMgr.get('btnExport').setDisabled(disabled);
   }
   // end setSearchButtonDisabled
 
@@ -372,6 +376,61 @@ Ext.onReady(function()
         scope: this
       }
     }
+  });
+
+  var padLeftComboBoxExport = new Ext.form.ComboBox({
+    store: padStore,
+    name: 'padLeftExport',
+    id: 'padLeftExport',
+    fieldLabel: 'Context Left',
+    displayField:'pad',
+    mode: 'local',
+    triggerAction: 'all',
+    value: '5',
+    selectOnFocus:true,
+    editable: false,
+    listeners: {
+      'select': {
+        fn: updateStatus,
+        scope: this
+      }
+    }
+  });
+
+  var padRightComboBoxExport = new Ext.form.ComboBox({
+    store: padStore,
+    name: 'padRightExport',
+    id: 'padRightExport',
+    fieldLabel: 'Context Right',
+    displayField:'pad',
+    mode: 'local',
+    triggerAction: 'all',
+    value: '5',
+    selectOnFocus:true,
+    editable: false,
+    listeners: {
+      'select': {
+        fn: updateStatus,
+        scope: this
+      }
+    }
+  });
+
+var exportStore = new Ext.data.SimpleStore({
+    fields: ['type'],
+    data : [['TextExporter'], ['WekaExporter']]
+  });
+var exportSelection = new Ext.form.ComboBox({
+    store: exportStore,
+    displayField:'type',
+    mode: 'local',
+    name: 'exportSelection',
+    id: 'exportSelection',
+    fieldLabel: 'Exporter',
+    triggerAction: 'all',
+    value: 'WekaExporter',
+    selectOnFocus:true,
+    editable: false
   });
 
   var resultLengthStore = new Ext.data.SimpleStore({
@@ -567,17 +626,21 @@ Ext.onReady(function()
     buttonAlign:'center'
   });
 
-  var formPanelStatistics = new Ext.FormPanel({
-    id: 'formPanelStatistics',
+  var formPanelExporter = new Ext.FormPanel({
+    id: 'formPanelExport',
     frame:true,
-    title: 'Statistics',
-    items: [],
+    title: 'Export',
+    items: [
+      exportSelection,
+      padLeftComboBoxExport,
+      padRightComboBoxExport
+    ],
     buttons: [{
-      id: 'btnWeka',
-      text: 'Weka Export',
+      id: 'btnExport',
+      text: 'Perform Export',
       disabled: false,
       listeners: {
-        click: showWeka
+        click: doExport
       }
     }],
     buttonAlign:'center'
@@ -650,7 +713,7 @@ Ext.onReady(function()
     activeTab: 0,
     items: [
       formPanelSimpleSearch,
-      formPanelStatistics
+      formPanelExporter
     ]
   });
 
