@@ -110,10 +110,13 @@ public class TextExporterServlet extends HttpServlet {
           response.getWriter().append("\n");
 
         }
-
+        response.getWriter().flush();
         offset = offset + 50;
 
       }
+
+      response.getWriter().println();
+      response.getWriter().println("finshed");
 
     }
     catch (AnnisServiceFactoryException e) {
