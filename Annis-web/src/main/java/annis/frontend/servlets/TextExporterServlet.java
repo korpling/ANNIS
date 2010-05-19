@@ -90,21 +90,28 @@ public class TextExporterServlet extends HttpServlet {
       AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter(
           "AnnisRemoteService.URL"));
 
-      int count = service.getCount(corpusIdList, queryAnnisQL);
-      AnnisResultSet queryResult = service
-          .getResultSet(corpusIdList, queryAnnisQL, count, 0, contextLeft, contextRight);
-
+      // int count = service.getCount(corpusIdList, queryAnnisQL);
+      AnnisResultSet queryResult = null;
       int counter = 0;
-      for (AnnisResult annisResult : queryResult) {
-        counter++;
-        response.getWriter().append("" + counter + ". ");
-        List<AnnisNode> tok = annisResult.getGraph().getTokens();
-        for (AnnisNode annisNode : tok) {
+      int offset = 0;
+      while (offset == 0 || (queryResult != null && queryResult.size() > 0)) {
 
-          response.getWriter().append(annisNode.getSpannedText());
-          response.getWriter().append(" ");
+        queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
+
+        for (AnnisResult annisResult : queryResult) {
+          counter++;
+          response.getWriter().append("" + counter + ". ");
+          List<AnnisNode> tok = annisResult.getGraph().getTokens();
+          for (AnnisNode annisNode : tok) {
+
+            response.getWriter().append(annisNode.getSpannedText());
+            response.getWriter().append(" ");
+          }
+          response.getWriter().append("\n");
+
         }
-        response.getWriter().append("\n");
+
+        offset = offset + 50;
 
       }
 
