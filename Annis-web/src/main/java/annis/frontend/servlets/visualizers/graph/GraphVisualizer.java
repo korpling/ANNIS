@@ -16,6 +16,9 @@ import java.awt.Paint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,8 +191,17 @@ public class GraphVisualizer extends Visualizer
     DirectedGraph<AnnisNode, Edge> g =
       new DirectedOrderedSparseMultigraph<AnnisNode, Edge>();
 
+    List<AnnisNode> sortedTokenList = annoGraph.getTokens();
+    Collections.sort(sortedTokenList, new Comparator<AnnisNode>() {
+
+      @Override
+      public int compare(AnnisNode o1, AnnisNode o2)
+      {
+        return o1.getTokenIndex().compareTo(o2.getTokenIndex());
+      }
+    });
     // get all token (so that they have the right order)
-    for(AnnisNode tok : annoGraph.getTokens())
+    for(AnnisNode tok : sortedTokenList)
     {
       g.addVertex(tok);
     }
