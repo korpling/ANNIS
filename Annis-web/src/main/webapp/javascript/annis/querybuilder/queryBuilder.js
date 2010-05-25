@@ -47,7 +47,7 @@ storeNodeAttributes.load({params: {corpusIdList: '', type: 'node'}});
 		
 var storeFieldOperators = new Ext.data.SimpleStore({
   fields: ['operator'],
-  data: [['='],['~']]
+  data: [['='],['~'], ['!='], ['!~']]
 });
 		
 var storeEdgeTypes = new Ext.data.SimpleStore({
@@ -143,10 +143,17 @@ function getAnnisQLQuery() {
           query += " & ";
           componentCount++;
         }
-        var quotes = (record.get('operator') == '=') ? '"' : '/';
+        var operator = record.get('operator').replace("~", "=");
+        var quotes = (record.get('operator') == '='
+          ||record.get('operator') == '!=' ) ? '"' : '/';
         var prefix = "";
-        if(record.get('name').trim() !== "" || record.get('name') == 'word' || record.get('name') == 'text') {
-          prefix = record.get('name') + '=';
+        if(record.get('name').trim() !== "" || record.get('name') == 'word' || record.get('name') == 'text')
+        {
+          prefix = record.get('name') + operator;
+        }
+        else if(record.get('name').trim() == "" && operator == "!=")
+        {
+          prefix = 'tok' + record.get('name') + operator;
         }
         query += prefix + quotes + record.get('value') + quotes;
       }
@@ -454,7 +461,7 @@ function getNewNodePanel(nodeWindowId) {
       id:'operator',
       header: 'op',
       dataIndex: 'operator',
-      width: 38,
+      width: 45,
       editor: new Ext.form.ComboBox({
         store: storeFieldOperators,
         displayField: 'operator',
