@@ -27,6 +27,8 @@
     <value><![CDATA[key!="value"]]></value>
     <value><![CDATA[key !="value"]]></value>
     <value><![CDATA[key!= "value"]]></value>
+    <value><![CDATA[tok != "value"]]></value>
+    <value><![CDATA[key!= /value.*/]]></value>
 	</util:list>
 	
 	<util:list id="bad">

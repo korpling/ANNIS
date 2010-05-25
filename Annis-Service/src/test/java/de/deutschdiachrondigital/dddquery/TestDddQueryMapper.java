@@ -168,6 +168,16 @@ public class TestDddQueryMapper {
 		testMapping("tok", "element()#(n1)[isToken()]$n1");
 	}
 	
+  @Test
+	public void textSearchMapping() {
+		testMapping("tok = \"text\"", "element()#(n1)[. = \"text\"]$n1");
+	}
+
+  @Test
+	public void textSearchNotEqual() {
+		testMapping("tok != \"text\"", "element()#(n1)[. != \"text\"]$n1");
+	}
+
 	@Test
 	public void nodeSearch() {
 		testMapping("node", "element()#(n1)$n1");

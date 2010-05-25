@@ -13,6 +13,7 @@ import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
 import annis.ql.node.AOrExpr;
 import annis.ql.node.ATextSearchExpr;
+import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
 
@@ -34,7 +35,9 @@ public class DnfTransformer extends DepthFirstAdapter {
 	}
 	
 	public PExpr normalize(PExpr expr) {
-		if ( expr instanceof AAnnotationSearchExpr || expr instanceof ATextSearchExpr || expr instanceof AAnyNodeSearchExpr || expr instanceof AMetaConstraintExpr )
+		if ( expr instanceof AAnnotationSearchExpr || expr instanceof ATextSearchExpr 
+      || expr instanceof ATextSearchNotEqualExpr || expr instanceof AAnyNodeSearchExpr
+      || expr instanceof AMetaConstraintExpr )
 			return clone(expr);
 		else if (expr instanceof ALinguisticConstraintExpr)
 			return (PExpr) expr.clone();

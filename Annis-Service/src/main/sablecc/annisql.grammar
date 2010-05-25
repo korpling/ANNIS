@@ -123,7 +123,7 @@ Productions
 
 	search_term { -> expr } = 
 		  {annotation} anno_namespace? [anno_type]:id anno_value?  { -> New expr.annotation_search(anno_namespace.id, anno_type, anno_value) } 
-		| {text} text_spec { -> New expr.text_search(text_spec) } 
+		| {text} text_spec { -> New expr.text_search(text_spec) }
 		;
 	
 	anno_namespace { -> id } =
@@ -136,8 +136,8 @@ Productions
 		;
 		
 	text_spec { -> text_spec } = 
-		  {regular}	regular_l_quote text regular_r_quote { -> New text_spec.wild(text) } 
-		| {regexp}	regexp_l_quote regexp regexp_r_quote { -> New text_spec.regexp(regexp) } 
+		  {regular}	regular_l_quote text regular_r_quote { -> New text_spec.wild(text) }
+		| {regexp}	regexp_l_quote regexp regexp_r_quote { -> New text_spec.regexp(regexp) }
 		;
 			
 	linguistic_term { -> expr } =
@@ -211,6 +211,7 @@ Abstract Syntax Tree
 	expr =
 		  {annotation_search} [anno_namespace]:id? [anno_type]:id [anno_value]:anno_value?
 		| {text_search} text_spec
+    | {text_search_not_equal} text_spec
 		| {any_node_search}
 		| {grouped} expr
 		| {implicit_and} expr*

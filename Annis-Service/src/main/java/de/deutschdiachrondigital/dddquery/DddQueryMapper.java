@@ -1,5 +1,6 @@
 package de.deutschdiachrondigital.dddquery;
 
+import annis.ql.node.ATextSearchNotEqualExpr;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -133,6 +134,23 @@ public class DddQueryMapper {
 
 			writeMapping("$n", pos(node));
 		}
+
+    @Override
+    public void caseATextSearchNotEqualExpr(ATextSearchNotEqualExpr node)
+    {
+      writeMapping("element()", "#(n", pos(node), ")");
+
+			if (node.getTextSpec() != null)
+      {
+				writeMapping("[. != ");
+				node.getTextSpec().apply(this);
+				writeMapping("]");
+			} 
+
+			writeMapping("$n", pos(node));
+    }
+
+
 
 		@Override
 		public void caseAAnyNodeSearchExpr(AAnyNodeSearchExpr node) {

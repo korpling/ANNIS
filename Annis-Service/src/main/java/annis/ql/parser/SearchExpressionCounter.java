@@ -1,5 +1,6 @@
 package annis.ql.parser;
 
+import annis.ql.node.ATextSearchNotEqualExpr;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,13 @@ public class SearchExpressionCounter extends DepthFirstAdapter {
 	public void caseATextSearchExpr(ATextSearchExpr node) {
 		addSearchExpr(node);
 	}
-	
+
+  @Override
+  public void caseATextSearchNotEqualExpr(ATextSearchNotEqualExpr node)
+  {
+    addSearchExpr(node);
+  }
+
 	@Override
 	public void caseAAnyNodeSearchExpr(AAnyNodeSearchExpr node) {
 		addSearchExpr(node);
