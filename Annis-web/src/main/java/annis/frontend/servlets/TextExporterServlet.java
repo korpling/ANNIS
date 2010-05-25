@@ -30,6 +30,7 @@ import annis.service.ifaces.AnnisResultSet;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class TextExporterServlet extends HttpServlet {
 
@@ -99,16 +100,27 @@ public class TextExporterServlet extends HttpServlet {
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
 
         for (AnnisResult annisResult : queryResult) {
-          counter++;
-          response.getWriter().append("" + counter + ". ");
-          List<AnnisNode> tok = annisResult.getGraph().getTokens();
-          for (AnnisNode annisNode : tok) {
+          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
-            response.getWriter().append(annisNode.getSpannedText());
+          counter++;
+          response.getWriter().append(counter + ". ");
+          List<AnnisNode> tok = annisResult.getGraph().getTokens();
+
+          for (AnnisNode annisNode : tok) {
+            Long tokID = annisNode.getId();
+            if (matchedNodeIds.contains(tokID)) {
+              response.getWriter().append("[");
+              response.getWriter().append(annisNode.getSpannedText());
+              response.getWriter().append("]");
+            }
+            else {
+              response.getWriter().append(annisNode.getSpannedText());
+            }
+
             response.getWriter().append(" ");
+
           }
           response.getWriter().append("\n");
-
         }
         response.getWriter().flush();
         offset = offset + 50;
