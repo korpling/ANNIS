@@ -61,14 +61,18 @@ public class SpringAnnisAdministrationDao {
 	// save the datasource to manually retrieve connections (needed for bulk-import)
 	private DataSource dataSource;
 	
+	/**
+	 * The name of the file and the relation containing the resolver information.
+	 */
+	private static final String FILE_RESOLVER_VIS_MAP= "resolver_vis_map";
+	
 	// tables imported from bulk files
 	// DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
 	private String[] importedTables = {
 			"corpus", "corpus_annotation",
 			"text", "node", "node_annotation", 
 			"component", "rank", "edge_annotation",
-                        // to add:
-                        //  "resolver_vis_map"
+			FILE_RESOLVER_VIS_MAP
 	};
 	
 	// tables created during import
@@ -170,11 +174,22 @@ public class SpringAnnisAdministrationDao {
 		executeSqlFromScript("staging_area.sql");
 	}
 
-	void bulkImport(String path) {
+	void bulkImport(String path) 
+	{
 		log.info("bulk-loading data");
 		for (String table : importedTables)
-			bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
-        }
+		{	
+			if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
+			{
+				try {
+					bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
+				} catch (FileAccessException e) 
+				{}
+			}
+			else
+				bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
+		}
+    }
 	
 	void computeTopLevelCorpus() {
 		log.info("computing top-level corpus");
@@ -260,7 +275,30 @@ public class SpringAnnisAdministrationDao {
 	void insertCorpus() {
 		log.info("moving corpus from staging area to main db");
 		for (String table : importedAndCreatedTables())
-			jdbcOperations.execute("INSERT INTO " + table + " (SELECT * FROM " + tableInStagingArea(table) + ")");
+		{	
+			int numOfEntries= jdbcOperations.queryForInt("SELECT COUNT(*) from "+tableInStagingArea(table));
+			if (numOfEntries > 0)
+			{
+				StringBuffer sql= new StringBuffer();
+				if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
+				{
+					sql.append("INSERT INTO ");
+					sql.append(table);
+					//FIXME DIRTY!!! find a better way instead of naming the column-names in code 
+					sql.append("(corpus, version, namespace, element, vis_type, display_name, \"order\", mappings)");
+					sql.append(" (SELECT * FROM ");
+					sql.append(tableInStagingArea(table) + ")");
+				}
+				else
+				{	
+					sql.append("INSERT INTO ");
+					sql.append(table);
+					sql.append(" (SELECT * FROM ");
+					sql.append(tableInStagingArea(table) + ")");
+				}
+				jdbcOperations.execute(sql.toString());
+			}
+		}
 	}
 	
 	void dropStagingArea() {
