@@ -58,7 +58,10 @@ public class TestDddQueryParserExamples {
 		Start syntaxTree = parser.parse(example.getQuery());
 		assertThat(syntaxTree, is(not(nullValue())));
 		String actual = DddQueryParser.dumpTree(syntaxTree).trim();
-		assertEquals("wrong syntax tree for: " + example.getQuery(), example.getSyntaxTree(), actual);
+                // replace the unix line ending from the SVN with the systems line ending
+                // (the dump tree will use the system line ending and the examples were created under linux)
+                String provided = example.getSyntaxTree().replaceAll("\n", System.getProperty("line.separator"));
+		assertEquals("wrong syntax tree for: " + example.getQuery(), provided, actual);
 	}
 	
 	///// Examples for good and bad queries
