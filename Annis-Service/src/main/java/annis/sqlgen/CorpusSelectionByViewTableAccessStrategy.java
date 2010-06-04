@@ -26,7 +26,7 @@ public class CorpusSelectionByViewTableAccessStrategy
 	}
 	
 	public void modifySqlSession(SimpleJdbcTemplate simpleJdbcTemplate, QueryData queryData) {
-		String viewDefinition = "CREATE VIEW :view_name AS SELECT * FROM :node_table"
+		String viewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
 			.replaceAll(":view_name", nodeTableViewName)
 			.replaceAll(":node_table", originalNodeTable());
 		

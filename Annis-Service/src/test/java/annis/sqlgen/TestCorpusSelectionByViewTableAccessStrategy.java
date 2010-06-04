@@ -31,7 +31,7 @@ public class TestCorpusSelectionByViewTableAccessStrategy {
 
 	// view definition if no corpus is selected
 	private static final String VIEW_DEFINITION_NO_SELECTION = "" +
-			"CREATE VIEW " + VIEW_NAME + " " +
+			"CREATE TEMPORARY VIEW " + VIEW_NAME + " " +
 			"AS SELECT * " +
 			"FROM " + TABLE_ALIAS;
 	
