@@ -47,6 +47,8 @@ public class InitDialog extends javax.swing.JDialog
 
     this.corpusAdministration = corpusAdministration;
 
+    final InitDialog finalThis = this;
+
     initWorker = new SwingWorker<String, Void>()
     {
 
@@ -62,7 +64,8 @@ public class InitDialog extends javax.swing.JDialog
           return "";
         } catch (Exception ex)
         {
-          ExceptionDialog dlg = new ExceptionDialog(null, ex);
+          finalThis.setVisible(false);
+          ExceptionDialog dlg = new ExceptionDialog(finalThis, ex);
           dlg.setVisible(true);
         }
 

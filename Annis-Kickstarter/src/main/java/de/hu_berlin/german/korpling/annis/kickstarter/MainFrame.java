@@ -114,7 +114,7 @@ public class MainFrame extends javax.swing.JFrame
         }
         catch(Exception ex)
         {
-          new ExceptionDialog(null, ex).setVisible(true);
+          new ExceptionDialog(ex).setVisible(true);
         }
       }
     };

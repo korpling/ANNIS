@@ -311,8 +311,6 @@ public class SpringAnnisAdministrationDao {
 		for (String table : tables)
 			jdbcOperations.execute("DROP TABLE " + tableInStagingArea(table));
 
-    // drop the resolver temporary table
-    jdbcOperations.execute("DROP TABLE _resolver_vis_map");
 	}
 	
 	void dropMaterializedTables() {

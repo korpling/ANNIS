@@ -23,6 +23,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import java.awt.Frame;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -87,7 +88,7 @@ public class ImportDialog extends javax.swing.JDialog
           }
           else
           {
-            new  ExceptionDialog(null, new Exception(
+            new  ExceptionDialog(new Exception(
             "Import failed: " + this.get())).setVisible(true);
             setVisible(false);
           }

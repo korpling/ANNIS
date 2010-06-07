@@ -213,7 +213,7 @@ public class ListDialog extends javax.swing.JDialog
     }
     catch(Exception ex)
     {
-      new ExceptionDialog(null, ex).setVisible(true);
+      new ExceptionDialog(ex).setVisible(true);
     }
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables

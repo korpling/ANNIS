@@ -6,6 +6,8 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import java.awt.Dialog;
+
 /**
  *
  * @author thomas
@@ -14,9 +16,28 @@ public class ExceptionDialog extends javax.swing.JDialog
 {
 
   /** Creates new form ExceptionDialog */
+  public ExceptionDialog(Exception exception)
+  {
+    super((Dialog) null, true);
+    init(exception);
+  }
+
+  /** Creates new form ExceptionDialog */
+  public ExceptionDialog(java.awt.Dialog parent, Exception exception)
+  {
+    super(parent, true);
+    init(exception);
+  }
+
+  /** Creates new form ExceptionDialog */
   public ExceptionDialog(java.awt.Frame parent, Exception exception)
   {
     super(parent, true);
+    init(exception);
+  }
+
+  private void init(Exception exception)
+  {
     initComponents();
 
     if(exception != null)
