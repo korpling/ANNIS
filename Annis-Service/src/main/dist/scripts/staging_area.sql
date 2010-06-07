@@ -111,5 +111,6 @@ CREATE TABLE _resolver_vis_map
   "element"    varchar(4), -- the type of the entry: node | edge
   "vis_type"   varchar(100) NOT NULL, -- the abstract type of visualization: tree, discourse, grid, ...
   "display_name"   varchar(100) NOT NULL, -- the name of the layer which shall be shown for display
-  "order" numeric default '0' -- the order of the layers, in which they shall be shown  				    
+  "order" numeric default '0', -- the order of the layers, in which they shall be shown
+  "mappings" varchar(100)			    
 );
