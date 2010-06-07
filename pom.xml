@@ -2,17 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-
-<repositories>
-  <repository>
-    <id>annis</id>
-    <name>Annis repository</name>
-    <url>http://korpling.german.hu-berlin.de/~annis/maven2/</url>
-    <layout>default</layout>
-  </repository>
-</repositories>
-
-
   <groupId>de.hu_berlin.german.korpling.annis</groupId>
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
