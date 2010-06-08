@@ -321,7 +321,7 @@ Ext.onReady(function() {
         title: 'Search Results',
         id: id,
         closable:true,
-        maximizable: false,
+        maximizable: true,
         width: (Ext.getBody().getViewSize().width - windowSearchFormWidth - 25),
         height:Ext.getBody().getViewSize().height - 35,
         //border:false,

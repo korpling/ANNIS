@@ -10,6 +10,7 @@ import annis.dao.SqlSessionModifier;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
+import org.apache.log4j.Logger;
 
 
 public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy 
@@ -17,7 +18,8 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 	implements SqlSessionModifier {
 
 	private String nodeTableViewName;
-	
+	private Logger log = Logger.getLogger(this.getClass());
+
 	private SubQueryCorpusSelectionStrategy subQueryCorpusSelectionStrategy;
 
 	public CorpusSelectionByViewOnlyToplevelTableAccessStrategy() {
@@ -49,6 +51,8 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 					.replaceAll(":documentList", StringUtils.join(documents, ", "));
 			}
 		}
+
+    log.info("SQL for view:\n" + viewDefinition);
 			
 		simpleJdbcTemplate.update(viewDefinition);
 	}
