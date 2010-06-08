@@ -300,14 +300,14 @@ public class SearchResultServlet extends HttpServlet
 
     json.putOnce("visualizer", visusalizer);
 
-    Set<Long> markedIDs = getMarkedIDs(result.getGraph());
+    Set<Long> markedAndCoveredIDs = calculateMarkedAndCoveredIDs(result.getGraph());
 
     HashSet<Long> textIdListFromResult = new HashSet<Long>();
     LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
     for (AnnisNode n : result.getGraph().getTokens())
     {
       // put first match corpus id into result
-      if(!json.has("corpusId") && markedIDs.contains(n.getId()))
+      if(!json.has("corpusId") && markedAndCoveredIDs.contains(n.getId()))
       {
         json.putOnce("corpusId", "" + n.getCorpus());
       }
@@ -336,21 +336,29 @@ public class SearchResultServlet extends HttpServlet
 
     }
 
-    Map<String,String> markerAsMap = new TreeMap<String, String>();
+    Map<String,String> markedAndCoveredAsMap = new TreeMap<String, String>();
 
-    for(long l : markedIDs)
+    for(long l : markedAndCoveredIDs)
     {
-      markerAsMap.put("" + l, "red");
+      markedAndCoveredAsMap.put("" + l, "red");
     }
 
-    json.putOnce("marker", markerAsMap);
+    Map<String,String> markedAsMap = new TreeMap<String, String>();
+
+    for(long l : result.getGraph().getMatchedNodeIds())
+    {
+      markedAsMap.put("" + l, "red");
+    }
+
+    json.putOnce("marker", markedAndCoveredAsMap);
+    json.putOnce("markerExact", markedAsMap);
     json.putOnce("textIdList", textIdListFromResult);
     json.putOnce("token", tokenList);
 
     return json;
   }
 
-  private Set<Long> getMarkedIDs(AnnotationGraph graph)
+  private Set<Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)
   {
     Set<Long> matchedNodes = graph.getMatchedNodeIds();
     Set<Long> matchedAndCovered = new HashSet<Long>(matchedNodes);

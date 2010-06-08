@@ -32,6 +32,7 @@ public abstract class Visualizer
   private String namespace = "";
   private String paula = null;
   private Map<String, String> markableMap = new HashMap<String, String>();
+  private Map<String, String> markableExactMap = new HashMap<String, String>();
   private String id = "";
   private String contextPath;
   private String annisRemoteServiceURL;
@@ -116,6 +117,23 @@ public abstract class Visualizer
   {
     this.markableMap = markableMap;
   }
+
+  /**
+   * Same as {@link #getMarkableMap() } except that this only includes the really
+   * matched nodes and not covered token.
+   * @return
+   */
+  public Map<String, String> getMarkableExactMap()
+  {
+    return markableExactMap;
+  }
+
+  public void setMarkableExactMap(Map<String, String> markableExactMap)
+  {
+    this.markableExactMap = markableExactMap;
+  }
+
+
 
   /**
    * Gets an optional result id to be used by {@link #writeOutput(Writer)}

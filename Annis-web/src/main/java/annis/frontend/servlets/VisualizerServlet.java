@@ -90,6 +90,7 @@ public class VisualizerServlet extends HttpServlet
     }
 
     Map<String, String> markableMap = new HashMap<String, String>();
+    Map<String, String> markableExactMap = new HashMap<String, String>();
 
     //fetching node marker properties from query string to set up fill/colorMap
     Enumeration<String> parameterNamesEnum = request.getParameterNames();
@@ -107,6 +108,10 @@ public class VisualizerServlet extends HttpServlet
           {
             //set up colorMap
             markableMap.put(elementName, color);
+          }
+          else if(parameterName.startsWith("markExact:"))
+          {
+            markableExactMap.put(elementName, color);
           }
         }
       }
@@ -152,6 +157,7 @@ public class VisualizerServlet extends HttpServlet
       Visualizer visualizer = (Visualizer) classLoader.loadClass(className).newInstance();
       visualizer.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
       visualizer.setMarkableMap(markableMap);
+      visualizer.setMarkableExactMap(markableExactMap);
       visualizer.setContextPath(getServletContext().getContextPath());
       visualizer.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
       visualizer.setDotPath(path2Dot);

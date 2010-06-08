@@ -121,7 +121,7 @@ Ext.onReady(function() {
 
   var tokenLevelCheckstate = {};
   function onTokenLevelCheck(item, checked) {
-    setKWICTokenLevelVisibility(item.getItemId(), checked)
+    setKWICTokenLevelVisibility(item.getItemId(), checked);
     tokenLevelCheckstate[item.getItemId()] = checked;
     adjustAllSliders(null);
   }
@@ -148,7 +148,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker'],
+    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker', 'markerExact'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -261,7 +261,7 @@ Ext.onReady(function() {
         ]
       }); // end pagingToolbar
 
-      var cmItems = 	[];
+      var cmItems = [];
 
       cmItems.push({
         id: 'actions',
@@ -331,7 +331,7 @@ Ext.onReady(function() {
         items: [
         gridSearchResult
         ]
-      } // end config
+      }; // end config
 
       // superclass constructor
       SearchResultWindow.superclass.constructor.call(this, config);
@@ -358,8 +358,8 @@ Ext.onReady(function() {
         output += this.appendAllAnnotations(rowData, tid);
       }
 
-      output += '</table>\n'
-      output += '</div>\n'
+      output += '</table>\n';
+      output += '</div>\n';
       
       output += '<div id="slider-' + rowData.callbackId + '" ></div>\n';
 
@@ -374,7 +374,7 @@ Ext.onReady(function() {
       var lastTokenIndex = -1;
       var lastTokenIndexWasSet = false;
 
-      var output = '<tr>\n'
+      var output = '<tr>\n';
       for(var i=0; i < rowData.token.length; i++)
       {
         if((rowData.token[i].textId*1) == textId)
@@ -405,11 +405,11 @@ Ext.onReady(function() {
       }
       else
       {
-        output += '<td class="SearchResultWindow token hit" >'
+        output += '<td class="SearchResultWindow token hit" >';
       }
       if(token != null && token.text != null)
       {
-        output += token.text
+        output += token.text;
       }
       output += '</td>\n';
       return output;
@@ -447,7 +447,7 @@ Ext.onReady(function() {
       var output = '<td ext:qtip="' + tokenLevel  + '" class="SearchResultWindow annotation" >';
       if(anno != null && anno.value != null)
       {
-        output += anno.value
+        output += anno.value;
       }
       output += '</td>\n';
       return output;
@@ -471,6 +471,22 @@ Ext.onReady(function() {
           markerString += key;
         }
       }
+      var markerExactString = '';
+      first = true;
+      for(key in rowData.markerExact)
+      {
+        if(rowData.markerExact[key] != null && rowData.markerExact[key] != '')
+        {
+          if(!first)
+          {
+            markerExactString += ',';
+          }
+          first = false;
+
+          markerExactString += key;
+        }
+      }
+
       
       for(var i=0; i < rowData.visualizer.length; i++)
       {
@@ -491,6 +507,7 @@ Ext.onReady(function() {
             + '&namespace=' + vis.namespace
             + '&vistype=' + vis.vistype
             + '&mark:red=' + markerString
+            + '&markExact:red=' + markerExactString
             + '" ></iframe>' +
     '						</div>\n';
       }

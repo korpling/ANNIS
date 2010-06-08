@@ -88,7 +88,7 @@ public class TigerTreeVisualizer extends Visualizer {
 		}
 
 		private boolean isQueryMatch(AnnisNode n) {
-			return getMarkableMap().containsKey(Long.toString(n.getId()));
+			return  getMarkableExactMap().containsKey(Long.toString(n.getId()));
 		}
 
 		@Override
