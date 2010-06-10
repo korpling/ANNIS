@@ -262,10 +262,15 @@ public class ClauseAnalysis extends DepthFirstAdapter
     String namespace = token(node.getNamespace());
     String name = token(node.getType());
     String value = token(node.getValue());
-    target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT_EQUAL));
+
+    boolean isNegated = node.getOp() != null && node.getOp() instanceof ANeComparison;
+
+    target.addEdgeAnnotation(new Annotation(namespace, name, value,
+      isNegated ? TextMatching.EXACT_NOT_EQUAL : TextMatching.EXACT_EQUAL));
     if (inSibling)
     {
-      context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.EXACT_EQUAL));
+      context.addEdgeAnnotation(new Annotation(namespace, name, value,
+         isNegated ? TextMatching.EXACT_NOT_EQUAL : TextMatching.EXACT_EQUAL));
     }
     inSibling = false;
   }
@@ -276,10 +281,15 @@ public class ClauseAnalysis extends DepthFirstAdapter
     String namespace = token(node.getNamespace());
     String name = token(node.getType());
     String value = token(node.getValue());
-    target.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP_EQUAL));
+
+    boolean isNegated = node.getOp() != null && node.getOp() instanceof ANeComparison;
+
+    target.addEdgeAnnotation(new Annotation(namespace, name, value,
+      isNegated ? TextMatching.REGEXP_NOT_EQUAL : TextMatching.REGEXP_EQUAL));
     if (inSibling)
     {
-      context.addEdgeAnnotation(new Annotation(namespace, name, value, TextMatching.REGEXP_EQUAL));
+      context.addEdgeAnnotation(new Annotation(namespace, name, value,
+        isNegated ? TextMatching.REGEXP_NOT_EQUAL : TextMatching.REGEXP_EQUAL));
     }
     inSibling = false;
   }

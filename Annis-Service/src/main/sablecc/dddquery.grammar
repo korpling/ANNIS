@@ -300,8 +300,10 @@ Productions
 		
 	edge_annotation { -> edge_annotation } = 
 		  {existance} namespace? [anno_type]:id { -> New edge_annotation.existance(namespace.id, anno_type) }
-		| {exact} namespace? [anno_type]:id eq l_quote pattern r_quote { -> New edge_annotation.exact(namespace.id, anno_type, pattern) }
-		| {regexp} namespace? [anno_type]:id eq l_regexp_quote pattern r_quote { -> New edge_annotation.regexp(namespace.id, anno_type, pattern) }
+		| {exact} namespace? [anno_type]:id eq l_quote pattern r_quote { -> New edge_annotation.exact(New comparison.eq(), namespace.id, anno_type, pattern) }
+		| {regexp} namespace? [anno_type]:id eq l_regexp_quote pattern r_quote { -> New edge_annotation.regexp(New comparison.eq(), namespace.id, anno_type, pattern) }
+    | {exact_neq} namespace? [anno_type]:id ne l_quote pattern r_quote { -> New edge_annotation.exact(New comparison.ne(),namespace.id, anno_type, pattern) }
+		| {regexp_neq} namespace? [anno_type]:id ne l_regexp_quote pattern r_quote { -> New edge_annotation.regexp(New comparison.ne(), namespace.id, anno_type, pattern) }
 		;
 		
 	alignment_spec { -> alignment_spec } =
@@ -460,8 +462,8 @@ Abstract Syntax Tree
 		
 	edge_annotation = 
 	      {existance} [namespace]:id? [type]:id
-		| {exact} [namespace]:id? [type]:id [value]:pattern
-		| {regexp} [namespace]:id? [type]:id [value]:pattern
+		| {exact} [op]:comparison? [namespace]:id? [type]:id [value]:pattern
+		| {regexp} [op]:comparison? [namespace]:id? [type]:id [value]:pattern
 		;
 		
 	edge_type_spec = [edge_type]:id? [name]:id?;
