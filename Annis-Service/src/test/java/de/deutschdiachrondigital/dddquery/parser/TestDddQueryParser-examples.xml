@@ -114,6 +114,7 @@
       AStep
          AChildAxis
             ARegexpEdgeAnnotation
+               AEqComparison
                func
                MO
          AElementNodeTest
