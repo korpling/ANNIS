@@ -20,12 +20,13 @@ TextExporter simply gives the text for all tokens in each search
 result, including context, in a one-row-per-hit format. The tokens
 covered by the match area are marked with square brackets and the
 results are numbered, as in the following example:</p>
-<tt>
-1. 1988 trade act requires Mrs. [Hills] to issue another review <br>
-2. , U.S. Trade Representative Carla [Hills] announced 0 . Under <br>
-3. by next spring . Mrs. [Hills] said 0 many of the <br>
-4. best products there . Mrs. [Hills] lauded South Korea for <br>
-5. to literary works , Mrs. [Hills] said 0 . These </tt>
+<tt><small>
+1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große <br>
+2. der 1,62 Meter große Gennadi [Subow] die deutsche Nationalelf vorübergehend in <br>
+3. und Reputation kämpfenden Mannschaft von [Rudi] Völler der Weg zur Weltmeisterschaft <br>
+4. Reputation kämpfenden Mannschaft von Rudi [Völler] der Weg zur Weltmeisterschaft endgültig <br>
+5. die deutschen Nationalkicker einen " [Rudi] Riese " auf der Bank <br>
+</tt></small>
 <p>The WekaExporter outputs the
 format used by the WEKA machine learning
 tool (http://www.cs.waikato.ac.nz/ml/weka/). Only the attributes
@@ -36,6 +37,7 @@ in the beginning of the export text, as in this example:
 <tt>@relation name
 <br>
 <br>
+<small>
 @attribute #1_id string<br>
 @attribute #1_token string<br>
 @attribute #1_tiger:cat string<br>
@@ -55,6 +57,7 @@ in the beginning of the export text, as in this example:
 '289614','NULL','NP','289291','deutsche','deutsch','Pos.Nom.Sg.Fem','ADJA'<br>
 '289625','NULL','NP','289245','fulminanter','fulminant','Pos.Nom.Sg.Masc','ADJA'<br>
 </tt>
+</small>
 <p>The export shows the properties
 of an NP node dominating a token with
 the part-of-speech ADJA. Since the token also has other attributes,
