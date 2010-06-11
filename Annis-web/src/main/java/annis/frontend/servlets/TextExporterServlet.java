@@ -128,7 +128,7 @@ public class TextExporterServlet extends HttpServlet {
       }
 
       response.getWriter().println();
-      response.getWriter().println("finshed");
+      response.getWriter().println("finished");
 
     }
     catch (AnnisServiceFactoryException e) {

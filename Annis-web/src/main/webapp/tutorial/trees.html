@@ -26,6 +26,15 @@ sentence dominating the PP. To do so, specify the sentence in another element an
 Since we do not know anything about the modifying node, whether it is a non-terminal node or a token, we simply use the <tt>node</tt> element as a place holder.
 This element can match any node or annotation in the graph:</p>
 <tt>cat="VP" &amp; node &amp; #1 >[tiger:func="MO"] #2</tt>
+<p>
+It is also possible to negate the label of the dominance edge as in the following query:
+</p>
+<tt>
+cat="VP" & node & #1 >[tiger:func!="MO"] #2
+</tt>
+<p>
+which finds all VPs dominating a node with a label other than MO.
+</p>
 </div>
 
 </body>

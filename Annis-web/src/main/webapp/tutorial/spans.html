@@ -13,6 +13,20 @@
 though many corpora contain part-of-speech and lemma annotations with the names <tt>pos</tt> and <tt>lemma</tt> respectively (annotation names are <strong>case sensitive</strong>).
 For example, to search for all forms of the German verb <em>sein </em>'to be' in a corpus with lemma annotation such as PCC2, simply select the PCC2 corpus and enter:</p>
 <tt>lemma="sein"</tt>
+
+<p>
+Negative searches are also possible using != instead of =. For negated tokens (word forms) use the reserved attribute tok. For example:
+</p>
+<tt>
+lemma!="sein"
+</tt>
+<p>
+or:
+</p><tt>
+tok!="ist"
+</tt>
+
+
 <p>To only find finite forms of this verb in PCC2, use the part-of-speech (pos) annotation concurrently, and specify that both the lemma and pos should apply to the same element:</p>
 <tt>lemma="sein" &amp; pos="VAFIN" &amp; #1 _=_ #2</tt>
 <p>The expression <tt>#1 _=_ #2</tt> uses the span identity operator to specify that the first annotation and the second annotation apply to exactly the same position in the corpus.
