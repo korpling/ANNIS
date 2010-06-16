@@ -32,6 +32,7 @@ import annis.exceptions.AnnisServiceFactoryException;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.model.Edge;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
@@ -246,18 +247,36 @@ public class SearchResultServlet extends HttpServlet
     LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
 
     long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
-    Set<String> annotationLevelSet = result.getAnnotationLevelSet();
-
+    
     // create a request for resolver entries
     LinkedList<SingleResolverRequest> request = new LinkedList<SingleResolverRequest>();
-    for(String annoName : annotationLevelSet)
+
+    Set<String> nodeNamespaces = new HashSet<String>();
+    for(AnnisNode node : result.getGraph().getNodes())
     {
-      String[] splitted = annoName.split(":");
-      if(splitted.length > 0)
+      if(!node.isToken())
       {
-        request.add(new SingleResolverRequest(corpusIdFromFirstNode, splitted[0], ElementType.node));
-        request.add(new SingleResolverRequest(corpusIdFromFirstNode, splitted[0], ElementType.edge));
+        for(Annotation annotation : node.getNodeAnnotations())
+        {
+          nodeNamespaces.add(annotation.getNamespace());
+        }
       }
+    }
+    Set<String> edgeNamespaces = new HashSet<String>();
+    for(Edge e : result.getGraph().getEdges())
+    {
+      for(Annotation annotation : e.getAnnotations())
+      {
+        edgeNamespaces.add(annotation.getNamespace());
+      }
+    }
+    for(String ns : nodeNamespaces)
+    {
+      request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+    }
+    for(String ns : edgeNamespaces)
+    {
+      request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique
