@@ -273,6 +273,10 @@ public class SearchResultServlet extends HttpServlet
     for(String ns : nodeNamespaces)
     {
       request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+      if(!edgeNamespaces.contains(ns))
+      {
+        request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+      }
     }
     for(String ns : edgeNamespaces)
     {
