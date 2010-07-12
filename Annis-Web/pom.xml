@@ -10,7 +10,7 @@
 
   <groupId>de.hu_berlin.german.korpling.annis</groupId>
   <artifactId>annis-web</artifactId>
-  <name>Annis-web</name>
+  <name>Annis-Web</name>
 
   <packaging>war</packaging>
   
