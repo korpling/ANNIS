@@ -33,32 +33,6 @@
 		<bean class="de.deutschdiachrondigital.dddquery.parser.postprocessors.ChildAxisNormalizer" scope="prototype" />
 		<bean class="de.deutschdiachrondigital.dddquery.parser.postprocessors.NodeTestNormalizer" scope="prototype" />
 	</util:list>
-
-	<bean id="aliasSetProvider" class="de.deutschdiachrondigital.dddquery.sql.old2.AliasSetProvider"  scope="prototype"/>
-	
-	<bean id="pathTranslator" class="de.deutschdiachrondigital.dddquery.sql.old2.PathTranslator4" scope="prototype">
-		<property name="aliasSetProvider" ref="aliasSetProvider"/>
-		<property name="rankTable" value="rank"/>
-		<property name="rankAnnoTable" value="rank_anno"/>
-		<property name="structTable" value="struct_annotation"/>
-		<property name="annoTable" value="struct_annotation"/>
-		<property name="annoAttributeTable" value="struct_annotation"/>
-	</bean>
-	
-	<bean id="graphTranslator" class="de.deutschdiachrondigital.dddquery.sql.old2.GraphTranslator" scope="prototype">
-		<!--  property name="aliasSetProvider" ref="aliasSetProvider"/ -->
-		<property name="pathTranslator" ref="pathTranslator"/>
-	</bean>
-	
-	<bean id="sqlGenerator" class="de.deutschdiachrondigital.dddquery.sql.SqlGenerator" scope="prototype">
-		<property name="pathTranslator" ref="pathTranslator"/>
-	</bean>
-	
-	<bean id="thorstenPathSqlGenerator" class="de.deutschdiachrondigital.dddquery.sql.old2.PathSqlGenerator" scope="prototype"/>
-	
-	<bean id="thorstenSqlGenerator" class="de.deutschdiachrondigital.dddquery.sql.old2.ThorstenSqlGenerator" scope="prototype">
-		<property name="pathSqlGenerator" ref="thorstenPathSqlGenerator"/>
-	</bean>
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
@@ -107,64 +81,8 @@
 	
 	<bean id="dddQueryMapper" class="de.deutschdiachrondigital.dddquery.helper.AnnisQlTranslator" scope="prototype"/>
 
-	<bean id="annisResultSetBuilder" class="annisservice.AnnisResultSetBuilder" scope="prototype"/>
-
-	<bean id="getCorpusHandler" class="annisservice.handler.GetCorpusHandler">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
-	
-	<bean id="getNodeAttributeSetHandler" class="annisservice.handler.GetNodeAttributeSetHandler">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
-	
-	<bean id="getNodeAttributeSetWithValuesHandler" class="annisservice.handler.GetNodeAttributeSetWithValuesHandler">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
-	
-	<bean id="getCountHandler" class="annisservice.handler.CachingGetCountHandler">
-		<lookup-method name="dddQueryMapper" bean="dddQueryMapper"/>
-		<lookup-method name="graphMatcher" bean="graphMatcher"/>
-		<property name="cacheEnabled" value="${annis.enable-match-cache}"/>
-	</bean>
-	
-	<bean id="getPaulaHandler" class="annisservice.handler.GetPaulaHandler">
-		<lookup-method name="annisResultSetBuilder" bean="annisResultSetBuilder"/>
-		<lookup-method name="queryExecution" bean="queryExecution"/>
-	</bean>
-
-	<bean id="getResultHandler" class="annisservice.handler.CachingGetResultHandler">
-		<lookup-method name="annotationRetriever" bean="annotationRetriever"/>
-		<lookup-method name="annisResultSetBuilder" bean="annisResultSetBuilder"/>
-		<lookup-method name="queryExecution" bean="queryExecution"/>
-		<property name="cacheEnabled" value="${annis.enable-annotations-cache}"/>
-	</bean>
-
-	<bean id="annisService" class="annisservice.AnnisServiceImpl" init-method="sayHello"/>
-	
-	<bean id="externalFileManagerDao" class="annisservice.extFiles.ExternalFileMgrDAO">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
-	
-	<bean id="externalFileManager" class="annisservice.extFiles.ExternalFileMgrImpl">
-		<property name="externalDataFolder" value="${annis.external-data-path}"/>
-	</bean>
-
-	<bean id="annisResolver" class="annisservice.annisresolver.ANNISResolver"/>
-
 	<bean id="shell" class="de.deutschdiachrondigital.dddquery.helper.Shell" scope="prototype">
-<!-- 
-		<property name="graphMatcher" ref="graphMatcher"/>
-		<property name="annotationRetriever" ref="annotationRetriever"/>
-		<property name="dddQueryMapper" ref="dddQueryMapper"/>
--->
 		<property name="annisService" ref="annisService"/>
-	</bean>
-	
-	<bean id="annotationRetriever" class="de.deutschdiachrondigital.dddquery.sql.old2.AnnotationRetriever" scope="prototype">
-		<property name="queryExecution" ref="planQueryExecution"/>
-		<property name="sqlGenerator">
-			<bean class="de.deutschdiachrondigital.dddquery.sql.old2.AnnotationRetrieverSqlGenerator6" scope="prototype"/>
-		</property>
 	</bean>
 	
 	<bean id="planQueryExecution" class="de.deutschdiachrondigital.dddquery.helper.PlanQueryExecution" scope="prototype">
