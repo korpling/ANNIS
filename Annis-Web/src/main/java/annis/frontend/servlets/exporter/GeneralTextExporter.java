@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets;
+package annis.frontend.servlets.exporter;
 
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.frontend.servlets.SubmitQueryServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
@@ -32,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class TextExporterServlet extends HttpServlet {
+public class GeneralTextExporter extends HttpServlet {
 
   private static final long serialVersionUID = -8182635617256833563L;
 
@@ -93,35 +94,13 @@ public class TextExporterServlet extends HttpServlet {
 
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       AnnisResultSet queryResult = null;
-      int counter = 0;
+      
       int offset = 0;
       while (offset == 0 || (queryResult != null && queryResult.size() > 0)) {
 
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
-
-        for (AnnisResult annisResult : queryResult) {
-          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
-
-          counter++;
-          response.getWriter().append(counter + ". ");
-          List<AnnisNode> tok = annisResult.getGraph().getTokens();
-
-          for (AnnisNode annisNode : tok) {
-            Long tokID = annisNode.getId();
-            if (matchedNodeIds.contains(tokID)) {
-              response.getWriter().append("[");
-              response.getWriter().append(annisNode.getSpannedText());
-              response.getWriter().append("]");
-            }
-            else {
-              response.getWriter().append(annisNode.getSpannedText());
-            }
-
-            response.getWriter().append(" ");
-
-          }
-          response.getWriter().append("\n");
-        }
+	convertText(queryResult, response);
+        
         response.getWriter().flush();
         offset = offset + 50;
 
@@ -147,5 +126,36 @@ public class TextExporterServlet extends HttpServlet {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
+  
+  public void convertText(AnnisResultSet queryResult, HttpServletResponse response) throws IOException{
+        int counter = 0;
+	for (AnnisResult annisResult : queryResult) {
+          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
+
+          counter++;
+          response.getWriter().append(counter + ". ");
+          List<AnnisNode> tok = annisResult.getGraph().getTokens();
+
+          for (AnnisNode annisNode : tok) {
+            Long tokID = annisNode.getId();
+            if (matchedNodeIds.contains(tokID)) {
+              response.getWriter().append("[");
+              response.getWriter().append(annisNode.getSpannedText());
+              response.getWriter().append("]");
+            }
+            else {
+              response.getWriter().append(annisNode.getSpannedText());
+            }
+            
+			//for (Annotation annotation : annisNode.getNodeAnnotations()){
+            //      response.getWriter().append("/"+annotation.getValue());
+            //}
+
+            response.getWriter().append(" ");
+
+          }
+          response.getWriter().append("\n");
+     }
   }
 }

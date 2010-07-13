@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets;
+package annis.frontend.servlets.exporter;
 
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.frontend.servlets.SubmitQueryServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 

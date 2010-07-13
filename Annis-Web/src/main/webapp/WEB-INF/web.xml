@@ -27,7 +27,7 @@
 	<!-- USED -->
   <servlet>
     <servlet-name>WekaExporterServlet</servlet-name>
-    <servlet-class>annis.frontend.servlets.WekaExporterServlet</servlet-class>
+    <servlet-class>annis.frontend.servlets.exporter.WekaExporterServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>WekaExporterServlet</servlet-name>
@@ -36,13 +36,21 @@
 
   <servlet>
     <servlet-name>TextExporterServlet</servlet-name>
-    <servlet-class>annis.frontend.servlets.TextExporterServlet</servlet-class>
+    <servlet-class>annis.frontend.servlets.exporter.TextExporterServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TextExporterServlet</servlet-name>
     <url-pattern>/secure/TextExporter</url-pattern>
   </servlet-mapping>
 
+ <servlet>
+    <servlet-name>SimpleTextExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.GeneralTextExporter</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SimpleTextExporterServlet</servlet-name>
+    <url-pattern>/secure/SimpleTextExporter</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>SearchResultServlet</servlet-name>
