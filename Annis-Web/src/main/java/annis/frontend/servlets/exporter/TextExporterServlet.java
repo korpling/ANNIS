@@ -25,37 +25,44 @@ import annis.service.ifaces.AnnisResultSet;
 import java.util.List;
 import java.util.Set;
 
-public class TextExporterServlet extends GeneralTextExporter {
+public class TextExporterServlet extends GeneralTextExporter
+{
 
- @Override
-public void convertText(AnnisResultSet queryResult, HttpServletResponse response) throws IOException{
-        int counter = 0;
-	for (AnnisResult annisResult : queryResult) {
-          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
+  @Override
+  public void convertText(AnnisResultSet queryResult, HttpServletResponse response, int offset) throws IOException
+  {
+    int counter = 0;
+    for (AnnisResult annisResult : queryResult)
+    {
+      Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
-          counter++;
-          response.getWriter().append(counter + ". ");
-          List<AnnisNode> tok = annisResult.getGraph().getTokens();
+      counter++;
+      response.getWriter().append((counter+offset) + ". ");
+      List<AnnisNode> tok = annisResult.getGraph().getTokens();
 
-          for (AnnisNode annisNode : tok) {
-            Long tokID = annisNode.getId();
-            if (matchedNodeIds.contains(tokID)) {
-              response.getWriter().append("[");
-              response.getWriter().append(annisNode.getSpannedText());
-              response.getWriter().append("]");
-            }
-            else {
-              response.getWriter().append(annisNode.getSpannedText());
-            }
-            
-			for (Annotation annotation : annisNode.getNodeAnnotations()){
-                  response.getWriter().append("/"+annotation.getValue());
-            }
+      for (AnnisNode annisNode : tok)
+      {
+        Long tokID = annisNode.getId();
+        if (matchedNodeIds.contains(tokID))
+        {
+          response.getWriter().append("[");
+          response.getWriter().append(annisNode.getSpannedText());
+          response.getWriter().append("]");
+        }
+        else
+        {
+          response.getWriter().append(annisNode.getSpannedText());
+        }
 
-            response.getWriter().append(" ");
+        for (Annotation annotation : annisNode.getNodeAnnotations())
+        {
+          response.getWriter().append("/" + annotation.getValue());
+        }
 
-          }
-          response.getWriter().append("\n");
-     }
+        response.getWriter().append(" ");
+
+      }
+      response.getWriter().append("\n");
+    }
   }
 }

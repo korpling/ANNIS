@@ -24,48 +24,63 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-public class GridExporterServlet extends GeneralTextExporter {
+public class GridExporterServlet extends GeneralTextExporter
+{
 
-List<String> searchedValues = Arrays.asList("tok","LAT","bibl");// Zu Testzwecken erstmal diese 3 Werte, spaeter durch GUI uebergeben.
-int counter = 0;
+  List<String> searchedValues = Arrays.asList("tok", "LAT", "bibl");// Zu Testzwecken erstmal diese 3 Werte, spaeter durch GUI uebergeben.
+  int counter = 0;
 
- @Override
-public void convertText(AnnisResultSet queryResult, HttpServletResponse response) throws IOException{
-        
-	for (AnnisResult annisResult : queryResult) {
-          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
+  @Override
+  public void convertText(AnnisResultSet queryResult, HttpServletResponse response, int offset) throws IOException
+  {
 
-          counter++;
-          response.getWriter().append(counter + ". ");
-          for (String value : searchedValues){
+    for (AnnisResult annisResult : queryResult)
+    {
 
-              if (value.equals("tok")){
-                response.getWriter().append("\t "+value+"\t ");
-                for (AnnisNode annisNode : annisResult.getGraph().getTokens()) {response.getWriter().append(annisNode.getSpannedText()+" ");}
-                response.getWriter().append("\n");
-              }else{
+      counter++;
+      response.getWriter().append(counter + ". ");
+      for (String value : searchedValues)
+      {
 
-                int count = 0;
-                for (AnnisNode resolveNode: annisResult.getGraph().getNodes()){
-                  
-                    for(Annotation resolveAnnotation : resolveNode.getNodeAnnotations()){
-                  
-                        if(resolveAnnotation.getName().equals(value)) {
-                            if (count==0) {
-                                response.getWriter().append("\t "+value+"\t ");
-                                count++;
-                            }
-                            response.getWriter().append(resolveAnnotation.getValue()+" ");
-                        }
-                    }
-                }
-                if (count!=0) response.getWriter().append("\n");
-              }
+        if (value.equals("tok"))
+        {
+          response.getWriter().append("\t " + value + "\t ");
+          for (AnnisNode annisNode : annisResult.getGraph().getTokens())
+          {
+            response.getWriter().append(annisNode.getSpannedText() + " ");
           }
-          
-          response.getWriter().append("\n\n");
-     }
+          response.getWriter().append("\n");
+        }
+        else
+        {
+
+          int count = 0;
+          for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
+          {
+
+            for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
+            {
+
+              if (resolveAnnotation.getName().equals(value))
+              {
+                if (count == 0)
+                {
+                  response.getWriter().append("\t " + value + "\t ");
+                  count++;
+                }
+                response.getWriter().append(resolveAnnotation.getValue() + " ");
+              }
+            }
+          }
+          if (count != 0)
+          {
+            response.getWriter().append("\n");
+          }
+        }
+      }
+
+      response.getWriter().append("\n\n");
+    }
   }
 }

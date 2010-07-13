@@ -33,12 +33,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class GeneralTextExporter extends HttpServlet {
+public class GeneralTextExporter extends HttpServlet
+{
 
   private static final long serialVersionUID = -8182635617256833563L;
 
   @SuppressWarnings("unchecked")
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+  {
     // BEGIN getting the needed parameters from the query
     HttpSession session = request.getSession();
 
@@ -53,54 +55,64 @@ public class GeneralTextExporter extends HttpServlet {
     // the left an right context size
     int contextLeft = 0;
     int contextRight = 0;
-    try {
+    try
+    {
       String p = request.getParameter(SubmitQueryServlet.PARAM_CONTEXT_LEFT);
-      if (p != null) {
+      if (p != null)
+      {
         contextLeft = Integer.parseInt(p);
       }
       p = request.getParameter(SubmitQueryServlet.PARAM_CONTEXT_RIGHT);
-      if (p != null) {
+      if (p != null)
+      {
         contextRight = Integer.parseInt(p);
       }
     }
-    catch (NumberFormatException ex) {
+    catch (NumberFormatException ex)
+    {
       // ignore
     }
     // get a "real" list of corpora from the comma-delimited parameter
     String corpusListAsString = request.getParameter(SubmitQueryServlet.PARAM_CORPUS_ID);
-    if (queryAnnisQL == null) {
+    if (queryAnnisQL == null)
+    {
       response.getWriter().println("missing parameter for the AQL query (" + SubmitQueryServlet.PARAM_ANNIS_QL + ")");
       return;
     }
-    if (corpusListAsString == null) {
-      response.getWriter()
-          .println("missing parameter for the corpus list (" + SubmitQueryServlet.PARAM_CORPUS_ID + ")");
+    if (corpusListAsString == null)
+    {
+      response.getWriter().println("missing parameter for the corpus list (" + SubmitQueryServlet.PARAM_CORPUS_ID + ")");
       return;
     }
 
-    for (String corpusId : corpusListAsString.split(",")) {
-      try {
+    for (String corpusId : corpusListAsString.split(","))
+    {
+      try
+      {
         corpusIdList.add(Long.parseLong(corpusId));
       }
-      catch (NumberFormatException ex) {
+      catch (NumberFormatException ex)
+      {
         // ignore
       }
     }
     // END getting the needed parameters from the query
 
-    try {
+    try
+    {
       AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter(
-          "AnnisRemoteService.URL"));
+        "AnnisRemoteService.URL"));
 
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       AnnisResultSet queryResult = null;
-      
+
       int offset = 0;
-      while (offset == 0 || (queryResult != null && queryResult.size() > 0)) {
+      while (offset == 0 || (queryResult != null && queryResult.size() > 0))
+      {
 
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
-	convertText(queryResult, response);
-        
+        convertText(queryResult, response, offset);
+
         response.getWriter().flush();
         offset = offset + 50;
 
@@ -110,52 +122,62 @@ public class GeneralTextExporter extends HttpServlet {
       response.getWriter().println("finished");
 
     }
-    catch (AnnisServiceFactoryException e) {
+    catch (AnnisServiceFactoryException e)
+    {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisQLSemanticsException e) {
+    catch (AnnisQLSemanticsException e)
+    {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisQLSyntaxException e) {
+    catch (AnnisQLSyntaxException e)
+    {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisCorpusAccessException e) {
+    catch (AnnisCorpusAccessException e)
+    {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
-  
-  public void convertText(AnnisResultSet queryResult, HttpServletResponse response) throws IOException{
-        int counter = 0;
-	for (AnnisResult annisResult : queryResult) {
-          Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
-          counter++;
-          response.getWriter().append(counter + ". ");
-          List<AnnisNode> tok = annisResult.getGraph().getTokens();
+  public void convertText(AnnisResultSet queryResult, HttpServletResponse response,
+    int offset) throws IOException
+  {
+    int counter = 0;
+    for (AnnisResult annisResult : queryResult)
+    {
+      Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
-          for (AnnisNode annisNode : tok) {
-            Long tokID = annisNode.getId();
-            if (matchedNodeIds.contains(tokID)) {
-              response.getWriter().append("[");
-              response.getWriter().append(annisNode.getSpannedText());
-              response.getWriter().append("]");
-            }
-            else {
-              response.getWriter().append(annisNode.getSpannedText());
-            }
-            
-			//for (Annotation annotation : annisNode.getNodeAnnotations()){
-            //      response.getWriter().append("/"+annotation.getValue());
-            //}
+      counter++;
+      response.getWriter().append((counter+offset) + ". ");
+      List<AnnisNode> tok = annisResult.getGraph().getTokens();
 
-            response.getWriter().append(" ");
+      for (AnnisNode annisNode : tok)
+      {
+        Long tokID = annisNode.getId();
+        if (matchedNodeIds.contains(tokID))
+        {
+          response.getWriter().append("[");
+          response.getWriter().append(annisNode.getSpannedText());
+          response.getWriter().append("]");
+        }
+        else
+        {
+          response.getWriter().append(annisNode.getSpannedText());
+        }
 
-          }
-          response.getWriter().append("\n");
-     }
+        //for (Annotation annotation : annisNode.getNodeAnnotations()){
+        //      response.getWriter().append("/"+annotation.getValue());
+        //}
+
+        response.getWriter().append(" ");
+
+      }
+      response.getWriter().append("\n");
+    }
   }
 }
