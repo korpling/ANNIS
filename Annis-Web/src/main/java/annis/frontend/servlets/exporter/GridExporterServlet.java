@@ -28,18 +28,17 @@ import java.util.List;
 public class GridExporterServlet extends GeneralTextExporter
 {
 
-  List<String> searchedValues = Arrays.asList("tok", "LAT", "bibl");// Zu Testzwecken erstmal diese 3 Werte, spaeter durch GUI uebergeben.
-  int counter = 0;
-
+  private List<String> searchedValues = Arrays.asList("tok", "LAT", "bibl");// Zu Testzwecken erstmal diese 3 Werte, spaeter durch GUI uebergeben.
+  
   @Override
   public void convertText(AnnisResultSet queryResult, HttpServletResponse response, int offset) throws IOException
   {
-
+    int counter = 0;
     for (AnnisResult annisResult : queryResult)
     {
 
       counter++;
-      response.getWriter().append(counter + ". ");
+      response.getWriter().append((counter+offset) + ". ");
       for (String value : searchedValues)
       {
 
