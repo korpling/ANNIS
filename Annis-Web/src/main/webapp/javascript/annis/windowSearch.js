@@ -418,7 +418,7 @@ Ext.onReady(function()
 
 var exportStore = new Ext.data.SimpleStore({
     fields: ['type'],
-    data : [['SimpleTextExporter'], ['TextExporter'], ['WekaExporter']]
+    data : [['SimpleTextExporter'], ['TextExporter'], ['WekaExporter'], ['GridExporter']]
   });
 var exportSelection = new Ext.form.ComboBox({
     store: exportStore,

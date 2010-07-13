@@ -52,6 +52,15 @@
     <url-pattern>/secure/SimpleTextExporter</url-pattern>
   </servlet-mapping>
 
+ <servlet>
+    <servlet-name>GridExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.GridExporterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GridExporterServlet</servlet-name>
+    <url-pattern>/secure/GridExporter</url-pattern>
+  </servlet-mapping>
+
   <servlet>
     <servlet-name>SearchResultServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.SearchResultServlet</servlet-class>
