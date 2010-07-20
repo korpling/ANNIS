@@ -29,6 +29,5 @@
     <module>Annis-Service</module>
     <module>Annis-Web</module>
     <module>Annis-Kickstarter</module>
-    <module>Annis-SQLGenerator</module>
   </modules>
 </project>
