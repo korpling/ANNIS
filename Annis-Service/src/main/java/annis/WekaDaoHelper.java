@@ -1,5 +1,6 @@
 package annis;
 
+import annis.dao.Match;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import annis.dao.Match;
 import annis.dao.Span;
 import annis.model.AnnisNode;
 import annis.model.Annotation;

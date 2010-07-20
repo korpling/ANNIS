@@ -9,15 +9,12 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static test.IsCollectionEmpty.empty;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -115,7 +112,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getSimpleJdbcTemplate(), is(not(nullValue())));
 		assertThat(springAnnisDao.getDddQueryParser(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlGenerator(), is(not(nullValue())));
-		assertThat(springAnnisDao.getMatchFilters(), is(not(nullValue())));
 		assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getAnnotationGraphDaoHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
@@ -206,21 +202,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}
 	
-	// retrieve annotation graph for a number of matches
-	@SuppressWarnings("unchecked")
-	@Test
-	public void retrieveAnnotationGraph() {
-		// stub AnnotationGraphHelper to create a dummy SQL query and extract a dummy graph
-		final List<AnnotationGraph> ANNOTATION_GRAPHS = mock(List.class);
-		when(annotationGraphDaoHelper.createSqlQuery(anyList(), anyInt(), anyInt())).thenReturn(SQL);
-		when(jdbcTemplate.query(any(String.class), any(AnnotationGraphDaoHelper.class))).thenReturn(ANNOTATION_GRAPHS);
-		
-		// call and test
-		assertThat(annisDao.retrieveAnnotationGraph(MATCHES, 1, 1), is(ANNOTATION_GRAPHS));
-		verify(annotationGraphDaoHelper).createSqlQuery(MATCHES, 1, 1);
-		verify(jdbcTemplate).query(SQL, annotationGraphDaoHelper);
-	}
-	
 	// retrieve annotation graph for a dddquery
 	@SuppressWarnings("unchecked")
 	@Test
@@ -239,14 +220,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(actual, is(ANNOTATION_GRAPHS));
 		verify(annotationGraphDaoHelper).createSqlQuery(CORPUS_LIST, DDDQUERY, OFFSET, LIMIT, CONTEXT, CONTEXT);
 		verify(jdbcTemplate).query(SQL, annotationGraphDaoHelper);
-	}
-	
-	// don't retrieve annotations if matches is empty
-	@Test
-	public void retrieveAnnotationGraphNoMatches() {
-		List<AnnotationGraph> result = annisDao.retrieveAnnotationGraph(new ArrayList<Match>(), 0, 0);
-		assertThat(result, is(empty()));
-		verifyNoMoreInteractions(jdbcTemplate);
 	}
 	
 	// retrieve annotation graph for a complete text

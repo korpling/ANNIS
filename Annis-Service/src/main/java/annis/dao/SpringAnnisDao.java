@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -32,7 +31,6 @@ import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import java.util.LinkedList;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -42,7 +40,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private int timeout;
   /// old
   private SqlGenerator sqlGenerator;
-  private List<MatchFilter> matchFilters;
   private AnnotationGraphDaoHelper annotationGraphDaoHelper;
   private WekaDaoHelper wekaSqlHelper;
   private ListCorpusSqlHelper listCorpusSqlHelper;
@@ -61,7 +58,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   public SpringAnnisDao()
   {
     planRowMapper = new ParameterizedSingleColumnRowMapper<String>();
-    matchFilters = new ArrayList<MatchFilter>();
     sqlSessionModifiers = new ArrayList<SqlSessionModifier>();
   }
 
@@ -111,8 +107,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     List<Match> matches = new QueryTemplate<Match>().query(corpusList, dddQuery, findSqlGenerator, findRowMapper);
 
-    // filter matches
-    filter(matches);
     return matches;
   }
 
@@ -147,19 +141,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
     return new QueryTemplate().explain(corpusList, dddQuery, countSqlGenerator, analyze);
-  }
-
-  @SuppressWarnings("unchecked")
-  public List<AnnotationGraph> retrieveAnnotationGraph(List<Match> matches,
-    int left, int right)
-  {
-    if (matches.isEmpty())
-    {
-      return new ArrayList<AnnotationGraph>();
-    }
-    return (List<AnnotationGraph>) getJdbcTemplate().query(
-      annotationGraphDaoHelper.createSqlQuery(matches, left, right),
-      annotationGraphDaoHelper);
   }
 
   @SuppressWarnings("unchecked")
@@ -262,23 +243,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return new MapSqlParameterSource();
   }
 
-  private void filter(List<Match> matches)
-  {
-    for (MatchFilter filter : matchFilters)
-    {
-      filter.init();
-      List<Match> matchCopy = new ArrayList<Match>(matches);
-      for (Match match : matchCopy)
-      {
-        if (filter.filterMatch(match))
-        {
-          log.debug("removing match " + match);
-          matches.remove(match);
-        }
-      }
-    }
-  }
-
   // /// Getter / Setter
   public DddQueryParser getDddQueryParser()
   {
@@ -298,16 +262,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   public void setSqlGenerator(SqlGenerator sqlGenerator)
   {
     this.sqlGenerator = sqlGenerator;
-  }
-
-  public List<MatchFilter> getMatchFilters()
-  {
-    return matchFilters;
-  }
-
-  public void setMatchFilters(List<MatchFilter> matchFilters)
-  {
-    this.matchFilters = matchFilters;
   }
 
   public ParameterizedSingleColumnRowMapper<String> getPlanRowMapper()

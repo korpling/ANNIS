@@ -125,15 +125,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		assertThat(dddQueryRunner.getCorpusList(), is(empty()));
 	}
 	
-	@Test
-	public void doFind() {
-		// call and test
-		dddQueryRunner.doFind(DDDQUERY);
-		verify(annisDao).findMatches(CORPUS_LIST, DDDQUERY);
-		verify(tableFormatter).formatAsTable(MATCHES);
-		verify(out).println(TABLE);
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void doCount() {
@@ -170,30 +161,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		verify(out).println(PLAN);
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void doAnnotate() {
-		// stub helper for this method
-		final List<Match> SLICE = mock(List.class);
-		final List<AnnotationGraph> ANNOTATIONS = mock(List.class);
-		when(annotationGraphHelper.slice(MATCHES, 0, MATCH_LIMIT)).thenReturn(SLICE);
-		
-		// stub AnnisDao.retrieveAnnotationGraph to return a result
-		when(annisDao.retrieveAnnotationGraph(anyList(), anyInt(), anyInt())).thenReturn(ANNOTATIONS);
-
-		// stub TableFormatter for this test (http://code.google.com/p/mockito/issues/detail?id=62)
-		when(tableFormatter.formatAsTable(anyList(), anyString(), anyString())).thenReturn(TABLE);
-		
-		// call and test
-		dddQueryRunner.doAnnotate(DDDQUERY);
-		
-		verify(annisDao).findMatches(CORPUS_LIST, DDDQUERY);
-		verify(annotationGraphHelper).slice(MATCHES, 0, MATCH_LIMIT);
-		verify(annisDao).retrieveAnnotationGraph(SLICE, 2, 2);
-		verify(tableFormatter).formatAsTable(ANNOTATIONS, "nodes", "edges");
-		verify(out).println(TABLE);
-	}
-	
 	@Test
 	public void doAnnotate2() {
 		// stub context for DddQueryRunner
@@ -212,40 +179,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		assertThat(dddQueryRunner.getCorpusList(), is(CORPORA));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void doWeka() {
-		// stub AnnisDao.annotateMatches to retrieve a result
-		final List<AnnisNode> ANNOTATED_NODES = mock(List.class);
-		when(annisDao.annotateMatches(anyList())).thenReturn(ANNOTATED_NODES);
-
-		// stub WekaDaoHelper output creation
-		final String WEKA = "WEKA";
-		when(wekaDaoHelper.exportAsWeka(anyList(), anyList())).thenReturn(WEKA);
-		
-		// call and verify
-		dddQueryRunner.doWeka(DDDQUERY);
-		
-		verify(annisDao).findMatches(CORPUS_LIST, DDDQUERY);
-		verify(annisDao).annotateMatches(MATCHES);
-		verify(wekaDaoHelper).exportAsWeka(ANNOTATED_NODES, MATCHES);
-		verify(out).println(WEKA);
-	}
-
-	// don't do weka if no matches where returned
-	@SuppressWarnings("unchecked")
-	@Test
-	public void doWekaNoMatches() {
-		// stub AnnisDao.findMatches to retrieve an empty result
-		when(annisDao.findMatches(anyList(), anyString())).thenReturn(new ArrayList<Match>());
-		
-		// call and test
-		dddQueryRunner.doWeka(DDDQUERY);
-		verify(annisDao).findMatches(CORPUS_LIST, DDDQUERY);
-		verify(out).println("(empty)");
-		verifyNoMoreInteractions(annisDao, wekaDaoHelper);
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void doList() {
@@ -295,30 +228,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		verify(annisDao).listNodeAnnotations(CORPUS_LIST, true);
 		verify(tableFormatter).formatAsTable(ANNOTATIONS, "name", "distinctValues");
 		verify(out).println(TABLE);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void doDot() {
-		// stub path
-		final String PATH = "PATH";
-		when(annotationGraphDotExporter.getPath()).thenReturn(PATH);
-
-		// stub annotation list of fixed size
-		final List<AnnotationGraph> GRAPHS = new ArrayList<AnnotationGraph>();
-		final int SIZE = 3;
-		final AnnotationGraph GRAPH = mock(AnnotationGraph.class);
-		for (int i = 0; i < SIZE; ++i)
-			GRAPHS.add(GRAPH);
-		when(annisDao.retrieveAnnotationGraph(anyList(), anyInt(), anyInt())).thenReturn(GRAPHS);
-		
-		// expected output
-		String message = String.valueOf(SIZE) + " graphs written to " + PATH;
-
-		// test and call
-		dddQueryRunner.doDot(DDDQUERY);
-		verify(annotationGraphDotExporter, times(3)).writeDotFile(GRAPH);
-		verify(out).println(message);
 	}
 	
 	@Test

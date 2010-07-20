@@ -68,7 +68,7 @@
 	<!-- SqlGenerator -->
 	<import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
 
-	<!-- XXX: Rowmapper? -->
+  <!-- XXX: Rowmapper? -->
 	<bean id="matchRowMapper" class="annis.dao.MatchRowMapper"/>
 	
 	<!-- Timing Aspect for DAO methods -->
@@ -89,7 +89,6 @@
 		<property name="dataSource" ref="dataSource"/>
 		<property name="dddQueryParser" ref="dddQueryParser"/>
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
-		<property name="matchFilters" ref="springAnnisDaoMatchFilters"/>
 		<property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
 		<property name="wekaSqlHelper" ref="wekaDaoHelper"/>
 		<property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
@@ -99,7 +98,7 @@
 		<!-- new -->
 		<property name="queryAnalysis" ref="queryAnalysis"/>
 		<property name="findSqlGenerator" ref="findSqlGenerator"/>
-		<property name="findRowMapper" ref="matchRowMapper"/>
+    <property name="findRowMapper" ref="matchRowMapper"/>
 		<property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
 		<property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
 		<property name="countSqlGenerator" ref="countSqlGenerator"/>
@@ -125,7 +124,5 @@
 		<ref bean="corpusSelectionByViewOnlyToplevelTableAccessStrategy"/>
  	</util:list>
 	
-	<util:list id="springAnnisDaoMatchFilters">
-	</util:list>
 
 </beans>

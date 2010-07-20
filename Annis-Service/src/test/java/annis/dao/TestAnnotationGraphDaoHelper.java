@@ -96,33 +96,6 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void createSqlQuery() {
-		// stub AnnotateMatchesQueryHelper to return a dummy token relation for the FROM clause
-		final List<Match> MATCHES = mock(List.class);
-		final String TOKEN_RELATION = "TOKEN_RELATION";
-
-		// FIXME: so ugly, just stub a match list
-		AnnotationGraphDaoHelper stubbedAnnotateMatchesQueryHelper = new AnnotationGraphDaoHelper() {
-			@Override
-			protected String tokenRelation(List<Match> matches, int left, int right) {
-				assertThat(matches, is(sameInstance(MATCHES)));
-				return TOKEN_RELATION;
-			}
-		};
-
-		String expected = "" +
-			"SELECT DISTINCT\n" + 
-			"\ttokens.key, facts.*\n" +
-			"FROM\n" +
-			TOKEN_RELATION + "\n" +
-			"\tJOIN facts AS facts ON (tokens.text_ref = facts.text_ref AND (tokens.min <= facts.left_token AND tokens.max >= facts.right_token OR facts.left_token <= tokens.min AND tokens.min <= facts.right_token OR facts.left_token <= tokens.max AND tokens.max <= facts.right_token))\n" +
-			"ORDER BY tokens.key, facts.pre";
-		
-		assertEquals(expected, stubbedAnnotateMatchesQueryHelper.createSqlQuery(MATCHES, 1, 1));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
 	public void createSqlQueryInline() {
 		// constants
 		final String INLINE_SQL = "INLINE SQL";
@@ -164,51 +137,6 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		assertEquals(expected, annotationGraphDaoHelper.createSqlQuery(CORPUSLIST, DDDQUERY, OFFSET, LIMIT, LEFT_CONTEXT, RIGHT_CONTEXT));
 	}
 	
-	@SuppressWarnings("deprecation")
-	@Test
-	public void tokenRelation() {
-		// setup a list of matches
-		final int NUM_MATCHES = 3;
-		final int TEXT_REF = 10;
-		List<Match> matches = new ArrayList<Match>();
-		for (int i = 0; i < NUM_MATCHES; ++i)
-			matches.add(new Match(Arrays.asList(
-					new Span(uniqueInt(), TEXT_REF, uniqueInt(), uniqueInt()),
-					new Span(uniqueInt(), TEXT_REF, uniqueInt(), uniqueInt()))));
-
-		// setup expected String
-		final int LEFT = uniqueInt();
-		final int RIGHT = uniqueInt();
-		StringBuffer expected = new StringBuffer();
-		expected.append("	(\n");
-
-		// FIXME: just write the string with replace
-		for (Match match : matches) {
-			expected.append("		SELECT '");
-			int min = Integer.MAX_VALUE;
-			int max = Integer.MIN_VALUE;
-			for (Span node : match) {
-				min = Math.min(min, node.getTokenLeft());
-				max = Math.max(max, node.getTokenRight());
-				expected.append(node.getStructId());
-				expected.append(",");
-			}
-			expected.setLength(expected.length() - ",".length());
-			expected.append("'::varchar AS key, ");
-			expected.append(TEXT_REF);
-			expected.append(" AS text_ref, ");
-			expected.append(min - LEFT);
-			expected.append(" AS min, ");
-			expected.append(max + RIGHT);
-			expected.append(" AS max UNION\n");
-		}
-		expected.setLength(expected.length() - " UNION\n".length());
-		expected.append("\n	) AS tokens");
-		
-		// test
-		assertEquals(expected.toString(), annotationGraphDaoHelper.tokenRelation(matches, LEFT, RIGHT));
-	}
-	
 	// create an sql query for a text id
 	@Test
 	public void createSqlQueryText() {
@@ -223,45 +151,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		
 		assertEquals(expected, annotationGraphDaoHelper.createSqlQuery(TEXT_ID));
 	}
-	
-	// return a slice of a list
-	@Test
-	public void slice() {
-		// slice elements 2 and 3
-		int offset = 1;
-		int length = 2;
-		List<Match> slice = annotationGraphDaoHelper.slice(matches, offset, length);
-		assertThat(slice, isCollection(match2, match3));
-	}
-	
-	// if the offset is larger than the list size, return empty list
-	@Test
-	public void sliceOffsetToLarge() {
-		// slice (non-existing) elements 6 and 7
-		int offset = 5;
-		int length = 2;
-		List<Match> slice = annotationGraphDaoHelper.slice(matches, offset, length);
-		assertThat(slice, is(empty()));
-	}
-	
-	// if offset + limit is larger than list size, return remaining elements
-	@Test
-	public void sliceAtEndOfList() {
-		// slice 5 elements starting at 3
-		int offset = 2;
-		int length = 5;
-		List<Match> slice = annotationGraphDaoHelper.slice(matches, offset, length);
-		assertThat(slice, isCollection(match3, match4, match5));
-	}
-	
-	// if length = 0, return entire list
-	@Test
-	public void sliceDontslice() {
-		int offset = 2;
-		int length = 0;
-		List<Match> slice = annotationGraphDaoHelper.slice(matches, offset, length);
-		assertThat(slice, isCollection(match1, match2, match3, match4, match5));
-	}
+
 	
 	// first column is the match group key
 	// return one annotation graph for each distinct key

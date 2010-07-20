@@ -103,14 +103,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		verify(dddQueryRunner).doSql(DDD_QUERY);
 	}
 	
-	// doFind translates and delegates to DddQueryRunner.doFind()
-	@Test
-	public void doFind() {
-		annisRunner.doFind(ANNIS_QUERY);
-		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doFind(DDD_QUERY);
-	}
-	
 	// doCount translates and delegates to DddQueryRunner.doCount()
 	@Test
 	public void doCount() {
@@ -133,14 +125,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		annisRunner.doAnalyze(ANNIS_QUERY);
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
 		verify(dddQueryRunner).doAnalyze(DDD_QUERY);
-	}
-	
-	// doAnnotate translates and delegates to DddQueryRunner.doAnnotate()
-	@Test
-	public void doAnnotate() {
-		annisRunner.doAnnotate(ANNIS_QUERY);
-		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doAnnotate(DDD_QUERY);
 	}
 
 	// doAnnotate2 translates and delegates to DddQueryRunner.doAnnotate2
@@ -169,14 +153,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		verify(dddQueryRunner).doCorpus(CORPORA);
 	}
 	
-	// doWeka translates and delegates to DddQueryRunner.doWeka()
-	@Test
-	public void doWeka() {
-		annisRunner.doWeka(ANNIS_QUERY);
-		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doWeka(DDD_QUERY);
-	}
-	
 	// doList delegates to DddQueryRunner.doList() {
 	@Test
 	public void doList() {
@@ -190,14 +166,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		final String VALUES = "VALUES";
 		annisRunner.doNodeAnnotations(VALUES);
 		verify(dddQueryRunner).doNodeAnnotations(VALUES);
-	}
-	
-	// doDot translates and delegates to DddQueryRunner.doDot()
-	@Test
-	public void doDot() {
-		annisRunner.doDot(ANNIS_QUERY);
-		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doDot(DDD_QUERY);
 	}
 
 	// doMeta translates and delegates to DddQueryRunner.doMeta()

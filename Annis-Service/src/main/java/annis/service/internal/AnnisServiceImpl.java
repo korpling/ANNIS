@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import annis.dao.AnnisDao;
-import annis.dao.AnnotationGraphDaoHelper;
 import annis.dao.Match;
 import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -86,20 +85,6 @@ public class AnnisServiceImpl implements AnnisService
     return annisResultSet;
   }
 
-  public AnnisResultSet getResultSet1(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
-    throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
-  {
-    List<Match> matches = annisDao.findMatches(corpusList, translate(annisQuery));
-    List<Match> slice = new AnnotationGraphDaoHelper().slice(matches, offset, limit); // ugly
-    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(slice, contextLeft, contextRight);
-    AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
-    for(AnnotationGraph annotationGraph : annotationGraphs)
-    {
-      annisResultSet.add(new AnnisResultImpl(annotationGraph));
-    }
-    return annisResultSet;
-  }
-
   public AnnisCorpusSet getCorpusSet() throws RemoteException
   {
     return new AnnisCorpusSetImpl(annisDao.listCorpora());
@@ -167,6 +152,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
+
     StringBuilder out = new StringBuilder();
     List<Match> matches = annisDao.findMatches(corpusList, translate(annisQL));
     if(!matches.isEmpty())
@@ -179,7 +165,6 @@ public class AnnisServiceImpl implements AnnisService
     {
       out.append("(empty)\n");
     }
-
     return out.toString();
   }
 

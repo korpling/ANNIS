@@ -99,24 +99,6 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
 	}
 	
-	// create SQL query for a list of matches with context left, right
-	public String createSqlQuery(List<Match> matches, int left, int right) {
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append("SELECT DISTINCT\n"); 
-		sb.append("\ttokens.key, facts.*\n");
-		sb.append("FROM\n");
-		
-		sb.append(tokenRelation(matches, left, right));
-		sb.append("\n");
-		
-		sb.append("\tJOIN facts AS facts ON (tokens.text_ref = facts.text_ref AND ");
-		sb.append("(tokens.min <= facts.left_token AND tokens.max >= facts.right_token OR facts.left_token <= tokens.min AND tokens.min <= facts.right_token OR facts.left_token <= tokens.max AND tokens.max <= facts.right_token))\n");
-		sb.append("ORDER BY tokens.key, facts.pre");
-		
-		return sb.toString();
-	}
-	
 	// FIXME: there is only one graph and no matched nodes. {-1} as key only needed because of algorithm in extractData
 	// create SQL query for a text id
 	public String createSqlQuery(long textId) {
@@ -210,19 +192,6 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		sb.append("\nORDER BY key, facts.pre");
 			
 		return sb.toString();
-	}
-	
-	public List<Match> slice(List<Match> matches, int offset, int length) {
-		if (length == 0)
-			return matches;
-		
-		if (offset >= matches.size())
-			return new ArrayList<Match>();
-		
-		int toIndex = offset + length;		
-		if (toIndex > matches.size())
-			toIndex = matches.size();
-		return matches.subList(offset, toIndex);
 	}
 
 	public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -330,51 +299,6 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		edge.setDestination(nodeById.get(destinationId));
 	}
 	
-	@Deprecated
-	protected String tokenRelation(List<Match> matches, int left, int right) {
-		
-		List<String> tokenRel = new ArrayList<String>();
-		for (List<Span> match : matches) {
-			
-			StringBuffer sb = new StringBuffer();
-
-			int min = Integer.MAX_VALUE;
-			int max = Integer.MIN_VALUE;
-			int textRef = match.get(0).getTextRef();
-			
-			for (Span node : match) {
-				min = Math.min(min, node.getTokenLeft());
-				max = Math.max(max, node.getTokenRight());
-			}
-			
-			sb.append("\t\tSELECT '");
-	
-			List<Long> ids = new ArrayList<Long>();
-			for (Span node : match)
-				ids.add(node.getStructId());
-			sb.append(StringUtils.join(ids, ","));
-			sb.append("'::varchar AS key, ");
-			
-			sb.append(textRef);
-			sb.append(" AS text_ref, ");
-			
-			sb.append(min - left);
-			sb.append(" AS min, ");
-			
-			sb.append(max + right);
-			sb.append(" AS max");
-			tokenRel.add(sb.toString());
-		}
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append("\t(\n");
-		sb.append(StringUtils.join(tokenRel, " UNION\n"));
-		sb.append("\n");
-		sb.append("\t) AS tokens");
-
-		return sb.toString();
-	}
-
 	///// Getter / Setter
 	
 	public AnnisNodeRowMapper getAnnisNodeRowMapper() {

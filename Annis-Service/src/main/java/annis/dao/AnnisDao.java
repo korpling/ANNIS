@@ -20,8 +20,6 @@ public interface AnnisDao {
 	
 	String plan(String dddQuery, List<Long> corpusList, boolean analyze);
 	
-	List<AnnotationGraph> retrieveAnnotationGraph(List<Match> matches, int left, int right);
-
 	List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right);
 	
 	AnnotationGraph retrieveAnnotationGraph(long textId);

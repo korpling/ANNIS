@@ -2,7 +2,6 @@ package annis;
 
 
 import annis.ql.parser.AnnisParser;
-import annis.resolver.ResolverEntry;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.deutschdiachrondigital.dddquery.DddQueryRunner;
 
@@ -43,10 +42,6 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doSql(translate(annisQuery));
 	}
 	
-	public void doFind(String annisQuery) {
-		dddQueryRunner.doFind(translate(annisQuery));
-	}
-	
 	public void doCount(String annisQuery) {
 		dddQueryRunner.doCount(translate(annisQuery));
 	}
@@ -57,10 +52,6 @@ public class AnnisRunner extends AnnisBaseRunner {
 	
 	public void doAnalyze(String annisQuery) {
 		dddQueryRunner.doAnalyze(translate(annisQuery));
-	}
-	
-	public void doAnnotate(String annisQuery) {
-		dddQueryRunner.doAnnotate(translate(annisQuery));
 	}
 	
 	public void doAnnotate2(String annisQuery) {
@@ -75,24 +66,12 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doWait(seconds);
 	}
 	
-	public void doWeka(String annisQuery) {
-		dddQueryRunner.doWeka(translate(annisQuery));
-	}
-	
 	public void doList(String unused) {
 		dddQueryRunner.doList(unused);
 	}
 	
 	public void doNodeAnnotations(String doListValues) {
 		dddQueryRunner.doNodeAnnotations(doListValues);
-	}
-	
-	public void doDot(String annisQuery) {
-		dddQueryRunner.doDot(translate(annisQuery));
-	}
-	
-	public void doPaula(String annisQuery) {
-		dddQueryRunner.doPaula(translate(annisQuery));
 	}
 	
 	public void doMeta(String corpusId) {
