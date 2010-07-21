@@ -158,7 +158,10 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		sb.append(") AS matches,\n");
 		sb.append("\tfacts AS facts\n");
 		sb.append("WHERE\n");
-		sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + left + " AND facts.right_token <= matches.right_token1 + " + right + ") OR (facts.left_token <= matches.left_token1 - " + left + " AND matches.left_token1 - " + left + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + right + " AND matches.right_token1 + " + right + " <= facts.right_token)))");
+		sb.append("\t(facts.toplevel_corpus IN(");
+    sb.append(StringUtils.join(corpusList,","));
+    sb.append(") AND ");
+    sb.append( " facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + left + " AND facts.right_token <= matches.right_token1 + " + right + ") OR (facts.left_token <= matches.left_token1 - " + left + " AND matches.left_token1 - " + left + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + right + " AND matches.right_token1 + " + right + " <= facts.right_token)))");
 		for (int i = 2; i <= nodeCount; ++i) {
 			sb.append(" OR\n");
 			sb.append("\t(facts.text_ref = matches.text_ref");
@@ -190,7 +193,9 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 			sb.append(" <= facts.right_token)))");
 		}
 		sb.append("\nORDER BY key, facts.pre");
-			
+		
+    log.debug("real annotation graph query: " + sb.toString());
+
 		return sb.toString();
 	}
 
