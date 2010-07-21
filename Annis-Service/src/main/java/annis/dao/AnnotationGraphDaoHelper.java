@@ -196,6 +196,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 
 	public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
 		
+    log.info("timing extractData begin");
+
 		// fn: match group -> annotation graph
 		Map<String, AnnotationGraph> graphByMatchGroup = new HashMap<String, AnnotationGraph>();
 		
@@ -277,7 +279,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		}
 		
 //		ArrayList<AnnotationGraph> graphs = new ArrayList<AnnotationGraph>(graphByMatchGroup.values());
-	
+
+    log.info("timing extractData stop");
 		return graphs;
 	}
 	
