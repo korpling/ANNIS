@@ -1,4 +1,11 @@
-CREATE TABLE facts AS SELECT DISTINCT
+--- :id is replaced by code
+CREATE TABLE facts_:id
+(
+  CHECK(toplevel_corpus = :id)
+)
+INHERITS (facts);
+
+INSERT INTO facts_:id SELECT DISTINCT
 	node.id AS id,
 	node.text_ref AS text_ref,
 	node.corpus_ref AS corpus_ref,
@@ -36,7 +43,10 @@ FROM
 	JOIN rank ON (rank.node_ref = node.id) 
 	JOIN component ON (rank.component_ref = component.id)
 	LEFT JOIN node_annotation ON (node_annotation.node_ref = node.id)
-	LEFT JOIN edge_annotation ON (edge_annotation.rank_ref = rank.pre);
+	LEFT JOIN edge_annotation ON (edge_annotation.rank_ref = rank.pre)
+WHERE
+  node.toplevel_corpus = :id;
+;
 
 -- can't be run inside transaction
 -- VACUUM ANALYZE facts;

@@ -78,11 +78,6 @@ public class SpringAnnisAdministrationDao {
 	// tables created during import
 	private String[] createdTables = { "corpus_stats" };
 	
-	// materialized tables
-	private String[] materializedTables = 
-//		{ "edges", "struct_annotation", "rank_annotations", "rank_text_ref" };
-		{ "facts" };
-	
 	///// Subtasks of creating the database
 	
 	void dropDatabase(String database) {
@@ -261,10 +256,18 @@ public class SpringAnnisAdministrationDao {
 		log.info("computing statistics for top-level corpus");
 		executeSqlFromScript("corpus_stats.sql");
 	}
-	
-	void updateIds() {
+
+  /**
+   *
+   * @return the new corpus ID
+   */
+	long updateIds() {
 		log.info("updating IDs in staging area");
 		executeSqlFromScript("update_ids.sql");
+    log.info("query for the new corpus ID");
+    long result = jdbcOperations.queryForLong("SELECT MAX(toplevel_corpus) FROM _node");
+    log.info("new corpus ID is " + result);
+    return result;
 	}
 	
 	void applyConstraints() {
@@ -315,21 +318,19 @@ public class SpringAnnisAdministrationDao {
 	
 	void dropMaterializedTables() {
 		log.info("dropping materialized tables");
-		
-		// clone the array before returning the list, so the source array is not reversed
-		// XXX: don't have to reverse the MATERIALIZED tables, do I?
-		List<String> oldTables = Arrays.asList(materializedTables.clone());
-		Collections.reverse(oldTables);
-		
-		for (String table : oldTables)
-			jdbcOperations.execute("DROP TABLE " + table);
+
+    jdbcOperations.execute("DROP TABLE facts");
+			
 	}
 
-	void createMaterializedTables() {
-		log.info("creating materialized tables");
-		for (String table : materializedTables) {
-			executeSqlFromScript(table + ".sql");
-		}
+	void createFacts(long corpusID) {
+		log.info("creating materialized facts table for corpus with ID " + corpusID);
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+    executeSqlFromScript("facts.sql", args);
+
+    log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
+    executeSqlFromScript("indexes_facts.sql", args);
+
 	}
 	
 	void rebuildIndexes() {
@@ -345,7 +346,14 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	void deleteCorpora(List<Long> ids) {
-		log.debug("recursivly deleting corpora: " + ids);
+
+    for(long l : ids)
+    {
+      log.debug("dropping facts table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE facts_" + l);
+    }
+
+    log.debug("recursivly deleting corpora: " + ids);
 		executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids", StringUtils.join(ids, ", ")));
 	}
 	
@@ -380,7 +388,7 @@ public class SpringAnnisAdministrationDao {
 		List<String> tables = new ArrayList<String>();
 		tables.addAll(Arrays.asList(importedTables));
 		tables.addAll(Arrays.asList(createdTables));
-		tables.addAll(Arrays.asList(materializedTables));
+		//tables.addAll(Arrays.asList(materializedTables));
 		return tables;
 	}
 	

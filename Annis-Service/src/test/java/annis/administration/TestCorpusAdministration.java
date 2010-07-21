@@ -60,21 +60,18 @@ public class TestCorpusAdministration {
 		verifyImport(inOrder, path2);
 		verifyImport(inOrder, path3);
 
-		// rebuild materialized tables and indexes only once
-		verifyPostImport(inOrder);
-
 		// that should be it
 		verifyNoMoreInteractions(administrationDao);
 	}
 
 	private void verifyPreImport(InOrder inOrder) {
-		inOrder.verify(administrationDao).dropIndexes();
+
+    // no pre import actions yet
 	}
 
-	private void verifyPostImport(InOrder inOrder) {
-		inOrder.verify(administrationDao).dropMaterializedTables();
-		inOrder.verify(administrationDao).createMaterializedTables();
-		inOrder.verify(administrationDao).rebuildIndexes();
+	private void verifyPostImport(InOrder inOrder)
+  {
+    // no post import actions yet
 	}
 
 	// a correct import requires this order
@@ -100,7 +97,7 @@ public class TestCorpusAdministration {
 		inOrder.verify(administrationDao).computeCorpusStatistics();
 		
 		// update IDs in staging area
-		inOrder.verify(administrationDao).updateIds();
+		long corpusID = inOrder.verify(administrationDao).updateIds();
 		
 		// apply constraints to ensure data integrity
 		inOrder.verify(administrationDao).applyConstraints();
@@ -110,6 +107,9 @@ public class TestCorpusAdministration {
 		
 		// drop the staging area
 		inOrder.verify(administrationDao).dropStagingArea();
+
+    // the facts child table must be created
+		inOrder.verify(administrationDao).createFacts(corpusID);
 	}
 	
 }

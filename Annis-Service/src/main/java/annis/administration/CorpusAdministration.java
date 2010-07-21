@@ -46,7 +46,7 @@ public class CorpusAdministration {
 		administrationDao.setDataSource(createDataSource(host, port, database, user, password));
 		administrationDao.createSchema();
 		administrationDao.populateSchema();
-		administrationDao.createMaterializedTables();
+    administrationDao.rebuildIndexes();
 		
 		// write database information to property file
 		writeDatabasePropertiesFile(host, port, database, user, password);
@@ -54,10 +54,8 @@ public class CorpusAdministration {
 	
 	@Transactional(readOnly = false)
 	public void importCorpora(List<String> paths) {
-		// first drop indexes on source tables
-		administrationDao.dropIndexes();
 		
-		// then import each corpus
+		// import each corpus
 		for (String path : paths) {
 			log.info("Importing corpus from: " + path);
 			
@@ -71,17 +69,17 @@ public class CorpusAdministration {
 			administrationDao.computeComponents();
 			administrationDao.computeLevel();
 			administrationDao.computeCorpusStatistics();
-			administrationDao.updateIds();
+			long corpusID = administrationDao.updateIds();
+
 			administrationDao.applyConstraints();
 			administrationDao.insertCorpus();
 			administrationDao.dropStagingArea();
+
+      // create the new facts table partition
+      administrationDao.createFacts(corpusID);
+
+      log.info("Finished import from: " + path);
 		}
-		
-		// finally rebuild materialized tables and indexes
-		log.info("Rebuilding materialized tables and indexes.");
-		administrationDao.dropMaterializedTables();
-		administrationDao.createMaterializedTables();
-		administrationDao.rebuildIndexes();
 	}
 	
 	public void importCorpora(String... paths) {
@@ -98,6 +96,7 @@ public class CorpusAdministration {
 		
 		log.info("Deleting corpora: " + ids);
 		administrationDao.deleteCorpora(ids);
+    log.info("Finished deleting corpora: " + ids);
 	}
 	
 	public List<Map<String, Object>> listCorpusStats() {

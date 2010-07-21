@@ -25,9 +25,6 @@ ALTER TABLE node DROP CONSTRAINT "node_corpus_ref_fkey";
 ---
 
 -- explain analyze
-DELETE FROM facts
-WHERE toplevel_corpus IN ( :ids );
-
 ---
 --- delete entries from source tables
 ---

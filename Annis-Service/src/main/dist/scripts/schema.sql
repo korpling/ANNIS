@@ -119,6 +119,42 @@ COMMENT ON COLUMN edge_annotation.namespace IS 'optional namespace of annotation
 COMMENT ON COLUMN edge_annotation.name IS 'annotation key';
 COMMENT ON COLUMN edge_annotation.value IS 'annotation value';
 
+CREATE TABLE facts
+(
+  id			numeric(38),
+	text_ref	numeric(38),
+	corpus_ref	numeric(38),
+	toplevel_corpus numeric(38),
+  node_namespace	varchar(100),
+	node_name		varchar(100),
+	"left"		integer,
+	"right"		integer,
+	token_index	integer,
+	continuous	boolean,
+	span		varchar(2000),
+	left_token	integer,
+	right_token	integer,
+
+  pre				numeric(38),
+	post			numeric(38),
+	parent		numeric(38),
+	root			boolean,
+	level			numeric(38),
+
+  component_id			numeric(38),
+	edge_type		char(1),
+	edge_namespace	varchar(255),
+	edge_name		varchar(255),
+
+	node_annotation_namespace	varchar(150),
+	node_annotation_name		varchar(150),
+	node_annotation_value		varchar(1500),
+
+  edge_annotation_namespace	varchar(150),
+	edge_annotation_name		varchar(150),
+	edge_annotation_value		varchar(1500)
+
+);
 
 -- external data
 CREATE TABLE extData
