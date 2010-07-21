@@ -1,4 +1,7 @@
 --- :id is replaced by code
+
+DROP TABLE IF EXISTS facts_:id;
+
 CREATE TABLE facts_:id
 (
   CHECK(toplevel_corpus = :id)
