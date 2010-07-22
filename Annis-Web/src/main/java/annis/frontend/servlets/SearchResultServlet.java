@@ -45,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -63,6 +64,8 @@ public class SearchResultServlet extends HttpServlet
   public static final String FILESYSTEM_CACHE_RESULT = "FileSystemCacheResult";
   private static final long serialVersionUID = 7180460653219721099L;
   private Random rand = new Random();
+
+  private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse rep) throws ServletException, IOException
@@ -90,6 +93,7 @@ public class SearchResultServlet extends HttpServlet
 
   private void writeJSONResult(HttpSession session, HttpServletRequest request, HttpServletResponse response)
   {
+    cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
     String queryAnnisQL = "";
     Integer totalCount = 0;
     List<Long> corpusIdList = (List<Long>) session.getAttribute(SubmitQueryServlet.KEY_CORPUS_ID_LIST);
@@ -249,8 +253,8 @@ public class SearchResultServlet extends HttpServlet
     long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
     
     // create a request for resolver entries
-    LinkedList<SingleResolverRequest> request = new LinkedList<SingleResolverRequest>();
-
+    HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
+    
     Set<String> nodeNamespaces = new HashSet<String>();
     for(AnnisNode node : result.getGraph().getNodes())
     {
@@ -272,20 +276,29 @@ public class SearchResultServlet extends HttpServlet
     }
     for(String ns : nodeNamespaces)
     {
-      request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
       if(!edgeNamespaces.contains(ns))
       {
-        request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+        resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
       }
     }
     for(String ns : edgeNamespaces)
     {
-      request.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique
-    visSet.addAll(service.getResolverEntries(request.toArray(new SingleResolverRequest[0])));
-
+    if(cacheResolver.containsKey(resolverRequests))
+    {
+      visSet.addAll(cacheResolver.get(resolverRequests));
+    }
+    else
+    {
+      List<ResolverEntry> resolverList =
+        service.getResolverEntries(resolverRequests.toArray(new SingleResolverRequest[0]));
+      visSet.addAll(resolverList);
+      cacheResolver.put(resolverRequests, resolverList);
+    }
     // sort everything
     ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);    
     Arrays.sort(visArray, new Comparator<ResolverEntry>()

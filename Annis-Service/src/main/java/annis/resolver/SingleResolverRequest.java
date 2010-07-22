@@ -54,5 +54,41 @@ public class SingleResolverRequest implements Serializable
     return type;
   }
 
-  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final SingleResolverRequest other = (SingleResolverRequest) obj;
+    if (this.corpusId != other.corpusId)
+    {
+      return false;
+    }
+    if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+    {
+      return false;
+    }
+    if (this.type != other.type)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 17 * hash + (int) (this.corpusId ^ (this.corpusId >>> 32));
+    hash = 17 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+    hash = 17 * hash + (this.type != null ? this.type.hashCode() : 0);
+    return hash;
+  }
+
 }
