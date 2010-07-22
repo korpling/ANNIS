@@ -28,7 +28,7 @@ import annis.sqlgen.TableAccessStrategy;
 public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 
 	private Logger log = Logger.getLogger(this.getClass());
-	
+
 	public static class MatchGroupRowMapper implements ParameterizedRowMapper<String> {
 
 		public String mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -37,6 +37,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		
 	}
 
+  private String nodeTableViewName;
+	
 	// for inline query generation
 	// FIXME: tests for dependencies missing
 	private DddQueryParser dddQueryParser;
@@ -156,12 +158,11 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		sb.append("\t(");
 		sb.append(matchSql);
 		sb.append(") AS matches,\n");
-		sb.append("\tfacts AS facts\n");
+		sb.append("\t");
+    sb.append(nodeTableViewName);
+    sb.append(" AS facts\n");
 		sb.append("WHERE\n");
-		sb.append("\t(facts.toplevel_corpus IN(");
-    sb.append(StringUtils.join(corpusList,","));
-    sb.append(") AND ");
-    sb.append( " facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + left + " AND facts.right_token <= matches.right_token1 + " + right + ") OR (facts.left_token <= matches.left_token1 - " + left + " AND matches.left_token1 - " + left + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + right + " AND matches.right_token1 + " + right + " <= facts.right_token)))");
+		sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + left + " AND facts.right_token <= matches.right_token1 + " + right + ") OR (facts.left_token <= matches.left_token1 - " + left + " AND matches.left_token1 - " + left + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + right + " AND matches.right_token1 + " + right + " <= facts.right_token)))");
 		for (int i = 2; i <= nodeCount; ++i) {
 			sb.append(" OR\n");
 			sb.append("\t(facts.text_ref = matches.text_ref");
@@ -194,14 +195,14 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		}
 		sb.append("\nORDER BY key, facts.pre");
 		
-    log.debug("real annotation graph query: " + sb.toString());
+    log.debug("SQL query with context:\n" + sb.toString());
 
 		return sb.toString();
 	}
 
 	public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
 		
-    log.info("timing extractData begin");
+    log.info("extractData begin");
 
 		// fn: match group -> annotation graph
 		Map<String, AnnotationGraph> graphByMatchGroup = new HashMap<String, AnnotationGraph>();
@@ -285,7 +286,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		
 //		ArrayList<AnnotationGraph> graphs = new ArrayList<AnnotationGraph>(graphByMatchGroup.values());
 
-    log.info("timing extractData stop");
+    log.info("extractData end");
+
 		return graphs;
 	}
 	
@@ -374,5 +376,18 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 	public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
 		this.queryAnalysis = queryAnalysis;
 	}
+
+  public String getNodeTableViewName()
+  {
+    return nodeTableViewName;
+  }
+
+  public void setNodeTableViewName(String nodeTableViewName)
+  {
+    this.nodeTableViewName = nodeTableViewName;
+  }
+
+  
+
 
 }
