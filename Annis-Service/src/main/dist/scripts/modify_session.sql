@@ -1,5 +1,5 @@
 --- Session
-SET enable_seqscan TO off;
+-- SET enable_seqscan TO off;
 -- SET enable_nestloop TO off;
 -- SET enable_mergejoin TO off;
 -- SET enable_hashjoin TO off;
