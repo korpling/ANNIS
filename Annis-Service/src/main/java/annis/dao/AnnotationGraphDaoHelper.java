@@ -38,6 +38,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 	}
 
   private String nodeTableViewName;
+  private String matchedNodesViewName;
 	
 	// for inline query generation
 	// FIXME: tests for dependencies missing
@@ -382,6 +383,16 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
   public void setNodeTableViewName(String nodeTableViewName)
   {
     this.nodeTableViewName = nodeTableViewName;
+  }
+
+  public String getMatchedNodesViewName()
+  {
+    return matchedNodesViewName;
+  }
+
+  public void setMatchedNodesViewName(String matchedNodesViewName)
+  {
+    this.matchedNodesViewName = matchedNodesViewName;
   }
 
   

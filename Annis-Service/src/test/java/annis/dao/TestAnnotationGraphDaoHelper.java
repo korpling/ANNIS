@@ -118,7 +118,8 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		QueryAnalysis queryAnalysis = mock(QueryAnalysis.class);
 		when(queryAnalysis.analyzeQuery(STATEMENT, CORPUSLIST)).thenReturn(queryData);
 		annotationGraphDaoHelper.setQueryAnalysis(queryAnalysis);
-		
+		annotationGraphDaoHelper.setNodeTableViewName("node_v");
+
 		// stub a match with 3 nodes
 		when(queryData.getMaxWidth()).thenReturn(3);
 		
@@ -127,7 +128,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 			"\t(matches.id1 || ',' || matches.id2 || ',' || matches.id3) AS key, facts.*\n" +
 			"FROM\n" +
 			"\t(" + INLINE_SQL + " ORDER BY id1, id2, id3 OFFSET " + OFFSET + " LIMIT " + LIMIT + ") AS matches,\n" +
-			"\tfacts AS facts\n" +
+			"\tnode_v AS facts\n" +
 			"WHERE\n" +
 			"\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + LEFT_CONTEXT + " AND facts.right_token <= matches.right_token1 + " + RIGHT_CONTEXT + ") OR (facts.left_token <= matches.left_token1 - " + LEFT_CONTEXT + " AND matches.left_token1 - " + LEFT_CONTEXT + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + RIGHT_CONTEXT + " AND matches.right_token1 + " + RIGHT_CONTEXT + " <= facts.right_token))) OR\n" +
 			"\t(facts.text_ref = matches.text_ref2 AND ((facts.left_token >= matches.left_token2 - " + LEFT_CONTEXT + " AND facts.right_token <= matches.right_token2 + " + RIGHT_CONTEXT + ") OR (facts.left_token <= matches.left_token2 - " + LEFT_CONTEXT + " AND matches.left_token2 - " + LEFT_CONTEXT + " <= facts.right_token) OR (facts.left_token <= matches.right_token2 + " + RIGHT_CONTEXT + " AND matches.right_token2 + " + RIGHT_CONTEXT + " <= facts.right_token))) OR\n" +

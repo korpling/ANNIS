@@ -56,6 +56,7 @@
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
 		<property name="queryAnalysis" ref="queryAnalysis"/>
     <property name="nodeTableViewName" value="node_v" />
+    <property name="matchedNodesViewName" value="matched_nodes" />
 	
 	</bean>
 		
