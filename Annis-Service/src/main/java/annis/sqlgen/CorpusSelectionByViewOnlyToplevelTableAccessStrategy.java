@@ -48,7 +48,7 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 				List<Long> documents = simpleJdbcTemplate.query(documentsWithMetaDataSql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
 				viewDefinition += " AND :corpus IN ( :documentList )"
 					.replaceAll(":corpus", column(originalNodeTable(), columnName(NODE_TABLE, "corpus_ref")))
-					.replaceAll(":documentList", StringUtils.join(documents, ", "));
+					.replaceAll(":documentList", documents.isEmpty() ? "NULL" : StringUtils.join(documents, ", "));
 			}
 		}
 
