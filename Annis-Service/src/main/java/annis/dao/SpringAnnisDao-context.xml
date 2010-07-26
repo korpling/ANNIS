@@ -42,6 +42,14 @@
 		<property name="password" value="$dao{datasource.password}"/>
 	</bean>
 
+  <bean id="matchViewGenerator" class="annis.dao.MatchViewGenerator">
+		<property name="dddQueryParser" ref="dddQueryParser"/>
+		<property name="sqlGenerator" ref="findSqlGenerator"/>
+		<property name="queryAnalysis" ref="queryAnalysis"/>
+    <property name="nodeTableViewName" value="node_v" />
+    <property name="matchedNodesViewName" value="matched_nodes" />
+	</bean>
+
 	<!-- Helper for annotate command -->
 	<bean id="annotationGraphDaoHelper" class="annis.dao.AnnotationGraphDaoHelper">
 		<property name="dddQueryParser" ref="dddQueryParser"/>
@@ -91,6 +99,7 @@
 		<property name="dddQueryParser" ref="dddQueryParser"/>
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
 		<property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
+    <property name="matchViewGenerator" ref="matchViewGenerator" />
 		<property name="wekaSqlHelper" ref="wekaDaoHelper"/>
 		<property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
 		<property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>

@@ -149,7 +149,7 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		matchSb.append(limit);
 		String matchSql = matchSb.toString();
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT DISTINCT\n");
 		sb.append("\t");
 		sb.append(key);

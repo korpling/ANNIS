@@ -54,6 +54,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private DddQueryParser dddQueryParser;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
+  private MatchViewGenerator matchViewGenerator;
 
   public SpringAnnisDao()
   {
@@ -161,6 +162,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
     }
 
+    // generate the view with the matched node IDs
+    getJdbcTemplate().execute(matchViewGenerator.createSqlQuery(corpusList, dddQuery, offset, limit, left, right));
+
+    // create the Annis graphs
     return (List<AnnotationGraph>) getJdbcTemplate().query(annotationGraphDaoHelper.createSqlQuery(corpusList, dddQuery, offset, limit, left, right), annotationGraphDaoHelper);
   }
 
@@ -409,4 +414,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.countSqlGenerator = countSqlGenerator;
   }
+
+  public MatchViewGenerator getMatchViewGenerator()
+  {
+    return matchViewGenerator;
+  }
+
+  public void setMatchViewGenerator(MatchViewGenerator matchViewGenerator)
+  {
+    this.matchViewGenerator = matchViewGenerator;
+  }
+
+  
 }
