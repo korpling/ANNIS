@@ -62,7 +62,7 @@ public class MatchViewGenerator
     matchSb.append(selectClause);
     matchSb.append("\n\tFROM\n(\n");
     matchSb.append(sqlGenerator.toSql(statement, corpusList));
-    matchSb.append("\n)");
+    matchSb.append("\n) as matched_ids");
 
     return matchSb.toString();
   }
