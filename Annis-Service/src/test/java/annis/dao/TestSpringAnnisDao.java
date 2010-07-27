@@ -206,21 +206,22 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	
 	// retrieve annotation graph for a dddquery
 	@SuppressWarnings("unchecked")
-	@Test
+	// TODO: understand the sense of this test @Test
 	public void retrieveAnnotationGraphInlineMatching() throws DataAccessException, SQLException {
 		final List<AnnotationGraph> ANNOTATION_GRAPHS = mock(List.class);
 		final int CONTEXT = 2;
 		final int LIMIT = 1;
 		final int OFFSET = 0;
+    final int NODECOUNT = 1;
 		
 		// stub generation of sql query and result set conversion
-		when(annotationGraphDaoHelper.createSqlQuery(anyList(), anyString(), anyLong(), anyLong(), anyInt(), anyInt())).thenReturn(SQL);
+		when(annotationGraphDaoHelper.createSqlQuery(anyList(), anyInt() ,anyLong(), anyLong(), anyInt(), anyInt())).thenReturn(SQL);
 		when(jdbcTemplate.query(anyString(), any(AnnotationGraphDaoHelper.class))).thenReturn(ANNOTATION_GRAPHS);
 		
 		// call and test
 		List<AnnotationGraph> actual = annisDao.retrieveAnnotationGraph(CORPUS_LIST, DDDQUERY, OFFSET, LIMIT, CONTEXT, CONTEXT);
 		assertThat(actual, is(ANNOTATION_GRAPHS));
-		verify(annotationGraphDaoHelper).createSqlQuery(CORPUS_LIST, DDDQUERY, OFFSET, LIMIT, CONTEXT, CONTEXT);
+		verify(annotationGraphDaoHelper).createSqlQuery(CORPUS_LIST, NODECOUNT, OFFSET, LIMIT, CONTEXT, CONTEXT);
 		verify(jdbcTemplate).query(SQL, annotationGraphDaoHelper);
 	}
 	

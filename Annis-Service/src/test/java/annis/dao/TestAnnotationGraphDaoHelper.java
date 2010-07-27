@@ -98,8 +98,8 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 	@Test
 	public void createSqlQueryInline() {
 		// constants
-		final String INLINE_SQL = "INLINE SQL";
-		final String DDDQUERY = "DDDQUERY";
+		final String MATCH_VIEW_NAME = "matched_nodes";
+		final int NODE_COUNT = 3;
 		final long OFFSET = 1L;
 		final long LIMIT = 2L;
 		final int LEFT_CONTEXT = 3;
@@ -108,17 +108,14 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		final Start STATEMENT = new Start();
 		
 		// stub DddQueryParser and SqlGenerator for inline query
-		DddQueryParser dddQueryParser = mock(DddQueryParser.class);
-		when(dddQueryParser.parse(DDDQUERY)).thenReturn(STATEMENT);
-		annotationGraphDaoHelper.setDddQueryParser(dddQueryParser);
 		SqlGenerator sqlGenerator = mock(SqlGenerator.class);
-		when(sqlGenerator.toSql(STATEMENT, CORPUSLIST)).thenReturn(INLINE_SQL);
 		annotationGraphDaoHelper.setSqlGenerator(sqlGenerator);
 		QueryData queryData = mock(QueryData.class);
 		QueryAnalysis queryAnalysis = mock(QueryAnalysis.class);
 		when(queryAnalysis.analyzeQuery(STATEMENT, CORPUSLIST)).thenReturn(queryData);
 		annotationGraphDaoHelper.setQueryAnalysis(queryAnalysis);
 		annotationGraphDaoHelper.setNodeTableViewName("node_v");
+    annotationGraphDaoHelper.setMatchedNodesViewName(MATCH_VIEW_NAME);
 
 		// stub a match with 3 nodes
 		when(queryData.getMaxWidth()).thenReturn(3);
@@ -127,7 +124,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 			"SELECT DISTINCT\n" + 
 			"\t(matches.id1 || ',' || matches.id2 || ',' || matches.id3) AS key, facts.*\n" +
 			"FROM\n" +
-			"\t(" + INLINE_SQL + " ORDER BY id1, id2, id3 OFFSET " + OFFSET + " LIMIT " + LIMIT + ") AS matches,\n" +
+			"\t(SELECT * FROM " + MATCH_VIEW_NAME + " ORDER BY id1, id2, id3 OFFSET " + OFFSET + " LIMIT " + LIMIT + ") AS matches,\n" +
 			"\tnode_v AS facts\n" +
 			"WHERE\n" +
 			"\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - " + LEFT_CONTEXT + " AND facts.right_token <= matches.right_token1 + " + RIGHT_CONTEXT + ") OR (facts.left_token <= matches.left_token1 - " + LEFT_CONTEXT + " AND matches.left_token1 - " + LEFT_CONTEXT + " <= facts.right_token) OR (facts.left_token <= matches.right_token1 + " + RIGHT_CONTEXT + " AND matches.right_token1 + " + RIGHT_CONTEXT + " <= facts.right_token))) OR\n" +
@@ -135,7 +132,7 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 			"\t(facts.text_ref = matches.text_ref3 AND ((facts.left_token >= matches.left_token3 - " + LEFT_CONTEXT + " AND facts.right_token <= matches.right_token3 + " + RIGHT_CONTEXT + ") OR (facts.left_token <= matches.left_token3 - " + LEFT_CONTEXT + " AND matches.left_token3 - " + LEFT_CONTEXT + " <= facts.right_token) OR (facts.left_token <= matches.right_token3 + " + RIGHT_CONTEXT + " AND matches.right_token3 + " + RIGHT_CONTEXT + " <= facts.right_token)))\n" +
 			"ORDER BY key, facts.pre";
 		
-		assertEquals(expected, annotationGraphDaoHelper.createSqlQuery(CORPUSLIST, DDDQUERY, OFFSET, LIMIT, LEFT_CONTEXT, RIGHT_CONTEXT));
+		assertEquals(expected, annotationGraphDaoHelper.createSqlQuery(CORPUSLIST, NODE_COUNT, OFFSET, LIMIT, LEFT_CONTEXT, RIGHT_CONTEXT));
 	}
 	
 	// create an sql query for a text id

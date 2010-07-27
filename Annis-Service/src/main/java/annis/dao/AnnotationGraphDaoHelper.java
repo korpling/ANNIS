@@ -24,6 +24,7 @@ import annis.model.Edge;
 import annis.ql.parser.QueryAnalysis;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 
@@ -116,13 +117,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 	}
 	
 	// kinda ugly
-	public String createSqlQuery(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right) {
-		// parse query
-		Start statement = dddQueryParser.parse(dddQuery);
-		
-		// get number of nodes in match
-		int nodeCount = queryAnalysis.analyzeQuery(statement, corpusList).getMaxWidth();
-		
+	public String createSqlQuery(List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right) {
+			
 		// key for annotation graph matches
 		StringBuffer keySb = new StringBuffer();
 		keySb.append("(matches.id1");
@@ -136,7 +132,8 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 		
 		// sql for matches
 		StringBuffer matchSb = new StringBuffer();
-		matchSb.append(sqlGenerator.toSql(statement, corpusList));
+		matchSb.append("SELECT * FROM ");
+    matchSb.append(matchedNodesViewName);
 		matchSb.append(" ORDER BY ");
 		matchSb.append("id1");
 		for (int i = 2; i <= nodeCount; ++i) {
@@ -200,6 +197,12 @@ public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 
 		return sb.toString();
 	}
+
+
+  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, int nodeCount, List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
+  {
+    return (List<AnnotationGraph>) jdbcTemplate.query(createSqlQuery(corpusList, nodeCount, offset, limit, left, right), this);
+  }
 
 	public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
 		

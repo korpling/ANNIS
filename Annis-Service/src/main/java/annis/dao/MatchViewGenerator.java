@@ -16,18 +16,35 @@
  */
 package annis.dao;
 
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
 import annis.ql.parser.QueryAnalysis;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.TableAccessStrategy;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
  * @author thomas
  */
-public class MatchViewGenerator
+public class MatchViewGenerator implements ResultSetExtractor
 {
+
+	private static final Logger log = Logger.getLogger(MatchViewGenerator.class);
 
   private DddQueryParser dddQueryParser;
   private SqlGenerator sqlGenerator;
@@ -35,7 +52,72 @@ public class MatchViewGenerator
   private String nodeTableViewName;
   private String matchedNodesViewName;
 
-  public String createSqlQuery(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
+  private AnnisNodeRowMapper annisNodeRowMapper;
+	private EdgeRowMapper edgeRowMapper;
+	private AnnotationRowMapper nodeAnnotationRowMapper;
+	private AnnotationRowMapper edgeAnnotationRowMapper;
+
+  public MatchViewGenerator()
+  {
+    // FIXME: totally ugly, but the query has fixed column names (and needs its own column aliasing)
+		// TableAccessStrategyFactory wants a corpus selection strategy
+		// solution: build AnnisNodes with API and refactor SqlGenerator to accept GROUP BY nodes
+		Map<String, String> nodeColumns = new HashMap<String, String>();
+		nodeColumns.put("namespace", "node_namespace");
+		nodeColumns.put("name", "node_name");
+		
+		Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
+		nodeAnnotationColumns.put("node_ref", "id");
+		nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
+		nodeAnnotationColumns.put("name", "node_annotation_name");
+		nodeAnnotationColumns.put("value", "node_annotation_value");
+		
+		Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
+		nodeAnnotationColumns.put("rank_ref", "pre");
+		edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
+		edgeAnnotationColumns.put("name", "edge_annotation_name");
+		edgeAnnotationColumns.put("value", "edge_annotation_value");
+		
+		Map<String, String> edgeColumns = new HashMap<String, String>();
+		edgeColumns.put("node_ref", "id");
+		edgeColumns.put("name", "edge_name");
+		edgeColumns.put("namespace", "edge_name");
+		
+		Map<String, Map<String, String>> columnAliases = new HashMap<String, Map<String, String>>();
+		columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
+		columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE, nodeAnnotationColumns);
+		columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE, edgeAnnotationColumns);
+		columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
+		
+		TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(null);
+		tableAccessStrategy.setColumnAliases(columnAliases);
+
+		annisNodeRowMapper = new AnnisNodeRowMapper();
+		annisNodeRowMapper.setTableAccessStrategy(tableAccessStrategy);
+		
+		edgeRowMapper = new EdgeRowMapper();
+		edgeRowMapper.setTableAccessStrategy(tableAccessStrategy);
+		
+		nodeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.NODE_ANNOTATION_TABLE);
+		nodeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
+		
+		edgeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.EDGE_ANNOTATION_TABLE);
+		edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
+  }
+
+
+  /**
+   *
+   * @param jdbcTemplate
+   * @param corpusList
+   * @param dddQuery
+   * @param offset
+   * @param limit
+   * @param left
+   * @param right
+   * @return the node count
+   */
+  public int createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
   {
     // parse query
     Start statement = dddQueryParser.parse(dddQuery);
@@ -44,28 +126,248 @@ public class MatchViewGenerator
     int nodeCount = queryAnalysis.analyzeQuery(statement, corpusList).getMaxWidth();
 
     // key for annotation graph matches
-    StringBuilder selectClause = new StringBuilder();
-    selectClause.append("id1");
-    for (int i = 2; i <= nodeCount; ++i)
-    {
-      selectClause.append(",");
-      selectClause.append("id");
-      selectClause.append(i);
-    }
+//    StringBuilder selectClause = new StringBuilder();
+//    for (int i = 1; i <= nodeCount; ++i)
+//    {
+//      if(i > 1)
+//      {
+//        selectClause.append(", ");
+//      }
+//      selectClause.append("id");
+//      selectClause.append(i);
+//
+//      selectClause.append(",");
+//      selectClause.append("left_token");
+//      selectClause.append(i);
+//
+//      selectClause.append(",");
+//      selectClause.append("right_token");
+//      selectClause.append(i);
+//
+//      selectClause.append(",");
+//      selectClause.append("text_ref");
+//      selectClause.append(i);
+//    }
 
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
     matchSb.append("CREATE TEMPORARY VIEW \"");
     matchSb.append(matchedNodesViewName);
     matchSb.append("\" AS\n");
-    matchSb.append("\t SELECT\n");
-    matchSb.append(selectClause);
+    matchSb.append("\t SELECT DISTINCT *\n");
     matchSb.append("\n\tFROM\n(\n");
     matchSb.append(sqlGenerator.toSql(statement, corpusList));
     matchSb.append("\n) as matched_ids");
 
-    return matchSb.toString();
+    jdbcTemplate.execute(matchSb.toString());
+
+    return nodeCount;
   }
+
+  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
+  {
+    createLimitedView(jdbcTemplate, nodeCount, offset, limit);
+    createResultView(jdbcTemplate, nodeCount);
+
+    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(left, right), this);
+  }
+
+  private void createLimitedView(JdbcTemplate jdbcTemplate, int nodeCount, long offset, long limit)
+  {
+    StringBuilder sbOrder = new StringBuilder();
+    for(int i=1; i <= nodeCount; i++)
+    {
+      if(i > 1)
+      {
+        sbOrder.append(", ");
+      }
+      sbOrder.append("id");
+      sbOrder.append(i);
+    }
+
+    String query =
+      "CREATE TEMPORARY VIEW limited AS\n"
+      + "SELECT row_number() OVER () AS resultid, *\n"
+      + "FROM (SELECT * FROM " + matchedNodesViewName + " ORDER BY " + sbOrder.toString() + ") AS m LIMIT " + limit + " OFFSET " + offset;
+
+    jdbcTemplate.execute(query);
+
+  }
+
+  private void createResultView(JdbcTemplate jdbcTemplate, int nodeCount)
+  {
+    StringBuilder q = new StringBuilder();
+
+    String[] fields = new String[] 
+    {
+      "id", "text_ref","left_token","right_token"
+    };
+
+    
+    // map the indexed columns to their "native" form without appended index
+    // and code the index in an extra column
+
+    q.append("CREATE TEMPORARY VIEW result AS\n");
+    for(int i=1; i<=nodeCount; i++)
+    {
+      if(i > 1)
+      {
+        q.append("\nUNION\n");
+      }
+
+      q.append("SELECT resultid AS resultid, ");
+      q.append(i);
+      q.append(" AS match_index");
+      for(String s : fields)
+      {
+        q.append(", ");
+        q.append(s);
+        q.append(i);
+        q.append(" AS ");
+        q.append(s);
+      }
+      q.append("\nFROM limited\n");
+    }
+
+    jdbcTemplate.execute(q.toString());
+
+  }
+
+  private String getContextQuery(int left, int right)
+  {
+    StringBuilder q = new StringBuilder();
+
+    q.append("SELECT DISTINCT * FROM (\n");
+    q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, ");
+    q.append(nodeTableViewName);
+    q.append(" AS f \n"
+      + "WHERE 	f.text_ref = r.text_ref AND f.left_token >= r.left_token - ");
+    q.append(left);
+    q.append(" AND f.right_token <= r.right_token + ");
+    q.append(right);
+    q.append("	\n"
+      + "AND f.id <> r.id \n"
+      + "UNION\n"
+      + "SELECT r.resultid AS resultid, r.match_index AS match_index, f.* FROM result AS r\n,");
+    q.append(nodeTableViewName);
+    q.append(" AS f\n"
+      + "WHERE f.id = r.id\n");
+    q.append("\n) as temp \nORDER BY resultid, pre");
+
+
+    return q.toString();
+  }
+
+  
+  @Override
+  public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException
+  {
+    List<AnnotationGraph> graphs = new LinkedList<AnnotationGraph>();
+
+    // fn: match group -> annotation graph
+		Map<Long, AnnotationGraph> graphByMatchGroup = new HashMap<Long, AnnotationGraph>();
+
+		// fn: node id -> node
+		Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
+
+		// fn: edge pre order value -> edge
+		Map<Long, Edge> edgeByPre = new HashMap<Long, Edge>();
+
+		int rowNum = 0;
+		while (resultSet.next()) {
+			// process result by match group
+			// match group is identified by the ids of the matched nodes
+      Long key = resultSet.getLong("resultid");
+      Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
+
+			if ( ! graphByMatchGroup.containsKey(key) ) {
+				log.debug("starting annotation graph for match: " + key);
+				AnnotationGraph graph = new AnnotationGraph();
+				graphs.add(graph);
+				graphByMatchGroup.put(key, graph);
+        
+				// clear mapping functions for this graph
+				// assumes that the result set is sorted by key, pre
+				nodeById.clear();
+				edgeByPre.clear();
+			}
+
+			AnnotationGraph graph = graphByMatchGroup.get(key);
+
+			// get node data
+			AnnisNode node = annisNodeRowMapper.mapRow(resultSet, rowNum);
+
+      
+      // add matched node id to the graph
+      long matchIndex = resultSet.getLong("match_index");
+      if(!resultSet.wasNull())
+      {
+        graph.addMatchedNodeId(node.getId());
+      }
+
+			// add node to graph if it is new, else get known copy
+			long id = node.getId();
+			if ( ! nodeById.containsKey(id) ) {
+				log.debug("new node: " + id);
+				nodeById.put(id, node);
+				graph.addNode(node);
+			} else {
+				node = nodeById.get(id);
+			}
+
+			// get edge data
+			Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
+
+			// add edge to graph if it is new, else get known copy
+			long pre = edge.getPre();
+			if ( ! edgeByPre.containsKey(pre) ) {
+				// fix source references in edge
+				edge.setDestination(node);
+				fixNodes(edge, edgeByPre, nodeById);
+
+				// add edge to src and dst nodes
+				node.addIncomingEdge(edge);
+				AnnisNode source = edge.getSource();
+				if (source != null)
+					source.addOutgoingEdge(edge);
+
+				log.debug("new edge: " + edge);
+				edgeByPre.put(pre, edge);
+				graph.addEdge(edge);
+			} else {
+				edge = edgeByPre.get(pre);
+			}
+
+			// add annotation data
+			Annotation nodeAnnotation = nodeAnnotationRowMapper.mapRow(resultSet, rowNum);
+			if (nodeAnnotation != null)
+				node.addNodeAnnotation(nodeAnnotation);
+			Annotation edgeAnnotation = edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
+			if (edgeAnnotation != null)
+				edge.addAnnotation(edgeAnnotation);
+		}
+    
+
+    return graphs;
+  }
+
+  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre, Map<Long, AnnisNode> nodeById) {
+		// pull source node from parent edge
+		AnnisNode source = edge.getSource();
+		if (source == null)
+			return;
+		long pre = source.getId();
+		Edge parentEdge = edgeByPre.get(pre);
+		AnnisNode parent = parentEdge != null ? parentEdge.getDestination() : null;
+//		log.debug("looking for node with rank.pre = " + pre + "; found: " + parent);
+		edge.setSource(parent);
+
+		// pull destination node from mapping function
+		long destinationId = edge.getDestination().getId();
+		edge.setDestination(nodeById.get(destinationId));
+	}
+
+  // getter/setter
 
   public String getNodeTableViewName()
   {
@@ -116,4 +418,47 @@ public class MatchViewGenerator
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
+
+  public AnnisNodeRowMapper getAnnisNodeRowMapper()
+  {
+    return annisNodeRowMapper;
+  }
+
+  public void setAnnisNodeRowMapper(AnnisNodeRowMapper annisNodeRowMapper)
+  {
+    this.annisNodeRowMapper = annisNodeRowMapper;
+  }
+
+  public AnnotationRowMapper getEdgeAnnotationRowMapper()
+  {
+    return edgeAnnotationRowMapper;
+  }
+
+  public void setEdgeAnnotationRowMapper(AnnotationRowMapper edgeAnnotationRowMapper)
+  {
+    this.edgeAnnotationRowMapper = edgeAnnotationRowMapper;
+  }
+
+  public EdgeRowMapper getEdgeRowMapper()
+  {
+    return edgeRowMapper;
+  }
+
+  public void setEdgeRowMapper(EdgeRowMapper edgeRowMapper)
+  {
+    this.edgeRowMapper = edgeRowMapper;
+  }
+
+  public AnnotationRowMapper getNodeAnnotationRowMapper()
+  {
+    return nodeAnnotationRowMapper;
+  }
+
+  public void setNodeAnnotationRowMapper(AnnotationRowMapper nodeAnnotationRowMapper)
+  {
+    this.nodeAnnotationRowMapper = nodeAnnotationRowMapper;
+  }
+
+  
+
 }

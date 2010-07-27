@@ -163,10 +163,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     }
 
     // generate the view with the matched node IDs
-    getJdbcTemplate().execute(matchViewGenerator.createSqlQuery(corpusList, dddQuery, offset, limit, left, right));
+    // TODO: make this dynamic
+    int nodeCount = matchViewGenerator.createMatchView(getJdbcTemplate(), corpusList, dddQuery, offset, limit, left, right);
 
     // create the Annis graphs
-    return (List<AnnotationGraph>) getJdbcTemplate().query(annotationGraphDaoHelper.createSqlQuery(corpusList, dddQuery, offset, limit, left, right), annotationGraphDaoHelper);
+    //return matchViewGenerator.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
+    return annotationGraphDaoHelper.queryAnnotationGraph(getJdbcTemplate(), nodeCount, corpusList, dddQuery, offset, limit, left, right);
   }
 
   @SuppressWarnings("unchecked")
