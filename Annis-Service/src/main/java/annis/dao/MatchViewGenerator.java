@@ -241,10 +241,19 @@ public class MatchViewGenerator implements ResultSetExtractor
     q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, ");
     q.append(nodeTableViewName);
     q.append(" AS f \n"
-      + "WHERE 	f.text_ref = r.text_ref AND f.left_token >= r.left_token - ");
+      + "WHERE 	f.text_ref = r.text_ref AND ((f.left_token >= r.left_token - ");
     q.append(left);
     q.append(" AND f.right_token <= r.right_token + ");
     q.append(right);
+    q.append(") OR (f.left_token <= r.left_token - ");
+    q.append(left);
+    q.append(" AND r.left_token - ");
+    q.append(left);
+    q.append(" <= f.right_token) OR (f.left_token <= r.right_token + ");
+    q.append(right);
+    q.append(" AND r.right_token + ");
+    q.append(right);
+    q.append(" <= f.right_token))");
     q.append("	\n"
       + "AND f.id <> r.id \n"
       + "UNION\n"
@@ -345,6 +354,8 @@ public class MatchViewGenerator implements ResultSetExtractor
 			Annotation edgeAnnotation = edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
 			if (edgeAnnotation != null)
 				edge.addAnnotation(edgeAnnotation);
+
+      rowNum++;
 		}
     
 
