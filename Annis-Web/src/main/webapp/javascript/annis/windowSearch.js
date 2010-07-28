@@ -10,7 +10,7 @@ var Citation = {
     var contextRaw = conf_context.substr(1);
     var reg = new RegExp(contextRaw + '.*', 'i');
     var citation = window.location.href.replace(reg, contextRaw + '/Cite/');
-    citation += "AQL(" + encodeURI(formPanelSearch.getComponent('queryAnnisQL').getValue()) + ")";
+    citation += "AQL(" + Url.encode(formPanelSearch.getComponent('queryAnnisQL').getValue()) + ")";
     citation += ",CIDS(";
     for(i=0;i<selections.length;i++) {
       if(i>0) { 
@@ -43,7 +43,7 @@ var Citation = {
         var value = pair[1];
 					
         if("AQL" == key) {
-          formPanelSearch.getComponent('queryAnnisQL').setValue(decodeURI(value.replace('"', '')));
+          formPanelSearch.getComponent('queryAnnisQL').setValue(Url.decode(value.replace('"', '')));
         } else if("CIDS" == key) {
           var cids = value.split(',');
           for(i=0;i<cids.length;i++) {
