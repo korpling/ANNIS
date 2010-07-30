@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  *
@@ -115,7 +116,7 @@ public class PartiturVisualizer extends WriterVisualizer
           if (event != null && type != ElementType.noEvent)
           {
             styleClass = "single_event";
-            quicktip = "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + event.getValue() + "\" ";
+            quicktip = "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(event.getValue()) + "\" ";
 
             // "eat up" token and use this info for colspan
             ElementType tmpType = type;
