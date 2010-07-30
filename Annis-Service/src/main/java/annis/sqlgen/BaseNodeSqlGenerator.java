@@ -2,6 +2,7 @@ package annis.sqlgen;
 
 import annis.model.AnnisNode;
 import annis.model.AnnisNode.TextMatching;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class BaseNodeSqlGenerator {
 
@@ -45,7 +46,7 @@ public class BaseNodeSqlGenerator {
 	}
 
 	protected String sqlString(String string) {
-		return "'" + string + "'";
+		return "'" + StringEscapeUtils.escapeSql(string) + "'";
 	}
 
 	protected String sqlString(String string, TextMatching textMatching) {
