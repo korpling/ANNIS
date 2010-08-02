@@ -670,7 +670,7 @@ var exportSelection = new Ext.form.ComboBox({
     frame:true,
     title: 'AnnisQL',
     header: false,
-    width: 330,
+    width: 340,
     height: 165,
     defaultType: 'textfield',
     monitorValid: true,
@@ -708,7 +708,7 @@ var exportSelection = new Ext.form.ComboBox({
 
 		    
   var panelSearchModes = new Ext.TabPanel({
-    width: 330,
+    width: 340,
     height: 160,
     activeTab: 0,
     items: [
@@ -720,7 +720,7 @@ var exportSelection = new Ext.form.ComboBox({
 			
   var panelSearch = new Ext.Panel({
     region: 'west',
-    width: 330,
+    width: 340,
     layout: "vbox",
     items: [formPanelSearch,corpusGrid, panelSearchModes]
   });
