@@ -458,35 +458,58 @@ Ext.onReady(function() {
     {
       var output = '';
 
-      var markerString = '';
-      var first = true;
+      var markerString = {};
+      var seen = {};
       for(key in rowData.marker)
       {
         if(rowData.marker[key] != null && rowData.marker[key] != '')
         {
-          if(!first)
+          var color = rowData.marker[key];
+          if(seen[color] != null)
           {
-            markerString += ',';
+            markerString[color] += ',';
           }
-          first = false;
-          
-          markerString += key;
+          else
+          {
+            markerString[color] = '';
+          }
+          seen[color] = true;
+          markerString[color] += key;   
         }
       }
-      var markerExactString = '';
-      first = true;
+
+      var markerParam = '';
+      for(c in markerString)
+      {
+        markerParam += '&mark:' + c + '=' + markerString[c];
+      }
+
+      var markerExactString = {};
+      seen = {};
       for(key in rowData.markerExact)
       {
         if(rowData.markerExact[key] != null && rowData.markerExact[key] != '')
         {
-          if(!first)
-          {
-            markerExactString += ',';
-          }
-          first = false;
 
-          markerExactString += key;
+          var color = rowData.markerExact[key];
+          if(seen[color] != null)
+          {
+            markerExactString[color] += ',';
+          }
+          else
+          {
+            markerExactString[color] = '';
+          }
+          seen[color] = true;
+          markerExactString[color] += key;
+
         }
+      }
+
+      var markerExactParam = '';
+      for(c in markerExactString)
+      {
+        markerExactParam += '&markExact:' + c + '=' + markerExactString[c];
       }
 
       
@@ -508,8 +531,8 @@ Ext.onReady(function() {
             + '&textId=' + rowData.textIdList[0]
             + '&namespace=' + vis.namespace
             + '&vistype=' + vis.vistype
-            + '&mark:red=' + markerString
-            + '&markExact:red=' + markerExactString
+            + markerParam
+            + markerExactParam
             + '" ></iframe>' +
     '						</div>\n';
       }
