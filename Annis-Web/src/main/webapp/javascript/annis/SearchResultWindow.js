@@ -460,11 +460,12 @@ Ext.onReady(function() {
 
       var markerString = {};
       var seen = {};
+      var color = 0;
       for(key in rowData.marker)
       {
         if(rowData.marker[key] != null && rowData.marker[key] != '')
         {
-          var color = rowData.marker[key];
+          color = rowData.marker[key];
           if(seen[color] != null)
           {
             markerString[color] += ',';
@@ -491,7 +492,7 @@ Ext.onReady(function() {
         if(rowData.markerExact[key] != null && rowData.markerExact[key] != '')
         {
 
-          var color = rowData.markerExact[key];
+          color = rowData.markerExact[key];
           if(seen[color] != null)
           {
             markerExactString[color] += ',';
