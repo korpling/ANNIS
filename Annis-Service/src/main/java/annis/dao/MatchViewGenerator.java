@@ -282,19 +282,6 @@ public class MatchViewGenerator implements ResultSetExtractor
 			// get node data
 			AnnisNode node = annisNodeRowMapper.mapRow(resultSet, rowNum);
 
-      
-      // add matched node id to the graph
-      long matchIndex = resultSet.getLong("match_index");
-      if(!resultSet.wasNull())
-      {
-        graph.addMatchedNodeId(node.getId());
-        node.setMatchedNodeInQuery(matchIndex);
-      }
-      else
-      {
-        node.setMatchedNodeInQuery(null);
-      }
-
 			// add node to graph if it is new, else get known copy
 			long id = node.getId();
 			if ( ! nodeById.containsKey(id) ) {
@@ -304,6 +291,18 @@ public class MatchViewGenerator implements ResultSetExtractor
 			} else {
 				node = nodeById.get(id);
 			}
+      
+      // add matched node id to the graph
+      long matchIndex = resultSet.getLong("match_index");
+      if(!resultSet.wasNull())
+      {
+        graph.addMatchedNodeId(id);
+        node.setMatchedNodeInQuery(matchIndex);
+      }
+      else if(!graph.getMatchedNodeIds().contains(id))
+      {
+        node.setMatchedNodeInQuery(null);
+      }
 
 			// get edge data
 			Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
