@@ -415,7 +415,7 @@ public class SearchResultServlet extends HttpServlet
     // add all covered nodes
     for (AnnisNode n : graph.getNodes())
     {
-      if (matchedNodes.contains(n.getId()))
+      if (matchedNodes.contains(n.getId()) && n.getMatchedNodeInQuery() != null)
       {
         Long matchPosition = n.getMatchedNodeInQuery();
         matchedAndCovered.put(n,matchPosition);
