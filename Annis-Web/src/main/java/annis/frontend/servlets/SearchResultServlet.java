@@ -67,6 +67,11 @@ public class SearchResultServlet extends HttpServlet
 
   private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
+  public enum MatchedNodeColors
+  {
+    Red, MediumVioletRed, OrangeRed, IndianRed, DarkRed, LimeGreen, YellowGreen,Peru
+  }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse rep) throws ServletException, IOException
   {
@@ -336,14 +341,14 @@ public class SearchResultServlet extends HttpServlet
 
     json.putOnce("visualizer", visusalizer);
 
-    Set<Long> markedAndCoveredIDs = calculateMarkedAndCoveredIDs(result.getGraph());
+    Map<AnnisNode,Long> markedAndCoveredNodes = calculateMarkedAndCoveredIDs(result.getGraph());
 
     HashSet<Long> textIdListFromResult = new HashSet<Long>();
     LinkedList<JSONObject> tokenList = new LinkedList<JSONObject>();
     for (AnnisNode n : result.getGraph().getTokens())
     {
       // put first match corpus id into result
-      if(!json.has("corpusId") && markedAndCoveredIDs.contains(n.getId()))
+      if(!json.has("corpusId") && markedAndCoveredNodes.containsKey(n))
       {
         json.putOnce("corpusId", "" + n.getCorpus());
       }
@@ -373,43 +378,54 @@ public class SearchResultServlet extends HttpServlet
     }
 
     Map<String,String> markedAndCoveredAsMap = new TreeMap<String, String>();
+    Map<String,String> markedExactAsMap = new TreeMap<String, String>();
 
-    for(long l : markedAndCoveredIDs)
+
+    for(AnnisNode n : markedAndCoveredNodes.keySet())
     {
-      markedAndCoveredAsMap.put("" + l, "red");
-    }
+      Long matchNodeInQuery = markedAndCoveredNodes.get(n);
+      if(matchNodeInQuery != null)
+      {
+        long pos =  matchNodeInQuery;
+        int color = Math.min((int) (pos-1), (MatchedNodeColors.values().length-1));
+        color = Math.max(color, 0);
+        markedAndCoveredAsMap.put("" + n.getId(), MatchedNodeColors.values()[color].name());
 
-    Map<String,String> markedAsMap = new TreeMap<String, String>();
 
-    for(long l : result.getGraph().getMatchedNodeIds())
-    {
-      markedAsMap.put("" + l, "red");
+        if(result.getGraph().getMatchedNodeIds().contains(n.getId()))
+        {
+          markedExactAsMap.put("" + n.getId(), MatchedNodeColors.values()[color].name());
+        }
+      }
     }
 
     json.putOnce("marker", markedAndCoveredAsMap);
-    json.putOnce("markerExact", markedAsMap);
+    json.putOnce("markerExact", markedExactAsMap);
     json.putOnce("textIdList", textIdListFromResult);
     json.putOnce("token", tokenList);
 
     return json;
   }
 
-  private Set<Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)
+  private Map<AnnisNode,Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)
   {
     Set<Long> matchedNodes = graph.getMatchedNodeIds();
-    Set<Long> matchedAndCovered = new HashSet<Long>(matchedNodes);
+    Map<AnnisNode,Long> matchedAndCovered = new HashMap<AnnisNode, Long>();
 
     // add all covered nodes
     for (AnnisNode n : graph.getNodes())
     {
       if (matchedNodes.contains(n.getId()))
       {
+        Long matchPosition = n.getMatchedNodeInQuery();
+        matchedAndCovered.put(n,matchPosition);
+
         long left = n.getLeftToken();
         long right = n.getRightToken();
 
         for (long i = left; i <= right; i++)
         {
-          matchedAndCovered.add(graph.getToken(i).getId());
+          matchedAndCovered.put(graph.getToken(i), matchPosition);
         }
       }
     }

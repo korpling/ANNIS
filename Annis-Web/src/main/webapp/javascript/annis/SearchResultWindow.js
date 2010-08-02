@@ -405,7 +405,9 @@ Ext.onReady(function() {
       }
       else
       {
-        output += '<td class="SearchResultWindow token hit" >';
+        output += '<td class="SearchResultWindow token hit" style="color:'
+          + marker[token.id]
+          +'">';
       }
       if(token != null && token.text != null)
       {

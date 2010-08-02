@@ -50,6 +50,7 @@ public class AnnisNode implements Serializable
   private Range tokenArity;
   // for sql generation
   private String marker;
+  private Long matchedNodeInQuery;
 
   public enum TextMatching
   {
@@ -657,5 +658,17 @@ public class AnnisNode implements Serializable
   {
     this.tokenArity = tokenArity;
   }
+
+  public Long getMatchedNodeInQuery()
+  {
+    return matchedNodeInQuery;
+  }
+
+  public void setMatchedNodeInQuery(Long matchedNodeInQuery)
+  {
+    this.matchedNodeInQuery = matchedNodeInQuery;
+  }
+
+  
 }
 

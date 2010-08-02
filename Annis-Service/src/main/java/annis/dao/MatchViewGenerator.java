@@ -125,30 +125,6 @@ public class MatchViewGenerator implements ResultSetExtractor
     // get number of nodes in match
     int nodeCount = queryAnalysis.analyzeQuery(statement, corpusList).getMaxWidth();
 
-    // key for annotation graph matches
-//    StringBuilder selectClause = new StringBuilder();
-//    for (int i = 1; i <= nodeCount; ++i)
-//    {
-//      if(i > 1)
-//      {
-//        selectClause.append(", ");
-//      }
-//      selectClause.append("id");
-//      selectClause.append(i);
-//
-//      selectClause.append(",");
-//      selectClause.append("left_token");
-//      selectClause.append(i);
-//
-//      selectClause.append(",");
-//      selectClause.append("right_token");
-//      selectClause.append(i);
-//
-//      selectClause.append(",");
-//      selectClause.append("text_ref");
-//      selectClause.append(i);
-//    }
-
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
     matchSb.append("CREATE TEMPORARY VIEW \"");
@@ -312,6 +288,11 @@ public class MatchViewGenerator implements ResultSetExtractor
       if(!resultSet.wasNull())
       {
         graph.addMatchedNodeId(node.getId());
+        node.setMatchedNodeInQuery(matchIndex);
+      }
+      else
+      {
+        node.setMatchedNodeInQuery(null);
       }
 
 			// add node to graph if it is new, else get known copy
