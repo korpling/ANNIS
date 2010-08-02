@@ -1,5 +1,6 @@
 package annis.frontend.servlets.visualizers.tree;
 
+import annis.frontend.servlets.MatchedNodeColors;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -72,11 +73,23 @@ public class TigerTreeVisualizer extends Visualizer {
 
 		@Override
 		public Shape getShape(AnnisNode n) {
-			if (isQueryMatch(n)) {
+			if (isQueryMatch(n)) 
+      {
+        // get CSS color name
+        String backColorName = getMarkableMap().get(""+n.getId());
+        Color backColor = Color.RED;
+        try
+        {
+          backColor = MatchedNodeColors.valueOf(backColorName).getColor();
+        }
+        catch(IllegalArgumentException ex)
+        {}
+
 				if (n.isToken()) {
-					return new Shape.Rectangle(Color.WHITE, Color.RED, DEFAULT_PEN_STYLE, getLabelPadding());
-				} else {
-					return new Shape.Ellipse(Color.WHITE, Color.RED, DEFAULT_PEN_STYLE, getLabelPadding());
+					return new Shape.Rectangle(Color.WHITE, backColor, DEFAULT_PEN_STYLE, getLabelPadding());
+				} else
+        {          
+					return new Shape.Ellipse(Color.WHITE, backColor, DEFAULT_PEN_STYLE, getLabelPadding());
 				}				
 			} else {
 				if (n.isToken()) {

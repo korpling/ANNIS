@@ -67,11 +67,6 @@ public class SearchResultServlet extends HttpServlet
 
   private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
-  public enum MatchedNodeColors
-  {
-    Red, MediumVioletRed, OrangeRed, IndianRed, DarkRed, LimeGreen, YellowGreen,Peru
-  }
-
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse rep) throws ServletException, IOException
   {
