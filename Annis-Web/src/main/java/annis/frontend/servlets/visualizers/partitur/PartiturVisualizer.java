@@ -20,6 +20,7 @@ import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,98 +89,120 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append("<table class=\"partitur_table\" >\n");
       }
 
+     for(int iterator=0;iterator<partitur.getNameslist().size();iterator++){
 
-      for (String tier : tierNames)
-      {
-        writer.append("<tr id=\"level_" + tier + "\">");
+          String tier = (String)partitur.getNameslist().toArray()[iterator];
+          List<Long> indexlist = new LinkedList<Long>();
 
-        writer.append("<th>" + tier + "</th>");
-
-        Iterator<PartiturParser.Token> itToken = partitur.getToken().iterator();
-        while (itToken.hasNext())
-        {
-          PartiturParser.Token token = itToken.next();
-
-          String val = "";
-          String color = "";
-          String styleClass = "";
-
-          StringBuffer tokenIdsArray = new StringBuffer();
-          StringBuffer eventIdsArray = new StringBuffer();
-
-          String quicktip = "";
-          int colspan = 1;
-
-          ElementType type = getTypeForToken(token, tier);
-          PartiturParser.Event event = token.getTier2Event().get(tier);
-
-          if (event != null && type != ElementType.noEvent)
-          {
-            styleClass = "single_event";
-            quicktip = "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(event.getValue()) + "\" ";
-
-            // "eat up" token and use this info for colspan
-            ElementType tmpType = type;
-
-            while (itToken.hasNext()
-              && tmpType != ElementType.end && tmpType != ElementType.single)
-            {
-              PartiturParser.Token tmpToken = itToken.next();
-              tmpType = getTypeForToken(tmpToken, tier);
-              colspan++;
-            }
-
-            color = "black";
-            if (getMarkableMap().containsKey("" + event.getId()))
-            {
-              color = getMarkableMap().get("" + event.getId());
-            }
-            val = event.getValue();
-
-            // token ids containing the same event: for Javascript highlighting
-
-            // current token is included in every case
-            tokenIdsArray.append("" + token.getId());
-            eventIdsArray.append(tier + "_" + token.getId());
-
-            // go to the end of the event
-            PartiturParser.Token tmp = token.getAfter();
-            boolean proceed = true;
-
-            while (tmp != null && proceed)
-            {
-              PartiturParser.Event tmpEvent = tmp.getTier2Event().get(tier);
-              if (tmpEvent != null && tmpEvent.getId() == event.getId())
-              {
-                tokenIdsArray.append("," + tmp.getId());
-                eventIdsArray.append("," + tier + "_" + tmp.getId());
-              }
-              else
-              {
-                proceed = false;
-              }
-
-              tmp = tmp.getAfter();
-            }
-
+          for(int iterator2=0; iterator2<partitur.getResultlist().size();iterator2++){
+                for (PartiturParser.ResultElement strr: partitur.getResultlist().get(iterator2)){
+                    if (strr.getName().equals(tier) && !indexlist.contains(strr.getId())) {indexlist.add(strr.getId());}
+                }
           }
 
-          writer.append("<td class=\"" + styleClass + "\" "
-            + "id=\"event_" + tier + "_" + token.getId() + "\" "
-            + "style=\"color:" + color + ";\" "
-            + "colspan=" + colspan + " "
-            + "annis:tokenIds=\"" + tokenIdsArray + "\" "
-            + "annis:eventIds=\"" + eventIdsArray + "\" "
-            + quicktip + " "
-            + "onMouseOver=\"toggleAnnotation(this, true);\" "
-            + "onMouseOut=\"toggleAnnotation(this, false);\""
-            + ">" + val + "</td>");
+          List<Long> currentarray = new LinkedList<Long>(); //Saves annotation-ids of the current row
 
-        }
-        writer.append("</tr>");
+          while (!indexlist.isEmpty()){ //Create Rows until all Annotations fit in
+             //TODO: Problem: Bei der Auswahr der anzuzeigenden Elementen kann nur
+            //die erste Zeile jeder Gruppe verborgen werden,
+            //die anderen Zeilen habe die selbe id, werden daher nicht gefunden.
+            List<Long> currentdontuselist = new LinkedList<Long>(); //Lists all Annotations that should not be added to the current row
+            writer.append("<tr id=\"level_"+tier+"\"><th>" + tier +  "</th>"); //new row
+            currentarray.clear();
+            for (int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++) {currentarray.add(Long.MIN_VALUE);} //Long.MIN_VALUE == empty
+            for(int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++){ //for each Token
+                    for (PartiturParser.ResultElement annotationelement: partitur.getResultlist().get(iterator3)){ // for each Annotation annotationelement of that Token
+                        if (indexlist.contains(annotationelement.getId()) && !currentdontuselist.contains(annotationelement.getId())){
+                            boolean neu=false; //Should the Annotation be added?
+                            if (currentarray.get(iterator3).equals(Long.MIN_VALUE)) {
+                                indexlist.remove(annotationelement.getId());
+                                currentarray.set(iterator3, annotationelement.getId());
+                                neu=true;
+                            }
+                            //get all other annotationelement.id (earlier Ids => dontuselist)
+                            for(int iterator4=0; iterator4<partitur.getResultlist().size();iterator4++){
+                                for (PartiturParser.ResultElement strr2: partitur.getResultlist().get(iterator4)){
+                                    if (strr2.getId()==annotationelement.getId() && neu) //{
+                                        if (currentarray.get(iterator4)==Long.MIN_VALUE) currentarray.set(iterator4, annotationelement.getId());
+                                        if (iterator4<=iterator3 && !currentdontuselist.contains(strr2.getId())) {
+                                            currentdontuselist.add(strr2.getId());
+                                        }
+                                }
+                            }
+                            //break; //Not needed?
+                        }
+                    }
+                }
+         
 
+            //Write Row
+            int length=1;
+            for(int iterator5=0; iterator5<currentarray.size();iterator5+=length){
+                StringBuffer tokenIdsArray = new StringBuffer();
+                StringBuffer eventIdsArray = new StringBuffer();
+                boolean unused = true;
+                length=1;
+                if (currentarray.get(iterator5)==Long.MIN_VALUE){ //empty entry
+                     writer.append("<th />");
+                }else{
+                    PartiturParser.ResultElement element=null;
+                    HashSet<Integer> common = new HashSet<Integer>();
+                    boolean found=false;
+                    for(int iterator6=0; iterator6<partitur.getResultlist().size();iterator6++){
+                                for (PartiturParser.ResultElement strr: partitur.getResultlist().get(iterator6)){
+                                    if (strr.getId()==currentarray.get(iterator5)) {
+                                        if (!found) element=strr;
+                                        if (!common.contains(iterator6)) common.add(iterator6);
+                                        found=true;
+                                        //TODO: Problem: bei gespaltenen Annotationen kann nur
+                                        //der erste Teileintrag in der Tabelle markiert werden,
+                                        //da alle Teile einer Annotation die selbe id haben (id der Annotation)
+                                        if (unused) {
+                                            tokenIdsArray.append("" + strr.getId());
+                                            eventIdsArray.append(tier + "_" + strr.getId());
+                                            unused=false;
+                                        } else{
+                                            tokenIdsArray.append("," + strr.getId());
+                                            eventIdsArray.append(","+tier + "_" + strr.getId());
+                                        }
+                                    }
+                                }
+                    }
+                    for (int iterator7=iterator5+1; iterator7<currentarray.size();iterator7++)
+                        if (common.contains(iterator7)) {
+                            length++;
+                        }
+                        else break;
+
+                    for (int iterator8=0; iterator8<currentarray.size();iterator8++)
+                        if (common.contains(iterator8)) {
+                            Long id = ((PartiturParser.Token)partitur.getToken().toArray()[iterator8]).getId();
+                            if (unused) {
+                                tokenIdsArray.append("" + id);
+                                eventIdsArray.append(tier + "_" + id);
+                                unused=false;
+                            } else{
+                                tokenIdsArray.append("," + id);
+                                eventIdsArray.append(","+tier + "_" + id);
+                            }
+                        }
+                    if (found)
+                         writer.append("<td class=\"single_event\" "
+                            + "id=\"event_" + tier + "_" + element.getId() + "\" "
+                            + "style=\"color:black;\" "
+                            + "colspan=" + length + " "
+                            + "annis:tokenIds=\"" + tokenIdsArray + "\" "
+                            + "annis:eventIds=\"" + eventIdsArray + "\" "
+                            + "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
+                            + "onMouseOver=\"toggleAnnotation(this, true);\" "
+                            + "onMouseOut=\"toggleAnnotation(this, false);\""
+                             + ">" + element.getValue() + "</td>");
+                    else writer.append("<td class=\"single_event\" >error</td>");
+                }
+            }
+            writer.append("</tr>");     //finish row
+          }
       }
-
 
       // add token itself
       writer.append("<tr><th>tok</th>");

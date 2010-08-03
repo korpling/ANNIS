@@ -40,8 +40,39 @@ public class PartiturParser implements Serializable
   private Set<String> knownTiers;
   private HashMap<String, String> tier2ns;
 
+  private HashSet<String> nameslist;  
+  private List<List<ResultElement>> resultlist;
+  private int anzahl;
+
   public PartiturParser(AnnotationGraph graph, String namespace)
   {
+    resultlist = new LinkedList<List<ResultElement>>();
+    nameslist = new HashSet<String>();
+    anzahl=0;
+
+    for (AnnisNode n : graph.getTokens()){anzahl++;}
+
+    for (AnnisNode n : graph.getTokens())
+    {
+         List<ResultElement> helper = new LinkedList<ResultElement>();
+        for(Edge edge : n.getIncomingEdges())
+        {
+            if(edge.getEdgeType() == Edge.EdgeType.COVERAGE)
+            {
+                AnnisNode parentNode = edge.getSource();
+                if(parentNode.getNamespace().equals(namespace))
+                {
+                    for(Annotation anno : parentNode.getNodeAnnotations()){
+                        helper.add(new ResultElement(parentNode.getId(), anno.getName(), anno.getValue()));
+                        if (!nameslist.contains(anno.getName())) { nameslist.add(anno.getName());
+                        }
+                    }
+                }
+            }
+        }
+        resultlist.add(helper);
+   }
+
     token = new LinkedList<Token>();
     knownTiers = new HashSet<String>();
 
@@ -61,10 +92,11 @@ public class PartiturParser implements Serializable
         if(edge.getEdgeType() == Edge.EdgeType.COVERAGE)
         {
           AnnisNode parentNode = edge.getSource();
-          for(Annotation anno : parentNode.getNodeAnnotations())
+
+          if(parentNode.getNamespace().equals(namespace))
           {
-            if(parentNode.getNamespace().equals(namespace))
-            {
+              for(Annotation anno : parentNode.getNodeAnnotations())
+              {
               // finally, put this annotation in the list
               Event newEvent = new Event(parentNode.getId(), anno.getValue());
               currentToken.getTier2Event().put(anno.getName(), newEvent);
@@ -95,6 +127,10 @@ public class PartiturParser implements Serializable
     }
 
   }
+
+  public HashSet<String> getNameslist() {return nameslist;}
+
+  public List<List<ResultElement>> getResultlist() {return resultlist;}
 
   public Set<String> getKnownTiers()
   {
@@ -187,4 +223,18 @@ public class PartiturParser implements Serializable
       return value;
     }
   }
+
+  public class ResultElement{
+      private long id;
+      private String name,value;
+
+      public String getName() {return name;}
+      public long getId() {return id;}
+      public String getValue() {return value;}
+
+      ResultElement(long i, String n,String v){
+          id=i;name=n;value=v;
+      }
+  }
+
 }
