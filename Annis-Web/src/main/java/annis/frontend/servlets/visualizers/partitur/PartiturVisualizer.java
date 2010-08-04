@@ -107,7 +107,7 @@ public class PartiturVisualizer extends WriterVisualizer
             //die erste Zeile jeder Gruppe verborgen werden,
             //die anderen Zeilen habe die selbe id, werden daher nicht gefunden.
             List<Long> currentdontuselist = new LinkedList<Long>(); //Lists all Annotations that should not be added to the current row
-            writer.append("<tr id=\"level_"+tier+"\"><th>" + tier +  "</th>"); //new row
+            writer.append("<tr class=\"level_"+tier+"\"><th>" + tier +  "</th>"); //new row
             currentarray.clear();
             for (int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++) {currentarray.add(Long.MIN_VALUE);} //Long.MIN_VALUE == empty
             for(int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++){ //for each Token
@@ -143,7 +143,7 @@ public class PartiturVisualizer extends WriterVisualizer
                 boolean unused = true;
                 length=1;
                 if (currentarray.get(iterator5)==Long.MIN_VALUE){ //empty entry
-                     writer.append("<th />");
+                     writer.append("<td></td>");
                 }else{
                     PartiturParser.ResultElement element=null;
                     HashSet<Integer> common = new HashSet<Integer>();
@@ -154,16 +154,13 @@ public class PartiturVisualizer extends WriterVisualizer
                                         if (!found) element=strr;
                                         if (!common.contains(iterator6)) common.add(iterator6);
                                         found=true;
-                                        //TODO: Problem: bei gespaltenen Annotationen kann nur
-                                        //der erste Teileintrag in der Tabelle markiert werden,
-                                        //da alle Teile einer Annotation die selbe id haben (id der Annotation)
                                         if (unused) {
-                                            tokenIdsArray.append("" + strr.getId());
-                                            eventIdsArray.append(tier + "_" + strr.getId());
+                                            tokenIdsArray.append("" + strr.getId() + "_" + iterator6);
+                                            eventIdsArray.append(tier + "_" + strr.getId() + "_" + iterator6);
                                             unused=false;
                                         } else{
-                                            tokenIdsArray.append("," + strr.getId());
-                                            eventIdsArray.append(","+tier + "_" + strr.getId());
+                                            tokenIdsArray.append("," + strr.getId() + "_" + iterator6);
+                                            eventIdsArray.append(","+tier + "_" + strr.getId() + "_" + iterator6);
                                         }
                                     }
                                 }
@@ -188,7 +185,7 @@ public class PartiturVisualizer extends WriterVisualizer
                         }
                     if (found)
                          writer.append("<td class=\"single_event\" "
-                            + "id=\"event_" + tier + "_" + element.getId() + "\" "
+                            + "id=\"event_" + tier + "_" + element.getId() + "_" + iterator5 + "\" "
                             + "style=\"color:black;\" "
                             + "colspan=" + length + " "
                             + "annis:tokenIds=\"" + tokenIdsArray + "\" "
