@@ -420,7 +420,11 @@ public class SearchResultServlet extends HttpServlet
 
         for (long i = left; i <= right; i++)
         {
-          matchedAndCovered.put(graph.getToken(i), matchPosition);
+          Long oldTokenPosition = matchedAndCovered.get(graph.getToken(i));
+          if(oldTokenPosition == null || matchPosition.compareTo(oldTokenPosition) >= 0 )
+          {
+            matchedAndCovered.put(graph.getToken(i), matchPosition);
+          }
         }
       }
     }
