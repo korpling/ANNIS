@@ -103,9 +103,6 @@ public class PartiturVisualizer extends WriterVisualizer
           List<Long> currentarray = new LinkedList<Long>(); //Saves annotation-ids of the current row
 
           while (!indexlist.isEmpty()){ //Create Rows until all Annotations fit in
-             //TODO: Problem: Bei der Auswahr der anzuzeigenden Elementen kann nur
-            //die erste Zeile jeder Gruppe verborgen werden,
-            //die anderen Zeilen habe die selbe id, werden daher nicht gefunden.
             List<Long> currentdontuselist = new LinkedList<Long>(); //Lists all Annotations that should not be added to the current row
             writer.append("<tr class=\"level_"+tier+"\"><th>" + tier +  "</th>"); //new row
             currentarray.clear();

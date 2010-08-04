@@ -28,10 +28,15 @@ Ext.onReady(function(){
   toolbarPartiture.doLayout();
 
   function onItemCheck(item, checked){
-    var element = Ext.get("level_" + item.getId());
-    element.setVisible(checked);
-    element.setDisplayed(checked ? "" : "none");
-  }
+    var elements = Ext.query(".level_" + item.getId());
+    Ext.each(elements, function(domitem,index)     {
+       var item = Ext.get(domitem);
+       item.setVisible(checked);
+       item.setDisplayed(checked ? "" : "none")
+    });
+ }
+
+  //var element = Ext.get("level_" + item.getId());
 
 });
 
