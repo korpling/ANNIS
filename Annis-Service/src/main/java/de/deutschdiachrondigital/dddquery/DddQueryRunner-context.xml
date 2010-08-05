@@ -45,6 +45,7 @@
 		<property name="listCorpusHelper" ref="listCorpusSqlHelper"/>
 		<property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
 		<property name="annotationGraphDotExporter" ref="annotationGraphDotExporter"/>
+    <property name="queryAnalysis" ref="queryAnalysis" />
 		
 		<property name="tableFormatter"><bean class="annis.TableFormatter"/></property>
 		

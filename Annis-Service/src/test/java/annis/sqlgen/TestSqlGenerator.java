@@ -46,13 +46,13 @@ public class TestSqlGenerator {
 	// SqlGenerator that is managed by Spring
 	@Autowired @Qualifier("find") private SqlGenerator springManagedSqlGenerator;
 	@Autowired private DddQueryParser parser;
+  @Autowired private QueryAnalysis springManagedQueryAnalysis;
 
 	@Before
 	public void setup() {
 		initMocks(this);
 		sqlGenerator = new SqlGenerator();
 		sqlGenerator.setClauseSqlGenerator(clauseSqlGenerator);
-		sqlGenerator.setQueryAnalysis(queryAnalysis);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -81,15 +81,12 @@ public class TestSqlGenerator {
 		final String sql2 = "SELECT 2";
 		sqlGenerator.setClauseSqlGenerator(clauseSqlGenerator);
 		when(clauseSqlGenerator.toSql(anyList(), anyInt(), anyList(), anyList())).thenReturn(sql1, sql2);
-		
-		// convert statement to SQL
-		String sql = sqlGenerator.toSql(statement, corpusList);
+
+    // convert statement to SQL
+		String sql = sqlGenerator.toSql(queryData, corpusList);
 		
 		// verify flow control
-	
-		// first the query is analyzed
-		verify(queryAnalysis).analyzeQuery(statement, corpusList);
-		
+    
 		// each clause (list of nodes) is transformed to SQL with correct width
 		verify(clauseSqlGenerator).toSql(nodes1, maxWidth, corpusList, metaData);
 		verify(clauseSqlGenerator).toSql(nodes2, maxWidth, corpusList, metaData);
@@ -103,7 +100,6 @@ public class TestSqlGenerator {
 	@Test
 	public void springManagedInstanceHasAllDependencies() {
 		assertThat(springManagedSqlGenerator.getClauseSqlGenerator(), is(not(nullValue())));
-		assertThat(springManagedSqlGenerator.getQueryAnalysis(), is(not(nullValue())));
 		ClauseSqlGenerator clauseSqlGenerator = springManagedSqlGenerator.getClauseSqlGenerator();
 		assertThat(clauseSqlGenerator, is(not(nullValue())));
 		assertThat(clauseSqlGenerator.getSelectClauseSqlGenerators(), is(not(empty())));
@@ -123,7 +119,8 @@ public class TestSqlGenerator {
 
 	private void dumpSql(String input) {
 		System.out.println("-- " + input);
-		System.out.println(springManagedSqlGenerator.toSql(parser.parse((input)), null));
+		System.out.println(springManagedSqlGenerator.toSql(
+      springManagedQueryAnalysis.analyzeQuery(parser.parse((input)), null), null));
 		System.out.println();
 	}
 

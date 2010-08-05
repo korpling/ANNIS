@@ -7,9 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import annis.model.AnnisNode;
-import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
-import de.deutschdiachrondigital.dddquery.node.Start;
 
 
 public class SqlGenerator
@@ -19,12 +17,8 @@ public class SqlGenerator
 	
 	// dependencies
 	private ClauseSqlGenerator clauseSqlGenerator;
-	private QueryAnalysis queryAnalysis;
 	
-	public String toSql(Start statement, List<Long> corpusList) {
-
-		// analyze the statement
-		QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+	public String toSql(QueryData queryData, List<Long> corpusList) {
 		
 		// build SQL query
 		List<String> subQueries = new ArrayList<String>();
@@ -46,14 +40,6 @@ public class SqlGenerator
 
 	public void setClauseSqlGenerator(ClauseSqlGenerator clauseSqlGenerator) {
 		this.clauseSqlGenerator = clauseSqlGenerator;
-	}
-
-	public QueryAnalysis getQueryAnalysis() {
-		return queryAnalysis;
-	}
-
-	public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
-		this.queryAnalysis = queryAnalysis;
 	}
 
 }

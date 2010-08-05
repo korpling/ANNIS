@@ -157,13 +157,11 @@
 	<bean id="findSqlGenerator" class="annis.sqlgen.SqlGenerator">
 		<qualifier value="find"/>
 		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
-		<property name="queryAnalysis" ref="queryAnalysis"/>
 	</bean>
 	
 	<!-- CountSqlGenerator: generates a SQL statement for a DDDquery which counts the results -->
 	<bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator">
 		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
-		<property name="queryAnalysis" ref="queryAnalysis"/>
 	</bean>
 	
 </beans>

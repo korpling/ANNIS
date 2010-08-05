@@ -8,6 +8,7 @@ import annis.sqlgen.ClauseAnalysis;
 import annis.sqlgen.DnfTransformer;
 import de.deutschdiachrondigital.dddquery.node.PExpr;
 import de.deutschdiachrondigital.dddquery.node.Start;
+import java.util.LinkedList;
 
 public class QueryAnalysis {
 
@@ -22,9 +23,13 @@ public class QueryAnalysis {
 		// save the corpus list
 		queryData.setCorpusList(corpusList);
 		
+    List<PExpr> clauses = new LinkedList<PExpr>();
+
 		// split statement into list of clauses
-		statement.apply(dnfTransformer);
-		List<PExpr> clauses = dnfTransformer.listClauses(statement);
+
+    statement.apply(dnfTransformer);
+    clauses = dnfTransformer.listClauses(statement);
+
 		log.debug(clauses.size() + " clause(s) in statement");
 		
 		// analyze each clause independently

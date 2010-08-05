@@ -102,7 +102,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setQueryAnalysis(queryAnalysis);
 
 		when(dddQueryParser.parse(anyString())).thenReturn(STATEMENT);
-		when(sqlGenerator.toSql(any(Start.class), anyList())).thenReturn(SQL);
+		when(sqlGenerator.toSql(any(QueryData.class), anyList())).thenReturn(SQL);
 		
 		simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
 	}
@@ -158,7 +158,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		
 		SqlGenerator findSqlGenerator = mock(SqlGenerator.class);
 		annisDao.setFindSqlGenerator(findSqlGenerator);
-		when(findSqlGenerator.toSql(any(Start.class), anyList())).thenReturn(SQL);
+		when(findSqlGenerator.toSql(any(QueryData.class), anyList())).thenReturn(SQL);
 		
 		MatchRowMapper findRowMapper = mock(MatchRowMapper.class);
 		annisDao.setFindRowMapper(findRowMapper);
@@ -169,7 +169,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(dddQueryParser).parse(DDDQUERY);
 		verify(queryAnalysis).analyzeQuery(STATEMENT, CORPUS_LIST);
 		verify(sqlSessionModifier).modifySqlSession(simpleJdbcTemplate, queryData);
-		verify(findSqlGenerator).toSql(STATEMENT, CORPUS_LIST);
+		verify(findSqlGenerator).toSql(queryData, CORPUS_LIST);
 		verify(jdbcTemplate).query(SQL, findRowMapper);
 	}
 	

@@ -13,6 +13,8 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotationGraphDaoHelper;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -29,6 +31,7 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	private DddQueryParser dddQueryParser;
 	private SqlGenerator findSqlGenerator;
 	private AnnisDao annisDao;
+  private QueryAnalysis queryAnalysis;
 	
 	private AnnotationGraphDaoHelper annotationGraphDaoHelper;
 	private WekaDaoHelper wekaDaoHelper;
@@ -66,7 +69,8 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	public void doSql(String dddQuery) {
 		// sql query
 		Start statement = dddQueryParser.parse(dddQuery);
-		String sql = findSqlGenerator.toSql(statement, corpusList);
+    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+		String sql = findSqlGenerator.toSql(queryData, corpusList);
 
 		out.println(sql);
 	}
@@ -221,5 +225,17 @@ public class DddQueryRunner extends AnnisBaseRunner {
 	public void setContext(int context) {
 		this.context = context;
 	}
+
+  public QueryAnalysis getQueryAnalysis()
+  {
+    return queryAnalysis;
+  }
+
+  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
+  {
+    this.queryAnalysis = queryAnalysis;
+  }
+
+  
 
 }

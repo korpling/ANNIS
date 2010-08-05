@@ -21,6 +21,7 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
 import de.deutschdiachrondigital.dddquery.node.Start;
@@ -117,13 +118,10 @@ public class MatchViewGenerator implements ResultSetExtractor
    * @param right
    * @return the node count
    */
-  public int createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
+  public int createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right)
   {
-    // parse query
-    Start statement = dddQueryParser.parse(dddQuery);
-
     // get number of nodes in match
-    int nodeCount = queryAnalysis.analyzeQuery(statement, corpusList).getMaxWidth();
+    int nodeCount = queryData.getMaxWidth();
 
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
@@ -132,7 +130,7 @@ public class MatchViewGenerator implements ResultSetExtractor
     matchSb.append("\" AS\n");
     matchSb.append("\t SELECT DISTINCT *\n");
     matchSb.append("\n\tFROM\n(\n");
-    matchSb.append(sqlGenerator.toSql(statement, corpusList));
+    matchSb.append(sqlGenerator.toSql(queryData, corpusList));
     matchSb.append("\n) as matched_ids");
 
     jdbcTemplate.execute(matchSb.toString());
