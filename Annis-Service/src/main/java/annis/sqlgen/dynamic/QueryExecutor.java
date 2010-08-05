@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * relANNIS scheme.
  * @author Thomas Krause
  */
-public interface DynamicSQLGenerator {
+public interface QueryExecutor {
 
   /**
    * Check if this generator is able to handle a specific AQL query.

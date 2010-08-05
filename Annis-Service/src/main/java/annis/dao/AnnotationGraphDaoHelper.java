@@ -26,6 +26,7 @@ import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+@Deprecated
 public class AnnotationGraphDaoHelper implements ResultSetExtractor {
 
 	private Logger log = Logger.getLogger(this.getClass());

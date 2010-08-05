@@ -64,7 +64,8 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	private SpringAnnisDao annisDao;
 	@Mock private DddQueryParser dddQueryParser;
 	@Mock private SqlGenerator sqlGenerator;
-  @Mock private MatchViewGenerator matchViewGenerator;
+  @Mock private DefaultQueryExecutor defaultQueryExecutor;
+  @Mock private GraphExtractor graphExtractor;
 	@Mock private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 	@Mock private MatchRowMapper matchRowMapper;
 	@Mock private JdbcTemplate jdbcTemplate;
@@ -91,7 +92,8 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao = new SpringAnnisDao();
 		annisDao.setDddQueryParser(dddQueryParser);
 		annisDao.setSqlGenerator(sqlGenerator);
-    annisDao.setMatchViewGenerator(matchViewGenerator);
+    annisDao.setDefaultQueryExecutor(defaultQueryExecutor);
+    annisDao.setGraphExtractor(graphExtractor);
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
 		annisDao.setAnnotationGraphDaoHelper(annotationGraphDaoHelper);

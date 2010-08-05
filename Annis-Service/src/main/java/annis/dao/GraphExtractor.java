@@ -20,12 +20,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.ql.parser.QueryAnalysis;
-import annis.ql.parser.QueryData;
-import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
-import de.deutschdiachrondigital.dddquery.node.Start;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -42,23 +37,20 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  *
  * @author thomas
  */
-public class MatchViewGenerator implements ResultSetExtractor
+public class GraphExtractor  implements ResultSetExtractor
 {
 
-	private static final Logger log = Logger.getLogger(MatchViewGenerator.class);
+	private static final Logger log = Logger.getLogger(GraphExtractor.class);
 
-  private DddQueryParser dddQueryParser;
-  private SqlGenerator sqlGenerator;
-  private QueryAnalysis queryAnalysis;
-  private String nodeTableViewName;
   private String matchedNodesViewName;
-
-  private AnnisNodeRowMapper annisNodeRowMapper;
-	private EdgeRowMapper edgeRowMapper;
+  private String nodeTableViewName;
 	private AnnotationRowMapper nodeAnnotationRowMapper;
 	private AnnotationRowMapper edgeAnnotationRowMapper;
+  private EdgeRowMapper edgeRowMapper;
+  
+  private AnnisNodeRowMapper annisNodeRowMapper;
 
-  public MatchViewGenerator()
+  public GraphExtractor()
   {
     // FIXME: totally ugly, but the query has fixed column names (and needs its own column aliasing)
 		// TableAccessStrategyFactory wants a corpus selection strategy
@@ -66,71 +58,44 @@ public class MatchViewGenerator implements ResultSetExtractor
 		Map<String, String> nodeColumns = new HashMap<String, String>();
 		nodeColumns.put("namespace", "node_namespace");
 		nodeColumns.put("name", "node_name");
-		
+
 		Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
 		nodeAnnotationColumns.put("node_ref", "id");
 		nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
 		nodeAnnotationColumns.put("name", "node_annotation_name");
 		nodeAnnotationColumns.put("value", "node_annotation_value");
-		
+
 		Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
 		nodeAnnotationColumns.put("rank_ref", "pre");
 		edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
 		edgeAnnotationColumns.put("name", "edge_annotation_name");
 		edgeAnnotationColumns.put("value", "edge_annotation_value");
-		
+
 		Map<String, String> edgeColumns = new HashMap<String, String>();
 		edgeColumns.put("node_ref", "id");
 		edgeColumns.put("name", "edge_name");
 		edgeColumns.put("namespace", "edge_name");
-		
-		Map<String, Map<String, String>> columnAliases = new HashMap<String, Map<String, String>>();
+
+    Map<String, Map<String, String>> columnAliases = new HashMap<String, Map<String, String>>();
 		columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
 		columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE, nodeAnnotationColumns);
 		columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE, edgeAnnotationColumns);
 		columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
-		
-		TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(null);
-		tableAccessStrategy.setColumnAliases(columnAliases);
 
-		annisNodeRowMapper = new AnnisNodeRowMapper();
-		annisNodeRowMapper.setTableAccessStrategy(tableAccessStrategy);
-		
-		edgeRowMapper = new EdgeRowMapper();
+    TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(null);
+		tableAccessStrategy.setColumnAliases(columnAliases);
+    
+    edgeRowMapper = new EdgeRowMapper();
 		edgeRowMapper.setTableAccessStrategy(tableAccessStrategy);
-		
-		nodeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.NODE_ANNOTATION_TABLE);
+
+    annisNodeRowMapper = new AnnisNodeRowMapper();
+		annisNodeRowMapper.setTableAccessStrategy(tableAccessStrategy);
+
+    nodeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.NODE_ANNOTATION_TABLE);
 		nodeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
-		
+
 		edgeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.EDGE_ANNOTATION_TABLE);
 		edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
-  }
-
-
-  /**
-   *
-   * @param jdbcTemplate
-   * @param corpusList
-   * @param dddQuery
-   * @param offset
-   * @param limit
-   * @param left
-   * @param right
-   */
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right)
-  {
-    // sql for matches
-    StringBuilder matchSb = new StringBuilder();
-    matchSb.append("CREATE TEMPORARY VIEW \"");
-    matchSb.append(matchedNodesViewName);
-    matchSb.append("\" AS\n");
-    matchSb.append("\t SELECT DISTINCT *\n");
-    matchSb.append("\n\tFROM\n(\n");
-    matchSb.append(sqlGenerator.toSql(queryData, corpusList));
-    matchSb.append("\n) as matched_ids");
-
-    jdbcTemplate.execute(matchSb.toString());
-
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
@@ -236,161 +201,135 @@ public class MatchViewGenerator implements ResultSetExtractor
     return q.toString();
   }
 
-  
   @Override
   public List<AnnotationGraph> extractData(ResultSet resultSet) throws SQLException, DataAccessException
   {
     List<AnnotationGraph> graphs = new LinkedList<AnnotationGraph>();
 
     // fn: match group -> annotation graph
-		Map<Long, AnnotationGraph> graphByMatchGroup = new HashMap<Long, AnnotationGraph>();
+    Map<Long, AnnotationGraph> graphByMatchGroup = new HashMap<Long, AnnotationGraph>();
 
-		// fn: node id -> node
-		Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
+    // fn: node id -> node
+    Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
 
-		// fn: edge pre order value -> edge
-		Map<Long, Edge> edgeByPre = new HashMap<Long, Edge>();
+    // fn: edge pre order value -> edge
+    Map<Long, Edge> edgeByPre = new HashMap<Long, Edge>();
 
-		int rowNum = 0;
-		while (resultSet.next()) {
-			// process result by match group
-			// match group is identified by the ids of the matched nodes
+    int rowNum = 0;
+    while (resultSet.next())
+    {
+      // process result by match group
+      // match group is identified by the ids of the matched nodes
       Long key = resultSet.getLong("resultid");
       Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
 
-			if ( ! graphByMatchGroup.containsKey(key) ) {
-				log.debug("starting annotation graph for match: " + key);
-				AnnotationGraph graph = new AnnotationGraph();
-				graphs.add(graph);
-				graphByMatchGroup.put(key, graph);
-        
-				// clear mapping functions for this graph
-				// assumes that the result set is sorted by key, pre
-				nodeById.clear();
-				edgeByPre.clear();
-			}
+      if (!graphByMatchGroup.containsKey(key))
+      {
+        log.debug("starting annotation graph for match: " + key);
+        AnnotationGraph graph = new AnnotationGraph();
+        graphs.add(graph);
+        graphByMatchGroup.put(key, graph);
 
-			AnnotationGraph graph = graphByMatchGroup.get(key);
+        // clear mapping functions for this graph
+        // assumes that the result set is sorted by key, pre
+        nodeById.clear();
+        edgeByPre.clear();
+      }
 
-			// get node data
-			AnnisNode node = annisNodeRowMapper.mapRow(resultSet, rowNum);
+      AnnotationGraph graph = graphByMatchGroup.get(key);
 
-			// add node to graph if it is new, else get known copy
-			long id = node.getId();
-			if ( ! nodeById.containsKey(id) ) {
-				log.debug("new node: " + id);
-				nodeById.put(id, node);
-				graph.addNode(node);
-			} else {
-				node = nodeById.get(id);
-			}
-      
+      // get node data
+      AnnisNode node = annisNodeRowMapper.mapRow(resultSet, rowNum);
+
+      // add node to graph if it is new, else get known copy
+      long id = node.getId();
+      if (!nodeById.containsKey(id))
+      {
+        log.debug("new node: " + id);
+        nodeById.put(id, node);
+        graph.addNode(node);
+      }
+      else
+      {
+        node = nodeById.get(id);
+      }
+
       // add matched node id to the graph
       long matchIndex = resultSet.getLong("match_index");
-      if(!resultSet.wasNull())
+      if (!resultSet.wasNull())
       {
         graph.addMatchedNodeId(id);
         node.setMatchedNodeInQuery(matchIndex);
       }
-      else if(!graph.getMatchedNodeIds().contains(id))
+      else if (!graph.getMatchedNodeIds().contains(id))
       {
         node.setMatchedNodeInQuery(null);
       }
 
-			// get edge data
-			Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
+      // get edge data
+      Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
 
-			// add edge to graph if it is new, else get known copy
-			long pre = edge.getPre();
-			if ( ! edgeByPre.containsKey(pre) ) {
-				// fix source references in edge
-				edge.setDestination(node);
-				fixNodes(edge, edgeByPre, nodeById);
+      // add edge to graph if it is new, else get known copy
+      long pre = edge.getPre();
+      if (!edgeByPre.containsKey(pre))
+      {
+        // fix source references in edge
+        edge.setDestination(node);
+        fixNodes(edge, edgeByPre, nodeById);
 
-				// add edge to src and dst nodes
-				node.addIncomingEdge(edge);
-				AnnisNode source = edge.getSource();
-				if (source != null)
-					source.addOutgoingEdge(edge);
+        // add edge to src and dst nodes
+        node.addIncomingEdge(edge);
+        AnnisNode source = edge.getSource();
+        if (source != null)
+        {
+          source.addOutgoingEdge(edge);
+        }
 
-				log.debug("new edge: " + edge);
-				edgeByPre.put(pre, edge);
-				graph.addEdge(edge);
-			} else {
-				edge = edgeByPre.get(pre);
-			}
+        log.debug("new edge: " + edge);
+        edgeByPre.put(pre, edge);
+        graph.addEdge(edge);
+      }
+      else
+      {
+        edge = edgeByPre.get(pre);
+      }
 
-			// add annotation data
-			Annotation nodeAnnotation = nodeAnnotationRowMapper.mapRow(resultSet, rowNum);
-			if (nodeAnnotation != null)
-				node.addNodeAnnotation(nodeAnnotation);
-			Annotation edgeAnnotation = edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
-			if (edgeAnnotation != null)
-				edge.addAnnotation(edgeAnnotation);
+      // add annotation data
+      Annotation nodeAnnotation = nodeAnnotationRowMapper.mapRow(resultSet, rowNum);
+      if (nodeAnnotation != null)
+      {
+        node.addNodeAnnotation(nodeAnnotation);
+      }
+      Annotation edgeAnnotation = edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
+      if (edgeAnnotation != null)
+      {
+        edge.addAnnotation(edgeAnnotation);
+      }
 
       rowNum++;
-		}
-    
+    }
+
 
     return graphs;
   }
 
-  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre, Map<Long, AnnisNode> nodeById) {
-		// pull source node from parent edge
-		AnnisNode source = edge.getSource();
-		if (source == null)
-			return;
-		long pre = source.getId();
-		Edge parentEdge = edgeByPre.get(pre);
-		AnnisNode parent = parentEdge != null ? parentEdge.getDestination() : null;
+  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre, Map<Long, AnnisNode> nodeById)
+  {
+    // pull source node from parent edge
+    AnnisNode source = edge.getSource();
+    if (source == null)
+    {
+      return;
+    }
+    long pre = source.getId();
+    Edge parentEdge = edgeByPre.get(pre);
+    AnnisNode parent = parentEdge != null ? parentEdge.getDestination() : null;
 //		log.debug("looking for node with rank.pre = " + pre + "; found: " + parent);
-		edge.setSource(parent);
+    edge.setSource(parent);
 
-		// pull destination node from mapping function
-		long destinationId = edge.getDestination().getId();
-		edge.setDestination(nodeById.get(destinationId));
-	}
-
-  // getter/setter
-
-  public String getNodeTableViewName()
-  {
-    return nodeTableViewName;
-  }
-
-  public void setNodeTableViewName(String nodeTableViewName)
-  {
-    this.nodeTableViewName = nodeTableViewName;
-  }
-
-  public SqlGenerator getSqlGenerator()
-  {
-    return sqlGenerator;
-  }
-
-  public void setSqlGenerator(SqlGenerator sqlGenerator)
-  {
-    this.sqlGenerator = sqlGenerator;
-  }
-
-  public DddQueryParser getDddQueryParser()
-  {
-    return dddQueryParser;
-  }
-
-  public void setDddQueryParser(DddQueryParser dddQueryParser)
-  {
-    this.dddQueryParser = dddQueryParser;
-  }
-
-  public QueryAnalysis getQueryAnalysis()
-  {
-    return queryAnalysis;
-  }
-
-  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
-  {
-    this.queryAnalysis = queryAnalysis;
+    // pull destination node from mapping function
+    long destinationId = edge.getDestination().getId();
+    edge.setDestination(nodeById.get(destinationId));
   }
 
   public String getMatchedNodesViewName()
@@ -403,46 +342,15 @@ public class MatchViewGenerator implements ResultSetExtractor
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public AnnisNodeRowMapper getAnnisNodeRowMapper()
+  public String getNodeTableViewName()
   {
-    return annisNodeRowMapper;
+    return nodeTableViewName;
   }
 
-  public void setAnnisNodeRowMapper(AnnisNodeRowMapper annisNodeRowMapper)
+  public void setNodeTableViewName(String nodeTableViewName)
   {
-    this.annisNodeRowMapper = annisNodeRowMapper;
-  }
-
-  public AnnotationRowMapper getEdgeAnnotationRowMapper()
-  {
-    return edgeAnnotationRowMapper;
-  }
-
-  public void setEdgeAnnotationRowMapper(AnnotationRowMapper edgeAnnotationRowMapper)
-  {
-    this.edgeAnnotationRowMapper = edgeAnnotationRowMapper;
-  }
-
-  public EdgeRowMapper getEdgeRowMapper()
-  {
-    return edgeRowMapper;
-  }
-
-  public void setEdgeRowMapper(EdgeRowMapper edgeRowMapper)
-  {
-    this.edgeRowMapper = edgeRowMapper;
-  }
-
-  public AnnotationRowMapper getNodeAnnotationRowMapper()
-  {
-    return nodeAnnotationRowMapper;
-  }
-
-  public void setNodeAnnotationRowMapper(AnnotationRowMapper nodeAnnotationRowMapper)
-  {
-    this.nodeAnnotationRowMapper = nodeAnnotationRowMapper;
+    this.nodeTableViewName = nodeTableViewName;
   }
 
   
-
 }

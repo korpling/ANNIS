@@ -54,7 +54,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private DddQueryParser dddQueryParser;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
-  private MatchViewGenerator matchViewGenerator;
+  private DefaultQueryExecutor defaultQueryExecutor;
+  private GraphExtractor graphExtractor;
 
   public SpringAnnisDao()
   {
@@ -165,10 +166,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     // generate the view with the matched node IDs
     // TODO: make this dynamic
     int nodeCount = queryData.getMaxWidth();
-    matchViewGenerator.createMatchView(getJdbcTemplate(), corpusList, queryData, offset, limit, left, right);
+    defaultQueryExecutor.createMatchView(getJdbcTemplate(), corpusList, queryData, offset, limit, left, right);
 
     // create the Annis graphs
-    return matchViewGenerator.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
+    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
     //return annotationGraphDaoHelper.queryAnnotationGraph(getJdbcTemplate(), nodeCount, corpusList, dddQuery, offset, limit, left, right);
   }
 
@@ -418,15 +419,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public MatchViewGenerator getMatchViewGenerator()
+  public DefaultQueryExecutor getDefaultQueryExecutor()
   {
-    return matchViewGenerator;
+    return defaultQueryExecutor;
   }
 
-  public void setMatchViewGenerator(MatchViewGenerator matchViewGenerator)
+  public void setDefaultQueryExecutor(DefaultQueryExecutor defaultQueryExecutor)
   {
-    this.matchViewGenerator = matchViewGenerator;
+    this.defaultQueryExecutor = defaultQueryExecutor;
   }
 
+  public GraphExtractor getGraphExtractor()
+  {
+    return graphExtractor;
+  }
+
+  public void setGraphExtractor(GraphExtractor graphExtractor)
+  {
+    this.graphExtractor = graphExtractor;
+  }
+
+  
   
 }
