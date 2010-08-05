@@ -17,7 +17,8 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 	extends TableAccessStrategy 
 	implements SqlSessionModifier {
 
-	private String nodeTableViewName;
+	private String factsViewName;
+  private String nodeViewName;
 	private Logger log = Logger.getLogger(this.getClass());
 
 	private SubQueryCorpusSelectionStrategy subQueryCorpusSelectionStrategy;
@@ -31,55 +32,87 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 	}
 	
 	public void modifySqlSession(SimpleJdbcTemplate simpleJdbcTemplate, QueryData queryData) {
-		String viewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
-			.replaceAll(":view_name", nodeTableViewName)
-			.replaceAll(":node_table", originalNodeTable());
+		
+    String factsViewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
+			.replaceAll(":view_name", factsViewName)
+			.replaceAll(":node_table", nodeTableAlias());
+
+    String nodeViewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
+			.replaceAll(":view_name", nodeViewName)
+			.replaceAll(":node_table", realNodeTableAlias());
 		
 		List<Long> corpusList = queryData.getCorpusList();
 		
 		if ( ! corpusList.isEmpty() ) {
-			viewDefinition += " WHERE :toplevel IN ( :corpusList )"
-				.replaceAll(":toplevel", column(originalNodeTable(), columnName(NODE_TABLE, "toplevel_corpus")))
-				.replaceAll(":corpusList", StringUtils.join(corpusList, ", "));
+			factsViewDefinition += corpusConstraint(corpusList,
+        column(nodeTableAlias(), columnName(NODE_TABLE, "toplevel_corpus")));
 
+      nodeViewDefinition += corpusConstraint(corpusList, 
+        column(realNodeTableAlias(), columnName(REAL_NODE_TABLE, "toplevel_corpus")));
+      
 			List<Annotation> metaData = queryData.getMetaData();
 			if ( ! metaData.isEmpty() ) {
 				String documentsWithMetaDataSql = subQueryCorpusSelectionStrategy.buildSubQuery(corpusList, metaData);
 				List<Long> documents = simpleJdbcTemplate.query(documentsWithMetaDataSql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
-				viewDefinition += " AND :corpus IN ( :documentList )"
-					.replaceAll(":corpus", column(originalNodeTable(), columnName(NODE_TABLE, "corpus_ref")))
-					.replaceAll(":documentList", documents.isEmpty() ? "NULL" : StringUtils.join(documents, ", "));
+
+        factsViewDefinition += metaDataConstraint(documents,
+          column(nodeTableAlias(), columnName(NODE_TABLE, "corpus_ref")));
+
+        nodeViewDefinition += metaDataConstraint(documents,
+          column(realNodeTableAlias(), columnName(REAL_NODE_TABLE, "corpus_ref")));
+
 			}
 		}
 
-    log.info("SQL for view:\n" + viewDefinition);
-			
-		simpleJdbcTemplate.update(viewDefinition);
+    log.debug("SQL for facts view:\n" + factsViewDefinition);
+		log.debug("SQL for node view:\n" + nodeViewDefinition);
+
+		simpleJdbcTemplate.update(factsViewDefinition);
+    simpleJdbcTemplate.update(nodeViewDefinition);
 	}
 
-	// return the original node table alias
-	private String originalNodeTable() {
+  private String corpusConstraint(List<Long> corpusList, String toplevelColumnName)
+  {
+    return " WHERE :toplevel IN ( :corpusList )"
+				.replaceAll(":toplevel", toplevelColumnName)
+				.replaceAll(":corpusList", StringUtils.join(corpusList, ", "));
+  }
+
+  private String metaDataConstraint(List<Long> documents, String corpusRefColumnName)
+  {
+    return " AND :corpus IN ( :documentList )"
+					.replaceAll(":corpus", corpusRefColumnName)
+					.replaceAll(":documentList", documents.isEmpty() ? "NULL" : StringUtils.join(documents, ", "));
+  }
+
+	/** return the original node table alias */
+	private String nodeTableAlias() {
 		return super.tableName(NODE_TABLE);
 	}
+
+  private String realNodeTableAlias() {
+		return super.tableName(REAL_NODE_TABLE);
+	}
+
 	
 	@Override
 	public String tableName(String table) {
 		String alias = super.tableName(table);
-		String originalNodeTable = originalNodeTable();
+		String originalNodeTable = nodeTableAlias();
 		if (alias.equals(originalNodeTable))
-				return nodeTableViewName;
+				return factsViewName;
 		else
 			return alias;
 	}
 	
 	///// Getter / Setter
 
-	public String getNodeTableViewName() {
-		return nodeTableViewName;
+	public String getFactsViewName() {
+		return factsViewName;
 	}
 
-	public void setNodeTableViewName(String nodeTableViewName) {
-		this.nodeTableViewName = nodeTableViewName;
+	public void setFactsViewName(String factsViewName) {
+		this.factsViewName = factsViewName;
 	}
 
 	
@@ -92,4 +125,14 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 		this.subQueryCorpusSelectionStrategy = subQueryCorpusSelectionStrategy;
 	}
 
+  public String getNodeViewName()
+  {
+    return nodeViewName;
+  }
+
+  public void setNodeViewName(String nodeViewName)
+  {
+    this.nodeViewName = nodeViewName;
+  }
+  
 }

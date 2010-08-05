@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package annis.sqlgen.dynamic;
+package annis.executors;
 
 import annis.ql.parser.QueryData;
 import java.util.EnumSet;
@@ -53,6 +53,6 @@ public interface QueryExecutor {
    * @param right
    *
    */
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right);
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData);
 
 }

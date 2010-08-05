@@ -32,7 +32,8 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 	private CorpusSelectionByViewOnlyToplevelTableAccessStrategy corpusSelectionByViewOnlyToplevelTableAccessStrategy;
 
 	// node table view name
-	private final static String VIEW_NAME = "VIEW_NAME";
+	private final static String FACTS_VIEW_NAME = "FACTS_VIEW_NAME";
+  private final static String NODE_VIEW_NAME = "NODE_VIEW_NAME";
 
 	// corpus list
 	private static final List<Long> CORPUS_LIST = Arrays.asList(1L, 2L, 3L);
@@ -45,7 +46,7 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 
 	// view definition if no corpus is selected
 	private static final String VIEW_DEFINITION_NO_SELECTION = "" +
-			"CREATE TEMPORARY VIEW " + VIEW_NAME + " " +
+			"CREATE TEMPORARY VIEW " + FACTS_VIEW_NAME + " " +
 			"AS SELECT * " +
 			"FROM " + TABLE_ALIAS;
 	
@@ -63,7 +64,8 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.setSubQueryCorpusSelectionStrategy(subQueryCorpusSelectionStrategy);
 		
 		// set view name and make sure table and column aliases are used
-		corpusSelectionByViewOnlyToplevelTableAccessStrategy.setNodeTableViewName(VIEW_NAME);
+		corpusSelectionByViewOnlyToplevelTableAccessStrategy.setFactsViewName(FACTS_VIEW_NAME);
+    corpusSelectionByViewOnlyToplevelTableAccessStrategy.setNodeViewName(NODE_VIEW_NAME);
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addTableAlias(NODE_TABLE, TABLE_ALIAS);
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addColumnAlias(NODE_TABLE, "toplevel_corpus", TOPLEVEL_ALIAS);
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addColumnAlias(NODE_TABLE, "corpus_ref", CORPUS_ALIAS);
@@ -76,7 +78,7 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 	public void tableNameReturnsViewNameForNodeTable() {
 		// make sure the node table is recognized even if it is aliased
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addTableAlias(NODE_TABLE, TABLE_ALIAS);
-		assertEquals(VIEW_NAME, corpusSelectionByViewOnlyToplevelTableAccessStrategy.tableName(NODE_TABLE));
+		assertEquals(FACTS_VIEW_NAME, corpusSelectionByViewOnlyToplevelTableAccessStrategy.tableName(NODE_TABLE));
 	}
 	
 	@Test

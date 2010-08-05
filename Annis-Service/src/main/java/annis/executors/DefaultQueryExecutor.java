@@ -14,10 +14,11 @@
  *  limitations under the License.
  *  under the License.
  */
-package annis.dao;
+package annis.executors;
 
 import annis.ql.parser.QueryData;
 import annis.sqlgen.SqlGenerator;
+import java.util.EnumSet;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -25,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author thomas
  */
-public class DefaultQueryExecutor
+public class DefaultQueryExecutor implements QueryExecutor
 {
 
   private SqlGenerator sqlGenerator;
@@ -37,6 +38,7 @@ public class DefaultQueryExecutor
    * @param corpusList
    * @param queryData
    */
+  @Override
   public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData)
   {
     // sql for matches
@@ -52,6 +54,19 @@ public class DefaultQueryExecutor
     jdbcTemplate.execute(matchSb.toString());
 
   }
+
+  @Override
+  public boolean checkIfApplicable(QueryData aql)
+  {
+    return true;
+  }
+
+  @Override
+  public EnumSet<AQLConstraints> getNeededConstraints()
+  {
+    return EnumSet.noneOf(AQLConstraints.class);
+  }
+
 
   // getter/setter
 
@@ -74,7 +89,5 @@ public class DefaultQueryExecutor
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
-
-    
 
 }

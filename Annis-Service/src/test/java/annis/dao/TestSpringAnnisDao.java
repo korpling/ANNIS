@@ -1,5 +1,6 @@
 package annis.dao;
 
+import annis.executors.DefaultQueryExecutor;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -130,6 +131,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getFindRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlSessionModifiers(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusByNameDaoHelper(), is(not(nullValue())));
+    assertThat(springAnnisDao.getExecutorList(), is(not(nullValue())));
 	}
 
 	@SuppressWarnings("unchecked")

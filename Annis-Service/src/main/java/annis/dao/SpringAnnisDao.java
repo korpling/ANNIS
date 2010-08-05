@@ -1,5 +1,6 @@
 package annis.dao;
 
+import annis.executors.DefaultQueryExecutor;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 
 import annis.WekaDaoHelper;
+import annis.executors.AQLConstraints;
+import annis.executors.QueryExecutor;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -29,7 +32,10 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedList;
+import java.util.Map;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -55,6 +61,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
   private DefaultQueryExecutor defaultQueryExecutor;
   private GraphExtractor graphExtractor;
+  private List<QueryExecutor> executorList;
+  private Map<AQLConstraints,QueryExecutor> executorConstraints;
 
   public SpringAnnisDao()
   {
@@ -161,8 +169,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     }
 
     // generate the view with the matched node IDs
-    // TODO: make this dynamic
-    defaultQueryExecutor.createMatchView(getJdbcTemplate(), corpusList, queryData);
+    // TODO: use the constraint approach to filter the executors before we iterate over them
+    for(QueryExecutor e : executorList)
+    {
+      if(e.checkIfApplicable(queryData))
+      {
+        e.createMatchView(getJdbcTemplate(), corpusList, queryData);
+        // leave the loop
+        break;
+      }
+    }
     
     return queryData;
   }
@@ -433,6 +449,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.graphExtractor = graphExtractor;
   }
 
-  
+  public List<QueryExecutor> getExecutorList()
+  {
+    return executorList;
+  }
+
+  public void setExecutorList(List<QueryExecutor> executorList)
+  {
+    this.executorList = executorList;
+
+    executorConstraints = new EnumMap<AQLConstraints, QueryExecutor>(AQLConstraints.class);
+
+    for(QueryExecutor q : this.executorList)
+    {
+      EnumSet<AQLConstraints> constraints = q.getNeededConstraints();
+      for(AQLConstraints c : constraints)
+      {
+        executorConstraints.put(c, q);
+      }
+    }
+
+  }
+
   
 }

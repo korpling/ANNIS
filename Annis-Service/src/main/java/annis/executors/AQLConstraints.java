@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package annis.sqlgen.dynamic;
+package annis.executors;
 
 /**
  * Several constraints for an AQL query.

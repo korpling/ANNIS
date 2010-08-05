@@ -16,6 +16,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 	">
 
+  <import resource="classpath:annis/executors/Executors-context.xml" />
+
 	<!-- Enable bean autowiring -->
 	<context:annotation-config/> 
 	
@@ -40,11 +42,6 @@
 		<property name="url" value="$dao{datasource.url}"/>
 		<property name="username" value="$dao{datasource.username}"/>
 		<property name="password" value="$dao{datasource.password}"/>
-	</bean>
-
-  <bean id="defaultQueryExecutor" class="annis.dao.DefaultQueryExecutor">
-		<property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
 	</bean>
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
@@ -122,6 +119,7 @@
 		<property name="countExtractor" ref="countExtractor"/>
 
     <property name="graphExtractor" ref="graphExtractor" />
+    <property name="executorList" ref="executorList" />
 	</bean>
 	
 	<bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
@@ -137,7 +135,7 @@
 	<bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
 		<property name="timeout" value="600000"/>
 	</bean>
-	
+
 	<util:list id="sqlSessionModifiers">
 		<ref bean="timeOutSqlSessionModifier"/>
 		<ref bean="sqlScriptSessionModifier"/>
