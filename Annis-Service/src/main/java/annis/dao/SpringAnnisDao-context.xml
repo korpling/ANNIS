@@ -44,12 +44,17 @@
 
   <bean id="defaultQueryExecutor" class="annis.dao.DefaultQueryExecutor">
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="matchedNodesViewName" value="matched_nodes" />
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
 	</bean>
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
     <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
-    <property name="matchedNodesViewName" value="matched_nodes" />
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+	</bean>
+
+
+	<bean id="countExtractor" class="annis.dao.CountExtractor">
+		<property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
 	</bean>
 
 	<!-- Helper for annotate command -->
@@ -58,7 +63,7 @@
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
 		<property name="queryAnalysis" ref="queryAnalysis"/>
     <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
-    <property name="matchedNodesViewName" value="matched_nodes" />
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
 	
 	</bean>
 		
@@ -114,7 +119,7 @@
     <property name="findRowMapper" ref="matchRowMapper"/>
 		<property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
 		<property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-		<property name="countSqlGenerator" ref="countSqlGenerator"/>
+		<property name="countExtractor" ref="countExtractor"/>
 
     <property name="graphExtractor" ref="graphExtractor" />
 	</bean>

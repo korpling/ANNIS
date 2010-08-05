@@ -30,19 +30,14 @@ public class DefaultQueryExecutor
 
   private SqlGenerator sqlGenerator;
   private String matchedNodesViewName;	
-
   
   /**
    *
    * @param jdbcTemplate
    * @param corpusList
-   * @param dddQuery
-   * @param offset
-   * @param limit
-   * @param left
-   * @param right
+   * @param queryData
    */
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right)
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData)
   {
     // sql for matches
     StringBuilder matchSb = new StringBuilder();

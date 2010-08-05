@@ -23,7 +23,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
-import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
@@ -48,7 +47,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   /// new
   private List<SqlSessionModifier> sqlSessionModifiers;
   private SqlGenerator findSqlGenerator;
-  private CountSqlGenerator countSqlGenerator;
+  private CountExtractor countExtractor;
   private MatchRowMapper findRowMapper;
   private QueryAnalysis queryAnalysis;
   private DddQueryParser dddQueryParser;
@@ -114,20 +113,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   public int countMatches(final List<Long> corpusList, final String dddQuery)
   {
+    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
 
-    // parse the query
-    Start statement = dddQueryParser.parse(dddQuery);
 
-    // analyze it
-    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-
-    // execute session modifiers
-    for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
-    {
-      sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
-    }
-
-    return getSimpleJdbcTemplate().queryForInt(countSqlGenerator.toSql(queryData, corpusList));
+    return countExtractor.queryCount(getJdbcTemplate());
 
   }
 
@@ -142,15 +131,23 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
-    return new QueryTemplate().explain(corpusList, dddQuery, countSqlGenerator, analyze);
+    return new QueryTemplate().explain(corpusList, dddQuery, sqlGenerator, analyze);
   }
 
   @SuppressWarnings("unchecked")
   public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
   {
-    // FIXME: copypaste from QueryTemplate.createSqlAndPrepareSession()
-    // still don't know how to refactor this code
+    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
 
+    int nodeCount = queryData.getMaxWidth();
+
+    // create the Annis graphs
+    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
+    //return annotationGraphDaoHelper.queryAnnotationGraph(getJdbcTemplate(), nodeCount, corpusList, dddQuery, offset, limit, left, right);
+  }
+
+  private QueryData createDynamicMatchView(List<Long> corpusList, String dddQuery)
+  {
     // parse the query
     Start statement = dddQueryParser.parse(dddQuery);
 
@@ -165,12 +162,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     // generate the view with the matched node IDs
     // TODO: make this dynamic
-    int nodeCount = queryData.getMaxWidth();
-    defaultQueryExecutor.createMatchView(getJdbcTemplate(), corpusList, queryData, offset, limit, left, right);
-
-    // create the Annis graphs
-    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
-    //return annotationGraphDaoHelper.queryAnnotationGraph(getJdbcTemplate(), nodeCount, corpusList, dddQuery, offset, limit, left, right);
+    defaultQueryExecutor.createMatchView(getJdbcTemplate(), corpusList, queryData);
+    
+    return queryData;
   }
 
   @SuppressWarnings("unchecked")
@@ -409,14 +403,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
   }
 
-  public CountSqlGenerator getCountSqlGenerator()
+  public CountExtractor getCountExtractor()
   {
-    return countSqlGenerator;
+    return countExtractor;
   }
 
-  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  public void setCountExtractor(CountExtractor countExtractor)
   {
-    this.countSqlGenerator = countSqlGenerator;
+    this.countExtractor = countExtractor;
   }
 
   public DefaultQueryExecutor getDefaultQueryExecutor()
