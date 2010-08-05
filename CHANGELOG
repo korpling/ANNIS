@@ -1,0 +1,50 @@
+Version 2.1.8
+=============
+
+* partitioning of the database table
+ - this allows much faster import of new corpora, even if there are already
+   big corpora in the database
+ - some performance improvement since the database tables to load are smaller
+ - performance of smaller corpora is not affected by bigger corpora
+* the "new" partitur visualizer is now able to display overlapping spans so the
+  old version is obsolete and can be replaced
+* highlight the matches belonging to different parts of the query in different
+  colors, especially helpful if you query something like cat="S" & tok & #1 > #2
+* cache for resolver entries for faster display of the results
+* text exporter which is exporting the the token annotations
+* general cleanup in the code
+* fix bug that didn't allow "+" to be used in exporters
+* don't throw an exception if you search for a metadata value that does not
+  exist in the corpus (just deliver 0 results)
+* more escaping of user input in SQL
+* updated to the latest version (3.2.1) of the ExtJS JavaScript-Framework 
+  (bug-fix release)
+* fixed some size issues in the GUI
+
+Version 2.1.7
+=============
+
+* Negation of word forms (e.g. in the pcc2 demo corpus: tok!=”in”), of attribute
+  values (pos!=”NN”) and of edge labels
+  (cat=”S” & cat=”PP” & #1 >[func!=”MO”] #2).
+* Configurable namespaces and display names for visualizers, allowing e.g. 
+  multiple tree visualizations for multiple parses etc. (see attached user 
+  guide).
+* Preliminary support for parallel corpora: parallel corpora are now importable
+  and alignments on all levels can be searched for; there is as yet no 
+  visualization for the alignment edges – results with multiple languages are 
+  arranged under each other in the KWIC view with hit elements highlighted 
+  (see ANNIS site for a picture).
+* Pointing relations can now carry both types and labels, allowing for both 
+  annotated dependency trees (e.g. relations like #1 ->dep[func="DET"] #2 are 
+  searchable, though there is no special visualization for them yet) and labeled
+  alignments (e.g. for “fuzzy” vs. “good” alignment etc.).
+* A new basic KWIC exporter in the export tab (just the matched tokens with 
+  context, in plain text)
+* Acceleration and parallelization of certain queries (as a side effect, a first
+  page of hits may now be retrieved before the complete match count is 
+  calculated)
+* Improvements in the behavior of resizing, highlighting and scrollbars in 
+  visualizers
+* Various bug fixes
+
