@@ -116,13 +116,9 @@ public class MatchViewGenerator implements ResultSetExtractor
    * @param limit
    * @param left
    * @param right
-   * @return the node count
    */
-  public int createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right)
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData, long offset, long limit, int left, int right)
   {
-    // get number of nodes in match
-    int nodeCount = queryData.getMaxWidth();
-
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
     matchSb.append("CREATE TEMPORARY VIEW \"");
@@ -135,7 +131,6 @@ public class MatchViewGenerator implements ResultSetExtractor
 
     jdbcTemplate.execute(matchSb.toString());
 
-    return nodeCount;
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)

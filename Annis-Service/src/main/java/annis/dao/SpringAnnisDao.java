@@ -164,7 +164,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     // generate the view with the matched node IDs
     // TODO: make this dynamic
-    int nodeCount = matchViewGenerator.createMatchView(getJdbcTemplate(), corpusList, queryData, offset, limit, left, right);
+    int nodeCount = queryData.getMaxWidth();
+    matchViewGenerator.createMatchView(getJdbcTemplate(), corpusList, queryData, offset, limit, left, right);
 
     // create the Annis graphs
     return matchViewGenerator.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
