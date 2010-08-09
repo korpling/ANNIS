@@ -46,13 +46,11 @@ public class BaseNodeSqlGenerator {
 	}
 
 	protected String sqlString(String string) {
-		return "'" + StringEscapeUtils.escapeSql(string) + "'";
+    return SQLHelper.sqlString(string);
 	}
 
 	protected String sqlString(String string, TextMatching textMatching) {
-		if (textMatching == TextMatching.REGEXP_EQUAL)
-			string = "^" + string + "$";
-		return sqlString(string);
+    return SQLHelper.sqlString(string, textMatching);
 	}
 
 	///// Getter / Setter
