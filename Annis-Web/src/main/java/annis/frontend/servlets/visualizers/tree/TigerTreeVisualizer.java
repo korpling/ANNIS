@@ -172,13 +172,15 @@ public class TigerTreeVisualizer extends Visualizer {
 				}
 				return spannedText;
 			} else {
-				return extractAnnotation(n.getNodeAnnotations(), getNamespace(), "cat");
+				return extractAnnotation(n.getNodeAnnotations(), getNamespace(),
+          getMappings().getProperty("node_key", "cat"));
 			}
 		}
 
 		@Override
 		public String getLabel(Edge e) {
-			return extractAnnotation(e.getAnnotations(), getNamespace(), "func");
+			return extractAnnotation(e.getAnnotations(), getNamespace(),
+        getMappings().getProperty("edge_key", "func"));
 		}
 
 		private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName) {
