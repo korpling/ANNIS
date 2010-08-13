@@ -156,8 +156,23 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
 
     while (rs.next())
     {
-      // TODO: fill these properties with resolver_vis_map.mappings
-      Properties props = new Properties();
+      Properties mappings = new Properties();
+
+      String mappingsAsString = rs.getString("mappings");
+      if(mappingsAsString != null)
+      {
+        // split the entrys
+        String[] entries = mappingsAsString.split(";");
+        for(String e : entries)
+        {
+          // split key-value
+          String[] keyvalue= e.split(":", 2);
+          if(keyvalue.length == 2)
+          {
+            mappings.put(keyvalue[0], keyvalue[1]);
+          }
+        }
+      }
 
       String element = rs.getString("element");
 
@@ -169,7 +184,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
         element == null ? null : ResolverEntry.ElementType.valueOf(element),
         rs.getString("vis_type"),
         rs.getString("display_name"),
-        props,
+        mappings,
         rs.getInt("order"));
       result.add(e);
 

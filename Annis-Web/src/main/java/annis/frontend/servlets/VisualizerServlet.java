@@ -24,6 +24,7 @@ import annis.cache.CacheException;
 import annis.cache.CacheInitializationException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.frontend.servlets.visualizers.Visualizer;
+import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
@@ -39,9 +40,11 @@ import java.util.Properties;
  * The passed GET parameters are:
  * <ol>
  * 
- * <li>spanId (mandatory)</li>
+ * <li>callbackId (mandatory)</li>
  * <li>textId (mandatory)</li>
- * <li>namespace (mandatory)</li>
+ * <li>vistype (mandatory)</li>
+ * <li>visId (mandatory)</li>
+ * <li>namespace</li>
  * <li>a list of mark:COLOR=NODEID[,NODEID]* parameters, where COLOR identifies the HTML color 
  * that will be used to mark the nodes passed after the '='</li>
  * </ol>
@@ -64,29 +67,15 @@ public class VisualizerServlet extends HttpServlet
     HttpSession session = request.getSession();
     OutputStream outStream = response.getOutputStream();
 
-    String callbackId = request.getParameter("callbackId");
-    String textId = request.getParameter("textId");
+    String callbackId = checkAndGetMandatoryStringParam("callbackId", request);
+    String textId = checkAndGetMandatoryStringParam("textId", request);
+    String vistype = checkAndGetMandatoryStringParam("vistype", request);
+    int visId = checkAndGetMandatoryIntParam("visId", request);
 
     String path2Dot = getInitParameter("DotPath");
     if (path2Dot == null || "".equals(path2Dot))
     {
       path2Dot = "dot";
-    }
-
-    if (callbackId == null)
-    {
-      throw new NullPointerException("Parameter 'callbackId' must no be null.");
-    }
-
-    String vistype = request.getParameter("vistype");
-    if (vistype == null)
-    {
-      throw new NullPointerException("Parameter 'vistype' must no be null.");
-    }
-
-    if (textId == null)
-    {
-      throw new NullPointerException("Parameter 'textId' must no be null.");
     }
 
     Map<String, String> markableMap = new HashMap<String, String>();
@@ -192,6 +181,16 @@ public class VisualizerServlet extends HttpServlet
           ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
 
           visualizer.setResult((AnnisResult) inStream.readObject());
+          ResolverEntry[] resolverEntries = (ResolverEntry[])inStream.readObject();
+
+          if(resolverEntries != null && visId < resolverEntries.length)
+          {
+            visualizer.setMappings(resolverEntries[visId].getMappings());
+          }
+          else
+          {
+            visualizer.setMappings(new Properties());
+          }
         }
       }
 
@@ -212,6 +211,32 @@ public class VisualizerServlet extends HttpServlet
     } catch (ClassNotFoundException e)
     {
       e.printStackTrace(new PrintWriter(outStream));
+    }
+  }
+
+  private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
+  {
+    String result = request.getParameter(name);
+    if (result == null)
+    {
+      throw new NullPointerException("Parameter '" + name + "' must no be null.");
+    }
+    return result;
+  }
+
+  
+  private int checkAndGetMandatoryIntParam(String name, HttpServletRequest request)
+  {
+    String asString = checkAndGetMandatoryStringParam(name, request);
+
+    try
+    {
+      return Integer.parseInt(asString);
+    }
+    catch(NumberFormatException ex)
+    {
+      throw new NumberFormatException("Could not cast the parameter '" + name
+        + "' to an integer (parameter value was '" + asString + "')");
     }
   }
 }

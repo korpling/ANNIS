@@ -166,17 +166,25 @@ public class SearchResultServlet extends HttpServlet
       for (AnnisResult r : resultSet)
       {
         long generatedID = Math.abs(rand.nextLong());
+
+        ResolverEntry[] resolverEntries = getResolverEntries(r, service);
+
         // construct byte array
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream objectOutput = new ObjectOutputStream(bos);
-        // serialize result
+        
+        // serialize AnnisResult
         objectOutput.writeObject(r);
+
+        // also put the resolver entries in the cache file
+        objectOutput.writeObject(resolverEntries);
+
         // copy to cache
         cacheAnnisResult.put("" + generatedID,
           bos.toByteArray());
 
         // create json
-        JSONObject jsonResult = jsonFromAnnisResult(r, corpusIdList, service);
+        JSONObject jsonResult = jsonFromAnnisResult(r, resolverEntries);
         jsonResult.putOnce("callbackId", "" + generatedID);
         jsonResultSet.add(jsonResult);
 
@@ -240,89 +248,14 @@ public class SearchResultServlet extends HttpServlet
     session.removeAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
   }
 
-  public JSONObject jsonFromAnnisResult(AnnisResult result, 
-    List<Long> corpusIdList, AnnisService service) throws JSONException, RemoteException
+  private JSONObject jsonFromAnnisResult(AnnisResult result, ResolverEntry[] visArray) throws JSONException, RemoteException
   {
     JSONObject json = new JSONObject();
 
     json.putOnce("tokenNamespaces", result.getTokenAnnotationLevelSet());
 
-    HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
     LinkedList<JSONObject> visusalizer = new LinkedList<JSONObject>();
-
-    long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
     
-    // create a request for resolver entries
-    HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
-    
-    Set<String> nodeNamespaces = new HashSet<String>();
-    for(AnnisNode node : result.getGraph().getNodes())
-    {
-      if(!node.isToken())
-      {
-        for(Annotation annotation : node.getNodeAnnotations())
-        {
-          nodeNamespaces.add(annotation.getNamespace());
-        }
-      }
-    }
-    Set<String> edgeNamespaces = new HashSet<String>();
-    for(Edge e : result.getGraph().getEdges())
-    {
-      for(Annotation annotation : e.getAnnotations())
-      {
-        edgeNamespaces.add(annotation.getNamespace());
-      }
-    }
-    for(String ns : nodeNamespaces)
-    {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
-      if(!edgeNamespaces.contains(ns))
-      {
-        resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
-      }
-    }
-    for(String ns : edgeNamespaces)
-    {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
-    }
-
-    // query with this resolver request and make sure it is unique
-    if(cacheResolver.containsKey(resolverRequests))
-    {
-      visSet.addAll(cacheResolver.get(resolverRequests));
-    }
-    else
-    {
-      List<ResolverEntry> resolverList =
-        service.getResolverEntries(resolverRequests.toArray(new SingleResolverRequest[0]));
-      visSet.addAll(resolverList);
-      cacheResolver.put(resolverRequests, resolverList);
-    }
-    // sort everything
-    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);    
-    Arrays.sort(visArray, new Comparator<ResolverEntry>()
-    {
-
-      @Override
-      public int compare(ResolverEntry o1, ResolverEntry o2)
-      {
-        if(o1.getOrder() < o2.getOrder())
-        {
-          return -1;
-        }
-        else if(o1.getOrder() > o2.getOrder())
-        {
-          return 1;
-        }
-        else
-        {
-          return 0;
-        }
-      }
-      
-    });
-
     for(int i=0; i < visArray.length; i++)
     {
       ResolverEntry e = visArray[i];
@@ -400,6 +333,85 @@ public class SearchResultServlet extends HttpServlet
     json.putOnce("token", tokenList);
 
     return json;
+  }
+
+  private ResolverEntry[] getResolverEntries(AnnisResult result, AnnisService service) throws RemoteException
+  {
+    HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
+    
+    long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
+
+    // create a request for resolver entries
+    HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
+
+    Set<String> nodeNamespaces = new HashSet<String>();
+    for(AnnisNode node : result.getGraph().getNodes())
+    {
+      if(!node.isToken())
+      {
+        for(Annotation annotation : node.getNodeAnnotations())
+        {
+          nodeNamespaces.add(annotation.getNamespace());
+        }
+      }
+    }
+    Set<String> edgeNamespaces = new HashSet<String>();
+    for(Edge e : result.getGraph().getEdges())
+    {
+      for(Annotation annotation : e.getAnnotations())
+      {
+        edgeNamespaces.add(annotation.getNamespace());
+      }
+    }
+    for(String ns : nodeNamespaces)
+    {
+      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+      if(!edgeNamespaces.contains(ns))
+      {
+        resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+      }
+    }
+    for(String ns : edgeNamespaces)
+    {
+      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+    }
+
+    // query with this resolver request and make sure it is unique
+    if(cacheResolver.containsKey(resolverRequests))
+    {
+      visSet.addAll(cacheResolver.get(resolverRequests));
+    }
+    else
+    {
+      List<ResolverEntry> resolverList =
+        service.getResolverEntries(resolverRequests.toArray(new SingleResolverRequest[0]));
+      visSet.addAll(resolverList);
+      cacheResolver.put(resolverRequests, resolverList);
+    }
+    // sort everything
+    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
+    Arrays.sort(visArray, new Comparator<ResolverEntry>()
+    {
+
+      @Override
+      public int compare(ResolverEntry o1, ResolverEntry o2)
+      {
+        if(o1.getOrder() < o2.getOrder())
+        {
+          return -1;
+        }
+        else if(o1.getOrder() > o2.getOrder())
+        {
+          return 1;
+        }
+        else
+        {
+          return 0;
+        }
+      }
+
+    });
+    return visArray;
   }
 
   private Map<AnnisNode,Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)

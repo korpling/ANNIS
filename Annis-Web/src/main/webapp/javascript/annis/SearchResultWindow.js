@@ -529,6 +529,7 @@ Ext.onReady(function() {
         output += '<iframe onload="checkIFrameLoaded(\'annotation-' + idcommon + '-body\')" width="100%" height="20px" frameborder="0" src="'
             + conf_context + '/empty.html" annis:src="'
             + conf_context + '/secure/Visualizer?callbackId=' + rowData.callbackId
+            + "&visId=" + vis.id
             + '&textId=' + rowData.textIdList[0]
             + '&namespace=' + vis.namespace
             + '&vistype=' + vis.vistype
