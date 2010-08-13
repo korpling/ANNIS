@@ -172,14 +172,16 @@ public class TigerTreeVisualizer extends Visualizer {
 				}
 				return spannedText;
 			} else {
-				return extractAnnotation(n.getNodeAnnotations(), getNamespace(),
+				return extractAnnotation(n.getNodeAnnotations(), 
+          getMappings().getProperty("node_anno_ns", getNamespace()),
           getMappings().getProperty("node_key", "cat"));
 			}
 		}
 
 		@Override
 		public String getLabel(Edge e) {
-			return extractAnnotation(e.getAnnotations(), getNamespace(),
+			return extractAnnotation(e.getAnnotations(),
+        getMappings().getProperty("edge_anno_ns", getNamespace()),
         getMappings().getProperty("edge_key", "func"));
 		}
 
@@ -208,7 +210,8 @@ public class TigerTreeVisualizer extends Visualizer {
 		double width = 0;
 		double maxheight = 0;
 		
-		for (DirectedGraph<AnnisNode, Edge> g: graphtools.getSyntaxGraphs(result.getGraph(), getNamespace())) {
+		for (DirectedGraph<AnnisNode, Edge> g: graphtools.getSyntaxGraphs(result.getGraph(),
+      getMappings().getProperty("node_ns", getNamespace()))) {
 			ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
 					g, backend, labeler, styler);
 			
