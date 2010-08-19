@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -294,11 +295,29 @@ public class DotGraphVisualizer extends WriterVisualizer
   }
   private void writeEdge(Edge edge)
   {
+    // from -> to
     dot.append("\t");
     dot.append(edge.getSource() == null ? null : edge.getSource().getId());
     dot.append(" -> ");
     dot.append(edge.getDestination() == null ? null : edge.getDestination().getId());
-    dot.append(";\n");
+    // attributes
+    dot.append(" [");
+    // label
+    dot.append("label=\"");
+    Iterator<Annotation> itAnno = edge.getAnnotations().iterator();
+    while(itAnno.hasNext())
+    {
+      Annotation anno = itAnno.next();
+      dot.append(anno.getQualifiedName());
+      dot.append("=");
+      dot.append(anno.getValue());
+      if(itAnno.hasNext())
+      {
+        dot.append("\\n");
+      }
+    }
+    dot.append("\"");
+    dot.append("];\n");
     // TODO
   }
 
