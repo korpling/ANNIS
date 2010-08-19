@@ -61,50 +61,15 @@ public class DotGraphVisualizer extends WriterVisualizer
 
     dot = new StringBuilder();
 
-    // node definitions
-    List<AnnisNode> token = new LinkedList<AnnisNode>();
-    for (AnnisNode n : getResult().getGraph().getNodes())
-    {
-      if(n.isToken())
-      {
-        token.add(n);
-      }
-      else
-      {
-        if(testNode(n))
-        {
-          writeNode(n);
-        }
-      }
-    }
-    // Token are in a subgraph
-    dot.append("\t{\n\trank=same;\n");
-    for(AnnisNode tok : token)
-    {
-      dot.append("\t");
-      writeNode(tok);
-    }
-    writeInvisibleTokenEdges(token);
-    dot.append("\t}\n");
-
-    for (Edge e : getResult().getGraph().getEdges())
-    {
-      if(testEdge(e))
-      {
-        writeEdge(e);
-      }
-    }
-
     try
     {
       String cmd = getMappings().getProperty("dotpath", "dot") + " -s" + scale + ".0 -T" + outputFormat;
       Runtime runTime = Runtime.getRuntime();
       Process p = runTime.exec(cmd);
-      StringWriter debugStdin = new StringWriter();
       OutputStreamWriter stdin = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
-      writeDOT(stdin);
-      writeDOT(debugStdin);
 
+      createDOT();
+      stdin.append(dot);
       stdin.flush();
 
       p.getOutputStream().close();
@@ -134,7 +99,7 @@ public class DotGraphVisualizer extends WriterVisualizer
           "Could not execute dot graph-layouter.\ncommand line:\n{0}\n\nstderr:\n{1}\n\nstdin:\n{2}",
           new Object[]
           {
-            cmd, errorMessage.toString(), debugStdin.toString()
+            cmd, errorMessage.toString(), dot.toString()
           });
       }
 
@@ -146,13 +111,48 @@ public class DotGraphVisualizer extends WriterVisualizer
 
   }
 
-  private void writeDOT(Writer writer) throws IOException
+  private void createDOT()
   {
-    writer.append("digraph G {\n");
-    writer.append("\tnode [shape=box];\n");
-    writer.append(dot);
-    writer.append("}");
+    dot.append("digraph G {\n");
+    dot.append("\tnode [shape=box];\n");
+     // node definitions
+    List<AnnisNode> token = new LinkedList<AnnisNode>();
+    for (AnnisNode n : getResult().getGraph().getNodes())
+    {
+      if(n.isToken())
+      {
+        token.add(n);
+      }
+      else
+      {
+        if(testNode(n))
+        {
+          writeNode(n);
+        }
+      }
+    }
+    // Token are in a subgraph
+    dot.append("\t{\n"
+      + "\trank=max;\n");
+    for(AnnisNode tok : token)
+    {
+      dot.append("\t");
+      writeNode(tok);
+    }
+    writeInvisibleTokenEdges(token);
+    dot.append("\t}\n");
+
+    for (Edge e : getResult().getGraph().getEdges())
+    {
+      if(testEdge(e))
+      {
+        writeEdge(e);
+      }
+    }
+    
+    dot.append("}");
   }
+  
 
   private boolean testNode(AnnisNode node)
   {
@@ -196,16 +196,11 @@ public class DotGraphVisualizer extends WriterVisualizer
     dot.append("label=\"");
     appendLabel(node);
     appendNodeAnnotations(node);
-    dot.append("\" ");
-
-    // rank
-    if(node.isToken())
-    {
-      dot.append("rank=\"max\" ");
-    }
+    dot.append("\", ");
 
     // background color
-    dot.append("style=filled fillcolor=\"");
+    dot.append("style=filled, ");
+    dot.append("fillcolor=\"");
     String colorAsString = getMarkableExactMap().get(Long.toString(node.getId()));
     if (colorAsString != null)
     {
