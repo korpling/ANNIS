@@ -169,7 +169,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
           String[] keyvalue= e.split(":", 2);
           if(keyvalue.length == 2)
           {
-            mappings.put(keyvalue[0], keyvalue[1]);
+            mappings.put(keyvalue[0].trim(), keyvalue[1].trim());
           }
         }
       }

@@ -153,7 +153,7 @@ public class SuperDAGLayout extends AbstractLayout<AnnisNode, Edge>
     {
       for(AnnisNode n : graph.getVertices())
       {
-        if(graph.getInEdges(n).size() == 0)
+        if(graph.getInEdges(n).isEmpty())
         {
           result.add(n);
         }

@@ -1,5 +1,6 @@
 package annis.frontend.servlets.visualizers.graph;
 
+import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.*;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -36,7 +37,7 @@ public class GraphVisualizer extends Visualizer
   public void writeOutput(OutputStream outstream)
   {
     DirectedGraph<AnnisNode, Edge> g = generateGraphFromModel(getResult().getGraph());
-
+    
     SuperDAGLayout dagLayout = new SuperDAGLayout(g);
     dagLayout.initialize();
 
@@ -82,7 +83,7 @@ public class GraphVisualizer extends Visualizer
       }
     });
 
-    final Map<String, String> markableMapFinal = getMarkableMap();
+    final Map<String, String> markableMapFinal = getMarkableExactMap();
 
     VertexLabelAsShapeRenderer<AnnisNode, Edge> vertexTrans =
       new VertexLabelAsShapeRenderer<AnnisNode, Edge>(vv.getRenderContext());
@@ -99,14 +100,17 @@ public class GraphVisualizer extends Visualizer
         if(markableMapFinal.containsKey(idAsString))
         {
           String markerColor = markableMapFinal.get(idAsString);
-          if("red".equalsIgnoreCase(markerColor))
+          MatchedNodeColors color = MatchedNodeColors.Red;
+          try
           {
-            return Color.red;
+            color = MatchedNodeColors.valueOf(markerColor);
           }
-          else
+          catch(IllegalArgumentException ex)
           {
-            return Color.gray;
+
           }
+          return color.getColor();
+          
         }
         else
         {
@@ -159,7 +163,6 @@ public class GraphVisualizer extends Visualizer
     Graphics2D graphics = image.createGraphics();
     graphics.setBackground(Color.WHITE);
     vv.paint(graphics);
-
 
     try
     {
