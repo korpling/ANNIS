@@ -84,6 +84,15 @@ public class DotGraphVisualizer extends WriterVisualizer
 
       p.destroy();
       writer.flush();
+
+      if(!"".equals(errorMessage.toString()))
+      {
+        Logger.getLogger(DotGraphVisualizer.class.getName()).log(
+          Level.SEVERE,
+          "Could not execute dot graph-layouter.\ncommand line:\n{0}\n\nstderr:\n{1}\n\nstdin:\n{2}",
+          new Object[]{cmd, errorMessage.toString(), debugStdin.toString()});
+      }
+
     }
     catch (IOException ex)
     {
@@ -104,13 +113,20 @@ public class DotGraphVisualizer extends WriterVisualizer
 
   private void writeNode(AnnisNode node)
   {
-    nodeDefinitions.append("\"");
-    nodeDefinitions.append(node.getName());
-    nodeDefinitions.append("\";\n");
+    nodeDefinitions.append("\t");
+    nodeDefinitions.append(node.getId());
+    nodeDefinitions.append(";\n");
+
+    // TODO: node annotations, spanned text and/or name
   }
 
   private void writeEdge(Edge edge)
   {
+    edgeDefinitions.append("\t");
+    edgeDefinitions.append(edge.getSource() == null ? null : edge.getSource().getId());
+    edgeDefinitions.append(" -> ");
+    edgeDefinitions.append(edge.getDestination() == null ? null : edge.getDestination().getId());
+    edgeDefinitions.append(";\n");
     // TODO
   }
 
