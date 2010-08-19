@@ -18,6 +18,8 @@
 package annis.frontend.servlets;
 
 import java.awt.Color;
+import java.util.Locale;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Colors for matched nodes. The names and color values correspond to the
@@ -46,6 +48,34 @@ public enum MatchedNodeColors
   public Color getColor()
   {
     return color;
+  }
+
+  /**
+   * Returns the hexadecimal RGB representation beginning with a hash-sign.
+   * @return the color in the format "#rrggbb"
+   */
+  public String getHTMLColor()
+  {
+    StringBuilder result = new StringBuilder("#");
+    result.append(twoDigitHex(color.getRed()));
+    result.append(twoDigitHex(color.getGreen()));
+    result.append(twoDigitHex(color.getBlue()));
+    return result.toString();
+  }
+
+  private String twoDigitHex(int i)
+  {
+    String result = Integer.toHexString(i).toLowerCase(Locale.ENGLISH);
+
+    if(result.length() > 2)
+    {
+      result = result.substring(0,2);
+    }
+    else if(result.length() < 2)
+    {
+      result = StringUtils.leftPad(result, 2, '0');
+    }
+    return result;
   }
 
 }

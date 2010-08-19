@@ -16,6 +16,7 @@
  */
 package annis.frontend.servlets.visualizers.graph;
 
+import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Edge;
@@ -36,14 +37,14 @@ public class DotGraphVisualizer extends WriterVisualizer
 
   private String outputFormat = "png";
   private int scale = 50;
-  private StringBuilder nodeDefinitions;
-  private StringBuilder edgeDefinitions;
+  private StringBuilder nodeDef;
+  private StringBuilder edgeDef;
 
   @Override
   public void writeOutput(Writer writer)
   {
-    nodeDefinitions = new StringBuilder();
-    edgeDefinitions = new StringBuilder();
+    nodeDef = new StringBuilder();
+    edgeDef = new StringBuilder();
     for (AnnisNode n : getResult().getGraph().getNodes())
     {
       writeNode(n);
@@ -105,28 +106,55 @@ public class DotGraphVisualizer extends WriterVisualizer
   {
     writer.append("digraph G {\n");
 
-    writer.append(nodeDefinitions);
-    writer.append(edgeDefinitions);
+    writer.append(nodeDef);
+    writer.append(edgeDef);
 
     writer.append("}");
   }
 
   private void writeNode(AnnisNode node)
   {
-    nodeDefinitions.append("\t");
-    nodeDefinitions.append(node.getId());
-    nodeDefinitions.append(";\n");
+    nodeDef.append("\t");
+    nodeDef.append(node.getId());
+    // attributes
+    nodeDef.append(" [ ");
+    // output label
+    nodeDef.append("label=\"");
+    if(node.isToken())
+    {
+      nodeDef.append(node.getSpannedText());
+    }
+    else
+    {
+      nodeDef.append(node.getName());
+    }
+    nodeDef.append("\" ");
+    // background color
+    nodeDef.append("style=filled fillcolor=\"");
+    String colorAsString = getMarkableExactMap().get(Long.toString(node.getId()));
+    if(colorAsString != null)
+    {
+      MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
+      nodeDef.append(color.getHTMLColor());
+    }
+    else
+    {
+      nodeDef.append("#ffffff");
+    }
+    nodeDef.append("\" ");
+    // "footer"
+    nodeDef.append("];\n");
 
     // TODO: node annotations, spanned text and/or name
   }
 
   private void writeEdge(Edge edge)
   {
-    edgeDefinitions.append("\t");
-    edgeDefinitions.append(edge.getSource() == null ? null : edge.getSource().getId());
-    edgeDefinitions.append(" -> ");
-    edgeDefinitions.append(edge.getDestination() == null ? null : edge.getDestination().getId());
-    edgeDefinitions.append(";\n");
+    edgeDef.append("\t");
+    edgeDef.append(edge.getSource() == null ? null : edge.getSource().getId());
+    edgeDef.append(" -> ");
+    edgeDef.append(edge.getDestination() == null ? null : edge.getDestination().getId());
+    edgeDef.append(";\n");
     // TODO
   }
 
