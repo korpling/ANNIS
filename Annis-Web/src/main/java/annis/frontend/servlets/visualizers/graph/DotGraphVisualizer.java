@@ -304,6 +304,10 @@ public class DotGraphVisualizer extends WriterVisualizer
     dot.append(" [");
     // label
     dot.append("label=\"");
+    dot.append(edge.getNamespace());
+    dot.append(".");
+    dot.append(edge.getName());
+    dot.append("\\n");
     Iterator<Annotation> itAnno = edge.getAnnotations().iterator();
     while(itAnno.hasNext())
     {
