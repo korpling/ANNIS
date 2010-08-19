@@ -26,7 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,8 +42,7 @@ public class DotGraphVisualizer extends WriterVisualizer
 
   private String outputFormat = "png";
   private int scale = 50;
-  private StringBuilder nodeDef;
-  private StringBuilder edgeDef;
+  private StringBuilder dot;
   private boolean displayAllNamespaces = false;
   private String requiredNodeNS;
   private String requiredEdgeNS;
@@ -54,9 +54,12 @@ public class DotGraphVisualizer extends WriterVisualizer
     requiredNodeNS = getMappings().getProperty("node_ns", getNamespace());
     requiredEdgeNS = getMappings().getProperty("edge_ns", getNamespace());
 
-    nodeDef = new StringBuilder();
-    edgeDef = new StringBuilder();
+    if(requiredEdgeNS == null && requiredNodeNS == null)
+    {
+      displayAllNamespaces = true;
+    }
 
+    dot = new StringBuilder();
 
     // node definitions
     List<AnnisNode> token = new LinkedList<AnnisNode>();
@@ -75,12 +78,14 @@ public class DotGraphVisualizer extends WriterVisualizer
       }
     }
     // Token are in a subgraph
-    nodeDef.append("{\nrank=same;\n");
+    dot.append("\t{\n\trank=same;\n");
     for(AnnisNode tok : token)
     {
+      dot.append("\t");
       writeNode(tok);
     }
-    nodeDef.append("}\n");
+    writeInvisibleTokenEdges(token);
+    dot.append("\t}\n");
 
     for (Edge e : getResult().getGraph().getEdges())
     {
@@ -92,7 +97,7 @@ public class DotGraphVisualizer extends WriterVisualizer
 
     try
     {
-      String cmd = getDotPath() + " -s" + scale + ".0 -T" + outputFormat;
+      String cmd = getMappings().getProperty("dotpath", "dot") + " -s" + scale + ".0 -T" + outputFormat;
       Runtime runTime = Runtime.getRuntime();
       Process p = runTime.exec(cmd);
       StringWriter debugStdin = new StringWriter();
@@ -145,9 +150,7 @@ public class DotGraphVisualizer extends WriterVisualizer
   {
     writer.append("digraph G {\n");
     writer.append("\tnode [shape=box];\n");
-    writer.append(nodeDef);
-    writer.append(edgeDef);
-
+    writer.append(dot);
     writer.append("}");
   }
 
@@ -185,51 +188,76 @@ public class DotGraphVisualizer extends WriterVisualizer
   private void writeNode(AnnisNode node)
   {
 
-    nodeDef.append("\t");
-    nodeDef.append(node.getId());
+    dot.append("\t");
+    dot.append(node.getId());
     // attributes
-    nodeDef.append(" [ ");
+    dot.append(" [ ");
     // output label
-    nodeDef.append("label=\"");
+    dot.append("label=\"");
     appendLabel(node);
     appendNodeAnnotations(node);
-    nodeDef.append("\" ");
+    dot.append("\" ");
 
     // rank
     if(node.isToken())
     {
-      nodeDef.append("rank=\"max\" ");
+      dot.append("rank=\"max\" ");
     }
 
     // background color
-    nodeDef.append("style=filled fillcolor=\"");
+    dot.append("style=filled fillcolor=\"");
     String colorAsString = getMarkableExactMap().get(Long.toString(node.getId()));
     if (colorAsString != null)
     {
       MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
-      nodeDef.append(color.getHTMLColor());
+      dot.append(color.getHTMLColor());
     }
     else
     {
-      nodeDef.append("#ffffff");
+      dot.append("#ffffff");
     }
-    nodeDef.append("\" ");
+    dot.append("\" ");
     // "footer"
-    nodeDef.append("];\n");
+    dot.append("];\n");
   }
 
+  private void writeInvisibleTokenEdges(List<AnnisNode> token)
+  {
+    Collections.sort(token, new Comparator<AnnisNode>() {
+
+      @Override
+      public int compare(AnnisNode o1, AnnisNode o2)
+      {
+        return o1.getTokenIndex().compareTo(o2.getTokenIndex());
+      }
+
+    });
+    AnnisNode lastTok = null;
+    for(AnnisNode tok : token)
+    {
+      if(lastTok != null)
+      {
+        dot.append("\t\t");
+        dot.append(lastTok.getId());
+        dot.append(" -> ");
+        dot.append(tok.getId());
+        dot.append(" [style=invis];\n");
+      }
+      lastTok = tok;
+    }
+  }
 
   private void appendLabel(AnnisNode node)
   {
     if (node.isToken())
     {
-      nodeDef.append(node.getSpannedText());
+      dot.append(node.getSpannedText());
     }
     else
     {
-      nodeDef.append(node.getName());
+      dot.append(node.getName());
     }
-    nodeDef.append("\\n");
+    dot.append("\\n");
   }
 
   private void appendNodeAnnotations(AnnisNode node)
@@ -238,11 +266,11 @@ public class DotGraphVisualizer extends WriterVisualizer
     {
       if(displayAllNamespaces || requiredNodeNS.equals(anno.getNamespace()))
       {
-        nodeDef.append("\\n");
+        dot.append("\\n");
 
-        nodeDef.append(anno.getQualifiedName());
-        nodeDef.append("=");
-        nodeDef.append(anno.getValue());
+        dot.append(anno.getQualifiedName());
+        dot.append("=");
+        dot.append(anno.getValue());
       }
     }
   }
@@ -271,11 +299,11 @@ public class DotGraphVisualizer extends WriterVisualizer
   }
   private void writeEdge(Edge edge)
   {
-    edgeDef.append("\t");
-    edgeDef.append(edge.getSource() == null ? null : edge.getSource().getId());
-    edgeDef.append(" -> ");
-    edgeDef.append(edge.getDestination() == null ? null : edge.getDestination().getId());
-    edgeDef.append(";\n");
+    dot.append("\t");
+    dot.append(edge.getSource() == null ? null : edge.getSource().getId());
+    dot.append(" -> ");
+    dot.append(edge.getDestination() == null ? null : edge.getDestination().getId());
+    dot.append(";\n");
     // TODO
   }
 
