@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 public class DotGraphVisualizer extends WriterVisualizer
 {
 
-  private String outputFormat = "dot";
+  private String outputFormat = "png";
   private int scale = 50;
   private StringBuilder nodeDefinitions;
   private StringBuilder edgeDefinitions;
@@ -117,6 +117,14 @@ public class DotGraphVisualizer extends WriterVisualizer
   @Override
   public String getContentType()
   {
-    return "text/plain";
+    return "image/png";
   }
+
+  @Override
+  public String getCharacterEncoding()
+  {
+    return "ISO-8859-1";
+  }
+
+
 }
