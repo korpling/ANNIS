@@ -19,12 +19,16 @@ package annis.frontend.servlets.visualizers.graph;
 import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.Edge;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,19 +43,51 @@ public class DotGraphVisualizer extends WriterVisualizer
   private int scale = 50;
   private StringBuilder nodeDef;
   private StringBuilder edgeDef;
+  private boolean displayAllNamespaces = false;
+  private String requiredNodeNS;
+  private String requiredEdgeNS;
 
   @Override
   public void writeOutput(Writer writer)
   {
+    displayAllNamespaces = Boolean.parseBoolean(getMappings().getProperty("all_ns", "false"));
+    requiredNodeNS = getMappings().getProperty("node_ns", getNamespace());
+    requiredEdgeNS = getMappings().getProperty("edge_ns", getNamespace());
+
     nodeDef = new StringBuilder();
     edgeDef = new StringBuilder();
+
+
+    // node definitions
+    List<AnnisNode> token = new LinkedList<AnnisNode>();
     for (AnnisNode n : getResult().getGraph().getNodes())
     {
-      writeNode(n);
+      if(n.isToken())
+      {
+        token.add(n);
+      }
+      else
+      {
+        if(testNode(n))
+        {
+          writeNode(n);
+        }
+      }
     }
+    // Token are in a subgraph
+    nodeDef.append("{\nrank=same;\n");
+    for(AnnisNode tok : token)
+    {
+      writeNode(tok);
+    }
+    nodeDef.append("}\n");
+
     for (Edge e : getResult().getGraph().getEdges())
     {
-      writeEdge(e);
+      if(testEdge(e))
+      {
+        writeEdge(e);
+      }
     }
 
     try
@@ -86,12 +122,15 @@ public class DotGraphVisualizer extends WriterVisualizer
       p.destroy();
       writer.flush();
 
-      if(!"".equals(errorMessage.toString()))
+      if (!"".equals(errorMessage.toString()))
       {
         Logger.getLogger(DotGraphVisualizer.class.getName()).log(
           Level.SEVERE,
           "Could not execute dot graph-layouter.\ncommand line:\n{0}\n\nstderr:\n{1}\n\nstdin:\n{2}",
-          new Object[]{cmd, errorMessage.toString(), debugStdin.toString()});
+          new Object[]
+          {
+            cmd, errorMessage.toString(), debugStdin.toString()
+          });
       }
 
     }
@@ -105,34 +144,67 @@ public class DotGraphVisualizer extends WriterVisualizer
   private void writeDOT(Writer writer) throws IOException
   {
     writer.append("digraph G {\n");
-
+    writer.append("\tnode [shape=box];\n");
     writer.append(nodeDef);
     writer.append(edgeDef);
 
     writer.append("}");
   }
 
+  private boolean testNode(AnnisNode node)
+  {
+    if(displayAllNamespaces)
+    {
+      return true;
+    }
+    
+    if(requiredNodeNS == null)
+    {
+      return false;
+    }
+      
+    for(Annotation anno : node.getNodeAnnotations())
+    {
+      if(requiredNodeNS.equals(anno.getNamespace()))
+      {
+        return true;
+      }
+    }
+    
+    for(Annotation anno : node.getEdgeAnnotations())
+    {
+      if(requiredNodeNS.equals(anno.getNamespace()))
+      {
+        return false;
+      }
+    }
+    
+    return false;
+  }
+
   private void writeNode(AnnisNode node)
   {
+
     nodeDef.append("\t");
     nodeDef.append(node.getId());
     // attributes
     nodeDef.append(" [ ");
     // output label
     nodeDef.append("label=\"");
+    appendLabel(node);
+    appendNodeAnnotations(node);
+    nodeDef.append("\" ");
+
+    // rank
     if(node.isToken())
     {
-      nodeDef.append(node.getSpannedText());
+      nodeDef.append("rank=\"max\" ");
     }
-    else
-    {
-      nodeDef.append(node.getName());
-    }
-    nodeDef.append("\" ");
+
     // background color
     nodeDef.append("style=filled fillcolor=\"");
     String colorAsString = getMarkableExactMap().get(Long.toString(node.getId()));
-    if(colorAsString != null)
+    if (colorAsString != null)
     {
       MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
       nodeDef.append(color.getHTMLColor());
@@ -144,10 +216,59 @@ public class DotGraphVisualizer extends WriterVisualizer
     nodeDef.append("\" ");
     // "footer"
     nodeDef.append("];\n");
-
-    // TODO: node annotations, spanned text and/or name
   }
 
+
+  private void appendLabel(AnnisNode node)
+  {
+    if (node.isToken())
+    {
+      nodeDef.append(node.getSpannedText());
+    }
+    else
+    {
+      nodeDef.append(node.getName());
+    }
+    nodeDef.append("\\n");
+  }
+
+  private void appendNodeAnnotations(AnnisNode node)
+  {
+    for(Annotation anno : node.getNodeAnnotations())
+    {
+      if(displayAllNamespaces || requiredNodeNS.equals(anno.getNamespace()))
+      {
+        nodeDef.append("\\n");
+
+        nodeDef.append(anno.getQualifiedName());
+        nodeDef.append("=");
+        nodeDef.append(anno.getValue());
+      }
+    }
+  }
+
+  private boolean testEdge(Edge edge)
+  {
+    if(displayAllNamespaces)
+    {
+      return true;
+    }
+
+    if(requiredEdgeNS == null)
+    {
+      return false;
+    }
+
+    for(Annotation anno : edge.getAnnotations())
+    {
+      if(requiredEdgeNS.equals(anno.getNamespace()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
   private void writeEdge(Edge edge)
   {
     edgeDef.append("\t");
@@ -169,6 +290,4 @@ public class DotGraphVisualizer extends WriterVisualizer
   {
     return "ISO-8859-1";
   }
-
-
 }
