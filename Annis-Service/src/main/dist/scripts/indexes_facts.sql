@@ -41,12 +41,7 @@ CREATE INDEX idx__exact_cover_:id ON facts_:id (text_ref, "left", "right");
 ----- 2nd query
 CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token);
 
--- optimize the select distinct
-CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
 CREATE INDEX idx__column__id_:id on facts_:id using hash (id);
-CREATE INDEX idx__column__text_ref_:id on facts_:id using hash (text_ref);
-CREATE INDEX idx__column__left_token_:id on facts_:id using hash (left_token);
-CREATE INDEX idx__column__right_token_:id on facts_:id using hash (right_token);
 
 -- index the facts_context;
 CREATE INDEX idx_facts_context_main_:id ON facts_context_:id
