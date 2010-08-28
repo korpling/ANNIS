@@ -156,6 +156,16 @@ CREATE TABLE facts
 
 );
 
+CREATE TABLE facts_context
+(
+  id          numeric(38),
+	text_ref    numeric(38),
+  corpus_ref  numeric(38),
+	left_token  integer,
+	right_token integer,
+  toplevel_corpus numeric(38)
+);
+
 -- external data
 CREATE TABLE extData
 (

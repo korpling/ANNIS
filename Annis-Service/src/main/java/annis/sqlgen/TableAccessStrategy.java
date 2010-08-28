@@ -12,12 +12,13 @@ public class TableAccessStrategy {
 
 	// default table names
   public final static String REAL_NODE_TABLE = "real_node";
-	public final static String NODE_TABLE = "node";
+  public final static String NODE_TABLE = "node";
 	public final static String RANK_TABLE = "rank";
 	public final static String COMPONENT_TABLE = "component";
 	public final static String NODE_ANNOTATION_TABLE = "node_annotation";
 	public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
-
+  public final static String CONTEXT = "facts_context";
+  
 	// the wrapped node
 	private AnnisNode node;
 	

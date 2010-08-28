@@ -123,6 +123,7 @@
 		<property name="tableAliases" ref="tableAliases"/>
 		<property name="columnAliases" ref="columnAliases"/>
 		<property name="factsViewName" value="${annis.filtered-facts-view}"/>
+    <property name="factsContextViewName" value="${annis.filtered-facts-context-view}" />
     <property name="nodeViewName" value="${annis.filtered-node-view}"/>
 		<property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy"/>
 	</bean>

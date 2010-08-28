@@ -10,6 +10,7 @@
   <bean id="defaultQueryExecutor" class="annis.executors.DefaultQueryExecutor">
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+    <property name="factsContextViewName" value="${annis.filtered-facts-context-view}" />
 	</bean>
 
   <bean id="spanExecutor" class="annis.executors.SpanExecutor" >
@@ -23,8 +24,10 @@
   </bean>
 
   <util:list id="executorList">
+    <!--
     <ref bean="spanExecutor" />
     <ref bean="tokExecutor"/>
+    -->
 		<ref bean="defaultQueryExecutor"/>
  	</util:list>
 

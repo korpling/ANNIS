@@ -33,6 +33,7 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 
 	// node table view name
 	private final static String FACTS_VIEW_NAME = "FACTS_VIEW_NAME";
+  private final static String FACTS_CONTEXT_VIEW_NAME = "FACTS_CONTEXT_VIEW_NAME";
   private final static String NODE_VIEW_NAME = "NODE_VIEW_NAME";
 
 	// corpus list
@@ -65,6 +66,7 @@ public class TestCorpusSelectionByViewOnlyToplevelTableAccessStrategy {
 		
 		// set view name and make sure table and column aliases are used
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.setFactsViewName(FACTS_VIEW_NAME);
+    corpusSelectionByViewOnlyToplevelTableAccessStrategy.setFactsContextViewName(FACTS_CONTEXT_VIEW_NAME);
     corpusSelectionByViewOnlyToplevelTableAccessStrategy.setNodeViewName(NODE_VIEW_NAME);
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addTableAlias(NODE_TABLE, TABLE_ALIAS);
 		corpusSelectionByViewOnlyToplevelTableAccessStrategy.addColumnAlias(NODE_TABLE, "toplevel_corpus", TOPLEVEL_ALIAS);
