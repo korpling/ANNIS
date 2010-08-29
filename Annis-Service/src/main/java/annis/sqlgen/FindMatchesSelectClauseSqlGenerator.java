@@ -28,7 +28,7 @@ public class FindMatchesSelectClauseSqlGenerator
 		for (int i = nodes.size(); i < maxWidth; ++i)
 			nodeColumns.add(selectClauseForNode(null, i + 1));
 		
-		return "DISTINCT\n" + StringUtils.join(nodeColumns, ",\n");
+		return "\n" + StringUtils.join(nodeColumns, ",\n");
 	}
 	
 	private String selectClauseForNode(AnnisNode node, int index) {

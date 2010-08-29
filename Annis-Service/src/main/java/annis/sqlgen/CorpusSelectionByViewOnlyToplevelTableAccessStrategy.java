@@ -77,6 +77,7 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 		}
 
     log.debug("SQL for facts view:\n" + factsViewDefinition);
+    log.debug("SQL for facts_context view:\n" + factsContextViewDefinition);
 		log.debug("SQL for node view:\n" + nodeViewDefinition);
 
 		simpleJdbcTemplate.update(factsViewDefinition);
