@@ -171,7 +171,7 @@ public class GraphExtractor  implements ResultSetExtractor
   {
     StringBuilder q = new StringBuilder();
 
-    q.append("SELECT DISTINCT * FROM (\n");
+    q.append("SELECT * FROM (\n");
     q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, ");
     q.append(nodeTableViewName);
     q.append(" AS f \n"
@@ -195,7 +195,7 @@ public class GraphExtractor  implements ResultSetExtractor
     q.append(nodeTableViewName);
     q.append(" AS f\n"
       + "WHERE f.id = r.id\n");
-    q.append("\n) as temp \nORDER BY resultid, pre");
+    q.append("\n) as temp \n");
 
 
     return q.toString();
