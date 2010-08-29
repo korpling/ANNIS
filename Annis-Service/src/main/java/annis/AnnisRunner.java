@@ -46,16 +46,25 @@ public class AnnisRunner extends AnnisBaseRunner {
 		dddQueryRunner.doCount(translate(annisQuery));
 	}
 	
-	public void doPlan(String annisQuery) {
-		dddQueryRunner.doPlan(translate(annisQuery));
+	public void doPlanCount(String annisQuery) {
+		dddQueryRunner.doPlanCount(translate(annisQuery));
 	}
 	
-	public void doAnalyze(String annisQuery) {
-		dddQueryRunner.doAnalyze(translate(annisQuery));
+	public void doAnalyzeCount(String annisQuery) {
+		dddQueryRunner.doAnalyzeCount(translate(annisQuery));
 	}
+
+  public void doPlanGraph(String annisQuery) {
+		dddQueryRunner.doPlanGraph(translate(annisQuery));
+	}
+
+  public void doAnalyzeGraph(String annisQuery)
+  {
+    dddQueryRunner.doAnalyzeGraph(translate(annisQuery));
+  }
 	
-	public void doAnnotate2(String annisQuery) {
-		dddQueryRunner.doAnnotate2(translate(annisQuery));
+	public void doAnnotate(String annisQuery) {
+		dddQueryRunner.doAnnotate(translate(annisQuery));
 	}
 	
 	public void doCorpus(String corpusList) {

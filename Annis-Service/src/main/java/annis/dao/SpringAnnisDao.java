@@ -62,7 +62,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private DefaultQueryExecutor defaultQueryExecutor;
   private GraphExtractor graphExtractor;
   private List<QueryExecutor> executorList;
-  private Map<AQLConstraints,QueryExecutor> executorConstraints;
+  private Map<AQLConstraints, QueryExecutor> executorConstraints;
 
   public SpringAnnisDao()
   {
@@ -123,7 +123,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
 
-
     return countExtractor.queryCount(getJdbcTemplate());
 
   }
@@ -135,11 +134,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @SuppressWarnings("unchecked")
-  public String plan(String dddQuery, List<Long> corpusList, boolean analyze)
+  public String planCount(String dddQuery, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
-    return new QueryTemplate().explain(corpusList, dddQuery, sqlGenerator, analyze);
+    createDynamicMatchView(corpusList, dddQuery);
+    return countExtractor.explain(getJdbcTemplate(), analyze);
+  }
+
+  public String planGraph(String dddQuery, List<Long> corpusList, 
+    long offset, long limit, int left, int right,
+    boolean analyze)
+  {
+    Validate.notNull(corpusList, "corpusList=null passed as argument");
+
+    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
+
+    int nodeCount = queryData.getMaxWidth();
+    return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
+      offset, limit, left, right, analyze);
   }
 
   @SuppressWarnings("unchecked")
@@ -170,16 +183,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     // generate the view with the matched node IDs
     // TODO: use the constraint approach to filter the executors before we iterate over them
-    for(QueryExecutor e : executorList)
+    for (QueryExecutor e : executorList)
     {
-      if(e.checkIfApplicable(queryData))
+      if (e.checkIfApplicable(queryData))
       {
         e.createMatchView(getJdbcTemplate(), corpusList, queryData);
         // leave the loop
         break;
       }
     }
-    
+
     return queryData;
   }
 
@@ -460,16 +473,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     executorConstraints = new EnumMap<AQLConstraints, QueryExecutor>(AQLConstraints.class);
 
-    for(QueryExecutor q : this.executorList)
+    for (QueryExecutor q : this.executorList)
     {
       EnumSet<AQLConstraints> constraints = q.getNeededConstraints();
-      for(AQLConstraints c : constraints)
+      for (AQLConstraints c : constraints)
       {
         executorConstraints.put(c, q);
       }
     }
 
   }
-
-  
 }

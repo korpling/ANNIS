@@ -190,7 +190,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		String test = annisDao.plan(DDDQUERY, CORPUS_LIST, false);
+		String test = annisDao.planCount(DDDQUERY, CORPUS_LIST, false);
 		assertThat(test, is(PLAN));
 		
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
@@ -203,7 +203,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		assertThat(annisDao.plan(DDDQUERY, CORPUS_LIST, true), is(PLAN));
+		assertThat(annisDao.planCount(DDDQUERY, CORPUS_LIST, true), is(PLAN));
 
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}
