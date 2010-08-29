@@ -195,7 +195,7 @@ public class GraphExtractor  implements ResultSetExtractor
     q.append(nodeTableViewName);
     q.append(" AS f\n"
       + "WHERE f.id = r.id\n");
-    q.append("\n) as temp \n");
+    q.append("\n) as temp ORDER BY resultid, pre\n");
 
 
     return q.toString();
