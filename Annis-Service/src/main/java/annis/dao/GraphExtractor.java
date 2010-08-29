@@ -124,6 +124,7 @@ public class GraphExtractor  implements ResultSetExtractor
       + "SELECT row_number() OVER () AS resultid, *\n"
       + "FROM (SELECT * FROM " + matchedNodesViewName + " ORDER BY " + sbOrder.toString() + ") AS m LIMIT " + limit + " OFFSET " + offset;
 
+    
     jdbcTemplate.execute(query);
 
   }
@@ -146,7 +147,7 @@ public class GraphExtractor  implements ResultSetExtractor
     {
       if(i > 1)
       {
-        q.append("\nUNION\n");
+        q.append("\nUNION ALL\n");
       }
 
       q.append("SELECT resultid AS resultid, ");
@@ -190,7 +191,7 @@ public class GraphExtractor  implements ResultSetExtractor
     q.append(" <= f.right_token))");
     q.append("	\n"
       + "AND f.id <> r.id \n"
-      + "UNION\n"
+      + "UNION ALL\n"
       + "SELECT r.resultid AS resultid, r.match_index AS match_index, f.* FROM result AS r\n,");
     q.append(nodeTableViewName);
     q.append(" AS f\n"

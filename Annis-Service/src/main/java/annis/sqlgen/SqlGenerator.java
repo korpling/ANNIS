@@ -26,7 +26,7 @@ public class SqlGenerator
 			String clauseSql = clauseSqlGenerator.toSql(alternative, queryData.getMaxWidth(), corpusList, queryData.getMetaData());
 			subQueries.add(clauseSql);
 		}
-		String sql = StringUtils.join(subQueries, "\n\nUNION ");
+		String sql = StringUtils.join(subQueries, "\n\nUNION ALL");
 		log.info("SQL:\n" + sql);
 
 		return sql;

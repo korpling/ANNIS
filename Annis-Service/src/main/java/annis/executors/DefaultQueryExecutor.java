@@ -20,7 +20,7 @@ import annis.ql.parser.QueryData;
 import annis.sqlgen.SqlGenerator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -122,6 +122,8 @@ public class DefaultQueryExecutor implements QueryExecutor
     }
     // end of EXISTS
     sb.append("\n)\n");
+
+    Logger.getLogger(DefaultQueryExecutor.class).debug("SQL createMatchView:\n" + sb.toString());
 
     jdbcTemplate.execute(sb.toString());
 
