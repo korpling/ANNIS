@@ -18,22 +18,14 @@ package annis.frontend.servlets.visualizers.graph;
 
 import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
-import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -267,6 +259,14 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     w("" + (edge.getDestination() == null ? "null" : edge.getDestination().getId()));
     // attributes
     w(" [");
+    if(edge.getEdgeType() == Edge.EdgeType.POINTING_RELATION)
+    {
+      w(" style=dashed color=green ");
+    }
+    else if(edge.getEdgeType() == Edge.EdgeType.COVERAGE)
+    {
+      w(" style=dotted color=orange ");
+    }
     // label
     w("label=\"");
     w(edge.getNamespace());
