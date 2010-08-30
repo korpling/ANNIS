@@ -17,17 +17,19 @@
 
 package annis.frontend.servlets.visualizers.dependency;
 
-import annis.exceptions.AnnisException;
+import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.Edge;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections15.map.HashedMap;
 
 /**
  *
@@ -39,6 +41,7 @@ public class RegularDependencyTree extends AbstractDotVisualizer
   private StringBuilder dot;
   private Map<Vector2,AnnisNode> token;
   private Set<String> alreadyWrittenEdge;
+  private boolean flatToken;
 
   private enum NodeType 
   {
@@ -50,6 +53,8 @@ public class RegularDependencyTree extends AbstractDotVisualizer
   {
     dot = sb;
 
+    flatToken = Boolean.parseBoolean(getMappings().getProperty("flat", "false"));
+
     w("digraph G {\n");
     w("  charset=\"UTF-8\";\n");
     w("  graph [truecolor bgcolor=\"#ff000000\"];\n");
@@ -58,6 +63,12 @@ public class RegularDependencyTree extends AbstractDotVisualizer
     token = new HashMap<Vector2, AnnisNode>();
     alreadyWrittenEdge = new HashSet<String>();
 
+    if(flatToken)
+    {
+      // Token are in a subgraph
+      w("  {\n \trank=max;\n");
+    }
+
     for(AnnisNode n : getResult().getGraph().getNodes())
     {
       if(n.isToken())
@@ -65,6 +76,12 @@ public class RegularDependencyTree extends AbstractDotVisualizer
         token.put(new Vector2(n.getLeftToken(), n.getRightToken()), n);
         writeNode(n);
       }
+    }
+
+    if(flatToken)
+    {
+      writeInvisibleTokenEdges(new LinkedList<AnnisNode>(token.values()));
+      w("  }\n");
     }
     
     for(Edge e : getResult().getGraph().getEdges())
@@ -76,6 +93,32 @@ public class RegularDependencyTree extends AbstractDotVisualizer
     }
 
     w("}");
+  }
+
+  private void writeInvisibleTokenEdges(List<AnnisNode> token)
+  {
+    Collections.sort(token, new Comparator<AnnisNode>() {
+
+      @Override
+      public int compare(AnnisNode o1, AnnisNode o2)
+      {
+        return o1.getTokenIndex().compareTo(o2.getTokenIndex());
+      }
+
+    });
+    AnnisNode lastTok = null;
+    for(AnnisNode tok : token)
+    {
+      if(lastTok != null)
+      {
+        w("\t\t");
+        w(lastTok.getId());
+        w(" -> ");
+        w(tok.getId());
+        w(" [style=invis];\n");
+      }
+      lastTok = tok;
+    }
   }
 
   /**
@@ -114,7 +157,21 @@ public class RegularDependencyTree extends AbstractDotVisualizer
 
   private void writeNode(AnnisNode n)
   {    
-    w("  " + n.getId() + "[shape=box, label=\"" + n.getSpannedText() + "\"]");    
+    w("  " + n.getId() + "[shape=box, label=\"" + n.getSpannedText() + "\" ");
+    // background color
+    w("style=filled, ");
+    w("fillcolor=\"");
+    String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    if (colorAsString != null)
+    {
+      MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
+      w(color.getHTMLColor());
+    }
+    else
+    {
+      w("#ffffff");
+    }
+    w("\" ];\n");
   }
 
   private void writeEdge(Edge e)
@@ -125,8 +182,21 @@ public class RegularDependencyTree extends AbstractDotVisualizer
     String srcId = srcNode == null ? "root" : "" + srcNode.getId();
     String destId = destNode == null ? "root" : "" + destNode.getId();
 
+    // get the edge annotation
+    StringBuilder sbAnno = new StringBuilder();
+    boolean first = true;
+    for(Annotation anno : e.getAnnotations())
+    {
+      if(!first)
+      {
+        sbAnno.append("\\n");
+      }
+      first = false;
+      sbAnno.append(anno.getName());
+    }
+
     String edgeString = srcId + " -> " + destId
-      + "[shape=box, label=\"" + "nolabel" + "\"]";
+      + "[shape=box, label=\"" + sbAnno.toString() + "\"]";
 
     if(!alreadyWrittenEdge.contains(edgeString))
     {
@@ -138,6 +208,11 @@ public class RegularDependencyTree extends AbstractDotVisualizer
   private void w(String s)
   {
     dot.append(s);
+  }
+
+  private void w(long l)
+  {
+    dot.append(l);
   }
 
   private class Vector2
