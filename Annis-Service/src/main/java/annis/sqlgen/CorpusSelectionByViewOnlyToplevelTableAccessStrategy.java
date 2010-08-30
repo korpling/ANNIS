@@ -19,8 +19,6 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 
 	private String factsViewName;
   private String nodeViewName;
-  private String factsContextViewName;
-
 	private Logger log = Logger.getLogger(this.getClass());
 
 	private SubQueryCorpusSelectionStrategy subQueryCorpusSelectionStrategy;
@@ -39,10 +37,6 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 			.replaceAll(":view_name", factsViewName)
 			.replaceAll(":node_table", nodeTableAlias());
 
-    String factsContextViewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
-			.replaceAll(":view_name", factsContextViewName)
-			.replaceAll(":node_table", contextTableAlias());
-
     String nodeViewDefinition = "CREATE TEMPORARY VIEW :view_name AS SELECT * FROM :node_table"
 			.replaceAll(":view_name", nodeViewName)
 			.replaceAll(":node_table", realNodeTableAlias());
@@ -52,9 +46,6 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 		if ( ! corpusList.isEmpty() ) {
 			factsViewDefinition += corpusConstraint(corpusList,
         column(nodeTableAlias(), columnName(NODE_TABLE, "toplevel_corpus")));
-
-      factsContextViewDefinition += corpusConstraint(corpusList,
-        column(contextTableAlias(), columnName(CONTEXT, "toplevel_corpus")));
 
       nodeViewDefinition += corpusConstraint(corpusList, 
         column(realNodeTableAlias(), columnName(REAL_NODE_TABLE, "toplevel_corpus")));
@@ -67,9 +58,6 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
         factsViewDefinition += metaDataConstraint(documents,
           column(nodeTableAlias(), columnName(NODE_TABLE, "corpus_ref")));
 
-        factsContextViewDefinition += metaDataConstraint(documents,
-          column(contextTableAlias(), columnName(NODE_TABLE, "corpus_ref")));
-
         nodeViewDefinition += metaDataConstraint(documents,
           column(realNodeTableAlias(), columnName(REAL_NODE_TABLE, "corpus_ref")));
 
@@ -77,11 +65,9 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
 		}
 
     log.debug("SQL for facts view:\n" + factsViewDefinition);
-    log.debug("SQL for facts_context view:\n" + factsContextViewDefinition);
 		log.debug("SQL for node view:\n" + nodeViewDefinition);
 
 		simpleJdbcTemplate.update(factsViewDefinition);
-    simpleJdbcTemplate.update(factsContextViewDefinition);
     simpleJdbcTemplate.update(nodeViewDefinition);
 	}
 
@@ -107,11 +93,6 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
   private String realNodeTableAlias() {
 		return super.tableName(REAL_NODE_TABLE);
 	}
-
-  private String contextTableAlias()
-  {
-    return super.tableName(CONTEXT);
-  }
 
 	
 	@Override
@@ -153,17 +134,5 @@ public class CorpusSelectionByViewOnlyToplevelTableAccessStrategy
   {
     this.nodeViewName = nodeViewName;
   }
-
-  public String getFactsContextViewName()
-  {
-    return factsContextViewName;
-  }
-
-  public void setFactsContextViewName(String factsContextViewName)
-  {
-    this.factsContextViewName = factsContextViewName;
-  }
-
-  
   
 }

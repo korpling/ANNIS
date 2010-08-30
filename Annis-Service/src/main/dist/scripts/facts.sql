@@ -51,16 +51,5 @@ WHERE
   node.toplevel_corpus = :id;
 ;
 
-DROP TABLE IF EXISTS  facts_context_:id;
-CREATE TABLE facts_context_:id
-(
-  CHECK(toplevel_corpus = :id)
-)
-INHERITS (facts_context);
-
-INSERT INTO facts_context_:id
-SELECT DISTINCT  id, text_ref, corpus_ref, left_token,right_token,toplevel_corpus
-FROM facts WHERE toplevel_corpus = :id;
-
 -- can't be run inside transaction
 -- VACUUM ANALYZE facts;

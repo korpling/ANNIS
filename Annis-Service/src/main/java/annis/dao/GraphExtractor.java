@@ -27,13 +27,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 /**
  *
@@ -100,19 +98,6 @@ public class GraphExtractor  implements ResultSetExtractor
 		edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
   }
 
-  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right, boolean analyze)
-  {
-    createLimitedView(jdbcTemplate, nodeCount, offset, limit);
-    createResultView(jdbcTemplate, nodeCount);
-    
-    ParameterizedSingleColumnRowMapper<String> planRowMapper = 
-      new ParameterizedSingleColumnRowMapper<String>();
-    
-    List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n" + getContextQuery(left, right), planRowMapper);
-    return StringUtils.join(plan, "\n");
-  }
-
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
   {
     createLimitedView(jdbcTemplate, nodeCount, offset, limit);
@@ -139,7 +124,6 @@ public class GraphExtractor  implements ResultSetExtractor
       + "SELECT row_number() OVER () AS resultid, *\n"
       + "FROM (SELECT * FROM " + matchedNodesViewName + " ORDER BY " + sbOrder.toString() + ") AS m LIMIT " + limit + " OFFSET " + offset;
 
-    
     jdbcTemplate.execute(query);
 
   }
@@ -162,7 +146,7 @@ public class GraphExtractor  implements ResultSetExtractor
     {
       if(i > 1)
       {
-        q.append("\nUNION ALL\n");
+        q.append("\nUNION\n");
       }
 
       q.append("SELECT resultid AS resultid, ");
@@ -187,30 +171,32 @@ public class GraphExtractor  implements ResultSetExtractor
   {
     StringBuilder q = new StringBuilder();
 
-    q.append("SELECT * FROM (\n");
-    q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, filtered_facts_context AS context, ");
+    q.append("SELECT DISTINCT * FROM (\n");
+    q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, ");
     q.append(nodeTableViewName);
     q.append(" AS f \n"
-      + "WHERE 	context.text_ref = r.text_ref AND ((context.left_token >= r.left_token - ");
+      + "WHERE 	f.text_ref = r.text_ref AND ((f.left_token >= r.left_token - ");
     q.append(left);
-    q.append(" AND context.right_token <= r.right_token + ");
+    q.append(" AND f.right_token <= r.right_token + ");
     q.append(right);
-    q.append(") OR (context.left_token <= r.right_token + ");
+    q.append(") OR (f.left_token <= r.left_token - ");
+    q.append(left);
+    q.append(" AND r.left_token - ");
+    q.append(left);
+    q.append(" <= f.right_token) OR (f.left_token <= r.right_token + ");
     q.append(right);
     q.append(" AND r.right_token + ");
     q.append(right);
-    q.append(" <= context.right_token))");
+    q.append(" <= f.right_token))");
     q.append("	\n"
-      + "AND f.id = context.id \n"
-      + "AND context.id <> r.id \n"
-      + "UNION ALL\n"
+      + "AND f.id <> r.id \n"
+      + "UNION\n"
       + "SELECT r.resultid AS resultid, r.match_index AS match_index, f.* FROM result AS r\n,");
     q.append(nodeTableViewName);
     q.append(" AS f\n"
       + "WHERE f.id = r.id\n");
-    q.append("\n) as temp ORDER BY resultid, pre\n");
+    q.append("\n) as temp \nORDER BY resultid, pre");
 
-    log.info("fancy context query:\n" + q.toString());
 
     return q.toString();
   }

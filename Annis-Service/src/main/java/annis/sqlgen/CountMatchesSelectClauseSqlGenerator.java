@@ -10,7 +10,7 @@ import org.apache.commons.lang.Validate;
 
 import annis.model.AnnisNode;
 
-public class FindMatchesSelectClauseSqlGenerator
+public class CountMatchesSelectClauseSqlGenerator
 	extends BaseNodeSqlGenerator
 	implements SelectClauseSqlGenerator {
 
@@ -32,7 +32,7 @@ public class FindMatchesSelectClauseSqlGenerator
 	}
 	
 	private String selectClauseForNode(AnnisNode node, int index) {
-		String[] columns = { "id", "text_ref", "left_token", "right_token" };
+		String[] columns = { "id" };
 		for (int i = 0; i < columns.length; ++i) {
 			columns[i] = (node == null ? "NULL" : tables(node).aliasedColumn(NODE_TABLE, columns[i])) + " AS " + columns[i] + index;
 		}

@@ -20,7 +20,6 @@ import annis.ql.parser.QueryData;
 import annis.sqlgen.SqlGenerator;
 import java.util.EnumSet;
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -31,20 +30,8 @@ public class DefaultQueryExecutor implements QueryExecutor
 {
 
   private SqlGenerator sqlGenerator;
-  private String matchedNodesViewName;
-  private String factsContextViewName;
-
-  private void appendAtt(StringBuilder sb, int i, String att)
-  {
-      sb.append("context");
-      sb.append(i);
-      sb.append(".");
-      sb.append(att);
-      sb.append(" AS ");
-      sb.append(att);
-      sb.append(i);
-  }
-
+  private String matchedNodesViewName;	
+  
   /**
    *
    * @param jdbcTemplate
@@ -55,77 +42,16 @@ public class DefaultQueryExecutor implements QueryExecutor
   public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData)
   {
     // sql for matches
-    StringBuilder sb = new StringBuilder();
-    sb.append("CREATE TEMPORARY VIEW \"");
-    sb.append(matchedNodesViewName);
-    sb.append("\" AS\n");
-    
-    // select clause
-    sb.append("\t SELECT \n");
-    for(int i=1; i <= queryData.getMaxWidth(); i++)
-    {
-      if(i > 1)
-      {
-        sb.append(", ");
-      }
-      // id
-      appendAtt(sb, i, "id");
-      sb.append(", ");
+    StringBuilder matchSb = new StringBuilder();
+    matchSb.append("CREATE TEMPORARY VIEW \"");
+    matchSb.append(matchedNodesViewName);
+    matchSb.append("\" AS\n");
+    matchSb.append("\t SELECT DISTINCT *\n");
+    matchSb.append("\n\tFROM\n(\n");
+    matchSb.append(sqlGenerator.toSql(queryData, corpusList));
+    matchSb.append("\n) as matched_ids");
 
-      // text_ref
-      appendAtt(sb, i, "text_ref");
-      sb.append(", ");
-
-      // left_token
-      appendAtt(sb, i, "left_token");
-      sb.append(", ");
-
-      // right_token
-      appendAtt(sb, i, "right_token");
-
-    }
-
-    // from clause
-    sb.append("\n\tFROM\n");
-    for(int i=1; i <= queryData.getMaxWidth(); i++)
-    {
-      if(i > 1)
-      {
-        sb.append(", ");
-      }
-      sb.append(factsContextViewName);
-      sb.append(" AS context");
-      sb.append(i);
-      sb.append("\n");
-    }
-
-    // where exists
-    sb.append("WHERE EXISTS(\n");
-    sb.append("SELECT * FROM (\n");
-    // the real query
-    sb.append(sqlGenerator.toSql(queryData, corpusList));
-    
-    sb.append("\n) AS query\n");
-    // semi-join condition
-    sb.append("WHERE ");
-    for(int i=1; i <= queryData.getMaxWidth(); i++)
-    {
-      if(i > 1)
-      {
-        sb.append(" AND ");
-      }
-      sb.append("query.id");
-      sb.append(i);
-      sb.append(" = context");
-      sb.append(i);
-      sb.append(".id");
-    }
-    // end of EXISTS
-    sb.append("\n)\n");
-
-    Logger.getLogger(DefaultQueryExecutor.class).debug("SQL createMatchView:\n" + sb.toString());
-
-    jdbcTemplate.execute(sb.toString());
+    jdbcTemplate.execute(matchSb.toString());
 
   }
 
@@ -163,17 +89,5 @@ public class DefaultQueryExecutor implements QueryExecutor
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
-
-  public String getFactsContextViewName()
-  {
-    return factsContextViewName;
-  }
-
-  public void setFactsContextViewName(String factsContextViewName)
-  {
-    this.factsContextViewName = factsContextViewName;
-  }
-
-  
 
 }

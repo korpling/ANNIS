@@ -79,25 +79,15 @@ public class DddQueryRunner extends AnnisBaseRunner {
 		out.println(annisDao.countMatches(getCorpusList(), dddQuery));
 	}
 	
-	public void doPlanCount(String dddQuery) {
-		out.println(annisDao.planCount(dddQuery, getCorpusList(), false));
-	}
-
-  public void doPlanGraph(String dddQuery) {
-		out.println(annisDao.planGraph(dddQuery, getCorpusList(),
-      0, matchLimit, context, context, false));
+	public void doPlan(String dddQuery) {
+		out.println(annisDao.plan(dddQuery, getCorpusList(), false));
 	}
 	
-	public void doAnalyzeCount(String dddQuery) {
-		out.println(annisDao.planCount(dddQuery, getCorpusList(), true));
-	}
-
-  public void doAnalyzeGraph(String dddQuery) {
-		out.println(annisDao.planGraph(dddQuery, getCorpusList(),
-      0, matchLimit, context, context, true));
+	public void doAnalyze(String dddQuery) {
+		out.println(annisDao.plan(dddQuery, getCorpusList(), true));
 	}
 	
-	public void doAnnotate(String dddQuery) {
+	public void doAnnotate2(String dddQuery) {
 		List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(), dddQuery, 0, matchLimit, context, context);
 		printAsTable(graphs, "nodes", "edges");
 	}

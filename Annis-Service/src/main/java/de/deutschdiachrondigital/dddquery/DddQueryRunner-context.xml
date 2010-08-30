@@ -49,7 +49,7 @@
 		
 		<property name="tableFormatter"><bean class="annis.TableFormatter"/></property>
 		
-		<property name="matchLimit" value="10"/>
+		<property name="matchLimit" value="100"/>
 		<property name="helloMessage" value="DddQuery Interactive shell"/>
 		<property name="prompt" value="DddQuery"/>
 	</bean>

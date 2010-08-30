@@ -111,28 +111,28 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		verify(dddQueryRunner).doCount(DDD_QUERY);
 	}
 	
-	// doPlanCount translates and delegates to DddQueryRunner.doPlanCount()
+	// doPlan translates and delegates to DddQueryRunner.doPlan()
 	@Test
-	public void doPlanCount() {
-		annisRunner.doPlanCount(ANNIS_QUERY);
+	public void doPlan() {
+		annisRunner.doPlan(ANNIS_QUERY);
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doPlanCount(DDD_QUERY);
+		verify(dddQueryRunner).doPlan(DDD_QUERY);
 	}
 	
-	// doAnalyzeCount translates and delegates to DddQueryRunner.doAnalyzeCount()
+	// doAnalyze translates and delegates to DddQueryRunner.doAnalyze()
 	@Test
-	public void doAnalyzeCount() {
-		annisRunner.doAnalyzeCount(ANNIS_QUERY);
+	public void doAnalyze() {
+		annisRunner.doAnalyze(ANNIS_QUERY);
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doAnalyzeCount(DDD_QUERY);
+		verify(dddQueryRunner).doAnalyze(DDD_QUERY);
 	}
 
-	// doAnnotate translates and delegates to DddQueryRunner.doAnnotate
+	// doAnnotate2 translates and delegates to DddQueryRunner.doAnnotate2
 	@Test
-	public void doAnnotate() {
-		annisRunner.doAnnotate(ANNIS_QUERY);
+	public void doAnnotate2() {
+		annisRunner.doAnnotate2(ANNIS_QUERY);
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doAnnotate(DDD_QUERY);
+		verify(dddQueryRunner).doAnnotate2(DDD_QUERY);
 	}
 	
 	// setCorpus translates the corpusList and delegates to DddQueryRunner.doSetCorpus()

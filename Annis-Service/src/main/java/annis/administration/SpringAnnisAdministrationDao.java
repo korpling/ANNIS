@@ -350,9 +350,7 @@ public class SpringAnnisAdministrationDao {
     for(long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS facts_" + l);
-      log.debug("dropping facts_context table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS facts_context_" + l);
+      jdbcOperations.execute("DROP TABLE facts_" + l);
     }
 
     log.debug("recursivly deleting corpora: " + ids);
