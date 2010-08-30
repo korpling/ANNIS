@@ -202,7 +202,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			logRuntime("1st 25 matches for query", task, runtimes);
 			
 			// query plan
-			String plan = annisDao.plan(query, Arrays.asList(corpusId), true);
+			String plan = annisDao.planCount(query, Arrays.asList(corpusId), true);
 			task.setPlan(plan);
 			
 			log.info("test query: " + task.getAnnisQuery() + " " + 

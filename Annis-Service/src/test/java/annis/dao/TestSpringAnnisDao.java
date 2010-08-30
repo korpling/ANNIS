@@ -184,26 +184,26 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	}
 	
 	@Ignore
-	public void plan() {
+	public void planCount() {
 		String EXPLAIN_SQL = "EXPLAIN SQL";
 		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		String test = annisDao.plan(DDDQUERY, CORPUS_LIST, false);
+		String test = annisDao.planCount(DDDQUERY, CORPUS_LIST, false);
 		assertThat(test, is(PLAN));
 		
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}
 	
 	@Ignore
-	public void planAnalyze() {
+	public void planCountAnalyze() {
 		String EXPLAIN_SQL = "EXPLAIN ANALYZE SQL";
 		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		assertThat(annisDao.plan(DDDQUERY, CORPUS_LIST, true), is(PLAN));
+		assertThat(annisDao.planCount(DDDQUERY, CORPUS_LIST, true), is(PLAN));
 
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}

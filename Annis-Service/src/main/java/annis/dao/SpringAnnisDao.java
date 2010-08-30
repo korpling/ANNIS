@@ -134,12 +134,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     throw new UnsupportedOperationException("doWait was only implemented for debug purposes");
   }
 
-  @SuppressWarnings("unchecked")
-  public String plan(String dddQuery, List<Long> corpusList, boolean analyze)
+   public String planCount(String dddQuery, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
-    return new QueryTemplate().explain(corpusList, dddQuery, sqlGenerator, analyze);
+    createDynamicMatchView(corpusList, dddQuery);
+    return countExtractor.explain(getJdbcTemplate(), analyze);
+  }
+
+  public String planGraph(String dddQuery, List<Long> corpusList,
+    long offset, long limit, int left, int right,
+    boolean analyze)
+  {
+    Validate.notNull(corpusList, "corpusList=null passed as argument");
+
+    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
+
+    int nodeCount = queryData.getMaxWidth();
+    return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
+      offset, limit, left, right, analyze);
   }
 
   @SuppressWarnings("unchecked")

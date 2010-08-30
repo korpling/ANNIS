@@ -139,36 +139,36 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void doPlan() {
+	public void doPlanCount() {
 		final String PLAN = "PLAN";
-		when(annisDao.plan(eq(DDDQUERY), anyList(), anyBoolean())).thenReturn(PLAN);
+		when(annisDao.planCount(eq(DDDQUERY), anyList(), anyBoolean())).thenReturn(PLAN);
 		
-		dddQueryRunner.doPlan(DDDQUERY);
+		dddQueryRunner.doPlanCount(DDDQUERY);
 		
-		verify(annisDao).plan(DDDQUERY, CORPUS_LIST, false);
+		verify(annisDao).planCount(DDDQUERY, CORPUS_LIST, false);
 		verify(out).println(PLAN);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void doAnalyze() {
+	public void doAnalyzeCount() {
 		final String PLAN = "PLAN";
-		when(annisDao.plan(eq(DDDQUERY), anyList(), anyBoolean())).thenReturn(PLAN);
+		when(annisDao.planCount(eq(DDDQUERY), anyList(), anyBoolean())).thenReturn(PLAN);
 		
-		dddQueryRunner.doAnalyze(DDDQUERY);
+		dddQueryRunner.doAnalyzeCount(DDDQUERY);
 		
-		verify(annisDao).plan(DDDQUERY, CORPUS_LIST, true);
+		verify(annisDao).planCount(DDDQUERY, CORPUS_LIST, true);
 		verify(out).println(PLAN);
 	}
 	
 	@Test
-	public void doAnnotate2() {
+	public void doAnnotate() {
 		// stub context for DddQueryRunner
 		final int CONTEXT = 2;
 		dddQueryRunner.setContext(CONTEXT);
 		
 		// call and test
-		dddQueryRunner.doAnnotate2(DDDQUERY);
+		dddQueryRunner.doAnnotate(DDDQUERY);
 		verify(annisDao).retrieveAnnotationGraph(CORPUS_LIST, DDDQUERY, 0, MATCH_LIMIT, CONTEXT, CONTEXT);
 	}
 	

@@ -27,75 +27,88 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 /**
  *
  * @author thomas
  */
-public class GraphExtractor  implements ResultSetExtractor
+public class GraphExtractor implements ResultSetExtractor
 {
 
-	private static final Logger log = Logger.getLogger(GraphExtractor.class);
-
+  private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
   private String nodeTableViewName;
-	private AnnotationRowMapper nodeAnnotationRowMapper;
-	private AnnotationRowMapper edgeAnnotationRowMapper;
+  private AnnotationRowMapper nodeAnnotationRowMapper;
+  private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
-  
   private AnnisNodeRowMapper annisNodeRowMapper;
 
   public GraphExtractor()
   {
     // FIXME: totally ugly, but the query has fixed column names (and needs its own column aliasing)
-		// TableAccessStrategyFactory wants a corpus selection strategy
-		// solution: build AnnisNodes with API and refactor SqlGenerator to accept GROUP BY nodes
-		Map<String, String> nodeColumns = new HashMap<String, String>();
-		nodeColumns.put("namespace", "node_namespace");
-		nodeColumns.put("name", "node_name");
+    // TableAccessStrategyFactory wants a corpus selection strategy
+    // solution: build AnnisNodes with API and refactor SqlGenerator to accept GROUP BY nodes
+    Map<String, String> nodeColumns = new HashMap<String, String>();
+    nodeColumns.put("namespace", "node_namespace");
+    nodeColumns.put("name", "node_name");
 
-		Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
-		nodeAnnotationColumns.put("node_ref", "id");
-		nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
-		nodeAnnotationColumns.put("name", "node_annotation_name");
-		nodeAnnotationColumns.put("value", "node_annotation_value");
+    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
+    nodeAnnotationColumns.put("node_ref", "id");
+    nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
+    nodeAnnotationColumns.put("name", "node_annotation_name");
+    nodeAnnotationColumns.put("value", "node_annotation_value");
 
-		Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
-		nodeAnnotationColumns.put("rank_ref", "pre");
-		edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
-		edgeAnnotationColumns.put("name", "edge_annotation_name");
-		edgeAnnotationColumns.put("value", "edge_annotation_value");
+    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
+    nodeAnnotationColumns.put("rank_ref", "pre");
+    edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
+    edgeAnnotationColumns.put("name", "edge_annotation_name");
+    edgeAnnotationColumns.put("value", "edge_annotation_value");
 
-		Map<String, String> edgeColumns = new HashMap<String, String>();
-		edgeColumns.put("node_ref", "id");
-		edgeColumns.put("name", "edge_name");
-		edgeColumns.put("namespace", "edge_name");
+    Map<String, String> edgeColumns = new HashMap<String, String>();
+    edgeColumns.put("node_ref", "id");
+    edgeColumns.put("name", "edge_name");
+    edgeColumns.put("namespace", "edge_name");
 
     Map<String, Map<String, String>> columnAliases = new HashMap<String, Map<String, String>>();
-		columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
-		columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE, nodeAnnotationColumns);
-		columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE, edgeAnnotationColumns);
-		columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
+    columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
+    columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE, nodeAnnotationColumns);
+    columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE, edgeAnnotationColumns);
+    columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
 
     TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(null);
-		tableAccessStrategy.setColumnAliases(columnAliases);
-    
+    tableAccessStrategy.setColumnAliases(columnAliases);
+
     edgeRowMapper = new EdgeRowMapper();
-		edgeRowMapper.setTableAccessStrategy(tableAccessStrategy);
+    edgeRowMapper.setTableAccessStrategy(tableAccessStrategy);
 
     annisNodeRowMapper = new AnnisNodeRowMapper();
-		annisNodeRowMapper.setTableAccessStrategy(tableAccessStrategy);
+    annisNodeRowMapper.setTableAccessStrategy(tableAccessStrategy);
 
     nodeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.NODE_ANNOTATION_TABLE);
-		nodeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
+    nodeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
 
-		edgeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.EDGE_ANNOTATION_TABLE);
-		edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
+    edgeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.EDGE_ANNOTATION_TABLE);
+    edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
+  }
+
+  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right, boolean analyze)
+  {
+    createLimitedView(jdbcTemplate, nodeCount, offset, limit);
+    createResultView(jdbcTemplate, nodeCount);
+
+    ParameterizedSingleColumnRowMapper<String> planRowMapper =
+      new ParameterizedSingleColumnRowMapper<String>();
+
+    List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
+      + "\n" + getContextQuery(left, right), planRowMapper);
+    return StringUtils.join(plan, "\n");
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
@@ -109,9 +122,9 @@ public class GraphExtractor  implements ResultSetExtractor
   private void createLimitedView(JdbcTemplate jdbcTemplate, int nodeCount, long offset, long limit)
   {
     StringBuilder sbOrder = new StringBuilder();
-    for(int i=1; i <= nodeCount; i++)
+    for (int i = 1; i <= nodeCount; i++)
     {
-      if(i > 1)
+      if (i > 1)
       {
         sbOrder.append(", ");
       }
@@ -132,19 +145,19 @@ public class GraphExtractor  implements ResultSetExtractor
   {
     StringBuilder q = new StringBuilder();
 
-    String[] fields = new String[] 
+    String[] fields = new String[]
     {
-      "id", "text_ref","left_token","right_token"
+      "id", "text_ref", "left_token", "right_token"
     };
 
-    
+
     // map the indexed columns to their "native" form without appended index
     // and code the index in an extra column
 
     q.append("CREATE TEMPORARY VIEW result AS\n");
-    for(int i=1; i<=nodeCount; i++)
+    for (int i = 1; i <= nodeCount; i++)
     {
-      if(i > 1)
+      if (i > 1)
       {
         q.append("\nUNION\n");
       }
@@ -152,7 +165,7 @@ public class GraphExtractor  implements ResultSetExtractor
       q.append("SELECT resultid AS resultid, ");
       q.append(i);
       q.append(" AS match_index");
-      for(String s : fields)
+      for (String s : fields)
       {
         q.append(", ");
         q.append(s);
@@ -351,6 +364,4 @@ public class GraphExtractor  implements ResultSetExtractor
   {
     this.nodeTableViewName = nodeTableViewName;
   }
-
-  
 }

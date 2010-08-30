@@ -1,6 +1,5 @@
 package de.deutschdiachrondigital.dddquery;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,208 +22,257 @@ import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
-public class DddQueryRunner extends AnnisBaseRunner {
+public class DddQueryRunner extends AnnisBaseRunner
+{
 
 //	private static Logger log = Logger.getLogger(DddQueryRunner.class);
-	
-	// dependencies
-	private DddQueryParser dddQueryParser;
-	private SqlGenerator findSqlGenerator;
-	private AnnisDao annisDao;
+  // dependencies
+  private DddQueryParser dddQueryParser;
+  private SqlGenerator findSqlGenerator;
+  private AnnisDao annisDao;
   private QueryAnalysis queryAnalysis;
-	
-	private AnnotationGraphDaoHelper annotationGraphDaoHelper;
-	private WekaDaoHelper wekaDaoHelper;
-	private ListCorpusSqlHelper listCorpusHelper;
-	private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+  private AnnotationGraphDaoHelper annotationGraphDaoHelper;
+  private WekaDaoHelper wekaDaoHelper;
+  private ListCorpusSqlHelper listCorpusHelper;
+  private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+  private AnnotationGraphDotExporter annotationGraphDotExporter;
+  private TableFormatter tableFormatter;
+  // settings
+  private int matchLimit;
+  private int context;
+  private List<Long> corpusList;
 
-	private AnnotationGraphDotExporter annotationGraphDotExporter;
-	private TableFormatter tableFormatter;
-	
-	// settings
-	private int matchLimit;
-	private int context;
-	private List<Long> corpusList;
-	
-	public DddQueryRunner() {
-		corpusList = new ArrayList<Long>();
-	}
-	
-	public static void main(String[] args) {
-		// get runner from Spring
-		AnnisBaseRunner.getInstance("dddQueryRunner", "de/deutschdiachrondigital/dddquery/DddQueryRunner-context.xml").run(args);
-	}
-	
-	///// CLI methods
-	
-	public void doHelp(String dddquery) {
-		out.println("not implemented");
-	}
+  public DddQueryRunner()
+  {
+    corpusList = new ArrayList<Long>();
+  }
 
-	public void doParse(String dddQuery) {
-		out.println(DddQueryParser.dumpTree(dddQueryParser.parse(dddQuery)));
-	}
-	
-	// FIXME: missing tests
-	public void doSql(String dddQuery) {
-		// sql query
-		Start statement = dddQueryParser.parse(dddQuery);
+  public static void main(String[] args)
+  {
+    // get runner from Spring
+    AnnisBaseRunner.getInstance("dddQueryRunner", "de/deutschdiachrondigital/dddquery/DddQueryRunner-context.xml").run(args);
+  }
+
+  ///// CLI methods
+  public void doHelp(String dddquery)
+  {
+    out.println("not implemented");
+  }
+
+  public void doParse(String dddQuery)
+  {
+    out.println(DddQueryParser.dumpTree(dddQueryParser.parse(dddQuery)));
+  }
+
+  // FIXME: missing tests
+  public void doSql(String dddQuery)
+  {
+    // sql query
+    Start statement = dddQueryParser.parse(dddQuery);
     QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-		String sql = findSqlGenerator.toSql(queryData, corpusList);
+    String sql = findSqlGenerator.toSql(queryData, corpusList);
 
-		out.println(sql);
-	}
-	
-	public void doCount(String dddQuery) {
-		out.println(annisDao.countMatches(getCorpusList(), dddQuery));
-	}
-	
-	public void doPlan(String dddQuery) {
-		out.println(annisDao.plan(dddQuery, getCorpusList(), false));
-	}
-	
-	public void doAnalyze(String dddQuery) {
-		out.println(annisDao.plan(dddQuery, getCorpusList(), true));
-	}
-	
-	public void doAnnotate2(String dddQuery) {
-		List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(), dddQuery, 0, matchLimit, context, context);
-		printAsTable(graphs, "nodes", "edges");
-	}
-	
-	public void doCorpus(List<Long> corpora) {
-		setCorpusList(corpora);
-	}
+    out.println(sql);
+  }
 
-	public void doWait(String seconds) {
-		try {
-			out.println(annisDao.doWait(Integer.parseInt(seconds)));
-		} catch (Exception e) {
-			//
-		}
-	}
-	
-	public void doList(String unused) {
-		List<AnnisCorpus> corpora = annisDao.listCorpora();
-		printAsTable(corpora, "id", "name", "textCount", "tokenCount");
-	}
-	
-	public void doNodeAnnotations(String doListValues) {
-		boolean listValues = "values".equals(doListValues);
-		List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(corpusList, listValues);
-		printAsTable(nodeAnnotations, "name", "distinctValues");
-	}
-	
-	public void doMeta(String corpusId) {
-		List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
-		printAsTable(corpusAnnotations, "namespace", "name", "value");
-	}
-	///// Helper
-	
-	private void printAsTable(List<? extends Object> list, String... fields) {
-		out.println(tableFormatter.formatAsTable(list, fields));
-	}
-	
-	///// Getter / Setter
-	
-	public DddQueryParser getDddQueryParser() {
-		return dddQueryParser;
-	}
-	
-	public void setDddQueryParser(DddQueryParser dddQueryParser) {
-		this.dddQueryParser = dddQueryParser;
-	}
-	
-	public SqlGenerator getFindSqlGenerator() {
-		return findSqlGenerator;
-	}
-	
-	public void setFindSqlGenerator(SqlGenerator sqlGenerator) {
-		this.findSqlGenerator = sqlGenerator;
-	}
-	
-	public AnnisDao getAnnisDao() {
-		return annisDao;
-	}
-	
-	public void setAnnisDao(AnnisDao annisDao) {
-		this.annisDao = annisDao;
-	}
-	
-	public AnnotationGraphDaoHelper getAnnotationGraphDaoHelper() {
-		return annotationGraphDaoHelper;
-	}
-	
-	public void setAnnotationGraphDaoHelper(
-			AnnotationGraphDaoHelper annotationGraphDaoHelper) {
-		this.annotationGraphDaoHelper = annotationGraphDaoHelper;
-	}
-	
-	public int getMatchLimit() {
-		return matchLimit;
-	}
-	
-	public void setMatchLimit(int matchLimit) {
-		this.matchLimit = matchLimit;
-	}
-	
-	public List<Long> getCorpusList() {
-		return corpusList;
-	}
-	
-	public void setCorpusList(List<Long> corpusList) {
-		this.corpusList = corpusList;
-	}
+  public void doCount(String dddQuery)
+  {
+    out.println(annisDao.countMatches(getCorpusList(), dddQuery));
+  }
 
-	public TableFormatter getTableFormatter() {
-		return tableFormatter;
-	}
+  public void doPlanCount(String dddQuery)
+  {
+    out.println(annisDao.planCount(dddQuery, getCorpusList(), false));
+  }
 
-	public void setTableFormatter(TableFormatter tableFormatter) {
-		this.tableFormatter = tableFormatter;
-	}
+  public void doPlanGraph(String dddQuery)
+  {
+    out.println(annisDao.planGraph(dddQuery, getCorpusList(),
+      0, matchLimit, context, context, false));
+  }
 
-	public WekaDaoHelper getWekaDaoHelper() {
-		return wekaDaoHelper;
-	}
+  public void doAnalyzeCount(String dddQuery)
+  {
+    out.println(annisDao.planCount(dddQuery, getCorpusList(), true));
+  }
 
-	public void setWekaDaoHelper(WekaDaoHelper wekaDaoHelper) {
-		this.wekaDaoHelper = wekaDaoHelper;
-	}
+  public void doAnalyzeGraph(String dddQuery)
+  {
+    out.println(annisDao.planGraph(dddQuery, getCorpusList(),
+      0, matchLimit, context, context, true));
+  }
 
-	public ListCorpusSqlHelper getListCorpusHelper() {
-		return listCorpusHelper;
-	}
+  public void doAnnotate(String dddQuery)
+  {
+    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(), dddQuery, 0, matchLimit, context, context);
+    printAsTable(graphs, "nodes", "edges");
+  }
 
-	public void setListCorpusHelper(ListCorpusSqlHelper listCorpusHelper) {
-		this.listCorpusHelper = listCorpusHelper;
-	}
+  public void doCorpus(List<Long> corpora)
+  {
+    setCorpusList(corpora);
+  }
 
-	public ListNodeAnnotationsSqlHelper getListNodeAnnotationsSqlHelper() {
-		return listNodeAnnotationsSqlHelper;
-	}
+  public void doWait(String seconds)
+  {
+    try
+    {
+      out.println(annisDao.doWait(Integer.parseInt(seconds)));
+    }
+    catch (Exception e)
+    {
+      //
+    }
+  }
 
-	public void setListNodeAnnotationsSqlHelper(
-			ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper) {
-		this.listNodeAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
-	}
+  public void doList(String unused)
+  {
+    List<AnnisCorpus> corpora = annisDao.listCorpora();
+    printAsTable(corpora, "id", "name", "textCount", "tokenCount");
+  }
 
-	public AnnotationGraphDotExporter getAnnotationGraphDotExporter() {
-		return annotationGraphDotExporter;
-	}
+  public void doNodeAnnotations(String doListValues)
+  {
+    boolean listValues = "values".equals(doListValues);
+    List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(corpusList, listValues);
+    printAsTable(nodeAnnotations, "name", "distinctValues");
+  }
 
-	public void setAnnotationGraphDotExporter(
-			AnnotationGraphDotExporter annotationGraphDotExporter) {
-		this.annotationGraphDotExporter = annotationGraphDotExporter;
-	}
+  public void doMeta(String corpusId)
+  {
+    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
+    printAsTable(corpusAnnotations, "namespace", "name", "value");
+  }
+  ///// Helper
 
-	public int getContext() {
-		return context;
-	}
+  private void printAsTable(List<? extends Object> list, String... fields)
+  {
+    out.println(tableFormatter.formatAsTable(list, fields));
+  }
 
-	public void setContext(int context) {
-		this.context = context;
-	}
+  ///// Getter / Setter
+  public DddQueryParser getDddQueryParser()
+  {
+    return dddQueryParser;
+  }
+
+  public void setDddQueryParser(DddQueryParser dddQueryParser)
+  {
+    this.dddQueryParser = dddQueryParser;
+  }
+
+  public SqlGenerator getFindSqlGenerator()
+  {
+    return findSqlGenerator;
+  }
+
+  public void setFindSqlGenerator(SqlGenerator sqlGenerator)
+  {
+    this.findSqlGenerator = sqlGenerator;
+  }
+
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+
+  public AnnotationGraphDaoHelper getAnnotationGraphDaoHelper()
+  {
+    return annotationGraphDaoHelper;
+  }
+
+  public void setAnnotationGraphDaoHelper(
+    AnnotationGraphDaoHelper annotationGraphDaoHelper)
+  {
+    this.annotationGraphDaoHelper = annotationGraphDaoHelper;
+  }
+
+  public int getMatchLimit()
+  {
+    return matchLimit;
+  }
+
+  public void setMatchLimit(int matchLimit)
+  {
+    this.matchLimit = matchLimit;
+  }
+
+  public List<Long> getCorpusList()
+  {
+    return corpusList;
+  }
+
+  public void setCorpusList(List<Long> corpusList)
+  {
+    this.corpusList = corpusList;
+  }
+
+  public TableFormatter getTableFormatter()
+  {
+    return tableFormatter;
+  }
+
+  public void setTableFormatter(TableFormatter tableFormatter)
+  {
+    this.tableFormatter = tableFormatter;
+  }
+
+  public WekaDaoHelper getWekaDaoHelper()
+  {
+    return wekaDaoHelper;
+  }
+
+  public void setWekaDaoHelper(WekaDaoHelper wekaDaoHelper)
+  {
+    this.wekaDaoHelper = wekaDaoHelper;
+  }
+
+  public ListCorpusSqlHelper getListCorpusHelper()
+  {
+    return listCorpusHelper;
+  }
+
+  public void setListCorpusHelper(ListCorpusSqlHelper listCorpusHelper)
+  {
+    this.listCorpusHelper = listCorpusHelper;
+  }
+
+  public ListNodeAnnotationsSqlHelper getListNodeAnnotationsSqlHelper()
+  {
+    return listNodeAnnotationsSqlHelper;
+  }
+
+  public void setListNodeAnnotationsSqlHelper(
+    ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper)
+  {
+    this.listNodeAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
+  }
+
+  public AnnotationGraphDotExporter getAnnotationGraphDotExporter()
+  {
+    return annotationGraphDotExporter;
+  }
+
+  public void setAnnotationGraphDotExporter(
+    AnnotationGraphDotExporter annotationGraphDotExporter)
+  {
+    this.annotationGraphDotExporter = annotationGraphDotExporter;
+  }
+
+  public int getContext()
+  {
+    return context;
+  }
+
+  public void setContext(int context)
+  {
+    this.context = context;
+  }
 
   public QueryAnalysis getQueryAnalysis()
   {
@@ -235,7 +283,4 @@ public class DddQueryRunner extends AnnisBaseRunner {
   {
     this.queryAnalysis = queryAnalysis;
   }
-
-  
-
 }
