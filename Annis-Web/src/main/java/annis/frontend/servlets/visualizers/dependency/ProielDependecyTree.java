@@ -43,7 +43,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     w("digraph G {\n");
     w("charset=\"UTF-8\";\n");
     w("graph [truecolor bgcolor=\"#ff000000\"];\n");
-   
+
     writeAllNodes();
     writeAllEdges();
 
@@ -115,7 +115,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     {
       if ("func".equals(anno.getName()))
       {
-        if("--".equals(anno.getValue()))
+        if ("--".equals(anno.getValue()))
         {
           return;
         }
@@ -125,7 +125,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     }
 
     String style = null;
-    if("secedge".equals(e.getName()))
+    if ("secedge".equals(e.getName()))
     {
       style = "color=blue, fontcolor=black, style=dashed";
     }
@@ -145,63 +145,146 @@ public class ProielDependecyTree extends AbstractDotVisualizer
 
   private void writeNode(AnnisNode n, String word)
   {
-    if("--".equals(word))
+    String shape = "box";
+    String id = "" + n.getId();
+    String fillcolor = "#ffffff";
+    String fontcolor = "black";
+    String style = "filled";
+    String label = "";
+
+    // get pos annotation
+    String posAnno = "";
+
+    for (Annotation anno : n.getNodeAnnotations())
     {
-      w("" +  n.getId() + " [fontcolor=\"black\",label=\"\",shape=\"circle\"];\n");
+      if ("tiger".equals(anno.getNamespace()) && "pos".equals(anno.getName())
+        && anno.getValue() != null)
+      {
+        posAnno = anno.getValue();
+      }
+    }
+
+    if (isEmptyNode(word))
+    {
+      if (isRootNode(n))
+      {
+        shape = "circle";
+      }
+      else
+      {
+        if(posAnno.length() > 0)
+        {
+          // decide which pos to use
+          switch (posAnno.charAt(0))
+          {
+            case 'V':
+              shape = "circle";
+              label = posAnno;
+              break;
+            case 'C':
+              shape = "diamond";
+              label = posAnno;
+              break;
+            case 'P':
+              shape = "hexagon";
+              label = posAnno;
+              break;
+          }
+        }
+      }
     }
     else
     {
-      w("" + n.getId() + "[shape=box, label=\"" + word + "\" ");
+      // is coordinator?
+      if("C-".equals(posAnno))
+      {
+        shape = "diamond";
+      }
+      label = word;
     }
-    // background color
-    w("style=filled, ");
-    w("fillcolor=\"");
-    String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
-    if(colorAsString == null)
+
+    // check coloring
+    String matchColorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    if (matchColorAsString == null)
     {
       // check if there mighte be a matching token that is directly belonging to
       // this "fake" token node
       AnnisNode token = getCorrespondingRealToken(n);
-      if(token != null)
+      if (token != null)
       {
-        colorAsString = getMarkableExactMap().get(Long.toString(token.getId()));
+        matchColorAsString = getMarkableExactMap().get(Long.toString(token.getId()));
       }
     }
-    if (colorAsString != null)
+
+    if (matchColorAsString != null)
     {
-      MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
-      w(color.getHTMLColor());
+      MatchedNodeColors matchColor = MatchedNodeColors.valueOf(matchColorAsString);
+      fillcolor = matchColor.getHTMLColor();
     }
-    else
-    {
-      w("#ffffff");
-    }
-    w("\" ];\n");
+
+    // write out the node
+    w(id);
+    w(" [");
+    wAtt("fontcolor", fontcolor);
+    wAtt("shape", shape);
+    wAtt("fillcolor", fillcolor);
+    wAtt("style", style);
+    wAtt("label", label);
+    w("];\n");
+
   }
 
   private AnnisNode getCorrespondingRealToken(AnnisNode n)
   {
-    if(n == null)
+    if (n == null)
     {
       return null;
     }
-    
-    for(Edge e : n.getOutgoingEdges())
+
+    for (Edge e : n.getOutgoingEdges())
     {
-      if(e.getDestination() != null && e.getDestination().isToken())
+      if (e.getDestination() != null && e.getDestination().isToken())
       {
-        for(Annotation anno : e.getAnnotations())
+        for (Annotation anno : e.getAnnotations())
         {
-          if("tiger".equals(anno.getNamespace()) && "func".equals(anno.getName()) &&
-            "--".equals(anno.getValue()))
+          if ("tiger".equals(anno.getNamespace()) && "func".equals(anno.getName())
+            && "--".equals(anno.getValue()))
           {
             return e.getDestination();
           }
         }
       }
     }
-    
+
     return null;
+  }
+
+  private boolean isRootNode(AnnisNode node)
+  {
+    boolean result = true;
+
+    for (Edge e : node.getIncomingEdges())
+    {
+      if (e.getSource() != null)
+      {
+        result = false;
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  private boolean isEmptyNode(String word)
+  {
+    if (word == null || "".equals(word) || "--".equals(word))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   private void w(String s)
@@ -212,5 +295,13 @@ public class ProielDependecyTree extends AbstractDotVisualizer
   private void w(long l)
   {
     dot.append(l);
+  }
+
+  private void wAtt(String key, String value)
+  {
+    w(key);
+    w("=\"");
+    w(value);
+    w("\"");
   }
 }
