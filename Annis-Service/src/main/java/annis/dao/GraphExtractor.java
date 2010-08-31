@@ -21,8 +21,12 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.sqlgen.TableAccessStrategy;
+import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,118 +104,104 @@ public class GraphExtractor implements ResultSetExtractor
 
   public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right, boolean analyze)
   {
-    createLimitedView(jdbcTemplate, nodeCount, offset, limit);
-    createResultView(jdbcTemplate, nodeCount);
-
     ParameterizedSingleColumnRowMapper<String> planRowMapper =
       new ParameterizedSingleColumnRowMapper<String>();
 
     List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n" + getContextQuery(left, right), planRowMapper);
+      + "\n" + getContextQuery(left, right, limit, offset, nodeCount), planRowMapper);
     return StringUtils.join(plan, "\n");
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
   {
-    createLimitedView(jdbcTemplate, nodeCount, offset, limit);
-    createResultView(jdbcTemplate, nodeCount);
-
-    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(left, right), this);
+    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(left, right, limit, offset, nodeCount), this);
   }
 
-  private void createLimitedView(JdbcTemplate jdbcTemplate, int nodeCount, long offset, long limit)
+  private String getContextQuery(int left, int right, long limit, long offset, int nodeCount)
   {
-    StringBuilder sbOrder = new StringBuilder();
-    for (int i = 1; i <= nodeCount; i++)
-    {
-      if (i > 1)
-      {
-        sbOrder.append(", ");
-      }
-      sbOrder.append("id");
-      sbOrder.append(i);
-    }
 
-    String query =
-      "CREATE TEMPORARY VIEW limited AS\n"
-      + "SELECT row_number() OVER () AS resultid, *\n"
-      + "FROM (SELECT * FROM " + matchedNodesViewName + " ORDER BY " + sbOrder.toString() + ") AS m LIMIT " + limit + " OFFSET " + offset;
+    // key for annotation graph matches
+		StringBuilder keySb = new StringBuilder();
+		keySb.append("ARRAY[matches.id1");
+		for (int i = 2; i <= nodeCount; ++i) {
+			keySb.append(",");
+			keySb.append("matches.id");
+			keySb.append(i);
+		}
+		keySb.append("] AS key");
+		String key = keySb.toString();
 
-    jdbcTemplate.execute(query);
+    // sql for matches
+		StringBuilder matchSb = new StringBuilder();
+		matchSb.append("SELECT * FROM ");
+    matchSb.append(matchedNodesViewName);
+		matchSb.append(" ORDER BY ");
+		matchSb.append("id1");
+		for (int i = 2; i <= nodeCount; ++i) {
+			matchSb.append(", ");
+			matchSb.append("id");
+			matchSb.append(i);
+		}
+		matchSb.append(" OFFSET ");
+		matchSb.append(offset);
+		matchSb.append(" LIMIT ");
+		matchSb.append(limit);
+		String matchSql = matchSb.toString();
 
-  }
-
-  private void createResultView(JdbcTemplate jdbcTemplate, int nodeCount)
-  {
-    StringBuilder q = new StringBuilder();
-
-    String[] fields = new String[]
-    {
-      "id", "text_ref", "left_token", "right_token"
-    };
-
-
-    // map the indexed columns to their "native" form without appended index
-    // and code the index in an extra column
-
-    q.append("CREATE TEMPORARY VIEW result AS\n");
-    for (int i = 1; i <= nodeCount; i++)
-    {
-      if (i > 1)
-      {
-        q.append("\nUNION\n");
-      }
-
-      q.append("SELECT resultid AS resultid, ");
-      q.append(i);
-      q.append(" AS match_index");
-      for (String s : fields)
-      {
-        q.append(", ");
-        q.append(s);
-        q.append(i);
-        q.append(" AS ");
-        q.append(s);
-      }
-      q.append("\nFROM limited\n");
-    }
-
-    jdbcTemplate.execute(q.toString());
-
-  }
-
-  private String getContextQuery(int left, int right)
-  {
-    StringBuilder q = new StringBuilder();
-
-    q.append("SELECT DISTINCT * FROM (\n");
-    q.append("SELECT r.resultid AS resultid, CAST(NULL as numeric) AS match_index, f.* FROM result AS r, ");
-    q.append(nodeTableViewName);
-    q.append(" AS f \n"
-      + "WHERE 	f.text_ref = r.text_ref AND ((f.left_token >= r.left_token - ");
-    q.append(left);
-    q.append(" AND f.right_token <= r.right_token + ");
-    q.append(right);
-    q.append(") OR (f.left_token <= r.left_token - ");
-    q.append(left);
-    q.append(" AND r.left_token - ");
-    q.append(left);
-    q.append(" <= f.right_token) OR (f.left_token <= r.right_token + ");
-    q.append(right);
-    q.append(" AND r.right_token + ");
-    q.append(right);
-    q.append(" <= f.right_token))");
-    q.append("	\n"
-      + "AND f.id <> r.id \n"
-      + "UNION\n"
-      + "SELECT r.resultid AS resultid, r.match_index AS match_index, f.* FROM result AS r\n,");
-    q.append(nodeTableViewName);
-    q.append(" AS f\n"
-      + "WHERE f.id = r.id\n");
-    q.append("\n) as temp \nORDER BY resultid, pre");
-
-
-    return q.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT DISTINCT\n");
+		sb.append("\t");
+		sb.append(key);
+		sb.append(", facts.*\n");
+		sb.append("FROM\n");
+		sb.append("\t(");
+		sb.append(matchSql);
+		sb.append(") AS matches,\n");
+		sb.append("\t");
+    sb.append(nodeTableViewName);
+    sb.append(" AS facts\n");
+		sb.append("WHERE\n");
+		sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
+      .append(left)
+      .append(" AND facts.right_token <= matches.right_token1 + ")
+      .append(right)
+      .append(") OR (facts.left_token <= matches.left_token1 - ")
+      .append(left).append(" AND matches.left_token1 - ")
+      .append(left).append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ")
+      .append(right).append(" AND matches.right_token1 + ")
+      .append(right).append(" <= facts.right_token)))");
+		for (int i = 2; i <= nodeCount; ++i) {
+			sb.append(" OR\n");
+			sb.append("\t(facts.text_ref = matches.text_ref");
+			sb.append(i);
+			sb.append(" AND ((facts.left_token >= matches.left_token");
+			sb.append(i);
+			sb.append(" - ");
+			sb.append(left);
+			sb.append(" AND facts.right_token <= matches.right_token");
+			sb.append(i);
+			sb.append(" + ");
+			sb.append(right);
+			sb.append(") OR (facts.left_token <= matches.left_token");
+			sb.append(i);
+			sb.append(" - ");
+			sb.append(left);
+			sb.append(" AND matches.left_token");
+			sb.append(i);
+			sb.append(" - ");
+			sb.append(left);
+			sb.append(" <= facts.right_token) OR (facts.left_token <= matches.right_token");
+			sb.append(i);
+			sb.append(" + ");
+			sb.append(right);
+			sb.append(" AND matches.right_token");
+			sb.append(i);
+			sb.append(" + ");
+			sb.append(right);
+			sb.append(" <= facts.right_token)))");
+		}
+		sb.append("\nORDER BY key, facts.pre");
+    return sb.toString();
   }
 
   @Override
@@ -220,7 +210,8 @@ public class GraphExtractor implements ResultSetExtractor
     List<AnnotationGraph> graphs = new LinkedList<AnnotationGraph>();
 
     // fn: match group -> annotation graph
-    Map<Long, AnnotationGraph> graphByMatchGroup = new HashMap<Long, AnnotationGraph>();
+
+    Map<List<Long>, AnnotationGraph> graphByMatchGroup = new HashMap<List<Long>, AnnotationGraph>();
 
     // fn: node id -> node
     Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
@@ -233,8 +224,17 @@ public class GraphExtractor implements ResultSetExtractor
     {
       // process result by match group
       // match group is identified by the ids of the matched nodes
-      Long key = resultSet.getLong("resultid");
+      Array sqlKey = resultSet.getArray("key");
       Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
+      Validate.isTrue(sqlKey.getBaseType() == Types.NUMERIC,
+        "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
+      
+      BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
+      ArrayList<Long> key = new ArrayList<Long>();
+      for(BigDecimal bd : keyArray)
+      {
+        key.add(bd.longValue());
+      }
 
       if (!graphByMatchGroup.containsKey(key))
       {
@@ -247,6 +247,12 @@ public class GraphExtractor implements ResultSetExtractor
         // assumes that the result set is sorted by key, pre
         nodeById.clear();
         edgeByPre.clear();
+
+        // set the matched keys
+        for(long l : key)
+        {
+          graph.addMatchedNodeId(l);
+        }
       }
 
       AnnotationGraph graph = graphByMatchGroup.get(key);
@@ -267,16 +273,18 @@ public class GraphExtractor implements ResultSetExtractor
         node = nodeById.get(id);
       }
 
-      // add matched node id to the graph
-      long matchIndex = resultSet.getLong("match_index");
-      if (!resultSet.wasNull())
+      // we now have the id of the node and the general key, so we can 
+      // add the matched node index to the graph (if matched)
+      long matchIndex = 1;
+      //node.setMatchedNodeInQuery(null);
+      for(long l : key)
       {
-        graph.addMatchedNodeId(id);
-        node.setMatchedNodeInQuery(matchIndex);
-      }
-      else if (!graph.getMatchedNodeIds().contains(id))
-      {
-        node.setMatchedNodeInQuery(null);
+        if(id == l)
+        {
+          node.setMatchedNodeInQuery(matchIndex);
+          break;
+        }
+        matchIndex++;
       }
 
       // get edge data
