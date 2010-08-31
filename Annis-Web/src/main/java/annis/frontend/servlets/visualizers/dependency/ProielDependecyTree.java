@@ -21,9 +21,7 @@ import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,7 +43,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     w("digraph G {\n");
     w("charset=\"UTF-8\";\n");
     w("graph [truecolor bgcolor=\"#ff000000\"];\n");
-    
+   
     writeAllNodes();
     writeAllEdges();
 
@@ -70,7 +68,6 @@ public class ProielDependecyTree extends AbstractDotVisualizer
         }
       }
 
-      Vector2 v = new Vector2(n);
       if (isDepNode)
       {
         writeNode(n, word);
@@ -160,6 +157,16 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     w("style=filled, ");
     w("fillcolor=\"");
     String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    if(colorAsString == null)
+    {
+      // check if there mighte be a matching token that is directly belonging to
+      // this "fake" token node
+      AnnisNode token = getCorrespondingRealToken(n);
+      if(token != null)
+      {
+        colorAsString = getMarkableExactMap().get(Long.toString(token.getId()));
+      }
+    }
     if (colorAsString != null)
     {
       MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);
@@ -170,6 +177,31 @@ public class ProielDependecyTree extends AbstractDotVisualizer
       w("#ffffff");
     }
     w("\" ];\n");
+  }
+
+  private AnnisNode getCorrespondingRealToken(AnnisNode n)
+  {
+    if(n == null)
+    {
+      return null;
+    }
+    
+    for(Edge e : n.getOutgoingEdges())
+    {
+      if(e.getDestination() != null && e.getDestination().isToken())
+      {
+        for(Annotation anno : e.getAnnotations())
+        {
+          if("tiger".equals(anno.getNamespace()) && "func".equals(anno.getName()) &&
+            "--".equals(anno.getValue()))
+          {
+            return e.getDestination();
+          }
+        }
+      }
+    }
+    
+    return null;
   }
 
   private void w(String s)
