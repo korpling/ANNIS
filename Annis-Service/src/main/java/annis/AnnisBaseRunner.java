@@ -18,7 +18,11 @@ import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import annis.exceptions.ParseException;
+import java.util.LinkedList;
+import java.util.List;
+import jline.ArgumentCompletor;
 import jline.ConsoleReader;
+import jline.SimpleCompletor;
 
 
 public abstract class AnnisBaseRunner {
@@ -71,11 +75,16 @@ public abstract class AnnisBaseRunner {
 	
 	protected void runInteractive() throws IOException {
 		System.out.println(helloMessage);
+    System.out.println();
+    System.out.println("Use \"help\" for a list of all commands.");
 		System.out.println();
 
     ConsoleReader console = new ConsoleReader();
     console.setUseHistory(true);
     console.setBellEnabled(true);
+
+    String[] commands = detectAvailableCommands().toArray(new String[0]);
+    console.addCompletor(new SimpleCompletor(commands));
 
     String line;
     prompt = "no corpus>";
@@ -84,9 +93,17 @@ public abstract class AnnisBaseRunner {
 			try {
 				
 				String command = line.split(" ")[0];
-        String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(1, line.split(" ").length), " ");
-				runCommand(command, args);
-        
+
+        if("help".equalsIgnoreCase(command))
+        {
+          System.out.println("Available commands:");
+          System.out.println(StringUtils.join(commands, "\n"));
+        }
+        else
+        {
+          String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(1, line.split(" ").length), " ");
+          runCommand(command, args);
+        }
 			} catch (IndexOutOfBoundsException e) {
 				continue;
 			} catch (UsageException e) {
@@ -103,6 +120,27 @@ public abstract class AnnisBaseRunner {
 		System.out.println();
 		System.out.println("ERROR: " + error);
 	}
+
+  protected List<String> detectAvailableCommands()
+  {
+    LinkedList<String> result = new LinkedList<String>();
+    Method[] methods = getClass().getMethods();
+    
+    for(Method m : methods)
+    {
+      if(m.getName().startsWith("do"))
+      {
+        String commandName = m.getName().substring("do".length());
+        if(commandName.length() > 1)
+        {
+          commandName = commandName.substring(0,1).toLowerCase() + commandName.substring(1);
+          result.add(commandName);   
+        }
+      }
+    }
+    
+    return result;
+  }
 
 	protected void runCommand(String command, String args) {
 		String methodName = "do" + command.substring(0, 1).toUpperCase() + command.substring(1);

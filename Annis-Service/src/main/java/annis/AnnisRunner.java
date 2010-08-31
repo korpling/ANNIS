@@ -99,6 +99,12 @@ public class AnnisRunner extends AnnisBaseRunner
     dddQueryRunner.doMeta(corpusId);
   }
 
+  public void doQuit(String dummy)
+  {
+    System.out.println("bye bye!");
+    System.exit(0);
+  }
+
   ///// Delegates for convenience
   private String translate(String annisQuery)
   {

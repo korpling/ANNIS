@@ -39,7 +39,7 @@
 		<property name="dddQueryRunner" ref="dddQueryRunner"/>
 		<property name="annisParser" ref="annisParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
-		<property name="helloMessage" value="Annis Interactive Shell v0.1"/>
+		<property name="helloMessage" value="Annis Interactive Shell v2.1.7"/>
 		<property name="prompt" value="Annis"/>
 	</bean>
 
