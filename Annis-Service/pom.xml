@@ -108,6 +108,14 @@
       <version>2.1_3</version>
       <scope>compile</scope>
     </dependency>
+
+    <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>0.9.94</version>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
 

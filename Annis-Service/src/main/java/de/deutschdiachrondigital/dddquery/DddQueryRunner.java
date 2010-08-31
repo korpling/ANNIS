@@ -21,6 +21,7 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import org.apache.commons.lang.StringUtils;
 
 public class DddQueryRunner extends AnnisBaseRunner
 {
@@ -110,6 +111,14 @@ public class DddQueryRunner extends AnnisBaseRunner
 
   public void doCorpus(List<Long> corpora)
   {
+    if(corpora.isEmpty())
+    {
+      setPrompt("no corpus>");
+    }
+    else
+    {
+      setPrompt(StringUtils.join(corpora,",") + ">");
+    }
     setCorpusList(corpora);
   }
 

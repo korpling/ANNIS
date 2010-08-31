@@ -76,6 +76,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doCorpus(String corpusList)
   {
     dddQueryRunner.doCorpus(dddQueryMapper.translateCorpusList(corpusList));
+    setPrompt(dddQueryRunner.getPrompt());
   }
 
   public void doWait(String seconds)

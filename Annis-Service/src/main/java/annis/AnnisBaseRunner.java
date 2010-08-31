@@ -18,6 +18,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import annis.exceptions.ParseException;
+import jline.ConsoleReader;
 
 
 public abstract class AnnisBaseRunner {
@@ -68,28 +69,28 @@ public abstract class AnnisBaseRunner {
 		}
 	}
 	
-	protected void runInteractive() {
+	protected void runInteractive() throws IOException {
 		System.out.println(helloMessage);
 		System.out.println();
-		BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-		while (true) {
+
+    ConsoleReader console = new ConsoleReader();
+    console.setUseHistory(true);
+    console.setBellEnabled(true);
+
+    String line;
+    prompt = "no corpus>";
+    while((line = console.readLine(prompt + " ")) != null)
+    {
 			try {
-				System.out.print(prompt + "> ");
-				String line = console.readLine();
-				if (line == null) {
-					System.out.println();
-					return;
-				}
 				
 				String command = line.split(" ")[0];
-				String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(1, line.split(" ").length), " ");
+        String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(1, line.split(" ").length), " ");
 				runCommand(command, args);
+        
 			} catch (IndexOutOfBoundsException e) {
 				continue;
 			} catch (UsageException e) {
 				error(e);
-			} catch (IOException e) {
-				throw new AnnisRunnerException("couldn't read command from file: " + e.getMessage());
 			}
 		}
 	}
