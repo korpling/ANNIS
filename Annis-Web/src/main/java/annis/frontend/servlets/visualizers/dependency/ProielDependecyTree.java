@@ -104,7 +104,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     AnnisNode srcNode = e.getSource();
     AnnisNode destNode = e.getDestination();
 
-    if (srcNode == null || destNode == null)
+    if (e.getName() == null || srcNode == null || destNode == null)
     {
       return;
     }
@@ -127,8 +127,17 @@ public class ProielDependecyTree extends AbstractDotVisualizer
       break;
     }
 
+    String style = null;
+    if("secedge".equals(e.getName()))
+    {
+      style = "color=blue, fontcolor=black, style=dashed";
+    }
+    else
+    {
+      style = "color=orange, fontcolor=black";
+    }
     String edgeString = srcId + " -> " + destId
-      + "[shape=box, label=\"" + sbAnno.toString() + "\"]";
+      + "[" + style + " label=\"" + sbAnno.toString() + "\"]";
 
     if (!alreadyWrittenEdge.contains(edgeString))
     {
