@@ -14,7 +14,6 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package annis.frontend.servlets.visualizers.dependency;
 
 import annis.frontend.servlets.MatchedNodeColors;
@@ -29,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -39,77 +39,153 @@ public class RegularDependencyTree extends AbstractDotVisualizer
 {
 
   private StringBuilder dot;
-  private Map<Vector2,AnnisNode> token;
+  private List<AnnisNode> realToken;
+  private List<AnnisNode> pseudoToken;
   private Set<String> alreadyWrittenEdge;
-  private boolean flatToken;
-
-  private enum NodeType 
-  {
-    empty,coordinator,other
-  }
+  private Random rand = new Random();
 
   @Override
   public void createDotContent(StringBuilder sb)
   {
     dot = sb;
 
-    flatToken = Boolean.parseBoolean(getMappings().getProperty("flat", "false"));
 
     w("digraph G {\n");
-    w("  charset=\"UTF-8\";\n");
-    w("  graph [truecolor bgcolor=\"#ff000000\"];\n");
-    w("  root [fontcolor=\"black\",label=\"\",shape=\"circle\"];\n");
+    w("charset=\"UTF-8\";\n");
+    w("graph [truecolor bgcolor=\"#ff000000\"];\n");
+    w("node [shape=none];\n");
 
-    token = new HashMap<Vector2, AnnisNode>();
+    realToken = new LinkedList<AnnisNode>();
+    pseudoToken = new LinkedList<AnnisNode>();
     alreadyWrittenEdge = new HashSet<String>();
 
-    if(flatToken)
-    {
-      // Token are in a subgraph
-      w("  {\n \trank=max;\n");
-    }
-
-    for(AnnisNode n : getResult().getGraph().getNodes())
-    {
-      if(n.isToken())
-      {
-        token.put(new Vector2(n), n);
-        writeNode(n);
-      }
-    }
-
-    if(flatToken)
-    {
-      writeInvisibleTokenEdges(new LinkedList<AnnisNode>(token.values()));
-      w("  }\n");
-    }
-    
-    for(Edge e : getResult().getGraph().getEdges())
-    {
-      if(e.getEdgeType() == Edge.EdgeType.POINTING_RELATION)
-      {
-        writeEdge(e);
-      }
-    }
+    writeAllRealToken();
+    writeAllPseudoToken();
+    writeAllTokenConnections();
+    writeAllDepEdges();
 
     w("}");
+  }
+  
+  private void writeAllRealToken()
+  {
+    // Token are in a subgraph
+    w("  {\n \trank=max;\n");
+
+    for (AnnisNode n : getResult().getGraph().getTokens())
+    {
+      realToken.add(n);
+      writeToken(n);
+    }
+    writeInvisibleTokenEdges(realToken);
+    w("  }\n");
+  }
+  
+  private void writeAllPseudoToken()
+  {
+    // write out pseudo token nodes
+    for (AnnisNode n : getResult().getGraph().getNodes())
+    {
+      if (!n.isToken())
+      {
+        boolean isDepNode = false;
+        String word = null;
+        for (Annotation anno : n.getNodeAnnotations())
+        {
+          if ("tiger".equals(anno.getNamespace()) && "word".equals(anno.getName()))
+          {
+            isDepNode = true;
+            word= anno.getValue();
+            break;
+          }
+        }
+
+        if (isDepNode)
+        {
+          writeNode(n);
+          pseudoToken.add(n);
+        }
+      }
+    }
+  }
+
+  private void writeAllDepEdges()
+  {
+    for (Edge e : getResult().getGraph().getEdges())
+    {
+      if(e.getDestination() != null && !e.getDestination().isToken())
+      {
+        boolean isDepEdge = false;
+        for (Annotation anno : e.getAnnotations())
+        {
+          if ("tiger".equals(anno.getNamespace()) && "func".equals(anno.getName()))
+          {
+            isDepEdge = true;
+            break;
+          }
+        }
+        if (isDepEdge)
+        {
+          writeEdge(e);
+        }
+      }
+    }
+  }
+
+  private void writeAllTokenConnections()
+  {
+    for (AnnisNode tok : pseudoToken)
+    {
+
+      AnnisNode realTok = getCorrespondingRealToken(tok);
+      if(realTok != null)
+      {
+        w("" + tok.getId() + " -> " + realTok.getId() + "[label=\"\", color=lightgrey, arrowhead=none]");
+      }
+    }
+  }
+
+
+  private AnnisNode getCorrespondingRealToken(AnnisNode n)
+  {
+    if (n == null)
+    {
+      return null;
+    }
+
+    for (Edge e : n.getOutgoingEdges())
+    {
+      if (e.getDestination() != null && e.getDestination().isToken())
+      {
+        for (Annotation anno : e.getAnnotations())
+        {
+          if ("tiger".equals(anno.getNamespace()) && "func".equals(anno.getName())
+            && "--".equals(anno.getValue()))
+          {
+            return e.getDestination();
+          }
+        }
+      }
+    }
+
+    return null;
   }
 
   private void writeInvisibleTokenEdges(List<AnnisNode> token)
   {
-    Collections.sort(token, new Comparator<AnnisNode>() {
+    Collections.sort(token, new Comparator<AnnisNode>()
+    {
 
       @Override
       public int compare(AnnisNode o1, AnnisNode o2)
       {
         return o1.getTokenIndex().compareTo(o2.getTokenIndex());
       }
-
     });
     AnnisNode lastTok = null;
-    for(AnnisNode tok : token)
+    for (AnnisNode tok : token)
     {
-      if(lastTok != null)
+      if (lastTok != null)
       {
         w("\t\t");
         w(lastTok.getId());
@@ -121,43 +197,32 @@ public class RegularDependencyTree extends AbstractDotVisualizer
     }
   }
 
-  /**
-   * try to avoid some data oddity where there are dummy nodes instead of annotations
-   * on the real token
-   * @param n
-   * @return
-   */
-  private AnnisNode getRealNode(AnnisNode n)
+  private void writeNode(AnnisNode n)
   {
-    if(n == null)
+    String color = "#000000";
+    String shape = "point";
+
+    String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    if (colorAsString != null)
     {
-      return null;
+      MatchedNodeColors matchedColor = MatchedNodeColors.valueOf(colorAsString);
+      color = matchedColor.getHTMLColor();
+      shape = "circle";
     }
-    else
-    {
-      if(n.isToken())
-      {
-        return n;
-      }
-      else
-      {
-        Vector2 v = new Vector2(n);
-        AnnisNode realToken = token.get(v);
-        if(realToken == null)
-        {
-          return n;
-        }
-        else
-        {
-          return realToken;
-        }
-      }
-    }
+
+    w("  " + n.getId() + "[shape=\"" + shape + "\", label=\"\" ");
+    // background color
+    w("style=filled, ");
+    w("fillcolor=\"");
+    w(color);
+    w("\" color=\"");
+    w(color);
+    w("\" ];\n");
   }
 
-  private void writeNode(AnnisNode n)
-  {    
-    w("  " + n.getId() + "[shape=box, label=\"" + n.getSpannedText() + "\" ");
+  private void writeToken(AnnisNode n)
+  {
+    w("  " + n.getId() + "[label=\"" + n.getSpannedText() + "\" ");
     // background color
     w("style=filled, ");
     w("fillcolor=\"");
@@ -176,35 +241,48 @@ public class RegularDependencyTree extends AbstractDotVisualizer
 
   private void writeEdge(Edge e)
   {
-    AnnisNode srcNode = getRealNode(e.getSource());
-    AnnisNode destNode = getRealNode(e.getDestination());
-    
-    String srcId = srcNode == null ? "root" : "" + srcNode.getId();
-    String destId = destNode == null ? "root" : "" + destNode.getId();
+    AnnisNode srcNode = e.getSource();
+    AnnisNode destNode = e.getDestination();
 
-    // get the edge annotation
-    StringBuilder sbAnno = new StringBuilder();
-    boolean first = true;
-    for(Annotation anno : e.getAnnotations())
+    if(e.getName() == null || srcNode == null || destNode == null)
     {
-      if(!first)
-      {
-        sbAnno.append("\\n");
-      }
-      first = false;
-      sbAnno.append(anno.getName());
+      return;
     }
-
-    String edgeString = srcId + " -> " + destId
-      + "[shape=box, label=\"" + sbAnno.toString() + "\"]";
-
-    if(!alreadyWrittenEdge.contains(edgeString))
+    else
     {
-      w("  " + edgeString);
-      alreadyWrittenEdge.add(edgeString);
+      String srcId = srcNode == null ? "root" : "" + srcNode.getId();
+      String destId = destNode == null ? "root" : "" + destNode.getId();
+
+      // get the edge annotation
+      StringBuilder sbAnno = new StringBuilder();
+      boolean first = true;
+      for (Annotation anno : e.getAnnotations())
+      {
+        if (!first)
+        {
+          sbAnno.append("\\n");
+        }
+        first = false;
+        sbAnno.append(anno.getValue());
+      }
+
+      String style = "solid";
+      if("secedge".equals(e.getName()))
+      {
+        style = "dashed";
+      }
+
+      String edgeString = srcId + " -> " + destId
+        + "[shape=none, label=\"" + sbAnno.toString() + "\" style=\"" + style + "\"];\n";
+
+      if (!alreadyWrittenEdge.contains(edgeString))
+      {
+        w(edgeString);
+        alreadyWrittenEdge.add(edgeString);
+      }
     }
   }
-  
+
   private void w(String s)
   {
     dot.append(s);
