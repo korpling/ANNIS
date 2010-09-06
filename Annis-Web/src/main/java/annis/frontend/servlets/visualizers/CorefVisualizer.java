@@ -325,7 +325,7 @@ private List<Long> getAllTokensFromEdge(Edge e, long edgenumber, String searched
           result.add(a.getId());
       }else{
           for (Edge ed : a.getOutgoingEdges()) {
-            if (ed.getEdgeType()==Edge.EdgeType.COVERAGE){
+            if (ed.getEdgeType()==Edge.EdgeType.COVERAGE || ed.getEdgeType()==Edge.EdgeType.DOMINANCE){
                 List<Long> resultb = getAllTokenChilds(ed.getDestination());
                 for (Long l : resultb){
                     if(!result.contains(l)) result.add(l);
@@ -361,7 +361,7 @@ private List<Long> getAllTokensFromEdge(Edge e, long edgenumber, String searched
           if(!result.contains(b.getId())) result.add(b.getId());
       }else{
           for (Edge ed : b.getOutgoingEdges()) {
-              if (ed.getEdgeType()==Edge.EdgeType.COVERAGE) {
+              if (ed.getEdgeType()==Edge.EdgeType.COVERAGE || ed.getEdgeType()==Edge.EdgeType.DOMINANCE) {
                 List<Long> resultb = getAllTokenChilds(ed.getDestination());
                 for (Long l : resultb){
                     if(!result.contains(l)) result.add(l);
@@ -399,7 +399,7 @@ private List<Long> getAllTokenChilds(AnnisNode a){
       if (a.isToken()) {
           result.add(a.getId());
       }else{
-          for (Edge ed : a.getOutgoingEdges()) if (ed.getEdgeType()==Edge.EdgeType.COVERAGE) {
+          for (Edge ed : a.getOutgoingEdges()) if (ed.getEdgeType()==Edge.EdgeType.COVERAGE || ed.getEdgeType()==Edge.EdgeType.DOMINANCE) {
               List<Long> resultb = getAllTokenChilds(ed.getDestination());
               for (Long l : resultb){
                 if(!result.contains(l)) result.add(l);
