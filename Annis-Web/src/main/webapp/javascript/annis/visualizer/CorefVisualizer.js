@@ -1,7 +1,9 @@
 var activationMap = new Array();
 var linkMap = new Array();
+var activationOrderMap = new Array();
+var colorMap = new Array();
 
-var currentNumberIndex = 0;
+var currentNumberIndex = 1;//0;
 
 Ext.onReady(function()
 {
@@ -76,7 +78,7 @@ function togglePRWithClass(el, on, className)
         var elToken = Ext.get("tok_" + pr);
         if(elToken != null)
         {
-          togglePRWithClassFinal(elToken, on, className);
+          togglePRWithClassFinal(elToken, on, className, el);
         }
       });
     }
@@ -85,93 +87,49 @@ function togglePRWithClass(el, on, className)
 
 }
 
-function togglePRWithClassFinal(el, on, className)
+function togglePRWithClassFinal(el, on, className, superEl)
 {
   var element = Ext.get(el);
   var idAtt = element.getAttributeNS("","id");
+  var sElement = Ext.get(superEl);
+  var superIdAtt = sElement.getAttributeNS("annis","pr_right");
 
   if(element != null && idAtt != null)
   {
     var id = 1*(idAtt.substring("tok_".length));
-    var isAlreadyHandled = on ? (activationMap[id] == 1) : (activationMap[id] == -1);
-
-    /*if(isAlreadyHandled)
-    {
-      return;
-      //on=!on;//test
-    }//*/
 
     if(on)
     {
-      element.addClass(className);
-      element.setStyle("background-color", getRGBFromNumber(currentNumberIndex));
-      activationMap[id] = 1;
+        element.addClass(className);
+        if (activationOrderMap[idAtt] == null){
+            activationOrderMap[idAtt] = "";
+        }
+        activationOrderMap[idAtt] += superIdAtt+",";
+        colorMap[superIdAtt] = currentNumberIndex;
+        element.setStyle("background-color", getRGBFromNumber(currentNumberIndex));
+        activationMap[id] = 1;
     }
     else
     {
       element.removeClass(className);
-      element.setStyle("background-color", "rgb(255,255,255)");
-      activationMap[id] = -1;
+      var recolor = 0;
+      if (activationOrderMap[idAtt]!=null) {
+          activationOrderMap[idAtt] = activationOrderMap[idAtt].replace(superIdAtt+",","");
+          var text = activationOrderMap[idAtt].split(",",10);
+          for(var i=0;i<10;i++){
+              var word = text[i];
+              if (word != null)
+              if (word.length>0) {
+                    recolor = word;break;
+              }
+          }
+      }
+      if (recolor==0){
+        element.setStyle("background-color", "rgb(255,255,255)");
+        activationMap[id] = -1;
+      } else {
+        element.setStyle("background-color", getRGBFromNumber(colorMap[recolor]));//colorMap[superIdAtt]));//"rgb(150,255,150)");
+      }
     }
   }
 }
-
-/**function togglePRWithClass(el, on, className)
-{
-  var element = Ext.get(el);
-  var idAtt = element.getAttributeNS("","id");
-
-  if(element != null && idAtt != null)
-  {
-    var id = 1*(idAtt.substring("tok_".length));
-    var isAlreadyHandled = on ? (activationMap[id] == 1) : (activationMap[id] == -1);
-
-    if(isAlreadyHandled)
-    {
-      return;
-    }
-
-    if(on)
-    {
-      element.addClass(className);
-      element.setStyle("background-color", getRGBFromNumber(currentNumberIndex));
-      activationMap[id] = 1;
-    }
-    else
-    {
-      element.removeClass(className);
-      element.setStyle("background-color", "rgb(255,255,255)");
-      activationMap[id] = -1;
-    }
-
-    var attLeft = element.getAttributeNS("annis", "pr_left");
-    var attRight = element.getAttributeNS("annis", "pr_right");
-    if(attLeft != null)
-    {
-      var prIDsL = attLeft.split(',');
-
-      Ext.each(prIDsL, function(pr)
-      {
-        var elToken = Ext.get("tok_" + pr);
-        if(elToken != null)
-        {
-          togglePRWithClass(elToken, on, className);
-        }
-      });
-    }
-
-    if(attRight != null)
-    {
-      var prIDsR = attRight.split(',');
-
-      Ext.each(prIDsR, function(pr)
-      {
-        var elToken = Ext.get("tok_" + pr);
-        if(elToken != null)
-        {
-          togglePRWithClass(elToken, on, className);
-        }
-      });
-    }
-
-  }//*/
