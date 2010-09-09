@@ -34,7 +34,7 @@ public class DaoTiming {
 		sb.append(") took ");
 		sb.append(new Date().getTime() - start);
 		sb.append(" ms");
-		log.info(sb);
+		log.debug(sb);
 		
 		// return method return value
 		return result;

@@ -27,7 +27,7 @@ public class SqlGenerator
 			subQueries.add(clauseSql);
 		}
 		String sql = StringUtils.join(subQueries, "\n\nUNION ");
-		log.info("SQL:\n" + sql);
+		log.debug("SQL:\n" + sql);
 
 		return sql;
 	}

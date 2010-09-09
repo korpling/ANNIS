@@ -39,7 +39,7 @@
 	<bean id="dddQueryRunner" class="de.deutschdiachrondigital.dddquery.DddQueryRunner">
 		<property name="annisDao" ref="springAnnisDao"/>
 		<property name="dddQueryParser" ref="dddQueryParser"/>
-		<property name="findSqlGenerator" ref="countSqlGenerator"/>
+		<property name="findSqlGenerator" ref="findSqlGenerator"/>
 		<property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
 		<property name="wekaDaoHelper" ref="wekaDaoHelper"/>
 		<property name="listCorpusHelper" ref="listCorpusSqlHelper"/>

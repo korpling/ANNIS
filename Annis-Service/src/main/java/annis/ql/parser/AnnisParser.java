@@ -46,7 +46,7 @@ public class AnnisParser {
 
 	public Start parse(String annisQuery) {
 		try {
-			log.info("parsing Annis query: " + annisQuery);
+			log.debug("parsing Annis query: " + annisQuery);
 
 			// build and post-process syntax tree
 			Start start = getInternalParser().parse(annisQuery);

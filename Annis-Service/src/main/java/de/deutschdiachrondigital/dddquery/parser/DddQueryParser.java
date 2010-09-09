@@ -65,7 +65,7 @@ public class DddQueryParser {
 
 	public Start parse(String dddQuery) {
 		try {
-			log.info("parsing DDDquery: " + dddQuery);
+			log.debug("parsing DDDquery: " + dddQuery);
 
 			// build and post-process syntax tree
 			Start start = getInternalParser().parse(dddQuery);

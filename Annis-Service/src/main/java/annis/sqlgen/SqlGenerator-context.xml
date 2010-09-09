@@ -139,9 +139,4 @@
 		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
 	</bean>
 	
-	<!-- CountSqlGenerator: generates a SQL statement for a DDDquery which counts the results -->
-	<bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator">
-		<property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
-	</bean>
-	
 </beans>
