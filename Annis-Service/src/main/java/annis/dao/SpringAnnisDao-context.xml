@@ -99,7 +99,7 @@
 
   <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource" ref="dataSource"/>
-        <property name="fetchSize" value="10000"/>
+        <property name="fetchSize" value="0"/>
   </bean>
 
 
