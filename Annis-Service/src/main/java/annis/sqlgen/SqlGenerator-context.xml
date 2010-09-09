@@ -33,9 +33,6 @@
 		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
 	</bean>
 	
-	<bean id="tableJoinsInWhereClauseSqlGenerator" class="annis.sqlgen.TableJoinsInWhereClauseSqlGenerator">
-		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-	</bean>
 	
 	<!-- WHERE clause generator -->
 	<bean id="defaultWhereClauseSqlGenerator" class="annis.sqlgen.DefaultWhereClauseSqlGenerator">
