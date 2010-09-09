@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -122,7 +123,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   public int countMatches(final List<Long> corpusList, final String dddQuery)
   {
     QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
-
 
     return countExtractor.queryCount(getJdbcTemplate());
 

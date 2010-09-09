@@ -96,11 +96,18 @@
 	<bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
 		<property name="requiredType" value="java.lang.Long"/>
 	</bean>
-	
+
+  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="fetchSize" value="10000"/>
+  </bean>
+
+
 	<!-- exported bean: AnnisDao -->
 	<bean id="springAnnisDao" class="annis.dao.SpringAnnisDao">
 		<property name="timeout" value="60000"/>
-		<property name="dataSource" ref="dataSource"/>
+    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
+		<!--<property name="dataSource" ref="dataSource"/>-->
 		<property name="dddQueryParser" ref="dddQueryParser"/>
 		<property name="sqlGenerator" ref="findSqlGenerator"/>
 		<property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
