@@ -18,6 +18,10 @@ INSERT INTO facts_:id SELECT DISTINCT
 	node."left" AS "left",
 	node."right" AS "right",
 	node.token_index AS token_index,
+  CASE
+   WHEN token_index is null THEN false
+   ELSE true
+  END as is_token,
 	node.continuous AS continuous,
 	node.span AS span,
 	node.left_token AS left_token,

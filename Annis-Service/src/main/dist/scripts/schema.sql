@@ -130,6 +130,7 @@ CREATE TABLE facts
 	"left"		integer,
 	"right"		integer,
 	token_index	integer,
+  is_token boolean,
 	continuous	boolean,
 	span		varchar(2000),
 	left_token	integer,

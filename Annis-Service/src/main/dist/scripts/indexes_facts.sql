@@ -39,7 +39,7 @@ CREATE INDEX idx_c__text__edge_anno_:id ON facts_:id (edge_annotation_name, edge
 CREATE INDEX idx__exact_cover_:id ON facts_:id (text_ref, "left", "right");
 
 -- search for token
-CREATE INDEX idx__token_search_:id on facts_:id (toplevel_corpus) WHERE token_index IS NOT NULL;
+CREATE INDEX idx__token_search_:id on facts_:id (is_token, toplevel_corpus);
 
 ----- 2nd query
 CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token);
