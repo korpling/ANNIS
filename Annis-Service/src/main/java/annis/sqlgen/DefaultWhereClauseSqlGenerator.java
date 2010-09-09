@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -32,11 +31,13 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import java.util.LinkedList;
 
 public class DefaultWhereClauseSqlGenerator 
 	extends BaseNodeSqlGenerator
 	implements WhereClauseSqlGenerator {
 
+  @Override
 	public List<String> whereConditions(AnnisNode node, List<Long> corpusList,
 			List<Annotation> metaData) {
 		List<String> conditions = new ArrayList<String>();
@@ -262,5 +263,10 @@ public class DefaultWhereClauseSqlGenerator
 		}
 	}
 
+  @Override
+  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Annotation> metaData)
+  {
+    return null;
+  }
 
 }

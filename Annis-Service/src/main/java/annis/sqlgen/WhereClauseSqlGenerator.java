@@ -9,4 +9,6 @@ public interface WhereClauseSqlGenerator {
 
 	List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Annotation> metaData);
 
+  List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Annotation> metaData);
+
 }
