@@ -24,7 +24,7 @@
 
   <util:list id="executorList">
     <ref bean="spanExecutor" />
-    <!--<ref bean="tokExecutor"/>-->
+    <ref bean="tokExecutor"/>
     <ref bean="defaultQueryExecutor"/>
   </util:list>
 
