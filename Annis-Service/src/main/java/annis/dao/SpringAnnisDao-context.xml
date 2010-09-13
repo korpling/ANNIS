@@ -45,7 +45,6 @@
   </bean>
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
-    <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
 

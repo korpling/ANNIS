@@ -42,6 +42,7 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     {
       if(documents.isEmpty())
       {
+        conditions.add("-- WARNING: can't generate any result if empty document list is given");
         conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
           "NULL"));
       }
@@ -52,10 +53,19 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
       }
     }
 
-    if (corpusList != null && !corpusList.isEmpty())
+    if (corpusList != null)
     {
-      conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
-        corpusList));
+      if(corpusList.isEmpty())
+      {
+        conditions.add("-- WARNING: can't generate any result if empty corpus list is given");
+        conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
+          "NULL"));
+      }
+      else
+      {
+        conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
+          corpusList));
+      }
     }
     return conditions;
   }

@@ -48,11 +48,12 @@ public class GraphExtractor implements ResultSetExtractor
 
   private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
-  private String nodeTableViewName;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
   private AnnisNodeRowMapper annisNodeRowMapper;
+
+  protected static final String FACTS_TABLE="facts";
 
   public GraphExtractor()
   {
@@ -108,16 +109,16 @@ public class GraphExtractor implements ResultSetExtractor
       new ParameterizedSingleColumnRowMapper<String>();
 
     List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n" + getContextQuery(left, right, limit, offset, nodeCount), planRowMapper);
+      + "\n" + getContextQuery(corpusList, left, right, limit, offset, nodeCount), planRowMapper);
     return StringUtils.join(plan, "\n");
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
   {
-    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(left, right, limit, offset, nodeCount), this);
+    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(corpusList, left, right, limit, offset, nodeCount), this);
   }
 
-  private String getContextQuery(int left, int right, long limit, long offset, int nodeCount)
+  private String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
   {
 
     // key for annotation graph matches
@@ -149,7 +150,7 @@ public class GraphExtractor implements ResultSetExtractor
 		String matchSql = matchSb.toString();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT DISTINCT\n");
+		sb.append("SELECT \n");
 		sb.append("\t");
 		sb.append(key);
 		sb.append(", facts.*\n");
@@ -158,9 +159,15 @@ public class GraphExtractor implements ResultSetExtractor
 		sb.append(matchSql);
 		sb.append(") AS matches,\n");
 		sb.append("\t");
-    sb.append(nodeTableViewName);
+    sb.append(FACTS_TABLE);
     sb.append(" AS facts\n");
 		sb.append("WHERE\n");
+    if(corpusList != null)
+    {
+      sb.append("facts.toplevel_corpus IN (");
+      sb.append(corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","));
+      sb.append(") AND\n");
+    }
 		sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
       .append(left)
       .append(" AND facts.right_token <= matches.right_token1 + ")
@@ -361,15 +368,5 @@ public class GraphExtractor implements ResultSetExtractor
   public void setMatchedNodesViewName(String matchedNodesViewName)
   {
     this.matchedNodesViewName = matchedNodesViewName;
-  }
-
-  public String getNodeTableViewName()
-  {
-    return nodeTableViewName;
-  }
-
-  public void setNodeTableViewName(String nodeTableViewName)
-  {
-    this.nodeTableViewName = nodeTableViewName;
   }
 }
