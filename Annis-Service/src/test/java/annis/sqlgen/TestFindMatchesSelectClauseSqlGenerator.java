@@ -45,7 +45,7 @@ public class TestFindMatchesSelectClauseSqlGenerator {
 	// return id, text_ref, left_token, right_token for every node
 	@Test
 	public void selectClauseOneMatch() {
-		String expected = "DISTINCT\n" +
+		String expected = "" +
 				"\t_node23.id AS id1, _node23.text_ref AS text_ref1, _node23.left_token AS left_token1, _node23.right_token AS right_token1";
 		String actual = generator.selectClause(Arrays.asList(node23), 1);
 		assertEquals(expected, actual);
@@ -54,7 +54,7 @@ public class TestFindMatchesSelectClauseSqlGenerator {
 	// put columns on new line for every node
 	@Test
 	public void selectClauseManyMatches() {
-		String expected = "DISTINCT\n" +
+		String expected = "" +
 			"\t_node23.id AS id1, _node23.text_ref AS text_ref1, _node23.left_token AS left_token1, _node23.right_token AS right_token1,\n" +
 			"\t_node42.id AS id2, _node42.text_ref AS text_ref2, _node42.left_token AS left_token2, _node42.right_token AS right_token2";
 		String actual = generator.selectClause(Arrays.asList(node23, node42), 2);
@@ -64,7 +64,7 @@ public class TestFindMatchesSelectClauseSqlGenerator {
 	// return NULL fields if less nodes than maxWidth are supplied
 	@Test
 	public void selectClausePadForMissingNodes() {
-		String expected = "DISTINCT\n" +
+		String expected = "" +
 			"\t_node23.id AS id1, _node23.text_ref AS text_ref1, _node23.left_token AS left_token1, _node23.right_token AS right_token1,\n" +
 			"\tNULL AS id2, NULL AS text_ref2, NULL AS left_token2, NULL AS right_token2";
 		assertEquals(expected, generator.selectClause(Arrays.asList(node23), 2));

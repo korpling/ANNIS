@@ -109,6 +109,18 @@ public class TableAccessStrategy {
 		return tables;
 	}
 	
+  public boolean isDistinctNeeded()
+  {
+    if(usesComponentTable() || usesEdgeAnnotationTable() || usesRankTable())
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
 	public boolean usesNodeAnnotationTable() {
 		return ! node.getNodeAnnotations().isEmpty();
 	}
