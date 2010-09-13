@@ -24,36 +24,45 @@ import java.util.List;
  *
  * @author thomas
  */
-public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
+public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
   implements WhereClauseSqlGenerator
 {
 
   @Override
-  public List<String> whereConditions(AnnisNode node, List<Long> corpusList,List<Long> documents)
+  public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
   {
-    return null;
+    if (documents == null && corpusList == null)
+    {
+      return null;
+    }
+    LinkedList<String> conditions = new LinkedList<String>();
+
+    conditions.add("-- select documents by metadata and toplevel corpus");
+    if (documents != null)
+    {
+      if(documents.isEmpty())
+      {
+        conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
+          "NULL"));
+      }
+      else
+      {
+        conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
+          documents));
+      }
+    }
+
+    if (corpusList != null && !corpusList.isEmpty())
+    {
+      conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
+        corpusList));
+    }
+    return conditions;
   }
 
   @Override
   public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
   {
-    LinkedList<String> conditions = new LinkedList<String>();
-    
-    conditions.add("-- annotations can always only be inside a subcorpus/document");
-
-    AnnisNode[] copyNodes = nodes.toArray(new AnnisNode[0]);
-
-    for(int left=0; left < copyNodes.length; left++)
-    {
-      for(int right=left+1; right < copyNodes.length; right++)
-      {
-        conditions.add(join("=",
-          tables(copyNodes[left]).aliasedColumn("node", "corpus_ref"),
-          tables(copyNodes[right]).aliasedColumn("node", "corpus_ref"))
-        );
-      }
-    }
-
-    return conditions;
+    return null;
   }
 }

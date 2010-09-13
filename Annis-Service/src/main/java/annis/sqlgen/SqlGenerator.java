@@ -18,12 +18,13 @@ public class SqlGenerator
 	// dependencies
 	private ClauseSqlGenerator clauseSqlGenerator;
 	
-	public String toSql(QueryData queryData, List<Long> corpusList) {
+	public String toSql(QueryData queryData, List<Long> corpusList, List<Long> documents) {
 		
 		// build SQL query
 		List<String> subQueries = new ArrayList<String>();
 		for (List<AnnisNode> alternative : queryData.getAlternatives()) {
-			String clauseSql = clauseSqlGenerator.toSql(alternative, queryData.getMaxWidth(), corpusList, queryData.getMetaData());
+			String clauseSql = clauseSqlGenerator.toSql(alternative, 
+        queryData.getMaxWidth(), corpusList, documents);
 			subQueries.add(clauseSql);
 		}
 		String sql = StringUtils.join(subQueries, "\n\nUNION ");

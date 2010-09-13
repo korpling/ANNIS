@@ -7,14 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
-import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
 import annis.model.AnnisNode;

@@ -64,6 +64,7 @@ public class TestSqlGenerator {
 		// is represented by the following data
 		QueryData queryData = mock(QueryData.class);
 		List<Long> corpusList = mock(List.class);
+    List<Long> documentList = mock(List.class);
 		when(queryData.getCorpusList()).thenReturn(corpusList);
 		List<AnnisNode> nodes1 = mock(List.class);
 		List<AnnisNode> nodes2 = mock(List.class);
@@ -83,13 +84,13 @@ public class TestSqlGenerator {
 		when(clauseSqlGenerator.toSql(anyList(), anyInt(), anyList(), anyList())).thenReturn(sql1, sql2);
 
     // convert statement to SQL
-		String sql = sqlGenerator.toSql(queryData, corpusList);
+		String sql = sqlGenerator.toSql(queryData, corpusList, documentList);
 		
 		// verify flow control
     
 		// each clause (list of nodes) is transformed to SQL with correct width
-		verify(clauseSqlGenerator).toSql(nodes1, maxWidth, corpusList, metaData);
-		verify(clauseSqlGenerator).toSql(nodes2, maxWidth, corpusList, metaData);
+		verify(clauseSqlGenerator).toSql(nodes1, maxWidth, corpusList, documentList);
+		verify(clauseSqlGenerator).toSql(nodes2, maxWidth, corpusList, documentList);
 
 		// check for correct SQL
 		assertEquals(sql1 + "\n\nUNION " + sql2, sql);
@@ -120,7 +121,7 @@ public class TestSqlGenerator {
 	private void dumpSql(String input) {
 		System.out.println("-- " + input);
 		System.out.println(springManagedSqlGenerator.toSql(
-      springManagedQueryAnalysis.analyzeQuery(parser.parse((input)), null), null));
+      springManagedQueryAnalysis.analyzeQuery(parser.parse((input)), null), null, null));
 		System.out.println();
 	}
 

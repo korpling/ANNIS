@@ -53,6 +53,7 @@ public interface QueryExecutor {
    * @param right
    *
    */
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData);
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, 
+    List<Long> documents, QueryData queryData);
 
 }

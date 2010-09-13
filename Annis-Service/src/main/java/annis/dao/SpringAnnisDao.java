@@ -64,6 +64,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private GraphExtractor graphExtractor;
   private List<QueryExecutor> executorList;
   private Map<AQLConstraints,QueryExecutor> executorConstraints;
+  private MetaDataFilter metaDataFilter;
 
   public SpringAnnisDao()
   {
@@ -100,6 +101,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       // analyze it
       QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
 
+      List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
+
       // execute session modifiers
       for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
       {
@@ -107,7 +110,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       }
 
       // create SQL query
-      return sqlGenerator.toSql(queryData, corpusList);
+      return sqlGenerator.toSql(queryData, corpusList, documents);
     }
   }
 
@@ -181,13 +184,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
     }
 
+    List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
+
     // generate the view with the matched node IDs
     // TODO: use the constraint approach to filter the executors before we iterate over them
     for(QueryExecutor e : executorList)
     {
       if(e.checkIfApplicable(queryData))
       {
-        e.createMatchView(getJdbcTemplate(), corpusList, queryData);
+        e.createMatchView(getJdbcTemplate(), corpusList, documents, queryData);
         // leave the loop
         break;
       }
@@ -484,5 +489,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   }
 
+  public MetaDataFilter getMetaDataFilter()
+  {
+    return metaDataFilter;
+  }
+
+  public void setMetaDataFilter(MetaDataFilter metaDataFilter)
+  {
+    this.metaDataFilter = metaDataFilter;
+  }
+
+  
   
 }

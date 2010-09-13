@@ -23,6 +23,7 @@ import annis.sqlgen.BaseNodeSqlGenerator;
 import annis.sqlgen.SQLHelper;
 import java.util.EnumSet;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -55,7 +56,8 @@ public class SpanExecutor implements QueryExecutor
   }
 
   @Override
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData)
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList,
+    List<Long> documents, QueryData queryData)
   {
 
     StringBuilder sql = new StringBuilder();
@@ -72,6 +74,11 @@ public class SpanExecutor implements QueryExecutor
     sql.append(n.getSpanTextMatching().sqlOperator());
     sql.append(" ");
     sql.append(SQLHelper.sqlString(n.getSpannedText(), n.getSpanTextMatching()));
+    sql.append("\n AND toplevel_corpus IN (");
+    sql.append(StringUtils.join(corpusList, ","));
+    sql.append(") AND corpus_ref IN (");
+    sql.append(StringUtils.join(documents, ","));
+    sql.append(")");
 
     jdbcTemplate.update(sql.toString());
   }

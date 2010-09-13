@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 
 public class ClauseSqlGenerator
 {
@@ -16,7 +15,7 @@ public class ClauseSqlGenerator
   private List<FromClauseSqlGenerator> fromClauseSqlGenerators;
   private List<WhereClauseSqlGenerator> whereClauseSqlGenerators;
 
-  public String toSql(List<AnnisNode> nodes, int maxWidth, List<Long> corpusList, List<Annotation> metaData)
+  public String toSql(List<AnnisNode> nodes, int maxWidth, List<Long> corpusList, List<Long> documents)
   {
     Assert.notEmpty(nodes, "empty node list");
     Assert.isTrue(maxWidth >= nodes.size(), "maxWidth < nodes.size()");
@@ -24,7 +23,7 @@ public class ClauseSqlGenerator
     StringBuffer sb = new StringBuffer();
     appendSelectClause(sb, nodes, maxWidth);
     appendFromClause(sb, nodes);
-    appendWhereClause(sb, nodes, corpusList, metaData);
+    appendWhereClause(sb, nodes, corpusList, documents);
 
     return sb.toString();
   }
@@ -59,7 +58,7 @@ public class ClauseSqlGenerator
   }
 
   ///// WHERE clause generation
-  void appendWhereClause(StringBuffer sb, List<AnnisNode> nodes, List<Long> corpusList, List<Annotation> metaData)
+  void appendWhereClause(StringBuffer sb, List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
   {
 
     // treat each condition as mutable string to remove last AND
@@ -71,7 +70,7 @@ public class ClauseSqlGenerator
       // append node conditions
       for (WhereClauseSqlGenerator generator : whereClauseSqlGenerators)
       {
-        List<String> conditions = generator.whereConditions(node, corpusList, metaData);
+        List<String> conditions = generator.whereConditions(node, corpusList, documents);
         if (conditions != null)
         {
           for (String constraint : conditions)
@@ -85,7 +84,7 @@ public class ClauseSqlGenerator
     // get common where clauses
     for(WhereClauseSqlGenerator generator : whereClauseSqlGenerators)
     {
-      List<String> conditions = generator.commonWhereConditions(nodes, corpusList, metaData);
+      List<String> conditions = generator.commonWhereConditions(nodes, corpusList, documents);
       if(conditions != null)
       {
         for (String constraint : conditions)
@@ -94,7 +93,7 @@ public class ClauseSqlGenerator
         }
       }
     }
-
+    
 
     // append AND to each condition in WHERE clause, skip comments, remember last condition
     StringBuffer lastConstraint = null;

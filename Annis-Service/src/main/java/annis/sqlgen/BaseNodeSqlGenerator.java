@@ -2,7 +2,9 @@ package annis.sqlgen;
 
 import annis.model.AnnisNode;
 import annis.model.AnnisNode.TextMatching;
+import java.util.Collection;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class BaseNodeSqlGenerator {
 
@@ -44,6 +46,15 @@ public class BaseNodeSqlGenerator {
 	protected String between(String lhs, int min, int max) {
 		return lhs + " BETWEEN SYMMETRIC " + min + " AND " + max;
 	}
+
+  protected String in(String lhs, String rhs)
+  {
+    return lhs + " IN (" + rhs + ")";
+  }
+  protected String in(String lhs, Collection values)
+  {
+    return in(lhs, StringUtils.join(values, ","));
+  }
 
 	protected String sqlString(String string) {
     return SQLHelper.sqlString(string);

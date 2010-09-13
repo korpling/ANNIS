@@ -14,7 +14,7 @@ public class TableJoinsInFromClauseSqlGenerator
 	public String fromClause(AnnisNode node) {
 		StringBuffer sb = new StringBuffer();
 		
-		// every node uses the struct table
+		// every node uses the node table
 		sb.append(tableAliasDefinition(node, NODE_TABLE, 1));
 		
 		// rank table

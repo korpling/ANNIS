@@ -38,8 +38,7 @@ public class DefaultWhereClauseSqlGenerator
 	implements WhereClauseSqlGenerator {
 
   @Override
-	public List<String> whereConditions(AnnisNode node, List<Long> corpusList,
-			List<Annotation> metaData) {
+	public List<String> whereConditions(AnnisNode node, List<Long> corpusList,List<Long> documents) {
 		List<String> conditions = new ArrayList<String>();
 		
 		if (node.getSpannedText() != null) {
@@ -48,7 +47,7 @@ public class DefaultWhereClauseSqlGenerator
 		}
 
 		if (node.isToken())
-			conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
+			conditions.add(tables(node).aliasedColumn(NODE_TABLE, "token_index") + " IS NOT NULL");
 
 		if (node.isRoot())
 			conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root") + " IS TRUE");
@@ -264,7 +263,7 @@ public class DefaultWhereClauseSqlGenerator
 	}
 
   @Override
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Annotation> metaData)
+  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList,List<Long> documents)
   {
     return null;
   }

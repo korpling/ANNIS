@@ -43,6 +43,10 @@
 		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
 	</bean>
 	
+  <bean id="metaDataAndCorpusWhereClause" class="annis.sqlgen.MetaDataAndCorpusWhereClause">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
+
 	<bean id="countClauseSqlGenerator" parent="findClauseSqlGenerator">
 		<property name="selectClauseSqlGenerators">
 			<util:list>
@@ -71,14 +75,14 @@
 			<util:list>
 				<ref bean="defaultWhereClauseSqlGenerator"/>
         <ref bean="subcorpusConstraintWhereClause"/>
+        <ref bean="metaDataAndCorpusWhereClause" />
 			</util:list>
 		</property>
 	</bean>
 	
 	<util:map id="tableAliases">
-    <entry key="real_node" value="node" />
-		<entry key="node" value="facts"/>
-		<entry key="node_annotation" value="facts"/>
+		<entry key="node" value="node"/>
+		<entry key="node_annotation" value="node_annotation"/>
 		<entry key="rank" value="facts"/>
 		<entry key="component" value="facts"/>
 		<entry key="edge_annotation" value="facts"/>
@@ -114,28 +118,26 @@
 		</entry>
 	</util:map>
 	
-	<bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy" scope="prototype">
+  <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy" scope="prototype">
 		<property name="tableAliases" ref="tableAliases"/>
 		<property name="columnAliases" ref="columnAliases"/>
 	</bean>
-	
+
+  <bean id="defaultTableAccessStrategy" class="annis.sqlgen.DefaultTableAccessStrategy">
+		<property name="tableAliases" ref="tableAliases"/>
+		<property name="columnAliases" ref="columnAliases"/>
+	</bean>
+
+	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory" >
+    <lookup-method name="createTableAccessStrategy" bean="defaultTableAccessStrategy"/>
+	</bean>
+
+
 	<bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy"/>
-
-	<bean id="corpusSelectionByViewOnlyToplevelTableAccessStrategy" class="annis.sqlgen.CorpusSelectionByViewOnlyToplevelTableAccessStrategy">
-		<property name="tableAliases" ref="tableAliases"/>
-		<property name="columnAliases" ref="columnAliases"/>
-		<property name="factsViewName" value="${annis.filtered-facts-view}"/>
-    <property name="nodeViewName" value="${annis.filtered-node-view}"/>
-		<property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy"/>
-	</bean>
-
-	<bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
-		<lookup-method name="createTableAccessStrategy" bean="corpusSelectionByViewOnlyToplevelTableAccessStrategy"/>
-	</bean>
 	
 	<bean id="queryAnalysis" class="annis.ql.parser.QueryAnalysis">
 		<property name="dnfTransformer" ref="dnfTransformer"/>
-		<lookup-method name="getClauseAnalysis" bean="clauseAnalysis"/>
+    <lookup-method name="getClauseAnalysis" bean="clauseAnalysis"/>
 	</bean>
 	
 	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->

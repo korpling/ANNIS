@@ -95,7 +95,7 @@ public class TestClauseSqlGenerator {
 			}
 			
 			@Override
-			void appendWhereClause(StringBuffer sb, List<AnnisNode> nodes, List<Long> corpusList, List<Annotation> metaData) {
+			void appendWhereClause(StringBuffer sb, List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents) {
 				assertThat(nodes, is(sameInstance(aliasedNodes)));
 				sb.append(whereClause);
 			}

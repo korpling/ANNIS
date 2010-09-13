@@ -10,6 +10,7 @@ import annis.TableFormatter;
 import annis.WekaDaoHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotationGraphDaoHelper;
+import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryAnalysis;
@@ -30,6 +31,7 @@ public class DddQueryRunner extends AnnisBaseRunner
   // dependencies
   private DddQueryParser dddQueryParser;
   private SqlGenerator findSqlGenerator;
+  private MetaDataFilter metaDataFilter;
   private AnnisDao annisDao;
   private QueryAnalysis queryAnalysis;
   private AnnotationGraphDaoHelper annotationGraphDaoHelper;
@@ -71,7 +73,8 @@ public class DddQueryRunner extends AnnisBaseRunner
     // sql query
     Start statement = dddQueryParser.parse(dddQuery);
     QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-    String sql = findSqlGenerator.toSql(queryData, corpusList);
+    
+    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
     out.println(sql);
   }
@@ -292,4 +295,17 @@ public class DddQueryRunner extends AnnisBaseRunner
   {
     this.queryAnalysis = queryAnalysis;
   }
+
+  public MetaDataFilter getMetaDataFilter()
+  {
+    return metaDataFilter;
+  }
+
+  public void setMetaDataFilter(MetaDataFilter metaDataFilter)
+  {
+    this.metaDataFilter = metaDataFilter;
+  }
+
+  
+
 }

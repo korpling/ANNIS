@@ -53,7 +53,8 @@ public class TokExecutor implements QueryExecutor
   }
 
   @Override
-  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, QueryData queryData)
+  public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList,
+    List<Long> documents, QueryData queryData)
   {
 
     StringBuilder sql = new StringBuilder();
@@ -64,7 +65,13 @@ public class TokExecutor implements QueryExecutor
     sql.append("SELECT id AS id1, text_ref AS text_ref1, left_token AS left_token1, right_token AS right_token1");
     sql.append(" FROM ");
     sql.append(filteredNodeViewName);
-    sql.append(" WHERE token_index IS NOT NULL");
+    sql.append(" WHERE token_index IS NOT NULL AND\n");
+    sql.append(" toplevel_corpus IN (");
+    sql.append(StringUtils.join(corpusList, ","));
+    sql.append(") AND corpus_ref IN (");
+    sql.append(StringUtils.join(documents, ","));
+    sql.append(")");
+
 
     jdbcTemplate.update(sql.toString());
   }

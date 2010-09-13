@@ -160,7 +160,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 	@Test
 	public void whereClauseForNodeIsToken() {
 		node23.setToken(true);
-		checkWhereCondition("_node23.is_token IS TRUE");
+		checkWhereCondition("_node23.token_index IS NOT NULL");
 	}
 	
 	// WHERE condition for _=_

@@ -53,6 +53,7 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"SpringAnnisDao-context.xml"})
@@ -64,6 +65,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	// simple SpringDao instance with mocked dependencies
 	private SpringAnnisDao annisDao;
 	@Mock private DddQueryParser dddQueryParser;
+  @Mock private MetaDataFilter metaDataFilter;
 	@Mock private SqlGenerator sqlGenerator;
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
   @Mock private GraphExtractor graphExtractor;
@@ -84,6 +86,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	private static final Start STATEMENT = new Start();
 	private static final String SQL = "SQL";
 	private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
+  private static final List<Long> DOCUMENT_LIST = new LinkedList<Long>();
 	@Mock private List<Match> MATCHES;
 	
 	@SuppressWarnings("unchecked")
@@ -103,9 +106,10 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
 		annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
 		annisDao.setQueryAnalysis(queryAnalysis);
+    annisDao.setMetaDataFilter(metaDataFilter);
 
 		when(dddQueryParser.parse(anyString())).thenReturn(STATEMENT);
-		when(sqlGenerator.toSql(any(QueryData.class), anyList())).thenReturn(SQL);
+		when(sqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
 		
 		simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
 	}
@@ -132,6 +136,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getSqlSessionModifiers(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusByNameDaoHelper(), is(not(nullValue())));
     assertThat(springAnnisDao.getExecutorList(), is(not(nullValue())));
+    assertThat(springAnnisDao.getMetaDataFilter(), is(not(nullValue())));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -142,7 +147,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		QueryData queryData = mock(QueryData.class);
 		when(queryData.getMetaData()).thenReturn(metaData);
 		when(queryData.getCorpusList()).thenReturn(CORPUS_LIST);
-		
+
 		// setup dependencies
 		DddQueryParser dddQueryParser = mock(DddQueryParser.class);
 		annisDao.setDddQueryParser(dddQueryParser);
@@ -162,7 +167,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		
 		SqlGenerator findSqlGenerator = mock(SqlGenerator.class);
 		annisDao.setFindSqlGenerator(findSqlGenerator);
-		when(findSqlGenerator.toSql(any(QueryData.class), anyList())).thenReturn(SQL);
+		when(findSqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
 		
 		MatchRowMapper findRowMapper = mock(MatchRowMapper.class);
 		annisDao.setFindRowMapper(findRowMapper);
@@ -173,7 +178,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(dddQueryParser).parse(DDDQUERY);
 		verify(queryAnalysis).analyzeQuery(STATEMENT, CORPUS_LIST);
 		verify(sqlSessionModifier).modifySqlSession(simpleJdbcTemplate, queryData);
-		verify(findSqlGenerator).toSql(queryData, CORPUS_LIST);
+		verify(findSqlGenerator).toSql(queryData, CORPUS_LIST, DOCUMENT_LIST);
 		verify(jdbcTemplate).query(SQL, findRowMapper);
 	}
 	

@@ -19,135 +19,141 @@
   <import resource="classpath:annis/executors/Executors-context.xml" />
 
 	<!-- Enable bean autowiring -->
-	<context:annotation-config/> 
+  <context:annotation-config/>
 	
 	<!-- Enable AspectJ-style AOP annotations -->
-	<aop:aspectj-autoproxy/>
+  <aop:aspectj-autoproxy/>
 
 	<!-- database connection configuration -->
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="file:${annis.home}/conf/database.properties"/>
-		<property name="placeholderPrefix" value="$dao{"/>
-	</bean>
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="file:${annis.home}/conf/database.properties"/>
+    <property name="placeholderPrefix" value="$dao{"/>
+  </bean>
 	
 	<!-- Transaction management -->
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
 
 	<!-- DataSource -->
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="$dao{datasource.driver}"/>
-		<property name="url" value="$dao{datasource.url}"/>
-		<property name="username" value="$dao{datasource.username}"/>
-		<property name="password" value="$dao{datasource.password}"/>
-	</bean>
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="$dao{datasource.driver}"/>
+    <property name="url" value="$dao{datasource.url}"/>
+    <property name="username" value="$dao{datasource.username}"/>
+    <property name="password" value="$dao{datasource.password}"/>
+  </bean>
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
     <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-	</bean>
-
-
-	<bean id="countExtractor" class="annis.dao.CountExtractor">
-		<property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-	</bean>
-
-	<!-- Helper for annotate command -->
-	<bean id="annotationGraphDaoHelper" class="annis.dao.AnnotationGraphDaoHelper">
-		<property name="dddQueryParser" ref="dddQueryParser"/>
-		<property name="sqlGenerator" ref="findSqlGenerator"/>
-		<property name="queryAnalysis" ref="queryAnalysis"/>
-    <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-	
-	</bean>
-		
-	<!-- Helper for weka command -->
-	<bean id="wekaDaoHelper" class="annis.WekaDaoHelper"/>
-	
-	<!-- Helper for list command -->
-	<bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper"/>
-		
-	<!-- Helper for nodeAnnotations command -->
-	<bean id="listNodeAnnotationsSqlHelper" class="annis.sqlgen.ListNodeAnnotationsSqlHelper"/>
-		
-	<!-- Helper for listCorpusAnnotations command -->
-	<bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
-		
-	<!-- DddQueryParser -->
-	<import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
-	
-	<!-- SqlGenerator -->
-	<import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
-
-  <!-- XXX: Rowmapper? -->
-	<bean id="matchRowMapper" class="annis.dao.MatchRowMapper"/>
-	
-	<!-- Timing Aspect for DAO methods -->
-	<bean class="annis.dao.DaoTiming"/>
-	
-	<!-- Custom transaction management, so that all AnnisDao methods are read-only -->
-	<bean class="annis.dao.DaoTransactionManagement">
-		<property name="transactionManager" ref="transactionManager"/>
-	</bean>
-	
-	<bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
-		<property name="requiredType" value="java.lang.Long"/>
-	</bean>
-
-  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="fetchSize" value="0"/>
   </bean>
 
 
-	<!-- exported bean: AnnisDao -->
-	<bean id="springAnnisDao" class="annis.dao.SpringAnnisDao">
-		<property name="timeout" value="60000"/>
+  <bean id="countExtractor" class="annis.dao.CountExtractor">
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+  </bean>
+
+	<!-- Helper for annotate command -->
+  <bean id="annotationGraphDaoHelper" class="annis.dao.AnnotationGraphDaoHelper">
+    <property name="dddQueryParser" ref="dddQueryParser"/>
+    <property name="sqlGenerator" ref="findSqlGenerator"/>
+    <property name="queryAnalysis" ref="queryAnalysis"/>
+    <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+	
+  </bean>
+		
+	<!-- Helper for weka command -->
+  <bean id="wekaDaoHelper" class="annis.WekaDaoHelper"/>
+	
+	<!-- Helper for list command -->
+  <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper"/>
+		
+	<!-- Helper for nodeAnnotations command -->
+  <bean id="listNodeAnnotationsSqlHelper" class="annis.sqlgen.ListNodeAnnotationsSqlHelper"/>
+		
+	<!-- Helper for listCorpusAnnotations command -->
+  <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
+		
+	<!-- DddQueryParser -->
+  <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
+	
+	<!-- SqlGenerator -->
+  <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
+
+  <!-- XXX: Rowmapper? -->
+  <bean id="matchRowMapper" class="annis.dao.MatchRowMapper"/>
+	
+	<!-- Timing Aspect for DAO methods -->
+  <bean class="annis.dao.DaoTiming"/>
+	
+	<!-- Custom transaction management, so that all AnnisDao methods are read-only -->
+  <bean class="annis.dao.DaoTransactionManagement">
+    <property name="transactionManager" ref="transactionManager"/>
+  </bean>
+	
+  <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
+    <property name="requiredType" value="java.lang.Long"/>
+  </bean>
+
+  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="fetchSize" value="0"/>
+  </bean>
+
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter">
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
 		<!--<property name="dataSource" ref="dataSource"/>-->
-		<property name="dddQueryParser" ref="dddQueryParser"/>
-		<property name="sqlGenerator" ref="findSqlGenerator"/>
-		<property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
+    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
+  </bean>
+
+	<!-- exported bean: AnnisDao -->
+  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao">
+    <property name="timeout" value="60000"/>
+    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
+		<!--<property name="dataSource" ref="dataSource"/>-->
+    <property name="dddQueryParser" ref="dddQueryParser"/>
+    <property name="sqlGenerator" ref="findSqlGenerator"/>
+    <property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
     <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
-		<property name="wekaSqlHelper" ref="wekaDaoHelper"/>
-		<property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
-		<property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
-		<property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
+    <property name="wekaSqlHelper" ref="wekaDaoHelper"/>
+    <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
+    <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
+    <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
 		
 		<!-- new -->
-		<property name="queryAnalysis" ref="queryAnalysis"/>
-		<property name="findSqlGenerator" ref="findSqlGenerator"/>
+    <property name="queryAnalysis" ref="queryAnalysis"/>
+    <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="findRowMapper" ref="matchRowMapper"/>
-		<property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
-		<property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-		<property name="countExtractor" ref="countExtractor"/>
+    <property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
+    <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
+    <property name="countExtractor" ref="countExtractor"/>
 
     <property name="graphExtractor" ref="graphExtractor" />
     <property name="executorList" ref="executorList" />
-	</bean>
-	
-	<bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
-		<property name="scriptFile" value="modify_session.sql"/>
-		<property name="administrationDao">
-			<bean class="annis.administration.SpringAnnisAdministrationDao">
-				<property name="scriptPath" value="${annis.script-path}"/>
-				<property name="dataSource" ref="dataSource"/>
-			</bean>
-		</property>
-	</bean>
-	
-	<bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
-		<property name="timeout" value="600000"/>
-	</bean>
 
-	<util:list id="sqlSessionModifiers">
-		<ref bean="timeOutSqlSessionModifier"/>
-		<ref bean="sqlScriptSessionModifier"/>
-		<ref bean="corpusSelectionByViewOnlyToplevelTableAccessStrategy"/>
- 	</util:list>
+    <property name="metaDataFilter" ref="metaDataFilter" />
+  </bean>
+	
+  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
+    <property name="scriptFile" value="modify_session.sql"/>
+    <property name="administrationDao">
+      <bean class="annis.administration.SpringAnnisAdministrationDao">
+        <property name="scriptPath" value="${annis.script-path}"/>
+        <property name="dataSource" ref="dataSource"/>
+      </bean>
+    </property>
+  </bean>
+	
+  <bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
+    <property name="timeout" value="600000"/>
+  </bean>
+
+  <util:list id="sqlSessionModifiers">
+    <ref bean="timeOutSqlSessionModifier"/>
+    <ref bean="sqlScriptSessionModifier"/>
+  </util:list>
 	
 
 </beans>
