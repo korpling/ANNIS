@@ -10,8 +10,8 @@ CREATE TEMPORARY TABLE _max (
 INSERT INTO _max VALUES (
     (SELECT max(id) + 1 FROM corpus),
     (SELECT max(post) + 1 FROM corpus),
-    (SELECT max(post) + 1 FROM rank), 
-    (SELECT max(id) + 1 FROM component),
+    (SELECT max(post) + 1 FROM facts),
+    (SELECT max(component_id) + 1 FROM facts),
     (SELECT max(id) + 1 FROM node),
     (SELECT max(id) + 1 FROM text)
 );

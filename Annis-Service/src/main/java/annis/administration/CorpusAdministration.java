@@ -73,10 +73,10 @@ public class CorpusAdministration {
 
 			administrationDao.applyConstraints();
 			administrationDao.insertCorpus();
-			administrationDao.dropStagingArea();
-
       // create the new facts table partition
       administrationDao.createFacts(corpusID);
+
+			administrationDao.dropStagingArea();
 
       log.info("Finished import from: " + path);
 		}

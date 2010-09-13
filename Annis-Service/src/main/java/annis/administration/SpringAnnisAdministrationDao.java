@@ -74,6 +74,13 @@ public class SpringAnnisAdministrationDao {
 			"component", "rank", "edge_annotation",
 			FILE_RESOLVER_VIS_MAP
 	};
+
+  private String[] tablesToCopyManually = {
+    	"corpus", "corpus_annotation",
+			"text", 
+			FILE_RESOLVER_VIS_MAP,
+      "corpus_stats"
+  };
 	
 	// tables created during import
 	private String[] createdTables = { "corpus_stats" };
@@ -277,7 +284,7 @@ public class SpringAnnisAdministrationDao {
 	
 	void insertCorpus() {
 		log.info("moving corpus from staging area to main db");
-		for (String table : importedAndCreatedTables())
+		for (String table : tablesToCopyManually)
 		{	
 			int numOfEntries= jdbcOperations.queryForInt("SELECT COUNT(*) from "+tableInStagingArea(table));
 			if (numOfEntries > 0)
@@ -351,6 +358,10 @@ public class SpringAnnisAdministrationDao {
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
+      log.debug("dropping node annotation table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
+      log.debug("dropping node table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE node_" + l);
     }
 
     log.debug("recursivly deleting corpora: " + ids);

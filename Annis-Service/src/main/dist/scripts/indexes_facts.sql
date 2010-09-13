@@ -1,3 +1,19 @@
+---------------------
+-- node_annotation --
+---------------------
+CREATE INDEX idx__node_annotation__value_:id ON node_annotation_:id(name,value,namespace);
+CREATE INDEX idx__node_annotation__namespace_:id ON node_annotation_:id(name,namespace);
+
+-----------
+--  node --
+-----------
+CREATE INDEX idx__node_token_index_:id ON node_:id (token_index);
+CREATE INDEX idx__node_is_token_:id ON node_:id (is_token);
+CREATE INDEX idx__node_span_:id ON node_:id (span,toplevel_corpus);
+
+----------
+--facts --
+----------
 -- Suche kombiniert mit parent
 CREATE INDEX idx_c__parent__node_:id ON facts_:id (parent);
 CREATE INDEX idx_c__parent__token_:id ON facts_:id (parent) WHERE token_index IS NULL;

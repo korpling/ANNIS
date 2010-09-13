@@ -47,7 +47,6 @@ CREATE TABLE node
 	"left"		integer NOT NULL,
 	"right"		integer NOT NULL,
 	token_index	integer,
-  is_token boolean,
 	continuous	boolean,
 	span		varchar(2000),
 	toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
@@ -66,10 +65,37 @@ COMMENT ON COLUMN node.continuous IS 'true if the span (text_ref, left, right) i
 COMMENT ON COLUMN node.token_index IS 'token position if the span (text_ref, left, right) is a token, otherwise NULL';
 COMMENT ON COLUMN node.span IS 'the covered text if the span is a token, otherwise NULL';
 
+CREATE TABLE component
+(
+	id			numeric(38) PRIMARY KEY,
+	type		char(1),
+	namespace	varchar(255),
+	name		varchar(255)
+);
+COMMENT ON COLUMN component.id IS 'primary key';
+COMMENT ON COLUMN component.type IS 'edge type of this component';
+COMMENT ON COLUMN component.namespace IS 'optional namespace of the edges’ names';
+COMMENT ON COLUMN component.name IS 'name of the edges in this component';
+
+CREATE TABLE rank
+(
+	pre				numeric(38)	PRIMARY KEY,
+	post			numeric(38)	NOT NULL UNIQUE,
+	node_ref		numeric(38)	NOT NULL REFERENCES node (id) ON DELETE CASCADE,
+	component_ref	numeric(38) NOT NULL REFERENCES component (id) ON DELETE CASCADE,
+	parent			numeric(38) NULL REFERENCES rank (pre) ON DELETE CASCADE,
+	root			boolean,
+	level			numeric(38) NOT NULL	-- depth of the node in the annotation graph
+);
+COMMENT ON COLUMN rank.pre IS 'pre-order value and primary key';
+COMMENT ON COLUMN rank.post IS 'post-order value';
+COMMENT ON COLUMN rank.node_ref IS 'foreign key to node.id';
+COMMENT ON COLUMN rank.component_ref IS 'foreign key to component.id';
+COMMENT ON COLUMN rank.parent IS 'foreign key to rank.pre of the parent node, or NULL for roots';
+
 CREATE TABLE node_annotation
 (
 	node_ref	numeric(38) REFERENCES node (id) ON DELETE CASCADE,
-  toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	namespace	varchar(150),
 	name		varchar(150) NOT NULL,
 	value		varchar(1500),
@@ -80,6 +106,18 @@ COMMENT ON COLUMN node_annotation.namespace IS 'optional namespace of annotation
 COMMENT ON COLUMN node_annotation.name IS 'annotation key';
 COMMENT ON COLUMN node_annotation.value IS 'annotation value';
 
+CREATE TABLE edge_annotation
+(
+	rank_ref	numeric(38)	REFERENCES rank (pre) ON DELETE CASCADE,
+	namespace	varchar(150),
+	name		varchar(150) NOT NULL,
+	value		varchar(1500),
+	UNIQUE (rank_ref, namespace, name)
+);
+COMMENT ON COLUMN edge_annotation.rank_ref IS 'foreign key to rank.pre';
+COMMENT ON COLUMN edge_annotation.namespace IS 'optional namespace of annotation key';
+COMMENT ON COLUMN edge_annotation.name IS 'annotation key';
+COMMENT ON COLUMN edge_annotation.value IS 'annotation value';
 
 CREATE TABLE facts
 (
@@ -118,20 +156,6 @@ CREATE TABLE facts
 	edge_annotation_value		varchar(1500)
 
 );
-
--- from component
-COMMENT ON COLUMN facts.component_id IS 'component id';
-COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
-COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
-COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
--- from rank
-COMMENT ON COLUMN facts.pre IS 'pre-order value';
-COMMENT ON COLUMN facts.post IS 'post-order value';
-COMMENT ON COLUMN facts.parent IS 'foreign key to rank.pre of the parent node, or NULL for roots';
--- from edge_annotation
-COMMENT ON COLUMN facts.edge_annotation_namespace IS 'optional namespace of annotation key';
-COMMENT ON COLUMN facts.edge_annotation_name IS 'annotation key';
-COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
 
 -- external data
 CREATE TABLE extData
@@ -189,6 +213,17 @@ CREATE VIEW corpus_info AS SELECT
 FROM 
 	corpus_stats;
 	
+CREATE VIEW table_stats AS select
+	(select count(*) from corpus ) as corpus,	
+	(select count(*) from corpus_annotation) as corpus_annotation,
+	(select count(*) from text ) as text,
+	(select count(*) from node ) as node,
+	(select count(*) from node_annotation ) as node_annotation,
+	(select count(*) from rank ) as rank,	
+	(select count(*) from component) as component,
+	(select count(*) from edge_annotation ) as edge_annotation,	
+	(select count(*) from extdata) as extdata
+;
 
 CREATE TABLE resolver_vis_map
 (
