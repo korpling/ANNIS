@@ -23,6 +23,13 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   ///// Commands
+  
+  public void doTestquery(String ignore)
+  {
+    doCorpus("4013");
+    doCount("cat=\"LK\" & cat=\"MF\" & #1 > #2");
+  }
+
   public void doDddquery(String annisQuery)
   {
     out.println(translate(annisQuery));

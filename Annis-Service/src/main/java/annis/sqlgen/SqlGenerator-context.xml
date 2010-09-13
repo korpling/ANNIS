@@ -80,6 +80,7 @@
 		<entry key="rank">
 			<util:map>
 				<entry key="component_ref" value="component_id"/>
+        <entry key="node_ref" value="id"/>
 			</util:map>
 		</entry>
 		<entry key="node_annotation">
