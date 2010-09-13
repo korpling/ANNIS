@@ -96,10 +96,10 @@
 		</entry>
 		<entry key="node_annotation">
 			<util:map>
-				<entry key="node_ref" value="id"/>
-				<entry key="namespace" value="node_annotation_namespace"/>
-				<entry key="name" value="node_annotation_name"/>
-				<entry key="value" value="node_annotation_value"/>
+				<entry key="node_ref" value="node_ref"/>
+				<entry key="namespace" value="namespace"/>
+				<entry key="name" value="name"/>
+				<entry key="value" value="value"/>
 			</util:map>
 		</entry>
 		<entry key="component">
