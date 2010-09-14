@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS _text;
 -- each corpus has a unique name
 -- corpora are ordered in a tree
 
-CREATE TABLE _corpus
+CREATE TEMPORARY TABLE _corpus
 (
 	id 			numeric(38) NOT NULL,		-- primary key
 	name		varchar(100) NOT NULL,		-- unique name
@@ -28,7 +28,7 @@ CREATE TABLE _corpus
 -- corpus annotations
 -- unique combinantion of corpus_ref, namespace and name
 
-CREATE TABLE _corpus_annotation
+CREATE TEMPORARY TABLE _corpus_annotation
 (
 	corpus_ref	numeric(38) NOT NULL,		-- foreign key to _corpus.id
 	namespace	varchar(100),
@@ -38,7 +38,7 @@ CREATE TABLE _corpus_annotation
 
 -- source texts
 -- stores each source text in its entirety
-CREATE TABLE _text
+CREATE TEMPORARY TABLE _text
 (
 	id 		numeric(38) NOT NULL,			-- primary key
 	name	varchar(1000),					-- name (not used)
@@ -50,7 +50,7 @@ CREATE TABLE _text
 -- are part of a corpus and reference a text
 -- cover a span of the text
 -- can be tokens (token_index NOT NULL, span NOT NULL)
-CREATE TABLE _node
+CREATE TEMPORARY TABLE _node
 (
 	id 				numeric(38)	NOT NULL,	-- primary key
 	text_ref 		numeric(38) NOT NULL,	-- foreign key to _text.id
@@ -63,22 +63,24 @@ CREATE TABLE _node
 	continuous		boolean,				-- true if spanned text in _text.text is continuous (not used)
 	span			varchar(2000)			-- for tokens: substring in _text.text (indexed for text search), else: NULL
 );
+CREATE INDEX tmpidx__node__id on _node(id);
 
 -- connected components of the annotation graph
 -- are of a type: Coverage, Dominance, Pointing relation or NULL for root nodes
 -- have a name
-CREATE TABLE _component
+CREATE TEMPORARY TABLE _component
 (
 	id			numeric(38) NOT NULL,		-- primary key
 	type		char(1),					-- edge type: c, d, P, NULL
 	namespace	varchar(255),				-- namespace (not used)
 	name		varchar(255)
 );
+CREATE INDEX tmpidx__component__id on _component(id);
 
 -- pre and post order of the annotation graph
 -- root nodes: parent IS NULL
 -- component and rank together model edges in the annotation graph
-CREATE TABLE _rank
+CREATE TEMPORARY TABLE _rank
 (
 	pre				numeric(38)	NOT NULL,	-- pre and post order of the annotation ODAG
 	post			numeric(38)	NOT NULL,
@@ -86,30 +88,35 @@ CREATE TABLE _rank
 	component_ref	numeric(38) NOT NULL,	-- foreign key to _component.id
 	parent			numeric(38) NULL		-- foreign key to _rank.pre, NULL for root nodes
 );
+CREATE INDEX tmpidx__rank__node_ref on _rank(node_ref);
+CREATE INDEX tmpidx__rank__component_ref on _rank(component_ref);
+CREATE INDEX tmpidx__rank__pre on _rank(pre);
 
 -- node annotations
 -- unique combinantion of node_ref, namespace and name
-CREATE TABLE _node_annotation
+CREATE TEMPORARY TABLE _node_annotation
 (
 	node_ref	numeric(38)	NOT NULL,		-- foreign key to _node.id
 	namespace	varchar(150),
 	name		varchar(150) NOT NULL,
 	value		varchar(1500)
 );
+CREATE INDEX tmpidx__node_annotation__node_ref on _node_annotation(node_ref);
 
 -- edge annotations
 -- unique combinantion of node_ref, namespace and name
-CREATE TABLE _edge_annotation
+CREATE TEMPORARY TABLE _edge_annotation
 (
 	rank_ref		numeric(38)	NOT NULL,	-- foreign key to _rank.pre
 	namespace		varchar(1000),
 	name			varchar(1000) NOT NULL,
 	value			varchar(1000)
 );
+CREATE INDEX tmpidx__edge_annotation__rank_ref on _edge_annotation(rank_ref);
 
 -- resolver visualization mappings
 -- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from relANNIS format
-CREATE TABLE _resolver_vis_map
+CREATE TEMPORARY TABLE _resolver_vis_map
 (
   "corpus"   varchar(100), -- the name of the supercorpus
   "version" 	varchar(100), -- the version of the corpus

@@ -10,7 +10,7 @@ UPDATE _node SET left_token = token_index, right_token = token_index;
 
 -- create a temporary table to get rid of joins between struct and rank
 -- force an ANALYZE on the table, so Postgres won't use slow seq scan
-CREATE TABLE _tmp_spanned_tokens AS 
+CREATE TEMPORARY TABLE _tmp_spanned_tokens AS
 SELECT r.pre, r.post, s.id, s.name, s.token_index, s.left_token, s.left_token AS old_left, s.right_token, s.right_token AS old_right 
 FROM _rank r, _node s, _component c 
 WHERE r.node_ref = s.id AND r.component_ref = c.id AND c.type IN ('c', 'd');
