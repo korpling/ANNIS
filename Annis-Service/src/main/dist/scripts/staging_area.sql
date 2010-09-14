@@ -63,7 +63,6 @@ CREATE TEMPORARY TABLE _node
 	continuous		boolean,				-- true if spanned text in _text.text is continuous (not used)
 	span			varchar(2000)			-- for tokens: substring in _text.text (indexed for text search), else: NULL
 );
-CREATE INDEX tmpidx__node__id on _node(id);
 
 -- connected components of the annotation graph
 -- are of a type: Coverage, Dominance, Pointing relation or NULL for root nodes
@@ -75,7 +74,6 @@ CREATE TEMPORARY TABLE _component
 	namespace	varchar(255),				-- namespace (not used)
 	name		varchar(255)
 );
-CREATE INDEX tmpidx__component__id on _component(id);
 
 -- pre and post order of the annotation graph
 -- root nodes: parent IS NULL
@@ -88,9 +86,6 @@ CREATE TEMPORARY TABLE _rank
 	component_ref	numeric(38) NOT NULL,	-- foreign key to _component.id
 	parent			numeric(38) NULL		-- foreign key to _rank.pre, NULL for root nodes
 );
-CREATE INDEX tmpidx__rank__node_ref on _rank(node_ref);
-CREATE INDEX tmpidx__rank__component_ref on _rank(component_ref);
-CREATE INDEX tmpidx__rank__pre on _rank(pre);
 
 -- node annotations
 -- unique combinantion of node_ref, namespace and name
@@ -101,7 +96,7 @@ CREATE TEMPORARY TABLE _node_annotation
 	name		varchar(150) NOT NULL,
 	value		varchar(1500)
 );
-CREATE INDEX tmpidx__node_annotation__node_ref on _node_annotation(node_ref);
+
 
 -- edge annotations
 -- unique combinantion of node_ref, namespace and name
@@ -112,7 +107,6 @@ CREATE TEMPORARY TABLE _edge_annotation
 	name			varchar(1000) NOT NULL,
 	value			varchar(1000)
 );
-CREATE INDEX tmpidx__edge_annotation__rank_ref on _edge_annotation(rank_ref);
 
 -- resolver visualization mappings
 -- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from relANNIS format

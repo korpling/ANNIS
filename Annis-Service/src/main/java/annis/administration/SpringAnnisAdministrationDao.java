@@ -38,7 +38,6 @@ import javax.activation.MimetypesFileTypeMap;
  * - Datenbank-Zugriffsrechte für verschiedene Methoden
  * - Reihenfolge der Aufrufe
  * - Skripte in $ANNIS_HOME/scripts
- * - COPY mechanism for PostgreSQL, see http://kato.iki.fi/sw/db/postgresql/jdbc/copy/
  */
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class SpringAnnisAdministrationDao {
@@ -191,7 +190,14 @@ public class SpringAnnisAdministrationDao {
 			else
 				bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
 		}
-    }
+  }
+
+  void createStagingAreaIndexes()
+  {
+    log.info("creating indexes for staging area");
+    executeSqlFromScript("indexes_staging.sql");
+  }
+
 	
 	void computeTopLevelCorpus() {
 		log.info("computing top-level corpus");
@@ -264,6 +270,7 @@ public class SpringAnnisAdministrationDao {
 		executeSqlFromScript("corpus_stats.sql");
 	}
 
+
   /**
    *
    * @return the new corpus ID
@@ -275,6 +282,12 @@ public class SpringAnnisAdministrationDao {
     long result = jdbcOperations.queryForLong("SELECT MAX(toplevel_corpus) FROM _node");
     log.info("new corpus ID is " + result);
     return result;
+	}
+
+  void updateCorpusStatsId(long corpusId)
+  {
+		log.info("updating corpus ID in corpus_stat");
+    jdbcOperations.update("UPDATE _corpus_stats SET id = " + corpusId);
 	}
 	
 	void applyConstraints() {
