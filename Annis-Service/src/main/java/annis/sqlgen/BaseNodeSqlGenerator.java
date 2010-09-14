@@ -53,7 +53,14 @@ public class BaseNodeSqlGenerator {
   }
   protected String in(String lhs, Collection values)
   {
-    return in(lhs, StringUtils.join(values, ","));
+    if(values.isEmpty())
+    {
+      return in(lhs, "NULL");
+    }
+    else
+    {
+      return in(lhs, StringUtils.join(values, ","));
+    }
   }
 
 	protected String sqlString(String string) {

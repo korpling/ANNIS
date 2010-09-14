@@ -19,6 +19,7 @@ package annis.sqlgen;
 import annis.model.AnnisNode;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -40,43 +41,40 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     conditions.add("-- select documents by metadata and toplevel corpus");
     if (documents != null)
     {
-      if(documents.isEmpty())
+      conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
+        documents));
+
+      if (tables(node).usesFacts())
       {
-        conditions.add("-- WARNING: can't generate any result if empty document list is given");
-        conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
-          "NULL"));
-      }
-      else
-      {
-        conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
+        conditions.add(in(tables(node).aliasedColumn("facts", "corpus_ref"),
           documents));
-        if(tables(node).usesFacts())
-        {
-          conditions.add(in(tables(node).aliasedColumn("facts", "corpus_ref"),
-            documents));
-        }
       }
+//      if (tables(node).usesNodeAnnotationTable())
+//      {
+//        conditions.add(in(tables(node).aliasedColumn("node_annotation", "corpus_ref"),
+//          documents));
+//      }
+
     }
 
     if (corpusList != null)
     {
-      if(corpusList.isEmpty())
-      {
-        conditions.add("-- WARNING: can't generate any result if empty corpus list is given");
-        conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
-          "NULL"));
-      }
-      else
-      {
-        conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
-          corpusList));
+      conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
+        corpusList));
 
-        if(tables(node).usesFacts())
-        {
-          conditions.add(in(tables(node).aliasedColumn("facts", "toplevel_corpus"),
-            corpusList));
-        }
+      if (tables(node).usesFacts())
+      {
+        conditions.add(in(tables(node).aliasedColumn("facts", "toplevel_corpus"),
+          corpusList));
       }
+
+      if (tables(node).usesNodeAnnotationTable())
+      {
+        conditions.add(in(tables(node).aliasedColumn("node_annotation", "toplevel_corpus"),
+          corpusList));
+      }
+
+
     }
     return conditions;
   }

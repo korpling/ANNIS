@@ -23,18 +23,20 @@ CREATE INDEX idx__node__6_:id ON node_:id (is_token,toplevel_corpus);
 --facts --
 ----------
 
-CREATE INDEX idx__facts__id_:id ON facts_:id (id,corpus_ref);
-CREATE INDEX idx__facts__1_:id ON facts_:id (edge_annotation_name,edge_name,edge_type,parent,pre,edge_annotation_value,corpus_ref);
-CREATE INDEX idx__facts__2_:id ON facts_:id (edge_name,edge_type,"level",post,pre,corpus_ref);
-CREATE INDEX idx__facts__3_:id ON facts_:id (edge_name,edge_type,pre,parent,corpus_ref);
-CREATE INDEX idx__facts__4 ON facts_:id (edge_name,edge_type,post,pre,corpus_ref);
+CREATE INDEX idx__facts__id_:id ON facts_:id (id);
+CREATE INDEX idx__facts__1_:id ON facts_:id (edge_annotation_name,edge_name,edge_type,parent,pre,edge_annotation_value);
+CREATE INDEX idx__facts__2_:id ON facts_:id (edge_name,edge_type,"level",post,pre);
+CREATE INDEX idx__facts__3_:id ON facts_:id (edge_name,edge_type,pre,parent);
+CREATE INDEX idx__facts__4 ON facts_:id (edge_name,edge_type,post,pre);
 
-CREATE INDEX idx__facts__n2_:id ON facts_:id (edge_type,"level",post,pre,corpus_ref) WHERE edge_name IS NULL;
-CREATE INDEX idx__facts__n3_:id ON facts_:id (edge_type,pre,parent,corpus_ref) WHERE edge_name IS NULL;;
-CREATE INDEX idx__facts__n4 ON facts_:id (edge_type,post,pre,corpus_ref) WHERE edge_name IS NULL;;
+CREATE INDEX idx__facts__n2_:id ON facts_:id (edge_type,"level",post,pre) WHERE edge_name IS NULL;
+CREATE INDEX idx__facts__n3_:id ON facts_:id (edge_type,pre,parent) WHERE edge_name IS NULL;;
+CREATE INDEX idx__facts__n4 ON facts_:id (edge_type,post,pre) WHERE edge_name IS NULL;;
 
-CREATE INDEX idx__facts__pre_:id ON facts_:id (pre,corpus_ref);
-CREATE INDEX idx__facts__root_:id ON facts_:id (root,corpus_ref);
+CREATE INDEX idx__facts__pre_:id ON facts_:id (pre);
+CREATE INDEX idx__facts__root_:id ON facts_:id (root);
+CREATE INDEX idx__facts__toplevel_corpus_:id ON facts_:id (toplevel_corpus);
+CREATE INDEX idx__facts__corpus_ref_:id ON facts_:id (corpus_ref);
 
 
 ----- 2nd query
