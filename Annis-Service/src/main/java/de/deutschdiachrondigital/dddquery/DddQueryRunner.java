@@ -1,5 +1,6 @@
 package de.deutschdiachrondigital.dddquery;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,18 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class DddQueryRunner extends AnnisBaseRunner
@@ -57,10 +70,6 @@ public class DddQueryRunner extends AnnisBaseRunner
   }
 
   ///// CLI methods
-  public void doHelp(String dddquery)
-  {
-    out.println("not implemented");
-  }
 
   public void doParse(String dddQuery)
   {
@@ -160,6 +169,50 @@ public class DddQueryRunner extends AnnisBaseRunner
   private void printAsTable(List<? extends Object> list, String... fields)
   {
     out.println(tableFormatter.formatAsTable(list, fields));
+  }
+
+  public Map<String,Set<String>> proposedIndexHelper(String dddQuery)
+  {
+    Map<String,Set<String>> result = new HashMap<String, Set<String>>();
+    result.put("facts", new TreeSet<String>());
+    result.put("node", new TreeSet<String>());
+
+    // sql query
+    Start statement = dddQueryParser.parse(dddQuery);
+    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+
+    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+
+    // extract WHERE clause
+
+    Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
+    if(mWhere.find())
+    {
+      String whereClause = sql.substring(mWhere.end());
+      //out.println("WHERE clause:\n" + whereClause);
+
+      for(String table : result.keySet())
+      {
+        Set<String> attr = result.get(table);
+        Matcher mFacts = Pattern.compile( table + "[0-9]+\\.([^ =]+)").matcher(whereClause);
+        while(mFacts.find())
+        {
+          attr.add(mFacts.group(1).trim());
+        }
+      }
+
+      // print result
+      //out.println("facts: " + StringUtils.join(factsAttributes, ", "));
+      //out.println("node: " + StringUtils.join(nodeAttributes, ", "));
+      //out.println("suggested index: ");
+      //out.println("CREATE INDEX idx__facts__noname ON facts (" + StringUtils.join(factsAttributes, ", ") + ");");
+      //out.println("CREATE INDEX idx__node__noname ON node (" + StringUtils.join(nodeAttributes, ", ") + ");");
+    }
+    else
+    {
+      out.println("Could not find the WHERE clause");
+    }
+    return result;
   }
 
   ///// Getter / Setter

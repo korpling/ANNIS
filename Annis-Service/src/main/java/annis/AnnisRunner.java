@@ -3,6 +3,17 @@ package annis;
 import annis.ql.parser.AnnisParser;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.deutschdiachrondigital.dddquery.DddQueryRunner;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -24,10 +35,53 @@ public class AnnisRunner extends AnnisBaseRunner
 
   ///// Commands
   
-  public void doTestquery(String ignore)
+  public void doProposedIndex(String ignore)
   {
-    doCorpus("4013");
-    doCount("cat=\"LK\" & cat=\"MF\" & #1 > #2");
+    File fInput = new File("queries.txt");
+
+    Map<String,List<String>> output = new HashMap<String, List<String>>();
+
+    if(fInput.exists())
+    {
+      try
+      {
+        String[] content = FileUtils.readFileToString(fInput).split("\n");
+        
+        for(String query : content)
+        {
+          Map<String,Set<String>> map = dddQueryRunner.proposedIndexHelper(translate(query));
+          for(String table : map.keySet())
+          {
+            if(!output.containsKey(table))
+            {
+              output.put(table, new LinkedList<String>());
+            }
+            Set<String> l = map.get(table);
+            if(l.size() > 0)
+            {
+              output.get(table).add(StringUtils.join(l, ","));
+            }
+            out.println(query + "/" + table + ": " + map.get(table));
+          }
+        }
+
+        for(String table : output.keySet())
+        {
+          File fOutput = new File(table + "_attributes.csv");
+          FileUtils.writeLines(fOutput, output.get(table));
+        }
+
+      }
+      catch (IOException ex)
+      {
+        Logger.getLogger(AnnisRunner.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+    }
+    else
+    {
+      out.println("Could not find queries.txt");
+    }
   }
 
   public void doDddquery(String annisQuery)
