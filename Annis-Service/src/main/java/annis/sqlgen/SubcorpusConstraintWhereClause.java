@@ -51,6 +51,14 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
           tables(copyNodes[left]).aliasedColumn("node", "corpus_ref"),
           tables(copyNodes[right]).aliasedColumn("node", "corpus_ref"))
         );
+
+        if(tables(copyNodes[left]).usesFacts() && tables(copyNodes[right]).usesFacts() )
+        {
+          conditions.add(join("=",
+            tables(copyNodes[left]).aliasedColumn("facts", "corpus_ref"),
+            tables(copyNodes[right]).aliasedColumn("facts", "corpus_ref"))
+          );
+        }
       }
     }
 

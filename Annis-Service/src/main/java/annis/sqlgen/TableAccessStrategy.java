@@ -109,7 +109,7 @@ public class TableAccessStrategy {
 		return tables;
 	}
 	
-  public boolean isDistinctNeeded()
+  public boolean usesFacts()
   {
     if(usesComponentTable() || usesEdgeAnnotationTable() || usesRankTable())
     {

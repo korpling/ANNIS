@@ -49,19 +49,22 @@ public class AnnisRunner extends AnnisBaseRunner
         
         for(String query : content)
         {
-          Map<String,Set<String>> map = dddQueryRunner.proposedIndexHelper(translate(query));
-          for(String table : map.keySet())
+          if(query.trim().length() > 0)
           {
-            if(!output.containsKey(table))
+            Map<String,Set<String>> map = dddQueryRunner.proposedIndexHelper(translate(query.trim()));
+            for(String table : map.keySet())
             {
-              output.put(table, new LinkedList<String>());
+              if(!output.containsKey(table))
+              {
+                output.put(table, new LinkedList<String>());
+              }
+              Set<String> l = map.get(table);
+              if(l.size() > 0)
+              {
+                output.get(table).add(StringUtils.join(l, ","));
+              }
+              out.println(query + "/" + table + ": " + map.get(table));
             }
-            Set<String> l = map.get(table);
-            if(l.size() > 0)
-            {
-              output.get(table).add(StringUtils.join(l, ","));
-            }
-            out.println(query + "/" + table + ": " + map.get(table));
           }
         }
 

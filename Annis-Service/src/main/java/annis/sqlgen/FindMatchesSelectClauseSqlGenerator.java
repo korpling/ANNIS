@@ -25,7 +25,7 @@ public class FindMatchesSelectClauseSqlGenerator
     {
       AnnisNode n = nodes.get(i);
 			nodeColumns.add(selectClauseForNode(n, i + 1));
-      if(tables(n).isDistinctNeeded())
+      if(tables(n).usesFacts())
       {
         isDistinct = true;
       }

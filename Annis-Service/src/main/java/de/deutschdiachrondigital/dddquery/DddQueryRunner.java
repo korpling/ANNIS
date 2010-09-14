@@ -176,6 +176,7 @@ public class DddQueryRunner extends AnnisBaseRunner
     Map<String,Set<String>> result = new HashMap<String, Set<String>>();
     result.put("facts", new TreeSet<String>());
     result.put("node", new TreeSet<String>());
+    result.put("node_annotation", new TreeSet<String>());
 
     // sql query
     Start statement = dddQueryParser.parse(dddQuery);
@@ -194,7 +195,7 @@ public class DddQueryRunner extends AnnisBaseRunner
       for(String table : result.keySet())
       {
         Set<String> attr = result.get(table);
-        Matcher mFacts = Pattern.compile( table + "[0-9]+\\.([^ =]+)").matcher(whereClause);
+        Matcher mFacts = Pattern.compile( table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
         while(mFacts.find())
         {
           attr.add(mFacts.group(1).trim());

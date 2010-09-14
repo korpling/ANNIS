@@ -50,6 +50,11 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
       {
         conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
           documents));
+        if(tables(node).usesFacts())
+        {
+          conditions.add(in(tables(node).aliasedColumn("facts", "corpus_ref"),
+            documents));
+        }
       }
     }
 
@@ -65,6 +70,12 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
       {
         conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
           corpusList));
+
+        if(tables(node).usesFacts())
+        {
+          conditions.add(in(tables(node).aliasedColumn("facts", "toplevel_corpus"),
+            corpusList));
+        }
       }
     }
     return conditions;

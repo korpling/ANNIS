@@ -85,6 +85,10 @@ public class TestCorpusAdministration {
 		// compute and verify top-level corpus
 		inOrder.verify(administrationDao).computeTopLevelCorpus();
 		
+    // update IDs in staging area
+		long corpusID = inOrder.verify(administrationDao).updateIds();
+		inOrder.verify(administrationDao).createStagingAreaIndexes();
+
 		// import binaries
 		inOrder.verify(administrationDao).importBinaryData(path);
 		
@@ -95,21 +99,21 @@ public class TestCorpusAdministration {
 		
 		// gather statistics about this corpus
 		inOrder.verify(administrationDao).computeCorpusStatistics();
-		
-		// update IDs in staging area
-		long corpusID = inOrder.verify(administrationDao).updateIds();
-		
+
+    inOrder.verify(administrationDao).updateCorpusStatsId(corpusID);
+
 		// apply constraints to ensure data integrity
 		inOrder.verify(administrationDao).applyConstraints();
 		
 		// insert the corpus from the staging area to the main db
 		inOrder.verify(administrationDao).insertCorpus();
-		
-		// drop the staging area
-		inOrder.verify(administrationDao).dropStagingArea();
 
     // the facts child table must be created
 		inOrder.verify(administrationDao).createFacts(corpusID);
+
+		// drop the staging area
+		inOrder.verify(administrationDao).dropStagingArea();
+
 	}
 	
 }

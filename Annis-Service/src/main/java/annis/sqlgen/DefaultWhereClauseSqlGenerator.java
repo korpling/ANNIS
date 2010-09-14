@@ -47,7 +47,7 @@ public class DefaultWhereClauseSqlGenerator
 		}
 
 		if (node.isToken())
-			conditions.add(tables(node).aliasedColumn(NODE_TABLE, "token_index") + " IS NOT NULL");
+			conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
 
 		if (node.isRoot())
 			conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root") + " IS TRUE");
