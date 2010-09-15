@@ -45,7 +45,7 @@ CREATE INDEX idx__facts__node_annotation_namespace_:id ON facts_:id(node_annotat
 -- node on facts
 CREATE INDEX idx__facts__5_:id ON facts_:id (span,toplevel_corpus);
 CREATE INDEX idx__facts__6_:id ON facts_:id (is_token,toplevel_corpus);
-CREATE INDEX idx__facts__name_:id ON facts_:id ("name",namespace);
+CREATE INDEX idx__facts__name_:id ON facts_:id (node_name,node_namespace);
 
 ----- 2nd query
 CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token);
