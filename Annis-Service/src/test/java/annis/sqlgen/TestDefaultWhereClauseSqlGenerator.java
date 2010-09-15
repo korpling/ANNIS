@@ -127,14 +127,14 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addNodeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
 		node23.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
-				join("=", "_annotation23_1.namespace", "'namespace1'"),
-				join("=", "_annotation23_1.name", "'name1'"),
-				join("=", "_annotation23_2.namespace", "'namespace2'"),
-				join("=", "_annotation23_2.name", "'name2'"),
-				join("=", "_annotation23_2.value", "'value2'"),
-				join("=", "_annotation23_3.namespace", "'namespace3'"),
-				join("=", "_annotation23_3.name", "'name3'"),
-				join("~", "_annotation23_3.value", "'^value3$'")
+				join("=", "_annotation23_1.node_annotation_namespace", "'namespace1'"),
+				join("=", "_annotation23_1.node_annotation_name", "'name1'"),
+				join("=", "_annotation23_2.node_annotation_namespace", "'namespace2'"),
+				join("=", "_annotation23_2.node_annotation_name", "'name2'"),
+				join("=", "_annotation23_2.node_annotation_value", "'value2'"),
+				join("=", "_annotation23_3.node_annotation_namespace", "'namespace3'"),
+				join("=", "_annotation23_3.node_annotation_name", "'name3'"),
+				join("~", "_annotation23_3.node_annotation_value", "'^value3$'")
 		);
 	}
 	
@@ -145,14 +145,14 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addEdgeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
 		node23.addEdgeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
-				join("=", "_rank_annotation23_1.namespace", "'namespace1'"),
-				join("=", "_rank_annotation23_1.name", "'name1'"),
-				join("=", "_rank_annotation23_2.namespace", "'namespace2'"),
-				join("=", "_rank_annotation23_2.name", "'name2'"),
-				join("=", "_rank_annotation23_2.value", "'value2'"),
-				join("=", "_rank_annotation23_3.namespace", "'namespace3'"),
-				join("=", "_rank_annotation23_3.name", "'name3'"),
-				join("~", "_rank_annotation23_3.value", "'^value3$'")
+				join("=", "_rank_annotation23_1.edge_annotation_namespace", "'namespace1'"),
+				join("=", "_rank_annotation23_1.edge_annotation_name", "'name1'"),
+				join("=", "_rank_annotation23_2.edge_annotation_namespace", "'namespace2'"),
+				join("=", "_rank_annotation23_2.edge_annotation_name", "'name2'"),
+				join("=", "_rank_annotation23_2.edge_annotation_value", "'value2'"),
+				join("=", "_rank_annotation23_3.edge_annotation_namespace", "'namespace3'"),
+				join("=", "_rank_annotation23_3.edge_annotation_name", "'name3'"),
+				join("~", "_rank_annotation23_3.edge_annotation_value", "'^value3$'")
 		);
 	}
 	
@@ -316,9 +316,9 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
 		checkWhereCondition(node42,
-				join("=", "_annotation42.namespace", "'namespace3'"),
-				join("=", "_annotation42.name", "'name3'"),
-				join("~", "_annotation42.value", "'^value3$'")
+				join("=", "_annotation42.node_annotation_namespace", "'namespace3'"),
+				join("=", "_annotation42.node_annotation_name", "'name3'"),
+				join("~", "_annotation42.node_annotation_value", "'^value3$'")
 		);
 	}
 	

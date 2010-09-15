@@ -5,7 +5,7 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -85,11 +85,18 @@ public class DefaultWhereClauseSqlGenerator
 			}
 		}
 		
-		addAnnotationConditions(node, conditions, node.getNodeAnnotations(), NODE_ANNOTATION_TABLE);
+		addAnnotationConditions(node, conditions, node.getNodeAnnotations(), 
+      NODE_ANNOTATION_TABLE, "node_annotation_");
+    if(tables(node).usesFacts())
+    {
+      addAnnotationConditions(node, conditions, node.getNodeAnnotations(), FACTS_TABLE,
+        "node_annotation_");
+    }
 
 		addJoinConditions(node, conditions);
 
-		addAnnotationConditions(node, conditions, node.getEdgeAnnotations(), EDGE_ANNOTATION_TABLE);
+		addAnnotationConditions(node, conditions, node.getEdgeAnnotations(),
+      EDGE_ANNOTATION_TABLE, "edge_annotation_");
 
 		return conditions;
 	}
@@ -248,16 +255,17 @@ public class DefaultWhereClauseSqlGenerator
 		}
 	}
 
-	private void addAnnotationConditions(AnnisNode node, List<String> conditions, Set<Annotation> annotations, String table) {
+	private void addAnnotationConditions(AnnisNode node, 
+    List<String> conditions, Set<Annotation> annotations, String table, String prefix) {
 		int i = 0;
 		for (Annotation annotation : annotations) {
 			++i;
 			if (annotation.getNamespace() != null)
-				conditions.add(join("=", tables(node).aliasedColumn(table, "namespace", i), sqlString(annotation.getNamespace())));
-			conditions.add(join("=", tables(node).aliasedColumn(table, "name", i), sqlString(annotation.getName())));
+				conditions.add(join("=", tables(node).aliasedColumn(table, prefix + "namespace", i), sqlString(annotation.getNamespace())));
+			conditions.add(join("=", tables(node).aliasedColumn(table, prefix + "name", i), sqlString(annotation.getName())));
 			if (annotation.getValue() != null) {
 				TextMatching textMatching = annotation.getTextMatching();
-				conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(table, "value", i), sqlString(annotation.getValue(), textMatching)));
+				conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(table, prefix + "value", i), sqlString(annotation.getValue(), textMatching)));
 			}
 		}
 	}

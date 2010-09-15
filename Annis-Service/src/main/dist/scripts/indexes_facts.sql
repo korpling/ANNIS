@@ -37,7 +37,10 @@ CREATE INDEX idx__facts__pre_:id ON facts_:id (pre);
 CREATE INDEX idx__facts__root_:id ON facts_:id (root);
 CREATE INDEX idx__facts__toplevel_corpus_:id ON facts_:id (toplevel_corpus);
 CREATE INDEX idx__facts__corpus_ref_:id ON facts_:id (corpus_ref);
+CREATE INDEX idx__facts__parent_corpus_ref_:id ON facts_:id (parent,corpus_ref);
 
+CREATE INDEX idx__facts__node_annotation_value_:id ON facts_:id(node_annotation_name,node_annotation_value,node_annotation_namespace);
+CREATE INDEX idx__facts__node_annotation_namespace_:id ON facts_:id(node_annotation_name,node_annotation_namespace);
 
 ----- 2nd query
 CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token);
