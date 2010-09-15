@@ -41,23 +41,45 @@ public class DefaultWhereClauseSqlGenerator
 	public List<String> whereConditions(AnnisNode node, List<Long> corpusList,List<Long> documents) {
 		List<String> conditions = new ArrayList<String>();
 		
-		if (node.getSpannedText() != null) {
+    boolean usesFacts = tables(node).usesFacts();
+
+		if (node.getSpannedText() != null)
+    {
 			TextMatching textMatching = node.getSpanTextMatching();
 			conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(NODE_TABLE, "span"), sqlString(node.getSpannedText(), textMatching)));
+      if(usesFacts)
+      {
+        conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(FACTS_TABLE, "span"), sqlString(node.getSpannedText(), textMatching)));
+      }
 		}
 
 		if (node.isToken())
+    {
 			conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
-
+      if(usesFacts)
+      {
+        conditions.add(tables(node).aliasedColumn(FACTS_TABLE, "is_token") + " IS TRUE");
+      }
+    }
 		if (node.isRoot())
 			conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root") + " IS TRUE");
 
 		if (node.getNamespace() != null)
+    {
 			conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "namespace"), sqlString(node.getNamespace())));
-
+      if(usesFacts)
+      {
+        conditions.add(join("=", tables(node).aliasedColumn(FACTS_TABLE, "namespace"), sqlString(node.getNamespace())));
+      }
+    }
 		if (node.getName() != null)
+    {
 			conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "name"), sqlString(node.getName())));
-
+      if(usesFacts)
+      {
+        conditions.add(join("=", tables(node).aliasedColumn(FACTS_TABLE, "name"), sqlString(node.getName())));
+      }
+    }
 		if (node.getArity() != null) {
 			// fugly
 			TableAccessStrategy tas = tables(null);
