@@ -8,7 +8,7 @@ CREATE TABLE facts_:id
 )
 INHERITS (facts);
 
-INSERT INTO facts_:id SELECT DISTINCT
+INSERT INTO facts_:id SELECT
 	_node.id AS id,
 	_node.text_ref AS text_ref,
 	_node.corpus_ref AS corpus_ref,

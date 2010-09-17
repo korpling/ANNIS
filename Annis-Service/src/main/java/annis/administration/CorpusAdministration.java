@@ -53,13 +53,13 @@ public class CorpusAdministration {
 	}
 	
 	@Transactional(readOnly = false)
-	public void importCorpora(List<String> paths) {
+	public void importCorpora(boolean temporaryStagingArea, List<String> paths) {
 		
 		// import each corpus
 		for (String path : paths) {
 			log.info("Importing corpus from: " + path);
 			
-			administrationDao.createStagingArea();
+			administrationDao.createStagingArea(temporaryStagingArea);
 			administrationDao.bulkImport(path);
 			administrationDao.computeTopLevelCorpus();
   
@@ -86,8 +86,8 @@ public class CorpusAdministration {
 		}
 	}
 	
-	public void importCorpora(String... paths) {
-		importCorpora(Arrays.asList(paths));
+	public void importCorpora(boolean temporaryStagingArea, String... paths) {
+		importCorpora(temporaryStagingArea, Arrays.asList(paths));
 	}
 	
 	@Transactional(readOnly = false)

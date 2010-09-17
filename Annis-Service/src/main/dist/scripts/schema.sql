@@ -68,12 +68,11 @@ COMMENT ON COLUMN node.span IS 'the covered text if the span is a token, otherwi
 
 CREATE TABLE node_annotation
 (
-	node_ref	numeric(38) REFERENCES node (id) ON DELETE CASCADE,
+	node_ref	numeric(38), -- REFERENCES node (id) ON DELETE CASCADE,
   toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	namespace	varchar(150),
 	name		varchar(150) NOT NULL,
-	value		varchar(1500),
-	UNIQUE (node_ref, namespace, name)
+	value		varchar(1500)
 );
 COMMENT ON COLUMN node_annotation.node_ref IS 'foreign key to node.id';
 COMMENT ON COLUMN node_annotation.namespace IS 'optional namespace of annotation key';

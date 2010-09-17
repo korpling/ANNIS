@@ -170,9 +170,10 @@ public class SpringAnnisAdministrationDao {
 		}
 	}
 
-	void createStagingArea() {
+	void createStagingArea(boolean useTemporary) {
 		log.info("creating staging area");
-		executeSqlFromScript("staging_area.sql");
+    MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary ? "TEMPORARY" : "");
+		executeSqlFromScript("staging_area.sql", args);
 	}
 
 	void bulkImport(String path) 

@@ -26,7 +26,7 @@ public class TestCorpusAdministration {
 	public void importCorporaOne() {
 		
 		String path = "somePath";
-		administration.importCorpora(path);
+		administration.importCorpora(false, path);
 		
 		// insertion of a corpus needs to follow an exact order
 		InOrder inOrder = inOrder(administrationDao);
@@ -47,7 +47,7 @@ public class TestCorpusAdministration {
 		String path1 = "somePath";
 		String path2 = "anotherPath";
 		String path3 = "yetAnotherPath";
-		administration.importCorpora(path1, path2, path3);
+		administration.importCorpora(false, path1, path2, path3);
 		
 		// insertion of a corpus needs to follow an exact order
 		InOrder inOrder = inOrder(administrationDao);
@@ -77,7 +77,7 @@ public class TestCorpusAdministration {
 	// a correct import requires this order
 	private void verifyImport(InOrder inOrder, String path) {
 		// create the staging area
-		inOrder.verify(administrationDao).createStagingArea();
+		inOrder.verify(administrationDao).createStagingArea(false);
 		
 		// bulk import the data
 		inOrder.verify(administrationDao).bulkImport(path);

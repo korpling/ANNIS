@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS _text;
 -- each corpus has a unique name
 -- corpora are ordered in a tree
 
-CREATE TEMPORARY TABLE _corpus
+CREATE :tmp TABLE _corpus
 (
 	id 			numeric(38) NOT NULL,		-- primary key
 	name		varchar(100) NOT NULL,		-- unique name
@@ -28,7 +28,7 @@ CREATE TEMPORARY TABLE _corpus
 -- corpus annotations
 -- unique combinantion of corpus_ref, namespace and name
 
-CREATE TEMPORARY TABLE _corpus_annotation
+CREATE :tmp TABLE _corpus_annotation
 (
 	corpus_ref	numeric(38) NOT NULL,		-- foreign key to _corpus.id
 	namespace	varchar(100),
@@ -38,7 +38,7 @@ CREATE TEMPORARY TABLE _corpus_annotation
 
 -- source texts
 -- stores each source text in its entirety
-CREATE TEMPORARY TABLE _text
+CREATE :tmp TABLE _text
 (
 	id 		numeric(38) NOT NULL,			-- primary key
 	name	varchar(1000),					-- name (not used)
@@ -50,7 +50,7 @@ CREATE TEMPORARY TABLE _text
 -- are part of a corpus and reference a text
 -- cover a span of the text
 -- can be tokens (token_index NOT NULL, span NOT NULL)
-CREATE TEMPORARY TABLE _node
+CREATE :tmp TABLE _node
 (
 	id 				numeric(38)	NOT NULL,	-- primary key
 	text_ref 		numeric(38) NOT NULL,	-- foreign key to _text.id
@@ -67,7 +67,7 @@ CREATE TEMPORARY TABLE _node
 -- connected components of the annotation graph
 -- are of a type: Coverage, Dominance, Pointing relation or NULL for root nodes
 -- have a name
-CREATE TEMPORARY TABLE _component
+CREATE :tmp TABLE _component
 (
 	id			numeric(38) NOT NULL,		-- primary key
 	type		char(1),					-- edge type: c, d, P, NULL
@@ -78,7 +78,7 @@ CREATE TEMPORARY TABLE _component
 -- pre and post order of the annotation graph
 -- root nodes: parent IS NULL
 -- component and rank together model edges in the annotation graph
-CREATE TEMPORARY TABLE _rank
+CREATE :tmp TABLE _rank
 (
 	pre				numeric(38)	NOT NULL,	-- pre and post order of the annotation ODAG
 	post			numeric(38)	NOT NULL,
@@ -89,7 +89,7 @@ CREATE TEMPORARY TABLE _rank
 
 -- node annotations
 -- unique combinantion of node_ref, namespace and name
-CREATE TEMPORARY TABLE _node_annotation
+CREATE :tmp TABLE _node_annotation
 (
 	node_ref	numeric(38)	NOT NULL,		-- foreign key to _node.id
 	namespace	varchar(150),
@@ -100,7 +100,7 @@ CREATE TEMPORARY TABLE _node_annotation
 
 -- edge annotations
 -- unique combinantion of node_ref, namespace and name
-CREATE TEMPORARY TABLE _edge_annotation
+CREATE :tmp TABLE _edge_annotation
 (
 	rank_ref		numeric(38)	NOT NULL,	-- foreign key to _rank.pre
 	namespace		varchar(1000),
@@ -110,7 +110,7 @@ CREATE TEMPORARY TABLE _edge_annotation
 
 -- resolver visualization mappings
 -- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from relANNIS format
-CREATE TEMPORARY TABLE _resolver_vis_map
+CREATE :tmp TABLE _resolver_vis_map
 (
   "corpus"   varchar(100), -- the name of the supercorpus
   "version" 	varchar(100), -- the version of the corpus

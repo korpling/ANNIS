@@ -158,7 +158,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		if (commandArgs.isEmpty())
 			throw new UsageException("Where can I find the corpus you want to import?");
 
-		corpusAdministration.importCorpora(commandArgs);
+		corpusAdministration.importCorpora(true, commandArgs);
 	}
 
 	private void doDelete(List<String> commandArgs) {
