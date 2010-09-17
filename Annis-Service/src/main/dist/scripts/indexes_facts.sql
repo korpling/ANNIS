@@ -1,37 +1,51 @@
 ----------
 --facts --
 ----------
+-- Suche kombiniert mit parent
+CREATE INDEX idx_c__parent__node_:id ON facts_:id (parent);
+CREATE INDEX idx_c__parent__token_:id ON facts_:id (parent) WHERE is_token IS TRUE;
+CREATE INDEX idx_c__parent__span_:id ON facts_:id (span varchar_pattern_ops, parent);
+CREATE INDEX idx_c__parent__node_anno_ex_:id ON facts_:id (node_annotation_name, parent);
+CREATE INDEX idx_c__parent__node_anno_:id ON facts_:id (node_annotation_name, node_annotation_value varchar_pattern_ops, parent);
+CREATE INDEX idx_c__parent__edge_anno_ex_:id ON facts_:id (edge_annotation_name, parent);
+CREATE INDEX idx_c__parent__edge_anno_:id ON facts_:id (edge_annotation_name, edge_annotation_value varchar_pattern_ops, parent);
 
-CREATE INDEX idx__facts__id_:id ON facts_:id (id);
-CREATE INDEX idx__facts__1_:id ON facts_:id (edge_annotation_name,edge_name,edge_type,parent,pre,edge_annotation_value);
-CREATE INDEX idx__facts__2_:id ON facts_:id (edge_name,edge_type,"level",post,pre);
-CREATE INDEX idx__facts__3_:id ON facts_:id (edge_name,edge_type,pre,parent);
-CREATE INDEX idx__facts__4_:id ON facts_:id (edge_name,edge_type,post,pre);
+-- Suche kombiniert mit pre WHERE type = d
+CREATE INDEX idx_c__dom__node_:id ON facts_:id (pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__token_:id ON facts_:id (pre) WHERE is_token IS TRUE AND edge_type = 'd';
+CREATE INDEX idx_c__dom__span_:id ON facts_:id (span varchar_pattern_ops, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__node_anno_ex_:id ON facts_:id (node_annotation_name, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__node_anno_:id ON facts_:id (node_annotation_name, node_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__edge_anno_ex_:id ON facts_:id (edge_annotation_name, pre) WHERE edge_type = 'd';
+CREATE INDEX idx_c__dom__edge_anno_:id ON facts_:id (edge_annotation_name, edge_annotation_value varchar_pattern_ops, pre) WHERE edge_type = 'd';
 
-CREATE INDEX idx__facts__n2_:id ON facts_:id (edge_type,"level",post,pre) WHERE edge_name IS NULL;
-CREATE INDEX idx__facts__n3_:id ON facts_:id (edge_type,pre,parent) WHERE edge_name IS NULL;;
-CREATE INDEX idx__facts__n4_:id ON facts_:id (edge_type,post,pre) WHERE edge_name IS NULL;;
+-- Suche kombiniert mit edge_name, pre WHERE type = p
+CREATE INDEX idx_c__pr__node_:id ON facts_:id (edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__token_:id ON facts_:id (edge_name, pre) WHERE is_token IS TRUE AND edge_type = 'p';
+CREATE INDEX idx_c__pr__span_:id ON facts_:id (span varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__node_anno_ex_:id ON facts_:id (node_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__node_anno_:id ON facts_:id (node_annotation_name, node_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__edge_anno_ex_:id ON facts_:id (edge_annotation_name, edge_name, pre) WHERE edge_type = 'p';
+CREATE INDEX idx_c__pr__edge_anno_:id ON facts_:id (edge_annotation_name, edge_annotation_value varchar_pattern_ops, edge_name, pre) WHERE edge_type = 'p';
 
-CREATE INDEX idx__facts__pre_:id ON facts_:id (pre);
-CREATE INDEX idx__facts__root_:id ON facts_:id (root);
-CREATE INDEX idx__facts__toplevel_corpus_:id ON facts_:id (toplevel_corpus);
-CREATE INDEX idx__facts__corpus_ref_:id ON facts_:id (corpus_ref);
-CREATE INDEX idx__facts__parent_corpus_ref_:id ON facts_:id (parent,corpus_ref);
+----- Prezedenz
+-- Suche kombiniert mit text_ref
+CREATE INDEX idx_c__text__node_:id ON facts_:id (text_ref);
+CREATE INDEX idx_c__text__token_:id ON facts_:id (text_ref) WHERE is_token IS TRUE;
+CREATE INDEX idx_c__text__span_:id ON facts_:id (span varchar_pattern_ops, text_ref);
+CREATE INDEX idx_c__text__node_anno_ex_:id ON facts_:id (node_annotation_name, text_ref);
+CREATE INDEX idx_c__text__node_anno_:id ON facts_:id (node_annotation_name, node_annotation_value varchar_pattern_ops, text_ref);
+CREATE INDEX idx_c__text__edge_anno_ex_:id ON facts_:id (edge_annotation_name, text_ref);
+CREATE INDEX idx_c__text__edge_anno_:id ON facts_:id (edge_annotation_name, edge_annotation_value varchar_pattern_ops, text_ref);
 
-CREATE INDEX idx__facts__node_annotation_value_:id ON facts_:id(node_annotation_name,node_annotation_value,node_annotation_namespace);
-CREATE INDEX idx__facts__node_annotation_namespace_:id ON facts_:id(node_annotation_name,node_annotation_namespace);
+----- _=_, _i_ etc.
+CREATE INDEX idx__exact_cover_:id ON facts_:id ("left", "right",text_ref);
 
--- node on facts
-CREATE INDEX idx__facts__6_:id ON facts_:id (span,toplevel_corpus);
-CREATE INDEX idx__facts__7_:id ON facts_:id (is_token,toplevel_corpus);
-CREATE INDEX idx__facts__name_:id ON facts_:id (node_name,node_namespace);
+-- search for token
+CREATE INDEX idx__token_search_:id on facts_:id (is_token, toplevel_corpus);
 
 ----- 2nd query
 CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token);
 
 -- optimize the select distinct
 CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
-CREATE INDEX idx__column__id_:id on facts_:id using hash (id);
-CREATE INDEX idx__column__text_ref_:id on facts_:id using hash (text_ref);
-CREATE INDEX idx__column__left_token_:id on facts_:id using hash (left_token);
-CREATE INDEX idx__column__right_token_:id on facts_:id using hash (right_token);

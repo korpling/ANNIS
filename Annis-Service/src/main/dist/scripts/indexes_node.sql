@@ -11,3 +11,4 @@ CREATE INDEX idx__node__5_:id ON node_:id (left_token,right_token,toplevel_corpu
 CREATE INDEX idx__node__6_:id ON node_:id (span,toplevel_corpus);
 CREATE INDEX idx__node__7_:id ON node_:id (is_token,toplevel_corpus);
 CREATE INDEX idx__node__name_:id ON node_:id ("name",namespace);
+CREATE INDEX idx__node_exact_cover_:id ON node_:id ("left", "right", text_ref);
