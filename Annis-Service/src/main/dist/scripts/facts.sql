@@ -18,10 +18,7 @@ INSERT INTO facts_:id SELECT DISTINCT
 	_node."left" AS "left",
 	_node."right" AS "right",
 	_node.token_index AS token_index,
-  CASE
-   WHEN token_index is null THEN false
-   ELSE true
-  END as is_token,
+  FALSE AS is_token,
 	_node.continuous AS continuous,
 	_node.span AS span,
 	_node.left_token AS left_token,
@@ -54,46 +51,8 @@ FROM
 WHERE
   _node.toplevel_corpus = :id;
 ;
+UPDATE facts_:id SET is_token=true WHERE token_index IS NOT NULL;
 
-DROP TABLE IF EXISTS node_:id;
-CREATE TABLE node_:id
-(
-  CHECK(toplevel_corpus = :id)
-)
-INHERITS (node);
-
-INSERT INTO node_:id 
-SELECT
-  id,
-  text_ref,
-  corpus_ref,
-  namespace,
-  name,
-  "left",
-  "right",
-  token_index,
-  CASE
-   WHEN token_index is null THEN false
-   ELSE true
-  END as is_token,
-  continuous,
-  span,
-  toplevel_corpus,
-  left_token,
-  right_token  
-FROM _node WHERE toplevel_corpus = :id;
-
-DROP TABLE IF EXISTS node_annotation_:id;
-CREATE TABLE node_annotation_:id
-(
-  CHECK(toplevel_corpus = :id)
-)
-INHERITS ( node_annotation) ;
-
-INSERT INTO node_annotation_:id
-SELECT a.node_ref, n.toplevel_corpus, a.namespace, a.name, a.value
-FROM _node_annotation as a, _node as n
-WHERE toplevel_corpus = :id AND a.node_ref = n.id;
 
 -- can't be run inside transaction
 -- VACUUM ANALYZE facts;

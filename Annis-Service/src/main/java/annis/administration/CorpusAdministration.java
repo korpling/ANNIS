@@ -68,7 +68,7 @@ public class CorpusAdministration {
 
 			administrationDao.importBinaryData(path);
 //			// finish transaction here to debug computation of left|right-token
-//			if (true) return;
+			//if (true) return;
 			administrationDao.computeLeftTokenRightToken();
 			administrationDao.computeComponents();
 			administrationDao.computeLevel();
