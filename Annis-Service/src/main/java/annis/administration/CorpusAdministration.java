@@ -64,7 +64,7 @@ public class CorpusAdministration {
 			administrationDao.computeTopLevelCorpus();
   
 			long corpusID = administrationDao.updateIds();
-      administrationDao.createStagingAreaIndexes();
+      //administrationDao.createStagingAreaIndexes();
 
 			administrationDao.importBinaryData(path);
 //			// finish transaction here to debug computation of left|right-token
