@@ -66,6 +66,10 @@ public class CorpusAdministration {
 			long corpusID = administrationDao.updateIds();
       
 			administrationDao.importBinaryData(path);
+      
+      administrationDao.createStagingAreaIndexes();
+      administrationDao.analyzeStagingTables();
+      
 //			// finish transaction here to debug computation of left|right-token
 			//if (true) return;
 			administrationDao.computeLeftTokenRightToken();
@@ -75,7 +79,6 @@ public class CorpusAdministration {
       administrationDao.updateCorpusStatsId(corpusID);
 
 			administrationDao.applyConstraints();
-      administrationDao.createStagingAreaIndexes();
       administrationDao.analyzeStagingTables();
 
 			administrationDao.insertCorpus();

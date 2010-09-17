@@ -348,7 +348,7 @@ public class SpringAnnisAdministrationDao {
   {
     for(String t : importedTables)
     {      
-      log.info("anaylzing " + t);
+      log.info("analyzing " + t);
       jdbcOperations.execute("ANALYZE " + tableInStagingArea(t));
     }
   }
