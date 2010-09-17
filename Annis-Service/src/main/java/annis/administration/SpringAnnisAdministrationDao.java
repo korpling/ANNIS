@@ -344,7 +344,18 @@ public class SpringAnnisAdministrationDao {
 			
 	}
 
-	void createFacts(long corpusID) {
+  void analyzeStagingTables()
+  {
+    for(String t : importedTables)
+    {      
+      log.info("anaylzing " + t);
+      jdbcOperations.execute("ANALYZE " + tableInStagingArea(t));
+    }
+  }
+
+	void createFacts(long corpusID) 
+  {
+
 		log.info("creating node table for corpus with ID " + corpusID);
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     executeSqlFromScript("node.sql", args);
