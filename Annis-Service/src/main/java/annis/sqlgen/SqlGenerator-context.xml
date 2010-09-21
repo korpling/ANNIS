@@ -46,10 +46,6 @@
     <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
   </bean>
 
-  <bean id="existsWhereClauseSqlGenerator" class="annis.sqlgen.ExistsWhereClauseSqlGenerator">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
-
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause">
     <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
   </bean>
@@ -74,7 +70,7 @@
       <util:list>
         <ref bean="tableJoinsInWhereClauseSqlGenerator" />
         <ref bean="defaultWhereClauseSqlGenerator"/>
-        <!--<ref bean="subcorpusConstraintWhereClause"/>-->
+        <ref bean="subcorpusConstraintWhereClause"/>
         <ref bean="metaDataAndCorpusWhereClause" />
       </util:list>
     </property>

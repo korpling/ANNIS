@@ -17,6 +17,10 @@
 package annis.sqlgen;
 
 import annis.model.AnnisNode;
+import annis.model.Edge;
+import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.Join;
+import annis.sqlgen.model.PointingRelation;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,17 +51,28 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
     {
       for(int right=left+1; right < copyNodes.length; right++)
       {
-        conditions.add(join("=",
-          tables(copyNodes[left]).aliasedColumn("node", "corpus_ref"),
-          tables(copyNodes[right]).aliasedColumn("node", "corpus_ref"))
-        );
-
+        // we only use this constraint on the facts table
         if(tables(copyNodes[left]).usesFacts() && tables(copyNodes[right]).usesFacts() )
         {
-          conditions.add(join("=",
-            tables(copyNodes[left]).aliasedColumn("facts", "corpus_ref"),
-            tables(copyNodes[right]).aliasedColumn("facts", "corpus_ref"))
-          );
+          // check if there is a connection between this nodes
+          boolean connected = false;
+          for(Join j : copyNodes[left].getJoins())
+          {
+            if((j instanceof Dominance || j instanceof PointingRelation)
+              && j.getTarget() != null && j.getTarget().getId() == copyNodes[right].getId())
+            {
+              connected = true;
+              break;
+            }
+          }
+
+          if(connected)
+          {
+            conditions.add(join("=",
+              tables(copyNodes[left]).aliasedColumn("facts", "corpus_ref"),
+              tables(copyNodes[right]).aliasedColumn("facts", "corpus_ref"))
+            );
+          }
         }
       }
     }
