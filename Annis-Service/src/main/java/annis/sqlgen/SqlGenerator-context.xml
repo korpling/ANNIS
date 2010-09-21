@@ -32,7 +32,10 @@
   <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator">
     <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
   </bean>
-	
+
+  <bean id="tableJoinsInWhereClauseSqlGenerator" class="annis.sqlgen.TableJoinsInWhereClauseSqlGenerator">
+		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
+	</bean>
 	
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseSqlGenerator" class="annis.sqlgen.DefaultWhereClauseSqlGenerator">
@@ -56,11 +59,12 @@
     </property>
     <property name="fromClauseSqlGenerators">
       <util:list>
-        <ref bean="tableJoinsInFromClauseSqlGenerator"/>
+        <ref bean="tableJoinsInWhereClauseSqlGenerator"/>
       </util:list>
     </property>
     <property name="whereClauseSqlGenerators">
       <util:list>
+        <ref bean="tableJoinsInWhereClauseSqlGenerator" />
         <ref bean="defaultWhereClauseSqlGenerator"/>
         <ref bean="subcorpusConstraintWhereClause"/>
         <ref bean="metaDataAndCorpusWhereClause" />
