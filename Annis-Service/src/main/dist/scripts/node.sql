@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS node_:id;
 CREATE TABLE node_:id
 (
-  CHECK(toplevel_corpus = :id)
+  CHECK(toplevel_corpus = :id),
+  PRIMARY KEY(id)
 )
 INHERITS (node);
 

@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS node_annotation_:id;
 CREATE TABLE node_annotation_:id
 (
-  CHECK(toplevel_corpus = :id)
+  CHECK(toplevel_corpus = :id),
+  FOREIGN KEY (node_ref) REFERENCES node_:id
 )
 INHERITS ( node_annotation) ;
 

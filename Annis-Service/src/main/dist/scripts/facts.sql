@@ -4,7 +4,9 @@ DROP TABLE IF EXISTS facts_:id;
 
 CREATE TABLE facts_:id
 (
-  CHECK(toplevel_corpus = :id)
+  CHECK(toplevel_corpus = :id),
+  FOREIGN KEY (id) REFERENCES node_:id,
+  FOREIGN KEY (corpus_ref) REFERENCES corpus
 )
 INHERITS (facts);
 
