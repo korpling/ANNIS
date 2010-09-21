@@ -87,11 +87,14 @@ public class TestCorpusAdministration {
 		
     // update IDs in staging area
 		long corpusID = inOrder.verify(administrationDao).updateIds();
-		inOrder.verify(administrationDao).createStagingAreaIndexes();
 
 		// import binaries
 		inOrder.verify(administrationDao).importBinaryData(path);
-		
+
+ 		inOrder.verify(administrationDao).createStagingAreaIndexes();
+    inOrder.verify(administrationDao).analyzeStagingTables();
+
+
 		// post-process the data to speed up queries
 		inOrder.verify(administrationDao).computeLeftTokenRightToken();
 		inOrder.verify(administrationDao).computeComponents();
@@ -104,6 +107,8 @@ public class TestCorpusAdministration {
 
 		// apply constraints to ensure data integrity
 		inOrder.verify(administrationDao).applyConstraints();
+
+    inOrder.verify(administrationDao).analyzeStagingTables();
 		
 		// insert the corpus from the staging area to the main db
 		inOrder.verify(administrationDao).insertCorpus();

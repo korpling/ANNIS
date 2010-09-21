@@ -21,7 +21,7 @@ public class TableJoinsInWhereClauseSqlGenerator
 	public String fromClause(AnnisNode node) {
 		List<String> tables = new ArrayList<String>();
 
-		// every node uses the struct table
+		// every node uses the node table
 		tables.add(tableAliasDefinition(node, NODE_TABLE, 1));
 
 		// rank table
