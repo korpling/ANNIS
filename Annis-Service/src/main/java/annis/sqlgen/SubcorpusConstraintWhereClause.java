@@ -16,6 +16,9 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+
 import annis.model.AnnisNode;
 import annis.model.Edge;
 import annis.sqlgen.model.Dominance;
@@ -69,8 +72,12 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
           if(connected)
           {
             conditions.add(join("=",
-              tables(copyNodes[left]).aliasedColumn("facts", "corpus_ref"),
-              tables(copyNodes[right]).aliasedColumn("facts", "corpus_ref"))
+              tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
+              tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref"))
+            );
+            conditions.add(join("=",
+              tables(copyNodes[left]).aliasedColumn(FACTS_TABLE, "corpus_ref"),
+              tables(copyNodes[right]).aliasedColumn(FACTS_TABLE, "corpus_ref"))
             );
           }
         }
