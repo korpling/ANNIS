@@ -10,21 +10,21 @@ BEGIN
 	
 	-- first step: init left_token, right_token
 	-- do it outside the loop, because count = old_count after this step
-	RAISE NOTICE 'computing minimum and maximum covered token_index for each node, % nodes to go', count;
+	RAISE NOTICE 'computing minimum and maximum covered token_index for each node, % nodes to go', count_current;
 	SELECT compute_spanned_tokens_step() INTO count_current;
 
 	-- loop...
 	WHILE count_current > 0 AND count_current != old_count LOOP
 		old_count := count_current;
-		SELECT compute_spanned_tokens_step() INTO count;
+		SELECT compute_spanned_tokens_step() INTO count_current;
 
 		-- count nodes that still need update
 		SELECT count(*) INTO count_current FROM _tmp_spanned_tokens
 			WHERE old_left IS NULL OR old_left != left_token OR old_right IS NULL OR old_right != right_token;
-		RAISE NOTICE 'updating nodes by component, % nodes updated, % to go', old_count - count, count;
+		RAISE NOTICE 'updating nodes by component, % nodes updated, % to go', old_count - count_current, count_current;
 	END LOOP;
 
-	RAISE NOTICE '% nodes could not be connected to the rest of the graph', count;
+	RAISE NOTICE '% nodes could not be connected to the rest of the graph', count_current;
 
 	RETURN count_current;
 END;
