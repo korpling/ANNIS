@@ -36,7 +36,7 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
 {
 
   @Override
-  public List<String> whereConditions(AnnisNode node, List<Long> corpusList,List<Long> documents)
+  public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
   {
     return null;
   }
@@ -45,41 +45,26 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
   public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
   {
     LinkedList<String> conditions = new LinkedList<String>();
-    
+
     conditions.add("-- annotations can always only be inside a subcorpus/document");
 
     AnnisNode[] copyNodes = nodes.toArray(new AnnisNode[0]);
 
-    for(int left=0; left < copyNodes.length; left++)
-    {
-      for(int right=left+1; right < copyNodes.length; right++)
-      {
-        // we only use this constraint on the facts table
-        if(tables(copyNodes[left]).usesFacts() && tables(copyNodes[right]).usesFacts() )
-        {
-          // check if there is a connection between this nodes
-          boolean connected = false;
-          for(Join j : copyNodes[left].getJoins())
-          {
-            if((j instanceof Dominance || j instanceof PointingRelation)
-              && j.getTarget() != null && j.getTarget().getId() == copyNodes[right].getId())
-            {
-              connected = true;
-              break;
-            }
-          }
 
-          if(connected)
-          {
-            conditions.add(join("=",
-              tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
-              tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref"))
-            );
-            conditions.add(join("=",
-              tables(copyNodes[left]).aliasedColumn(FACTS_TABLE, "corpus_ref"),
-              tables(copyNodes[right]).aliasedColumn(FACTS_TABLE, "corpus_ref"))
-            );
-          }
+    for (int left = 0; left < copyNodes.length; left++)
+    {
+      for (int right = left + 1; right < copyNodes.length; right++)
+      {
+        conditions.add(join("=",
+          tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
+          tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref")));
+
+        // we only use this constraint on the facts table
+        if (tables(copyNodes[left]).usesFacts() && tables(copyNodes[right]).usesFacts())
+        {
+          conditions.add(join("=",
+            tables(copyNodes[left]).aliasedColumn(FACTS_TABLE, "corpus_ref"),
+            tables(copyNodes[right]).aliasedColumn(FACTS_TABLE, "corpus_ref")));
         }
       }
     }
