@@ -47,7 +47,7 @@ public class DefaultWhereClauseSqlGenerator
     addAnnotationConditions(node, conditions, node.getNodeAnnotations(),
       NODE_ANNOTATION_TABLE, "node_annotation_");
 
-    if (tables(node).usesFacts())
+    if (tables(node).usesPartialFacts())
     {
       addAnnotationConditions(node, conditions, node.getNodeAnnotations(), FACTS_TABLE,
         "node_annotation_");
@@ -282,7 +282,7 @@ public class DefaultWhereClauseSqlGenerator
   protected void addNodeConditions(AnnisNode node,
     List<String> conditions, Set<Annotation> annotations)
   {
-    boolean usesFacts = tables(node).usesFacts();
+    boolean usesFacts = tables(node).usesPartialFacts();
 
     if (node.getSpannedText() != null)
     {
@@ -387,7 +387,7 @@ public class DefaultWhereClauseSqlGenerator
       tables(target).aliasedColumn(NODE_TABLE, rightColumn)));
 
     // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesFacts() && tables(target).usesFacts())
+    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
     {
       conditions.add(join(operator, tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
         tables(target).aliasedColumn(FACTS_TABLE, rightColumn)));
@@ -401,7 +401,7 @@ public class DefaultWhereClauseSqlGenerator
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
 
     // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesFacts() && tables(target).usesFacts())
+    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
     {
       conditions.add(between(tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
         tables(target).aliasedColumn(FACTS_TABLE, rightColumn), min, max));
@@ -415,7 +415,7 @@ public class DefaultWhereClauseSqlGenerator
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), offset));
 
     // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesFacts() && tables(target).usesFacts())
+    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
     {
       conditions.add(numberJoin(operator, tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
         tables(target).aliasedColumn(FACTS_TABLE, rightColumn), offset));

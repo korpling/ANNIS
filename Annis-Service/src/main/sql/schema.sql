@@ -37,51 +37,52 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
-CREATE TABLE node
-(
-	id			numeric(38)	PRIMARY KEY,
-	text_ref	numeric(38) NOT NULL REFERENCES text (id) ON DELETE CASCADE,
-	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-	namespace	varchar(100),
-	name		varchar(100) NOT NULL,
-	"left"		integer NOT NULL,
-	"right"		integer NOT NULL,
-	token_index	integer,
-  is_token boolean,
-	continuous	boolean,
-	span		varchar(2000),
-	toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-	left_token	integer NULL,	-- token_index of left-most token in tree under this node
-	right_token	integer	NULL	-- token_index of right-most token in tree under this node
-);
-COMMENT ON COLUMN node.id IS 'primary key';
-COMMENT ON COLUMN node.corpus_ref IS 'foreign key to corpus.id';
-COMMENT ON COLUMN node.toplevel_corpus IS 'foreign key to toplevel corpus.id';
-COMMENT ON COLUMN node.namespace IS 'optional namespace of the node''s name';
-COMMENT ON COLUMN node.name IS 'name of the node';
-COMMENT ON COLUMN node.text_ref IS 'foreign key to text.id';
-COMMENT ON COLUMN node."left" IS 'left text span border (inclusive)';
-COMMENT ON COLUMN node."right" IS 'right text span border (inclusive)';
-COMMENT ON COLUMN node.continuous IS 'true if the span (text_ref, left, right) is gap-free, otherwise false';
-COMMENT ON COLUMN node.token_index IS 'token position if the span (text_ref, left, right) is a token, otherwise NULL';
-COMMENT ON COLUMN node.span IS 'the covered text if the span is a token, otherwise NULL';
-
-CREATE TABLE node_annotation
-(
-	node_ref	numeric(38), -- REFERENCES node (id) ON DELETE CASCADE,
-  toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-	namespace	varchar(150),
-	name		varchar(150) NOT NULL,
-	value		varchar(1500)
-);
-COMMENT ON COLUMN node_annotation.node_ref IS 'foreign key to node.id';
-COMMENT ON COLUMN node_annotation.namespace IS 'optional namespace of annotation key';
-COMMENT ON COLUMN node_annotation.name IS 'annotation key';
-COMMENT ON COLUMN node_annotation.value IS 'annotation value';
+--CREATE TABLE node
+--(
+--	id			numeric(38)	PRIMARY KEY,
+--	text_ref	numeric(38) NOT NULL REFERENCES text (id) ON DELETE CASCADE,
+--	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	namespace	varchar(100),
+--	name		varchar(100) NOT NULL,
+--	"left"		integer NOT NULL,
+--	"right"		integer NOT NULL,
+--	token_index	integer,
+--  is_token boolean,
+--	continuous	boolean,
+--	span		varchar(2000),
+--	toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	left_token	integer NULL,	-- token_index of left-most token in tree under this node
+--	right_token	integer	NULL	-- token_index of right-most token in tree under this node
+--);
+--COMMENT ON COLUMN node.id IS 'primary key';
+--COMMENT ON COLUMN node.corpus_ref IS 'foreign key to corpus.id';
+--COMMENT ON COLUMN node.toplevel_corpus IS 'foreign key to toplevel corpus.id';
+--COMMENT ON COLUMN node.namespace IS 'optional namespace of the node''s name';
+--COMMENT ON COLUMN node.name IS 'name of the node';
+--COMMENT ON COLUMN node.text_ref IS 'foreign key to text.id';
+--COMMENT ON COLUMN node."left" IS 'left text span border (inclusive)';
+--COMMENT ON COLUMN node."right" IS 'right text span border (inclusive)';
+--COMMENT ON COLUMN node.continuous IS 'true if the span (text_ref, left, right) is gap-free, otherwise false';
+--COMMENT ON COLUMN node.token_index IS 'token position if the span (text_ref, left, right) is a token, otherwise NULL';
+--COMMENT ON COLUMN node.span IS 'the covered text if the span is a token, otherwise NULL';
+--
+--CREATE TABLE node_annotation
+--(
+--	node_ref	numeric(38), -- REFERENCES node (id) ON DELETE CASCADE,
+--  toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	namespace	varchar(150),
+--	name		varchar(150) NOT NULL,
+--	value		varchar(1500)
+--);
+--COMMENT ON COLUMN node_annotation.node_ref IS 'foreign key to node.id';
+--COMMENT ON COLUMN node_annotation.namespace IS 'optional namespace of annotation key';
+--COMMENT ON COLUMN node_annotation.name IS 'annotation key';
+--COMMENT ON COLUMN node_annotation.value IS 'annotation value';
 
 
 CREATE TABLE facts
 (
+  fid SERIAL PRIMARY KEY,
   id			numeric(38),
 	text_ref	numeric(38),
 	corpus_ref	numeric(38),
@@ -114,8 +115,10 @@ CREATE TABLE facts
 
   edge_annotation_namespace	varchar(150),
 	edge_annotation_name		varchar(150),
-	edge_annotation_value		varchar(1500)
+	edge_annotation_value		varchar(1500),
 
+  sample_node BOOLEAN,
+  sample_node_annotation BOOLEAN
 );
 
 -- from component

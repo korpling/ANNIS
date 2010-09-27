@@ -36,7 +36,6 @@ public class CorpusAdministration {
 	
 		// switch to new database, but still as super user to install stored procedure compute_rank_level
 		administrationDao.setDataSource(createDataSource(host, port, database, superUser, superPassword));
-//		administrationDao.installPlPython();
 		administrationDao.installPlPgSql();
 		administrationDao.createFunctionComputeRankLevel();
 		administrationDao.createFunctionComputeSpannedTokens();
@@ -73,7 +72,6 @@ public class CorpusAdministration {
 //			// finish transaction here to debug computation of left|right-token
 			//if (true) return;
 			administrationDao.computeLeftTokenRightToken();
-			administrationDao.computeComponents();
 			administrationDao.computeLevel();
 			administrationDao.computeCorpusStatistics();
       administrationDao.updateCorpusStatsId(corpusID);

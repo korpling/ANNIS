@@ -16,6 +16,10 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+
 import annis.model.AnnisNode;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,36 +45,31 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     conditions.add("-- select documents by metadata and toplevel corpus");
     if (documents != null)
     {
-      conditions.add(in(tables(node).aliasedColumn("node", "corpus_ref"),
+      conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
         documents));
 
-      if (tables(node).usesFacts())
+      if (tables(node).usesPartialFacts())
       {
-        conditions.add(in(tables(node).aliasedColumn("facts", "corpus_ref"),
+        conditions.add(in(tables(node).aliasedColumn(FACTS_TABLE, "corpus_ref"),
           documents));
       }
-//      if (tables(node).usesNodeAnnotationTable())
-//      {
-//        conditions.add(in(tables(node).aliasedColumn("node_annotation", "corpus_ref"),
-//          documents));
-//      }
-
     }
 
     if (corpusList != null)
     {
-      conditions.add(in(tables(node).aliasedColumn("node", "toplevel_corpus"),
+      conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "toplevel_corpus"),
         corpusList));
 
-      if (tables(node).usesFacts())
+      if (tables(node).usesPartialFacts())
       {
-        conditions.add(in(tables(node).aliasedColumn("facts", "toplevel_corpus"),
+        conditions.add(in(tables(node).aliasedColumn(FACTS_TABLE, "toplevel_corpus"),
           corpusList));
       }
 
-      if (tables(node).usesNodeAnnotationTable())
+      if (tables(node).usesNodeAnnotationTable() && 
+        !tables(node).isMaterialized(NODE_ANNOTATION_TABLE, FACTS_TABLE))
       {
-        conditions.add(in(tables(node).aliasedColumn("node_annotation", "toplevel_corpus"),
+        conditions.add(in(tables(node).aliasedColumn(NODE_ANNOTATION_TABLE, "toplevel_corpus"),
           corpusList));
       }
 

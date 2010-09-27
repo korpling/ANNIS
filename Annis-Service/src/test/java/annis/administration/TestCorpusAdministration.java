@@ -97,7 +97,6 @@ public class TestCorpusAdministration {
 
 		// post-process the data to speed up queries
 		inOrder.verify(administrationDao).computeLeftTokenRightToken();
-		inOrder.verify(administrationDao).computeComponents();
 		inOrder.verify(administrationDao).computeLevel();
 		
 		// gather statistics about this corpus

@@ -86,6 +86,12 @@ public class TableJoinsInWhereClauseSqlGenerator
 			}
 		}
 
+    // don't output comment if there is not a single other constraint
+    if(conditions.size() == 1)
+    {
+      conditions.clear();
+    }
+
 		return conditions;
 	}
 

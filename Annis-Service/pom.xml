@@ -227,7 +227,7 @@
           <systemProperties>
             <property>
               <name>annis.home</name>
-              <value>src/main/dist</value>
+              <value>src/main/distribution/</value>
             </property>
           </systemProperties>
         </configuration>

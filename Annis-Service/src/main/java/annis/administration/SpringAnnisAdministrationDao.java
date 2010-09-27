@@ -116,11 +116,6 @@ public class SpringAnnisAdministrationDao {
 		jdbcOperations.execute("CREATE DATABASE " + database + " ENCODING = 'UTF8' TEMPLATE template0");
 	}
 
-	void installPlPython() {
-		log.info("installing stored procedure language plpythonu");
-		jdbcOperations.execute("CREATE LANGUAGE plpythonu");
-	}
-
 	void installPlPgSql() {
 		log.info("installing stored procedure language plpgsql");
     try
@@ -260,11 +255,7 @@ public class SpringAnnisAdministrationDao {
 		log.info("computing values for rank.level");
 		executeSqlFromScript("level.sql");
 	}
-	
-	void computeComponents() {
-		log.info("computing components by edge type");
-		executeSqlFromScript("pointing_relations.sql");
-	}
+
 	
 	void computeCorpusStatistics() {
 		log.info("computing statistics for top-level corpus");
@@ -356,21 +347,26 @@ public class SpringAnnisAdministrationDao {
 	void createFacts(long corpusID) 
   {
 
-		log.info("creating node table for corpus with ID " + corpusID);
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-    executeSqlFromScript("node.sql", args);
 
-    log.info("creating node_annotation table for corpus with ID " + corpusID);
-    executeSqlFromScript("node_annotation.sql", args);
+//		log.info("creating node table for corpus with ID " + corpusID);
+//
+//    executeSqlFromScript("node.sql", args);
+//
+//    log.info("creating node_annotation table for corpus with ID " + corpusID);
+//    executeSqlFromScript("node_annotation.sql", args);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("facts.sql", args);
 
-    log.info("indexing the new node table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_node.sql", args);
-    
-    log.info("indexing the new node_annotation table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_node_annotation.sql", args);
+    log.info("updating values in materialized facts table for corpus with ID " + corpusID);
+    executeSqlFromScript("update_facts.sql", args);
+
+//    log.info("indexing the new node table (corpus with ID " + corpusID + ")");
+//    executeSqlFromScript("indexes_node.sql", args);
+//
+//    log.info("indexing the new node_annotation table (corpus with ID " + corpusID + ")");
+//    executeSqlFromScript("indexes_node_annotation.sql", args);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript("indexes_facts.sql", args);
@@ -378,7 +374,7 @@ public class SpringAnnisAdministrationDao {
 	}
 	
 	void rebuildIndexes() {
-		log.info("creating indexes");
+		log.info("creating general indexes");
 		executeSqlFromScript("indexes.sql");
 	}
 	
@@ -389,20 +385,22 @@ public class SpringAnnisAdministrationDao {
 		return simpleJdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
 	}
 	
-	void deleteCorpora(List<Long> ids) {
+	void deleteCorpora(List<Long> ids)
+  {
+
+    log.debug("recursivly deleting corpora: " + ids);
+		executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids", StringUtils.join(ids, ", ")));
 
     for(long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
-      log.debug("dropping node annotation table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
-      log.debug("dropping node table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE node_" + l);
+//      log.debug("dropping node annotation table for corpus " + l);
+//      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
+//      log.debug("dropping node table for corpus " + l);
+//      jdbcOperations.execute("DROP TABLE node_" + l);
     }
 
-    log.debug("recursivly deleting corpora: " + ids);
-		executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids", StringUtils.join(ids, ", ")));
 	}
 	
 	List<Map<String, Object>> listCorpusStats() {

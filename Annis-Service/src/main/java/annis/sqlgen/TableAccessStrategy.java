@@ -108,11 +108,18 @@ public class TableAccessStrategy {
 		
 		return tables;
 	}
-	
-  public boolean usesFacts()
+
+  /**
+   * Returns true if this node uses the partial facts table.
+   * "Partial" means the node and node_annotation tables are not materialized.
+   * @return
+   */
+  public boolean usesPartialFacts()
   {
     if(isMaterialized(COMPONENT_TABLE, FACTS_TABLE) && isMaterialized(EDGE_ANNOTATION_TABLE, FACTS_TABLE)
-      && isMaterialized(RANK_TABLE, FACTS_TABLE))
+      && isMaterialized(RANK_TABLE, FACTS_TABLE)
+      && !isMaterialized(NODE_TABLE, FACTS_TABLE)
+      && !isMaterialized(NODE_ANNOTATION_TABLE, FACTS_TABLE))
     {
       if(usesComponentTable() || usesEdgeAnnotationTable() || usesRankTable())
       {

@@ -12,7 +12,8 @@ INSERT INTO _max VALUES (
     (SELECT max(post) + 1 FROM corpus),
     (SELECT max(post) + 1 FROM facts),
     (SELECT max(component_id) + 1 FROM facts),
-    (SELECT max(id) + 1 FROM node),
+--    (SELECT max(id) + 1 FROM node),
+    (SELECT max(id) + 1 FROM facts),
     (SELECT max(id) + 1 FROM text)
 );
 

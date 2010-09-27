@@ -24,8 +24,9 @@ public class FindMatchesSelectClauseSqlGenerator
 		for (int i = 0; i < nodes.size(); ++i) 
     {
       AnnisNode n = nodes.get(i);
+      TableAccessStrategy t = tables(n);
 			nodeColumns.add(selectClauseForNode(n, i + 1));
-      if(tables(n).usesFacts())
+      if(t.usesComponentTable() || t.usesEdgeAnnotationTable() || t.usesRankTable())
       {
         isDistinct = true;
       }

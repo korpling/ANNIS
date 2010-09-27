@@ -49,3 +49,7 @@ CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref, left_token, right_token)
 
 -- optimize the select distinct
 CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
+
+-- allow search for nodes
+CREATE INDEX idx__sample_node__:id ON facts_:id(sample_node);
+CREATE INDEX idx__sample_node_anno__:id ON facts_:id(sample_node_annotation);

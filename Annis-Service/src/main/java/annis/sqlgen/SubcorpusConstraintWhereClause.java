@@ -20,10 +20,6 @@ import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import annis.model.AnnisNode;
-import annis.model.Edge;
-import annis.sqlgen.model.Dominance;
-import annis.sqlgen.model.Join;
-import annis.sqlgen.model.PointingRelation;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,8 +55,8 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
           tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
           tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref")));
 
-        // we only use this constraint on the facts table
-        if (tables(copyNodes[left]).usesFacts() && tables(copyNodes[right]).usesFacts())
+        // check if we have to apply this constraint on the facts table as well
+        if (tables(copyNodes[left]).usesPartialFacts() && tables(copyNodes[right]).usesPartialFacts())
         {
           conditions.add(join("=",
             tables(copyNodes[left]).aliasedColumn(FACTS_TABLE, "corpus_ref"),
