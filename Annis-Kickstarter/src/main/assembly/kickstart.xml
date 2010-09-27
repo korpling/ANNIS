@@ -15,11 +15,15 @@
     </fileSet>
     <!-- we need all the config files of the service -->
     <fileSet>
-      <directory>../Annis-Service/src/main/dist/</directory>
+      <directory>../Annis-Service/src/main/distribution/</directory>
+      <outputDirectory>/</outputDirectory>
       <excludes>
         <exclude>conf/database.properties</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../Annis-Service/src/main/sql/</directory>
+      <outputDirectory>scripts/</outputDirectory>
     </fileSet>
      <!-- overwrite the database.properties -->
     <fileSet>
