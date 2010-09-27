@@ -8,8 +8,12 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>src/main/dist/</directory>
+      <directory>src/main/distribution/</directory>
       <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/sql/</directory>
+      <outputDirectory>scripts/</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/scripts/</directory>
