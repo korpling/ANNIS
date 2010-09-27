@@ -85,6 +85,8 @@ public class CorpusAdministration {
 
 			administrationDao.dropStagingArea();
 
+      administrationDao.analyzeFacts(corpusID);
+
       log.info("Finished import from: " + path);
 		}
 	}

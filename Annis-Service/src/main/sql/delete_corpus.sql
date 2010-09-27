@@ -28,7 +28,7 @@ AND facts.text_ref = facts.id;
 DELETE FROM corpus_annotation
 USING corpus toplevel, corpus child
 WHERE toplevel.id IN ( :ids ) 
-AND toplevel.pre < child.pre AND toplevel.post >= child.pre 
+AND toplevel.pre <= child.pre AND toplevel.post >= child.pre
 AND corpus_annotation.corpus_ref = child.id;
 
 -- corpus_stats
