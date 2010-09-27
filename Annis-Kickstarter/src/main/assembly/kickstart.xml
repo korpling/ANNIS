@@ -37,7 +37,7 @@
     </fileSet>
     <!-- copy (hopefully compiled, TODO) web application -->
     <fileSet>
-      <directory>../Annis-web/target/Annis-web/</directory>
+      <directory>../Annis-Web/target/Annis-web/</directory>
       <outputDirectory>/webapp/</outputDirectory>
     </fileSet>
   </fileSets>
