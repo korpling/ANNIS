@@ -25,9 +25,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -49,7 +51,7 @@ public class MatrixExtractor implements ResultSetExtractor
   {
     List<AnnotatedMatch> matches = new ArrayList<AnnotatedMatch>();
 
-    Map<List<Long>, AnnotatedMatch> matchesByGroup = new HashMap<List<Long>, AnnotatedMatch>();
+    Map<List<Long>, AnnotatedSpan[]> matchesByGroup = new HashMap<List<Long>, AnnotatedSpan[]>();
 
     while (resultSet.next())
     {
@@ -117,6 +119,7 @@ public class MatrixExtractor implements ResultSetExtractor
           "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
 
         BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
+        int matchWidth = keyArray.length;
         ArrayList<Long> key = new ArrayList<Long>();
         for (BigDecimal bd : keyArray)
         {
@@ -125,20 +128,22 @@ public class MatrixExtractor implements ResultSetExtractor
 
         if (!matchesByGroup.containsKey(key))
         {
-          AnnotatedMatch mTmp = new AnnotatedMatch();
-          matchesByGroup.put(key, mTmp);
+          matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
 
         }
 
         int posInMatch = key.indexOf(id);
         if(posInMatch > -1)
         {
-          matchesByGroup.get(key).add(posInMatch, new AnnotatedSpan(id, coveredText, annotations));
+          matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations);
         }
       }
     }
 
-    matches.addAll(matchesByGroup.values());
+    for(AnnotatedSpan[] match : matchesByGroup.values())
+    {
+      matches.add(new AnnotatedMatch(Arrays.asList(match)));
+    }
 
     return matches;
 
