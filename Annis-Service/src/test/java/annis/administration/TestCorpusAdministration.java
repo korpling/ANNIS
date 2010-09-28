@@ -118,6 +118,9 @@ public class TestCorpusAdministration {
 		// drop the staging area
 		inOrder.verify(administrationDao).dropStagingArea();
 
+    // analyze facts table
+    inOrder.verify(administrationDao).analyzeFacts(corpusID);
+
 	}
 	
 }
