@@ -1,5 +1,6 @@
 var windowSearchFormWidth = 347;
-
+var lastQuery = '';
+var lastStatus = '';
 
 var Citation = {
   generate : function() {
@@ -90,22 +91,33 @@ Ext.onReady(function()
     // just a dummy for the good old days (or for the newer ones)
     formPanelSearch.getComponent('matchCount').setValue("");
 
+    if(lastQuery === formPanelSearch.getComponent('queryAnnisQL').getValue())
+    {
+      formPanelSearch.getComponent('matchCount').setValue(lastStatus);
+    }
+    else
+    {
+      lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
+      
+      Ext.Ajax.request({
+        url: conf_context + '/secure/ValidateQuery',
+        method: 'GET',
+        params: {
+          'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue()
+        },
+        success: function(response) {
+          formPanelSearch.getComponent('matchCount').setValue(response.responseText);
+          lastStatus = formPanelSearch.getComponent('matchCount').getValue();
+        },
+        failure: function() {
+          formPanelSearch.getComponent('matchCount').setValue("FATAL ERROR: Unable to validate query.");
+          lastStatus = formPanelSearch.getComponent('matchCount').getValue();
+        },
+        autoAbort: false,
+        timeout: 10000
+      });
 
-    Ext.Ajax.request({
-      url: conf_context + '/secure/ValidateQuery',
-      method: 'GET',
-      params: {
-        'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue()
-      },
-      success: function(response) {
-        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
-      },
-      failure: function() {
-        formPanelSearch.getComponent('matchCount').setValue("FATAL ERROR: Unable to validate query.");
-      },
-      autoAbort: false,
-      timeout: 10000
-    });
+    }
 
   } // end updateStatus
 	
@@ -143,6 +155,8 @@ Ext.onReady(function()
       }
       corpusIdString += selections[i].id;
     }
+
+    lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
 				
     // submitting query to Server
     Ext.Ajax.request({
@@ -169,6 +183,7 @@ Ext.onReady(function()
           buttons: Ext.MessageBox.OK
         });
         formPanelSearch.getComponent('matchCount').setValue("");
+        lastStatus="";
         setSearchButtonDisabled(false);
       },
       autoAbort: true,
@@ -231,6 +246,8 @@ Ext.onReady(function()
   /** A function that displays or updated the count for a search (after submitting it) */
   function showCount()
   {
+    lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
+    lastStatus = formPanelSearch.getComponent('matchCount').getValue();
     formPanelSearch.getComponent('matchCount').setValue("Getting match count...");
     // submitting query to Server
     Ext.Ajax.request({
@@ -242,6 +259,7 @@ Ext.onReady(function()
       success: function(response)
       {
         formPanelSearch.getComponent('matchCount').setValue(response.responseText);
+        lastStatus = formPanelSearch.getComponent('matchCount').getValue();
         formPanelSearch.getComponent('matchCount').getEl().
         frame('ff0000', 1, {
           duration:3
@@ -281,6 +299,7 @@ Ext.onReady(function()
           buttons: Ext.MessageBox.OK
         });
         formPanelSearch.getComponent('matchCount').setValue("");
+        lastStatus="";
         setSearchButtonDisabled(false);
       },
       autoAbort: true,
