@@ -61,13 +61,6 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 	@Mock private AnnotationRowMapper edgeAnnotationRowMapper;
 	@Mock private AnnotationGraphDaoHelper.MatchGroupRowMapper matchGroupRowMapper;
 	
-	// some dummy matches
-	@Mock private Match match1;
-	@Mock private Match match2;
-	@Mock private Match match3;
-	@Mock private Match match4;
-	@Mock private Match match5;
-	@Mock private List<Match> matches;
 	
 	@Mock private ResultSet resultSet;
 
@@ -91,7 +84,6 @@ public class TestAnnotationGraphDaoHelper extends AnnisHomeTest {
 		when(edgeRowMapper.mapRow(any(ResultSet.class), anyInt())).thenReturn(newEdge(1, 2));
 		assertThat(ANNOTATION1, is(not(ANNOTATION2)));
 	
-		matches = Arrays.asList(match1, match2, match3, match4, match5);
 	}
 	
 	@SuppressWarnings("unchecked")

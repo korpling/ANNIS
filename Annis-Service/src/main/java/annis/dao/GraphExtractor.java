@@ -16,6 +16,8 @@
  */
 package annis.dao;
 
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -52,8 +54,6 @@ public class GraphExtractor implements ResultSetExtractor
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
   private AnnisNodeRowMapper annisNodeRowMapper;
-
-  protected static final String FACTS_TABLE="facts";
 
   public GraphExtractor()
   {

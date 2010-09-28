@@ -5,20 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 
-import annis.WekaDaoHelper;
 import annis.executors.AQLConstraints;
 import annis.executors.QueryExecutor;
-import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryAnalysis;
@@ -47,7 +42,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   /// old
   private SqlGenerator sqlGenerator;
   private AnnotationGraphDaoHelper annotationGraphDaoHelper;
-  private WekaDaoHelper wekaSqlHelper;
   private ListCorpusSqlHelper listCorpusSqlHelper;
   private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
@@ -55,7 +49,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private List<SqlSessionModifier> sqlSessionModifiers;
   private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
-  private MatchRowMapper findRowMapper;
+  private MatrixExtractor matrixExtractor;
   private QueryAnalysis queryAnalysis;
   private DddQueryParser dddQueryParser;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
@@ -63,7 +57,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private DefaultQueryExecutor defaultQueryExecutor;
   private GraphExtractor graphExtractor;
   private List<QueryExecutor> executorList;
-  private Map<AQLConstraints,QueryExecutor> executorConstraints;
+  private Map<AQLConstraints, QueryExecutor> executorConstraints;
   private MetaDataFilter metaDataFilter;
 
   public SpringAnnisDao()
@@ -72,72 +66,33 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     sqlSessionModifiers = new ArrayList<SqlSessionModifier>();
   }
 
-  // really ugly
-  private class QueryTemplate<T>
-  {
-
-    public List<T> query(List<Long> corpusList, String dddQuery, SqlGenerator sqlGenerator, ParameterizedRowMapper<T> rowMapper)
-    {
-      String sql = createSqlAndPrepareSession(corpusList, dddQuery, sqlGenerator);
-      return getSimpleJdbcTemplate().query(sql, rowMapper);
-    }
-
-    public String explain(List<Long> corpusList, String dddQuery, SqlGenerator sqlGenerator, boolean analyze)
-    {
-      // prepend SQL query with EXPLAIN
-      String prefix = analyze ? "EXPLAIN ANALYZE" : "EXPLAIN";
-      String sql = prefix + " " + createSqlAndPrepareSession(corpusList, dddQuery, sqlGenerator);
-
-      // execute sql
-      List<String> plan = getSimpleJdbcTemplate().query(sql, planRowMapper);
-      return StringUtils.join(plan, "\n");
-    }
-
-    private String createSqlAndPrepareSession(List<Long> corpusList, String dddQuery, SqlGenerator sqlGenerator)
-    {
-      // parse the query
-      Start statement = dddQueryParser.parse(dddQuery);
-
-      // analyze it
-      QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-
-      List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
-
-      // execute session modifiers
-      for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
-      {
-        sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
-      }
-
-      // create SQL query
-      return sqlGenerator.toSql(queryData, corpusList, documents);
-    }
-  }
-
-  public List<Match> findMatches(List<Long> corpusList, String dddQuery)
-  {
-    Validate.notNull(corpusList, "corpusList=null passed as argument");
-
-    List<Match> matches = new QueryTemplate<Match>().query(corpusList, dddQuery, findSqlGenerator, findRowMapper);
-
-    return matches;
-  }
-
+  @Override
   public int countMatches(final List<Long> corpusList, final String dddQuery)
   {
     QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
 
     return countExtractor.queryCount(getJdbcTemplate());
+  }
 
+  @Override
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final String dddquery)
+  {
+    QueryData queryData = createDynamicMatchView(corpusList, dddquery);
+
+    int nodeCount = queryData.getMaxWidth();
+
+    return matrixExtractor.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
   }
 
   @Deprecated
+  @Override
   public int doWait(final int seconds)
   {
     throw new UnsupportedOperationException("doWait was only implemented for debug purposes");
   }
 
-   public String planCount(String dddQuery, List<Long> corpusList, boolean analyze)
+  @Override
+  public String planCount(String dddQuery, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
@@ -145,6 +100,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return countExtractor.explain(getJdbcTemplate(), analyze);
   }
 
+  @Override
   public String planGraph(String dddQuery, List<Long> corpusList,
     long offset, long limit, int left, int right,
     boolean analyze)
@@ -159,6 +115,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
   {
     QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
@@ -188,27 +145,21 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     // generate the view with the matched node IDs
     // TODO: use the constraint approach to filter the executors before we iterate over them
-    for(QueryExecutor e : executorList)
+    for (QueryExecutor e : executorList)
     {
-      if(e.checkIfApplicable(queryData))
+      if (e.checkIfApplicable(queryData))
       {
         e.createMatchView(getJdbcTemplate(), corpusList, documents, queryData);
         // leave the loop
         break;
       }
     }
-    
+
     return queryData;
   }
 
   @SuppressWarnings("unchecked")
-  public List<AnnisNode> annotateMatches(List<Match> matches)
-  {
-    return (List<AnnisNode>) getJdbcTemplate().query(
-      wekaSqlHelper.createSqlQuery(matches), wekaSqlHelper);
-  }
-
-  @SuppressWarnings("unchecked")
+  @Override
   public List<AnnisCorpus> listCorpora()
   {
     return (List<AnnisCorpus>) getJdbcTemplate().query(
@@ -216,6 +167,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList,
     boolean listValues)
   {
@@ -225,6 +177,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
     List<AnnotationGraph> graphs = (List<AnnotationGraph>) getJdbcTemplate().query(annotationGraphDaoHelper.createSqlQuery(textId),
@@ -241,6 +194,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public List<Annotation> listCorpusAnnotations(long corpusId)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
@@ -249,6 +203,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return corpusAnnotations;
   }
 
+  @Override
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
@@ -256,6 +211,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return result;
   }
 
+  @Override
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
   {
     try
@@ -344,16 +300,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.timeout = timeout;
   }
 
-  public WekaDaoHelper getWekaSqlHelper()
-  {
-    return wekaSqlHelper;
-  }
-
-  public void setWekaSqlHelper(WekaDaoHelper wekaHelper)
-  {
-    this.wekaSqlHelper = wekaHelper;
-  }
-
   public ListCorpusSqlHelper getListCorpusSqlHelper()
   {
     return listCorpusSqlHelper;
@@ -404,16 +350,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   public void setFindSqlGenerator(SqlGenerator findSqlGenerator)
   {
     this.findSqlGenerator = findSqlGenerator;
-  }
-
-  public MatchRowMapper getFindRowMapper()
-  {
-    return findRowMapper;
-  }
-
-  public void setFindRowMapper(MatchRowMapper findRowMapper)
-  {
-    this.findRowMapper = findRowMapper;
   }
 
   public QueryAnalysis getQueryAnalysis()
@@ -478,10 +414,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     executorConstraints = new EnumMap<AQLConstraints, QueryExecutor>(AQLConstraints.class);
 
-    for(QueryExecutor q : this.executorList)
+    for (QueryExecutor q : this.executorList)
     {
       EnumSet<AQLConstraints> constraints = q.getNeededConstraints();
-      for(AQLConstraints c : constraints)
+      for (AQLConstraints c : constraints)
       {
         executorConstraints.put(c, q);
       }
@@ -499,6 +435,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.metaDataFilter = metaDataFilter;
   }
 
-  
-  
+  public MatrixExtractor getMatrixExtractor()
+  {
+    return matrixExtractor;
+  }
+
+  public void setMatrixExtractor(MatrixExtractor matrixExtractor)
+  {
+    this.matrixExtractor = matrixExtractor;
+  }
 }

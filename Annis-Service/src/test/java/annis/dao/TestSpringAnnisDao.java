@@ -39,8 +39,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import test.TestHelper;
 import annis.AnnisHomeTest;
-import annis.WekaDaoHelper;
-import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryAnalysis;
@@ -70,12 +68,10 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
   @Mock private GraphExtractor graphExtractor;
 	@Mock private ParameterizedSingleColumnRowMapper<String> planRowMapper;
-	@Mock private MatchRowMapper matchRowMapper;
 	@Mock private JdbcTemplate jdbcTemplate;
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 //	@Mock private AnnisResultSetBuilder annisResultSetBuilder;
 	@Mock private AnnotationGraphDaoHelper annotationGraphDaoHelper;
-	@Mock private WekaDaoHelper wekaHelper;
 	@Mock private ListCorpusSqlHelper listCorpusHelper;
 	@Mock private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	@Mock private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
@@ -87,7 +83,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	private static final String SQL = "SQL";
 	private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
   private static final List<Long> DOCUMENT_LIST = new LinkedList<Long>();
-	@Mock private List<Match> MATCHES;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -101,7 +96,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
 		annisDao.setAnnotationGraphDaoHelper(annotationGraphDaoHelper);
-		annisDao.setWekaSqlHelper(wekaHelper);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
 		annisDao.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
 		annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
@@ -125,68 +119,18 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getAnnotationGraphDaoHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(), is(not(nullValue())));
-		assertThat(springAnnisDao.getWekaSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListNodeAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getCountExtractor(), is(not(nullValue())));
 		
 		// new
 		assertThat(springAnnisDao.getQueryAnalysis(), is(not(nullValue())));
 		assertThat(springAnnisDao.getFindSqlGenerator(), is(not(nullValue())));
-		assertThat(springAnnisDao.getFindRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlSessionModifiers(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusByNameDaoHelper(), is(not(nullValue())));
     assertThat(springAnnisDao.getExecutorList(), is(not(nullValue())));
     assertThat(springAnnisDao.getMetaDataFilter(), is(not(nullValue())));
 	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void find() {
-		// setup data that is passed around
-		List<Annotation> metaData = mock(List.class);
-		QueryData queryData = mock(QueryData.class);
-		when(queryData.getMetaData()).thenReturn(metaData);
-		when(queryData.getCorpusList()).thenReturn(CORPUS_LIST);
-
-		// setup dependencies
-		DddQueryParser dddQueryParser = mock(DddQueryParser.class);
-		annisDao.setDddQueryParser(dddQueryParser);
-		when(dddQueryParser.parse(DDDQUERY)).thenReturn(STATEMENT);
-		
-		QueryAnalysis queryAnalysis = mock(QueryAnalysis.class);
-		annisDao.setQueryAnalysis(queryAnalysis);
-		when(queryAnalysis.analyzeQuery(STATEMENT, CORPUS_LIST)).thenReturn(queryData);
-		
-		JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
-		annisDao.setJdbcTemplate(jdbcTemplate);
-		SimpleJdbcTemplate simpleJdbcTemplate = annisDao.getSimpleJdbcTemplate();
-		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(MATCHES);
-		
-		SqlSessionModifier sqlSessionModifier = mock(SqlSessionModifier.class);
-		annisDao.setSqlSessionModifiers(Arrays.asList(sqlSessionModifier));
-		
-		SqlGenerator findSqlGenerator = mock(SqlGenerator.class);
-		annisDao.setFindSqlGenerator(findSqlGenerator);
-		when(findSqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
-		
-		MatchRowMapper findRowMapper = mock(MatchRowMapper.class);
-		annisDao.setFindRowMapper(findRowMapper);
-		
-		// call and test
-		assertThat(annisDao.findMatches(CORPUS_LIST, DDDQUERY), is(MATCHES));
-		
-		verify(dddQueryParser).parse(DDDQUERY);
-		verify(queryAnalysis).analyzeQuery(STATEMENT, CORPUS_LIST);
-		verify(sqlSessionModifier).modifySqlSession(simpleJdbcTemplate, queryData);
-		verify(findSqlGenerator).toSql(queryData, CORPUS_LIST, DOCUMENT_LIST);
-		verify(jdbcTemplate).query(SQL, findRowMapper);
-	}
 	
-	// corpusList must not be null
-	@Test(expected=IllegalArgumentException.class)
-	public void findCorpusListNull() {
-		annisDao.findMatches(null, DDDQUERY);
-	}
 	
 	@Ignore
 	public void planCount() {
@@ -268,21 +212,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.retrieveAnnotationGraph(0);
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void annotateMatches() {
-		// stub JdbcTemplate to return a dummy list of AnnisNode
-		final List<AnnisNode> ANNIS_NODES = mock(List.class);
-		when(jdbcTemplate.query(anyString(), any(WekaDaoHelper.class))).thenReturn(ANNIS_NODES);
-
-		// stub WekaHelper to create a dummy SQL query
-		when(wekaHelper.createSqlQuery(anyList())).thenReturn(SQL);
-		
-		// call and test
-		assertThat(annisDao.annotateMatches(MATCHES), is(ANNIS_NODES));
-		verify(wekaHelper).createSqlQuery(MATCHES);
-		verify(jdbcTemplate).query(SQL, wekaHelper);
-	}
 	
 	@SuppressWarnings("unchecked")
 	@Test

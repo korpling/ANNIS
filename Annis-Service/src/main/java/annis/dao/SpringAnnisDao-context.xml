@@ -53,6 +53,10 @@
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
 
+  <bean id="matrixExtractor" class="annis.dao.MatrixExtractor">
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+  </bean>
+
 	<!-- Helper for annotate command -->
   <bean id="annotationGraphDaoHelper" class="annis.dao.AnnotationGraphDaoHelper">
     <property name="dddQueryParser" ref="dddQueryParser"/>
@@ -64,7 +68,7 @@
   </bean>
 		
 	<!-- Helper for weka command -->
-  <bean id="wekaDaoHelper" class="annis.WekaDaoHelper"/>
+  <bean id="wekaHelper" class="annis.WekaHelper"/>
 	
 	<!-- Helper for list command -->
   <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper"/>
@@ -80,9 +84,6 @@
 	
 	<!-- SqlGenerator -->
   <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
-
-  <!-- XXX: Rowmapper? -->
-  <bean id="matchRowMapper" class="annis.dao.MatchRowMapper"/>
 	
 	<!-- Timing Aspect for DAO methods -->
   <bean class="annis.dao.DaoTiming"/>
@@ -116,7 +117,6 @@
     <property name="sqlGenerator" ref="findSqlGenerator"/>
     <property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
     <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
-    <property name="wekaSqlHelper" ref="wekaDaoHelper"/>
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
@@ -124,10 +124,10 @@
 		<!-- new -->
     <property name="queryAnalysis" ref="queryAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
-    <property name="findRowMapper" ref="matchRowMapper"/>
     <property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
     <property name="countExtractor" ref="countExtractor"/>
+    <property name="matrixExtractor" ref="matrixExtractor" />
 
     <property name="graphExtractor" ref="graphExtractor" />
     <property name="executorList" ref="executorList" />

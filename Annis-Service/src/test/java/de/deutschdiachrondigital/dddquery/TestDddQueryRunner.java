@@ -34,10 +34,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import annis.AnnisHomeTest;
 import annis.AnnotationGraphDotExporter;
 import annis.TableFormatter;
-import annis.WekaDaoHelper;
+import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotationGraphDaoHelper;
-import annis.dao.Match;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -60,7 +59,7 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 	@Mock private PrintStream out;
 	@Mock private AnnisDao annisDao;
 	@Mock private AnnotationGraphDaoHelper annotationGraphHelper;
-	@Mock private WekaDaoHelper wekaDaoHelper;
+	@Mock private WekaHelper wekaHelper;
 	@Mock private ListCorpusSqlHelper listCorpusHelper;
 	@Mock private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	@Mock private TableFormatter tableFormatter;
@@ -70,7 +69,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 	private static final String DDDQUERY = "DDDQUERY";
 	private static final int MATCH_LIMIT = 3;
 	private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
-	@Mock private List<Match> MATCHES;
 	private String TABLE = "TABLE";
 	
 	// DddQueryRunner that is managed by Spring
@@ -86,7 +84,7 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		dddQueryRunner.setOut(out);
 		dddQueryRunner.setAnnisDao(annisDao);
 		dddQueryRunner.setAnnotationGraphDaoHelper(annotationGraphHelper);
-		dddQueryRunner.setWekaDaoHelper(wekaDaoHelper);
+		dddQueryRunner.setWekaHelper(wekaHelper);
 		dddQueryRunner.setListCorpusHelper(listCorpusHelper);
 		dddQueryRunner.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
 		dddQueryRunner.setTableFormatter(tableFormatter);
@@ -94,9 +92,6 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		
 		// settings
 		dddQueryRunner.setMatchLimit(MATCH_LIMIT);
-
-		// stub DAO to retrieve matches
-		when(annisDao.findMatches(anyList(), eq(DDDQUERY))).thenReturn(MATCHES);
 		
 		// stub table formatter
 		when(tableFormatter.formatAsTable(anyList())).thenReturn(TABLE);
@@ -109,7 +104,7 @@ public class TestDddQueryRunner extends AnnisHomeTest {
 		assertThat(springManagedDddQueryRunner.getDddQueryParser(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getFindSqlGenerator(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getAnnotationGraphDaoHelper(), is(not(nullValue())));
-		assertThat(springManagedDddQueryRunner.getWekaDaoHelper(), is(not(nullValue())));
+		assertThat(springManagedDddQueryRunner.getWekaHelper(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getListCorpusHelper(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getListNodeAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springManagedDddQueryRunner.getTableFormatter(), is(not(nullValue())));

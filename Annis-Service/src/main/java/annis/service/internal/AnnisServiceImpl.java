@@ -1,6 +1,6 @@
 package annis.service.internal;
 
-import annis.WekaDaoHelper;
+import annis.WekaHelper;
 import annis.resolver.ResolverEntry;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -8,13 +8,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import annis.dao.AnnisDao;
-import annis.dao.Match;
+import annis.dao.AnnotatedMatch;
 import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.externalFiles.ExternalFileMgr;
-import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.resolver.SingleResolverRequest;
@@ -42,8 +41,8 @@ public class AnnisServiceImpl implements AnnisService
   private DddQueryMapper dddQueryMapper;
   private DddQueryParser dddQueryParser;
   private AnnisDao annisDao;
-  private WekaDaoHelper wekaDaoHelper;
   private ExternalFileMgr externalFileMgr;
+  private WekaHelper wekaHelper;
 
   /**
    * Log the successful initialization of this bean.
@@ -59,6 +58,7 @@ public class AnnisServiceImpl implements AnnisService
     log.info("AnnisService loaded.");
   }
 
+  @Override
   public void ping() throws RemoteException
   {
   }
@@ -68,11 +68,13 @@ public class AnnisServiceImpl implements AnnisService
     return dddQueryMapper.translate(annisQuery);
   }
 
+  @Override
   public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
   {
     return annisDao.countMatches(corpusList, translate(annisQuery));
   }
 
+  @Override
   public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
     throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
@@ -85,16 +87,19 @@ public class AnnisServiceImpl implements AnnisService
     return annisResultSet;
   }
 
+  @Override
   public AnnisCorpusSet getCorpusSet() throws RemoteException
   {
     return new AnnisCorpusSetImpl(annisDao.listCorpora());
   }
 
+  @Override
   public AnnisAttributeSet getNodeAttributeSet(List<Long> corpusList, boolean fetchValues) throws RemoteException
   {
     return new AnnisAttributeSetImpl(annisDao.listNodeAnnotations(corpusList, fetchValues));
   }
 
+  @Override
   public String getPaula(Long textId) throws RemoteException
   {
     AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
@@ -105,6 +110,7 @@ public class AnnisServiceImpl implements AnnisService
     throw new AnnisServiceException("no text found with id = " + textId);
   }
 
+  @Override
   public AnnisResult getAnnisResult(Long textId) throws RemoteException
   {
     AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
@@ -115,6 +121,7 @@ public class AnnisServiceImpl implements AnnisService
     throw new AnnisServiceException("no text found with id = " + textId);
   }
 
+  @Override
   public boolean isValidQuery(String annisQuery) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException
   {
     dddQueryParser.parse(translate(annisQuery));
@@ -122,6 +129,7 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   // TODO: test getBinary
+  @Override
   public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException
   {
     log.debug("Retrieving binary file with id = " + id);
@@ -136,6 +144,7 @@ public class AnnisServiceImpl implements AnnisService
     }
   }
 
+  @Override
   public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException
   {
     return annisDao.listCorpusAnnotations(corpusId);
@@ -152,20 +161,15 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-
-    StringBuilder out = new StringBuilder();
-    List<Match> matches = annisDao.findMatches(corpusList, translate(annisQL));
-    if(!matches.isEmpty())
+    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, translate(annisQL));
+    if(matches.isEmpty())
     {
-      List<AnnisNode> annotatedNodes = annisDao.annotateMatches(matches);
-      out.append(wekaDaoHelper.exportAsWeka(annotatedNodes, matches));
-      out.append("\n");
+      return "(empty)";
     }
     else
     {
-      out.append("(empty)\n");
+      return wekaHelper.exportAsArff(matches);
     }
-    return out.toString();
   }
 
   ///// Getter / Setter
@@ -209,13 +213,13 @@ public class AnnisServiceImpl implements AnnisService
     this.dddQueryParser = dddQueryParser;
   }
 
-  public WekaDaoHelper getWekaDaoHelper()
+  public WekaHelper getWekaHelper()
   {
-    return wekaDaoHelper;
+    return wekaHelper;
   }
 
-  public void setWekaDaoHelper(WekaDaoHelper wekaDaoHelper)
+  public void setWekaHelper(WekaHelper wekaHelper)
   {
-    this.wekaDaoHelper = wekaDaoHelper;
+    this.wekaHelper = wekaHelper;
   }
 }

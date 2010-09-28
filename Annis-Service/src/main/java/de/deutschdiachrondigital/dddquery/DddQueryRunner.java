@@ -8,8 +8,9 @@ import java.util.List;
 import annis.AnnisBaseRunner;
 import annis.AnnotationGraphDotExporter;
 import annis.TableFormatter;
-import annis.WekaDaoHelper;
+import annis.WekaHelper;
 import annis.dao.AnnisDao;
+import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotationGraphDaoHelper;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
@@ -48,7 +49,7 @@ public class DddQueryRunner extends AnnisBaseRunner
   private AnnisDao annisDao;
   private QueryAnalysis queryAnalysis;
   private AnnotationGraphDaoHelper annotationGraphDaoHelper;
-  private WekaDaoHelper wekaDaoHelper;
+  private WekaHelper wekaHelper;
   private ListCorpusSqlHelper listCorpusHelper;
   private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
   private AnnotationGraphDotExporter annotationGraphDotExporter;
@@ -86,6 +87,20 @@ public class DddQueryRunner extends AnnisBaseRunner
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
     out.println(sql);
+  }
+
+  public void doMatrix(String dddQuery)
+  {
+    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), dddQuery);
+    if(matches.isEmpty())
+    {
+      out.println("(empty");
+    }
+    else
+    {
+      WekaHelper helper = new WekaHelper();
+      out.println(helper.exportAsArff(matches));
+    }
   }
 
   public void doCount(String dddQuery)
@@ -288,14 +303,14 @@ public class DddQueryRunner extends AnnisBaseRunner
     this.tableFormatter = tableFormatter;
   }
 
-  public WekaDaoHelper getWekaDaoHelper()
+  public WekaHelper getWekaHelper()
   {
-    return wekaDaoHelper;
+    return wekaHelper;
   }
 
-  public void setWekaDaoHelper(WekaDaoHelper wekaDaoHelper)
+  public void setWekaHelper(WekaHelper wekaDaoHelper)
   {
-    this.wekaDaoHelper = wekaDaoHelper;
+    this.wekaHelper = wekaDaoHelper;
   }
 
   public ListCorpusSqlHelper getListCorpusHelper()

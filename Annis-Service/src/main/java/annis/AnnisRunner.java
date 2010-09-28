@@ -107,6 +107,11 @@ public class AnnisRunner extends AnnisBaseRunner
     dddQueryRunner.doSql(translate(annisQuery));
   }
 
+  public void doMatrix(String annisQuery)
+  {
+    dddQueryRunner.doMatrix(translate(annisQuery));
+  }
+
   public void doCount(String annisQuery)
   {
     dddQueryRunner.doCount(translate(annisQuery));

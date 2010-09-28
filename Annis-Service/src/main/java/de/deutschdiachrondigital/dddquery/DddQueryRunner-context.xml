@@ -42,7 +42,7 @@
     <property name="dddQueryParser" ref="dddQueryParser"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
-    <property name="wekaDaoHelper" ref="wekaDaoHelper"/>
+    <property name="wekaHelper" ref="wekaHelper"/>
     <property name="listCorpusHelper" ref="listCorpusSqlHelper"/>
     <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
     <property name="annotationGraphDotExporter" ref="annotationGraphDotExporter"/>

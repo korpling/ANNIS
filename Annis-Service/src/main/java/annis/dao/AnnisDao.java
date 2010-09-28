@@ -15,28 +15,27 @@ public interface AnnisDao
 
   int countMatches(List<Long> corpusList, String dddQuery);
 
-  List<Match> findMatches(List<Long> corpusList, String dddQuery);
-
-  String planCount(String dddQuery, List<Long> corpusList, boolean analyze);
+  public String planCount(String dddQuery, List<Long> corpusList, boolean analyze);
 
   public String planGraph(String dddQuery, List<Long> corpusList,
     long offset, long limit, int left, int right, boolean analyse);
 
-  List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right);
+  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right);
 
-  AnnotationGraph retrieveAnnotationGraph(long textId);
+  public AnnotationGraph retrieveAnnotationGraph(long textId);
 
-  List<AnnisNode> annotateMatches(List<Match> matches);
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final String dddquery);
 
   int doWait(int seconds);
 
-  List<AnnisCorpus> listCorpora();
+  public List<AnnisCorpus> listCorpora();
 
-  List<Long> listCorpusByName(List<String> corpusNames);
+  public List<Long> listCorpusByName(List<String> corpusNames);
 
-  List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, boolean listValues);
+  public List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, boolean listValues);
 
-  List<Annotation> listCorpusAnnotations(long id);
+  public List<Annotation> listCorpusAnnotations(long id);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
+
 }
