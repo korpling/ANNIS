@@ -150,7 +150,7 @@ public class GraphExtractor implements ResultSetExtractor
 		String matchSql = matchSb.toString();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT \n");
+		sb.append("SELECT DISTINCT \n");
 		sb.append("\t");
 		sb.append(key);
 		sb.append(", facts.*\n");
