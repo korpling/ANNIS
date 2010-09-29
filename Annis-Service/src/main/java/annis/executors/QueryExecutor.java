@@ -36,12 +36,6 @@ public interface QueryExecutor {
   public boolean checkIfApplicable(QueryData aql);
 
   /**
-   * Returns a set of general constraints that must be fullfilled for an AQL
-   * query to be executed by this generator.
-   */
-  public EnumSet<AQLConstraints> getNeededConstraints();
-
-  /**
    * Create a SQL query on the relANNIS scheme from an AQL query.
    * 
    * @param jdbcTemplate

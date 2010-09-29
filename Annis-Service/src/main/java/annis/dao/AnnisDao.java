@@ -26,8 +26,6 @@ public interface AnnisDao
 
   public List<AnnotatedMatch> matrix(final List<Long> corpusList, final String dddquery);
 
-  int doWait(int seconds);
-
   public List<AnnisCorpus> listCorpora();
 
   public List<Long> listCorpusByName(List<String> corpusNames);

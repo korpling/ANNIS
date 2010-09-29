@@ -1,6 +1,5 @@
 package de.deutschdiachrondigital.dddquery;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +23,12 @@ import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class DddQueryRunner extends AnnisBaseRunner
@@ -147,18 +140,6 @@ public class DddQueryRunner extends AnnisBaseRunner
       setPrompt(StringUtils.join(corpora,",") + ">");
     }
     setCorpusList(corpora);
-  }
-
-  public void doWait(String seconds)
-  {
-    try
-    {
-      out.println(annisDao.doWait(Integer.parseInt(seconds)));
-    }
-    catch (Exception e)
-    {
-      //
-    }
   }
 
   public void doList(String unused)

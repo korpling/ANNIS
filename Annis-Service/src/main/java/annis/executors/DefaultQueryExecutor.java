@@ -62,13 +62,6 @@ public class DefaultQueryExecutor implements QueryExecutor
     return true;
   }
 
-  @Override
-  public EnumSet<AQLConstraints> getNeededConstraints()
-  {
-    return EnumSet.noneOf(AQLConstraints.class);
-  }
-
-
   // getter/setter
 
   public SqlGenerator getSqlGenerator()

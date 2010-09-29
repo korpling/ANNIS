@@ -12,21 +12,7 @@
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
 
-  <bean id="spanExecutor" class="annis.executors.SpanExecutor" >
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-    <property name="filteredNodeViewName" value="${annis.filtered-node-view}" />
-  </bean>
-
-  <bean id="tokExecutor" class="annis.executors.TokExecutor" >
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-    <property name="filteredNodeViewName" value="${annis.filtered-node-view}" />
-  </bean>
-
   <util:list id="executorList">
-    <!--
-    <ref bean="spanExecutor" />
-    <ref bean="tokExecutor"/>
-    -->
     <ref bean="defaultQueryExecutor"/>
   </util:list>
 

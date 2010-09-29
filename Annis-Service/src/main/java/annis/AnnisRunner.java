@@ -148,11 +148,6 @@ public class AnnisRunner extends AnnisBaseRunner
     setPrompt(dddQueryRunner.getPrompt());
   }
 
-  public void doWait(String seconds)
-  {
-    dddQueryRunner.doWait(seconds);
-  }
-
   public void doList(String unused)
   {
     dddQueryRunner.doList(unused);
