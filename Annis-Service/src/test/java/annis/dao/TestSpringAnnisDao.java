@@ -7,17 +7,16 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -71,7 +69,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	@Mock private JdbcTemplate jdbcTemplate;
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 //	@Mock private AnnisResultSetBuilder annisResultSetBuilder;
-	@Mock private AnnotationGraphDaoHelper annotationGraphDaoHelper;
 	@Mock private ListCorpusSqlHelper listCorpusHelper;
 	@Mock private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	@Mock private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
@@ -95,7 +92,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
     annisDao.setGraphExtractor(graphExtractor);
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
-		annisDao.setAnnotationGraphDaoHelper(annotationGraphDaoHelper);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
 		annisDao.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
 		annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
@@ -116,7 +112,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getDddQueryParser(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlGenerator(), is(not(nullValue())));
 		assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
-		assertThat(springAnnisDao.getAnnotationGraphDaoHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListNodeAnnotationsSqlHelper(), is(not(nullValue())));
@@ -157,27 +152,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}
 	
-	// retrieve annotation graph for a dddquery
-	@SuppressWarnings("unchecked")
-	// TODO: understand the sense of this test @Test
-	public void retrieveAnnotationGraphInlineMatching() throws DataAccessException, SQLException {
-		final List<AnnotationGraph> ANNOTATION_GRAPHS = mock(List.class);
-		final int CONTEXT = 2;
-		final int LIMIT = 1;
-		final int OFFSET = 0;
-    final int NODECOUNT = 1;
-		
-		// stub generation of sql query and result set conversion
-		when(annotationGraphDaoHelper.createSqlQuery(anyList(), anyInt() ,anyLong(), anyLong(), anyInt(), anyInt())).thenReturn(SQL);
-		when(jdbcTemplate.query(anyString(), any(AnnotationGraphDaoHelper.class))).thenReturn(ANNOTATION_GRAPHS);
-		
-		// call and test
-		List<AnnotationGraph> actual = annisDao.retrieveAnnotationGraph(CORPUS_LIST, DDDQUERY, OFFSET, LIMIT, CONTEXT, CONTEXT);
-		assertThat(actual, is(ANNOTATION_GRAPHS));
-		verify(annotationGraphDaoHelper).createSqlQuery(CORPUS_LIST, NODECOUNT, OFFSET, LIMIT, CONTEXT, CONTEXT);
-		verify(jdbcTemplate).query(SQL, annotationGraphDaoHelper);
-	}
-	
 	// retrieve annotation graph for a complete text
 	@Test
 	public void retrieveAnnotationGraphText() {
@@ -185,19 +159,17 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		
 		// stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
 		final AnnotationGraph GRAPH = mock(AnnotationGraph.class);
-		when(annotationGraphDaoHelper.createSqlQuery(anyLong())).thenReturn(SQL);
-		when(jdbcTemplate.query(any(String.class), any(AnnotationGraphDaoHelper.class))).thenReturn(Arrays.asList(GRAPH));
 
+    when(graphExtractor.queryAnnotationGraph(any(JdbcTemplate.class), anyLong())).thenReturn(Arrays.asList(GRAPH));
+		
 		// call and test
 		assertThat(annisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
-		verify(annotationGraphDaoHelper).createSqlQuery(TEXT_ID);
-		verify(jdbcTemplate).query(SQL, annotationGraphDaoHelper);
 	}
 	
 	// return null if text was not found
 	@Test
 	public void retrieveAnnotationGraphNoText() {
-		when(jdbcTemplate.query(anyString(), any(AnnotationGraphDaoHelper.class))).thenReturn(new ArrayList<AnnotationGraph>());
+		when(jdbcTemplate.query(anyString(), any(GraphExtractor.class))).thenReturn(new ArrayList<AnnotationGraph>());
 		assertThat(annisDao.retrieveAnnotationGraph(0), is(nullValue()));
 	}
 	
@@ -208,7 +180,8 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// stub returned graph list with more than one entry
 		final List<AnnotationGraph> GRAPHS = mock(List.class);
 		when(GRAPHS.size()).thenReturn(2);
-		when(jdbcTemplate.query(anyString(), any(AnnotationGraphDaoHelper.class))).thenReturn(GRAPHS);
+    when(graphExtractor.queryAnnotationGraph(any(JdbcTemplate.class),
+      anyLong())).thenReturn(GRAPHS);
 		annisDao.retrieveAnnotationGraph(0);
 	}
 	

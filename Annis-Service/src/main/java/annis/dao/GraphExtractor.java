@@ -118,7 +118,12 @@ public class GraphExtractor implements ResultSetExtractor
     return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(corpusList, left, right, limit, offset, nodeCount), this);
   }
 
-  private String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
+  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, long textID)
+  {
+    return (List<AnnotationGraph>) jdbcTemplate.query(getTextQuery(textID), this);
+  }
+
+  protected String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
   {
 
     // key for annotation graph matches
@@ -150,7 +155,7 @@ public class GraphExtractor implements ResultSetExtractor
 		String matchSql = matchSb.toString();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT \n");
+		sb.append("SELECT DISTINCT \n");
 		sb.append("\t");
 		sb.append(key);
 		sb.append(", facts.*\n");
@@ -209,6 +214,18 @@ public class GraphExtractor implements ResultSetExtractor
 		}
 		sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
+  }
+
+  protected String getTextQuery(long textID)
+  {
+    String template = "SELECT DISTINCT \n"
+			+ "\t'-1' AS key, facts.*\n"
+			+ "FROM\n"
+			+ "\tfacts AS facts\n"
+			+ "WHERE\n" + "\tfacts.text_ref = :text_id\n"
+			+ "ORDER BY facts.pre";
+		String sql = template.replace(":text_id", String.valueOf(textID));
+		return sql;
   }
 
   @Override

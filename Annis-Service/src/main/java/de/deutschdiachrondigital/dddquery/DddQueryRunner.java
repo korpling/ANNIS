@@ -10,7 +10,6 @@ import annis.TableFormatter;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.dao.AnnotationGraphDaoHelper;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -41,7 +40,6 @@ public class DddQueryRunner extends AnnisBaseRunner
   private MetaDataFilter metaDataFilter;
   private AnnisDao annisDao;
   private QueryAnalysis queryAnalysis;
-  private AnnotationGraphDaoHelper annotationGraphDaoHelper;
   private WekaHelper wekaHelper;
   private ListCorpusSqlHelper listCorpusHelper;
   private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
@@ -64,7 +62,6 @@ public class DddQueryRunner extends AnnisBaseRunner
   }
 
   ///// CLI methods
-
   public void doParse(String dddQuery)
   {
     out.println(DddQueryParser.dumpTree(dddQueryParser.parse(dddQuery)));
@@ -76,7 +73,7 @@ public class DddQueryRunner extends AnnisBaseRunner
     // sql query
     Start statement = dddQueryParser.parse(dddQuery);
     QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-    
+
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
     out.println(sql);
@@ -85,7 +82,7 @@ public class DddQueryRunner extends AnnisBaseRunner
   public void doMatrix(String dddQuery)
   {
     List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), dddQuery);
-    if(matches.isEmpty())
+    if (matches.isEmpty())
     {
       out.println("(empty");
     }
@@ -131,13 +128,13 @@ public class DddQueryRunner extends AnnisBaseRunner
 
   public void doCorpus(List<Long> corpora)
   {
-    if(corpora.isEmpty())
+    if (corpora.isEmpty())
     {
       setPrompt("no corpus>");
     }
     else
     {
-      setPrompt(StringUtils.join(corpora,",") + ">");
+      setPrompt(StringUtils.join(corpora, ",") + ">");
     }
     setCorpusList(corpora);
   }
@@ -167,9 +164,9 @@ public class DddQueryRunner extends AnnisBaseRunner
     out.println(tableFormatter.formatAsTable(list, fields));
   }
 
-  public Map<String,Set<String>> proposedIndexHelper(String dddQuery)
+  public Map<String, Set<String>> proposedIndexHelper(String dddQuery)
   {
-    Map<String,Set<String>> result = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> result = new HashMap<String, Set<String>>();
     result.put("facts", new TreeSet<String>());
     result.put("node", new TreeSet<String>());
     result.put("node_annotation", new TreeSet<String>());
@@ -183,16 +180,16 @@ public class DddQueryRunner extends AnnisBaseRunner
     // extract WHERE clause
 
     Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
-    if(mWhere.find())
+    if (mWhere.find())
     {
       String whereClause = sql.substring(mWhere.end());
       //out.println("WHERE clause:\n" + whereClause);
 
-      for(String table : result.keySet())
+      for (String table : result.keySet())
       {
         Set<String> attr = result.get(table);
-        Matcher mFacts = Pattern.compile( table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
-        while(mFacts.find())
+        Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
+        while (mFacts.find())
         {
           attr.add(mFacts.group(1).trim());
         }
@@ -241,17 +238,6 @@ public class DddQueryRunner extends AnnisBaseRunner
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
-  }
-
-  public AnnotationGraphDaoHelper getAnnotationGraphDaoHelper()
-  {
-    return annotationGraphDaoHelper;
-  }
-
-  public void setAnnotationGraphDaoHelper(
-    AnnotationGraphDaoHelper annotationGraphDaoHelper)
-  {
-    this.annotationGraphDaoHelper = annotationGraphDaoHelper;
   }
 
   public int getMatchLimit()
@@ -355,7 +341,4 @@ public class DddQueryRunner extends AnnisBaseRunner
   {
     this.metaDataFilter = metaDataFilter;
   }
-
-  
-
 }

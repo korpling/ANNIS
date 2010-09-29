@@ -41,7 +41,6 @@
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="dddQueryParser" ref="dddQueryParser"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
-    <property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="listCorpusHelper" ref="listCorpusSqlHelper"/>
     <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>

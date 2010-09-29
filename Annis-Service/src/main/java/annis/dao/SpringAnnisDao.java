@@ -36,7 +36,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private int timeout;
   /// old
   private SqlGenerator sqlGenerator;
-  private AnnotationGraphDaoHelper annotationGraphDaoHelper;
   private ListCorpusSqlHelper listCorpusSqlHelper;
   private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
@@ -111,7 +110,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     // create the Annis graphs
     return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
-    //return annotationGraphDaoHelper.queryAnnotationGraph(getJdbcTemplate(), nodeCount, corpusList, dddQuery, offset, limit, left, right);
   }
 
   private QueryData createDynamicMatchView(List<Long> corpusList, String dddQuery)
@@ -167,8 +165,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   @Override
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
-    List<AnnotationGraph> graphs = (List<AnnotationGraph>) getJdbcTemplate().query(annotationGraphDaoHelper.createSqlQuery(textId),
-      annotationGraphDaoHelper);
+    List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(getJdbcTemplate(), textId);
     if (graphs.isEmpty())
     {
       return null;
@@ -247,28 +244,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     ParameterizedSingleColumnRowMapper<String> planRowMapper)
   {
     this.planRowMapper = planRowMapper;
-  }
-
-  public AnnotationGraphDaoHelper getAnnotateMatchesQueryHelper()
-  {
-    return getAnnotationGraphDaoHelper();
-  }
-
-  public AnnotationGraphDaoHelper getAnnotationGraphDaoHelper()
-  {
-    return annotationGraphDaoHelper;
-  }
-
-  public void setAnnotateMatchesQueryHelper(
-    AnnotationGraphDaoHelper annotateMatchesQueryHelper)
-  {
-    setAnnotationGraphDaoHelper(annotateMatchesQueryHelper);
-  }
-
-  public void setAnnotationGraphDaoHelper(
-    AnnotationGraphDaoHelper annotationGraphDaoHelper)
-  {
-    this.annotationGraphDaoHelper = annotationGraphDaoHelper;
   }
 
   public int getTimeout()

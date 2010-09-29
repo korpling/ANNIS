@@ -56,16 +56,6 @@
   <bean id="matrixExtractor" class="annis.dao.MatrixExtractor">
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
-
-	<!-- Helper for annotate command -->
-  <bean id="annotationGraphDaoHelper" class="annis.dao.AnnotationGraphDaoHelper">
-    <property name="dddQueryParser" ref="dddQueryParser"/>
-    <property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="queryAnalysis" ref="queryAnalysis"/>
-    <property name="nodeTableViewName" value="${annis.filtered-facts-view}" />
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-	
-  </bean>
 		
 	<!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper"/>
@@ -115,7 +105,6 @@
 		<!--<property name="dataSource" ref="dataSource"/>-->
     <property name="dddQueryParser" ref="dddQueryParser"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="annotationGraphDaoHelper" ref="annotationGraphDaoHelper"/>
     <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
