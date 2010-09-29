@@ -21,6 +21,8 @@ import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
 import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.service.ifaces.AnnisResult;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,6 +34,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author thomas
+ * @author Christian
  */
 public class CorefVisualizer extends WriterVisualizer
 {
@@ -39,7 +42,8 @@ public class CorefVisualizer extends WriterVisualizer
   long globalIndex;
   List<TReferent> ReferentList;
   List<TComponent> Komponent;
-  HashMap<Long,List<Long>> ReferentOfToken, ComponentOfToken, TokensOfNode;
+  HashMap<Long,List<Long>> ComponentOfToken, TokensOfNode; //ReferentOfToken
+  HashMap<Long,HashMap<Long, Integer>> ReferentOfToken; // the Long ist the Referend, the Integer means: { 0=incoming P-Edge, 1=outgoing P-Edge, 2=both}
 
   List<Long> visitedNodes;
   LinkedList<TComponenttype> Componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which Component
@@ -84,13 +88,17 @@ public class CorefVisualizer extends WriterVisualizer
 
       //get Info
       globalIndex = 0;
+      int toolTipMaxLineCount = 1;
       TokensOfNode = new HashMap<Long,List<Long>>();//LinkedList<List<Long>>();
       ReferentList = new LinkedList<TReferent>();
       Komponent = new LinkedList<TComponent>();
-      ReferentOfToken = new HashMap<Long,List<Long>>();
+      ReferentOfToken = new HashMap<Long,HashMap<Long, Integer>>();
       ComponentOfToken = new HashMap<Long,List<Long>>();
       Componenttype = new LinkedList<TComponenttype>();
-      for (Edge e : getResult().getGraph().getEdges()) if (e.getName()!=null && e.getEdgeType()==Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null) {
+      AnnisResult anResult = getResult(); if (anResult==null) { writer.append("An Error occured: Could not get Result (Result == null)</body>");return;}
+      AnnotationGraph anGraph = anResult.getGraph(); if (anGraph==null) { writer.append("An Error occured: Could not get Graph of Result (Graph == null)</body>");return;}
+      List<Edge> edgeList = anGraph.getEdges(); if (edgeList==null) return;
+      for (Edge e : edgeList) if (e != null && e.getName()!=null && e.getEdgeType()==Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null) {
           visitedNodes = new LinkedList<Long>();
           //got Type for this?
           boolean gotIt = false;
@@ -129,10 +137,11 @@ public class CorefVisualizer extends WriterVisualizer
           if (TokensOfNode.containsKey(e.getDestination().getId())){//neu
              for (Long l : TokensOfNode.get(e.getDestination().getId())){
                     if (ReferentOfToken.get(l)==null) {
-                        List<Long> newlist = new LinkedList<Long>();
-                        newlist.add(globalIndex);
+                        HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
+                        newlist.put(globalIndex, 0);
                         ReferentOfToken.put(l, newlist);
-                    } else if(!ReferentOfToken.get(l).contains(globalIndex)) ReferentOfToken.get(l).add(globalIndex);
+                    } else if (!ReferentOfToken.get(l).containsKey(globalIndex)){ ReferentOfToken.get(l).put(globalIndex, 0);
+                    } else if(ReferentOfToken.get(l).containsKey(globalIndex) && ReferentOfToken.get(l).get(globalIndex).equals(1)) ReferentOfToken.get(l).put(globalIndex, 2);
              }
           }else setReferent(e.getDestination(), globalIndex);//neu
           //e.getDestination().getId()
@@ -144,17 +153,6 @@ public class CorefVisualizer extends WriterVisualizer
       }
 
       colorlist = new HashMap<Integer,Integer>();
-      /*/for (int i=0;i<Komponent.size();i++){
-          int col = getNewColor(i);
-          colorlist.put(i, col);
-      }//*/
-
-          /*//test
-          writer.append("<br>TokensOfNode: "+TokensOfNode);
-          writer.append("<br>ReferentList: "+ReferentList);
-          writer.append("<br>Komponent: "+Komponent);
-          writer.append("<br>ReferentOfToken: "+ReferentOfToken+" ende.");
-          //*/// -test
 
       //write Output
       List<Long> prevpositions, listpositions;
@@ -194,10 +192,6 @@ public class CorefVisualizer extends WriterVisualizer
               }
           }
          }
-
-          /*test
-          if (finalpositions.size()>0) writer.append("Pos: "+finalpositions+";"+listpositions+"|");
-          //*/// -test
 
           //Write ///////////////////////////////////////////////////////
           String onclick="", style = "";
@@ -254,23 +248,25 @@ public class CorefVisualizer extends WriterVisualizer
                                 break;
                             }
                         }
-                        tooltip = "ext:qtip=\"<b>Component: "+(pr+1)+"</b>, Type: "+currentType2+Annotations2+"\"";
-                        writer.append("<tr><td id=\"tok_"
+                        tooltip = "ext:qtip=\"<b>Component</b>: "+(pr+1)+", <b>Type</b>: "+currentType2+Annotations2+"\"";
+                        if (tooltip.length()/40+1>toolTipMaxLineCount) toolTipMaxLineCount = tooltip.length()/40+1;
+                        writer.append("<tr><td nowrap id=\"tok_"
                         + tok.getId() + "\" " + tooltip + " style=\""
                         + style + "\" onclick=\""
                         + onclick + "\" annis:pr_left=\""
                         + left2 + "\" annis:pr_right=\""
                         + right2 + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>");
-                        writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
+                        //writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
                       }else{//easier
-                        tooltip = "ext:qtip=\"<b>Component: "+(currentPositionComponent+1)+"</b>, Type: "+currentType+Annotations+"\"";
-                        writer.append("<tr><td id=\"tok_"
+                        tooltip = "ext:qtip=\"<b>Component</b>: "+(currentPositionComponent+1)+", <b>Type</b>: "+currentType+Annotations+"\"";
+                        if (tooltip.length()/40+1>toolTipMaxLineCount) toolTipMaxLineCount = tooltip.length()/40+1;
+                        writer.append("<tr><td nowrap id=\"tok_"
                         + tok.getId() + "\" " + tooltip + " style=\""
                         + style + "\" onclick=\""
                         + onclick + "\" annis:pr_left=\""
                         + left + "\" annis:pr_right=\""
                         + right + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>");
-                        writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
+                        //writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
                       }
                     }
                     currentlinkcount++;
@@ -285,26 +281,31 @@ public class CorefVisualizer extends WriterVisualizer
                             colorlist.put((int)(long)currentPositionComponent, color);
                         }
                         if (color>16777215) color =16777215;
-                        String addition = ""; //"";
-                        //if (checklist==null || !checklist.get(index)) addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white";
+
+                        String addition = ";border-style: solid; border-width: 0px 0px 0px 0px; border-color: white "; //"";
                         if (checklist!=null && checklist.size()>index && checklist.get(index).booleanValue()==true){
                             boolean connection =false;
                             if (lastId!=null && currentId!=null && ReferentOfToken.get(lastId)!=null && ReferentOfToken.get(currentId)!=null)
-                                for (long l : ReferentOfToken.get(lastId)) if (ReferentOfToken.get(currentId).contains(l)){ connection=true; break; }
+                                for (long l : ReferentOfToken.get(lastId).keySet()) if (ReferentList.get((int)l) != null && !ReferentOfToken.get(lastId).get(l).equals(0) && currentPositionComponent.equals(ReferentList.get((int)l).Component)
+                                        && ReferentOfToken.get(currentId).get(l)!=null && !ReferentOfToken.get(currentId).get(l).equals(0)){ connection=true; break; }
                             if (!connection) addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
-                        }else  addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
-                        //if (prevpositions!=null) if (prevpositions.size()<index && finalpositions.size()<index && prevpositions.contains((long)finalpositions.get(index))) addition="";
-                        tooltip = "ext:qtip=\"<b>Component: "+(currentPositionComponent+1)+"</b>, Type: "+currentType+Annotations+"\"";
-                        //tooltip = "ext:qtip=\"<b>type: ''</b>, certainity: ''\"";
+                        }else  addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";//2px
+
+                        //String addition =  ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
+                        if (prevpositions!=null && prevpositions.contains(currentPositionComponent)) addition="";
+                        tooltip = "ext:qtip=\"<b>Component</b>: "+(currentPositionComponent+1)+", <b>Type</b>: "+currentType+Annotations+"\"";
+                        if (tooltip.length()/40+1>toolTipMaxLineCount) toolTipMaxLineCount = tooltip.length()/40+1;
+
+                        writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");//
                         writer.append("<tr><td height=\"3px\" width=\"100%\" "
                         //+"id=\"tok_" + tok.getId() + "_"+currentlinkcount + "\" "
                         + " style=\"" + style + addition + "\" onclick=\""
                         + onclick +"\" annis:pr_left=\""
                         + left + "\"annis:pr_right=\""
                         + right + "\" "+ tooltip + "BGCOLOR=\""+
-                       Integer.toHexString(color) //6710937) // "#666699"
-                       + "\"></td></tr>");
+                       Integer.toHexString(color) + "\"></td></tr>");
                         writer.append("<tr><td height=\"2px\"></td></tr>");
+                        writer.append("</table></td></tr>");//
                     }
                 }
                 if (currentlinkcount>maxlinkcount) maxlinkcount=currentlinkcount;
@@ -325,6 +326,12 @@ public class CorefVisualizer extends WriterVisualizer
             }
             writer.append("</table>");
       }
+      writer.append("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">");
+      writer.append("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
+      if (toolTipMaxLineCount>10) toolTipMaxLineCount=10;
+      writer.append("<tr><td height=\"n: "+(toolTipMaxLineCount*15+15)+"px\"></td></tr>");
+      writer.append("</table></td></tr>");
+
       writer.append("</body></html>");
     }
     catch(IOException ex)
@@ -350,10 +357,11 @@ public class CorefVisualizer extends WriterVisualizer
                     if (!ComponentOfToken.get(l).contains(cnr)) ComponentOfToken.get(l).add(cnr);
                 }
                 if (b) {if (ReferentOfToken.get(l)==null) {
-                    List<Long> newlist = new LinkedList<Long>();
-                    newlist.add(globalIndex);
-                    ReferentOfToken.put(l, newlist);
-                } else if (!ReferentOfToken.get(l).contains(globalIndex)) ReferentOfToken.get(l).add(globalIndex);
+                        HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
+                        newlist.put(globalIndex, 1);
+                        ReferentOfToken.put(l, newlist);
+                    } else if (!ReferentOfToken.get(l).containsKey(globalIndex)){ ReferentOfToken.get(l).put(globalIndex, 1);
+                    } else if(ReferentOfToken.get(l).get(globalIndex).equals(0)) ReferentOfToken.get(l).put(globalIndex, 2);
              }}
          }else{
             result = searchTokens(a,b,cnr);
@@ -377,13 +385,19 @@ public class CorefVisualizer extends WriterVisualizer
      return result;
  }
 
- private void setReferent(AnnisNode a, long index){
+ private void setReferent(AnnisNode a, long index){ //is Destination
      if (a.isToken()){
-            if (ReferentOfToken.get(a.getId())==null) {
+                    if (ReferentOfToken.get(a.getId())==null) {
+                        HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
+                        newlist.put(globalIndex, 0);
+                        ReferentOfToken.put(a.getId(), newlist);
+                    } else if (!ReferentOfToken.get(a.getId()).containsKey(globalIndex)){ ReferentOfToken.get(a.getId()).put(globalIndex, 0);
+                    } else if(ReferentOfToken.get(a.getId()).get(globalIndex).equals(1)) ReferentOfToken.get(a.getId()).put(globalIndex, 2);
+            /*if (ReferentOfToken.get(a.getId())==null) {
                 List<Long> newlist = new LinkedList<Long>();
                 newlist.add(index);
                 ReferentOfToken.put(a.getId(), newlist);
-            } else if(!ReferentOfToken.get(a.getId()).contains(index)) ReferentOfToken.get(a.getId()).add(index);
+            } else if(!ReferentOfToken.get(a.getId()).contains(index)) ReferentOfToken.get(a.getId()).add(index);//*/
      }else{
          for (Edge e : a.getOutgoingEdges()) if (e.getEdgeType()!=Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null) {
              setReferent(e.getDestination(), index);
@@ -404,11 +418,17 @@ public class CorefVisualizer extends WriterVisualizer
              if (!newlist.contains(cnr)) newlist.add(cnr);
          }
          if (b){
-            if (ReferentOfToken.get(a.getId())==null) {
+                    if (ReferentOfToken.get(a.getId())==null) {
+                        HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
+                        newlist.put(globalIndex, 1);
+                        ReferentOfToken.put(a.getId(), newlist);
+                    } else if (!ReferentOfToken.get(a.getId()).containsKey(globalIndex)){ ReferentOfToken.get(a.getId()).put(globalIndex, 1);
+                    } else if (ReferentOfToken.get(a.getId()).get(globalIndex).equals(1)) ReferentOfToken.get(a.getId()).put(globalIndex, 2);
+            /*if (ReferentOfToken.get(a.getId())==null) {
                 List<Long> newlist = new LinkedList<Long>();
                 newlist.add(globalIndex);
                 ReferentOfToken.put(a.getId(), newlist);
-            } else if(!ReferentOfToken.get(a.getId()).contains(globalIndex)) ReferentOfToken.get(a.getId()).add(globalIndex);
+            } else if(!ReferentOfToken.get(a.getId()).contains(globalIndex)) ReferentOfToken.get(a.getId()).add(globalIndex);//*/
          }
      }else{
          for (Edge e : a.getOutgoingEdges()) if (e.getEdgeType()!=Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null) {
@@ -421,15 +441,27 @@ public class CorefVisualizer extends WriterVisualizer
 
  private String getAnnotations(Long id, long component){
      String result = "";
-     int nr = 1;
-     for (long l :ReferentOfToken.get(id)){
+     String incoming = "", outgoing = "";
+     int nri = 1, nro = 1;//, referents = 0;
+     for (long l :ReferentOfToken.get(id).keySet()){
          if (ReferentList.get((int)(long)l)!=null && ReferentList.get((int)(long)l).Component==component && ReferentList.get((int)(long)l).Annotations != null && ReferentList.get((int)(long)l).Annotations.size()>0){
-             for (Annotation an : ReferentList.get((int)(long)l).Annotations) {
-                if (nr == 1) { result = ", Annotations : "+an.getName()+"="+an.getValue();nr--;
-                } else { result += ", "+an.getName()+"="+an.getValue();}
+             //referents++;
+             //if (referents>1) result += "[";
+             int num = ReferentOfToken.get(id).get(l);
+             if (num == 0 || num == 2) {
+                for (Annotation an : ReferentList.get((int)(long)l).Annotations) {
+                    if (nri == 1) { incoming = ", <b>incoming Annotations</b>: "+an.getName()+"="+an.getValue();nri--;
+                    } else { incoming += ", "+an.getName()+"="+an.getValue();}}
+             }
+             if (num == 1 || num == 2) {
+                for (Annotation an : ReferentList.get((int)(long)l).Annotations) {
+                    if (nro == 1) { outgoing = ", <b>outgoing Annotations</b>: "+an.getName()+"="+an.getValue();nro--;
+                    } else { outgoing += ", "+an.getName()+"="+an.getValue();}}
              }
          }
      }
+     if (nro<1) result+=outgoing;
+     if (nri<1) result+=incoming;
      return result;
  }
 
