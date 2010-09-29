@@ -123,13 +123,13 @@ public class GraphExtractor implements ResultSetExtractor
 
     // key for annotation graph matches
 		StringBuilder keySb = new StringBuilder();
-		keySb.append("ARRAY[matches.id1");
+		keySb.append("matches.id1");
 		for (int i = 2; i <= nodeCount; ++i) {
-			keySb.append(",");
+			keySb.append(" || ',' || ");
 			keySb.append("matches.id");
 			keySb.append(i);
 		}
-		keySb.append("] AS key");
+		keySb.append(" AS key");
 		String key = keySb.toString();
 
     // sql for matches
@@ -150,7 +150,7 @@ public class GraphExtractor implements ResultSetExtractor
 		String matchSql = matchSb.toString();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT DISTINCT \n");
+		sb.append("SELECT \n");
 		sb.append("\t");
 		sb.append(key);
 		sb.append(", facts.*\n");
@@ -231,16 +231,14 @@ public class GraphExtractor implements ResultSetExtractor
     {
       // process result by match group
       // match group is identified by the ids of the matched nodes
-      Array sqlKey = resultSet.getArray("key");
-      Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
-      Validate.isTrue(sqlKey.getBaseType() == Types.NUMERIC,
-        "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
-      
-      BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
+      String rawSqlKey = resultSet.getString("key");
+      String[] sqlKeySplitted = rawSqlKey.split(",");
+
       ArrayList<Long> key = new ArrayList<Long>();
-      for(BigDecimal bd : keyArray)
+      for(String s : sqlKeySplitted)
       {
-        key.add(bd.longValue());
+        long l = Long.parseLong(s);
+        key.add(l);
       }
 
       if (!graphByMatchGroup.containsKey(key))
