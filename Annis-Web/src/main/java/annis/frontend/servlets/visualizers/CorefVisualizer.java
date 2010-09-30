@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author thomas
- * @author Christian
+ * @author Christian Schulz-Hanke
  */
 public class CorefVisualizer extends WriterVisualizer
 {
