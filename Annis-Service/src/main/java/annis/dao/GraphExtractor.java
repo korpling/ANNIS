@@ -123,109 +123,104 @@ public class GraphExtractor implements ResultSetExtractor
     return (List<AnnotationGraph>) jdbcTemplate.query(getTextQuery(textID), this);
   }
 
-  protected String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
+  public String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
   {
 
     // key for annotation graph matches
-		StringBuilder keySb = new StringBuilder();
-		keySb.append("ARRAY[matches.id1");
-		for (int i = 2; i <= nodeCount; ++i) {
-			keySb.append(",");
-			keySb.append("matches.id");
-			keySb.append(i);
-		}
-		keySb.append("] AS key");
-		String key = keySb.toString();
+    StringBuilder keySb = new StringBuilder();
+    keySb.append("ARRAY[matches.id1");
+    for (int i = 2; i <= nodeCount; ++i)
+    {
+      keySb.append(",");
+      keySb.append("matches.id");
+      keySb.append(i);
+    }
+    keySb.append("] AS key");
+    String key = keySb.toString();
 
     // sql for matches
-		StringBuilder matchSb = new StringBuilder();
-		matchSb.append("SELECT * FROM ");
+    StringBuilder matchSb = new StringBuilder();
+    matchSb.append("SELECT * FROM ");
     matchSb.append(matchedNodesViewName);
-		matchSb.append(" ORDER BY ");
-		matchSb.append("id1");
-		for (int i = 2; i <= nodeCount; ++i) {
-			matchSb.append(", ");
-			matchSb.append("id");
-			matchSb.append(i);
-		}
-		matchSb.append(" OFFSET ");
-		matchSb.append(offset);
-		matchSb.append(" LIMIT ");
-		matchSb.append(limit);
-		String matchSql = matchSb.toString();
+    matchSb.append(" ORDER BY ");
+    matchSb.append("id1");
+    for (int i = 2; i <= nodeCount; ++i)
+    {
+      matchSb.append(", ");
+      matchSb.append("id");
+      matchSb.append(i);
+    }
+    matchSb.append(" OFFSET ");
+    matchSb.append(offset);
+    matchSb.append(" LIMIT ");
+    matchSb.append(limit);
+    String matchSql = matchSb.toString();
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT DISTINCT \n");
-		sb.append("\t");
-		sb.append(key);
-		sb.append(", facts.*\n");
-		sb.append("FROM\n");
-		sb.append("\t(");
-		sb.append(matchSql);
-		sb.append(") AS matches,\n");
-		sb.append("\t");
+    StringBuilder sb = new StringBuilder();
+    sb.append("SELECT DISTINCT \n");
+    sb.append("\t");
+    sb.append(key);
+    sb.append(", facts.*\n");
+    sb.append("FROM\n");
+    sb.append("\t(");
+    sb.append(matchSql);
+    sb.append(") AS matches,\n");
+    sb.append("\t");
     sb.append(FACTS_TABLE);
     sb.append(" AS facts\n");
-		sb.append("WHERE\n");
-    if(corpusList != null)
+    sb.append("WHERE\n");
+    if (corpusList != null)
     {
       sb.append("facts.toplevel_corpus IN (");
       sb.append(corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","));
       sb.append(") AND\n");
     }
-		sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
-      .append(left)
-      .append(" AND facts.right_token <= matches.right_token1 + ")
-      .append(right)
-      .append(") OR (facts.left_token <= matches.left_token1 - ")
-      .append(left).append(" AND matches.left_token1 - ")
-      .append(left).append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ")
-      .append(right).append(" AND matches.right_token1 + ")
-      .append(right).append(" <= facts.right_token)))");
-		for (int i = 2; i <= nodeCount; ++i) {
-			sb.append(" OR\n");
-			sb.append("\t(facts.text_ref = matches.text_ref");
-			sb.append(i);
-			sb.append(" AND ((facts.left_token >= matches.left_token");
-			sb.append(i);
-			sb.append(" - ");
-			sb.append(left);
-			sb.append(" AND facts.right_token <= matches.right_token");
-			sb.append(i);
-			sb.append(" + ");
-			sb.append(right);
-			sb.append(") OR (facts.left_token <= matches.left_token");
-			sb.append(i);
-			sb.append(" - ");
-			sb.append(left);
-			sb.append(" AND matches.left_token");
-			sb.append(i);
-			sb.append(" - ");
-			sb.append(left);
-			sb.append(" <= facts.right_token) OR (facts.left_token <= matches.right_token");
-			sb.append(i);
-			sb.append(" + ");
-			sb.append(right);
-			sb.append(" AND matches.right_token");
-			sb.append(i);
-			sb.append(" + ");
-			sb.append(right);
-			sb.append(" <= facts.right_token)))");
-		}
-		sb.append("\nORDER BY key, facts.pre");
+    sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ").append(left).append(" AND facts.right_token <= matches.right_token1 + ").append(right).append(") OR (facts.left_token <= matches.left_token1 - ").append(left).append(" AND matches.left_token1 - ").append(left).append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ").append(right).append(" AND matches.right_token1 + ").append(right).append(" <= facts.right_token)))");
+    for (int i = 2; i <= nodeCount; ++i)
+    {
+      sb.append(" OR\n");
+      sb.append("\t(facts.text_ref = matches.text_ref");
+      sb.append(i);
+      sb.append(" AND ((facts.left_token >= matches.left_token");
+      sb.append(i);
+      sb.append(" - ");
+      sb.append(left);
+      sb.append(" AND facts.right_token <= matches.right_token");
+      sb.append(i);
+      sb.append(" + ");
+      sb.append(right);
+      sb.append(") OR (facts.left_token <= matches.left_token");
+      sb.append(i);
+      sb.append(" - ");
+      sb.append(left);
+      sb.append(" AND matches.left_token");
+      sb.append(i);
+      sb.append(" - ");
+      sb.append(left);
+      sb.append(" <= facts.right_token) OR (facts.left_token <= matches.right_token");
+      sb.append(i);
+      sb.append(" + ");
+      sb.append(right);
+      sb.append(" AND matches.right_token");
+      sb.append(i);
+      sb.append(" + ");
+      sb.append(right);
+      sb.append(" <= facts.right_token)))");
+    }
+    sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
   }
 
-  protected String getTextQuery(long textID)
+  public String getTextQuery(long textID)
   {
     String template = "SELECT DISTINCT \n"
-			+ "\t'-1' AS key, facts.*\n"
-			+ "FROM\n"
-			+ "\tfacts AS facts\n"
-			+ "WHERE\n" + "\tfacts.text_ref = :text_id\n"
-			+ "ORDER BY facts.pre";
-		String sql = template.replace(":text_id", String.valueOf(textID));
-		return sql;
+      + "\t'-1' AS key, facts.*\n"
+      + "FROM\n"
+      + "\tfacts AS facts\n"
+      + "WHERE\n" + "\tfacts.text_ref = :text_id\n"
+      + "ORDER BY facts.pre";
+    String sql = template.replace(":text_id", String.valueOf(textID));
+    return sql;
   }
 
   @Override
@@ -252,10 +247,10 @@ public class GraphExtractor implements ResultSetExtractor
       Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
       Validate.isTrue(sqlKey.getBaseType() == Types.NUMERIC,
         "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
-      
+
       BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
       ArrayList<Long> key = new ArrayList<Long>();
-      for(BigDecimal bd : keyArray)
+      for (BigDecimal bd : keyArray)
       {
         key.add(bd.longValue());
       }
@@ -273,7 +268,7 @@ public class GraphExtractor implements ResultSetExtractor
         edgeByPre.clear();
 
         // set the matched keys
-        for(long l : key)
+        for (long l : key)
         {
           graph.addMatchedNodeId(l);
         }
@@ -301,9 +296,9 @@ public class GraphExtractor implements ResultSetExtractor
       // add the matched node index to the graph (if matched)
       long matchIndex = 1;
       //node.setMatchedNodeInQuery(null);
-      for(long l : key)
+      for (long l : key)
       {
-        if(id == l)
+        if (id == l)
         {
           node.setMatchedNodeInQuery(matchIndex);
           break;

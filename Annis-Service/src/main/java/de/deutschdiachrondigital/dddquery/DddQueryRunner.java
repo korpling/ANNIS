@@ -10,6 +10,7 @@ import annis.TableFormatter;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
+import annis.dao.GraphExtractor;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -77,6 +78,23 @@ public class DddQueryRunner extends AnnisBaseRunner
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
     out.println(sql);
+  }
+
+  public void doSqlGraph(String dddQuery)
+  {
+    // sql query
+    Start statement = dddQueryParser.parse(dddQuery);
+    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
+
+    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+
+    out.println("CREATE TEMPORARY VIEW matched_nodes AS " + sql + ";");
+
+    GraphExtractor ge = new GraphExtractor();
+    ge.setMatchedNodesViewName("matched_nodes");
+    out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth())
+      + ";");
+
   }
 
   public void doMatrix(String dddQuery)
