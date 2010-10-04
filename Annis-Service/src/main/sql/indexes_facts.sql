@@ -39,13 +39,13 @@ CREATE INDEX idx_c__text__edge_anno_ex_:id ON facts_:id (edge_annotation_name, t
 CREATE INDEX idx_c__text__edge_anno_:id ON facts_:id (edge_annotation_name, edge_annotation_value varchar_pattern_ops, text_ref);
 
 ----- _=_, _i_ etc.
-CREATE INDEX idx__exact_cover_:id ON facts_:id ("left", "right",text_ref);
+CREATE INDEX idx__exact_cover_:id ON facts_:id (text_ref,"left", "right");
 
 -- search for token
 CREATE INDEX idx__token_search_:id on facts_:id (is_token, toplevel_corpus);
 
 ----- 2nd query
-CREATE INDEX idx__2nd_query_:id ON facts_:id (left_token, right_token,text_ref);
+CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref,left_token, right_token);
 
 -- optimize the select distinct
 CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
