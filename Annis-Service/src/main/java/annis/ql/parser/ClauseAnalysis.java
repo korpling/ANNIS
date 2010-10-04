@@ -1,0 +1,552 @@
+/*
+ *  Copyright 2010 thomas.
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ * 
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  under the License.
+ */
+package annis.ql.parser;
+
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.ql.analysis.DepthFirstAdapter;
+import annis.ql.node.AAndExpr;
+import annis.ql.node.AAnnotationSearchExpr;
+import annis.ql.node.AAnyNodeSearchExpr;
+import annis.ql.node.AArityLingOp;
+import annis.ql.node.ADirectPrecedenceSpec;
+import annis.ql.node.ADocumentConstraintExpr;
+import annis.ql.node.AEqualAnnoValue;
+import annis.ql.node.AExactOverlapLingOp;
+import annis.ql.node.AGroupedExpr;
+import annis.ql.node.AImplicitAndExpr;
+import annis.ql.node.AInclusionLingOp;
+import annis.ql.node.AIndirectPrecedenceSpec;
+import annis.ql.node.ALeftAlignLingOp;
+import annis.ql.node.ALeftOverlapLingOp;
+import annis.ql.node.ALinguisticConstraintExpr;
+import annis.ql.node.AMetaConstraintExpr;
+import annis.ql.node.AOrExpr;
+import annis.ql.node.AOverlapLingOp;
+import annis.ql.node.ARangePrecedenceSpec;
+import annis.ql.node.ARangeSpec;
+import annis.ql.node.ARegexpTextSpec;
+import annis.ql.node.ARightAlignLingOp;
+import annis.ql.node.ARightOverlapLingOp;
+import annis.ql.node.ARootLingOp;
+import annis.ql.node.ATextSearchExpr;
+import annis.ql.node.ATextSearchNotEqualExpr;
+import annis.ql.node.ATokenArityLingOp;
+import annis.ql.node.AUnequalAnnoValue;
+import annis.ql.node.AWildTextSpec;
+import annis.ql.node.PExpr;
+import annis.ql.node.PLingOp;
+import annis.ql.node.Token;
+import annis.sqlgen.model.Inclusion;
+import annis.sqlgen.model.Join;
+import annis.sqlgen.model.LeftAlignment;
+import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Overlap;
+import annis.sqlgen.model.Precedence;
+import annis.sqlgen.model.RightAlignment;
+import annis.sqlgen.model.RightOverlap;
+import annis.sqlgen.model.SameSpan;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.Validate;
+
+/**
+ *
+ * @author thomas
+ */
+public class ClauseAnalysis extends DepthFirstAdapter
+{
+
+  private Map<String, AnnisNode> nodes;
+  private int aliasCount;
+  private List<Annotation> metaAnnotations;
+  private int precedenceBound;
+
+  public ClauseAnalysis()
+  {
+    this(0, new ArrayList<Annotation>(), new HashMap<String, AnnisNode>());
+  }
+
+  public ClauseAnalysis(int aliasCount, List<Annotation> metaAnnotations, Map<String, AnnisNode> nodes)
+  {
+    this.aliasCount = aliasCount;
+    this.metaAnnotations = metaAnnotations;
+    this.nodes = nodes;
+  }
+
+  ///// Analysis interface
+  public int nodesCount()
+  {
+    return nodes.size();
+  }
+
+  ///// Syntax Tree Walking
+  @Override
+  public void caseAOrExpr(AOrExpr node)
+  {
+    throw new UnsupportedOperationException("using OR in a predicate is not supported");
+  }
+
+  @Override
+  public void caseAImplicitAndExpr(AImplicitAndExpr node)
+  {
+    throw new UnsupportedOperationException("using implicit AND in a predicate is not (yet?) supported");
+  }
+
+  @Override
+  public void caseAGroupedExpr(AGroupedExpr node)
+  {
+    throw new UnsupportedOperationException("using a grouped expression in a predicate is not (yet?) supported");
+  }
+
+  @Override
+  public void caseARootLingOp(ARootLingOp node)
+  {
+    AnnisNode nleft = lhs(node);
+    Validate.notNull(nleft, errorLHS("root"));
+    nleft.setRoot(true);
+  }
+
+  @Override
+  public void caseAArityLingOp(AArityLingOp node)
+  {
+    AnnisNode nleft = lhs(node);
+    Validate.notNull(nleft, errorLHS("arity"));
+    nleft.setArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
+  }
+
+  @Override
+  public void caseATokenArityLingOp(ATokenArityLingOp node)
+  {
+    AnnisNode nleft = lhs(node);
+    Validate.notNull(nleft, errorLHS("token-arity"));
+    nleft.setTokenArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
+  }
+
+  @Override
+  public void caseAExactOverlapLingOp(AExactOverlapLingOp node)
+  {
+    join(node, SameSpan.class);
+  }
+
+  @Override
+  public void caseALeftAlignLingOp(ALeftAlignLingOp node)
+  {
+    join(node, LeftAlignment.class);
+  }
+
+  @Override
+  public void caseARightAlignLingOp(ARightAlignLingOp node)
+  {
+    join(node, RightAlignment.class);
+  }
+
+  @Override
+  public void caseAInclusionLingOp(AInclusionLingOp node)
+  {
+    join(node, Inclusion.class);
+  }
+
+  @Override
+  public void caseAOverlapLingOp(AOverlapLingOp node)
+  {
+    join(node, Overlap.class);
+  }
+
+  @Override
+  public void caseALeftOverlapLingOp(ALeftOverlapLingOp node)
+  {
+    join(node, LeftOverlap.class);
+  }
+
+  @Override
+  public void caseARightOverlapLingOp(ARightOverlapLingOp node)
+  {
+    join(node, RightOverlap.class);
+  }
+
+  @Override
+  public void caseADirectPrecedenceSpec(ADirectPrecedenceSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
+
+    left.addJoin(new Precedence(right, 1));
+  }
+
+  @Override
+  public void caseAIndirectPrecedenceSpec(AIndirectPrecedenceSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
+
+    if (precedenceBound > 0)
+    {
+      left.addJoin(new Precedence(right, precedenceBound));
+    }
+    else
+    {
+      left.addJoin(new Precedence(right));
+    }
+  }
+
+  @Override
+  public void caseARangePrecedenceSpec(ARangePrecedenceSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
+
+    ARangeSpec spec = (ARangeSpec) node.getRangeSpec();
+    int min = number(spec.getMin());
+    if (min == 0)
+    {
+      throw new AnnisQLSyntaxException("Distance can't be 0");
+    }
+    if (spec.getMax() == null)
+    {
+      left.addJoin(new Precedence(right, min));
+    }
+    else
+    {
+      int max = number(spec.getMax());
+      if (max == 0)
+      {
+        throw new AnnisQLSyntaxException("Distance can't be 0");
+      }
+      left.addJoin(new Precedence(right, min, max));
+    }
+  }
+
+//  @Override
+//  public void caseADirectDominanceSpec(ADirectDominanceSpec node)
+//  {
+//    PLingOp parent = (PLingOp) node.parent();
+//    AnnisNode left = lhs(parent);
+//    AnnisNode right = rhs(parent);
+//
+//    Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
+//    Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
+//
+//    String name = token(node.getName());
+//    
+//    if(node.getLeftOrRight() != null)
+//    {
+//      if(node.getLeftOrRight() instanceof ALeftLeftOrRight)
+//      {
+//        left.addJoin(new LeftDominance(right, name));
+//      }
+//      else if(node.getLeftOrRight() instanceof ARightLeftOrRight)
+//      {
+//        left.addJoin(new RightDominance(right, name));
+//      }
+//      else
+//      {
+//        throw new AnnisQLSemanticsException("unknown direct dominance type, was either left nor right");
+//      }
+//    }
+//
+//    if(node.getEdgeSpec() != null)
+//    {
+//      AEdgeSpec spec = (AEdgeSpec) node.getEdgeSpec();
+//      spec.getEdgeAnnotation()
+//    }
+//
+//  }
+
+  @Override
+  public void caseADocumentConstraintExpr(ADocumentConstraintExpr node)
+  {
+    throw new UnsupportedOperationException("using a document constraint expression in a predicate is not yet supported");
+  }
+
+  @Override
+  public void caseAMetaConstraintExpr(AMetaConstraintExpr node)
+  {
+    throw new UnsupportedOperationException("using a metadata constraint expression in a predicate is not yet supported");
+  }
+
+  @Override
+  public void caseAAndExpr(AAndExpr node)
+  {
+    for (PExpr expr : node.getExpr())
+    {
+      analyzeNestedPath(expr);
+    }
+  }
+
+  @Override
+  public void caseAAnnotationSearchExpr(AAnnotationSearchExpr node)
+  {
+    AnnisNode target = newNode();
+
+    if (node.getAnnoNamespace() != null)
+    {
+      target.setNamespace(node.getAnnoNamespace().getText());
+    }
+
+    target.setName(node.getAnnoType().getText());
+
+    if (node.getAnnoValue() != null)
+    {
+      AnnisNode.TextMatching textMatching = null;
+      Token text = null;
+
+      if (node.getAnnoValue() instanceof AUnequalAnnoValue)
+      {
+        AUnequalAnnoValue val = (AUnequalAnnoValue) node.getAnnoValue();
+        if (val.getTextSpec() instanceof AWildTextSpec)
+        {
+          textMatching = AnnisNode.TextMatching.EXACT_NOT_EQUAL;
+          text = ((AWildTextSpec) val.getTextSpec()).getText();
+        }
+        else if (val.getTextSpec() instanceof ARegexpTextSpec)
+        {
+          textMatching = AnnisNode.TextMatching.REGEXP_NOT_EQUAL;
+          text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
+        }
+      }
+      else if (node.getAnnoValue() instanceof AEqualAnnoValue)
+      {
+        AEqualAnnoValue val = (AEqualAnnoValue) node.getAnnoValue();
+        if (val.getTextSpec() instanceof AWildTextSpec)
+        {
+          textMatching = AnnisNode.TextMatching.EXACT_EQUAL;
+          text = ((AWildTextSpec) val.getTextSpec()).getText();
+        }
+        else if (val.getTextSpec() instanceof ARegexpTextSpec)
+        {
+          textMatching = AnnisNode.TextMatching.REGEXP_EQUAL;
+          text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
+        }
+      }
+
+      Validate.notNull(text, "No text given for annotation search expression");
+      Validate.notNull(textMatching, "No match operator given for annotation search expression");
+
+      target.setSpannedText(text.getText(), textMatching);
+    }
+
+  }
+
+  @Override
+  public void caseATextSearchExpr(ATextSearchExpr node)
+  {
+    AnnisNode target = newNode();
+
+    if (node.getTextSpec() instanceof AWildTextSpec)
+    {
+      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+        AnnisNode.TextMatching.EXACT_EQUAL);
+    }
+    else if (node.getTextSpec() instanceof ARegexpTextSpec)
+    {
+      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+        AnnisNode.TextMatching.REGEXP_EQUAL);
+    }
+
+  }
+
+  @Override
+  public void caseATextSearchNotEqualExpr(ATextSearchNotEqualExpr node)
+  {
+    AnnisNode target = newNode();
+
+    if (node.getTextSpec() instanceof AWildTextSpec)
+    {
+      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+        AnnisNode.TextMatching.EXACT_NOT_EQUAL);
+    }
+    else if (node.getTextSpec() instanceof ARegexpTextSpec)
+    {
+      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+        AnnisNode.TextMatching.REGEXP_NOT_EQUAL);
+    }
+
+  }
+
+  @Override
+  public void caseAAnyNodeSearchExpr(AAnyNodeSearchExpr node)
+  {
+    newNode();
+  }
+
+  private AnnisNode newNode()
+  {
+    AnnisNode n = new AnnisNode(++aliasCount);
+    nodes.put("" + n.getId(), n);
+    return n;
+  }
+
+  private ClauseAnalysis analyzeNestedPath(PExpr expr)
+  {
+    ClauseAnalysis nested = new ClauseAnalysis(aliasCount, metaAnnotations, nodes);
+    expr.apply(nested);
+    aliasCount = nested.aliasCount;
+    return nested;
+  }
+
+  private AnnisNode.Range annisRangeFromARangeSpec(ARangeSpec spec)
+  {
+    String min = spec.getMin().getText();
+    String max = spec.getMax() != null ? spec.getMax().getText() : null;
+
+    if (max == null)
+    {
+      return new AnnisNode.Range(Integer.parseInt(min), Integer.parseInt(min));
+    }
+    else
+    {
+      return new AnnisNode.Range(Integer.parseInt(min), Integer.parseInt(max));
+    }
+  }
+
+  /**
+   * Automatically create a join from a node and a join class.
+   *
+   * This will automatically get the parent node, it's left and right hand node
+   * and will construct a new join specified by the type using reflection.
+   *
+   * @node
+   * @type
+   */
+  private void join(PLingOp node, Class<? extends Join> type)
+  {
+    AnnisNode left = lhs(node);
+    AnnisNode right = rhs(node);
+
+    Validate.notNull(left, errorLHS(type.getSimpleName()));
+    Validate.notNull(right, errorRHS(type.getSimpleName()));
+    try
+    {
+      Constructor<? extends Join> c = type.getConstructor(AnnisNode.class);
+      Join newJoin = c.newInstance(right);
+      left.addJoin(newJoin);
+    }
+    catch (Exception ex)
+    {
+      Logger.getLogger(ClauseAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+
+//  private LinkedList<Annotation> fromEdgeAnnotation (AEdgeSpec spec)
+//  {
+//    LinkedList<Annotation> result = new LinkedList<Annotation>();
+//    for(PEdgeAnnotation pAnno : spec.getEdgeAnnotation())
+//    {
+//      AEdgeAnnotation anno = (AEdgeAnnotation) pAnno;
+//      if(anno.getValue() != null)
+//      {
+//        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType()), token(anno.getValue().)));
+//      }
+//      else
+//      {
+//        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType())));
+//      }
+//    }
+//    return result;
+//  }
+
+  private int number(Token token)
+  {
+    return Integer.parseInt(token(token));
+  }
+
+  private String token(Token token)
+  {
+    return token != null ? token.getText() : null;
+  }
+
+  private AnnisNode lhs(PLingOp node)
+  {
+    String tok = lhsStr(node);
+    if (tok == null)
+    {
+      return null;
+    }
+    return nodes.get(tok);
+  }
+
+  private AnnisNode rhs(PLingOp node)
+  {
+    String tok = rhsStr(node);
+    if (tok == null)
+    {
+      return null;
+    }
+    return nodes.get(tok);
+  }
+
+  private String lhsStr(PLingOp node)
+  {
+    return token(((ALinguisticConstraintExpr) node.parent()).getLhs());
+  }
+
+  private String rhsStr(PLingOp node)
+  {
+    return token(((ALinguisticConstraintExpr) node.parent()).getRhs());
+  }
+
+  private String errorLHS(String function)
+  {
+    return function + " operator needs a left-hand-side";
+  }
+
+  private String errorRHS(String function)
+  {
+    return function + " operator needs a right-hand-side";
+  }
+
+  //// Getter/Setter
+  public List<Annotation> getMetaAnnotations()
+  {
+    return metaAnnotations;
+  }
+
+  public Collection<AnnisNode> getNodes()
+  {
+    return nodes.values();
+  }
+
+  public int getPrecedenceBound()
+  {
+    return precedenceBound;
+  }
+
+  public void setPrecedenceBound(int precedenceBound)
+  {
+    this.precedenceBound = precedenceBound;
+  }
+}

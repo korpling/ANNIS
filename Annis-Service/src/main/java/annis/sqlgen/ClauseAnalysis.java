@@ -36,7 +36,6 @@ import de.deutschdiachrondigital.dddquery.node.AContainingAxis;
 import de.deutschdiachrondigital.dddquery.node.ADescendantAxis;
 import de.deutschdiachrondigital.dddquery.node.AEdgeTypeSpec;
 import de.deutschdiachrondigital.dddquery.node.AElementNodeTest;
-import de.deutschdiachrondigital.dddquery.node.AEqComparison;
 import de.deutschdiachrondigital.dddquery.node.AExactEdgeAnnotation;
 import de.deutschdiachrondigital.dddquery.node.AExistanceEdgeAnnotation;
 import de.deutschdiachrondigital.dddquery.node.AFollowingAxis;

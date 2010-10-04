@@ -1,11 +1,16 @@
 package annis;
 
+import annis.model.AnnisNode;
+import annis.ql.node.Start;
+import annis.ql.parser.AQLAnalysis;
 import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryData;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.deutschdiachrondigital.dddquery.DddQueryRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,8 @@ public class AnnisRunner extends AnnisBaseRunner
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
 
+  private AQLAnalysis aqlAnalysis;
+
   public static void main(String[] args)
   {
     // get runner from Spring
@@ -35,6 +42,11 @@ public class AnnisRunner extends AnnisBaseRunner
 
   ///// Commands
   
+  public void doDebug(String ignore)
+  {
+    doAqlParser("node & node & #1 _=_ #2");
+  }
+
   public void doProposedIndex(String ignore)
   {
     File fInput = new File("queries.txt");
@@ -174,6 +186,38 @@ public class AnnisRunner extends AnnisBaseRunner
     System.exit(0);
   }
 
+  public void doAqlParser(String query)
+  {
+    Start start = annisParser.parse(query);
+
+    System.out.println("AQL graph (seen from parser):");
+    System.out.println(annisParser.dumpTree(start));
+
+    QueryData qd =  aqlAnalysis.analyzeQuery(start, dddQueryRunner.getCorpusList());
+
+    System.out.println("AQL graph (seen from analyzer):");
+    Iterator<List<AnnisNode>> itOr = qd.getAlternatives().iterator();
+    while(itOr.hasNext())
+    {
+      List<AnnisNode> nextNodes = itOr.next();
+      Iterator<AnnisNode> itAnd = nextNodes.iterator();
+      while(itAnd.hasNext())
+      {
+        System.out.println("\t" + itAnd.next());
+        if(itAnd.hasNext())
+        {
+          System.out.println("\tAND");
+        }
+      }
+
+      if(itOr.hasNext())
+      {
+        System.out.println("OR");
+      }
+    }
+
+  }
+
   ///// Delegates for convenience
   private String translate(String annisQuery)
   {
@@ -210,4 +254,16 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.dddQueryRunner = dddQueryRunner;
   }
+
+  public AQLAnalysis getAqlAnalysis()
+  {
+    return aqlAnalysis;
+  }
+
+  public void setAqlAnalysis(AQLAnalysis aqlAnalysis)
+  {
+    this.aqlAnalysis = aqlAnalysis;
+  }
+
+  
 }

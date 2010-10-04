@@ -23,6 +23,7 @@ import java.util.List;
 import jline.ArgumentCompletor;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
+import org.apache.commons.lang.time.StopWatch;
 
 public abstract class AnnisBaseRunner
 {
@@ -147,6 +148,7 @@ public abstract class AnnisBaseRunner
   protected List<String> detectAvailableCommands()
   {
     LinkedList<String> result = new LinkedList<String>();
+
     Method[] methods = getClass().getMethods();
 
     for (Method m : methods)
@@ -161,7 +163,6 @@ public abstract class AnnisBaseRunner
         }
       }
     }
-
     return result;
   }
 

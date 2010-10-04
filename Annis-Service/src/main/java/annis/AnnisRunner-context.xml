@@ -41,6 +41,7 @@
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="helloMessage" value="Annis Interactive Shell v2.1.7"/>
 		<property name="prompt" value="Annis"/>
+    <property name="aqlAnalysis" ref="aqlAnalysis" />
 	</bean>
 
 </beans>
