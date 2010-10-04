@@ -175,7 +175,14 @@ public class GraphExtractor implements ResultSetExtractor
       sb.append(corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","));
       sb.append(") AND\n");
     }
-    sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ").append(left).append(" AND facts.right_token <= matches.right_token1 + ").append(right).append(") OR (facts.left_token <= matches.left_token1 - ").append(left).append(" AND matches.left_token1 - ").append(left).append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ").append(right).append(" AND matches.right_token1 + ").append(right).append(" <= facts.right_token)))");
+    sb.append("\t(\n");
+    sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
+      .append(left).append(" AND facts.right_token <= matches.right_token1 + ")
+      .append(right).append(") OR (facts.left_token <= matches.left_token1 - ")
+      .append(left).append(" AND matches.left_token1 - ").append(left)
+      .append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ")
+      .append(right).append(" AND matches.right_token1 + ")
+      .append(right).append(" <= facts.right_token)))");
     for (int i = 2; i <= nodeCount; ++i)
     {
       sb.append(" OR\n");
@@ -207,6 +214,7 @@ public class GraphExtractor implements ResultSetExtractor
       sb.append(right);
       sb.append(" <= facts.right_token)))");
     }
+    sb.append("\n\t)\n");
     sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
   }
