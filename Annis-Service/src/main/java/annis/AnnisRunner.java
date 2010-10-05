@@ -1,7 +1,6 @@
 package annis;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.dao.AnnisDao;
 import annis.ql.node.Start;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.AnnisParser;
@@ -11,7 +10,6 @@ import de.deutschdiachrondigital.dddquery.DddQueryRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +26,10 @@ public class AnnisRunner extends AnnisBaseRunner
 //	private static Logger log = Logger.getLogger(AnnisRunner.class);
   // delegate most commands to DddQueryRunner
   private DddQueryRunner dddQueryRunner;
-  // parser for Annis queries
+  private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
-
   private QueryAnalysis aqlAnalysis;
 
   public static void main(String[] args)
@@ -42,37 +39,36 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   ///// Commands
-  
   public void doDebug(String ignore)
   {
-    doAqlParser("node & node & #1 ->func[a=\"c\"] #2 & meta::abc=\"ds\"");
+    doCompareParser("node & node & #1 . #2");
   }
 
   public void doProposedIndex(String ignore)
   {
     File fInput = new File("queries.txt");
 
-    Map<String,List<String>> output = new HashMap<String, List<String>>();
+    Map<String, List<String>> output = new HashMap<String, List<String>>();
 
-    if(fInput.exists())
+    if (fInput.exists())
     {
       try
       {
         String[] content = FileUtils.readFileToString(fInput).split("\n");
-        
-        for(String query : content)
+
+        for (String query : content)
         {
-          if(query.trim().length() > 0)
+          if (query.trim().length() > 0)
           {
-            Map<String,Set<String>> map = dddQueryRunner.proposedIndexHelper(translate(query.trim()));
-            for(String table : map.keySet())
+            Map<String, Set<String>> map = dddQueryRunner.proposedIndexHelper(translate(query.trim()));
+            for (String table : map.keySet())
             {
-              if(!output.containsKey(table))
+              if (!output.containsKey(table))
               {
                 output.put(table, new LinkedList<String>());
               }
               Set<String> l = map.get(table);
-              if(l.size() > 0)
+              if (l.size() > 0)
               {
                 output.get(table).add(StringUtils.join(l, ","));
               }
@@ -81,7 +77,7 @@ public class AnnisRunner extends AnnisBaseRunner
           }
         }
 
-        for(String table : output.keySet())
+        for (String table : output.keySet())
         {
           File fOutput = new File(table + "_attributes.csv");
           FileUtils.writeLines(fOutput, output.get(table));
@@ -187,17 +183,28 @@ public class AnnisRunner extends AnnisBaseRunner
     System.exit(0);
   }
 
-  public void doAqlParser(String query)
+  public void doCompareParser(String query)
   {
-    Start start = annisParser.parse(query);
+    QueryData qdAQL = annisDao.parseAQL(query, null);
+    QueryData qdDDD = annisDao.parseDDDQuery(translate(query), null);
 
-    System.out.println("AQL graph (seen from parser):");
-    System.out.println(annisParser.dumpTree(start));
+    String strAQL = qdAQL.toString();
+    String strDDD = qdDDD.toString();
 
-    QueryData qd =  aqlAnalysis.analyzeQuery(start, dddQueryRunner.getCorpusList());
+    if(strAQL.equals(strDDD))
+    {
+      System.out.println(strAQL);
+      System.out.println("both are equal");
+    }
+    else
+    {
+      System.out.println("AQL:");
+      System.out.println(strAQL);
+      System.out.println("DDD:");
+      System.out.println(strDDD);
+      System.out.println("NOT EQUAL");
+    }
 
-    System.out.println("AQL graph (seen from analyzer):");
-    System.out.println(qd.toString());
 
   }
 
@@ -228,6 +235,18 @@ public class AnnisRunner extends AnnisBaseRunner
     this.annisParser = annisParser;
   }
 
+    public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+
+
+
   public DddQueryRunner getDddQueryRunner()
   {
     return dddQueryRunner;
@@ -247,6 +266,4 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.aqlAnalysis = aqlAnalysis;
   }
-
-  
 }

@@ -493,22 +493,18 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     AnnisNode target = newNode();
 
-    if (node.getAnnoNamespace() != null)
-    {
-      target.setNamespace(node.getAnnoNamespace().getText());
-    }
-
-    target.setName(node.getAnnoType().getText());
+    Annotation anno = new Annotation(token(node.getAnnoNamespace()), token(node.getAnnoType()));
 
     if (node.getAnnoValue() != null)
     {
       AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
       String text = textFromAnnoValue(node.getAnnoValue());
 
-      Annotation anno = new Annotation(token(node.getAnnoNamespace()), token(node.getAnnoType()),
-        text, textMatching);
-      target.addNodeAnnotation(anno);
+      anno.setValue(text);
+      anno.setTextMatching(textMatching);
     }
+    
+    target.addNodeAnnotation(anno);
 
   }
 
@@ -563,7 +559,9 @@ public class ClauseAnalysis extends DepthFirstAdapter
   private AnnisNode newNode()
   {
     AnnisNode n = new AnnisNode(++aliasCount);
-    nodes.put("" + n.getId(), n);
+    n.setVariable("n" + n.getId());
+    n.setMarker(n.getVariable());
+    nodes.put(n.getVariable(), n);
     return n;
   }
 
@@ -726,7 +724,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       return null;
     }
-    return nodes.get(tok);
+    return nodes.get("n" + tok);
   }
 
   private AnnisNode rhs(PLingOp node)
@@ -736,7 +734,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       return null;
     }
-    return nodes.get(tok);
+    return nodes.get("n" + tok);
   }
 
   private String lhsStr(PLingOp node)

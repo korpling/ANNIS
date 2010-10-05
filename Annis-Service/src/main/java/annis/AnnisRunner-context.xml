@@ -29,13 +29,14 @@
 	<!-- DddQueryRunner -->
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryRunner-context.xml"/>
 	
-	<!-- AnnisParser -->
-	<import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
-	
+  <!-- AnnisDao -->
+  <import resource="classpath:annis/dao/SpringAnnisDao-context.xml"/>
+  
 	<!-- DddQueryMapper -->
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 
 	<bean id="annisRunner" class="annis.AnnisRunner">
+    <property name="annisDao" ref="springAnnisDao"/>
 		<property name="dddQueryRunner" ref="dddQueryRunner"/>
 		<property name="annisParser" ref="annisParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
