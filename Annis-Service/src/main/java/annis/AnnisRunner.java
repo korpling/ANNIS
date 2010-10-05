@@ -44,7 +44,7 @@ public class AnnisRunner extends AnnisBaseRunner
   
   public void doDebug(String ignore)
   {
-    doAqlParser("node & node & #1 _=_ #2");
+    doAqlParser("namespace:word=\"abc\" & tok & #1 >[secedge!=\"sdf\"] #2");
   }
 
   public void doProposedIndex(String ignore)

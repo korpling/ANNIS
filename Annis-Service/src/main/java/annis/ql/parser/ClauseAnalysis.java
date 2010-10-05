@@ -16,6 +16,7 @@
  */
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -24,15 +25,20 @@ import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
 import annis.ql.node.AArityLingOp;
+import annis.ql.node.ADirectDominanceSpec;
 import annis.ql.node.ADirectPrecedenceSpec;
 import annis.ql.node.ADocumentConstraintExpr;
+import annis.ql.node.AEdgeAnnotation;
+import annis.ql.node.AEdgeSpec;
 import annis.ql.node.AEqualAnnoValue;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AGroupedExpr;
 import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
+import annis.ql.node.AIndirectDominanceSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
 import annis.ql.node.ALeftAlignLingOp;
+import annis.ql.node.ALeftLeftOrRight;
 import annis.ql.node.ALeftOverlapLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
@@ -42,6 +48,7 @@ import annis.ql.node.ARangePrecedenceSpec;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
 import annis.ql.node.ARightAlignLingOp;
+import annis.ql.node.ARightLeftOrRight;
 import annis.ql.node.ARightOverlapLingOp;
 import annis.ql.node.ARootLingOp;
 import annis.ql.node.ATextSearchExpr;
@@ -49,22 +56,28 @@ import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.AUnequalAnnoValue;
 import annis.ql.node.AWildTextSpec;
+import annis.ql.node.PAnnoValue;
+import annis.ql.node.PEdgeAnnotation;
 import annis.ql.node.PExpr;
 import annis.ql.node.PLingOp;
 import annis.ql.node.Token;
+import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
+import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
+import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -250,41 +263,53 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
-//  @Override
-//  public void caseADirectDominanceSpec(ADirectDominanceSpec node)
-//  {
-//    PLingOp parent = (PLingOp) node.parent();
-//    AnnisNode left = lhs(parent);
-//    AnnisNode right = rhs(parent);
-//
-//    Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
-//    Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
-//
-//    String name = token(node.getName());
-//    
-//    if(node.getLeftOrRight() != null)
-//    {
-//      if(node.getLeftOrRight() instanceof ALeftLeftOrRight)
-//      {
-//        left.addJoin(new LeftDominance(right, name));
-//      }
-//      else if(node.getLeftOrRight() instanceof ARightLeftOrRight)
-//      {
-//        left.addJoin(new RightDominance(right, name));
-//      }
-//      else
-//      {
-//        throw new AnnisQLSemanticsException("unknown direct dominance type, was either left nor right");
-//      }
-//    }
-//
-//    if(node.getEdgeSpec() != null)
-//    {
-//      AEdgeSpec spec = (AEdgeSpec) node.getEdgeSpec();
-//      spec.getEdgeAnnotation()
-//    }
-//
-//  }
+  @Override
+  public void caseADirectDominanceSpec(ADirectDominanceSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
+
+    String name = token(node.getName());
+
+    if (node.getLeftOrRight() != null)
+    {
+      if (node.getLeftOrRight() instanceof ALeftLeftOrRight)
+      {
+        left.addJoin(new LeftDominance(right, name));
+      }
+      else if (node.getLeftOrRight() instanceof ARightLeftOrRight)
+      {
+        left.addJoin(new RightDominance(right, name));
+      }
+      else
+      {
+        throw new AnnisQLSemanticsException("unknown direct dominance type, was either left nor right");
+      }
+    }
+    else
+    {
+      left.addJoin(new Dominance(right, name, 1));
+    }
+
+    if (node.getEdgeSpec() != null)
+    {
+      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for(Annotation a : annotations)
+      {
+        right.addEdgeAnnotation(a);
+      }
+    }
+  }
+
+  @Override
+  public void caseAIndirectDominanceSpec(AIndirectDominanceSpec node)
+  {
+    super.caseAIndirectDominanceSpec(node);
+  }
 
   @Override
   public void caseADocumentConstraintExpr(ADocumentConstraintExpr node)
@@ -321,42 +346,9 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     if (node.getAnnoValue() != null)
     {
-      AnnisNode.TextMatching textMatching = null;
-      Token text = null;
-
-      if (node.getAnnoValue() instanceof AUnequalAnnoValue)
-      {
-        AUnequalAnnoValue val = (AUnequalAnnoValue) node.getAnnoValue();
-        if (val.getTextSpec() instanceof AWildTextSpec)
-        {
-          textMatching = AnnisNode.TextMatching.EXACT_NOT_EQUAL;
-          text = ((AWildTextSpec) val.getTextSpec()).getText();
-        }
-        else if (val.getTextSpec() instanceof ARegexpTextSpec)
-        {
-          textMatching = AnnisNode.TextMatching.REGEXP_NOT_EQUAL;
-          text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
-        }
-      }
-      else if (node.getAnnoValue() instanceof AEqualAnnoValue)
-      {
-        AEqualAnnoValue val = (AEqualAnnoValue) node.getAnnoValue();
-        if (val.getTextSpec() instanceof AWildTextSpec)
-        {
-          textMatching = AnnisNode.TextMatching.EXACT_EQUAL;
-          text = ((AWildTextSpec) val.getTextSpec()).getText();
-        }
-        else if (val.getTextSpec() instanceof ARegexpTextSpec)
-        {
-          textMatching = AnnisNode.TextMatching.REGEXP_EQUAL;
-          text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
-        }
-      }
-
-      Validate.notNull(text, "No text given for annotation search expression");
-      Validate.notNull(textMatching, "No match operator given for annotation search expression");
-
-      target.setSpannedText(text.getText(), textMatching);
+      AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
+      String text = textFromAnnoValue(node.getAnnoValue());
+      target.setSpannedText(text, textMatching);
     }
 
   }
@@ -364,16 +356,21 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseATextSearchExpr(ATextSearchExpr node)
   {
-    AnnisNode target = newNode();
+    AnnisNode context = newNode();
 
-    if (node.getTextSpec() instanceof AWildTextSpec)
+
+    if(node.getTextSpec() == null)
     {
-      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+      context.setToken(true);
+    }
+    else if (node.getTextSpec() instanceof AWildTextSpec)
+    {
+      context.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
         AnnisNode.TextMatching.EXACT_EQUAL);
     }
     else if (node.getTextSpec() instanceof ARegexpTextSpec)
     {
-      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+      context.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
         AnnisNode.TextMatching.REGEXP_EQUAL);
     }
 
@@ -461,23 +458,92 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
-//  private LinkedList<Annotation> fromEdgeAnnotation (AEdgeSpec spec)
-//  {
-//    LinkedList<Annotation> result = new LinkedList<Annotation>();
-//    for(PEdgeAnnotation pAnno : spec.getEdgeAnnotation())
-//    {
-//      AEdgeAnnotation anno = (AEdgeAnnotation) pAnno;
-//      if(anno.getValue() != null)
-//      {
-//        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType()), token(anno.getValue().)));
-//      }
-//      else
-//      {
-//        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType())));
-//      }
-//    }
-//    return result;
-//  }
+  private LinkedList<Annotation> fromEdgeAnnotation(AEdgeSpec spec)
+  {
+    LinkedList<Annotation> result = new LinkedList<Annotation>();
+    for (PEdgeAnnotation pAnno : spec.getEdgeAnnotation())
+    {
+      AEdgeAnnotation anno = (AEdgeAnnotation) pAnno;
+      if (anno.getValue() != null)
+      {
+        String text = textFromAnnoValue(anno.getValue());
+        AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(anno.getValue());
+        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType()),
+          text, textMatching));
+      }
+      else
+      {
+        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType())));
+      }
+    }
+    return result;
+  }
+
+  private String textFromAnnoValue(PAnnoValue value)
+  {
+    Token text = null;
+
+    if (value instanceof AUnequalAnnoValue)
+    {
+      AUnequalAnnoValue val = (AUnequalAnnoValue) value;
+      if (val.getTextSpec() instanceof AWildTextSpec)
+      {
+        text = ((AWildTextSpec) val.getTextSpec()).getText();
+      }
+      else if (val.getTextSpec() instanceof ARegexpTextSpec)
+      {
+        text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
+      }
+    }
+    else if (value instanceof AEqualAnnoValue)
+    {
+      AEqualAnnoValue val = (AEqualAnnoValue) value;
+      if (val.getTextSpec() instanceof AWildTextSpec)
+      {
+        text = ((AWildTextSpec) val.getTextSpec()).getText();
+      }
+      else if (val.getTextSpec() instanceof ARegexpTextSpec)
+      {
+        text = ((ARegexpTextSpec) val.getTextSpec()).getRegexp();
+      }
+    }
+
+    Validate.notNull(text, "No text given for annotation search expression");
+    return token(text);
+  }
+
+  private AnnisNode.TextMatching textMatchingFromAnnoValue(PAnnoValue value)
+  {
+    AnnisNode.TextMatching textMatching = null;
+
+    if (value instanceof AUnequalAnnoValue)
+    {
+      AUnequalAnnoValue val = (AUnequalAnnoValue) value;
+      if (val.getTextSpec() instanceof AWildTextSpec)
+      {
+        textMatching = AnnisNode.TextMatching.EXACT_NOT_EQUAL;
+      }
+      else if (val.getTextSpec() instanceof ARegexpTextSpec)
+      {
+        textMatching = AnnisNode.TextMatching.REGEXP_NOT_EQUAL;
+      }
+    }
+    else if (value instanceof AEqualAnnoValue)
+    {
+      AEqualAnnoValue val = (AEqualAnnoValue) value;
+      if (val.getTextSpec() instanceof AWildTextSpec)
+      {
+        textMatching = AnnisNode.TextMatching.EXACT_EQUAL;
+      }
+      else if (val.getTextSpec() instanceof ARegexpTextSpec)
+      {
+        textMatching = AnnisNode.TextMatching.REGEXP_EQUAL;
+      }
+    }
+
+    Validate.notNull(textMatching, "No match operator given for annotation search expression");
+    return textMatching;
+  }
 
   private int number(Token token)
   {
