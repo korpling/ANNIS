@@ -75,7 +75,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCompareParser("node & node & #1 .* #2");
+    doParse("tok!=\"der\" & node & #1 . #2");
   }
 
   public void doProposedIndex(String ignore)

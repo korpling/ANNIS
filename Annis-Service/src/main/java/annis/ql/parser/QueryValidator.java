@@ -12,6 +12,7 @@ import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.ATextSearchExpr;
+import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
 import annis.ql.node.TDigits;
@@ -45,7 +46,9 @@ public class QueryValidator extends DepthFirstAdapter {
 		// determine the original positions of the search references in this alternative
 		// and what nodes are connected by linguistic operators
 		for (PExpr expr : node.getExpr()) {
-			if (expr instanceof ATextSearchExpr || expr instanceof AAnnotationSearchExpr || expr instanceof AAnyNodeSearchExpr) {
+			if (expr instanceof ATextSearchExpr 
+        || expr instanceof ATextSearchNotEqualExpr
+        || expr instanceof AAnnotationSearchExpr || expr instanceof AAnyNodeSearchExpr) {
 				expected.add(dnfTransformer.getPosition(expr));
 			}
 			if (expr instanceof ALinguisticConstraintExpr) {

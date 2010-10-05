@@ -40,7 +40,10 @@ public class SearchExpressionCounter extends DepthFirstAdapter {
 	}
 	
 	public void mapSearchExpressionClone(Node clone, Node original) {
-		if ( ! ( original instanceof ATextSearchExpr || original instanceof AAnnotationSearchExpr || original instanceof AAnyNodeSearchExpr) )
+		if ( !
+      ( original instanceof ATextSearchExpr
+      || original instanceof ATextSearchNotEqualExpr
+      || original instanceof AAnnotationSearchExpr || original instanceof AAnyNodeSearchExpr) )
 			return;
 		
 		int pos = getPosition(original);
