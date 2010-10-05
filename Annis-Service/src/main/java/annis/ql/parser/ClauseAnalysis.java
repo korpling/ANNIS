@@ -44,6 +44,7 @@ import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.AMetaConstraintExpr;
 import annis.ql.node.AOrExpr;
 import annis.ql.node.AOverlapLingOp;
+import annis.ql.node.ARangeDominanceSpec;
 import annis.ql.node.ARangePrecedenceSpec;
 import annis.ql.node.ARangeSpec;
 import annis.ql.node.ARegexpTextSpec;
@@ -308,7 +309,47 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseAIndirectDominanceSpec(AIndirectDominanceSpec node)
   {
-    super.caseAIndirectDominanceSpec(node);
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
+
+    left.addJoin(new Dominance(right, token(node.getName())));
+  }
+
+  @Override
+  public void caseARangeDominanceSpec(ARangeDominanceSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
+
+    ARangeSpec rangeSpec = (ARangeSpec) node.getRangeSpec();
+    if (rangeSpec.getMax() == null)
+    {
+      int distance = number(rangeSpec.getMin());
+      if (distance == 0)
+      {
+        throw new AnnisQLSyntaxException("Distance can't be 0");
+      }
+      left.addJoin(new Dominance(right, token(node.getName()), distance));
+    }
+    else
+    {
+      int min = number(rangeSpec.getMin());
+      int max = number(rangeSpec.getMax());
+      if (min == 0 || max == 0)
+      {
+        throw new AnnisQLSyntaxException("Distance can't be 0");
+      }
+      left.addJoin(new Dominance(right, token(node.getName()), min, max));
+    }
+
   }
 
   @Override

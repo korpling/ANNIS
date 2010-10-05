@@ -221,9 +221,11 @@ public class AnnisNode implements Serializable
 
     if (spannedText != null)
     {
-      sb.append("; spans ");
+      sb.append("; spans");
+      String op = spanTextMatching != null ? spanTextMatching.sqlOperator() : " ";
       String quote = spanTextMatching != null ? spanTextMatching.quote()
         : "?";
+      sb.append(op);
       sb.append(quote);
       sb.append(spannedText);
       sb.append(quote);
