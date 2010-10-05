@@ -197,34 +197,7 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData qd =  aqlAnalysis.analyzeQuery(start, dddQueryRunner.getCorpusList());
 
     System.out.println("AQL graph (seen from analyzer):");
-    Iterator<List<AnnisNode>> itOr = qd.getAlternatives().iterator();
-    while(itOr.hasNext())
-    {
-      List<AnnisNode> nextNodes = itOr.next();
-      Iterator<AnnisNode> itAnd = nextNodes.iterator();
-      while(itAnd.hasNext())
-      {
-        System.out.println("\t" + itAnd.next());
-        if(itAnd.hasNext())
-        {
-          System.out.println("\tAND");
-        }
-      }
-
-      if(itOr.hasNext())
-      {
-        System.out.println("OR");
-      }
-    }
-    Iterator<Annotation> itMeta = qd.getMetaData().iterator();
-    if(itMeta.hasNext())
-    {
-      System.out.println("META");
-    }
-    while(itMeta.hasNext())
-    {
-      System.out.println("\t" + itMeta.next().toString());
-    }
+    System.out.println(qd.toString());
 
   }
 

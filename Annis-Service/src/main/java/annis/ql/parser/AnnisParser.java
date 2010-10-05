@@ -75,7 +75,7 @@ public class AnnisParser {
 		return dumpTree(parse(annisQuery));
 	}
 	
-	public String dumpTree(Start start) {
+	public static String dumpTree(Start start) {
 		try {
 			StringWriter result = new StringWriter();
 			start.apply(new TreeDumper(new PrintWriter(result)));

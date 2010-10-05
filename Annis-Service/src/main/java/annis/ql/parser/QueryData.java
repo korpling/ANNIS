@@ -8,6 +8,7 @@ import java.util.List;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
+import java.util.Iterator;
 
 public class QueryData {
 	private List<List<AnnisNode>> alternatives;
@@ -20,7 +21,48 @@ public class QueryData {
 		corpusList = new ArrayList<Long>();
 		metaData = new ArrayList<Annotation>();
 	}
-	
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    Iterator<List<AnnisNode>> itOr = getAlternatives().iterator();
+    while(itOr.hasNext())
+    {
+      List<AnnisNode> nextNodes = itOr.next();
+      Iterator<AnnisNode> itAnd = nextNodes.iterator();
+      while(itAnd.hasNext())
+      {
+        sb.append("\t").append(itAnd.next());
+        sb.append("\n");
+        if(itAnd.hasNext())
+        {
+          sb.append("\tAND");
+          sb.append("\n");
+        }
+      }
+
+      if(itOr.hasNext())
+      {
+        sb.append("OR");
+        sb.append("\n");
+      }
+    }
+    Iterator<Annotation> itMeta = getMetaData().iterator();
+    if(itMeta.hasNext())
+    {
+      sb.append("META");
+      sb.append("\n");
+    }
+    while(itMeta.hasNext())
+    {
+      sb.append("\t").append(itMeta.next().toString());
+      sb.append("\n");
+    }
+
+    return sb.toString();
+  }
+
 	public List<List<AnnisNode>> getAlternatives() {
 		return alternatives;
 	}

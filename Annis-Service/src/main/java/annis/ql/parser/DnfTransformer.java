@@ -16,6 +16,8 @@ import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class DnfTransformer extends DepthFirstAdapter
 {
@@ -31,8 +33,9 @@ public class DnfTransformer extends DepthFirstAdapter
     PExpr inDnf = normalize(node.getPExpr());
     node.setPExpr(inDnf);
 
-    log.debug("dnf is: " + new Ast2String().toString(inDnf));
+    log.debug("dnf is: " + AnnisParser.dumpTree(node));
   }
+
 
   public PExpr normalize(PExpr expr)
   {

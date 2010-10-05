@@ -125,7 +125,7 @@ public class TestDnfTransformer {
 			}
 
 			public void describeTo(Description description) {
-				description.appendText("A syntax tree matching the query: " + new Ast2String().toString(expected));
+				description.appendText("A syntax tree matching the query: " + AnnisParser.dumpTree(expected));
 			}
 			
 		};
