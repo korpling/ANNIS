@@ -260,7 +260,7 @@ public class GraphExtractor implements ResultSetExtractor
       ArrayList<Long> key = new ArrayList<Long>();
       for (BigDecimal bd : keyArray)
       {
-        key.add(bd.longValue());
+        key.add(bd == null ? null : bd.longValue());
       }
 
       if (!graphByMatchGroup.containsKey(key))
@@ -276,9 +276,12 @@ public class GraphExtractor implements ResultSetExtractor
         edgeByPre.clear();
 
         // set the matched keys
-        for (long l : key)
+        for (Long l : key)
         {
-          graph.addMatchedNodeId(l);
+          if(l != null)
+          {
+            graph.addMatchedNodeId(l);
+          }
         }
       }
 
@@ -304,14 +307,17 @@ public class GraphExtractor implements ResultSetExtractor
       // add the matched node index to the graph (if matched)
       long matchIndex = 1;
       //node.setMatchedNodeInQuery(null);
-      for (long l : key)
+      for (Long l : key)
       {
-        if (id == l)
+        if(l != null)
         {
-          node.setMatchedNodeInQuery(matchIndex);
-          break;
+          if (id == l)
+          {
+            node.setMatchedNodeInQuery(matchIndex);
+            break;
+          }
+          matchIndex++;
         }
-        matchIndex++;
       }
 
       // get edge data
