@@ -26,6 +26,7 @@ import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
 import annis.ql.node.AArityLingOp;
 import annis.ql.node.ADirectDominanceSpec;
+import annis.ql.node.ADirectPointingRelationSpec;
 import annis.ql.node.ADirectPrecedenceSpec;
 import annis.ql.node.ADirectSiblingSpec;
 import annis.ql.node.ADocumentConstraintExpr;
@@ -37,6 +38,7 @@ import annis.ql.node.AGroupedExpr;
 import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
+import annis.ql.node.AIndirectPointingRelationSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
 import annis.ql.node.AIndirectSiblingSpec;
 import annis.ql.node.ALeftAlignLingOp;
@@ -54,6 +56,7 @@ import annis.ql.node.ARightAlignLingOp;
 import annis.ql.node.ARightLeftOrRight;
 import annis.ql.node.ARightOverlapLingOp;
 import annis.ql.node.ARootLingOp;
+import annis.ql.node.ASameAnnotationGroupLingOp;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.ATokenArityLingOp;
@@ -72,6 +75,7 @@ import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.Overlap;
+import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
@@ -88,6 +92,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
+import org.omg.CORBA.portable.IndirectionException;
 
 /**
  *
@@ -120,10 +125,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   }
 
   ///// Syntax Tree Walking
-
-
   // <editor-fold desc="Currently unsupported or illegal">
-
   @Override
   public void caseAOrExpr(AOrExpr node)
   {
@@ -142,11 +144,20 @@ public class ClauseAnalysis extends DepthFirstAdapter
     throw new UnsupportedOperationException("using a grouped expression in a predicate is not (yet?) supported");
   }
 
+  @Override
+  public void caseASameAnnotationGroupLingOp(ASameAnnotationGroupLingOp node)
+  {
+    throw new AnnisQLSyntaxException("@ lingop is currently unsupported");
+  }
+
+  @Override
+  public void caseADocumentConstraintExpr(ADocumentConstraintExpr node)
+  {
+    throw new UnsupportedOperationException("using a document constraint expression in a predicate is not yet supported");
+  }
 
   // </editor-fold>
-
   // <editor-fold desc="unary">
-
   @Override
   public void caseARootLingOp(ARootLingOp node)
   {
@@ -171,9 +182,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     nleft.setTokenArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
   }
 
-
   // </editor-fold>
-
   // <editor-fold desc="Alignment">
   @Override
   public void caseAExactOverlapLingOp(AExactOverlapLingOp node)
@@ -216,11 +225,9 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     join(node, RightOverlap.class);
   }
-  
+
   // </editor-fold>
-
   // <editor-fold desc="Precedence">
-
   @Override
   public void caseADirectPrecedenceSpec(ADirectPrecedenceSpec node)
   {
@@ -286,9 +293,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   }
 
   // </editor-fold>
-
   // <editor-fold desc="Dominance">
-
   @Override
   public void caseADirectDominanceSpec(ADirectDominanceSpec node)
   {
@@ -377,12 +382,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   }
 
-
   // </editor-fold>
-
   // <editor-fold desc="Sibling">
-
-
   @Override
   public void caseADirectSiblingSpec(ADirectSiblingSpec node)
   {
@@ -406,7 +407,6 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
-
   @Override
   public void caseAIndirectSiblingSpec(AIndirectSiblingSpec node)
   {
@@ -420,21 +420,57 @@ public class ClauseAnalysis extends DepthFirstAdapter
     left.addJoin(new CommonAncestor(right, token(node.getName())));
   }
 
+
   // </editor-fold>
 
-  
-  // <editor-fold desc="TODO">
+  // <editor-fold desc="Pointing relations">
 
   @Override
-  public void caseADocumentConstraintExpr(ADocumentConstraintExpr node)
+  public void caseADirectPointingRelationSpec(ADirectPointingRelationSpec node)
   {
-    throw new UnsupportedOperationException("using a document constraint expression in a predicate is not yet supported");
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(PointingRelation.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(PointingRelation.class.getSimpleName()));
+
+    String name = token(node.getName());
+
+    left.addJoin(new PointingRelation(right, name, 1));
+
+    if (node.getEdgeSpec() != null)
+    {
+      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for (Annotation a : annotations)
+      {
+        right.addEdgeAnnotation(a);
+      }
+    }
   }
+
+
+  @Override
+  public void caseAIndirectPointingRelationSpec(AIndirectPointingRelationSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(PointingRelation.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(PointingRelation.class.getSimpleName()));
+
+    left.addJoin(new PointingRelation(right, token(node.getName())));
+  }
+
+  // </editor-fold>
+
 
   @Override
   public void caseAMetaConstraintExpr(AMetaConstraintExpr node)
   {
-    throw new UnsupportedOperationException("using a metadata constraint expression in a predicate is not yet supported");
+    Annotation annotation = new Annotation(token(node.getNamespace()), token(node.getName()));
+    metaAnnotations.add(annotation);
   }
 
   @Override
@@ -446,12 +482,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
-
-  // </editor-fold>
-
-  
   // <editor-fold desc="Node expressions">
-
   @Override
   public void caseAAnnotationSearchExpr(AAnnotationSearchExpr node)
   {
@@ -520,10 +551,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     newNode();
   }
 
-
   // </editor-fold>
-
-
   // <editor-fold desc="Complex helper" >
   private AnnisNode newNode()
   {
@@ -724,10 +752,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return function + " operator needs a right-hand-side";
   }
 
-
   // </editor-fold>
-
-
   // <editor-fold desc="Getter and Setter">
   public List<Annotation> getMetaAnnotations()
   {
@@ -748,6 +773,5 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     this.precedenceBound = precedenceBound;
   }
-
   // </editor-fold>
 }
