@@ -33,8 +33,6 @@
 
 	<!-- AnnisService -->
 	<bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
-		<property name="dddQueryParser" ref="dddQueryParser"/>
-		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="annisDao" ref="springAnnisDao"/>
 		<property name="externalFileMgr" ref="externalFileManager"/>
     <property name="wekaHelper" ref="wekaHelper"/>

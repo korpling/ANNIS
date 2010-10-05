@@ -38,13 +38,15 @@ public class TestListNodeAnnotationsSqlHelper {
 	
 	@Test
 	public void createSqlQuery() {
-		String expected = "SELECT DISTINCT namespace, name, NULL AS value FROM node_annotation";
+		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
+      + "NULL AS node_annotation_value FROM facts WHERE sample_node_annotation = true";
 		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, false));
 	}
 	
 	@Test
 	public void createSqlQueryListValues() {
-		String expected = "SELECT DISTINCT namespace, name, value FROM node_annotation";
+		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
+      + "node_annotation_value FROM facts WHERE sample_node_annotation = true";
 		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, true));
 	}
 		
@@ -54,8 +56,8 @@ public class TestListNodeAnnotationsSqlHelper {
 		// stub a result set with 2 annotations with NULL value set
 		ResultSet resultSet = mock(ResultSet.class);
 		when(resultSet.next()).thenReturn(true, true, false);
-		when(resultSet.getString("name")).thenReturn(NAME1, NAME2);
-		when(resultSet.getString("value")).thenReturn(NULL);
+		when(resultSet.getString("node_annotation_name")).thenReturn(NAME1, NAME2);
+		when(resultSet.getString("node_annotation_value")).thenReturn(NULL);
 		
 		// expected
 		AnnisAttribute attribute1 = newNamedAnnisAttribute(NAME1);
@@ -77,8 +79,8 @@ public class TestListNodeAnnotationsSqlHelper {
 		ResultSet resultSet = mock(ResultSet.class);
 		when(resultSet.next()).thenReturn(true, true, true, true, true, false);
 		// row 1 - 3: annotation with 3 values
-		when(resultSet.getString("name")).thenReturn(NAME1, NAME1, NAME1, NAME2, NAME3);
-		when(resultSet.getString("value")).thenReturn(VALUE1, VALUE2, VALUE3, VALUE1, NULL);
+		when(resultSet.getString("node_annotation_name")).thenReturn(NAME1, NAME1, NAME1, NAME2, NAME3);
+		when(resultSet.getString("node_annotation_value")).thenReturn(VALUE1, VALUE2, VALUE3, VALUE1, NULL);
 		
 		// expected
 		AnnisAttribute attribute1 = newNamedAnnisAttribute(NAME1, VALUE1, VALUE2, VALUE3);

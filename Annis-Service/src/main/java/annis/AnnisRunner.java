@@ -13,7 +13,6 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
-import de.deutschdiachrondigital.dddquery.DddQueryRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,10 +32,7 @@ import org.apache.commons.lang.StringUtils;
 public class AnnisRunner extends AnnisBaseRunner
 {
 
-//	private static Logger log = Logger.getLogger(AnnisRunner.class);
-  // delegate most commands to DddQueryRunner
   private List<Long> corpusList;
-  //private DddQueryRunner dddQueryRunner;
   private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
@@ -46,7 +42,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private MetaDataFilter metaDataFilter;
   private int context;
   private int matchLimit;
-  private String prompt;
+  private boolean isDDDQueryMode;
 
   public static void main(String[] args)
   {
@@ -57,9 +53,24 @@ public class AnnisRunner extends AnnisBaseRunner
   public AnnisRunner()
   {
     corpusList = new LinkedList<Long>();
+    isDDDQueryMode = false;
   }
 
 
+  // switch between AQL as input mode and DDDQuery
+  public void doLanguage(String newLanguage)
+  {
+    if("ddd".equalsIgnoreCase(newLanguage) || "dddquery".equalsIgnoreCase(newLanguage))
+    {
+      isDDDQueryMode = true;
+      System.out.println("new input language is DDDQuery");
+    }
+    else
+    {
+      isDDDQueryMode = false;
+      System.out.println("new input language is AQL");
+    }
+  }
 
   ///// Commands
   public void doDebug(String ignore)
@@ -124,11 +135,6 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(translate(annisQuery));
   }
 
-//  public void doParseInternal(String annisQuery)
-//  {
-//    dddQueryRunner.doParse(translate(annisQuery));
-//  }
-
   public void doParse(String annisQuery)
   {
     out.println(annisParser.dumpTree(annisQuery));
@@ -137,7 +143,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doSql(String annisQuery)
   {
     // sql query
-    QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+    QueryData queryData = parse(annisQuery);
 
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
@@ -147,7 +153,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doSqlGraph(String annisQuery)
   {
     // sql query
-    QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+    QueryData queryData = parse(annisQuery);
 
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
@@ -161,7 +167,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMatrix(String annisQuery)
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), annisDao.parseAQL(annisQuery, getCorpusList()));
+    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
     if (matches.isEmpty())
     {
       out.println("(empty");
@@ -175,35 +181,35 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.countMatches(getCorpusList(), annisDao.parseAQL(annisQuery, getCorpusList())));
+    out.println(annisDao.countMatches(getCorpusList(), parse(annisQuery)));
   }
 
   public void doPlanCount(String annisQuery)
   {
-    out.println(annisDao.planCount(annisDao.parseAQL(annisQuery, getCorpusList()), getCorpusList(), false));
+    out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), false));
   }
 
   public void doAnalyzeCount(String annisQuery)
   {
-    out.println(annisDao.planCount(annisDao.parseAQL(annisQuery, getCorpusList()), getCorpusList(), true));
+    out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), true));
   }
 
   public void doPlanGraph(String annisQuery)
   {
-    out.println(annisDao.planGraph(annisDao.parseAQL(annisQuery, getCorpusList()), getCorpusList(),
+    out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
       0, matchLimit, context, context, false));
   }
 
   public void doAnalyzeGraph(String annisQuery)
   {
-    out.println(annisDao.planGraph(annisDao.parseAQL(annisQuery, getCorpusList()), getCorpusList(),
+    out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
       0, matchLimit, context, context, true));
   }
 
   public void doAnnotate(String annisQuery)
   {
     List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
-      annisDao.parseAQL(annisQuery, getCorpusList()), 0, matchLimit, context, context);
+      parse(annisQuery), 0, matchLimit, context, context);
     printAsTable(graphs, "nodes", "edges");
   }
 
@@ -283,7 +289,7 @@ public class AnnisRunner extends AnnisBaseRunner
     result.put("node_annotation", new TreeSet<String>());
 
     // sql query
-    QueryData queryData = annisDao.parseAQL(aql, corpusList);
+    QueryData queryData = parse(aql);
 
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
@@ -324,6 +330,18 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(new TableFormatter().formatAsTable(list, fields));
   }
 
+  private QueryData parse(String input)
+  {
+    if(isDDDQueryMode)
+    {
+      return annisDao.parseDDDQuery(input, getCorpusList());
+    }
+    else
+    {
+      return annisDao.parseAQL(input, getCorpusList());
+    }
+  }
+
   ///// Getter / Setter
   public DddQueryMapper getDddQueryMapper()
   {
@@ -354,18 +372,6 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.annisDao = annisDao;
   }
-
-
-
-//  public DddQueryRunner getDddQueryRunner()
-//  {
-//    return dddQueryRunner;
-//  }
-//
-//  public void setDddQueryRunner(DddQueryRunner dddQueryRunner)
-//  {
-//    this.dddQueryRunner = dddQueryRunner;
-//  }
 
   public QueryAnalysis getAqlAnalysis()
   {

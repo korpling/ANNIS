@@ -38,8 +38,6 @@ public class AnnisServiceImpl implements AnnisService
 
   private static final long serialVersionUID = 1970615866336637980L;
   private Logger log = Logger.getLogger(this.getClass());
-  private DddQueryMapper dddQueryMapper;
-  private DddQueryParser dddQueryParser;
   private AnnisDao annisDao;
   private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
@@ -63,22 +61,18 @@ public class AnnisServiceImpl implements AnnisService
   {
   }
 
-  private String translate(String annisQuery)
-  {
-    return dddQueryMapper.translate(annisQuery);
-  }
 
   @Override
   public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
   {
-    return annisDao.countMatches(corpusList, annisDao.parseDDDQuery(translate(annisQuery), corpusList));
+    return annisDao.countMatches(corpusList, annisDao.parseAQL(annisQuery, corpusList));
   }
 
   @Override
   public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
     throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseDDDQuery(translate(annisQuery), corpusList), offset, limit, contextLeft, contextRight);
+    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseAQL(annisQuery, corpusList), offset, limit, contextLeft, contextRight);
     AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
     for(AnnotationGraph annotationGraph : annotationGraphs)
     {
@@ -124,7 +118,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public boolean isValidQuery(String annisQuery) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException
   {
-    dddQueryParser.parse(translate(annisQuery));
+    annisDao.parseAQL(annisQuery, null);
     return true;
   }
 
@@ -161,7 +155,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, annisDao.parseDDDQuery(translate(annisQL), corpusList));
+    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, annisDao.parseAQL(annisQL, corpusList));
     if(matches.isEmpty())
     {
       return "(empty)";
@@ -191,26 +185,6 @@ public class AnnisServiceImpl implements AnnisService
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
-  }
-
-  public DddQueryMapper getDddQueryMapper()
-  {
-    return dddQueryMapper;
-  }
-
-  public void setDddQueryMapper(DddQueryMapper dddQueryMapper)
-  {
-    this.dddQueryMapper = dddQueryMapper;
-  }
-
-  public DddQueryParser getDddQueryParser()
-  {
-    return dddQueryParser;
-  }
-
-  public void setDddQueryParser(DddQueryParser dddQueryParser)
-  {
-    this.dddQueryParser = dddQueryParser;
   }
 
   public WekaHelper getWekaHelper()
