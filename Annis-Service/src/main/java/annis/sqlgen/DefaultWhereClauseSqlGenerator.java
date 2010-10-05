@@ -32,6 +32,7 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 import java.util.LinkedList;
+import org.apache.commons.lang.StringUtils;
 
 public class DefaultWhereClauseSqlGenerator
   extends BaseNodeSqlGenerator
@@ -43,7 +44,7 @@ public class DefaultWhereClauseSqlGenerator
   {
     List<String> conditions = new ArrayList<String>();
 
-    addNodeConditions(node, conditions, node.getNodeAnnotations());
+    addNodeConditions(node, conditions, node.getNodeAnnotations(), corpusList);
     addAnnotationConditions(node, conditions, node.getNodeAnnotations(),
       NODE_ANNOTATION_TABLE, "node_annotation_");
 
@@ -54,7 +55,7 @@ public class DefaultWhereClauseSqlGenerator
     }
 
     addNodeJoinConditions(node, conditions);
-    addEdgeJoinConditions(node, conditions);
+    addEdgeJoinConditions(node, conditions, corpusList);
 
     addAnnotationConditions(node, conditions, node.getEdgeAnnotations(),
       EDGE_ANNOTATION_TABLE, "edge_annotation_");
@@ -142,7 +143,7 @@ public class DefaultWhereClauseSqlGenerator
     }
   }
 
-  protected void addEdgeJoinConditions(AnnisNode node, List<String> conditions)
+  protected void addEdgeJoinConditions(AnnisNode node, List<String> conditions, List<Long> corpusList)
   {
     for (Join join : node.getJoins())
     {
@@ -186,7 +187,10 @@ public class DefaultWhereClauseSqlGenerator
         StringBuffer sb = new StringBuffer();
         sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE) + " AS ancestor WHERE\n");
         sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post + " AND\n");
-        sb.append("\t" + pre + " < " + pre2 + " AND " + pre2 + " < " + post + ")");
+        sb.append("\t" + pre + " < " + pre2 + " AND " + pre2 + " < " + post
+          + " AND toplevel_corpus IN(" 
+          + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,","))
+          + "))");
         conditions.add(sb.toString());
 
       }
@@ -280,7 +284,7 @@ public class DefaultWhereClauseSqlGenerator
   }
 
   protected void addNodeConditions(AnnisNode node,
-    List<String> conditions, Set<Annotation> annotations)
+    List<String> conditions, Set<Annotation> annotations, List<Long> corpusList)
   {
     boolean usesFacts = tables(node).usesPartialFacts();
 
@@ -333,7 +337,9 @@ public class DefaultWhereClauseSqlGenerator
       StringBuffer sb = new StringBuffer();
       sb.append("(SELECT count(DISTINCT " + pre + ")\n");
       sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
-      sb.append("\tWHERE " + parent + " = " + pre1 + ")");
+      sb.append("\tWHERE " + parent + " = " + pre1 
+        + " AND toplevel_corpus IN(" + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,",")) + ")"
+        + ")");
       AnnisNode.Range arity = node.getArity();
       if (arity.getMin() == arity.getMax())
       {
