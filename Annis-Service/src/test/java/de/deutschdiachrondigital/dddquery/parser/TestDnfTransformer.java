@@ -1,5 +1,6 @@
-package annis.sqlgen;
+package de.deutschdiachrondigital.dddquery.parser;
 
+import annis.sqlgen.UnknownExpressionException;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newAndExpr;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newOrExpr;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newPathExpr;

@@ -7,6 +7,21 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
 	">
 	
+  <!-- transforms a DDDquery into its disjunctive normal form -->
+  <bean id="dnfTransformer" class="de.deutschdiachrondigital.dddquery.parser.DnfTransformer"/>
+
+	<!-- analyzes a single clause of a DDDquery -->
+  <bean id="clauseAnalysis" class="de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis" scope="prototype">
+    <property name="precedenceBound" value="${annis.precedence-restriction}"/>
+  </bean>
+
+
+  <bean id="queryAnalysis" class="de.deutschdiachrondigital.dddquery.parser.QueryAnalysis">
+    <property name="dnfTransformer" ref="dnfTransformer"/>
+    <lookup-method name="getClauseAnalysis" bean="clauseAnalysis"/>
+  </bean>
+	
+
 	<!-- DDDquery Parser -->
 	<bean id="dddQueryParser" class="de.deutschdiachrondigital.dddquery.parser.DddQueryParser">
 		<lookup-method name="getInternalParser" bean="dddQueryInternalParser"/>

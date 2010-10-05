@@ -1,5 +1,6 @@
-package annis.sqlgen;
+package de.deutschdiachrondigital.dddquery.parser;
 
+import annis.sqlgen.UnknownExpressionException;
 import java.util.ArrayList;
 import java.util.List;
 

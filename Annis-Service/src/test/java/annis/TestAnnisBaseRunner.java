@@ -77,7 +77,7 @@ public class TestAnnisBaseRunner {
 		assertThat(instance.args, is(nullValue()));
 		
 		// command "stuff" with arguments
-		String[] args = { "knownCommand", "arg1", "arg2" };
+		String[] args = { "knownCommand arg1 arg2"};
 		instance.run(args);
 		
 		// test execution of "stuff" command

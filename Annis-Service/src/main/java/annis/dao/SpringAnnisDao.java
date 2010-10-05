@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import annis.executors.QueryExecutor;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
-import annis.ql.parser.QueryAnalysis;
+import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;

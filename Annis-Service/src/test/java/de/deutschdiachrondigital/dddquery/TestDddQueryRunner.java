@@ -112,7 +112,7 @@ public class TestDddQueryRunner extends AnnisHomeTest
     assertThat(springManagedDddQueryRunner.getTableFormatter(), is(not(nullValue())));
     assertThat(springManagedDddQueryRunner.getAnnotationGraphDotExporter(), is(not(nullValue())));
 
-    assertThat(springManagedDddQueryRunner.getMatchLimit(), is(100));	// default value
+    assertThat(springManagedDddQueryRunner.getMatchLimit(), is(10));	// default value
   }
 
   // fresh instances have an empty corpusList

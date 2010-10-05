@@ -1,11 +1,12 @@
-package annis.ql.parser;
+package de.deutschdiachrondigital.dddquery.parser;
 
+import annis.ql.parser.QueryData;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import annis.sqlgen.ClauseAnalysis;
-import annis.sqlgen.DnfTransformer;
+import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
+import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
 import de.deutschdiachrondigital.dddquery.node.PExpr;
 import de.deutschdiachrondigital.dddquery.node.Start;
 import java.util.LinkedList;

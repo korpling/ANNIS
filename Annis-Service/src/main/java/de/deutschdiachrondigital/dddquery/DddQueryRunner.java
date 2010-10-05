@@ -1,5 +1,6 @@
 package de.deutschdiachrondigital.dddquery;
 
+import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import annis.dao.GraphExtractor;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
-import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;

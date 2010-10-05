@@ -1,5 +1,6 @@
 package annis.ql.parser;
 
+import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
 import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newPathExpr;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -26,8 +27,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
-import annis.sqlgen.ClauseAnalysis;
-import annis.sqlgen.DnfTransformer;
+import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
+import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
 import de.deutschdiachrondigital.dddquery.node.APathExpr;
 import de.deutschdiachrondigital.dddquery.node.PExpr;
 import de.deutschdiachrondigital.dddquery.node.Start;

@@ -14,15 +14,7 @@
       </list>
     </property>
   </bean>
-	
-	<!-- transforms a DDDquery into its disjunctive normal form -->	
-  <bean id="dnfTransformer" class="annis.sqlgen.DnfTransformer"/>
-	
-	<!-- analyzes a single clause of a DDDquery -->
-  <bean id="clauseAnalysis" class="annis.sqlgen.ClauseAnalysis" scope="prototype">
-    <property name="precedenceBound" value="${annis.precedence-restriction}"/>
-  </bean>
-	
+
 	<!-- SELECT clause generator -->
   <bean id="findMatchesSelectClauseSqlGenerator" class="annis.sqlgen.FindMatchesSelectClauseSqlGenerator">
     <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
@@ -146,12 +138,7 @@
 
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy"/>
-	
-  <bean id="queryAnalysis" class="annis.ql.parser.QueryAnalysis">
-    <property name="dnfTransformer" ref="dnfTransformer"/>
-    <lookup-method name="getClauseAnalysis" bean="clauseAnalysis"/>
-  </bean>
-	
+
 	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
   <bean id="findSqlGenerator" class="annis.sqlgen.SqlGenerator">
     <qualifier value="find"/>

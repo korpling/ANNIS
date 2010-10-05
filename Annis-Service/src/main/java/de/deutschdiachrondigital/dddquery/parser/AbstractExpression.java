@@ -1,4 +1,4 @@
-package annis.sqlgen;
+package de.deutschdiachrondigital.dddquery.parser;
 
 import de.deutschdiachrondigital.dddquery.node.PComparison;
 

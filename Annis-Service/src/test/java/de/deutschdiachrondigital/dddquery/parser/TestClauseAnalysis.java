@@ -1,4 +1,4 @@
-package annis.sqlgen;
+package de.deutschdiachrondigital.dddquery.parser;
 
 
 import static annis.ql.parser.AstBuilder.newCommonAncestorAxis;

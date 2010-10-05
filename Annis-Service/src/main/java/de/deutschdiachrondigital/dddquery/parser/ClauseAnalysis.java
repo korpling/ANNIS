@@ -1,4 +1,4 @@
-package annis.sqlgen;
+package de.deutschdiachrondigital.dddquery.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
-import annis.sqlgen.Expression.Type;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
@@ -65,6 +64,7 @@ import de.deutschdiachrondigital.dddquery.node.PComparison;
 import de.deutschdiachrondigital.dddquery.node.PExpr;
 import de.deutschdiachrondigital.dddquery.node.PNodeTest;
 import de.deutschdiachrondigital.dddquery.node.Token;
+import de.deutschdiachrondigital.dddquery.parser.Expression.Type;
 
 public class ClauseAnalysis extends DepthFirstAdapter
 {
