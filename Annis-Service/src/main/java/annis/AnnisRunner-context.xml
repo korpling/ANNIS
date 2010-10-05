@@ -37,12 +37,16 @@
 
 	<bean id="annisRunner" class="annis.AnnisRunner">
     <property name="annisDao" ref="springAnnisDao"/>
-		<property name="dddQueryRunner" ref="dddQueryRunner"/>
+		<!--<property name="dddQueryRunner" ref="dddQueryRunner"/>-->
 		<property name="annisParser" ref="annisParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="helloMessage" value="Annis Interactive Shell v2.1.7"/>
 		<property name="prompt" value="Annis"/>
     <property name="aqlAnalysis" ref="aqlAnalysis" />
+    <property name="findSqlGenerator" ref="findSqlGenerator"/>
+    <property name="metaDataFilter" ref="metaDataFilter" />
+
+    <property name="matchLimit" value="10"/>
 	</bean>
 
 </beans>

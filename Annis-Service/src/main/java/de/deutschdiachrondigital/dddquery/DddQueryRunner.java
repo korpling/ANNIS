@@ -182,51 +182,6 @@ public class DddQueryRunner extends AnnisBaseRunner
     out.println(tableFormatter.formatAsTable(list, fields));
   }
 
-  public Map<String, Set<String>> proposedIndexHelper(String dddQuery)
-  {
-    Map<String, Set<String>> result = new HashMap<String, Set<String>>();
-    result.put("facts", new TreeSet<String>());
-    result.put("node", new TreeSet<String>());
-    result.put("node_annotation", new TreeSet<String>());
-
-    // sql query
-    Start statement = dddQueryParser.parse(dddQuery);
-    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
-
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
-
-    // extract WHERE clause
-
-    Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
-    if (mWhere.find())
-    {
-      String whereClause = sql.substring(mWhere.end());
-      //out.println("WHERE clause:\n" + whereClause);
-
-      for (String table : result.keySet())
-      {
-        Set<String> attr = result.get(table);
-        Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
-        while (mFacts.find())
-        {
-          attr.add(mFacts.group(1).trim());
-        }
-      }
-
-      // print result
-      //out.println("facts: " + StringUtils.join(factsAttributes, ", "));
-      //out.println("node: " + StringUtils.join(nodeAttributes, ", "));
-      //out.println("suggested index: ");
-      //out.println("CREATE INDEX idx__facts__noname ON facts (" + StringUtils.join(factsAttributes, ", ") + ");");
-      //out.println("CREATE INDEX idx__node__noname ON node (" + StringUtils.join(nodeAttributes, ", ") + ");");
-    }
-    else
-    {
-      out.println("Could not find the WHERE clause");
-    }
-    return result;
-  }
-
   ///// Getter / Setter
   public DddQueryParser getDddQueryParser()
   {

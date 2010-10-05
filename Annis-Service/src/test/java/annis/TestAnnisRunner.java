@@ -47,7 +47,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		// setup test object and dependencies
 		annisRunner = new AnnisRunner();
 		initMocks(this);
-		annisRunner.setDddQueryRunner(dddQueryRunner);
 		annisRunner.setDddQueryMapper(dddQueryMapper);
 		annisRunner.setOut(out);
 
@@ -58,7 +57,6 @@ public class TestAnnisRunner extends AnnisHomeTest {
 	// Spring managed instance has its dependencies set
 	@Test
 	public void springManagedInstanceHasAllDependencies() {
-		assertThat(springManagedAnnisRunner.getDddQueryRunner(), is(not(nullValue())));
 		assertThat(springManagedAnnisRunner.getAnnisParser(), is(not(nullValue())));
 		assertThat(springManagedAnnisRunner.getDddQueryMapper(), is(not(nullValue())));
 	}
@@ -70,14 +68,7 @@ public class TestAnnisRunner extends AnnisHomeTest {
 		verify(dddQueryMapper).translate(ANNIS_QUERY);
 		verify(out).println(DDD_QUERY);
 	}
-	
-	// doParseInternal translates and delegates to DddQueryRunner.doParse()
-	@Test
-	public void doParseInternal() {
-		annisRunner.doParseInternal(ANNIS_QUERY);
-		verify(dddQueryMapper).translate(ANNIS_QUERY);
-		verify(dddQueryRunner).doParse(DDD_QUERY);
-	}
+
 	
 	// doParse creates a tree dump and prints
 	@Test

@@ -525,7 +525,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
     else if (node.getTextSpec() instanceof ARegexpTextSpec)
     {
-      context.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+      context.setSpannedText(((ARegexpTextSpec) node.getTextSpec()).getRegexp().getText(),
         AnnisNode.TextMatching.REGEXP_EQUAL);
     }
 
@@ -543,7 +543,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
     else if (node.getTextSpec() instanceof ARegexpTextSpec)
     {
-      target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
+      target.setSpannedText(((ARegexpTextSpec) node.getTextSpec()).getRegexp().getText(),
         AnnisNode.TextMatching.REGEXP_NOT_EQUAL);
     }
 
