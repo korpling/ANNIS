@@ -101,10 +101,13 @@ public class AttributeListServlet extends HttpServlet {
           for(AnnisAttribute att : attributeList)
           {
             String a = att.getName();
-            int found = a.indexOf(':');
-            if(found > -1 && (found+1) < a.length())
+            if(a != null)
             {
-              att.setName(a.substring(found+1));
+              int found = a.indexOf(':');
+              if(found > -1 && (found+1) < a.length())
+              {
+                att.setName(a.substring(found+1));
+              }
             }
           }
         }
