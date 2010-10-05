@@ -39,7 +39,8 @@ import test.TestHelper;
 import annis.AnnisHomeTest;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
-import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
+import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
@@ -47,8 +48,7 @@ import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
-import de.deutschdiachrondigital.dddquery.node.Start;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import annis.ql.node.Start;
 import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -60,7 +60,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	
 	// simple SpringDao instance with mocked dependencies
 	private SpringAnnisDao annisDao;
-	@Mock private DddQueryParser dddQueryParser;
+	@Mock private AnnisParser annisParser;
   @Mock private MetaDataFilter metaDataFilter;
 	@Mock private SqlGenerator sqlGenerator;
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
@@ -86,7 +86,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	public void setup() {
 		initMocks(this);
 		annisDao = new SpringAnnisDao();
-		annisDao.setDddQueryParser(dddQueryParser);
+		annisDao.setAqlParser(annisParser);
 		annisDao.setSqlGenerator(sqlGenerator);
     annisDao.setDefaultQueryExecutor(defaultQueryExecutor);
     annisDao.setGraphExtractor(graphExtractor);
@@ -98,7 +98,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setQueryAnalysis(queryAnalysis);
     annisDao.setMetaDataFilter(metaDataFilter);
 
-		when(dddQueryParser.parse(anyString())).thenReturn(STATEMENT);
+		when(annisParser.parse(anyString())).thenReturn(STATEMENT);
 		when(sqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
 		
 		simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
@@ -109,7 +109,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	public void springManagedInstanceHasAllDependencies() {
 		SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(springManagedAnnisDao);
 		assertThat(springAnnisDao.getSimpleJdbcTemplate(), is(not(nullValue())));
-		assertThat(springAnnisDao.getDddQueryParser(), is(not(nullValue())));
+		assertThat(springAnnisDao.getAqlParser(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlGenerator(), is(not(nullValue())));
 		assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
@@ -134,7 +134,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		String test = annisDao.planCount(DDDQUERY, CORPUS_LIST, false);
+		String test = annisDao.planCount(annisDao.parseDDDQuery(DDDQUERY, CORPUS_LIST), CORPUS_LIST, false);
 		assertThat(test, is(PLAN));
 		
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
@@ -147,7 +147,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		String PLAN = "PLAN 1\nPLAN 2";
 		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
 		
-		assertThat(annisDao.planCount(DDDQUERY, CORPUS_LIST, true), is(PLAN));
+		assertThat(annisDao.planCount(annisDao.parseDDDQuery(DDDQUERY, CORPUS_LIST), CORPUS_LIST, true), is(PLAN));
 
 		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
 	}

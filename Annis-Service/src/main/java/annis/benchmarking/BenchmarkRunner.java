@@ -202,7 +202,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 			logRuntime("1st 25 matches for query", task, runtimes);
 			
 			// query plan
-			String plan = annisDao.planCount(query, Arrays.asList(corpusId), true);
+			String plan = annisDao.planCount(annisDao.parseDDDQuery(query, Arrays.asList(corpusId)), Arrays.asList(corpusId), true);
 			task.setPlan(plan);
 			
 			log.info("test query: " + task.getAnnisQuery() + " " + 
@@ -315,7 +315,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 
 	private int timeCountMatches(long corpusId, String query, List<Long> times) {
 		long start = new Date().getTime();
-		int count = annisDao.countMatches(Arrays.asList(corpusId), query);
+		int count = annisDao.countMatches(Arrays.asList(corpusId), annisDao.parseDDDQuery(query, Arrays.asList(corpusId)));
 		long end = new Date().getTime();
 		if (times != null)
 			times.add(end - start);
@@ -324,7 +324,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	
 	private void timeAnnotateFirst25(long corpusId, String query, List<Long> times) {
 		long start = new Date().getTime();
-		annisDao.retrieveAnnotationGraph(Arrays.asList(corpusId), query, OFFSET, LIMIT, LEFT, RIGHT);
+		annisDao.retrieveAnnotationGraph(Arrays.asList(corpusId), annisDao.parseDDDQuery(query, Arrays.asList(corpusId)) , OFFSET, LIMIT, LEFT, RIGHT);
 		long end = new Date().getTime();
 		if (times != null)
 			times.add(end - start);

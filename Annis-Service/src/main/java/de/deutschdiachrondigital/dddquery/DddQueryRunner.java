@@ -99,7 +99,7 @@ public class DddQueryRunner extends AnnisBaseRunner
 
   public void doMatrix(String dddQuery)
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), dddQuery);
+    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), annisDao.parseDDDQuery(dddQuery, getCorpusList()));
     if (matches.isEmpty())
     {
       out.println("(empty");
@@ -113,34 +113,34 @@ public class DddQueryRunner extends AnnisBaseRunner
 
   public void doCount(String dddQuery)
   {
-    out.println(annisDao.countMatches(getCorpusList(), dddQuery));
+    out.println(annisDao.countMatches(getCorpusList(), annisDao.parseDDDQuery(dddQuery, getCorpusList())));
   }
 
   public void doPlanCount(String dddQuery)
   {
-    out.println(annisDao.planCount(dddQuery, getCorpusList(), false));
+    out.println(annisDao.planCount(annisDao.parseDDDQuery(dddQuery, getCorpusList()), getCorpusList(), false));
   }
 
   public void doPlanGraph(String dddQuery)
   {
-    out.println(annisDao.planGraph(dddQuery, getCorpusList(),
+    out.println(annisDao.planGraph(annisDao.parseDDDQuery(dddQuery, getCorpusList()), getCorpusList(),
       0, matchLimit, context, context, false));
   }
 
   public void doAnalyzeCount(String dddQuery)
   {
-    out.println(annisDao.planCount(dddQuery, getCorpusList(), true));
+    out.println(annisDao.planCount(annisDao.parseDDDQuery(dddQuery, getCorpusList()), getCorpusList(), true));
   }
 
   public void doAnalyzeGraph(String dddQuery)
   {
-    out.println(annisDao.planGraph(dddQuery, getCorpusList(),
+    out.println(annisDao.planGraph(annisDao.parseDDDQuery(dddQuery, getCorpusList()), getCorpusList(),
       0, matchLimit, context, context, true));
   }
 
   public void doAnnotate(String dddQuery)
   {
-    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(), dddQuery, 0, matchLimit, context, context);
+    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(), annisDao.parseDDDQuery(dddQuery, getCorpusList()), 0, matchLimit, context, context);
     printAsTable(graphs, "nodes", "edges");
   }
 

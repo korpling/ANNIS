@@ -71,14 +71,14 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
   {
-    return annisDao.countMatches(corpusList, translate(annisQuery));
+    return annisDao.countMatches(corpusList, annisDao.parseDDDQuery(translate(annisQuery), corpusList));
   }
 
   @Override
   public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
     throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, translate(annisQuery), offset, limit, contextLeft, contextRight);
+    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseDDDQuery(translate(annisQuery), corpusList), offset, limit, contextLeft, contextRight);
     AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
     for(AnnotationGraph annotationGraph : annotationGraphs)
     {
@@ -161,7 +161,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, translate(annisQL));
+    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, annisDao.parseDDDQuery(translate(annisQL), corpusList));
     if(matches.isEmpty())
     {
       return "(empty)";

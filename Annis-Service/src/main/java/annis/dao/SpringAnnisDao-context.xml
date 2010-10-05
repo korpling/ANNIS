@@ -71,6 +71,7 @@
 		
 	<!-- DddQueryParser -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
+  <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
 	
 	<!-- SqlGenerator -->
   <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
@@ -103,15 +104,19 @@
     <property name="timeout" value="60000"/>
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
 		<!--<property name="dataSource" ref="dataSource"/>-->
-    <property name="dddQueryParser" ref="dddQueryParser"/>
+
+    <property name="aqlParser" ref="annisParser"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
+    <property name="dddqueryParser" ref="dddQueryParser" />
+    <property name="dddqueryAnalysis" ref="queryAnalysis" />
+
     <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listNodeAnnotationsSqlHelper" ref="listNodeAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
 		
 		<!-- new -->
-    <property name="queryAnalysis" ref="queryAnalysis"/>
+    <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
@@ -122,6 +127,7 @@
     <property name="executorList" ref="executorList" />
 
     <property name="metaDataFilter" ref="metaDataFilter" />
+
   </bean>
 	
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">

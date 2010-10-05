@@ -3,7 +3,7 @@ package annis;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.ql.node.Start;
-import annis.ql.parser.AQLAnalysis;
+import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryData;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
@@ -33,7 +33,7 @@ public class AnnisRunner extends AnnisBaseRunner
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
 
-  private AQLAnalysis aqlAnalysis;
+  private QueryAnalysis aqlAnalysis;
 
   public static void main(String[] args)
   {
@@ -238,12 +238,12 @@ public class AnnisRunner extends AnnisBaseRunner
     this.dddQueryRunner = dddQueryRunner;
   }
 
-  public AQLAnalysis getAqlAnalysis()
+  public QueryAnalysis getAqlAnalysis()
   {
     return aqlAnalysis;
   }
 
-  public void setAqlAnalysis(AQLAnalysis aqlAnalysis)
+  public void setAqlAnalysis(QueryAnalysis aqlAnalysis)
   {
     this.aqlAnalysis = aqlAnalysis;
   }

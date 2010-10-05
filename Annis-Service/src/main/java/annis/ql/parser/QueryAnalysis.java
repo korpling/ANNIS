@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
  *
  * @author thomas
  */
-public class AQLAnalysis
+public class QueryAnalysis
 {
-  private final Logger log = Logger.getLogger(AQLAnalysis.class);
+  private final Logger log = Logger.getLogger(QueryAnalysis.class);
 
   private DnfTransformer dnfTransformer;
   private ClauseAnalysis clauseAnalysis;

@@ -14,7 +14,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import annis.executors.QueryExecutor;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
-import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
+import annis.ql.node.Start;
+import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -24,7 +26,6 @@ import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
-import de.deutschdiachrondigital.dddquery.node.Start;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import java.util.LinkedList;
 
@@ -44,14 +45,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
   private MatrixExtractor matrixExtractor;
-  private QueryAnalysis queryAnalysis;
-  private DddQueryParser dddQueryParser;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
   private DefaultQueryExecutor defaultQueryExecutor;
   private GraphExtractor graphExtractor;
   private List<QueryExecutor> executorList;
   private MetaDataFilter metaDataFilter;
+  private QueryAnalysis queryAnalysis;
+  private AnnisParser aqlParser;
+  private DddQueryParser dddqueryParser;
+  private de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis;
 
   public SpringAnnisDao()
   {
@@ -60,17 +63,34 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  public int countMatches(final List<Long> corpusList, final String dddQuery)
+  public QueryData parseAQL(String aql, List<Long> corpusList)
   {
-    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
+    // parse the query
+    Start statement = aqlParser.parse(aql);
+
+    // analyze it
+    return queryAnalysis.analyzeQuery(statement, corpusList);
+  }
+
+  @Override
+  public QueryData parseDDDQuery(String dddquery, List<Long> corpusList)
+  {
+    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.parse(dddquery);
+    return dddqueryAnalysis.analyzeQuery(statement, corpusList);
+  }
+
+  @Override
+  public int countMatches(final List<Long> corpusList, final QueryData aql)
+  {
+    QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     return countExtractor.queryCount(getJdbcTemplate());
   }
 
   @Override
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final String dddquery)
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
   {
-    QueryData queryData = createDynamicMatchView(corpusList, dddquery);
+    QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
 
@@ -78,22 +98,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  public String planCount(String dddQuery, List<Long> corpusList, boolean analyze)
+  public String planCount(QueryData aql, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
-    createDynamicMatchView(corpusList, dddQuery);
+    createDynamicMatchView(corpusList, aql);
     return countExtractor.explain(getJdbcTemplate(), analyze);
   }
 
   @Override
-  public String planGraph(String dddQuery, List<Long> corpusList,
+  public String planGraph(QueryData aql, List<Long> corpusList,
     long offset, long limit, int left, int right,
     boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
-    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
+    QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
     return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
@@ -102,9 +122,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, String dddQuery, long offset, long limit, int left, int right)
+  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
   {
-    QueryData queryData = createDynamicMatchView(corpusList, dddQuery);
+    QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
 
@@ -112,13 +132,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
   }
 
-  private QueryData createDynamicMatchView(List<Long> corpusList, String dddQuery)
+  private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
   {
-    // parse the query
-    Start statement = dddQueryParser.parse(dddQuery);
-
-    // analyze it
-    QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
 
     // execute session modifiers
     for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
@@ -214,16 +229,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   }
 
-  // /// Getter / Setter
-  public DddQueryParser getDddQueryParser()
+  public AnnisParser getAqlParser()
   {
-    return dddQueryParser;
+    return aqlParser;
   }
 
-  public void setDddQueryParser(DddQueryParser parser)
+  public void setAqlParser(AnnisParser aqlParser)
   {
-    this.dddQueryParser = parser;
+    this.aqlParser = aqlParser;
   }
+
+  
+
+  // /// Getter / Setter
+  
 
   public SqlGenerator getSqlGenerator()
   {
@@ -388,4 +407,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.matrixExtractor = matrixExtractor;
   }
+
+  public de.deutschdiachrondigital.dddquery.parser.QueryAnalysis getDddqueryAnalysis()
+  {
+    return dddqueryAnalysis;
+  }
+
+  public void setDddqueryAnalysis(de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
+  {
+    this.dddqueryAnalysis = dddqueryAnalysis;
+  }
+
+  public DddQueryParser getDddqueryParser()
+  {
+    return dddqueryParser;
+  }
+
+  public void setDddqueryParser(DddQueryParser dddqueryParser)
+  {
+    this.dddqueryParser = dddqueryParser;
+  }
+
 }
