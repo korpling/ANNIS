@@ -74,28 +74,33 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "left", "left");
         joinOnNode(conditions, node, target, "=", "right", "right");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof LeftAlignment)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "left", "left");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof RightAlignment)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "right", "right");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Inclusion)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "<=", "left", "left");
         joinOnNode(conditions, node, target, ">=", "right", "right");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Overlap)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "<=", "left", "right");
         joinOnNode(conditions, target, node, "<=", "left", "right");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof LeftOverlap)
       {
@@ -103,6 +108,7 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, "<=", "left", "left");
         joinOnNode(conditions, target, node, "<=", "left", "right");
         joinOnNode(conditions, node, target, "<=", "right", "right");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof RightOverlap)
       {
@@ -110,6 +116,7 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, ">=", "right", "right");
         joinOnNode(conditions, target, node, ">=", "right", "left");
         joinOnNode(conditions, node, target, ">=", "left", "left");
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Precedence)
       {
@@ -162,7 +169,7 @@ public class DefaultWhereClauseSqlGenerator
           conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
         }
         conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"), tables(target).aliasedColumn(RANK_TABLE, "parent")));
-
+        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof CommonAncestor)
       {
@@ -176,7 +183,9 @@ public class DefaultWhereClauseSqlGenerator
         {
           conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
         }
-
+        
+        joinOnNode(conditions, node, target, "<>", "id", "id");
+        
         // fugly
         TableAccessStrategy tas = tables(null);
         String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
