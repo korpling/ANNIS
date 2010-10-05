@@ -27,6 +27,7 @@ import annis.ql.node.AAnyNodeSearchExpr;
 import annis.ql.node.AArityLingOp;
 import annis.ql.node.ADirectDominanceSpec;
 import annis.ql.node.ADirectPrecedenceSpec;
+import annis.ql.node.ADirectSiblingSpec;
 import annis.ql.node.ADocumentConstraintExpr;
 import annis.ql.node.AEdgeAnnotation;
 import annis.ql.node.AEdgeSpec;
@@ -37,6 +38,7 @@ import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
+import annis.ql.node.AIndirectSiblingSpec;
 import annis.ql.node.ALeftAlignLingOp;
 import annis.ql.node.ALeftLeftOrRight;
 import annis.ql.node.ALeftOverlapLingOp;
@@ -62,6 +64,7 @@ import annis.ql.node.PEdgeAnnotation;
 import annis.ql.node.PExpr;
 import annis.ql.node.PLingOp;
 import annis.ql.node.Token;
+import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -74,6 +77,7 @@ import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
+import annis.sqlgen.model.Sibling;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,6 +120,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
   }
 
   ///// Syntax Tree Walking
+
+
+  // <editor-fold desc="Currently unsupported or illegal">
+
   @Override
   public void caseAOrExpr(AOrExpr node)
   {
@@ -133,6 +141,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     throw new UnsupportedOperationException("using a grouped expression in a predicate is not (yet?) supported");
   }
+
+
+  // </editor-fold>
+
+  // <editor-fold desc="unary">
 
   @Override
   public void caseARootLingOp(ARootLingOp node)
@@ -158,6 +171,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
     nleft.setTokenArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
   }
 
+
+  // </editor-fold>
+
+  // <editor-fold desc="Alignment">
   @Override
   public void caseAExactOverlapLingOp(AExactOverlapLingOp node)
   {
@@ -199,6 +216,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     join(node, RightOverlap.class);
   }
+  
+  // </editor-fold>
+
+  // <editor-fold desc="Precedence">
 
   @Override
   public void caseADirectPrecedenceSpec(ADirectPrecedenceSpec node)
@@ -264,6 +285,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
+  // </editor-fold>
+
+  // <editor-fold desc="Dominance">
+
   @Override
   public void caseADirectDominanceSpec(ADirectDominanceSpec node)
   {
@@ -299,7 +324,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     if (node.getEdgeSpec() != null)
     {
       LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
-      for(Annotation a : annotations)
+      for (Annotation a : annotations)
       {
         right.addEdgeAnnotation(a);
       }
@@ -352,6 +377,54 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   }
 
+
+  // </editor-fold>
+
+  // <editor-fold desc="Sibling">
+
+
+  @Override
+  public void caseADirectSiblingSpec(ADirectSiblingSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(Sibling.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(Sibling.class.getSimpleName()));
+
+    left.addJoin(new Sibling(right, token(node.getName())));
+
+    if (node.getEdgeSpec() != null)
+    {
+      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for (Annotation a : annotations)
+      {
+        left.addEdgeAnnotation(a);
+        right.addEdgeAnnotation(a);
+      }
+    }
+  }
+
+
+  @Override
+  public void caseAIndirectSiblingSpec(AIndirectSiblingSpec node)
+  {
+    PLingOp parent = (PLingOp) node.parent();
+    AnnisNode left = lhs(parent);
+    AnnisNode right = rhs(parent);
+
+    Validate.notNull(left, errorLHS(CommonAncestor.class.getSimpleName()));
+    Validate.notNull(right, errorRHS(CommonAncestor.class.getSimpleName()));
+
+    left.addJoin(new CommonAncestor(right, token(node.getName())));
+  }
+
+  // </editor-fold>
+
+  
+  // <editor-fold desc="TODO">
+
   @Override
   public void caseADocumentConstraintExpr(ADocumentConstraintExpr node)
   {
@@ -372,6 +445,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
       analyzeNestedPath(expr);
     }
   }
+
+
+  // </editor-fold>
+
+  
+  // <editor-fold desc="Node expressions">
 
   @Override
   public void caseAAnnotationSearchExpr(AAnnotationSearchExpr node)
@@ -400,7 +479,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     AnnisNode context = newNode();
 
 
-    if(node.getTextSpec() == null)
+    if (node.getTextSpec() == null)
     {
       context.setToken(true);
     }
@@ -441,6 +520,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
     newNode();
   }
 
+
+  // </editor-fold>
+
+
+  // <editor-fold desc="Complex helper" >
   private AnnisNode newNode()
   {
     AnnisNode n = new AnnisNode(++aliasCount);
@@ -520,6 +604,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return result;
   }
 
+  // </editor-fold>
+
+
+  // <editor-fold desc="Conversion">
   private String textFromAnnoValue(PAnnoValue value)
   {
     Token text = null;
@@ -636,7 +724,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return function + " operator needs a right-hand-side";
   }
 
-  //// Getter/Setter
+
+  // </editor-fold>
+
+
+  // <editor-fold desc="Getter and Setter">
   public List<Annotation> getMetaAnnotations()
   {
     return metaAnnotations;
@@ -656,4 +748,6 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     this.precedenceBound = precedenceBound;
   }
+
+  // </editor-fold>
 }
