@@ -166,7 +166,7 @@ public class DddQueryRunner extends AnnisBaseRunner
   public void doNodeAnnotations(String doListValues)
   {
     boolean listValues = "values".equals(doListValues);
-    List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(corpusList, listValues);
+    List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(getCorpusList(), listValues);
     printAsTable(nodeAnnotations, "name", "distinctValues");
   }
 

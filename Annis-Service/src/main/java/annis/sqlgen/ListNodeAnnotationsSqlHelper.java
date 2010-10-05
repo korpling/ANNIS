@@ -16,12 +16,19 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import annis.model.AnnisNode;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisAttributeImpl;
+import org.apache.commons.lang.StringUtils;
 
 public class ListNodeAnnotationsSqlHelper implements ResultSetExtractor {
 
 	public String createSqlQuery(List<Long> corpusList, boolean listValues) {
-		String template = "SELECT DISTINCT namespace, name, :value FROM node_annotation";
-		String sql = template.replace(":value", listValues ? "value" : "NULL AS value");
+		String template = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
+      + ":value FROM facts WHERE sample_node_annotation = true";
+
+    if(corpusList != null && !corpusList.isEmpty())
+    {
+      template += " AND toplevel_corpus IN (" + StringUtils.join(corpusList, ", ") + ")";
+    }
+		String sql = template.replace(":value", listValues ? "node_annotation_value" : "NULL AS node_annotation_value");
 		return sql;
 	}
 	
@@ -31,8 +38,8 @@ public class ListNodeAnnotationsSqlHelper implements ResultSetExtractor {
 		
 		while (resultSet.next()) {
 
-			String namespace = resultSet.getString("namespace");
-			String name = resultSet.getString("name");
+			String namespace = resultSet.getString("node_annotation_namespace");
+			String name = resultSet.getString("node_annotation_name");
 			String qName = AnnisNode.qName(namespace, name);
 			
 			if ( ! attributesByName.containsKey(qName) )
@@ -41,7 +48,7 @@ public class ListNodeAnnotationsSqlHelper implements ResultSetExtractor {
 			AnnisAttribute attribute = attributesByName.get(qName);
 			attribute.setName(qName);
 			
-			String value = resultSet.getString("value");
+			String value = resultSet.getString("node_annotation_value");
 			
 			if (value != null)
 				attribute.addValue(value);
