@@ -108,14 +108,15 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   public ClauseAnalysis()
   {
-    this(0, new ArrayList<Annotation>(), new HashMap<String, AnnisNode>());
+    this(0, new ArrayList<Annotation>(), new HashMap<String, AnnisNode>(), 0);
   }
 
-  public ClauseAnalysis(int aliasCount, List<Annotation> metaAnnotations, Map<String, AnnisNode> nodes)
+  public ClauseAnalysis(int aliasCount, List<Annotation> metaAnnotations, Map<String, AnnisNode> nodes, int precedenceBound)
   {
     this.aliasCount = aliasCount;
     this.metaAnnotations = metaAnnotations;
     this.nodes = nodes;
+    this.precedenceBound = precedenceBound;
   }
 
   ///// Analysis interface
@@ -253,7 +254,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     if (precedenceBound > 0)
     {
-      left.addJoin(new Precedence(right, precedenceBound));
+      left.addJoin(new Precedence(right, 1, precedenceBound));
     }
     else
     {
@@ -567,7 +568,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   private ClauseAnalysis analyzeNestedPath(PExpr expr)
   {
-    ClauseAnalysis nested = new ClauseAnalysis(aliasCount, metaAnnotations, nodes);
+    ClauseAnalysis nested = new ClauseAnalysis(aliasCount, metaAnnotations, nodes, precedenceBound);
     expr.apply(nested);
     aliasCount = nested.aliasCount;
     return nested;
