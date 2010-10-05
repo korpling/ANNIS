@@ -469,7 +469,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseAMetaConstraintExpr(AMetaConstraintExpr node)
   {
-    Annotation annotation = new Annotation(token(node.getNamespace()), token(node.getName()));
+    String annoText = textFromAnnoValue(node.getValue());
+    AnnisNode.TextMatching annoTextMatching = textMatchingFromAnnoValue(node.getValue());
+    token(node.getName());
+
+    Annotation annotation = 
+      new Annotation(token(node.getNamespace()), token(node.getName()), annoText, annoTextMatching);
     metaAnnotations.add(annotation);
   }
 
@@ -499,7 +504,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
       String text = textFromAnnoValue(node.getAnnoValue());
-      target.setSpannedText(text, textMatching);
+
+      Annotation anno = new Annotation(token(node.getAnnoNamespace()), token(node.getAnnoType()),
+        text, textMatching);
+      target.addNodeAnnotation(anno);
     }
 
   }
@@ -508,7 +516,6 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseATextSearchExpr(ATextSearchExpr node)
   {
     AnnisNode context = newNode();
-
 
     if (node.getTextSpec() == null)
     {

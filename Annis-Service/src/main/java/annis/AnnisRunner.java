@@ -1,6 +1,7 @@
 package annis;
 
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.ql.node.Start;
 import annis.ql.parser.AQLAnalysis;
 import annis.ql.parser.AnnisParser;
@@ -44,7 +45,7 @@ public class AnnisRunner extends AnnisBaseRunner
   
   public void doDebug(String ignore)
   {
-    doAqlParser("namespace:word=\"abc\" & tok & #1 >[secedge!=\"sdf\"] #2");
+    doAqlParser("node & node & #1 ->func[a=\"c\"] #2 & meta::abc=\"ds\"");
   }
 
   public void doProposedIndex(String ignore)
@@ -214,6 +215,15 @@ public class AnnisRunner extends AnnisBaseRunner
       {
         System.out.println("OR");
       }
+    }
+    Iterator<Annotation> itMeta = qd.getMetaData().iterator();
+    if(itMeta.hasNext())
+    {
+      System.out.println("META");
+    }
+    while(itMeta.hasNext())
+    {
+      System.out.println("\t" + itMeta.next().toString());
     }
 
   }
