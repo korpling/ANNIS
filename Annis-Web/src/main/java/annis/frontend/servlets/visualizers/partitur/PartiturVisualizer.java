@@ -180,10 +180,16 @@ public class PartiturVisualizer extends WriterVisualizer
                                 eventIdsArray.append(","+tier + "_" + id);
                             }
                         }
+
+                    String color = "black";
+                    if (getMarkableMap().containsKey("" + element.getId()))
+                    {
+                      color = getMarkableMap().get("" + element.getId());
+                    }
                     if (found)
                          writer.append("<td class=\"single_event\" "
                             + "id=\"event_" + tier + "_" + element.getId() + "_" + iterator5 + "\" "
-                            + "style=\"color:black;\" "
+                            + "style=\"color:" + color + ";\" "
                             + "colspan=" + length + " "
                             + "annis:tokenIds=\"" + tokenIdsArray + "\" "
                             + "annis:eventIds=\"" + eventIdsArray + "\" "
