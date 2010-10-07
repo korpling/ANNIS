@@ -182,9 +182,9 @@ public class PartiturVisualizer extends WriterVisualizer
                         }
 
                     String color = "black";
-                    if (getMarkableMap().containsKey("" + element.getId()))
+                    if (getMarkableExactMap().containsKey("" + element.getId()))
                     {
-                      color = getMarkableMap().get("" + element.getId());
+                      color = getMarkableExactMap().get("" + element.getId());
                     }
                     if (found)
                          writer.append("<td class=\"single_event\" "
@@ -212,9 +212,9 @@ public class PartiturVisualizer extends WriterVisualizer
       {
         String color = "black";
 
-        if (getMarkableMap().containsKey("" + token.getId()))
+        if (getMarkableExactMap().containsKey("" + token.getId()))
         {
-          color = getMarkableMap().get("" + token.getId());
+          color = getMarkableExactMap().get("" + token.getId());
         }
         writer.append("<td class=\"tok\" style=\"color:" + color + ";\" "
           + "id=\"token_" + token.getId() + "\" "
