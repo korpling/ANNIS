@@ -15,11 +15,7 @@
  */
 package annis.frontend.servlets;
 
-import annis.exceptions.AnnisServiceFactoryException;
-import annis.exceptions.ParseException;
-import annis.ql.parser.ParserException;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
 import java.io.IOException;
 import javax.servlet.ServletException;

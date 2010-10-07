@@ -419,7 +419,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 		checkWhereCondition(
 				join("=", "_rank23.parent", "_rank42.parent"),
 				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL"
+				"_component23.name IS NULL",
+        join("<>", "_node23.id", "_node42.id")
 		);
 	}
 	
