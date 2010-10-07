@@ -26,9 +26,6 @@
 		</property>
 	</bean>
 	
-	<!-- DddQueryRunner -->
-	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryRunner-context.xml"/>
-	
   <!-- AnnisDao -->
   <import resource="classpath:annis/dao/SpringAnnisDao-context.xml"/>
   
