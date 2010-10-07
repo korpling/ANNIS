@@ -222,7 +222,7 @@ public class GraphExtractor implements ResultSetExtractor
   public String getTextQuery(long textID)
   {
     String template = "SELECT DISTINCT \n"
-      + "\t'-1' AS key, facts.*\n"
+      + "\tARRAY[-1::numeric] AS key, facts.*\n"
       + "FROM\n"
       + "\tfacts AS facts\n"
       + "WHERE\n" + "\tfacts.text_ref = :text_id\n"
