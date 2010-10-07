@@ -17,7 +17,7 @@ var Citation = {
       if(i>0) { 
         citation += ",";
       }
-      citation += selections[i].id;
+      citation += selections[i].json.name;
     }
     citation += ")";
     citation += ",CLEFT(" + formPanelSimpleSearch.getComponent('padLeft').getValue() + ")";
@@ -45,15 +45,23 @@ var Citation = {
 					
         if("AQL" == key) {
           formPanelSearch.getComponent('queryAnnisQL').setValue(Url.decode(value.replace('"', '')));
-        } else if("CIDS" == key) {
+        } else if("CIDS" == key)
+        {
           var cids = value.split(',');
-          for(i=0;i<cids.length;i++) {
-            cids[i] = store.getById(cids[i]);
+          var selection = new Array();
+          for(i=0;i<cids.length;i++)
+          {
+            var index = store.findExact('name',cids[i])
+            selection[i] = store.getAt(index);
           }
-          selectionModel.selectRecords(cids, false);
-        } else if("CLEFT" == key) {
+          selectionModel.selectRecords(selection, false);
+        } 
+        else if("CLEFT" == key)
+        {
           formPanelSimpleSearch.getComponent('padLeft').setValue(value);
-        } else if("CRIGHT" == key) {
+        } 
+        else if("CRIGHT" == key)
+        {
           formPanelSimpleSearch.getComponent('padRight').setValue(value);
         }
       });
