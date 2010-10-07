@@ -74,33 +74,28 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "left", "left");
         joinOnNode(conditions, node, target, "=", "right", "right");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof LeftAlignment)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "left", "left");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof RightAlignment)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "right", "right");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Inclusion)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "<=", "left", "left");
         joinOnNode(conditions, node, target, ">=", "right", "right");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Overlap)
       {
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "<=", "left", "right");
         joinOnNode(conditions, target, node, "<=", "left", "right");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof LeftOverlap)
       {
@@ -108,7 +103,6 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, "<=", "left", "left");
         joinOnNode(conditions, target, node, "<=", "left", "right");
         joinOnNode(conditions, node, target, "<=", "right", "right");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof RightOverlap)
       {
@@ -116,7 +110,6 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, ">=", "right", "right");
         joinOnNode(conditions, target, node, ">=", "right", "left");
         joinOnNode(conditions, node, target, ">=", "left", "left");
-        joinOnNode(conditions, node, target, "<>", "id", "id");
       }
       else if (join instanceof Precedence)
       {
