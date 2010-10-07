@@ -75,7 +75,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doParse("tok!=\"der\" & node & #1 . #2");
+    doText("0");
   }
 
   public void doProposedIndex(String ignore)
@@ -243,6 +243,14 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
     printAsTable(corpusAnnotations, "namespace", "name", "value");
+  }
+
+  public void doText(String textID)
+  {
+    List<AnnotationGraph> result = new LinkedList<AnnotationGraph>();
+    AnnotationGraph graph =  annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
+    result.add(graph);
+    printAsTable(result, "nodes", "edges");
   }
 
   public void doQuit(String dummy)

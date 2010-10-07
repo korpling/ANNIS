@@ -144,7 +144,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
 
     // generate the view with the matched node IDs
-    // TODO: use the constraint approach to filter the executors before we iterate over them
     for (QueryExecutor e : executorList)
     {
       if (e.checkIfApplicable(queryData))

@@ -99,9 +99,22 @@ public class CorefVisualizer extends WriterVisualizer
       ReferentOfToken = new HashMap<Long,HashMap<Long, Integer>>();
       ComponentOfToken = new HashMap<Long,List<Long>>();
       Componenttype = new LinkedList<TComponenttype>();
-      AnnisResult anResult = getResult(); if (anResult==null) { writer.append("An Error occured: Could not get Result (Result == null)</body>");return;}
-      AnnotationGraph anGraph = anResult.getGraph(); if (anGraph==null) { writer.append("An Error occured: Could not get Graph of Result (Graph == null)</body>");return;}
-      List<Edge> edgeList = anGraph.getEdges(); if (edgeList==null) return;
+      AnnisResult anResult = getResult();
+      if (anResult==null)
+      {
+        writer.append("An Error occured: Could not get Result (Result == null)</body>");
+        return;
+      }
+      AnnotationGraph anGraph = anResult.getGraph();
+      if (anGraph==null)
+      {
+        writer.append("An Error occured: Could not get Graph of Result (Graph == null)</body>");
+        return;
+      }
+      List<Edge> edgeList = anGraph.getEdges();
+      if (edgeList==null)
+        return;
+
       for (Edge e : edgeList) if (e != null && e.getName()!=null && e.getEdgeType()==Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null) {
           visitedNodes = new LinkedList<Long>();
           //got Type for this?
