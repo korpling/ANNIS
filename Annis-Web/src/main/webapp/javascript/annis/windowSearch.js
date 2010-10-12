@@ -298,16 +298,10 @@ Ext.onReady(function()
           }
         }
       },
-      failure: function()
+      failure: function(response)
       {
-        Ext.MessageBox.show({
-          title: 'FATAL ERROR: count',
-          msg: 'Unable to fetch match count. This may be caused by a timeout or connection problem.',
-          icon: Ext.MessageBox.ERROR,
-          buttons: Ext.MessageBox.OK
-        });
-        formPanelSearch.getComponent('matchCount').setValue("");
-        lastStatus="";
+        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
+        lastStatus = formPanelSearch.getComponent('matchCount').getValue();
         setSearchButtonDisabled(false);
       },
       autoAbort: true,

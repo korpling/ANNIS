@@ -34,7 +34,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 {
 
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
-  private int timeout;
   /// old
   private SqlGenerator sqlGenerator;
   private ListCorpusSqlHelper listCorpusSqlHelper;
@@ -263,17 +262,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.planRowMapper = planRowMapper;
   }
-
-  public int getTimeout()
-  {
-    return timeout;
-  }
-
-  public void setTimeout(int timeout)
-  {
-    this.timeout = timeout;
-  }
-
+  
   public ListCorpusSqlHelper getListCorpusSqlHelper()
   {
     return listCorpusSqlHelper;

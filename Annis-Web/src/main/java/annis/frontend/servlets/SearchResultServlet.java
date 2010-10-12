@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.dao.DataAccessResourceFailureException;
 
 public class SearchResultServlet extends HttpServlet
 {
@@ -228,12 +229,20 @@ public class SearchResultServlet extends HttpServlet
     {
       this.cleanSession(session);
       out.println("Please select a Corpus.");
-
     }
     catch (AnnisServiceException e)
     {
       this.cleanSession(session);
-      out.println(e.getMessage());
+      Throwable secondLevelCause = e.getCause();
+      if(secondLevelCause != null && secondLevelCause.getCause() != null && secondLevelCause.getCause() instanceof DataAccessResourceFailureException)
+      {
+        out.println("Timeout or connection error");
+      }
+      else
+      {
+        out.println(e.getMessage());
+      }
+      response.setStatus(504);
     }
 
 
