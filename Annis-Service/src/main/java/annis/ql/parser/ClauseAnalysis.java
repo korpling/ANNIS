@@ -469,7 +469,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
       {
         throw new AnnisQLSyntaxException("Distance can't be 0");
       }
-      left.addJoin(new Dominance(right, token(node.getName()), distance));
+      left.addJoin(new PointingRelation(right, token(node.getName()), distance));
     }
     else
     {

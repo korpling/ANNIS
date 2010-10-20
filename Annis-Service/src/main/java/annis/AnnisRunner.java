@@ -75,7 +75,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCount("node & node & #1 ->IDENT_relation #2");
+    doCount("node & node & #1 ->IDENT_relation 2 #2");
   }
 
   public void doProposedIndex(String ignore)
