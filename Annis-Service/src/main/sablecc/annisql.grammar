@@ -162,8 +162,7 @@ Productions
 		| {sibling}	op_sibling sibling_spec { -> New ling_op.sibling(sibling_spec) }
 /*		| {sibling_and_precedence}	op_sibling_and_precedence { -> New ling_op.sibling_and_precedence() } */
 		| {same_annotation_group}	op_same_annotation_group { -> New ling_op.same_annotation_group() }
-		| {pointing_relation_direct}	op_pointing_relation [name]:id edge_spec? { -> New ling_op.pointing_relation( New pointing_relation_spec.direct(name, edge_spec) ) }
-		| {poinging_relation_indirect}	op_pointing_relation [name]:id star { -> New ling_op.pointing_relation( New pointing_relation_spec.indirect(name) ) }
+	  | {pointing_relation}	op_pointing_relation pointing_relation_spec { -> New ling_op.pointing_relation(pointing_relation_spec) }
 		;
 
 	unary_op { -> ling_op } = 
@@ -186,6 +185,12 @@ Productions
 		  {direct}		[name]:id? left_or_right? edge_spec? { -> New dominance_spec.direct(name, left_or_right, edge_spec) }
 		| {range}		[name]:id? range_spec { -> New dominance_spec.range(name, range_spec) } 
 		| {indirect}	[name]:id? star { -> New dominance_spec.indirect(name) }
+		;
+
+  pointing_relation_spec { -> pointing_relation_spec } =
+		  {direct}		[name]:id edge_spec? { -> New pointing_relation_spec.direct(name, edge_spec) }
+		| {range}		[name]:id range_spec { -> New pointing_relation_spec.range(name, range_spec) }
+		| {indirect}	[name]:id star { -> New pointing_relation_spec.indirect(name) }
 		;
 		
 	sibling_spec { -> sibling_spec } =
@@ -280,6 +285,7 @@ Abstract Syntax Tree
 	pointing_relation_spec =
 		  {direct} [name]:id edge_spec?
 		| {indirect} [name]:id
+    | {range} [name]:id range_spec
 		;
 		
 	edge_spec = edge_annotation+ ;
