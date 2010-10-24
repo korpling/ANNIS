@@ -29,6 +29,7 @@ import annis.cache.Cache;
 import annis.cache.FilesystemCache;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.frontend.filters.AuthenticationFilter;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -36,6 +37,7 @@ import annis.model.Edge;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
+import annis.security.AnnisUser;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
@@ -84,7 +86,7 @@ public class SearchResultServlet extends HttpServlet
 
     if (request.getParameter("count") != null)
     {
-      writeCount(session, response);
+      writeCount(session, request, response);
     }
     else
     {
@@ -101,6 +103,11 @@ public class SearchResultServlet extends HttpServlet
 
     int offset = 0;
     int limit = 50;
+
+    if(!checkCorpora(response, request, corpusIdList))
+    {
+      return;
+    }
 
     try
     {
@@ -123,10 +130,17 @@ public class SearchResultServlet extends HttpServlet
     AnnisService service;
     try
     {
+
+      int contextLeft = (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT);
+      int contextRight = (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
+
+      contextLeft = Math.min(10, contextLeft);
+      contextRight = Math.min(10, contextRight);
+
       queryAnnisQL = session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL).toString();
 
       service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-      AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT), (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT));
+      AnnisResultSet resultSet = service.getResultSet(corpusIdList, queryAnnisQL, limit, offset, contextLeft, contextRight);
 
 
       if (session.getAttribute(FILESYSTEM_CACHE_RESULT) == null)
@@ -202,7 +216,7 @@ public class SearchResultServlet extends HttpServlet
     }
   }
 
-  private void writeCount(HttpSession session, HttpServletResponse response) throws IOException
+  private void writeCount(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException
   {
     response.setContentType("text/plain");
 
@@ -211,6 +225,11 @@ public class SearchResultServlet extends HttpServlet
     String queryAnnisQL = (String) session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL);
     List<Long> corpusIdList = (List<Long>) session.getAttribute(SubmitQueryServlet.KEY_CORPUS_ID_LIST);
 
+    if(!checkCorpora(response, request, corpusIdList))
+    {
+      return;
+    }
+    
     //Gather totalCount from AnnisRemoteService
     try
     {
@@ -451,6 +470,28 @@ public class SearchResultServlet extends HttpServlet
     }
 
     return matchedAndCovered;
+  }
+
+  private boolean checkCorpora(HttpServletResponse response, HttpServletRequest request ,List<Long> corpusIdList)
+  {
+    AnnisUser user = ((AnnisUser) request.getSession().getAttribute(AuthenticationFilter.KEY_USER));
+
+    Set<Long> allowedCorpora = new HashSet<Long>(user.getCorpusIdList());
+    if(!allowedCorpora.containsAll(corpusIdList))
+    {
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      try
+      {
+        response.getWriter().append("You are not allowed to access all of these corpora: " + corpusIdList.toString());
+      }
+      catch (IOException ex)
+      {
+        Logger.getLogger(SearchResultServlet.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      return false;
+    }
+
+    return true;
   }
 }
 
