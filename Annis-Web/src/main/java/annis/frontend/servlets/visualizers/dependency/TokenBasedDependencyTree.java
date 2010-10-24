@@ -18,9 +18,13 @@ package annis.frontend.servlets.visualizers.dependency;
 
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONException;
@@ -52,15 +56,53 @@ public class TokenBasedDependencyTree extends WriterVisualizer
 
       // output the data for the javascript
       println("<script type=\"text/javascript\">");
+      println("fcolors={};");
       println("shownfeatures=[\"t\"];");
       println("tokens=new Object();");
-      
+
+
+      HashMap<Long,Integer> id2pos = new HashMap<Long, Integer>();
       int counter = 0;
       for(AnnisNode tok : result.getGraph().getTokens())
       {
+        id2pos.put(tok.getId(), counter);
+        counter++;
+      }
+
+
+      counter = 0;
+      for(AnnisNode tok : result.getGraph().getTokens())
+      {
         JSONObject o = new JSONObject();
-        o.append("t", tok.getSpannedText());
-        
+        o.put("t", tok.getSpannedText());
+
+        JSONObject govs = new JSONObject();
+        Set<Edge> edges = tok.getIncomingEdges();
+        for(Edge e : edges)
+        {
+          if(e.getEdgeType() == Edge.EdgeType.POINTING_RELATION)
+          {
+            String label = "";
+            for(Annotation anno : e.getAnnotations())
+            {
+              if(anno.getNamespace() != null && anno.getNamespace().equals(anno.getNamespace()))
+              {
+                label = anno.getValue();
+                break;
+              }
+            }
+
+            if(e.getSource() == null)
+            {
+              govs.put("root", label);
+            }
+            else
+            {
+              govs.put("" + id2pos.get(e.getSource().getId()), label);
+            }
+          }
+        }
+        o.put("govs", govs);
 
         theWriter.append("tokens[").append("" + counter).append("]=");
         theWriter.append(o.toString().replaceAll("\n", " "));
