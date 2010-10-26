@@ -568,14 +568,14 @@ var exportSelection = new Ext.form.ComboBox({
       header: "Texts",
       dataIndex: 'textCount',
       align: 'right',
-      width: 60
+      width: 50
     },
     {
       id: "tokens",
       header: "Tokens",
       dataIndex: 'tokenCount',
       align: 'right',
-      width: 60
+      width: 50
     },
     {
       id: "id",
@@ -741,7 +741,7 @@ var exportSelection = new Ext.form.ComboBox({
 			
   var panelSearch = new Ext.Panel({
     region: 'west',
-    width: 340,
+    width: 330,
     layout: "vbox",
     items: [formPanelSearch,corpusGrid, panelSearchModes]
   });
