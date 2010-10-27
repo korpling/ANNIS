@@ -6,6 +6,14 @@ Version 2.1.8
    big corpora in the database
  - some performance improvement since the database tables to load are smaller
  - performance of smaller corpora is not affected by bigger corpora
+* new and much extended version of the coreference visualizer
+* negation of meta-data
+* the pointing relation "->" operator is now able to specify the range "-> m,n"
+* dependency visualizers 
+  - a general dependency visualizer based on the work of Kim Gerdes and the
+    Vākyārtha annotation project
+  - specialized version for the PROIEL corpus 
+  (this work was sponsored by the PROIEL project at the University of Oslo) 
 * the "new" partitur visualizer is now able to display overlapping spans so the
   old version is obsolete and can be replaced
 * highlight the matches belonging to different parts of the query in different
@@ -17,8 +25,7 @@ Version 2.1.8
 * don't throw an exception if you search for a metadata value that does not
   exist in the corpus (just deliver 0 results)
 * more escaping of user input in SQL
-* updated to the latest version (3.2.1) of the ExtJS JavaScript-Framework 
-  (bug-fix release)
+* updated to the latest version (3.3.0) of the ExtJS JavaScript-Framework 
 * fixed some size issues in the GUI
 
 Version 2.1.7

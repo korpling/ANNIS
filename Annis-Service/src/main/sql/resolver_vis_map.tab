@@ -3,6 +3,6 @@
 3	NULL	NULL	mmax	node	grid	mmax	103	NULL
 4	NULL	NULL	mmax	edge	discourse	coref	104	NULL
 5	NULL	NULL	urml	node	old_grid	urml	105	NULL
-6	NULL	NULL	external	NULL	file	external file	106	NULL
+6	NULL	NULL	external	node	file	external file	106	NULL
 7	NULL	NULL	NULL	NULL	paula	paula	107	NULL
 8	NULL	NULL	NULL	NULL	paula_text	paula text	108	NULL

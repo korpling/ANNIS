@@ -34,7 +34,7 @@ import org.json.JSONObject;
  *
  * @author thomas
  */
-public class TokenBasedDependencyTree extends WriterVisualizer
+public class VakyarthaDependencyTree extends WriterVisualizer
 {
 
   private Writer theWriter;
@@ -104,6 +104,20 @@ public class TokenBasedDependencyTree extends WriterVisualizer
         }
         o.put("govs", govs);
 
+        JSONObject attris = new JSONObject();
+
+        JSONObject tAttris = new JSONObject();
+        String tokenColor = "black";
+        if(getMarkableExactMap().containsKey("" + tok.getId()))
+        {
+          tokenColor = getMarkableExactMap().get("" + tok.getId());
+        }
+        tAttris.put("fill", tokenColor);
+        tAttris.put("font", "11px Arial,Tahoma,Helvetica,Sans-Serif");
+
+        attris.put("t", tAttris);
+        o.put("attris", attris);
+
         theWriter.append("tokens[").append("" + counter).append("]=");
         theWriter.append(o.toString().replaceAll("\n", " "));
         theWriter.append(";\n");
@@ -121,13 +135,13 @@ public class TokenBasedDependencyTree extends WriterVisualizer
       println("</body>");
       println("</html>");
     }
+
     catch (JSONException ex)
     {
-      Logger.getLogger(TokenBasedDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch (IOException ex)
+      Logger.getLogger(VakyarthaDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
+    }    catch (IOException ex)
     {
-      Logger.getLogger(TokenBasedDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(VakyarthaDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 

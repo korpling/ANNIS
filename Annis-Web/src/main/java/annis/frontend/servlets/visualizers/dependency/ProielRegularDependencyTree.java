@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class RegularDependencyTree extends AbstractDotVisualizer
+public class ProielRegularDependencyTree extends AbstractDotVisualizer
 {
 
   private StringBuilder dot;
