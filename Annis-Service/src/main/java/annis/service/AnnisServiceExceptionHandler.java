@@ -16,8 +16,7 @@ public class AnnisServiceExceptionHandler {
 	
 	@AfterThrowing(pointcut="annisServiceMethod()", throwing="e")
 	public void convertException(Exception e) throws AnnisServiceException {
-		StringWriter stackTrace = new StringWriter();
-		throw new AnnisServiceException(e.getLocalizedMessage(), e);
+		throw new AnnisServiceException(e.getLocalizedMessage());
 	}
 	
 }
