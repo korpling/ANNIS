@@ -235,12 +235,19 @@ Ext.onReady(function()
 
     var exporterSelection = formPanelExporter.getComponent("exportSelection").getValue();
 
+
     // open a new browser window/tab
     var url = conf_context + '/secure/' + exporterSelection + '?queryAnnisQL='
       + encodeURIComponent(formPanelSearch.getComponent('queryAnnisQL').getValue())
       + '&corpusIds=' + corpusIdString
       + '&padLeft=' + formPanelExporter.getComponent('padLeftExport').getValue()
       + '&padRight=' + formPanelExporter.getComponent('padRightExport').getValue();
+
+    var additionalParams = formPanelExporter.getComponent('additionalParamsExport').getValue();
+    if(additionalParams !== "")
+    {
+      url += '&' + additionalParams;
+    }    
     window.open(url, 'Export');
   }
    		
@@ -429,6 +436,20 @@ Ext.onReady(function()
     value: '5',
     selectOnFocus:true,
     editable: false,
+    listeners: {
+      'select': {
+        fn: updateStatus,
+        scope: this
+      }
+    }
+  });
+
+var additionalParamsExport = new Ext.form.TextField({
+    name: 'additionalParamsExport',
+    id: 'additionalParamsExport',
+    fieldLabel: 'Additional parameters',
+    value: '',
+    selectOnFocus:true,
     listeners: {
       'select': {
         fn: updateStatus,
@@ -654,7 +675,8 @@ var exportSelection = new Ext.form.ComboBox({
     items: [
       exportSelection,
       padLeftComboBoxExport,
-      padRightComboBoxExport
+      padRightComboBoxExport,
+      additionalParamsExport
     ],
     buttons: [{
       id: 'btnExport',
@@ -730,7 +752,7 @@ var exportSelection = new Ext.form.ComboBox({
 		    
   var panelSearchModes = new Ext.TabPanel({
     width: 340,
-    height: 160,
+    height: 180,
     activeTab: 0,
     items: [
       formPanelSimpleSearch,
