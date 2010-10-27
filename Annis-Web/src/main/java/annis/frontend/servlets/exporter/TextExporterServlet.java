@@ -20,6 +20,7 @@ import javax.servlet.http.*;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
+import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.util.List;
@@ -29,7 +30,7 @@ public class TextExporterServlet extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, HttpServletResponse response, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response, int offset) throws IOException
   {
     int counter = 0;
     for (AnnisResult annisResult : queryResult)

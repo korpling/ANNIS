@@ -26,11 +26,14 @@ import javax.servlet.http.*;
 import annis.model.AnnisNode;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class GeneralTextExporter extends HttpServlet
@@ -106,12 +109,48 @@ public class GeneralTextExporter extends HttpServlet
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       AnnisResultSet queryResult = null;
 
+      
+      
+      LinkedList<String> keys = new LinkedList<String>();
+      
+      if(request.getParameter("keys") == null)
+      {
+        // auto set
+        keys.add("tok");
+        AnnisAttributeSet attributes = service.getNodeAttributeSet(corpusIdList, false);
+        for(AnnisAttribute a : attributes)
+        {
+          if(a.getName() != null)
+          {
+            String[] namespaceAndName = a.getName().split(":", 2);
+            if(namespaceAndName.length > 1)
+            {
+              keys.add(namespaceAndName[1]);
+            }
+            else
+            {
+              keys.add(namespaceAndName[0]);
+            }
+          }
+        }
+      }
+      else
+      {
+        // manually specified
+        String[] keysSplitted = request.getParameter("keys").split("\\,");
+        for(String k : keysSplitted)
+        {
+          keys.add(k.trim());
+        }
+      }
       int offset = 0;
       while (offset == 0 || (queryResult != null && queryResult.size() > 0))
       {
 
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
-        convertText(queryResult, response, offset);
+
+
+        convertText(queryResult, keys, response, offset);
 
         response.getWriter().flush();
         offset = offset + 50;
@@ -144,7 +183,7 @@ public class GeneralTextExporter extends HttpServlet
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, HttpServletResponse response,
+  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response,
     int offset) throws IOException
   {
     int counter = 0;

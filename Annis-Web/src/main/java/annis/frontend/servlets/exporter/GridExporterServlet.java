@@ -20,31 +20,33 @@ import javax.servlet.http.*;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
-import java.util.Arrays;
 import java.util.List;
 
 public class GridExporterServlet extends GeneralTextExporter
 {
 
-  private List<String> searchedValues = Arrays.asList("tok", "LAT", "bibl");// Zu Testzwecken erstmal diese 3 Werte, spaeter durch GUI uebergeben.
-  
   @Override
-  public void convertText(AnnisResultSet queryResult, HttpServletResponse response, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response, int offset) throws IOException
   {
+    
+    
+
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
     {
 
       counter++;
       response.getWriter().append((counter+offset) + ". ");
-      for (String value : searchedValues)
+      for (String k : keys)
       {
 
-        if (value.equals("tok"))
+        if ("tok".equals(k))
         {
-          response.getWriter().append("\t " + value + "\t ");
+          response.getWriter().append("\t " + k + "\t ");
           for (AnnisNode annisNode : annisResult.getGraph().getTokens())
           {
             response.getWriter().append(annisNode.getSpannedText() + " ");
@@ -61,11 +63,11 @@ public class GridExporterServlet extends GeneralTextExporter
             for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
             {
 
-              if (resolveAnnotation.getName().equals(value))
+              if (resolveAnnotation.getName().equals(k))
               {
                 if (count == 0)
                 {
-                  response.getWriter().append("\t " + value + "\t ");
+                  response.getWriter().append("\t " + k + "\t ");
                   count++;
                 }
                 response.getWriter().append(resolveAnnotation.getValue() + " ");
