@@ -4,16 +4,18 @@
  *
  * Copyright 2010, Kim Gerdes
  *
- * This program is free software:
- * you can redistribute it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details. http://www.gnu.org/licenses/
+ * This program is free software: 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and limitations under the License. 
  *
  */
 
+
+    
 
 ///////////////////////// parameters ////////////////
 ////////////////////////////////////////////////////
@@ -31,7 +33,7 @@ worddistancefactor = 8; // distant words get higher curves. this factor fixes ho
 
 defaultattris={"font": '14px "Arial"', "text-anchor":'start'}
 
-attris = {"t":		{"font": '18px "Arial"', "text-anchor":'start'},
+attris = {"t":		{"font": '18px "Arial"', "text-anchor":'start'}, 
 	  "cat":	{"font": '14px "Times"', "text-anchor":'start',"fill": '#036'},
 	  "lemma":	{"font": '14px "Times"', "text-anchor":'start',"fill": '#036'},
 	  "depline":	{"stroke": 'green',"stroke-width":'1',"stroke-dasharray": ""},
@@ -54,8 +56,8 @@ function Pnode(index,token)
 		this.texts=new Object();
 		this.svgs=new Object();
 		var currenty=dependencyspace;
-		for (var i in shownfeatures)
-			{
+		for (var i in shownfeatures) 
+			{	
 			var f = shownfeatures[i];
 			this.texts[f]=token[f]
 			var t = paper.text(currentx, currenty, token[f]);
@@ -83,18 +85,18 @@ drawsvgDep = function(ind,govind,x1,y1,x2,y2,func,lineattris,textattris)
 		var x1x2=Math.abs(x1-x2)/2
 		var yy = Math.max(y1-x1x2-worddistancefactor*Math.abs(ind-govind),-tokdepdist)
 		yy = Math.min(yy,y1-depminh)
-		var c = paper.path(attris["depline"]).moveTo(x1, y1).curveTo(x1, yy, x2, yy, x2, y2);
+		var c = paper.path(attris["depline"]).moveTo(x1, y1).curveTo(x1, yy, x2, yy, x2, y2);	
 		c.attr({"x":x1,"y":y1});
 		var poi = paper.path(attris["depline"]).moveTo(x2-pois, y2-pois).lineTo(x2, y2).lineTo(x2+pois,y2-pois);
 		poi.attr({"x":x2-5,"y":y2-5})
-		if (func in fcolors)
+		if (func in fcolors) 
 		      {
 			var color = "#"+fcolors[func];
-			c.attr({stroke: color});
-			poi.attr({stroke: color});
+			c.attr({stroke: color}); 
+			poi.attr({stroke: color}); 
 		      }
-		c.attr(lineattris);
-		poi.attr( lineattris);
+		c.attr(lineattris); 
+		poi.attr( lineattris); 
 		var yy = Math.max(yy,10)
 		t = paper.text(x2, y2+3, func);
 		t.attr(attris["deptext"]);
@@ -106,7 +108,7 @@ drawsvgDep = function(ind,govind,x1,y1,x2,y2,func,lineattris,textattris)
 		set.push(poi); // pointer
 		return set;
 	}
-
+	
 
 drawDep = function(ind,govind,func,c)	// draw dependency of type func from govind to ind
 	{
@@ -136,13 +138,13 @@ drawDep = function(ind,govind,func,c)	// draw dependency of type func from govin
 	}
 
 
-drawalldeps = function()
+drawalldeps = function() 
 	{
 	  for (var i in words)
 		  {
 			  var n = words[i];
 			  var c=0
-			  for (var i in n.govs)
+			  for (var i in n.govs) 
 			  {
 				  drawDep(n.index,i,n.govs[i],c);
 				  c+=1;
@@ -155,11 +157,11 @@ drawalldeps = function()
 
 words = new Object();
 
-makewords = function()
+makewords = function() 
 	{
 		svgwi=0;
 		currentx=tab;
-		for (var i in tokens)
+		for (var i in tokens) 
 			{
 			var node = new Pnode( i, tokens[i]);
 			words[i]=node;
