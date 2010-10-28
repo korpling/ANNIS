@@ -57,6 +57,7 @@ public class GridExporterServlet extends GeneralTextExporter
         {
 
           int count = 0;
+          long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() -1;
           for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
           {
 
@@ -70,7 +71,12 @@ public class GridExporterServlet extends GeneralTextExporter
                   response.getWriter().append("\t " + k + "\t ");
                   count++;
                 }
-                response.getWriter().append(resolveAnnotation.getValue() + " ");
+                response.getWriter().append(resolveAnnotation.getValue() );
+                long leftIndex = Math.max(1, resolveNode.getLeftToken() - tokenOffset);
+                long rightIndex = resolveNode.getRightToken() - tokenOffset;
+                response.getWriter().append("[" + leftIndex
+                  + "-" + rightIndex + "]");
+                response.getWriter().append(" ");
               }
             }
           }
