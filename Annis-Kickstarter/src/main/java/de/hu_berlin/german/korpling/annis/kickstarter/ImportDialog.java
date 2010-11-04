@@ -24,13 +24,8 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
 import annis.administration.SpringAnnisAdministrationDao;
-import java.awt.Frame;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Filter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
