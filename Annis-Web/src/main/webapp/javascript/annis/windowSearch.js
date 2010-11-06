@@ -447,7 +447,7 @@ Ext.onReady(function()
 var additionalParamsExport = new Ext.form.TextField({
     name: 'additionalParamsExport',
     id: 'additionalParamsExport',
-    fieldLabel: 'Additional parameters',
+    fieldLabel: 'Parameters',
     value: '',
     selectOnFocus:true,
     listeners: {

@@ -503,15 +503,14 @@ public class SpringAnnisAdministrationDao {
 
 		try {
 			// retrieve the currently open connection if running inside a transaction
-			Connection con = DataSourceUtils.getConnection(dataSource);
+      Connection con = DataSourceUtils.getConnection(dataSource);
 
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
-      			
-			// XXX: does this connection leak when it is not transaction managed?
-			// can't close it, otherwise the next time it is used in code that does run
-			// inside a transaction (the usual case during import) will fail
+
+      DataSourceUtils.releaseConnection(con, dataSource);
+      
 		} catch (SQLException e) {
 			throw new DatabaseAccessException(e);
 		} catch (IOException e) {
