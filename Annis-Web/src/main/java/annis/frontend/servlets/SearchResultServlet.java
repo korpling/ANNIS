@@ -375,17 +375,16 @@ public class SearchResultServlet extends HttpServlet
     Set<String> nodeNamespaces = new HashSet<String>();
     for(AnnisNode node : result.getGraph().getNodes())
     {
-      if(!node.isToken())
+      nodeNamespaces.add(node.getNamespace());
+      for(Annotation annotation : node.getNodeAnnotations())
       {
-        for(Annotation annotation : node.getNodeAnnotations())
-        {
-          nodeNamespaces.add(annotation.getNamespace());
-        }
+        nodeNamespaces.add(annotation.getNamespace());
       }
     }
     Set<String> edgeNamespaces = new HashSet<String>();
     for(Edge e : result.getGraph().getEdges())
     {
+      edgeNamespaces.add(e.getNamespace());
       for(Annotation annotation : e.getAnnotations())
       {
         edgeNamespaces.add(annotation.getNamespace());
@@ -394,10 +393,6 @@ public class SearchResultServlet extends HttpServlet
     for(String ns : nodeNamespaces)
     {
       resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
-      if(!edgeNamespaces.contains(ns))
-      {
-        resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
-      }
     }
     for(String ns : edgeNamespaces)
     {
