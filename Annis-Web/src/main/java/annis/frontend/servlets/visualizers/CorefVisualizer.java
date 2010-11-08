@@ -151,61 +151,87 @@ public class CorefVisualizer extends WriterVisualizer
 
       for (Edge e : edgeList)
       {
-        if (e != null && e.getName() != null && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null)
+        if (e != null && e.getName() != null
+          && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
+          && e.getDestination() != null)
         {
-          visitedNodes = new LinkedList<Long>();
-          //got Type for this?
-          boolean gotIt = false;
-          int Componentnr;
-          for (Componentnr = 0; Componentnr < Componenttype.size(); Componentnr++)
+          boolean hasAnnoWithCorrectNamespace = false;
+          if(e.getNamespace() != null && e.getNamespace().equals(getNamespace()))
           {
-            if (Componenttype.get(Componentnr) != null && Componenttype.get(Componentnr).Type != null && Componenttype.get(Componentnr).NodeList != null
-              && Componenttype.get(Componentnr).Type.equals(e.getName()) && Componenttype.get(Componentnr).NodeList.contains(e.getSource().getId()))
-            {
-              gotIt = true;
-              break;
-            }
+            hasAnnoWithCorrectNamespace = true;
           }
-          TComponent currentComponent;
-          TComponenttype currentComponenttype;
-          if (gotIt)
+          else if(e.getDestination().getNamespace() != null && e.getDestination().getNamespace().equals(getNamespace()))
           {
-            currentComponent = Komponent.get(Componentnr);
-            currentComponenttype = Componenttype.get(Componentnr);
+            hasAnnoWithCorrectNamespace = true;
           }
           else
           {
-            currentComponenttype = new TComponenttype();
-            currentComponenttype.Type = e.getName();
-            Componenttype.add(currentComponenttype);
-            Componentnr = Komponent.size();
-            currentComponent = new TComponent();
-            currentComponent.Type = e.getName();
-            currentComponent.TokenList = new LinkedList<Long>();
-            Komponent.add(currentComponent);
-            currentComponenttype.NodeList.add(e.getSource().getId());
-          }
-          TReferent Ref = new TReferent();
-          Ref.Annotations = e.getAnnotations();
-          Ref.Component = Componentnr;
-          Ref.Node = e.getSource().getId();
-          Ref.Type = e.getName();
-          ReferentList.add(Ref);
-
-          List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), currentComponenttype, Componentnr);
-
-          setReferent(e.getDestination(), globalIndex, 0);//neu
-          setReferent(e.getSource(), globalIndex, 1);//neu
-
-          for (Long l : currentTokens)
-          {
-            if (!currentComponent.TokenList.contains(l))
+            for(Annotation anno : e.getDestination().getNodeAnnotations())
             {
-              currentComponent.TokenList.add(l);
+              if(anno.getNamespace() != null && anno.getNamespace().equals(getNamespace()))
+              {
+                hasAnnoWithCorrectNamespace = true;
+                break;
+              }
             }
           }
 
-          globalIndex++;
+          if(hasAnnoWithCorrectNamespace)
+          {
+            visitedNodes = new LinkedList<Long>();
+            //got Type for this?
+            boolean gotIt = false;
+            int Componentnr;
+            for (Componentnr = 0; Componentnr < Componenttype.size(); Componentnr++)
+            {
+              if (Componenttype.get(Componentnr) != null && Componenttype.get(Componentnr).Type != null && Componenttype.get(Componentnr).NodeList != null
+                && Componenttype.get(Componentnr).Type.equals(e.getName()) && Componenttype.get(Componentnr).NodeList.contains(e.getSource().getId()))
+              {
+                gotIt = true;
+                break;
+              }
+            }
+            TComponent currentComponent;
+            TComponenttype currentComponenttype;
+            if (gotIt)
+            {
+              currentComponent = Komponent.get(Componentnr);
+              currentComponenttype = Componenttype.get(Componentnr);
+            }
+            else
+            {
+              currentComponenttype = new TComponenttype();
+              currentComponenttype.Type = e.getName();
+              Componenttype.add(currentComponenttype);
+              Componentnr = Komponent.size();
+              currentComponent = new TComponent();
+              currentComponent.Type = e.getName();
+              currentComponent.TokenList = new LinkedList<Long>();
+              Komponent.add(currentComponent);
+              currentComponenttype.NodeList.add(e.getSource().getId());
+            }
+            TReferent Ref = new TReferent();
+            Ref.Annotations = e.getAnnotations();
+            Ref.Component = Componentnr;
+            Ref.Node = e.getSource().getId();
+            Ref.Type = e.getName();
+            ReferentList.add(Ref);
+
+            List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), currentComponenttype, Componentnr);
+
+            setReferent(e.getDestination(), globalIndex, 0);//neu
+            setReferent(e.getSource(), globalIndex, 1);//neu
+
+            for (Long l : currentTokens)
+            {
+              if (!currentComponent.TokenList.contains(l))
+              {
+                currentComponent.TokenList.add(l);
+              }
+            }
+
+            globalIndex++;
+          }
         }
       }
 
