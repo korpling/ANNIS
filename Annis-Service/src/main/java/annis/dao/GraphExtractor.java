@@ -79,7 +79,7 @@ public class GraphExtractor implements ResultSetExtractor
     Map<String, String> edgeColumns = new HashMap<String, String>();
     edgeColumns.put("node_ref", "id");
     edgeColumns.put("name", "edge_name");
-    edgeColumns.put("namespace", "edge_name");
+    edgeColumns.put("namespace", "edge_namespace");
 
     Map<String, Map<String, String>> columnAliases = new HashMap<String, Map<String, String>>();
     columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
