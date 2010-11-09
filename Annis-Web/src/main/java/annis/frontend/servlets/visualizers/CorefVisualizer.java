@@ -438,7 +438,7 @@ public class CorefVisualizer extends WriterVisualizer
           {
             if (currentlinkcount < maxlinkcount)
             {
-              println("<tr><td height=\"n: " + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>");
+              println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>");
             }
           }
           println("</table></td></tr>");
@@ -452,7 +452,7 @@ public class CorefVisualizer extends WriterVisualizer
           if (maxlinkcount > 0)
           {
             println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
-            println("<tr><td height=\"n: " + maxlinkcount * 5 + "px\"></td></tr>");
+            println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>");
             println("</table></td></tr>");
           }
         }
