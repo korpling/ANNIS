@@ -20,20 +20,30 @@ import javax.servlet.http.*;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.util.List;
+import java.util.Map;
 
 public class GridExporterServlet extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, List<String> keys,
+    Map<String,String[]> httpArgs, HttpServletResponse response, int offset) throws IOException
   {
     
-    
+    boolean showNumbers = true;
+    if(httpArgs.containsKey("numbers"))
+    {
+      String[] arg = httpArgs.get("numbers");
+      if(arg[0].equalsIgnoreCase("false")
+        || arg[0].equalsIgnoreCase("0")
+        || arg[0].equalsIgnoreCase("off"))
+      {
+        showNumbers = false;
+      }
+    }
 
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
@@ -72,10 +82,14 @@ public class GridExporterServlet extends GeneralTextExporter
                   count++;
                 }
                 response.getWriter().append(resolveAnnotation.getValue() );
+
+                if(showNumbers)
+                {
                 long leftIndex = Math.max(1, resolveNode.getLeftToken() - tokenOffset);
                 long rightIndex = resolveNode.getRightToken() - tokenOffset;
                 response.getWriter().append("[" + leftIndex
                   + "-" + rightIndex + "]");
+                }
                 response.getWriter().append(" ");
               }
             }

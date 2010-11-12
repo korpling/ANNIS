@@ -150,7 +150,7 @@ public class GeneralTextExporter extends HttpServlet
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
 
 
-        convertText(queryResult, keys, response, offset);
+        convertText(queryResult, keys, request.getParameterMap(), response, offset);
 
         response.getWriter().flush();
         offset = offset + 50;
@@ -183,7 +183,7 @@ public class GeneralTextExporter extends HttpServlet
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response,
+  public void convertText(AnnisResultSet queryResult, List<String> keys, Map<String,String[]> httpArgs, HttpServletResponse response,
     int offset) throws IOException
   {
     int counter = 0;

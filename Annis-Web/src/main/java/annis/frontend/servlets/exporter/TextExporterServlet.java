@@ -24,13 +24,16 @@ import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TextExporterServlet extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, List<String> keys, HttpServletResponse response, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, 
+    List<String> keys, Map<String,String[]> httpArgs, HttpServletResponse response,
+    int offset) throws IOException
   {
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
