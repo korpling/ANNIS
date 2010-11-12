@@ -89,119 +89,174 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append("<table class=\"partitur_table\" >\n");
       }
 
-     for(int iterator=0;iterator<partitur.getNameslist().size();iterator++){
+      for (int iterator = 0; iterator < partitur.getNameslist().size(); iterator++)
+      {
 
-          String tier = (String)partitur.getNameslist().toArray()[iterator];
-          List<Long> indexlist = new LinkedList<Long>();
+        String tier = (String) partitur.getNameslist().toArray()[iterator];
+        List<Long> indexlist = new LinkedList<Long>();
 
-          for(int iterator2=0; iterator2<partitur.getResultlist().size();iterator2++){
-                for (PartiturParser.ResultElement strr: partitur.getResultlist().get(iterator2)){
-                    if (strr.getName().equals(tier) && !indexlist.contains(strr.getId())) {indexlist.add(strr.getId());}
-                }
-          }
-
-          List<Long> currentarray = new LinkedList<Long>(); //Saves annotation-ids of the current row
-
-          while (!indexlist.isEmpty()){ //Create Rows until all Annotations fit in
-            List<Long> currentdontuselist = new LinkedList<Long>(); //Lists all Annotations that should not be added to the current row
-            writer.append("<tr class=\"level_"+tier+"\"><th>" + tier +  "</th>"); //new row
-            currentarray.clear();
-            for (int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++) {currentarray.add(Long.MIN_VALUE);} //Long.MIN_VALUE == empty
-            for(int iterator3=0; iterator3<partitur.getResultlist().size();iterator3++){ //for each Token
-                    for (PartiturParser.ResultElement annotationelement: partitur.getResultlist().get(iterator3)){ // for each Annotation annotationelement of that Token
-                        if (indexlist.contains(annotationelement.getId()) && !currentdontuselist.contains(annotationelement.getId())){
-                            boolean neu=false; //Should the Annotation be added?
-                            if (currentarray.get(iterator3).equals(Long.MIN_VALUE)) {
-                                indexlist.remove(annotationelement.getId());
-                                currentarray.set(iterator3, annotationelement.getId());
-                                neu=true;
-                            }
-                            //get all other annotationelement.id (earlier Ids => dontuselist)
-                            for(int iterator4=0; iterator4<partitur.getResultlist().size();iterator4++){
-                                for (PartiturParser.ResultElement strr2: partitur.getResultlist().get(iterator4)){
-                                    if (strr2.getId()==annotationelement.getId() && neu) //{
-                                        if (currentarray.get(iterator4)==Long.MIN_VALUE) currentarray.set(iterator4, annotationelement.getId());
-                                        if (iterator4<=iterator3 && !currentdontuselist.contains(strr2.getId())) {
-                                            currentdontuselist.add(strr2.getId());
-                                        }
-                                }
-                            }
-                            //break; //Not needed?
-                        }
-                    }
-                }
-         
-
-            //Write Row
-            int length=1;
-            for(int iterator5=0; iterator5<currentarray.size();iterator5+=length){
-                StringBuffer tokenIdsArray = new StringBuffer();
-                StringBuffer eventIdsArray = new StringBuffer();
-                boolean unused = true;
-                length=1;
-                if (currentarray.get(iterator5)==Long.MIN_VALUE){ //empty entry
-                     writer.append("<td></td>");
-                }else{
-                    PartiturParser.ResultElement element=null;
-                    HashSet<Integer> common = new HashSet<Integer>();
-                    boolean found=false;
-                    for(int iterator6=0; iterator6<partitur.getResultlist().size();iterator6++){
-                                for (PartiturParser.ResultElement strr: partitur.getResultlist().get(iterator6)){
-                                    if (strr.getId()==currentarray.get(iterator5)) {
-                                        if (!found) element=strr;
-                                        if (!common.contains(iterator6)) common.add(iterator6);
-                                        found=true;
-                                        if (unused) {
-                                            tokenIdsArray.append("" + strr.getId() + "_" + iterator6);
-                                            eventIdsArray.append(tier + "_" + strr.getId() + "_" + iterator6);
-                                            unused=false;
-                                        } else{
-                                            tokenIdsArray.append("," + strr.getId() + "_" + iterator6);
-                                            eventIdsArray.append(","+tier + "_" + strr.getId() + "_" + iterator6);
-                                        }
-                                    }
-                                }
-                    }
-                    for (int iterator7=iterator5+1; iterator7<currentarray.size();iterator7++)
-                        if (common.contains(iterator7)) {
-                            length++;
-                        }
-                        else break;
-
-                    for (int iterator8=0; iterator8<currentarray.size();iterator8++)
-                        if (common.contains(iterator8)) {
-                            Long id = ((PartiturParser.Token)partitur.getToken().toArray()[iterator8]).getId();
-                            if (unused) {
-                                tokenIdsArray.append("" + id);
-                                eventIdsArray.append(tier + "_" + id);
-                                unused=false;
-                            } else{
-                                tokenIdsArray.append("," + id);
-                                eventIdsArray.append(","+tier + "_" + id);
-                            }
-                        }
-
-                    String color = "black";
-                    if (getMarkableExactMap().containsKey("" + element.getId()))
-                    {
-                      color = getMarkableExactMap().get("" + element.getId());
-                    }
-                    if (found)
-                         writer.append("<td class=\"single_event\" "
-                            + "id=\"event_" + tier + "_" + element.getId() + "_" + iterator5 + "\" "
-                            + "style=\"color:" + color + ";\" "
-                            + "colspan=" + length + " "
-                            + "annis:tokenIds=\"" + tokenIdsArray + "\" "
-                            + "annis:eventIds=\"" + eventIdsArray + "\" "
-                            + "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
-                            + "onMouseOver=\"toggleAnnotation(this, true);\" "
-                            + "onMouseOut=\"toggleAnnotation(this, false);\""
-                             + ">" + element.getValue() + "</td>");
-                    else writer.append("<td class=\"single_event\" >error</td>");
-                }
+        for (int iterator2 = 0; iterator2 < partitur.getResultlist().size(); iterator2++)
+        {
+          for (PartiturParser.ResultElement strr : partitur.getResultlist().get(iterator2))
+          {
+            if (strr.getName().equals(tier) && !indexlist.contains(strr.getId()))
+            {
+              indexlist.add(strr.getId());
             }
-            writer.append("</tr>");     //finish row
           }
+        }
+
+        List<Long> currentarray = new LinkedList<Long>(); //Saves annotation-ids of the current row
+
+        while (!indexlist.isEmpty())
+        { //Create Rows until all Annotations fit in
+          List<Long> currentdontuselist = new LinkedList<Long>(); //Lists all Annotations that should not be added to the current row
+          writer.append("<tr class=\"level_" + tier + "\"><th>" + tier + "</th>"); //new row
+          currentarray.clear();
+          for (int iterator3 = 0; iterator3 < partitur.getResultlist().size(); iterator3++)
+          {
+            currentarray.add(Long.MIN_VALUE);
+          } //Long.MIN_VALUE == empty
+          for (int iterator3 = 0; iterator3 < partitur.getResultlist().size(); iterator3++)
+          { //for each Token
+            for (PartiturParser.ResultElement annotationelement : partitur.getResultlist().get(iterator3))
+            { // for each Annotation annotationelement of that Token
+              if (indexlist.contains(annotationelement.getId()) && !currentdontuselist.contains(annotationelement.getId()))
+              {
+                boolean neu = false; //Should the Annotation be added?
+                if (currentarray.get(iterator3).equals(Long.MIN_VALUE))
+                {
+                  indexlist.remove(annotationelement.getId());
+                  currentarray.set(iterator3, annotationelement.getId());
+                  neu = true;
+                }
+                //get all other annotationelement.id (earlier Ids => dontuselist)
+                for (int iterator4 = 0; iterator4 < partitur.getResultlist().size(); iterator4++)
+                {
+                  for (PartiturParser.ResultElement strr2 : partitur.getResultlist().get(iterator4))
+                  {
+                    if (strr2.getId() == annotationelement.getId() && neu) //{
+                    {
+                      if (currentarray.get(iterator4) == Long.MIN_VALUE)
+                      {
+                        currentarray.set(iterator4, annotationelement.getId());
+                      }
+                    }
+                    if (iterator4 <= iterator3 && !currentdontuselist.contains(strr2.getId()))
+                    {
+                      currentdontuselist.add(strr2.getId());
+                    }
+                  }
+                }
+                //break; //Not needed?
+              }
+            }
+          }
+
+
+          //Write Row
+          int length = 1;
+          for (int iterator5 = 0; iterator5 < currentarray.size(); iterator5 += length)
+          {
+            StringBuffer tokenIdsArray = new StringBuffer();
+            StringBuffer eventIdsArray = new StringBuffer();
+            boolean unused = true;
+            length = 1;
+            if (currentarray.get(iterator5) == Long.MIN_VALUE)
+            { //empty entry
+              writer.append("<td></td>");
+            }
+            else
+            {
+              PartiturParser.ResultElement element = null;
+              HashSet<Integer> common = new HashSet<Integer>();
+              boolean found = false;
+              for (int iterator6 = 0; iterator6 < partitur.getResultlist().size(); iterator6++)
+              {
+                for (PartiturParser.ResultElement strr : partitur.getResultlist().get(iterator6))
+                {
+                  if (strr.getId() == currentarray.get(iterator5))
+                  {
+                    if (!found)
+                    {
+                      element = strr;
+                    }
+                    if (!common.contains(iterator6))
+                    {
+                      common.add(iterator6);
+                    }
+                    found = true;
+                    if (unused)
+                    {
+                      tokenIdsArray.append("" + strr.getId() + "_" + iterator6);
+                      eventIdsArray.append(tier + "_" + strr.getId() + "_" + iterator6);
+                      unused = false;
+                    }
+                    else
+                    {
+                      tokenIdsArray.append("," + strr.getId() + "_" + iterator6);
+                      eventIdsArray.append("," + tier + "_" + strr.getId() + "_" + iterator6);
+                    }
+                  }
+                }
+              }
+              for (int iterator7 = iterator5 + 1; iterator7 < currentarray.size(); iterator7++)
+              {
+                if (common.contains(iterator7))
+                {
+                  length++;
+                }
+                else
+                {
+                  break;
+                }
+              }
+
+              for (int iterator8 = 0; iterator8 < currentarray.size(); iterator8++)
+              {
+                if (common.contains(iterator8))
+                {
+                  Long id = ((PartiturParser.Token) partitur.getToken().toArray()[iterator8]).getId();
+                  if (unused)
+                  {
+                    tokenIdsArray.append("" + id);
+                    eventIdsArray.append(tier + "_" + id);
+                    unused = false;
+                  }
+                  else
+                  {
+                    tokenIdsArray.append("," + id);
+                    eventIdsArray.append("," + tier + "_" + id);
+                  }
+                }
+              }
+
+              String color = "black";
+              if (getMarkableExactMap().containsKey("" + element.getId()))
+              {
+                color = getMarkableExactMap().get("" + element.getId());
+              }
+              if (found)
+              {
+                writer.append("<td class=\"single_event\" "
+                  + "id=\"event_" + tier + "_" + element.getId() + "_" + iterator5 + "\" "
+                  + "style=\"color:" + color + ";\" "
+                  + "colspan=" + length + " "
+                  + "annis:tokenIds=\"" + tokenIdsArray + "\" "
+                  + "annis:eventIds=\"" + eventIdsArray + "\" "
+                  + "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
+                  + "onMouseOver=\"toggleAnnotation(this, true);\" "
+                  + "onMouseOut=\"toggleAnnotation(this, false);\""
+                  + ">" + element.getValue() + "</td>");
+              }
+              else
+              {
+                writer.append("<td class=\"single_event\" >error</td>");
+              }
+            }
+          }
+          writer.append("</tr>");     //finish row
+        }
       }
 
       // add token itself
@@ -295,11 +350,11 @@ public class PartiturVisualizer extends WriterVisualizer
   {
     boolean result = false;
     Iterator<AnnisToken> itToken = tokenList.listIterator();
-    while(itToken.hasNext() && !result)
+    while (itToken.hasNext() && !result)
     {
       AnnisToken tok = itToken.next();
       String tokText = tok.getText();
-      for(int i=0; i < tokText.length(); i++)
+      for (int i = 0; i < tokText.length(); i++)
       {
         char cc = tokText.charAt(i);
         // hebrew extended and basic, arabic basic and extendend
@@ -318,16 +373,13 @@ public class PartiturVisualizer extends WriterVisualizer
           result = true;
         }
 
-        if(result)
+        if (result)
         {
           break;
         }
       }
     }
-    
+
     return result;
   }
 }
-
-
-

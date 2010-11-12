@@ -644,39 +644,43 @@ public class CorefVisualizer extends WriterVisualizer
     String result = "";
     String incoming = "", outgoing = "";
     int nri = 1, nro = 1;
-    for (long l : ReferentOfToken.get(id).keySet())
+
+    if(ReferentOfToken.get(id) != null)
     {
-      if (ReferentList.get((int) (long) l) != null && ReferentList.get((int) (long) l).Component == component
-        && ReferentList.get((int) (long) l).Annotations != null && ReferentList.get((int) (long) l).Annotations.size() > 0)
+      for (long l : ReferentOfToken.get(id).keySet())
       {
-        int num = ReferentOfToken.get(id).get(l);
-        if (num == 0 || num == 2)
+        if (ReferentList.get((int) (long) l) != null && ReferentList.get((int) (long) l).Component == component
+          && ReferentList.get((int) (long) l).Annotations != null && ReferentList.get((int) (long) l).Annotations.size() > 0)
         {
-          for (Annotation an : ReferentList.get((int) (long) l).Annotations)
+          int num = ReferentOfToken.get(id).get(l);
+          if (num == 0 || num == 2)
           {
-            if (nri == 1)
+            for (Annotation an : ReferentList.get((int) (long) l).Annotations)
             {
-              incoming = ", <b>incoming Annotations</b>: " + an.getName() + "=" + an.getValue();
-              nri--;
-            }
-            else
-            {
-              incoming += ", " + an.getName() + "=" + an.getValue();
+              if (nri == 1)
+              {
+                incoming = ", <b>incoming Annotations</b>: " + an.getName() + "=" + an.getValue();
+                nri--;
+              }
+              else
+              {
+                incoming += ", " + an.getName() + "=" + an.getValue();
+              }
             }
           }
-        }
-        if (num == 1 || num == 2)
-        {
-          for (Annotation an : ReferentList.get((int) (long) l).Annotations)
+          if (num == 1 || num == 2)
           {
-            if (nro == 1)
+            for (Annotation an : ReferentList.get((int) (long) l).Annotations)
             {
-              outgoing = ", <b>outgoing Annotations</b>: " + an.getName() + "=" + an.getValue();
-              nro--; // remove l+"- "+
-            }
-            else
-            {
-              outgoing += ", " + an.getName() + "=" + an.getValue();
+              if (nro == 1)
+              {
+                outgoing = ", <b>outgoing Annotations</b>: " + an.getName() + "=" + an.getValue();
+                nro--; // remove l+"- "+
+              }
+              else
+              {
+                outgoing += ", " + an.getName() + "=" + an.getValue();
+              }
             }
           }
         }
