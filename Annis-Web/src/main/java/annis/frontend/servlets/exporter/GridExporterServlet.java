@@ -15,6 +15,7 @@
  */
 package annis.frontend.servlets.exporter;
 
+import annis.dao.AnnotatedSpan;
 import java.io.IOException;
 import javax.servlet.http.*;
 
@@ -22,22 +23,26 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class GridExporterServlet extends GeneralTextExporter
 {
 
   @Override
   public void convertText(AnnisResultSet queryResult, List<String> keys,
-    Map<String,String[]> httpArgs, HttpServletResponse response, int offset) throws IOException
+    Map<String, String[]> httpArgs, HttpServletResponse response, int offset) throws IOException
   {
-    
+
+
     boolean showNumbers = true;
-    if(httpArgs.containsKey("numbers"))
+    if (httpArgs.containsKey("numbers"))
     {
       String[] arg = httpArgs.get("numbers");
-      if(arg[0].equalsIgnoreCase("false")
+      if (arg[0].equalsIgnoreCase("false")
         || arg[0].equalsIgnoreCase("0")
         || arg[0].equalsIgnoreCase("off"))
       {
@@ -48,9 +53,31 @@ public class GridExporterServlet extends GeneralTextExporter
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
     {
+      HashMap<String, TreeMap<Long, Span>> annos =
+        new HashMap<String, TreeMap<Long, Span>>();
 
       counter++;
-      response.getWriter().append((counter+offset) + ". ");
+      response.getWriter().append((counter + offset) + ". ");
+
+      long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
+      for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
+      {
+
+        for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
+        {
+          String k = resolveAnnotation.getName();
+          if (annos.get(k) == null)
+          {
+            annos.put(k, new TreeMap<Long, Span>());
+          }
+
+          // create a separate span for every annotation
+          annos.get(k).put(resolveNode.getLeftToken(), new Span(resolveNode.getLeftToken(), resolveNode.getRightToken(),
+            resolveAnnotation.getValue()));
+          
+        }
+      }
+
       for (String k : keys)
       {
 
@@ -65,43 +92,76 @@ public class GridExporterServlet extends GeneralTextExporter
         }
         else
         {
-
-          int count = 0;
-          long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() -1;
-          for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
+          if(annos.get(k) != null)
           {
-
-            for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
+            response.getWriter().append("\t " + k + "\t ");
+            for(Span s : annos.get(k).values())
             {
 
-              if (resolveAnnotation.getName().equals(k))
-              {
-                if (count == 0)
-                {
-                  response.getWriter().append("\t " + k + "\t ");
-                  count++;
-                }
-                response.getWriter().append(resolveAnnotation.getValue() );
+              response.getWriter().append(s.getValue());
 
-                if(showNumbers)
-                {
-                long leftIndex = Math.max(1, resolveNode.getLeftToken() - tokenOffset);
-                long rightIndex = resolveNode.getRightToken() - tokenOffset;
+              if (showNumbers)
+              {
+                long leftIndex = Math.max(1, s.getStart() - tokenOffset);
+                long rightIndex = s.getEnd() - tokenOffset;
                 response.getWriter().append("[" + leftIndex
                   + "-" + rightIndex + "]");
-                }
-                response.getWriter().append(" ");
               }
+              response.getWriter().append(" ");
+
             }
-          }
-          if (count != 0)
-          {
             response.getWriter().append("\n");
           }
         }
       }
 
       response.getWriter().append("\n\n");
+    }
+  }
+
+
+  private class Span
+  {
+
+    private long start;
+    private long end;
+    private String value;
+
+    public Span(long start, long end, String value)
+    {
+      this.start = start;
+      this.end = end;
+      this.value = value;
+    }
+
+    public long getStart()
+    {
+      return start;
+    }
+
+    public void setStart(long start)
+    {
+      this.start = start;
+    }
+
+    public long getEnd()
+    {
+      return end;
+    }
+
+    public void setEnd(long end)
+    {
+      this.end = end;
+    }
+
+    public String getValue()
+    {
+      return value;
+    }
+
+    public void setValue(String value)
+    {
+      this.value = value;
     }
   }
 }

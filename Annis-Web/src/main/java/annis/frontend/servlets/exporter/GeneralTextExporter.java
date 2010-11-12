@@ -109,8 +109,6 @@ public class GeneralTextExporter extends HttpServlet
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       AnnisResultSet queryResult = null;
 
-      
-      
       LinkedList<String> keys = new LinkedList<String>();
       
       if(request.getParameter("keys") == null)
