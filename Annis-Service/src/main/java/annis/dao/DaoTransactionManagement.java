@@ -35,7 +35,7 @@ public class DaoTransactionManagement {
 				try {
 					return pjp.proceed();
 				} catch (Throwable t) {
-					throw new RuntimeException(t);
+					throw new RuntimeException(t.getLocalizedMessage(), t);
 				}
 			}
 			
