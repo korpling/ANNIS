@@ -16,11 +16,21 @@ The following query searches for two <tt>np_form</tt> annotations, which specify
 <tt>mmax:np_form="pper" & <br>mmax:np_form="defnp" & <br>#1 &#8209;&gt;anaphor_antecedent #2</tt>
 <p>
 Using the pointing relation operator <tt>-&gt;</tt> with the type <tt>anaphor_antecedent</tt>, the first <tt>np_form</tt>, which should be a personal pronoun (<tt>pper</tt>), is said to be the anaphor to its antecedent, the second np_form, which is definite (<tt>defnp</tt>).
-To see a visualization of the coreference relations, open the mmax annotation level in the example corpus. In the image below, one of the matches for the above query is highlighted in red (<i>die Spieler ... sie</i> 'the players ... they'). Other discourse referents in the text (marked with an underline) may be clicked on, causing coreferential chains containing them to be highlighted as well.
+To see a visualization of the coreference relations, open the mmax annotation level in the example corpus. In the image below, one of the matches for the above query is highlighted in red (die Seeburger und einige Groﬂ-Glienicker ... sie ëthe Seeburgers and some Groﬂ-Glienickers... theyí). Other discourse referents in the text (marked with an underline) may be clicked on, causing coreferential chains containing them to be highlighted as well. Note that discourse referents may overlap, leading to multiple underlines: Die Seeburger ëthe Seeburgersí is a shorter discourse referent overlapping with the larger one (ëthe Seeburgers and some Groﬂ-Glienickersí), and each referent has its own underline. Annotations of the coreference edges of each relation can be viewed by hovering of the appropriate underline.
 </p>
 
-<img src="coref.png">
+<img src="coref.gif">
 
+<p>
+Another way to use pointing relations is found in syntactic dependency trees. The queries in this case can use both pointing relation types and annotations, as in the following query:
+</p>
+<tt>pos="VVFIN" & tok & #1 ->dep[func="obja"] #2</tt>
+
+<p>
+This query searches for a finite verb (with the part-of-speech VVFIN) and a token, with a pointing relation of the type ëdepí (for dependency) between the two, annotated with ëfunc="obja"í (the function Object, Accusative). The result can be viewed with the dependency arch visualizer, which shows the verb gibt ëgivesí and its object Wunder ëmiraclesí.
+</p>
+
+<img src="dep_vis.gif">
 
 
 </div>

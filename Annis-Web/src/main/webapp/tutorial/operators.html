@@ -81,9 +81,9 @@ B	    </strong>
 		  <td width="26">&nbsp;</td>
 		  <td>Both elements span an area ending with the same token </td>
 		</tr>
-	<tr>
+<tr>
 	  <td height="38"><code>-&gt;LABEL</code></td>
-	  <td>labelled pointing relation</td>
+	  <td>labeled pointing relation</td>
 	  <td colspan="3"><center>
 <table cellpadding="0" cellspacing="0">
 <tr><td colspan="4" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>LABEL</tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
@@ -91,7 +91,26 @@ B	    </strong>
 <tr><td colspan="2" align="center">V</td><td style="border-right: solid windowtext 1.0pt">&nbsp;</td><td align="center">&nbsp;</td></tr>
 <tr><td colspan="2" align="center"><strong>A</strong></td><td colspan="2" align="center">&nbsp;<strong>B</strong></td>
 </table>
-	  </center></td><td>A labelled, directed relationship between two elements (e.g. coreference, where an anaphor points to its antecedent)</td>
+	  </center></td><td>A labeled, directed relationship between two elements. Annotations can be specified with
+<tt>-&gt;LABEL[annotation="VALUE"]</tt>
+</td>
+	</tr>
+
+		<tr>
+		  <td height="38"><code>-&gt;LABEL *</code></td>
+		  <td>indirect pointing relation</td>
+		  <td colspan="3"><center>
+<table cellpadding="0" cellspacing="0">
+<tr><td colspan="6" align="center"><tt>LABEL&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;LABEL</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-left: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-right: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td colspan="4" align="left">&nbsp;&nbsp;&nbsp;V</td><td style="border-right: solid windowtext 1.0pt">&nbsp;</td><td align="center">&nbsp;</td></tr>
+<tr><td colspan="3" align="center"><strong>A</strong></td><td colspan="3" align="center">&nbsp;<strong>B</strong></td>
+</table>
+
+		  </center></td><td>An indirect labeled relationship between two elements. The length of the chain may be specified with
+<tt>-&gt;LABEL n,m</tt> for relation chains of length n to m
+
+	</td>
 	</tr>
 	<tr>
 	  <td height="38"><code>&gt;@l</code></td>
@@ -148,19 +167,33 @@ B	    </strong>
  </tr>
  <tr>
   <td valign="center">
-  #x:length=n
+  #x:tokenarity=n
   </td>
   <td valign="center">
-  Length
+  Tokenarity
   </td>
   <td colspan="3" align="center" valign="center">
-   x<br>
-  ... <br>
-   /   \<br>
-  <b> 1 … n</b>
+   x<br>...<br> /  \<br>
+  <b>1 ... n</b>
   </td>
   <td>Specifies the length of the span of tokens covered by the node</td>
  </tr>
+
+
+  <tr>
+   <td valign="center">
+   #x:root
+   </td>
+   <td valign="center">
+   Root
+   </td>
+   <td colspan="3" align="center" valign="center">
+    ___<br>x<br>...
+   </td>
+   <td>Specifies that the node is not dominated by any other node within its namespace</td>
+  </tr>
+
+
 	  </table>
 </div>
 
