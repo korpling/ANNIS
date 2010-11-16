@@ -67,7 +67,7 @@ class AnnisGraphTools {
 	}
 	
 	private boolean includeEdge(Edge e) {
-		return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE) && e.getNamespace() != null;
+		return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE);
 	}
 	
 	public static boolean hasEdgeSubtype(Edge e, String edgeSubtype) {

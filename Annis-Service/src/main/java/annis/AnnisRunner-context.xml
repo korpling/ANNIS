@@ -36,7 +36,7 @@
     <property name="annisDao" ref="springAnnisDao"/>
 		<property name="annisParser" ref="annisParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
-		<property name="helloMessage" value="Annis Interactive Shell v2.1.7"/>
+		<property name="helloMessage" value="Annis Interactive Shell 2.1.8"/>
 		<property name="prompt" value="Annis"/>
     <property name="aqlAnalysis" ref="aqlAnalysis" />
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
