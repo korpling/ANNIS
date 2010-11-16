@@ -208,7 +208,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     }
     else
     {
-      w(node.getName());
+      w(node.getQualifiedName());
     }
     w("\\n");
   }
