@@ -24,6 +24,9 @@ enhancements:
 * cache for resolver entries for faster display of the results
 * text exporter which is exporting the the token annotations
 * Kickstarter displays current status/step while importing
+* Citations Links should use corpus name, not number
+* Trigger timeout is now only controlled by the database (no extra timeout for
+  frontend)
 
 bugfixes:
 
@@ -37,6 +40,10 @@ bugfixes:
 * trigger the timeout only in the database, not in the JavaScript GUI
 * fixed bug where invalid queries where accepted when using the negation in
   combination with tok
+* leaking JDBC connections were removed during import, this caused some problems
+  during import of multiple corpora with Kickstarter if the maximum connection
+  number of Postgres was too restrictive
+* Resolver does not trigger on edge_namespace alone
 
 
 Version 2.1.7
