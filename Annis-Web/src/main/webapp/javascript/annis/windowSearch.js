@@ -637,11 +637,11 @@ var exportSelection = new Ext.form.ComboBox({
           windowCorpusList.alignTo('windowSearchForm', 'tr', [10,0]);
         },
         disabled: false,
+        ctCls: 'annis-toolbar-btn',
         tooltip: {
           text:'Click here to open the corpus selection Window.',
           title:'More Corpora',
           autoHide:true
-															
         }
       })
       ]
@@ -884,7 +884,7 @@ var exportSelection = new Ext.form.ComboBox({
   });
   
   // highlight tutorial
-  Ext.get('tutorial').frame('ff0000', 5);
+  Ext.get('tutorial').frame('ff0000', 2);
   
 });
 

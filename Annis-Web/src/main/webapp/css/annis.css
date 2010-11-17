@@ -58,3 +58,45 @@ div.annis-level-selector-expanded {
 div.annis-level-body {
 	display: none;
 }
+
+.annis-toolbar-btn .x-btn-tl, .annis-toolbar-btn .x-btn-tr, .annis-toolbar-btn .x-btn-tc, .annis-toolbar-btn .x-btn-ml, .annis-toolbar-btn .x-btn-mr, .annis-toolbar-btn .x-btn-mc, .annis-toolbar-btn .x-btn-bl, .annis-toolbar-btn .x-btn-br, .annis-toolbar-btn .x-btn-bc {
+   /* background-image:url(../images/highlight-btn.gif);*/
+}
+
+.annis-toolbar-btn .x-btn-tl {
+  background-position: 0 0;
+}
+
+.annis-toolbar-btn .x-btn-tc {
+  background-position: 0 -6px;
+}
+
+.annis-toolbar-btn .x-btn-tr {
+  background-position: -3px 0px;
+}
+
+.annis-toolbar-btn .x-btn-ml {
+  background-position: 0 -24px;
+}
+
+.annis-toolbar-btn .x-btn-mc {
+  background-position: 0 -1096px;
+}
+
+.annis-toolbar-btn .x-btn-mr {
+  background-position: -3px -24px;
+}
+
+
+.annis-toolbar-btn .x-btn-bl {
+  background-position: 0 -3px;
+}
+
+.annis-toolbar-btn .x-btn-bc {
+  background-position: 0 -15px;
+}
+
+.annis-toolbar-btn .x-btn-br {
+  background-position: -3px -3px;
+}
+

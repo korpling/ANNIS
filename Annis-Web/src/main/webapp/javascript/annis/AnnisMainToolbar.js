@@ -70,13 +70,15 @@ Ext.onReady(function()
       config.items = [
       {
         text:'ANNIS&sup2;',
-        menu: menuAnnis
+        menu: menuAnnis,
+        ctCls: 'annis-toolbar-btn'
       },
       {
         id: "tutorial",
         text: 'Tutorial',
         handler: this.showTutorial,
-        scope: this
+        scope: this,
+        ctCls: 'annis-toolbar-btn'
       },
       '->',
       labelUser
