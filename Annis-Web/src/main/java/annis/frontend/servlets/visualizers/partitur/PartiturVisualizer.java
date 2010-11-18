@@ -241,9 +241,9 @@ public class PartiturVisualizer extends WriterVisualizer
               }
 
               String color = "black";
-              if (getMarkableExactMap().containsKey("" + element.getId()))
+              if (getMarkableExactMap().containsKey("" + element.getNodeId()))
               {
-                color = getMarkableExactMap().get("" + element.getId());
+                color = getMarkableExactMap().get("" + element.getNodeId());
               }
               if (found)
               {

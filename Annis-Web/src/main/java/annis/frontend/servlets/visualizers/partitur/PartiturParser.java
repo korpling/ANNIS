@@ -60,7 +60,7 @@ public class PartiturParser implements Serializable
             for (Annotation anno : parentNode.getNodeAnnotations())
             {
               String newId = "" +  parentNode.getId() + "_" + anno.getNamespace() + "_" + anno.getName();
-              helper.add(new ResultElement(newId, anno.getName(), anno.getValue()));
+              helper.add(new ResultElement(newId, parentNode.getId(), anno.getName(), anno.getValue()));
               if (!nameslist.contains(anno.getName()))
               {
                 nameslist.add(anno.getName());
@@ -233,6 +233,7 @@ public class PartiturParser implements Serializable
   {
 
     private String id;
+    private long nodeId;
     private String name, value;
 
     public String getName()
@@ -251,9 +252,17 @@ public class PartiturParser implements Serializable
       return value;
     }
 
-    ResultElement(String id, String name, String value)
+    public long getNodeId()
+    {
+      return nodeId;
+    }
+
+
+
+    ResultElement(String id, long nodeId, String name, String value)
     {
       this.id = id;
+      this.nodeId = nodeId;
       this.name = name;
       this.value = value;
     }
