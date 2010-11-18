@@ -21,7 +21,7 @@ OR resolver_vis_map.version is NULL AND toplevel.version is NULL);
 DELETE FROM text 
 USING facts
 WHERE facts.toplevel_corpus IN ( :ids )
-AND facts.text_ref = facts.id;
+AND facts.text_ref = text.id;
 
 -- corpus_annotation
 -- explain analyze
