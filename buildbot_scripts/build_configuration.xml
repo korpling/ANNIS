@@ -5,8 +5,8 @@
        xmlns:java="http://bitten.edgewall.org/tools/java">
 
   <step id="checkout" description="Checkout source from repository">
-    <svn:checkout url="file:///srv/svn/annis/"
-        path="${path}" revision="${revision}" />
+    <!-- the revision will be in the form "trunk,636", so use sed to get the real revision number from this string -->
+    <sh:exec file="/usr/local/bin/checkout_bzr_annis.sh" args="${path} ${revision} /srv/bzr/annis/${path} ${basedir}" />
   </step>
 
   <step id="build all" description="Build all maven based annis projects">
