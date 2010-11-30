@@ -33,7 +33,7 @@ public class SQLHelper
 
   public static String sqlString(String string, TextMatching textMatching)
   {
-    if (textMatching == TextMatching.REGEXP_EQUAL)
+    if (textMatching == TextMatching.REGEXP_EQUAL || textMatching == TextMatching.REGEXP_NOT_EQUAL)
     {
       string = "^" + string + "$";
     }
