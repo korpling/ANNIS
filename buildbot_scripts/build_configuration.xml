@@ -25,11 +25,11 @@
   
   <step id="copy webapp" description="Copy the Annis2-webapp">
    <sh:exec file="chmod" args="u+x buildbot_scripts/copyWebapp.sh" /> 
-   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/tomcat/Annis-stable22"/>
+   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/tomcat/Annis22"/>
   </step>
 
   <step id="patch webapp" description="Patch the Annis2-webapp with some korpling relative configuration">
-    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/tomcat/Annis-stable22 ${revision} /etc/annis/user_config_stable22"/>
+    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/tomcat/Annis22 ${revision} /etc/annis/user_config"/>
   </step>
 
   <step id="copy service" description="Copy the AnnisService">
