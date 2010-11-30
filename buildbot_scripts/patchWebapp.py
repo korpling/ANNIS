@@ -14,7 +14,7 @@ fJS = open(config_js_path, "r")
 JSContent = fJS.read();
 fJS.close();
 
-JSContent = JSContent.replace("'/Annis-web';", "'/Annis-trunk';")
+JSContent = JSContent.replace("'/Annis-web';", "'/Annis2.2';")
 regRev = re.compile("var conf_revision='[^']*';")
 JSContent = regRev.sub("var conf_revision='" + rev + " (SVN)';", JSContent)
 fJS = open(config_js_path, "w")
@@ -31,5 +31,8 @@ fWeb.close()
 fWeb = open(web_xml_path, 'w')
 WebContent = WebContent.replace("<param-value>/etc/annis/user_config_dev/</param-value>", "<param-value>%s</param-value>\n" % user_conf_dir)
 WebContent = WebContent.replace("<param-value>annis.security.TestSecurityManager</param-value>", "<param-value>annis.security.SimpleSecurityManager</param-value>\n")
+WebContent = WebContent.replace("<param-value>rmi://localhost:4711/AnnisService</param-value>", "<param-value>rmi://localhost:4730/AnnisService</param-value>")
+WebContent = WebContent.replace("<param-value>rmi://localhost:4711/AnnisResolverService</param-value>", "<param-value>rmi://localhost:4730/AnnisResolverService</param-value>");
+
 fWeb.write(WebContent)
 fWeb.close()
