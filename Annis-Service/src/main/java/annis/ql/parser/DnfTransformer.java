@@ -16,8 +16,6 @@ import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 public class DnfTransformer extends DepthFirstAdapter
 {

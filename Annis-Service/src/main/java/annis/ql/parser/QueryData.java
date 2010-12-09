@@ -9,8 +9,11 @@ import java.util.List;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class QueryData {
+public class QueryData implements Cloneable
+{
 	private List<List<AnnisNode>> alternatives;
 	private List<Long> corpusList;
 	private List<Annotation> metaData;
@@ -95,4 +98,20 @@ public class QueryData {
 	public boolean addMetaAnnotations(List<Annotation> annotations) {
 		return metaData.addAll(annotations);
 	}
+
+  @Override
+  public QueryData clone()
+  {
+    try
+    {
+      return (QueryData) super.clone();
+    } catch (CloneNotSupportedException ex)
+    {
+      Logger.getLogger(QueryData.class.getName()).log(Level.SEVERE, null, ex);
+      throw new InternalError("could not clone QueryData");
+    }
+  }
+
+
+
 }
