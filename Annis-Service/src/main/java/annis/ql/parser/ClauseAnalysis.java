@@ -780,6 +780,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   private String lhsStr(PLingOp node)
   {
+    ALinguisticConstraintExpr constraint = (ALinguisticConstraintExpr) node.parent();
     return token(((ALinguisticConstraintExpr) node.parent()).getLhs());
   }
 

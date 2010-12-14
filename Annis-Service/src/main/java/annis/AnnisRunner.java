@@ -75,7 +75,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doDddquery("node & node & #1 > #2");
+    QueryData qdAQL = annisDao.parseAQL("node & node & node & #1 > #2 & #1 > #3", null);
+    System.out.println(qdAQL);
   }
 
   public void doProposedIndex(String ignore)
