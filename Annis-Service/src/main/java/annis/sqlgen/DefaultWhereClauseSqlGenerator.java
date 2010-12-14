@@ -16,6 +16,7 @@ import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
@@ -74,6 +75,10 @@ public class DefaultWhereClauseSqlGenerator
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "=", "left", "left");
         joinOnNode(conditions, node, target, "=", "right", "right");
+      }
+      else if(join instanceof Identical)
+      {
+        joinOnNode(conditions, node, target, "=", "id", "id");
       }
       else if (join instanceof LeftAlignment)
       {

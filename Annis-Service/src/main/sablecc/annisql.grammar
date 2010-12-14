@@ -62,7 +62,7 @@ Tokens
 	{default} star = '*';	
 	{default} colon = ':';
 	{default} doublecolon = '::';
-	
+
 	{default} op_exact_overlap = '_=_';
 	{default} op_left_align = '_l_';
 	{default} op_right_align = '_r_';
@@ -149,7 +149,8 @@ Productions
 		hash digits { -> digits } ;
 	
 	binary_op { -> ling_op } = 
-		  {exact_overlap}	op_exact_overlap { -> New ling_op.exact_overlap() } 
+		  {exact_overlap}	op_exact_overlap { -> New ling_op.exact_overlap() }
+    | {identity} equal { -> New ling_op.identity()}
 		| {left_align}	op_left_align { -> New ling_op.left_align() }
 		| {right_align}	op_right_align { -> New ling_op.right_align() }
 		| {inclusion}	op_inclusion { -> New ling_op.inclusion() }
@@ -245,6 +246,7 @@ Abstract Syntax Tree
 		
 		// binary
 		| {exact_overlap}
+    | {identity}
 		| {left_align} 
 		| {right_align}
 		| {inclusion} 

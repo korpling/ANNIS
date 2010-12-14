@@ -35,6 +35,7 @@ import annis.ql.node.AEdgeSpec;
 import annis.ql.node.AEqualAnnoValue;
 import annis.ql.node.AExactOverlapLingOp;
 import annis.ql.node.AGroupedExpr;
+import annis.ql.node.AIdentityLingOp;
 import annis.ql.node.AImplicitAndExpr;
 import annis.ql.node.AInclusionLingOp;
 import annis.ql.node.AIndirectDominanceSpec;
@@ -70,6 +71,7 @@ import annis.ql.node.PLingOp;
 import annis.ql.node.Token;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
@@ -93,8 +95,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
-import org.omg.CORBA.portable.IndirectionException;
-
 /**
  *
  * @author thomas
@@ -183,6 +183,13 @@ public class ClauseAnalysis extends DepthFirstAdapter
     Validate.notNull(nleft, errorLHS("token-arity"));
     nleft.setTokenArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
   }
+
+  @Override
+  public void caseAIdentityLingOp(AIdentityLingOp node)
+  {
+    join(node, Identical.class);
+  }
+
 
   // </editor-fold>
   // <editor-fold desc="Alignment">
@@ -773,6 +780,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   private String lhsStr(PLingOp node)
   {
+    ALinguisticConstraintExpr constraint = (ALinguisticConstraintExpr) node.parent();
     return token(((ALinguisticConstraintExpr) node.parent()).getLhs());
   }
 

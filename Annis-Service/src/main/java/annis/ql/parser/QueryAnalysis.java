@@ -50,7 +50,11 @@ public class QueryAnalysis
 		log.debug(clauses.size() + " clause(s) in statement");
 		
 		// analyze each clause independently
-		for (PExpr clause : clauses) {
+		for (PExpr clause : clauses)
+    {
+      NodeRelationNormalizer nodeRelationNormalizer = new NodeRelationNormalizer();
+      clause.apply(nodeRelationNormalizer);
+
 			// get a fresh clause analyzer from Spring
 			ClauseAnalysis clauseAnalysis = getClauseAnalysis();
 			clause.apply(clauseAnalysis);
@@ -86,5 +90,6 @@ public class QueryAnalysis
   {
     this.clauseAnalysis = clauseAnalysis;
   }
+
 
 }
