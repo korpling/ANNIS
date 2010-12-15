@@ -20,9 +20,12 @@ package annis.ql.parser;
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AArityLingOp;
+import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AIdentityLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
+import annis.ql.node.APointingRelationLingOp;
 import annis.ql.node.ARootLingOp;
+import annis.ql.node.ASiblingLingOp;
 import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.Node;
 import annis.ql.node.PExpr;
@@ -144,13 +147,9 @@ public class NodeRelationNormalizer extends DepthFirstAdapter
         right = node.getRhs().getText();
       }
 
-      if(op instanceof AIdentityLingOp || op instanceof ARootLingOp
-        || op instanceof AArityLingOp || op instanceof ATokenArityLingOp)
-      {
-        // TODO: find other reasons to ignore
-        // ignore
-      }
-      else
+      if(op instanceof ADominanceLingOp 
+        || op instanceof APointingRelationLingOp
+        || op instanceof ASiblingLingOp)
       {
         if(isIn.get(left) == null)
         {
