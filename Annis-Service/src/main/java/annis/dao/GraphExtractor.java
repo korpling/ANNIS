@@ -23,12 +23,11 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.sqlgen.TableAccessStrategy;
-import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -256,12 +255,12 @@ public class GraphExtractor implements ResultSetExtractor
       Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
         "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
 
-      BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
-      ArrayList<Long> key = new ArrayList<Long>();
-      for (BigDecimal bd : keyArray)
-      {
-        key.add(bd == null ? null : bd.longValue());
-      }
+      Long[] keyArray = (Long[]) sqlKey.getArray();
+      List<Long> key = Arrays.asList(keyArray);
+//      for (Long bd : keyArray)
+//      {
+//        key.add(bd == null ? null : bd.longValue());
+//      }
 
       if (!graphByMatchGroup.containsKey(key))
       {
