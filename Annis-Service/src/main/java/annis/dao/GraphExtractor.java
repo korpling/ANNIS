@@ -222,7 +222,7 @@ public class GraphExtractor implements ResultSetExtractor
   public String getTextQuery(long textID)
   {
     String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::numeric] AS key, facts.*\n"
+      + "\tARRAY[-1::bigint] AS key, facts.*\n"
       + "FROM\n"
       + "\tfacts AS facts\n"
       + "WHERE\n" + "\tfacts.text_ref = :text_id\n"
@@ -253,8 +253,8 @@ public class GraphExtractor implements ResultSetExtractor
       // match group is identified by the ids of the matched nodes
       Array sqlKey = resultSet.getArray("key");
       Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
-      Validate.isTrue(sqlKey.getBaseType() == Types.NUMERIC,
-        "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
+      Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+        "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
 
       BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
       ArrayList<Long> key = new ArrayList<Long>();

@@ -1,12 +1,12 @@
 -- (modified) source tables
 CREATE TABLE corpus
 (
-	id			numeric(38) PRIMARY KEY,
+	id			bigint PRIMARY KEY,
 	name		varchar(100) NOT NULL, -- UNIQUE,
 	type		varchar(100) NOT NULL,
 	version 	varchar(100),
-	pre			numeric(38) NOT NULL UNIQUE,
-	post		numeric(38) NOT NULL UNIQUE,
+	pre			bigint NOT NULL UNIQUE,
+	post		bigint NOT NULL UNIQUE,
 	top_level	boolean NOT NULL	-- true for roots of the corpus forest
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
@@ -16,7 +16,7 @@ COMMENT ON COLUMN corpus.post IS 'post-order value';
 
 CREATE TABLE corpus_annotation
 (
-	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+	corpus_ref	bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 	namespace	varchar(100),
 	name		varchar(1000) NOT NULL,
 	value		varchar(2000),
@@ -29,7 +29,7 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-	id		numeric(38) PRIMARY KEY,
+	id		bigint PRIMARY KEY,
 	name	varchar(1000),
 	text	text
 );
@@ -39,9 +39,9 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 
 --CREATE TABLE node
 --(
---	id			numeric(38)	PRIMARY KEY,
---	text_ref	numeric(38) NOT NULL REFERENCES text (id) ON DELETE CASCADE,
---	corpus_ref	numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	id			bigint	PRIMARY KEY,
+--	text_ref	bigint NOT NULL REFERENCES text (id) ON DELETE CASCADE,
+--	corpus_ref	bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 --	namespace	varchar(100),
 --	name		varchar(100) NOT NULL,
 --	"left"		integer NOT NULL,
@@ -50,7 +50,7 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 --  is_token boolean,
 --	continuous	boolean,
 --	span		varchar(2000),
---	toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 --	left_token	integer NULL,	-- token_index of left-most token in tree under this node
 --	right_token	integer	NULL	-- token_index of right-most token in tree under this node
 --);
@@ -68,8 +68,8 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 --
 --CREATE TABLE node_annotation
 --(
---	node_ref	numeric(38), -- REFERENCES node (id) ON DELETE CASCADE,
---  toplevel_corpus numeric(38) NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--	node_ref	bigint, -- REFERENCES node (id) ON DELETE CASCADE,
+--  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
 --	namespace	varchar(150),
 --	name		varchar(150) NOT NULL,
 --	value		varchar(1500)
@@ -83,10 +83,10 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 CREATE TABLE facts
 (
   fid SERIAL PRIMARY KEY,
-  id			numeric(38),
-	text_ref	numeric(38),
-	corpus_ref	numeric(38),
-	toplevel_corpus numeric(38),
+  id			bigint,
+	text_ref	bigint,
+	corpus_ref	bigint,
+	toplevel_corpus bigint,
   node_namespace	varchar(100),
 	node_name		varchar(100),
 	"left"		integer,
@@ -98,13 +98,13 @@ CREATE TABLE facts
 	left_token	integer,
 	right_token	integer,
 
-  pre				numeric(38),
-	post			numeric(38),
-	parent		numeric(38),
+  pre				bigint,
+	post			bigint,
+	parent		bigint,
 	root			boolean,
-	level			numeric(38),
+	level			bigint,
 
-  component_id			numeric(38),
+  component_id			bigint,
 	edge_type		char(1),
 	edge_namespace	varchar(255),
 	edge_name		varchar(255),
@@ -153,27 +153,27 @@ CREATE TABLE extData
 CREATE TABLE corpus_stats
 (
 	name				varchar,
-	id					numeric NOT NULL REFERENCES corpus ON DELETE CASCADE,
-	corpus				numeric,
-	text				numeric,
-	node				numeric,
-	rank				numeric,
-	component			numeric,
-	corpus_annotation	numeric,
-	node_annotation		numeric,
-	edge_annotation		numeric,
-	tokens				numeric,
-	roots				numeric,
-	edges				numeric,
-	depth				numeric,
-	c_comps				numeric,
-	c_edges				numeric,
-	d_comps				numeric,
-	d_edges				numeric,
-	p_comps				numeric,
-	p_edges				numeric,
-	u_comps				numeric,
-	u_edges				numeric,
+	id					bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
+	corpus				bigint,
+	text				bigint,
+	node				bigint,
+	rank				bigint,
+	component			bigint,
+	corpus_annotation	bigint,
+	node_annotation		bigint,
+	edge_annotation		bigint,
+	tokens				bigint,
+	roots				bigint,
+	edges				bigint,
+	depth				bigint,
+	c_comps				bigint,
+	c_edges				bigint,
+	d_comps				bigint,
+	d_edges				bigint,
+	p_comps				bigint,
+	p_edges				bigint,
+	u_comps				bigint,
+	u_edges				bigint,
 	avg_level			real,
 	avg_children		real,
 	avg_duplicates		real
@@ -201,7 +201,7 @@ CREATE TABLE resolver_vis_map
   "element"    varchar(4) CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar(100) NOT NULL,
   "display_name"   varchar(100) NOT NULL,
-  "order" numeric default '0',
+  "order" bigint default '0',
   "mappings" varchar(100),
    UNIQUE (corpus,version,namespace,element,vis_type)  				    
 );

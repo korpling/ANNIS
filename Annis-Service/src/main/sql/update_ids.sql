@@ -1,10 +1,10 @@
 CREATE TEMPORARY TABLE _max (
-    corpus_id numeric(38) NULL,
-    corpus_post numeric(38) NULL,
-    rank_post numeric(38) NULL,
-    component_id numeric(38) NULL,
-    node_id numeric(38) NULL,
-    text_id numeric(38) NULL
+    corpus_id bigint NULL,
+    corpus_post bigint NULL,
+    rank_post bigint NULL,
+    component_id bigint NULL,
+    node_id bigint NULL,
+    text_id bigint NULL
 );
 
 INSERT INTO _max VALUES (

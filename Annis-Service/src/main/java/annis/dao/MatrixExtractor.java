@@ -115,8 +115,8 @@ public class MatrixExtractor implements ResultSetExtractor
         // create key
         Array sqlKey = resultSet.getArray("key");
         Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
-        Validate.isTrue(sqlKey.getBaseType() == Types.NUMERIC,
-          "Key in database must be from the type \"numeric\" but was \"" + sqlKey.getBaseTypeName() + "\"");
+        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+          "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
 
         BigDecimal[] keyArray = (BigDecimal[]) sqlKey.getArray();
         int matchWidth = keyArray.length;
