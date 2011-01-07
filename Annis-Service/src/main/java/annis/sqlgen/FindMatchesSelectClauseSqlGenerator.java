@@ -14,6 +14,7 @@ public class FindMatchesSelectClauseSqlGenerator
 	extends BaseNodeSqlGenerator
 	implements SelectClauseSqlGenerator {
 
+  @Override
 	public String selectClause(List<AnnisNode> nodes, int maxWidth) {
 		Validate.isTrue(nodes.size() <= maxWidth, "BUG: nodes.size() > maxWidth");
 		

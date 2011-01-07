@@ -19,20 +19,17 @@ package annis.ql.parser;
 
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAndExpr;
-import annis.ql.node.AArityLingOp;
 import annis.ql.node.ADominanceLingOp;
 import annis.ql.node.AIdentityLingOp;
 import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.APointingRelationLingOp;
-import annis.ql.node.ARootLingOp;
 import annis.ql.node.ASiblingLingOp;
-import annis.ql.node.ATokenArityLingOp;
 import annis.ql.node.Node;
 import annis.ql.node.PExpr;
 import annis.ql.node.PLingOp;
 import annis.ql.node.TDigits;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -132,8 +129,7 @@ public class NodeRelationNormalizer extends DepthFirstAdapter
 
   public class RelationCollector extends DepthFirstAdapter
   {
-    private Map<String, List<ALinguisticConstraintExpr>> isIn = new HashMap<String,
-      List<ALinguisticConstraintExpr>>();
+    private Map<String, List<ALinguisticConstraintExpr>> isIn = new LinkedHashMap<String, List<ALinguisticConstraintExpr>>();
 
     @Override
     public void caseALinguisticConstraintExpr(ALinguisticConstraintExpr node)
