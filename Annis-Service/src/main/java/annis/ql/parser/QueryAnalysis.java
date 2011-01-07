@@ -50,17 +50,21 @@ public class QueryAnalysis
 		log.debug(clauses.size() + " clause(s) in statement");
 		
 		// analyze each clause independently
-		for (PExpr clause : clauses) {
+		for (PExpr clause : clauses)
+    {
+      NodeRelationNormalizer nodeRelationNormalizer = new NodeRelationNormalizer();
+      clause.apply(nodeRelationNormalizer);
+
 			// get a fresh clause analyzer from Spring
-			ClauseAnalysis clauseAnalysis = getClauseAnalysis();
-			clause.apply(clauseAnalysis);
+			ClauseAnalysis myClauseAnalysis = getClauseAnalysis();
+			clause.apply(myClauseAnalysis);
 			
 			// save nodes and update column width
-			queryData.addAlternative(new LinkedList<AnnisNode>(clauseAnalysis.getNodes()));
-			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), clauseAnalysis.nodesCount()));
+			queryData.addAlternative(new LinkedList<AnnisNode>(myClauseAnalysis.getNodes()));
+			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), myClauseAnalysis.nodesCount()));
 			
 			// collect meta data
-			queryData.addMetaAnnotations(clauseAnalysis.getMetaAnnotations());
+			queryData.addMetaAnnotations(myClauseAnalysis.getMetaAnnotations());
 		}
 		log.debug("maximum column width is " + queryData.getMaxWidth());
 		
@@ -86,5 +90,6 @@ public class QueryAnalysis
   {
     this.clauseAnalysis = clauseAnalysis;
   }
+
 
 }

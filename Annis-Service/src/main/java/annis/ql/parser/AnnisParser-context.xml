@@ -23,7 +23,6 @@
 		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
 	</util:list>
 
-
   <!-- transforms a AQL query into its disjunctive normal form -->
   <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" />
 
