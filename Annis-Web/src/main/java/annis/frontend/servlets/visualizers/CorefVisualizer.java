@@ -151,10 +151,7 @@ public class CorefVisualizer extends WriterVisualizer
 
       for (Edge e : edgeList)
       {
-        if (e != null && e.getName() != null
-          && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
-          && e.getDestination() != null
-          && e.getNamespace() != null && e.getNamespace().equals(getNamespace()))
+        if (includeEdge(e))
         {
           visitedNodes = new LinkedList<Long>();
           //got Type for this?
@@ -478,12 +475,12 @@ public class CorefVisualizer extends WriterVisualizer
   /**
    * collects all Tokens of the Component
    * @param a AnnisNode to start with
-   * @param type String that determines which Component we search for
+   * @param name String that determines which Component we search for
    * @param c Componenttype, that will include its Tokens
    * @param cnr Number of the Component
    * @return List of Tokens
    */
-  private List<Long> getAllTokens(AnnisNode a, String type, TComponenttype c, long cnr)
+  private List<Long> getAllTokens(AnnisNode a, String name, TComponenttype c, long cnr)
   {
     List<Long> result = null;
     if (!visitedNodes.contains(a.getId()))
@@ -521,10 +518,11 @@ public class CorefVisualizer extends WriterVisualizer
       //get "P"-Edges!
       for (Edge e : a.getOutgoingEdges())
       {
-        if (e.getName() != null && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null && !visitedNodes.contains(e.getDestination().getId()))
+        if (includeEdge(e) && name.equals(e.getName())
+          && !visitedNodes.contains(e.getDestination().getId()))
         {
           c.NodeList.add(e.getDestination().getId());
-          List<Long> Med = getAllTokens(e.getDestination(), type, c, cnr);
+          List<Long> Med = getAllTokens(e.getDestination(), name, c, cnr);
           for (Long l : Med)
           {
             if (!result.contains(l))
@@ -536,10 +534,11 @@ public class CorefVisualizer extends WriterVisualizer
       }
       for (Edge e : a.getIncomingEdges())
       {
-        if (e.getName() != null && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null && !visitedNodes.contains(e.getSource().getId()))
+        if (includeEdge(e) && name.equals(e.getName())
+          && !visitedNodes.contains(e.getSource().getId()))
         {
           c.NodeList.add(e.getSource().getId());
-          List<Long> Med = getAllTokens(e.getSource(), type, c, cnr);
+          List<Long> Med = getAllTokens(e.getSource(), name, c, cnr);
           for (Long l : Med)
           {
             if (!result.contains(l))
@@ -836,5 +835,20 @@ public class CorefVisualizer extends WriterVisualizer
     }
     theWriter.append(s);
     theWriter.append("\n");
+  }
+
+  private boolean includeEdge(Edge e)
+  {
+    if (e != null && e.getName() != null
+          && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
+          && e.getDestination() != null
+          && e.getNamespace() != null && e.getNamespace().equals(getNamespace()))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }
