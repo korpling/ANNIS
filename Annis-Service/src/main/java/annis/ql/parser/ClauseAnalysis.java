@@ -88,7 +88,7 @@ import annis.sqlgen.model.Sibling;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   public ClauseAnalysis()
   {
-    this(0, new ArrayList<Annotation>(), new HashMap<String, AnnisNode>(), 0);
+    this(0, new ArrayList<Annotation>(), new LinkedHashMap<String, AnnisNode>(), 0);
   }
 
   public ClauseAnalysis(int aliasCount, List<Annotation> metaAnnotations, Map<String, AnnisNode> nodes, int precedenceBound)
