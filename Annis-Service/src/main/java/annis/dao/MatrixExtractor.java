@@ -129,13 +129,16 @@ public class MatrixExtractor implements ResultSetExtractor
         if (!matchesByGroup.containsKey(key))
         {
           matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
-
         }
 
-        int posInMatch = key.indexOf(id);
-        if(posInMatch > -1)
+        // set annotation spans for *all* positions of the id
+        // (node could have matched several times)
+        for(int posInMatch=0; posInMatch < key.size(); posInMatch++)
         {
-          matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations);
+          if(key.get(posInMatch) == id)
+          {
+            matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations);
+          }
         }
       }
     }
