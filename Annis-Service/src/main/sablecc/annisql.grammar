@@ -1,7 +1,7 @@
 Package annis.ql;
 
 Helpers
-	blank = ' ' | 10 | 13;
+	blank = ' ' | 9 | 10 | 13;
 
 	wildcards = '*' | '?';	
 	regexp_chars = '*' | '+' | '?' | '(' | ')' | '[' | ']' | '|';
