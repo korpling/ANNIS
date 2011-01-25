@@ -235,7 +235,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doNodeAnnotations(String doListValues)
   {
     boolean listValues = "values".equals(doListValues);
-    List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(getCorpusList(), listValues);
+    List<AnnisAttribute> nodeAnnotations = 
+      annisDao.listNodeAnnotations(getCorpusList(), listValues, true);
     printAsTable(nodeAnnotations, "name", "distinctValues");
   }
 

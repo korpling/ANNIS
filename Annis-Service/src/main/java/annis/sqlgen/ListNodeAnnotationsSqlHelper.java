@@ -20,18 +20,39 @@ import org.apache.commons.lang.StringUtils;
 
 public class ListNodeAnnotationsSqlHelper implements ResultSetExtractor {
 
-	public String createSqlQuery(List<Long> corpusList, boolean listValues) {
-		String template = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + ":value FROM facts WHERE sample_node_annotation = true";
+	public String createSqlQuery(List<Long> corpusList, boolean listValues, boolean onlyMostFrequentValue)
+  {
 
-    if(corpusList != null && !corpusList.isEmpty())
+
+    String sql = "select node_annotation_namespace, node_annotation_name, node_annotation_value from\n"
+     + "(\n"
+     + "  select *, row_number() OVER (PARTITION BY node_annotation_namespace, node_annotation_name) as row_num\n"
+     + "  FROM\n"
+     + "  (\n"
+     + "    select \n"
+     + "    node_annotation_namespace, node_annotation_name, :value AS node_annotation_value, \n"
+     + "    count(node_annotation_value) as frequency\n"
+     + "    FROM facts\n"
+     + "    WHERE\n"
+     + "    sample_node_annotation = true AND\n"
+     + "    node_annotation_value <> '--' AND\n"
+     + "    toplevel_corpus IN (:corpora)\n"
+     + "    GROUP BY node_annotation_namespace, node_annotation_name, node_annotation_value\n"
+     + "    ORDER by node_annotation_namespace, node_annotation_name, frequency desc\n"
+     + "  ) as tableAll\n"
+     + ") as tableFreq\n";
+    if( (listValues && onlyMostFrequentValue) || !listValues )
     {
-      template += " AND toplevel_corpus IN (" + StringUtils.join(corpusList, ", ") + ")";
+      sql += "where row_num = 1";
     }
-		String sql = template.replace(":value", listValues ? "node_annotation_value" : "NULL AS node_annotation_value");
+
+    sql = sql.replace(":corpora",  StringUtils.join(corpusList, ", "));
+    sql = sql.replace(":value", listValues ? "node_annotation_value" : "NULL");
+    
 		return sql;
 	}
 	
+  @Override
 	public Object extractData(ResultSet resultSet) throws SQLException,
 			DataAccessException {
 		Map<String, AnnisAttribute> attributesByName = new HashMap<String, AnnisAttribute>();

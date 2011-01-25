@@ -167,11 +167,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   @SuppressWarnings("unchecked")
   @Override
   public List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList,
-    boolean listValues)
+    boolean listValues, boolean onlyMostFrequentValues)
   {
     return (List<AnnisAttribute>) getJdbcTemplate().query(
       listNodeAnnotationsSqlHelper.createSqlQuery(corpusList,
-      listValues), listNodeAnnotationsSqlHelper);
+      listValues, onlyMostFrequentValues), listNodeAnnotationsSqlHelper);
   }
 
   @SuppressWarnings("unchecked")

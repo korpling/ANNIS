@@ -10,7 +10,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -226,10 +225,10 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(NODE_ANNOTATIONS);
 		
 		// stub SQL query
-		when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean())).thenReturn(SQL);
+		when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean(), anyBoolean())).thenReturn(SQL);
 		
 		// call and test
-		assertThat(annisDao.listNodeAnnotations(CORPUS_LIST, false), is(NODE_ANNOTATIONS));
+		assertThat(annisDao.listNodeAnnotations(CORPUS_LIST, false, false), is(NODE_ANNOTATIONS));
 		verify(jdbcTemplate).query(SQL, listNodeAnnotationsSqlHelper);
 	}
 	

@@ -2,6 +2,7 @@ package annis.sqlgen;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.junit.Test;
 
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisAttributeImpl;
+import java.util.LinkedList;
 
 public class TestListNodeAnnotationsSqlHelper {
 
@@ -35,20 +37,100 @@ public class TestListNodeAnnotationsSqlHelper {
 	public void setup() {
 		listNodeAnnotationsSqlHelper = new ListNodeAnnotationsSqlHelper();
 	}
-	
-	@Test
-	public void createSqlQuery() {
-		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + "NULL AS node_annotation_value FROM facts WHERE sample_node_annotation = true";
-		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, false));
-	}
-	
-	@Test
-	public void createSqlQueryListValues() {
-		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + "node_annotation_value FROM facts WHERE sample_node_annotation = true";
-		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, true));
-	}
+
+  public void createSqlQueryNoEmptyCorpusList()
+  {
+    try
+    {
+      listNodeAnnotationsSqlHelper.createSqlQuery(null, true, true);
+    }
+    catch(IllegalArgumentException ex)
+    {
+      return;
+    }
+    fail("should throw illegal argument exception on empty corpus list");
+  }
+
+  @Test
+  public void createSqlQueryOnlyNames()
+  {
+    String expected = "select node_annotation_namespace, node_annotation_name, node_annotation_value from\n"
+     + "(\n"
+     + "  select *, row_number() OVER (PARTITION BY node_annotation_namespace, node_annotation_name) as row_num\n"
+     + "  FROM\n"
+     + "  (\n"
+     + "    select \n"
+     + "    node_annotation_namespace, node_annotation_name, NULL AS node_annotation_value, \n"
+     + "    count(node_annotation_value) as frequency\n"
+     + "    FROM facts\n"
+     + "    WHERE\n"
+     + "    sample_node_annotation = true AND\n"
+     + "    node_annotation_value <> '--' AND\n"
+     + "    toplevel_corpus IN (1977, 1988)\n"
+     + "    GROUP BY node_annotation_namespace, node_annotation_name, node_annotation_value\n"
+     + "    ORDER by node_annotation_namespace, node_annotation_name, frequency desc\n"
+     + "  ) as tableAll\n"
+     + ") as tableFreq\n"
+     + "where row_num = 1";
+    List<Long> corpora = new LinkedList<Long>();
+    corpora.add(1977l);
+    corpora.add(1988l);
+    assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(corpora, false, false));
+    assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(corpora, false, true));
+  }
+
+  @Test
+  public void createSqlQueryListAllValues()
+  {
+    String expected = "select node_annotation_namespace, node_annotation_name, node_annotation_value from\n"
+     + "(\n"
+     + "  select *, row_number() OVER (PARTITION BY node_annotation_namespace, node_annotation_name) as row_num\n"
+     + "  FROM\n"
+     + "  (\n"
+     + "    select \n"
+     + "    node_annotation_namespace, node_annotation_name, node_annotation_value AS node_annotation_value, \n"
+     + "    count(node_annotation_value) as frequency\n"
+     + "    FROM facts\n"
+     + "    WHERE\n"
+     + "    sample_node_annotation = true AND\n"
+     + "    node_annotation_value <> '--' AND\n"
+     + "    toplevel_corpus IN (1977, 1988)\n"
+     + "    GROUP BY node_annotation_namespace, node_annotation_name, node_annotation_value\n"
+     + "    ORDER by node_annotation_namespace, node_annotation_name, frequency desc\n"
+     + "  ) as tableAll\n"
+     + ") as tableFreq\n";
+    List<Long> corpora = new LinkedList<Long>();
+    corpora.add(1977l);
+    corpora.add(1988l);
+    assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(corpora, true, false));
+  }
+
+  @Test
+  public void createSqlQueryListMostFrequentValues()
+  {
+    String expected = "select node_annotation_namespace, node_annotation_name, node_annotation_value from\n"
+     + "(\n"
+     + "  select *, row_number() OVER (PARTITION BY node_annotation_namespace, node_annotation_name) as row_num\n"
+     + "  FROM\n"
+     + "  (\n"
+     + "    select \n"
+     + "    node_annotation_namespace, node_annotation_name, node_annotation_value AS node_annotation_value, \n"
+     + "    count(node_annotation_value) as frequency\n"
+     + "    FROM facts\n"
+     + "    WHERE\n"
+     + "    sample_node_annotation = true AND\n"
+     + "    node_annotation_value <> '--' AND\n"
+     + "    toplevel_corpus IN (1977, 1988)\n"
+     + "    GROUP BY node_annotation_namespace, node_annotation_name, node_annotation_value\n"
+     + "    ORDER by node_annotation_namespace, node_annotation_name, frequency desc\n"
+     + "  ) as tableAll\n"
+     + ") as tableFreq\n"
+     + "where row_num = 1";
+    List<Long> corpora = new LinkedList<Long>();
+    corpora.add(1977l);
+    corpora.add(1988l);
+    assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(corpora, true, true));
+  }
 		
 	@SuppressWarnings("unchecked")
 	@Test

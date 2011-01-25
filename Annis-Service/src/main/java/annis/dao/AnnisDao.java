@@ -2,7 +2,6 @@ package annis.dao;
 
 import java.util.List;
 
-import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
@@ -31,7 +30,8 @@ public interface AnnisDao
 
   public List<Long> listCorpusByName(List<String> corpusNames);
 
-  public List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, boolean listValues);
+  public List<AnnisAttribute> listNodeAnnotations(List<Long> corpusList, 
+    boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
 
