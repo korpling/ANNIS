@@ -92,7 +92,7 @@ public class AttributeListServlet extends HttpServlet {
 			if("edge".equals(request.getParameter("type"))) {
 				// not implemented yet
 			} else {
-				attributeList = service.getNodeAttributeSet(corpusIdList, false, false);
+				attributeList = service.getNodeAttributeSet(corpusIdList, true, true);
         
         // check if we should not add prefix
         if(request.getParameter("noprefix") != null)
