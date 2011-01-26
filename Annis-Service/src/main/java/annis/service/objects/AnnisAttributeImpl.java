@@ -29,7 +29,7 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable {
 	
 	public String getJSON() {
 		StringBuffer sBuffer = new StringBuffer();
-		sBuffer.append("name: '" + this.getName() + "', values: [");
+		sBuffer.append("'name': '" + this.getName() + "', 'values': [");
 		int vCount = 0;
 		for(String value : this.getValueSet()) {
 			if(vCount++ > 0 )
