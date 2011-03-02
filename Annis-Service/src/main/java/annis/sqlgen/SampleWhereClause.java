@@ -25,9 +25,6 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 
 import annis.model.AnnisNode;
-import annis.sqlgen.model.Dominance;
-import annis.sqlgen.model.Join;
-import annis.sqlgen.model.PointingRelation;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,20 +51,25 @@ public class SampleWhereClause extends BaseNodeSqlGenerator
       && t.isMaterialized(COMPONENT_TABLE, FACTS_TABLE))
     {
 
-      // the node is not allowed to particiapte in a relation that needs a join
-      // to the rank, component or edge_annotation table
-      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable())
+      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
       {
-        // decide whether we have to use the node_annotation sample or the node 
-        // sample property
-        if(t.usesNodeAnnotationTable())
-        {
-          conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_node_annotation"), "true"));
-        }
-        else
-        {
-          conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_node"), "true"));
-        }
+        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n"), "true"));
+      }
+      else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
+      {
+        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c"), "true"));
+      }
+      else if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable())
+      {
+        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_na"), "true"));
+      }
+      else if(!t.usesNodeAnnotationTable())
+      {
+        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c_ea"), "true"));
+      }
+      else if(!t.usesEdgeAnnotationTable())
+      {
+        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c_na"), "true"));
       }
     }
     return conditions;

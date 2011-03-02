@@ -39,14 +39,14 @@ public class TestListNodeAnnotationsSqlHelper {
 	@Test
 	public void createSqlQuery() {
 		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + "NULL AS node_annotation_value FROM facts WHERE sample_node_annotation = true";
+      + "NULL AS node_annotation_value FROM facts WHERE sample_n_na = true";
 		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, false));
 	}
 	
 	@Test
 	public void createSqlQueryListValues() {
 		String expected = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + "node_annotation_value FROM facts WHERE sample_node_annotation = true";
+      + "node_annotation_value FROM facts WHERE sample_n_na = true";
 		assertEquals(expected, listNodeAnnotationsSqlHelper.createSqlQuery(null, true));
 	}
 		

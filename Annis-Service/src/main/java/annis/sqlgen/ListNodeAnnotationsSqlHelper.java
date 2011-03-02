@@ -22,7 +22,7 @@ public class ListNodeAnnotationsSqlHelper implements ResultSetExtractor {
 
 	public String createSqlQuery(List<Long> corpusList, boolean listValues) {
 		String template = "SELECT DISTINCT node_annotation_namespace, node_annotation_name, "
-      + ":value FROM facts WHERE sample_node_annotation = true";
+      + ":value FROM facts WHERE sample_n_na = true";
 
     if(corpusList != null && !corpusList.isEmpty())
     {
