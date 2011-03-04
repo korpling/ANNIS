@@ -53,7 +53,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
 
     String sqlBoth =
       sqlNode + "\n"
-      + "UNION ALL \n"
+      + "UNION ALL\n"
       + sqlEdge + "\n";
 
     return sqlBoth;
