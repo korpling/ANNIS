@@ -65,7 +65,7 @@ Ext.onReady(function(){
       handler: function() {
         formPanelLogin.getForm().submit(loginSubmitConfig);
       }
-            		
+      
     }],
     buttonAlign:'center',
     url: conf_context + '/LoginLogout'
