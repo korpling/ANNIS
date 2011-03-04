@@ -24,7 +24,7 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.ListNodeAnnotationsSqlHelper;
+import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import java.util.LinkedList;
@@ -37,7 +37,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   /// old
   private SqlGenerator sqlGenerator;
   private ListCorpusSqlHelper listCorpusSqlHelper;
-  private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+  private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
   /// new
   private List<SqlSessionModifier> sqlSessionModifiers;
@@ -170,8 +170,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     boolean listValues, boolean onlyMostFrequentValues)
   {
     return (List<AnnisAttribute>) getJdbcTemplate().query(
-      listNodeAnnotationsSqlHelper.createSqlQuery(corpusList,
-      listValues, onlyMostFrequentValues), listNodeAnnotationsSqlHelper);
+      listAnnotationsSqlHelper.createSqlQuery(corpusList,
+      listValues, onlyMostFrequentValues), listAnnotationsSqlHelper);
   }
 
   @SuppressWarnings("unchecked")
@@ -273,15 +273,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.listCorpusSqlHelper = listCorpusHelper;
   }
 
-  public ListNodeAnnotationsSqlHelper getListNodeAnnotationsSqlHelper()
+  public ListAnnotationsSqlHelper getListAnnotationsSqlHelper()
   {
-    return listNodeAnnotationsSqlHelper;
+    return listAnnotationsSqlHelper;
   }
 
-  public void setListNodeAnnotationsSqlHelper(
-    ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper)
+  public void setListAnnotationsSqlHelper(
+    ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper)
   {
-    this.listNodeAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
+    this.listAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
   }
 
   public ListCorpusAnnotationsSqlHelper getListCorpusAnnotationsSqlHelper()

@@ -22,7 +22,7 @@ import java.util.LinkedList;
 public class TestListNodeAnnotationsSqlHelper {
 
 	// object under test
-	private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+	private ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	
 	// dummy annotation data
 	private static final String NULL = null;
@@ -35,7 +35,7 @@ public class TestListNodeAnnotationsSqlHelper {
 
 	@Before
 	public void setup() {
-		listNodeAnnotationsSqlHelper = new ListNodeAnnotationsSqlHelper();
+		listNodeAnnotationsSqlHelper = new ListAnnotationsSqlHelper();
 	}
 
   public void createSqlQueryNoEmptyCorpusList()

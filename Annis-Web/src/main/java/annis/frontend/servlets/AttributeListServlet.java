@@ -33,101 +33,111 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AttributeListServlet extends HttpServlet {
-	private static final long serialVersionUID = -4188886565776492022L;
+public class AttributeListServlet extends HttpServlet
+{
+
+  private static final long serialVersionUID = -4188886565776492022L;
 
   @Override
   protected void doPost(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException
   {
     doGet(arg0, arg1);
   }
-	
-  
-  
-	@SuppressWarnings("unchecked")
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String corpusIdsParam = request.getParameter("corpusIds");
-		
-		List<Long> corpusIdList = new Vector<Long>();
-				
-		//gather selected corpora
-		try {
-			for(String corpusId : corpusIdsParam.split(","))
-				corpusIdList.add(Long.parseLong(corpusId));
-		} catch (NullPointerException e) {
-			//We got no corpus Ids...
-		} catch (NumberFormatException e) {
-			//We got wrong Corpus Ids
-		}
-		
-		/* Required Stuff */
-		boolean scriptTag = false;
-		String cb = request.getParameter("callback");
-		if (cb != null) {
-		    scriptTag = true;
-		    response.setContentType("text/javascript");
-		} else {
-		    response.setContentType("application/x-json");
-		}
-		Writer out = response.getWriter();
-		if (scriptTag) {
-		    out.write(cb + "(");
-		}
-		/* END Required Stuff */
-		
-		try {
-			AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-			AnnisAttributeSet attributeList;
+
+  @SuppressWarnings("unchecked")
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+  {
+    String corpusIdsParam = request.getParameter("corpusIds");
+
+    List<Long> corpusIdList = new Vector<Long>();
+
+    //gather selected corpora
+    try
+    {
+      for (String corpusId : corpusIdsParam.split(","))
+      {
+        corpusIdList.add(Long.parseLong(corpusId));
+      }
+    }
+    catch (NullPointerException e)
+    {
+      //We got no corpus Ids...
+    }
+    catch (NumberFormatException e)
+    {
+      //We got wrong Corpus Ids
+    }
+
+    /* Required Stuff */
+    boolean scriptTag = false;
+    String cb = request.getParameter("callback");
+    if (cb != null)
+    {
+      scriptTag = true;
+      response.setContentType("text/javascript");
+    }
+    else
+    {
+      response.setContentType("application/x-json");
+    }
+    Writer out = response.getWriter();
+    if (scriptTag)
+    {
+      out.write(cb + "(");
+    }
+    /* END Required Stuff */
+
+    try
+    {
+      AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+      AnnisAttributeSet attributeList;
 
       // add all corpora if not choosen
-      if(corpusIdsParam == null)
+      if (corpusIdsParam == null)
       {
         AnnisCorpusSet allCorpora = service.getCorpusSet();
-        for(AnnisCorpus c : allCorpora)
+        for (AnnisCorpus c : allCorpora)
         {
           corpusIdList.add(c.getId());
         }
       }
-      
-			if("edge".equals(request.getParameter("type"))) {
-				// not implemented yet
-			} else {
-				attributeList = service.getNodeAttributeSet(corpusIdList, true, true);
-        
-        // check if we should not add prefix
-        if(request.getParameter("noprefix") != null)
+
+      attributeList = service.getNodeAttributeSet(corpusIdList, true, true);
+
+      // check if we should not add prefix
+      if (request.getParameter("noprefix") != null)
+      {
+        for (AnnisAttribute att : attributeList)
         {
-          for(AnnisAttribute att : attributeList)
+          String a = att.getName();
+          if (a != null)
           {
-            String a = att.getName();
-            if(a != null)
+            int found = a.indexOf(':');
+            if (found > -1 && (found + 1) < a.length())
             {
-              int found = a.indexOf(':');
-              if(found > -1 && (found+1) < a.length())
-              {
-                att.setName(a.substring(found+1));
-              }
+              att.setName(a.substring(found + 1));
             }
           }
         }
-        
-				out.write(attributeList.getJSON());
-			}
-		}
-    catch(Exception ex)
+      }
+
+      out.write(attributeList.getJSON());
+    }
+    catch (Exception ex)
     {
       Logger.getLogger(AttributeListServlet.class.getName()).log(
         Level.SEVERE, "could not get attribute list", ex);
     }
-		
-		
-		
-		
-		/* Required Stuff */
-		if (scriptTag) {
-		    out.write(");");
-		}
-		/* END Required Stuff */
-		
-	}
+
+
+
+
+    /* Required Stuff */
+    if (scriptTag)
+    {
+      out.write(");");
+    }
+    /* END Required Stuff */
+
+  }
 }
