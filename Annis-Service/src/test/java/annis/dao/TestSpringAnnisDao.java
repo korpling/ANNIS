@@ -228,7 +228,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean(), anyBoolean())).thenReturn(SQL);
 		
 		// call and test
-		assertThat(annisDao.listNodeAnnotations(CORPUS_LIST, false, false), is(NODE_ANNOTATIONS));
+		assertThat(annisDao.listAnnotations(CORPUS_LIST, false, false), is(NODE_ANNOTATIONS));
 		verify(jdbcTemplate).query(SQL, listNodeAnnotationsSqlHelper);
 	}
 	

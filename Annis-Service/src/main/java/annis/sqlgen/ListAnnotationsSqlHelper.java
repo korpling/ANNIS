@@ -24,20 +24,21 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
-    String sql = "select ':type' as \"type\", namespace, name, value from\n"
+    String sql = "select namespace, name, value, \"type\", subtype from\n"
       + "(\n"
       + "  select *, row_number() OVER (PARTITION BY namespace, name) as row_num\n"
       + "  FROM\n"
       + "  (\n"
-      + "    select \n"
-      + "    :type_annotation_namespace as namespace, :type_annotation_name as name, :value AS value, \n"
-      + "    count(:type_annotation_value) as frequency\n"
-      + "    FROM facts\n"
+      + "    select distinct\n"
+      + "    namespace, name, \"type\", subtype, occurences, :value AS value\n"
+      + "    FROM annotations\n"
       + "    WHERE\n"
-      + "    :type_annotation_value <> '--' AND\n"
-      + "    toplevel_corpus IN (:corpora)\n"
-      + "    GROUP BY :type_annotation_namespace, :type_annotation_name, :type_annotation_value\n"
-      + "    ORDER by :type_annotation_namespace, :type_annotation_name, frequency desc\n"
+      + "    value <> '--'\n"
+      + (
+        corpusList.isEmpty() ?
+          "\n" : "    AND toplevel_corpus IN (:corpora)\n"
+        )
+      + "    ORDER by namespace, name, occurences desc\n"
       + "  ) as tableAll\n"
       + ") as tableFreq\n";
     if ((listValues && onlyMostFrequentValue) || !listValues)
@@ -46,17 +47,10 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
     }
 
     sql = sql.replaceAll(":corpora", StringUtils.join(corpusList, ", "));
-    sql = sql.replaceAll(":value", listValues ? ":type_annotation_value" : "NULL::varchar");
+    sql = sql.replaceAll(":value", listValues ? "value" : "NULL::varchar");
 
-    String sqlNode = sql.replaceAll(":type", "node");
-    String sqlEdge = sql.replaceAll(":type", "edge");
 
-    String sqlBoth =
-      sqlNode + "\n"
-      + "UNION ALL\n"
-      + sqlEdge + "\n";
-
-    return sqlBoth;
+    return sql;
   }
 
   @Override

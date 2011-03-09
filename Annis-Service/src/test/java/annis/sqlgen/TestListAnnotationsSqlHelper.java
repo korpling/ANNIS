@@ -19,7 +19,6 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisAttributeImpl;
 import java.util.LinkedList;
 import org.junit.Ignore;
-import org.springframework.test.annotation.DirtiesContext;
 
 public class TestListAnnotationsSqlHelper {
 

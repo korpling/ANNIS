@@ -86,10 +86,10 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public AnnisAttributeSet getNodeAttributeSet(List<Long> corpusList,
+  public AnnisAttributeSet getAttributeSet(List<Long> corpusList,
     boolean fetchValues, boolean onlyMostFrequentValues) throws RemoteException
   {
-    return new AnnisAttributeSetImpl(annisDao.listNodeAnnotations(corpusList,
+    return new AnnisAttributeSetImpl(annisDao.listAnnotations(corpusList,
       fetchValues, onlyMostFrequentValues));
   }
 

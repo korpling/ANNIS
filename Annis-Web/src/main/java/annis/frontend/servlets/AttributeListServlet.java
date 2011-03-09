@@ -102,7 +102,7 @@ public class AttributeListServlet extends HttpServlet
         }
       }
 
-      attributeList = service.getNodeAttributeSet(corpusIdList, true, true);
+      attributeList = service.getAttributeSet(corpusIdList, true, true);
 
       // check if we should not add prefix
       if (request.getParameter("noprefix") != null)

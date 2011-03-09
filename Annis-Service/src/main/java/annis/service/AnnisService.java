@@ -74,7 +74,7 @@ public interface AnnisService extends Remote {
    * @return
 	 * @throws RemoteException
 	 */
-	public AnnisAttributeSet getNodeAttributeSet(
+	public AnnisAttributeSet getAttributeSet(
     List<Long> corpusList, boolean fetchValues, boolean onlyMostFrequent) throws RemoteException;
 	
 	/**
