@@ -1,7 +1,6 @@
 Ext.onReady(function()
 {
-  Ext.Ajax.defaultHeaders =
-  {
+  Ext.Ajax.defaultHeaders = {
     "Content-Type" : "application/x-www-form-urlencoded; charset=utf-8"
   };
 
@@ -11,14 +10,8 @@ Ext.onReady(function()
 
     var grid = null;
 
-    // init config
-    config.title = 'Meta Data for id ' + id;
-    config.width = 400;
-    config.height = 200;
-
     // get datastore
-    var storeMeta = new Ext.data.JsonStore(
-    {
+    var storeMeta = new Ext.data.JsonStore({
       url : conf_context + '/secure/MetaData?mID=' + id,
       totalProperty : 'size',
       root : 'metadata',
@@ -28,8 +21,7 @@ Ext.onReady(function()
       remoteSort : true
     });
 
-    var colModel = new Ext.grid.ColumnModel([
-    {
+    var colModel = new Ext.grid.ColumnModel([ {
       header : "Name",
       dataIndex : 'key'
     },
@@ -39,66 +31,66 @@ Ext.onReady(function()
       dataIndex : 'value'
     } ]);
 
-    var gridMeta = new Ext.grid.GridPanel(
-    {
+    var gridMeta = new Ext.grid.GridPanel({
       ds : storeMeta,
       cm : colModel,
       loadMask : true,
-      viewConfig :
-      {
+      viewConfig : {
         forceFit : true,
         autoFill : true
       },
       autoHeight : true,
-      autoWidth : true
+      autoWidth : true,
+      flex : 1
     });
 
-    var storeNodeAttributes = new Ext.data.JsonStore(
-    {
+    var storeNodeAttributes = new Ext.data.JsonStore({
       url : conf_context + '/secure/AttributeList?noprefix',
       // turn on remote sorting
       remoteSort : false,
       fields : [ 'name', 'values' ]
     });
 
-    var colModelAttribute = new Ext.grid.ColumnModel([
-    {
+    var colModelAttribute = new Ext.grid.ColumnModel([ {
       header : "Name",
       dataIndex : "name"
-    },
-    {
+    }, {
       header : "Value",
       dataIndex : "values"
     } ]);
 
-    var gridAttribute = new Ext.grid.GridPanel(
-    {
+    var gridAttribute = new Ext.grid.GridPanel({
       ds : storeNodeAttributes,
       cm : colModelAttribute,
       loadMask : true,
-      viewConfig :
-      {
+      viewConfig : {
         forceFit : true,
         autoFill : true
       },
       autoHeight : true,
-      autoWidth : true
+      autoWidth : true,
+      flex : 1
     });
 
     storeMeta.load();
     storeNodeAttributes.setDefaultSort('name', 'asc');
-    storeNodeAttributes.load(
-    {
-      params :
-      {
+    storeNodeAttributes.load({
+      params : {
         corpusIdList : '',
         type : 'node'
       }
     });
 
+    // init config
+    config.title = 'Meta Data for id ' + id;
+    config.width = 800;
+    config.height = 400;
     config.items = [ gridMeta, gridAttribute ];
     config.autoScroll = true;
-    config.layout = 'fit';
+    config.layout = {
+      type : 'hbox',
+      align : 'stretchmax'
+    };
 
     MetaDataWindow.superclass.constructor.call(this, config);
   };
