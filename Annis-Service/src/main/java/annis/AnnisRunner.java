@@ -237,7 +237,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     boolean listValues = "values".equals(doListValues);
     List<AnnisAttribute> annotations =
-      annisDao.listNodeAnnotations(getCorpusList(), listValues, true);
+      annisDao.listAnnotations(getCorpusList(), listValues, true);
     AnnisAttributeSetImpl set = new AnnisAttributeSetImpl(annotations);
     System.out.println(set.getJSON());
   }
