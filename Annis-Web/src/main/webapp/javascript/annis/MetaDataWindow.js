@@ -9,9 +9,12 @@ Ext.onReady(function()
     return record.json.name + "=\"" + value + "\"";
   }
 
-  MetaDataWindow = function(id)
+  MetaDataWindow = function(id, name)
   {
     var config = {};
+    config.title = 'Meta Data for ' + name;
+    config.width = 800;
+    config.height = 400;
 
     var grid = null;
 
@@ -52,7 +55,7 @@ Ext.onReady(function()
     var storeNodeAttributes = new Ext.data.JsonStore({
       url : conf_context + '/secure/AttributeList?noprefix',
       // turn on remote sorting
-      remoteSort : false,
+      remoteSort : false,      
       fields : [ 'name', 'values' ]
     });
 
@@ -87,10 +90,7 @@ Ext.onReady(function()
       }
     });
 
-    // init config
-    config.title = 'Meta Data for id ' + id;
-    config.width = 800;
-    config.height = 400;
+    // init config    
     config.items = [ gridMeta, gridAttribute ];
     config.autoScroll = true;
     config.layout = {
