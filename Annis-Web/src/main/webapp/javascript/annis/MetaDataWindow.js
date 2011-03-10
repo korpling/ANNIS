@@ -4,6 +4,11 @@ Ext.onReady(function()
     "Content-Type" : "application/x-www-form-urlencoded; charset=utf-8"
   };
 
+  function readableExample(value, metadata, record, rowIndex, colIndex, store)
+  {
+    return record.json.name + "=\"" + value + "\"";
+  }
+
   MetaDataWindow = function(id)
   {
     var config = {};
@@ -52,11 +57,12 @@ Ext.onReady(function()
     });
 
     var colModelAttribute = new Ext.grid.ColumnModel([ {
-      header : "Name",
+      header : "name",
       dataIndex : "name"
     }, {
-      header : "Value",
-      dataIndex : "values"
+      header : "example",
+      dataIndex : "values",
+      renderer : readableExample
     } ]);
 
     var gridAttribute = new Ext.grid.GridPanel({
