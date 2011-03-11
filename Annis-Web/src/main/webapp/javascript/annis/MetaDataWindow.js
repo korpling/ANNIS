@@ -101,15 +101,5 @@ Ext.onReady(function()
     MetaDataWindow.superclass.constructor.call(this, config);
   };
 
-  var name = {
-    constructor : function(id, name)
-    {
-      name = "Searchresult";
-      MetaDataWindowResult.superclass.constructor.call(this, id, name);
-    }
-  };
-
   Ext.extend(MetaDataWindow, Ext.Window);
-  MetaDataWindowResult = Ext.extend(MetaDataWindow, name);
-
 });

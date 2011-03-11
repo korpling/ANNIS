@@ -549,7 +549,7 @@ Ext.onReady(function() {
 
       var id = rowData.corpusId;
       
-      var action = 'new MetaDataWindowResult(' + id + ').show();';
+      var action = 'new MetaDataWindow(' + id + ', \' search result \').show();';
 
       var output = '<a href="#" onclick="' + action + '"><img src="' + conf_context + '/images/info.gif"></a>';
 
