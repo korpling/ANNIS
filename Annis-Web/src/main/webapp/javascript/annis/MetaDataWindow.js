@@ -55,7 +55,7 @@ Ext.onReady(function()
     var storeNodeAttributes = new Ext.data.JsonStore({
       url : conf_context + '/secure/AttributeList?noprefix',
       // turn on remote sorting
-      remoteSort : false,      
+      remoteSort : false,
       fields : [ 'name', 'values' ]
     });
 
@@ -90,7 +90,7 @@ Ext.onReady(function()
       }
     });
 
-    // init config    
+    // init config
     config.items = [ gridMeta, gridAttribute ];
     config.autoScroll = true;
     config.layout = {
@@ -101,5 +101,15 @@ Ext.onReady(function()
     MetaDataWindow.superclass.constructor.call(this, config);
   };
 
+  var name = {
+    constructor : function(id, name)
+    {
+      name = "Searchresult";
+      MetaDataWindowResult.superclass.constructor.call(this, id, name);
+    }
+  };
+
   Ext.extend(MetaDataWindow, Ext.Window);
+  MetaDataWindowResult = Ext.extend(MetaDataWindow, name);
+
 });

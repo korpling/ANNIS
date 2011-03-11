@@ -548,7 +548,8 @@ Ext.onReady(function() {
       var rowData = row.data; // this is the JSON result set we are sending from the frontend
 
       var id = rowData.corpusId;
-      var action = 'new MetaDataWindow(' + id + ').show();';
+      
+      var action = 'new MetaDataWindowResult(' + id + ').show();';
 
       var output = '<a href="#" onclick="' + action + '"><img src="' + conf_context + '/images/info.gif"></a>';
 
