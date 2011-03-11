@@ -11,10 +11,12 @@ Ext.onReady(function()
 
   MetaDataWindow = function(id, name)
   {
+    var hideAttr = (name === "Search Result") ? true : false;
+
     var config = {};
     config.title = 'Meta Data for ' + name;
     config.width = 800;
-    config.height = 400;
+    config.height = 420;
 
     var grid = null;
 
@@ -42,61 +44,66 @@ Ext.onReady(function()
     var gridMeta = new Ext.grid.GridPanel({
       ds : storeMeta,
       cm : colModel,
+      title : 'meta data',
       loadMask : true,
       viewConfig : {
         forceFit : true,
         autoFill : true
       },
-      autoHeight : true,
-      autoWidth : true,
+      height : 380,
       flex : 1
     });
 
-    var storeNodeAttributes = new Ext.data.JsonStore({
-      url : conf_context + '/secure/AttributeList?noprefix',
-      // turn on remote sorting
-      remoteSort : false,
-      fields : [ 'name', 'values' ]
-    });
+    if (!hideAttr)
+    {
+      var storeNodeAttributes = new Ext.data.JsonStore({
+        url : conf_context + '/secure/AttributeList?noprefix',
+        // turn on remote sorting
+        remoteSort : false,
+        fields : [ 'name', 'values' ]
+      });
 
-    var colModelAttribute = new Ext.grid.ColumnModel([ {
-      header : "name",
-      dataIndex : "name"
-    }, {
-      header : "example",
-      dataIndex : "values",
-      renderer : readableExample
-    } ]);
+      var colModelAttribute = new Ext.grid.ColumnModel([ {
+        header : "name",
+        dataIndex : "name"
+      }, {
+        header : "example",
+        dataIndex : "values",
+        renderer : readableExample
+      } ]);
 
-    var gridAttribute = new Ext.grid.GridPanel({
-      ds : storeNodeAttributes,
-      cm : colModelAttribute,
-      loadMask : true,
-      viewConfig : {
-        forceFit : true,
-        autoFill : true
-      },
-      autoHeight : true,
-      autoWidth : true,
-      flex : 1
-    });
+      var gridAttribute = new Ext.grid.GridPanel({
+        ds : storeNodeAttributes,
+        cm : colModelAttribute,
+        loadMask : true,
+        title : 'corpus description',
+        viewConfig : {
+          forceFit : true,
+          autoFill : true
+        },        
+        autoWidth : true,       
+        height : 380,
+        flex : 1
+      });
+
+      storeNodeAttributes.setDefaultSort('name', 'asc');
+      storeNodeAttributes.load({
+        params : {
+          corpusIdList : '',
+          type : 'node'
+        }
+      });
+    }
 
     storeMeta.load();
-    storeNodeAttributes.setDefaultSort('name', 'asc');
-    storeNodeAttributes.load({
-      params : {
-        corpusIdList : '',
-        type : 'node'
-      }
-    });
 
     // init config
-    config.items = [ gridMeta, gridAttribute ];
+    config.items = (!hideAttr) ? [gridMeta, gridAttribute ] : [ gridMeta ];
     config.autoScroll = true;
     config.layout = {
-      type : 'hbox',
-      align : 'stretchmax'
-    };
+        type : 'hbox'
+    };    
+    config.shadow = false;
 
     MetaDataWindow.superclass.constructor.call(this, config);
   };
