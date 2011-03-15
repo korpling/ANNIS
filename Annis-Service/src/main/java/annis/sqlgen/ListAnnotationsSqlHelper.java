@@ -84,6 +84,17 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       }
       attribute.setType(t);
 
+      AnnisAttribute.SubType st = AnnisAttribute.SubType.unknown;
+      try
+      {
+        st = AnnisAttribute.SubType.valueOf(resultSet.getString("subtype"));
+      }
+      catch(Exception ex)
+      {
+        // ignore
+      }
+      attribute.setSubtype(st);
+
       String value = resultSet.getString("value");
 
       if (value != null)

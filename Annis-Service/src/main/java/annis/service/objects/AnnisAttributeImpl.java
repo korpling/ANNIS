@@ -16,6 +16,7 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
   private String name = "";
   private Set<String> distinctValues = new HashSet<String>();
   private Type type;
+  private SubType subtype;
 
   @Override
   public Set<String> getValueSet()
@@ -48,11 +49,24 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
   }
 
   @Override
+  public SubType getSubtype()
+  {
+    return subtype;
+  }
+
+  @Override
+  public void setSubtype(SubType subtype)
+  {
+    this.subtype = subtype;
+  }
+  
+  @Override
   public String getJSON()
   {
     StringBuffer sBuffer = new StringBuffer();
     sBuffer.append("\"name\": \"").append(this.getName()).append("\",\n")
       .append("\"type\" : \"").append(getType().name()).append("\",\n")
+      .append("\"subtype\" : \"").append(getSubtype().name()).append("\",\n")
       .append("\"values\": [");
     int vCount = 0;
     for (String value : this.getValueSet())

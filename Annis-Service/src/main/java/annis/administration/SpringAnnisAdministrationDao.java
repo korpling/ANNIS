@@ -349,6 +349,9 @@ public class SpringAnnisAdministrationDao {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     log.info("creating annotations table for corpus with ID " + corpusID);
     executeSqlFromScript("annotations.sql", args);
+
+    log.info("indexing annotations table for corpus with ID " + corpusID);
+    executeSqlFromScript("indexes_annotations.sql", args);
   }
 
   void analyzeFacts(long corpusID)
