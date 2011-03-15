@@ -107,3 +107,4 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
     return new ArrayList<AnnisAttribute>(attributesByName.values());
   }
 }
+

@@ -82,7 +82,7 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 
 CREATE TABLE facts
 (
-  fid SERIAL PRIMARY KEY,
+  fid BIGSERIAL PRIMARY KEY,
   id			bigint,
 	text_ref	bigint,
 	corpus_ref	bigint,
@@ -117,8 +117,11 @@ CREATE TABLE facts
 	edge_annotation_name		varchar(150),
 	edge_annotation_value		varchar(1500),
 
-  sample_node BOOLEAN,
-  sample_node_annotation BOOLEAN
+  sample_n BOOLEAN,
+  sample_n_na BOOLEAN,
+  sample_n_r_c BOOLEAN,
+  sample_n_r_c_ea BOOLEAN,
+  sample_n_r_c_na BOOLEAN
 );
 
 -- from component

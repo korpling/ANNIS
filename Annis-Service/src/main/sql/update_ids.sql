@@ -17,12 +17,15 @@ INSERT INTO _max VALUES (
     (SELECT max(id) + 1 FROM text)
 );
 
-UPDATE _max SET corpus_id = 0 WHERE corpus_id IS NULL;
-UPDATE _max SET corpus_post = 0 WHERE corpus_post IS NULL;
-UPDATE _max SET rank_post = 0 WHERE rank_post IS NULL;
-UPDATE _max SET component_id = 0 WHERE component_id IS NULL;
-UPDATE _max SET node_id = 0 WHERE node_id IS NULL;
-UPDATE _max SET text_id = 0 WHERE text_id IS NULL;
+UPDATE _max
+SET
+corpus_id = (CASE WHEN corpus_id IS NULL THEN 0 ELSE corpus_id END),
+corpus_post = (CASE WHEN corpus_post IS NULL THEN 0 ELSE corpus_post END),
+rank_post = (CASE WHEN rank_post IS NULL THEN 0 ELSE rank_post END),
+component_id = (CASE WHEN component_id IS NULL THEN 0 ELSE component_id END),
+node_id = (CASE WHEN node_id IS NULL THEN 0 ELSE node_id END),
+text_id = (CASE WHEN text_id IS NULL THEN 0 ELSE text_id END)
+;
 
 UPDATE _node_annotation SET node_ref = node_ref + (SELECT node_id FROM _max);
     

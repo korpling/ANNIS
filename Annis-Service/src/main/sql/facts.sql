@@ -5,8 +5,11 @@ DROP TABLE IF EXISTS facts_:id;
 CREATE TABLE facts_:id
 (
   -- temporary columns for calculating the sample_*
-  node_rownum INTEGER,
-  node_anno_rownum INTEGER
+  n_rownum INTEGER,
+  n_na_rownum INTEGER,
+  n_r_c_ea_rownum INTEGER,
+  n_r_c_rownum INTEGER,
+  n_r_c_na_rownum INTEGER
   -- check constraints
   CHECK(toplevel_corpus = :id)
 )
@@ -43,16 +46,40 @@ INSERT INTO facts_:id
   edge_annotation_namespace,
 	edge_annotation_name,
 	edge_annotation_value,
-  sample_node,
-  sample_node_annotation,
-  node_rownum,
-  node_anno_rownum
+  sample_n,
+  sample_n_r_c,
+  sample_n_na,
+  sample_n_r_c_ea,
+  sample_n_r_c_na,
+  n_rownum,
+  n_na_rownum,
+  n_r_c_ea_rownum,
+  n_r_c_rownum,
+  n_r_c_na_rownum
 )
 
 SELECT
 *,
-    row_number() OVER (PARTITION BY id) AS node_rownum,
-    row_number() OVER (PARTITION BY id, node_annotation_namespace, node_annotation_name, node_annotation_value) AS node_anno_rownum
+    row_number() OVER (PARTITION BY id) AS n_rownum,
+    row_number() OVER (PARTITION BY id, 
+                                    node_annotation_namespace,
+                                    node_annotation_name,
+                                    node_annotation_value) AS n_na_rownum,
+    row_number() OVER (PARTITION BY id,
+                                    parent,
+                                    component_id,
+                                    edge_annotation_namespace,
+                                    edge_annotation_name,
+                                    edge_annotation_value) AS n_r_c_ea_rownum,
+    row_number() OVER (PARTITION BY id,
+                                    parent,
+                                    component_id) AS n_r_c_rownum,
+    row_number() OVER (PARTITION BY id,
+                                    parent,
+                                    component_id,
+                                    node_annotation_namespace,
+                                    node_annotation_name,
+                                    node_annotation_value) AS n_r_c_na_rownum
 FROM
 (
   SELECT
@@ -89,8 +116,11 @@ FROM
     _edge_annotation.namespace AS edge_annotation_namespace,
     _edge_annotation.name AS edge_annotation_name,
     _edge_annotation.value AS edge_annotation_value,
-    false AS sample_node,
-    false AS sample_node_anno
+    false AS sample_n,
+    false AS sample_n_r_c,
+    false AS sample_n_na,
+    false AS sample_n_r_c_ea,
+    false AS sample_n_r_c_na
   FROM
     _node
     JOIN _rank ON (_rank.node_ref = _node.id)
