@@ -1,4 +1,4 @@
---- ../../../target/generated-sources/sablecc/de/deutschdiachrondigital/dddquery/node/Node.java	2009-09-01 15:14:56.000000000 +0200
+--- generated-sources/sablecc/de/deutschdiachrondigital/dddquery/node/Node.java	2009-09-01 15:14:56.000000000 +0200
 +++ dddqueryNode.java	2009-09-01 15:09:55.000000000 +0200
 @@ -63,13 +63,13 @@
          return null;
