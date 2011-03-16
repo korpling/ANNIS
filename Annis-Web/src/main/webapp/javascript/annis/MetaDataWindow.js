@@ -16,7 +16,7 @@ Ext.onReady(function()
 
     var config = {};
     config.title = 'Meta Data for ' + name;
-    config.width = 800;
+    config.width = (!hideAttr) ? 800 : 400;
     config.height = 420;
 
     var grid = null;
