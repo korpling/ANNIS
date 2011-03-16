@@ -6,7 +6,8 @@ Ext.onReady(function()
 
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
-    return record.json.name + "=\"" + value + "\"";
+    return '<p style=\'white-space: normal\'>' + record.json.name + "=\""
+        + value + "\"</p>";
   }
 
   MetaDataWindow = function(id, name)
@@ -34,11 +35,14 @@ Ext.onReady(function()
     var colModel = new Ext.grid.ColumnModel([ {
       header : "Name",
       dataIndex : 'key'
-    },
-
-    {
+    }, {
       header : "Value",
-      dataIndex : 'value'
+      dataIndex : 'value',
+      renderer : function(value)
+      {
+        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
+        return '<p style=\'' + css + '\'>' + value + '</p>';
+      }
     } ]);
 
     var gridMeta = new Ext.grid.GridPanel({
