@@ -2,8 +2,8 @@
 function renderCorpusInfo (value, metadata, record, rowIndex, colIndex, store)
 {
   var id = value;
-  var action = 'new MetaDataWindow(' + id + ').show();';
-
+  var corpusName = record.json.name;
+  var action = 'new MetaDataWindow(' + id + ",\'" + corpusName +"\').show();";
   var output = '<a href="#" onclick="' + action + '"><img src="' + conf_context + '/images/info.gif"></a>';
   
   return output;

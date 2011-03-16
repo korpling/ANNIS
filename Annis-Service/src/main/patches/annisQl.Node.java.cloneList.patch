@@ -1,4 +1,4 @@
---- ../../../target/generated-sources/sablecc/annis/ql/node/Node.java	2009-09-01 15:14:55.000000000 +0200
+--- generated-sources/sablecc/annis/ql/node/Node.java	2009-09-01 15:14:55.000000000 +0200
 +++ annisNode.java	2009-09-01 15:08:53.000000000 +0200
 @@ -63,13 +63,13 @@
          return null;
