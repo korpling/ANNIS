@@ -365,11 +365,6 @@ public class SpringAnnisAdministrationDao {
 
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
-//		log.info("creating node table for corpus with ID " + corpusID);
-//
-//    executeSqlFromScript("node.sql", args);
-
-
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("facts.sql", args);
 
@@ -378,12 +373,6 @@ public class SpringAnnisAdministrationDao {
 
     log.info("clustering materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("cluster.sql", args);
-
-//    log.info("indexing the new node table (corpus with ID " + corpusID + ")");
-//    executeSqlFromScript("indexes_node.sql", args);
-//
-//    log.info("indexing the new node_annotation table (corpus with ID " + corpusID + ")");
-//    executeSqlFromScript("indexes_node_annotation.sql", args);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript("indexes_facts.sql", args);

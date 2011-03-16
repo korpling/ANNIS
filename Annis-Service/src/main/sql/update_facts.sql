@@ -1,11 +1,12 @@
 UPDATE facts_:id
 SET
 is_token=(CASE WHEN token_index IS NOT NULL THEN true ELSE false END),
-sample_n=(CASE WHEN n_rownum = 1 THEN true ELSE false END),
-sample_n_na=(CASE WHEN n_na_rownum = 1 THEN true ELSE false END),
-sample_n_r_c=(CASE WHEN n_r_c_rownum = 1 THEN true ELSE false END),
-sample_n_r_c_ea=(CASE WHEN n_r_c_ea_rownum = 1 THEN true ELSE false END),
-sample_n_r_c_na=(CASE WHEN n_r_c_na_rownum = 1 THEN true ELSE false END)
+sample = 
+  ((n_rownum = 1)::integer::bit(5) << 4)
+  |  ((n_na_rownum = 1)::integer::bit(5) << 3)
+  |  ((n_r_c_rownum = 1)::integer::bit(5) << 2)
+  |  ((n_r_c_ea_rownum = 1)::integer::bit(5) << 1 )
+  |  ((n_r_c_na_rownum = 1)::integer::bit(5) )
 ;
 
 -- remove the obsolete columns
