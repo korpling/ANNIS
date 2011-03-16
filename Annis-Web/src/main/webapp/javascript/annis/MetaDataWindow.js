@@ -57,7 +57,8 @@ Ext.onReady(function()
     if (!hideAttr)
     {
       var storeNodeAttributes = new Ext.data.JsonStore({
-        url : conf_context + '/secure/AttributeList?noprefix',
+        url : conf_context + '/secure/AttributeList?corpusIds=' + id
+            + '&noprefix',
         // turn on remote sorting
         remoteSort : false,
         fields : [ 'name', 'values' ]
@@ -80,8 +81,8 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true
-        },        
-        autoWidth : true,       
+        },
+        autoWidth : true,
         height : 380,
         flex : 1
       });
@@ -98,11 +99,11 @@ Ext.onReady(function()
     storeMeta.load();
 
     // init config
-    config.items = (!hideAttr) ? [gridMeta, gridAttribute ] : [ gridMeta ];
+    config.items = (!hideAttr) ? [ gridMeta, gridAttribute ] : [ gridMeta ];
     config.autoScroll = true;
     config.layout = {
-        type : 'hbox'
-    };    
+      type : 'hbox'
+    };
     config.shadow = false;
 
     MetaDataWindow.superclass.constructor.call(this, config);
