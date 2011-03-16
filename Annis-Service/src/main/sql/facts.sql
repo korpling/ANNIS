@@ -46,11 +46,7 @@ INSERT INTO facts_:id
   edge_annotation_namespace,
 	edge_annotation_name,
 	edge_annotation_value,
-  sample_n,
-  sample_n_r_c,
-  sample_n_na,
-  sample_n_r_c_ea,
-  sample_n_r_c_na,
+  sample,
   n_rownum,
   n_na_rownum,
   n_r_c_ea_rownum,
@@ -116,11 +112,7 @@ FROM
     _edge_annotation.namespace AS edge_annotation_namespace,
     _edge_annotation.name AS edge_annotation_name,
     _edge_annotation.value AS edge_annotation_value,
-    false AS sample_n,
-    false AS sample_n_r_c,
-    false AS sample_n_na,
-    false AS sample_n_r_c_ea,
-    false AS sample_n_r_c_na
+    B'00000' AS sample
   FROM
     _node
     JOIN _rank ON (_rank.node_ref = _node.id)

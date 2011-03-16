@@ -50,7 +50,7 @@ public class TestListAnnotationsSqlHelper {
     }
     fail("should throw illegal argument exception on empty corpus list");
   }
-		
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void extractDataNoValues() throws SQLException {

@@ -53,23 +53,28 @@ public class SampleWhereClause extends BaseNodeSqlGenerator
 
       if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
       {
-        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n"), "true"));
+        conditions.add("-- artificial node subview");
+        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{true, false, false, false, false}));
       }
       else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
       {
-        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c"), "true"));
+        conditions.add("-- artificial node-rank-component subview");
+        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, true, false, false}));
       }
       else if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable())
       {
-        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_na"), "true"));
+        conditions.add("-- artificial node-node_annotation subview");
+        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, true, false, false, false}));
       }
       else if(!t.usesNodeAnnotationTable())
       {
-        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c_ea"), "true"));
+        conditions.add("-- artificial node-rank-component-edge_annotation subview");
+        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, true, false}));
       }
       else if(!t.usesEdgeAnnotationTable())
       {
-        conditions.add(join("=", t.aliasedColumn(FACTS_TABLE, "sample_n_r_c_na"), "true"));
+        conditions.add("-- artificial node-rank-component-node_annotation subview");
+        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, false, true}));
       }
     }
     return conditions;

@@ -117,11 +117,7 @@ CREATE TABLE facts
 	edge_annotation_name		varchar(150),
 	edge_annotation_value		varchar(1500),
 
-  sample_n BOOLEAN,
-  sample_n_na BOOLEAN,
-  sample_n_r_c BOOLEAN,
-  sample_n_r_c_ea BOOLEAN,
-  sample_n_r_c_na BOOLEAN
+  sample bit(5)
 );
 
 -- from component
@@ -137,6 +133,7 @@ COMMENT ON COLUMN facts.parent IS 'foreign key to rank.pre of the parent node, o
 COMMENT ON COLUMN facts.edge_annotation_namespace IS 'optional namespace of annotation key';
 COMMENT ON COLUMN facts.edge_annotation_name IS 'annotation key';
 COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
+COMMENT ON COLUMN facts.sample IS 'Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]';
 
 -- external data
 CREATE TABLE extData
