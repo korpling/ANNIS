@@ -20,6 +20,15 @@ public interface AnnisAttribute extends JSONAble, Serializable
     unknown
   };
 
+  public enum SubType
+  {
+    n,
+    d,
+    p,
+    c,
+    unknown
+  };
+
   /**
    *
    * @return A set of distinct values available on this attribute, if populated. Otherwise an empty set object.
@@ -50,6 +59,18 @@ public interface AnnisAttribute extends JSONAble, Serializable
    * @param type
    */
   public void setType(Type type);
+
+  /**
+   * Returns the sub-type ((n)ode, (c)overage, (d)ominance, ...) of this attribute
+   * @return
+   */
+  public SubType getSubtype();
+
+  /**
+   * Sets the sub-type ((n)ode, (c)overage, (d)ominance, ...) of this attribute
+   * @param type
+   */
+  public void setSubtype(SubType subtype);
   
   /**
    * Adds a value the set of distinct values
