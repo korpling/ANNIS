@@ -21,9 +21,9 @@ public class AnnisAttributeSetImpl extends HashSet<AnnisAttribute> implements An
 		StringBuffer sBuffer = new StringBuffer();
 		for(AnnisAttribute a : this) {
 			if(sBuffer.length() > 0)
-				sBuffer.append(", ");
+				sBuffer.append(", \n");
 			sBuffer.append(a.getJSON());
 		}
-		return "[" + sBuffer + "]";
+		return "[" + sBuffer + "]\n";
 	}
 }

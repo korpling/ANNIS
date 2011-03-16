@@ -11,6 +11,7 @@ import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import java.io.File;
@@ -232,11 +233,13 @@ public class AnnisRunner extends AnnisBaseRunner
     printAsTable(corpora, "id", "name", "textCount", "tokenCount");
   }
 
-  public void doNodeAnnotations(String doListValues)
+  public void doAnnotations(String doListValues)
   {
     boolean listValues = "values".equals(doListValues);
-    List<AnnisAttribute> nodeAnnotations = annisDao.listNodeAnnotations(getCorpusList(), listValues);
-    printAsTable(nodeAnnotations, "name", "distinctValues");
+    List<AnnisAttribute> annotations =
+      annisDao.listAnnotations(getCorpusList(), listValues, true);
+    AnnisAttributeSetImpl set = new AnnisAttributeSetImpl(annotations);
+    System.out.println(set.getJSON());
   }
 
   public void doMeta(String corpusId)

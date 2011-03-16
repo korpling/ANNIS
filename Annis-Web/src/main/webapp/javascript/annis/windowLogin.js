@@ -51,7 +51,7 @@ Ext.onReady(function(){
       allowBlank:true,
       listeners:{
         specialkey:function(f,o){
-          if(o.getKey()==13)
+          if(o.getKey()===13)
           {
             formPanelLogin.getForm().submit(loginSubmitConfig);
           }
@@ -65,7 +65,7 @@ Ext.onReady(function(){
       handler: function() {
         formPanelLogin.getForm().submit(loginSubmitConfig);
       }
-            		
+      
     }],
     buttonAlign:'center',
     url: conf_context + '/LoginLogout'

@@ -70,10 +70,12 @@ public interface AnnisService extends Remote {
 	 * 
 	 * @param corpusList
 	 * @param fetchValues Set to true if distinct values for the attributes should be retrieved as well. Attention: This may cause performance penalties.
-	 * @return
+	 * @param onlyMostFrequent if true and fetchValues is also true only the most frequent values are queried
+   * @return
 	 * @throws RemoteException
 	 */
-	public AnnisAttributeSet getNodeAttributeSet(List<Long> corpusList, boolean fetchValues) throws RemoteException;
+	public AnnisAttributeSet getAttributeSet(
+    List<Long> corpusList, boolean fetchValues, boolean onlyMostFrequent) throws RemoteException;
 	
 	/**
 	 * 

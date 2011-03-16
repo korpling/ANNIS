@@ -115,7 +115,8 @@ public class GeneralTextExporter extends HttpServlet
       {
         // auto set
         keys.add("tok");
-        AnnisAttributeSet attributes = service.getNodeAttributeSet(corpusIdList, false);
+        AnnisAttributeSet attributes = 
+          service.getAttributeSet(corpusIdList, false, false);
         for(AnnisAttribute a : attributes)
         {
           if(a.getName() != null)

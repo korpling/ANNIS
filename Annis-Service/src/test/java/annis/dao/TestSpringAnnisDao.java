@@ -10,7 +10,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -46,7 +45,7 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.ListNodeAnnotationsSqlHelper;
+import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
 import java.util.LinkedList;
@@ -70,7 +69,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 //	@Mock private AnnisResultSetBuilder annisResultSetBuilder;
 	@Mock private ListCorpusSqlHelper listCorpusHelper;
-	@Mock private ListNodeAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
+	@Mock private ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
 	@Mock private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
 	@Mock private QueryAnalysis queryAnalysis;
 
@@ -93,7 +92,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
-		annisDao.setListNodeAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
+		annisDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
 		annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
 		annisDao.setQueryAnalysis(queryAnalysis);
     annisDao.setMetaDataFilter(metaDataFilter);
@@ -114,7 +113,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(), is(not(nullValue())));
-		assertThat(springAnnisDao.getListNodeAnnotationsSqlHelper(), is(not(nullValue())));
+		assertThat(springAnnisDao.getListAnnotationsSqlHelper(), is(not(nullValue())));
 		assertThat(springAnnisDao.getCountExtractor(), is(not(nullValue())));
 		
 		// new
@@ -226,10 +225,10 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(NODE_ANNOTATIONS);
 		
 		// stub SQL query
-		when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean())).thenReturn(SQL);
+		when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean(), anyBoolean())).thenReturn(SQL);
 		
 		// call and test
-		assertThat(annisDao.listNodeAnnotations(CORPUS_LIST, false), is(NODE_ANNOTATIONS));
+		assertThat(annisDao.listAnnotations(CORPUS_LIST, false, false), is(NODE_ANNOTATIONS));
 		verify(jdbcTemplate).query(SQL, listNodeAnnotationsSqlHelper);
 	}
 	
