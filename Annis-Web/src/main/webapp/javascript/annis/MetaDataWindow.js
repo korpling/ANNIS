@@ -109,6 +109,7 @@ Ext.onReady(function()
       type : 'hbox'
     };
     config.shadow = false;
+    config.resizable = false;
 
     MetaDataWindow.superclass.constructor.call(this, config);
   };
