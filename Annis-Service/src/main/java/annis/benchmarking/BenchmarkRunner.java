@@ -42,7 +42,7 @@ public class BenchmarkRunner extends AnnisBaseRunner {
 	private SpringAnnisAdministrationDao administrationDao;
 	private DddQueryMapper dddQueryMapper;
 
-	public class Task {
+	public static class Task {
 		private String corpusName;
 		private long corpusId;
 		private String annisQuery;

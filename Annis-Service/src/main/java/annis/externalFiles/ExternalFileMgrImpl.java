@@ -128,11 +128,12 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	 */
 	public Long putFile(ExtFileObjectCom extFile)
 	{ 
-		logger.debug("calling putFile("+extFile.getFile().getName()+") was called...");
 		if (extFile== null)
 			throw new ExternalFileMgrException(ERR_EMPTY_EXTFILE);
 		if (extFile.getFile()== null)
 			throw new ExternalFileMgrException(ERR_NO_FILE);
+
+    logger.debug("calling putFile("+extFile.getFile().getName()+") was called...");
 		
 		//Datei in den Branch kopieren
 		String strBranch= extFile.getBranch();
@@ -223,7 +224,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	
 	/**
 	 * Returns the file which corresponds to the given reference in byte packages. 
-	 * If there�s no file to the given reference null will be returned.
+	 * If there's no file to the given reference null will be returned.
 	 * @param id Long - reference to the needed file 
 	 * @return file which corresponds to the given reference
 	 * @throws Exception

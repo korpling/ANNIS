@@ -127,7 +127,7 @@ public class NodeRelationNormalizer extends DepthFirstAdapter
     result.add(newIdentityRelation);
   }
 
-  public class RelationCollector extends DepthFirstAdapter
+  public static class RelationCollector extends DepthFirstAdapter
   {
     private Map<String, List<ALinguisticConstraintExpr>> isIn = new LinkedHashMap<String, List<ALinguisticConstraintExpr>>();
 

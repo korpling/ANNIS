@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
@@ -80,7 +81,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		}
 	}
 
-	class OptionBuilder {
+	static class OptionBuilder
+  {
 		
 		private Options options;
 		
@@ -200,13 +202,29 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
 	private void usage(String error) {
 		Resource resource = new ClassPathResource("annis/administration/usage.txt");
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+		BufferedReader reader = null;
+    try
+    {
+			reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
 			for (String line = reader.readLine(); line != null; line = reader.readLine())
 				System.out.println(line);
 		} catch (IOException e) {
 			log.warn("could not read usage information: " + e.getMessage());
 		}
+    finally
+    {
+      if(reader != null)
+      {
+        try
+        {
+          reader.close();
+        }
+        catch (IOException ex)
+        {
+          java.util.logging.Logger.getLogger(AnnisAdminRunner.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+    }
 		if (error != null)
 			error(error);
 	}

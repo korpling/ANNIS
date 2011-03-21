@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
@@ -462,9 +463,11 @@ public class SpringAnnisAdministrationDao {
 	private String readSqlFromResource(Resource resource, MapSqlParameterSource args) {
 		// XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
 		Map parameters = args != null ? args.getValues() : new HashMap();
-		try {
+    BufferedReader reader = null;
+		try
+    {
 			String sql = "";
-			BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()));
+			reader = new BufferedReader(new FileReader(resource.getFile()));
 			for (String line = reader.readLine(); line != null; line = reader.readLine())
 				sql += line + "\n";
 			for (Object placeHolder : parameters.keySet()) {
@@ -474,10 +477,26 @@ public class SpringAnnisAdministrationDao {
 				sql = sql.replaceAll(key, value);
 			}
 			return sql;
-		} catch (IOException e) {
+		} 
+    catch (IOException e)
+    {
 			log.error("Couldn't read SQL script from resource file.", e);
 			throw new FileAccessException("Couldn't read SQL script from resource file.", e);
 		}
+    finally
+    {
+      if(reader != null)
+      {
+        try
+        {
+          reader.close();
+        }
+        catch (IOException ex)
+        {
+          java.util.logging.Logger.getLogger(SpringAnnisAdministrationDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+    }
 	}
 	
 	// executes an SQL script from $ANNIS_HOME/scripts
