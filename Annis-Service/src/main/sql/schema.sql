@@ -224,6 +224,8 @@ CREATE TABLE annotations
   occurences bigint,
   "type" varchar(10),
   "subtype" char(1),
+  edge_namespace varchar(150),
+  edge_name varchar(150),
   toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 );
