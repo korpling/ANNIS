@@ -128,11 +128,12 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	 */
 	public Long putFile(ExtFileObjectCom extFile)
 	{ 
-		logger.debug("calling putFile("+extFile.getFile().getName()+") was called...");
 		if (extFile== null)
 			throw new ExternalFileMgrException(ERR_EMPTY_EXTFILE);
 		if (extFile.getFile()== null)
 			throw new ExternalFileMgrException(ERR_NO_FILE);
+
+    logger.debug("calling putFile("+extFile.getFile().getName()+") was called...");
 		
 		//Datei in den Branch kopieren
 		String strBranch= extFile.getBranch();
