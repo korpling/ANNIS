@@ -224,7 +224,7 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 	
 	/**
 	 * Returns the file which corresponds to the given reference in byte packages. 
-	 * If there�s no file to the given reference null will be returned.
+	 * If there's no file to the given reference null will be returned.
 	 * @param id Long - reference to the needed file 
 	 * @return file which corresponds to the given reference
 	 * @throws Exception

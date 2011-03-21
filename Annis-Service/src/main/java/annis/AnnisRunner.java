@@ -97,18 +97,21 @@ public class AnnisRunner extends AnnisBaseRunner
           if (query.trim().length() > 0)
           {
             Map<String, Set<String>> map = proposedIndexHelper(query.trim());
-            for (String table : map.keySet())
+            for (Map.Entry<String, Set<String>> t : map.entrySet())
             {
+              String table = t.getKey();
+              Set<String> l = t.getValue();
+
               if (!output.containsKey(table))
               {
                 output.put(table, new LinkedList<String>());
               }
-              Set<String> l = map.get(table);
+
               if (l.size() > 0)
               {
                 output.get(table).add(StringUtils.join(l, ","));
               }
-              out.println(query + "/" + table + ": " + map.get(table));
+              out.println(query + "/" + table + ": " + l);
             }
           }
         }
