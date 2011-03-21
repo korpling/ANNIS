@@ -20,8 +20,8 @@ INSERT INTO annotations_:id
   occurences,
   "type",
   subtype,
-  edge_name,
-  edge_namespace
+  edge_namespace,
+  edge_name
 )
 
 SELECT :id, namespace, name, value, count(value) as occurences, 
