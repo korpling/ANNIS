@@ -49,6 +49,18 @@ public interface AnnisAttribute extends JSONAble, Serializable
   public void setName(String name);
 
   /**
+   * Get the fully qualified edge name including namespace (if any)
+   * or null if this is not an edge.
+   */
+  public String getEdgeName();
+
+  /**
+   * Set the fully qualified edge name including namespace (if any)
+   * or null if this is not an edge.
+   */
+  public void setEdgeName(String edgeName);
+
+  /**
    * Returns the type (node, edge, ...) of this attribute
    * @return
    */
