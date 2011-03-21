@@ -37,7 +37,7 @@ SELECT DISTINCT :id, e.namespace, e.name, e.value, count(e.value) as occurences,
   'edge', c.type, c.namespace, c.name
 FROM _edge_annotation as e, _rank as r, _component as c
 WHERE e.rank_ref = r.pre AND r.component_ref = c.id
-      AND e.name is not null
+      AND e.name is not null and c.name is not null
 GROUP BY e.namespace, e.name, e.value, c.type, c.namespace, c.name
 ;
 
