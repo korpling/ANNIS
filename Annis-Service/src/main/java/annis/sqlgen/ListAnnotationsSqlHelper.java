@@ -66,17 +66,23 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       String name = resultSet.getString("name");
       String qName = AnnisNode.qName(namespace, name);
 
-      if (!attributesByName.containsKey(qName))
-      {
-        attributesByName.put(qName, new AnnisAttributeImpl());
-      }
-
-      AnnisAttribute attribute = attributesByName.get(qName);
-      attribute.setName(qName);
-
       String edgeNamespace = resultSet.getString("edge_namespace");
       String edgeName = resultSet.getString("edge_name");
       String qEdgeName = AnnisNode.qName(edgeNamespace, edgeName);
+
+      String key = qName;
+      if(qEdgeName != null)
+      {
+        key += "_" + qEdgeName;
+      }
+      if (!attributesByName.containsKey(key))
+      {
+        attributesByName.put(key, new AnnisAttributeImpl());
+      }
+
+      AnnisAttribute attribute = attributesByName.get(key);
+      attribute.setName(qName);
+
       attribute.setEdgeName(qEdgeName);
 
       AnnisAttribute.Type t = AnnisAttribute.Type.unknown;
