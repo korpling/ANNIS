@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FindBugsFilter>
+  <Class name="annis.ql.parser.Parser"/>
+  <Class name="de.deutschdiachrondigital.dddquery.parser.Parser"/>
+  <Class name="annis.ql.lexer.Lexer"/>
+  <Class name="de.deutschdiachrondigital.dddquery.lexer.Lexer"/>
+</FindBugsFilter>

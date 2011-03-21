@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO  
 {
-	private Logger log = Logger.getLogger(this.getClass());
+	private transient Logger logger;
 	
 	private static final String TOOLNAME=	"ExtFileObjectImpl"; 
 	private static final long serialVersionUID = 1678615866336637980L;
@@ -110,6 +110,15 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 		this.setFile(cFile);
 	}
 	
+  private Logger log()
+  {
+    if(logger == null)
+    {
+      logger = Logger.getLogger(this.getClass());
+    }
+    return logger;
+  }
+
 	/**
 	 * returns the unique id of this object
 	 * @return
@@ -162,7 +171,7 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 	 */
 	public File getFile(String fName)
 	{
-		log.debug("Reading binary file: " + fName);
+		log().debug("Reading binary file: " + fName);
 		
 		File retFile = new File(fName);
 

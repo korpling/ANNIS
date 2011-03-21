@@ -466,15 +466,20 @@ public class SpringAnnisAdministrationDao {
     BufferedReader reader = null;
 		try
     {
-			String sql = "";
+      StringBuilder sqlBuf = new StringBuilder();
 			reader = new BufferedReader(new FileReader(resource.getFile()));
 			for (String line = reader.readLine(); line != null; line = reader.readLine())
-				sql += line + "\n";
-			for (Object placeHolder : parameters.keySet()) {
+      {
+				sqlBuf.append(line).append("\n");
+      }
+      String sql = sqlBuf.toString();
+			for (Object placeHolder : parameters.keySet())
+      {
 				String key = placeHolder.toString();
 				String value = parameters.get(placeHolder).toString();
 				log.debug("substitution for parameter '" + key + "' in SQL script: " + value);
-				sql = sql.replaceAll(key, value);
+
+        sql = sql.replaceAll(key, value);
 			}
 			return sql;
 		} 
