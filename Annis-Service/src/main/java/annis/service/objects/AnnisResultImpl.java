@@ -27,7 +27,10 @@ import annis.model.Edge;
 import annis.model.Edge.EdgeType;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisToken;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashSet;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 @Deprecated
 public class AnnisResultImpl implements AnnisResult
@@ -288,9 +291,17 @@ public class AnnisResultImpl implements AnnisResult
 
       return paulaString;
     }
-    catch(Exception e)
+    catch(TransformerException e)
     {
-      throw new RuntimeException("couldn't generate PAULA-Unart: " + e.getMessage());
+      throw new RuntimeException("[TransformerException] couldn't generate PAULA-Unart: " + e.getMessage());
+    }
+    catch(ParserConfigurationException e)
+    {
+      throw new RuntimeException("[ParserConfigurationException] couldn't generate PAULA-Unart: " + e.getMessage());
+    }
+    catch(UnsupportedEncodingException e)
+    {
+      throw new RuntimeException("[UnsupportedEncodingException] couldn't generate PAULA-Unart: " + e.getMessage());
     }
   }
 

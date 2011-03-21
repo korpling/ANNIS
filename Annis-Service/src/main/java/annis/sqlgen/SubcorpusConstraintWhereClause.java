@@ -139,7 +139,7 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
     return hasAlreadyTextref;
   }
 
-  public class IdPair
+  public static class IdPair
   {
 
     public long id1;

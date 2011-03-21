@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
 
@@ -164,13 +165,31 @@ public class ExtFileObjectImpl implements ExtFileObjectCom, ExtFileObjectDAO
 		log.debug("Reading binary file: " + fName);
 		
 		File retFile = new File(fName);
-		
-		try {
-			FileOutputStream fos = new FileOutputStream(retFile);
+
+    FileOutputStream fos = null;
+		try
+    {
+			fos = new FileOutputStream(retFile);
 			fos.write(this.bytes);
-		} catch (IOException e) {
+		} 
+    catch (IOException e)
+    {
 			throw new ExternalFileMgrException(e);
 		}
+    finally
+    {
+      if(fos != null)
+      {
+        try
+        {
+          fos.close();
+        }
+        catch (IOException ex)
+        {
+          java.util.logging.Logger.getLogger(ExtFileObjectImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+    }
 		return(retFile);
 	}
 	

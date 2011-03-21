@@ -82,7 +82,7 @@ public class AnnisNode implements Serializable
     }
   };
 
-  public static class Range
+  public static class Range implements Serializable
   {
 
     private int min;
