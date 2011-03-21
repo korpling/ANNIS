@@ -20,6 +20,12 @@ Ext.onReady(function()
     config.height = 420;
 
     var grid = null;
+    
+    var selectableCell = new Ext.Template(
+        '<td class="x-grid3-col x-grid3-cell x-grid3-td-{id} x-selectable {css}" style="{style}" tabIndex="0" {cellAttr}>',
+        '<div class="x-grid3-cell-inner x-grid3-col-{id}" {attr}>{value}</div>',
+        '</td>'
+     );
 
     // get datastore
     var storeMeta = new Ext.data.JsonStore({
@@ -52,11 +58,14 @@ Ext.onReady(function()
       loadMask : true,
       viewConfig : {
         forceFit : true,
-        autoFill : true
+        autoFill : true,
+        templates: {
+          cell: selectableCell
+        }
       },
       height : 380,
       flex : 1
-    });
+      });
 
     if (!hideAttr)
     {
@@ -84,7 +93,10 @@ Ext.onReady(function()
         title : 'corpus description',
         viewConfig : {
           forceFit : true,
-          autoFill : true
+          autoFill : true,
+          templates: {
+            cell: selectableCell
+          }
         },
         autoWidth : true,
         height : 380,
