@@ -24,13 +24,13 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
-    String sql = "select namespace, name, value, \"type\", subtype from\n"
+    String sql = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
       + "(\n"
-      + "  select *, row_number() OVER (PARTITION BY namespace, name) as row_num\n"
+      + "  select *, row_number() OVER (PARTITION BY namespace, name, edge_namespace, edge_name) as row_num\n"
       + "  FROM\n"
       + "  (\n"
       + "    select distinct\n"
-      + "    namespace, name, \"type\", subtype, occurences, :value AS value\n"
+      + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, occurences, :value AS value\n"
       + "    FROM annotations\n"
       + "    WHERE\n"
       + "    value <> '--'\n"
@@ -38,7 +38,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
         corpusList.isEmpty() ?
           "\n" : "    AND toplevel_corpus IN (:corpora)\n"
         )
-      + "    ORDER by namespace, name, occurences desc\n"
+      + "    ORDER by namespace, name, edge_namespace, edge_name, occurences desc\n"
       + "  ) as tableAll\n"
       + ") as tableFreq\n";
     if ((listValues && onlyMostFrequentValue) || !listValues)
@@ -66,13 +66,25 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       String name = resultSet.getString("name");
       String qName = AnnisNode.qName(namespace, name);
 
-      if (!attributesByName.containsKey(qName))
+      String edgeNamespace = resultSet.getString("edge_namespace");
+      String edgeName = resultSet.getString("edge_name");
+      String qEdgeName = AnnisNode.qName(edgeNamespace, edgeName);
+
+      String key = qName;
+      if(qEdgeName != null)
       {
-        attributesByName.put(qName, new AnnisAttributeImpl());
+        key += "_" + qEdgeName;
+      }
+      if (!attributesByName.containsKey(key))
+      {
+        attributesByName.put(key, new AnnisAttributeImpl());
       }
 
-      AnnisAttribute attribute = attributesByName.get(qName);
+      AnnisAttribute attribute = attributesByName.get(key);
       attribute.setName(qName);
+
+      attribute.setEdgeName(qEdgeName);
+
       AnnisAttribute.Type t = AnnisAttribute.Type.unknown;
       try
       {

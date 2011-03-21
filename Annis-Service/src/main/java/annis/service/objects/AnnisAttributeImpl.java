@@ -14,6 +14,7 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
 
   private static final long serialVersionUID = 4786862953057862936L;
   private String name = "";
+  private String edgeName = null;
   private Set<String> distinctValues = new HashSet<String>();
   private Type type;
   private SubType subtype;
@@ -35,6 +36,19 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
   {
     this.name = name;
   }
+
+  @Override
+  public String getEdgeName()
+  {
+    return edgeName;
+  }
+
+  @Override
+  public void setEdgeName(String edgeName)
+  {
+    this.edgeName = edgeName;
+  }
+
 
   @Override
   public Type getType()
@@ -64,8 +78,12 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
   public String getJSON()
   {
     StringBuffer sBuffer = new StringBuffer();
-    sBuffer.append("\"name\": \"").append(this.getName()).append("\",\n")
-      .append("\"type\" : \"").append(getType().name()).append("\",\n")
+    sBuffer.append("\"name\": \"").append(this.getName()).append("\",\n");
+    if(this.getEdgeName() != null)
+    {
+      sBuffer.append("\"edge_name\": \"").append(this.getEdgeName()).append("\",\n");
+    }
+    sBuffer.append("\"type\" : \"").append(getType().name()).append("\",\n")
       .append("\"subtype\" : \"").append(getSubtype().name()).append("\",\n")
       .append("\"values\": [");
     int vCount = 0;
