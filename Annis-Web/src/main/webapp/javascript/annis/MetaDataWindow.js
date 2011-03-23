@@ -9,6 +9,14 @@ Ext.onReady(function()
     return '<p style=\'white-space: normal\'>' + record.json.name + "=\""
         + value + "\"</p>";
   }
+  
+  function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
+  {    
+    var operator = (record.json.subtype === 'd') ? '>' : '->';
+    return '<p style=\'white-space: normal\'> node & node & #1 ' + operator
+        + '[' + record.json.name + "=\"" + record.json.values
+        + "\"] #2</p>";
+  }
 
   MetaDataWindow = function(id, name)
   {
@@ -66,31 +74,34 @@ Ext.onReady(function()
       height : 380,
       flex : 1
       });
+    
+    storeMeta.load();
 
     if (!hideAttr)
     {
-      var storeNodeAttributes = new Ext.data.JsonStore({
+      var storeAttributes = new Ext.data.JsonStore({
         url : conf_context + '/secure/AttributeList?corpusIds=' + id
             + '&noprefix',
         // turn on remote sorting
         remoteSort : false,
-        fields : [ 'name', 'values' ]
+        fields : [ 'name', 'values', 'type' ]
       });
 
-      var colModelAttribute = new Ext.grid.ColumnModel([ {
+      var colModelNodeAnnotations = new Ext.grid.ColumnModel([ {
         header : "name",
         dataIndex : "name"
       }, {
         header : "example",
         dataIndex : "values",
         renderer : readableExample
-      } ]);
+      } ]);    
+      
 
-      var gridAttribute = new Ext.grid.GridPanel({
-        ds : storeNodeAttributes,
-        cm : colModelAttribute,
+      var gridNodeAnnotations = new Ext.grid.GridPanel({
+        ds : storeAttributes,
+        cm : colModelNodeAnnotations,
         loadMask : true,
-        title : 'corpus description',
+        title : 'node annotations',
         viewConfig : {
           forceFit : true,
           autoFill : true,
@@ -99,23 +110,65 @@ Ext.onReady(function()
           }
         },
         autoWidth : true,
-        height : 380,
+        height : 360        
+      });
+     
+      var storeEdgeAnnotations = new Ext.data.JsonStore({
+        remoteSort : false,
+        fields : [ 'name', 'values', 'type' ]
+      });  
+      
+      var colModelEdgeAnnotation = new Ext.grid.ColumnModel([ {
+        header : "name",
+        dataIndex : "name"
+      }, {
+        header : "example",
+        dataIndex : "values",
+        renderer : edgeAnnotation
+      } ]);
+      
+      var gridEdgeAnnotations = new Ext.grid.GridPanel({
+        ds : storeEdgeAnnotations,
+        cm : colModelEdgeAnnotation,
+        loadMask : true,
+        title : 'edge annotations',
+        viewConfig : {
+          forceFit : true,
+          autoFill : true,
+          templates: {
+            cell: selectableCell
+          }
+        },
+        autoWidth : true,
+        height : 360   
+      });
+         
+      
+      storeAttributes.setDefaultSort('name', 'asc');
+      storeAttributes.on("load", function(store, records, options)
+      {       
+        storeEdgeAnnotations.add(store.getRange(0, store.getCount()));
+        storeEdgeAnnotations.filter("type", "edge", true, true);
+        store.filter("type", "node", true, true);
+      });
+      storeAttributes.load();
+      
+   
+     
+      var rightPanel = new Ext.Panel({
+        layout: 'accordion',
+        layoutConfig: {
+            animate: true
+        },
+        items : [ gridNodeAnnotations, gridEdgeAnnotations ],
         flex : 1
       });
-
-      storeNodeAttributes.setDefaultSort('name', 'asc');
-      storeNodeAttributes.load({
-        params : {
-          corpusIdList : '',
-          type : 'node'
-        }
-      });
-    }
-
-    storeMeta.load();
+    }    
+    
+    
 
     // init config
-    config.items = (!hideAttr) ? [ gridMeta, gridAttribute ] : [ gridMeta ];
+    config.items = (!hideAttr) ? [ gridMeta, rightPanel ] : [ gridMeta ];
     config.autoScroll = true;
     config.layout = {
       type : 'hbox'
