@@ -10,33 +10,48 @@ Ext.onReady(function()
     var edgeNameArray = name.split(":");
     return edgeNameArray[edgeNameArray.length - 1];
   }
-  
+
+  function hasDominanceEdges(records)
+  {
+    for(var i=0; i < records.length; i++)
+    {
+      var r = records[i];
+      if(r.get("type") === 'edge' && r.get("subtype") === 'd')
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // filter function for edge types
-  var edge_names = [];
+  var edge_names = {};
   function edgeNames(record, id)
   {
     
     var qualifiedName = false; // if we want the qualified name set to true
     
-    if (record.json.edge_name)
+    if (record.get("edge_name"))
     {
-      if (qualifiedName)
-      {
-        var edgeName = record.get('edge_name');
-      } else
+      var eName = record.get('edge_name');
+      if (!qualifiedName)
       { 
-        var edgeName = killNameSpaces(record.get('edge_name'));
-        record.set('edge_name', edgeName);
+        eName = killNameSpaces(eName);
+        record.set('edge_name', eName);
       }
 
-      record.set('name', edgeName);
+      if(Ext.util.Format.trim(eName) !== '')
+      {
+        record.set('name', eName);
+      }
       record.commit();
 
-      for ( var i = 0; i < edge_names.length; i++)
-        if (edge_names[i] == edgeName)
-          return false;
+      if(edge_names.eName === true)
+      {
+        return false;
+      }
 
-      edge_names.push(edgeName);
+      edge_names[eName] = true;
       return true;
     }
     return false;
@@ -60,7 +75,8 @@ Ext.onReady(function()
   function edgeTypes(value, metadata, record, rowIndex, colIndex, store)
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->';
-    return '<p style=\'white-space: normal\'> node & node & #1 ' + operator + value
+    return '<p style=\'white-space: normal\'> node & node & #1 ' + operator + 
+        record.get('edge_name')
         + " #2</p>";
   }
 
@@ -228,11 +244,27 @@ Ext.onReady(function()
       storeAttributes.setDefaultSort('name', 'asc');
       storeAttributes.on("load", function(store, records, options)
       {
+        if(hasDominanceEdges(records))
+        {
+          var a = [];
+          a[0] = '';
+          var domEdgeType = {};
+          domEdgeType['name'] = '(dominance)';
+          domEdgeType['type'] = 'edge';
+          domEdgeType['subtype'] = 'd';
+          domEdgeType['edge_name'] = ' ';
+          domEdgeType['values'] = a;
+          var domEdgeTypeRecord = new storeEdgeTypes.recordType(domEdgeType, Ext.id());
+          
+          storeEdgeTypes.add(domEdgeTypeRecord);
+        }
+
         // copy and filter for the several annotation-stores
         storeEdgeAnnotations.add(store.getRange(0, store.getCount()));
         storeEdgeTypes.add(store.getRange(0, store.getCount()));
         storeEdgeAnnotations.filter("type", "edge", true, true);
-        storeEdgeTypes.filterBy(edgeNames);
+        storeEdgeTypes.filterBy(edgeNames); // end filterBy storeEdgeTypes
+
         store.filter("type", "node", true, true);
       });
 
