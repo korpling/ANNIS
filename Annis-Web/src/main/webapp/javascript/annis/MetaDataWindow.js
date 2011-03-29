@@ -11,9 +11,32 @@ Ext.onReady(function()
     return edgeNameArray[edgeNameArray.length - 1];
   }
 
+  function isAmbiguous(store, records, field)
+  {
+    var names = {};
+    var i;
+    for(i=0; i < records.length; i++)
+    {
+      var n = killNameSpaces(records[i].get(field));
+      if(n)
+      {
+        if(names[n] === true)
+        {
+          return true;
+        }
+        else
+        {
+          names[n] = true;
+        }
+      }
+    }
+    return false;
+  }
+
   function hasDominanceEdges(records)
   {
-    for(var i=0; i < records.length; i++)
+    var i;
+    for(i=0; i < records.length; i++)
     {
       var r = records[i];
       if(r.get("type") === 'edge' && r.get("subtype") === 'd')
@@ -29,17 +52,10 @@ Ext.onReady(function()
   function edgeNames(record, id)
   {
     
-    var qualifiedName = false; // if we want the qualified name set to true
-    
     if (record.get("edge_name"))
     {
       var eName = record.get('edge_name');
-      if (!qualifiedName)
-      { 
-        eName = killNameSpaces(eName);
-        record.set('edge_name', eName);
-      }
-
+      
       if(Ext.util.Format.trim(eName) !== '')
       {
         record.set('name', eName);
@@ -58,6 +74,18 @@ Ext.onReady(function()
   }
   
   //render functions
+  function nameRenderer(value, metadata, record, rowIndex, colIndex, store)
+  {
+    if(isAmbiguous(store, store.getRange(), 'name') === true)
+    {
+      return value;
+    }
+    else
+    {
+      return killNameSpaces(value);
+    }
+  }
+
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
     return '<p style=\'white-space: normal\'>' + record.get('name') + "=\""
@@ -76,7 +104,7 @@ Ext.onReady(function()
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->';
     return '<p style=\'white-space: normal\'> node & node & #1 ' + operator + 
-        record.get('edge_name')
+        killNameSpaces(record.get('edge_name'))
         + " #2</p>";
   }
 
@@ -149,16 +177,22 @@ Ext.onReady(function()
       var height = 300;
 
       var storeAttributes = new Ext.data.JsonStore({
-        url : conf_context + '/secure/AttributeList?corpusIds=' + id
-            + '&noprefix',
+        url : conf_context + '/secure/AttributeList?corpusIds=' + id,
         // turn on remote sorting
         remoteSort : false,
         fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ]
       });
 
+      var storeNodeAnnotations = new Ext.data.JsonStore({
+        remoteSort : false,
+        fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
+        storeId: 'storeNodeAnnotations'
+      });
+
       var colModelNodeAnnotations = new Ext.grid.ColumnModel([ {
         header : "name",
-        dataIndex : "name"
+        dataIndex : "name",
+        renderer: nameRenderer
       }, {
         header : "example",
         dataIndex : "values",
@@ -166,7 +200,7 @@ Ext.onReady(function()
       } ]);
 
       var gridNodeAnnotations = new Ext.grid.GridPanel({
-        ds : storeAttributes,
+        ds : storeNodeAnnotations,
         cm : colModelNodeAnnotations,
         loadMask : true,
         title : 'node annotations',
@@ -183,12 +217,14 @@ Ext.onReady(function()
 
       var storeEdgeAnnotations = new Ext.data.JsonStore({
         remoteSort : false,
-        fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ]
+        fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
+        storeId: 'storeEdgeAnnotations'
       });
 
       var colModelEdgeAnnotation = new Ext.grid.ColumnModel([ {
         header : "name",
-        dataIndex : "name"
+        dataIndex : "name",
+        renderer: nameRenderer
       }, {
         header : "example",
         dataIndex : "values",
@@ -213,12 +249,14 @@ Ext.onReady(function()
 
       var storeEdgeTypes = new Ext.data.JsonStore({
         remoteSort : false,
-        fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ]
+        fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
+        storeId: 'storeEdgeTypes'
       });
 
       var colEdgeTypes = new Ext.grid.ColumnModel([ {
         header : "name",
-        dataIndex : "name"
+        dataIndex : "name",
+        renderer: nameRenderer
       }, {
         header : "example",
         dataIndex : "edge_name",
@@ -244,16 +282,17 @@ Ext.onReady(function()
       storeAttributes.setDefaultSort('name', 'asc');
       storeAttributes.on("load", function(store, records, options)
       {
+
         if(hasDominanceEdges(records))
         {
           var a = [];
           a[0] = '';
           var domEdgeType = {};
-          domEdgeType['name'] = '(dominance)';
-          domEdgeType['type'] = 'edge';
-          domEdgeType['subtype'] = 'd';
-          domEdgeType['edge_name'] = ' ';
-          domEdgeType['values'] = a;
+          domEdgeType.name = '(dominance)';
+          domEdgeType.type = 'edge';
+          domEdgeType.subtype = 'd';
+          domEdgeType.edge_name = ' ';
+          domEdgeType.values = a;
           var domEdgeTypeRecord = new storeEdgeTypes.recordType(domEdgeType, Ext.id());
           
           storeEdgeTypes.add(domEdgeTypeRecord);
@@ -262,13 +301,30 @@ Ext.onReady(function()
         // copy and filter for the several annotation-stores
         storeEdgeAnnotations.add(store.getRange(0, store.getCount()));
         storeEdgeTypes.add(store.getRange(0, store.getCount()));
-        storeEdgeAnnotations.filter("type", "edge", true, true);
-        storeEdgeTypes.filterBy(edgeNames); // end filterBy storeEdgeTypes
+        storeNodeAnnotations.add(store.getRange(0, store.getCount()));
+        
+        var knownEdgeAnnotations = {};
+        storeEdgeAnnotations.filterBy(function(record, id){
+          if(record.get("type") === 'edge')
+          {
+            var annoName = record.get('subtype')
+              + '.' + record.get('edge_type') + '.' + record.get("name");
+            if(knownEdgeAnnotations[annoName] !== true)
+            {
+              knownEdgeAnnotations[annoName] = true;
+              return true;
+            }
+          }
+          return false;
+        });
+        storeEdgeTypes.filterBy(edgeNames);
 
-        store.filter("type", "node", true, true);
-      });
+        storeNodeAnnotations.filter("type", "node", false, true);
+        
+      }); // end on load storeAttributes
 
       storeAttributes.load();
+      
 
       rightPanel = new Ext.Panel({
         layout : 'accordion',
