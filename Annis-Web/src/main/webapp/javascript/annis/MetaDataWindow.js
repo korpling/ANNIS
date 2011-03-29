@@ -88,7 +88,7 @@ Ext.onReady(function()
 
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
-    return '<p style=\'white-space: normal\'>' + record.get('name') + "=\""
+    return '<p style=\'white-space: normal\'>' + killNameSpaces(record.get('name')) + "=\""
         + value + "\"</p>";
   }
 
@@ -96,7 +96,7 @@ Ext.onReady(function()
   {    
     var operator = (record.get('subtype') === "d") ? '>' : '->' + killNameSpaces(record.get('edge_name'));
     return '<p style=\'white-space: normal\'> node & node & #1 ' + operator
-        + '[' + record.get('name') + "=\"" + record.get('values')
+        + '[' + killNameSpaces(record.get('name')) + "=\"" + record.get('values')
         + "\"] #2</p>";
   }
 
