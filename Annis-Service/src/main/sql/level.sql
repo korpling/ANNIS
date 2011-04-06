@@ -1,3 +1,5 @@
+set enable_mergejoin = false;
+
 -- compute real roots
 -- actually, roots of components that are not actual roots should link parent to their parent node (even though it is in another component)
 -- BEGIN;
@@ -30,7 +32,7 @@ AS
     WHERE
       r.root is true
 
-    UNION
+    UNION ALL
 
     SELECT r.pre as pre, l.level+1 as level
     FROM _rank as r, levelcalc as l
@@ -50,3 +52,5 @@ DROP INDEX _idx_rank__parent;
 DROP INDEX _idx_tmplevels_pre;
 
 DROP TABLE tmplevels;
+
+set enable_mergejoin = true;
