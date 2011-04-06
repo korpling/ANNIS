@@ -13,7 +13,8 @@ AS
     WHERE
       n.token_index is not null
       AND r.node_ref = n.id
-    UNION ALL
+
+    UNION
 
     SELECT r.node_ref AS id, r.parent AS parent, r.pre AS pre,
           l.left_token AS left_token, l.right_token AS right_token
@@ -26,6 +27,8 @@ AS
   FROM leftright
   GROUP BY id
 );
+
+CREATE INDEX _idx_spannendtoken_id on spannendtoken(id);
 
 UPDATE _node SET
 left_token = (SELECT left_token FROM spannendtoken AS s WHERE s.id = _node.id),

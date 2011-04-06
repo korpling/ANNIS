@@ -3,7 +3,7 @@
 -- BEGIN;
 ALTER TABLE _rank ADD root boolean DEFAULT 'n';
 
-CREATE TABLE _tmp_real_roots AS SELECT node_ref
+CREATE TEMPORARY TABLE _tmp_real_roots AS SELECT node_ref
 FROM _rank 
 GROUP BY node_ref
 HAVING count(distinct _rank.parent) = 0;
@@ -19,11 +19,34 @@ ALTER TABLE _rank ADD level integer;
 
 -- create indexes for better performance
 CREATE INDEX _idx_rank__parent ON _rank (parent);
-CREATE INDEX _idx_rank__level_pre ON _rank (level, pre);
 
--- rank.level is computed recursively in a stored procedure
-SELECT compute_rank_level();
+CREATE TEMPORARY TABLE tmplevels
+AS
+(
+  WITH RECURSIVE levelcalc AS
+  (
+    SELECT r.pre as pre, 0 as level
+    FROM _rank as r
+    WHERE
+      r.root is true
+
+    UNION
+
+    SELECT r.pre as pre, l.level+1 as level
+    FROM _rank as r, levelcalc as l
+    WHERE
+      r.parent = l.pre
+  )
+  SELECT * FROM levelcalc as l
+);
+CREATE INDEX _idx_tmplevels_pre on tmplevels(pre);
+
+UPDATE _rank SET
+level = (SELECT level FROM tmplevels AS l WHERE l.pre = _rank.pre)
+WHERE _rank.pre is not null;
 
 -- drop those indexes
 DROP INDEX _idx_rank__parent;
-DROP INDEX _idx_rank__level_pre;
+DROP INDEX _idx_tmplevels_pre;
+
+DROP TABLE tmplevels;
