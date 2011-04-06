@@ -14,7 +14,7 @@ AS
       n.token_index is not null
       AND r.node_ref = n.id
 
-    UNION
+    UNION ALL
 
     SELECT r.node_ref AS id, r.parent AS parent, r.pre AS pre,
           l.left_token AS left_token, l.right_token AS right_token
