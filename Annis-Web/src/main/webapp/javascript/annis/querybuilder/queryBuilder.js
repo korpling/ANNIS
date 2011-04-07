@@ -6,6 +6,18 @@ captionClear = 'Clear';
 captionAddField = 'Add';
 captionDelete = 'X';
 
+function queryBuilderUpdateNodeAnnos(corpusIdListAsString)
+{
+  var storeNodeAttributes = Ext.StoreMgr.get('storeNodeAttributes');
+  storeNodeAttributes.load({
+    params: {
+      corpusIds: corpusIdListAsString,
+      type: 'node'
+    }
+  });
+}
+
+
 // helper //
 
 Array.prototype.remove=function(s)
@@ -23,11 +35,22 @@ Array.prototype.remove=function(s)
 
 //The field record type
 var AnnisSearchField = Ext.data.Record.create([
-  // the "name" below matches the tag name to read, except "availDate"
-  // which is mapped to the tag "availability"
-  {name: 'name', type: 'string'},
-  {name: 'operator', type: 'string'},
-  {name: 'value', type: 'string'}
+// the "name" below matches the tag name to read, except "availDate"
+// which is mapped to the tag "availability"
+{
+  name: 'name',
+  type: 'string'
+},
+
+{
+  name: 'operator',
+  type: 'string'
+},
+
+{
+  name: 'value',
+  type: 'string'
+}
 ]);
 	
 Ext.QuickTips.init();
@@ -38,54 +61,54 @@ var storeNodeAttributes = new Ext.data.JsonStore({
   url: conf_context + '/secure/AttributeList?noprefix',
   // turn on remote sorting
   remoteSort: false,
-  fields: [ 'name', 'values' ]
+  fields: [ 'name', 'values' ],
+  storeId: 'storeNodeAttributes'
 });
 
 storeNodeAttributes.setDefaultSort('name', 'asc');
-storeNodeAttributes.load({params: {corpusIdList: '', type: 'node'}});
-		
+  	
 		
 var storeFieldOperators = new Ext.data.SimpleStore({
   fields: ['operator'],
   data: [['='],['~'], ['!='], ['!~']]
 });
-		
+
 var storeEdgeTypes = new Ext.data.SimpleStore({
   fields: ['operator', 'type'],
   data : 	[
-    ['.'   , '.'				], 
-    ['.*'  , '.*'				], 
-    ['>'   , '>'					], 
-    ['>*'  , '>*'				],
-    ['>@l'  , '>@l'					],
-    ['>@r'  , '>@r'					],
-    ['$'   , '$'							],
-    ['$*' , '$*'],
-    ['->'   , '->'							],
-    ['_=_' , '_=_'			],
-    ['_i_' , '_i_'			],
-    ['_l_' , '_l_'						],
-    ['_r_' , '_r_'					],
-    ['_o_', '_o_'					],
-    ['_ol_', '_ol_'					],
-    ['_or_', '_or_'					]
+  ['.'   , '.'				],
+  ['.*'  , '.*'				],
+  ['>'   , '>'					],
+  ['>*'  , '>*'				],
+  ['>@l'  , '>@l'					],
+  ['>@r'  , '>@r'					],
+  ['$'   , '$'							],
+  ['$*' , '$*'],
+  ['->'   , '->'							],
+  ['_=_' , '_=_'			],
+  ['_i_' , '_i_'			],
+  ['_l_' , '_l_'						],
+  ['_r_' , '_r_'					],
+  ['_o_', '_o_'					],
+  ['_ol_', '_ol_'					],
+  ['_or_', '_or_'					]
 
-    //['@'   , '@'			]
+  //['@'   , '@'			]
   ]
 });
 
 // turn on validation errors beside the field globally
 Ext.form.Field.prototype.msgTarget = 'side';
-	
+
 var nodeWindowList = [];
 var edgeWindowList = [];
 var createEdgeButtonList = [];
 var edgeProperties = {};
 var nodeProperties = {};
-		
+
 var edgeCount = 0;
 var nodeCount = 0;
-		
+
 function isValidDestination(srcNodeId, dstNodeId) {
   if(srcNodeId == dstNodeId) {
     return false;
@@ -93,8 +116,8 @@ function isValidDestination(srcNodeId, dstNodeId) {
   var state = true;
   Ext.each(edgeWindowList, function(edgeWindow) {
     if((edgeProperties[edgeWindow.getItemId()].srcNodeId == srcNodeId  && edgeProperties[edgeWindow.getItemId()].dstNodeId == dstNodeId)
-        ||
-        (edgeProperties[edgeWindow.getItemId()].srcNodeId == dstNodeId && edgeProperties[edgeWindow.getItemId()].dstNodeId == srcNodeId)) {
+      ||
+      (edgeProperties[edgeWindow.getItemId()].srcNodeId == dstNodeId && edgeProperties[edgeWindow.getItemId()].dstNodeId == srcNodeId)) {
       state = false;
       return false;
     }
@@ -102,12 +125,12 @@ function isValidDestination(srcNodeId, dstNodeId) {
   return state;
 }
 
-var edgeCreationSource = '';	
+var edgeCreationSource = '';
 function resetCreateEdgeButtons() {
   edgeCreationSource = '';
   Ext.each(createEdgeButtonList, function(edgeButton) {
-    var buttonNodeId = edgeButton.getItemId().replace('createEdgeButton', '');	
-			
+    var buttonNodeId = edgeButton.getItemId().replace('createEdgeButton', '');
+
     if(nodeProperties[buttonNodeId].edgeOutIdList.length + nodeProperties[buttonNodeId].edgeInIdList.length  < nodeWindowList.length-1) {
       edgeButton.enable();
     } else {
@@ -137,27 +160,27 @@ function getAnnisQLQuery() {
     if(properties.store.getCount() > 0) {
       var nodeComponentCount = 0;
       properties.store.each(
-      function(record) {
-        if(nodeComponentCount++ > 0) {
-          nodeIdentityOperations += ' & #' + componentCount  + ' _=_ #' + (componentCount+1);
-          query += " & ";
-          componentCount++;
+        function(record) {
+          if(nodeComponentCount++ > 0) {
+            nodeIdentityOperations += ' & #' + componentCount  + ' _=_ #' + (componentCount+1);
+            query += " & ";
+            componentCount++;
+          }
+          var operator = record.get('operator').replace("~", "=");
+          var quotes = (record.get('operator') == '='
+            ||record.get('operator') == '!=' ) ? '"' : '/';
+          var prefix = "";
+          if(record.get('name').trim() !== "" || record.get('name') == 'word' || record.get('name') == 'text')
+          {
+            prefix = record.get('name') + operator;
+          }
+          else if(record.get('name').trim() == "" && operator == "!=")
+          {
+            prefix = 'tok' + record.get('name') + operator;
+          }
+          query += prefix + quotes + record.get('value') + quotes;
         }
-        var operator = record.get('operator').replace("~", "=");
-        var quotes = (record.get('operator') == '='
-          ||record.get('operator') == '!=' ) ? '"' : '/';
-        var prefix = "";
-        if(record.get('name').trim() !== "" || record.get('name') == 'word' || record.get('name') == 'text')
-        {
-          prefix = record.get('name') + operator;
-        }
-        else if(record.get('name').trim() == "" && operator == "!=")
-        {
-          prefix = 'tok' + record.get('name') + operator;
-        }
-        query += prefix + quotes + record.get('value') + quotes;
-      }
-    );
+        );
     } else {
       query += "node";
     }
@@ -248,11 +271,11 @@ function drawLine(srcId, dstId) {
   var dstPosition = [dstNodeWindowSize.width/2+dstNodeWindowPosition[0], dstNodeWindowSize.height/2+dstNodeWindowPosition[1]];
 			
   LineDrawer.drawLine(document.getElementById('canvas'), 
-  srcPosition[0],
-  srcPosition[1], 
-  dstPosition[0],
-  dstPosition[1]
-  );
+    srcPosition[0],
+    srcPosition[1],
+    dstPosition[0],
+    dstPosition[1]
+    );
   // draw two arrows
   var v_x = dstPosition[0] - srcPosition[0];
   var v_y = dstPosition[1] - srcPosition[1];
@@ -311,7 +334,10 @@ function removeEdge(id) {
 function createEdgeWindow(srcWindowId, dstWindowId) {
   edgeCount++;
   var edgeId = 'edge' + edgeCount;
-  edgeProperties[edgeId] = {srcNodeId: srcWindowId, dstNodeId: dstWindowId};
+  edgeProperties[edgeId] = {
+    srcNodeId: srcWindowId,
+    dstNodeId: dstWindowId
+  };
   var edgeWindow = new Ext.Window({
     title: 'Edge Specification ' + edgeCount,
     id: edgeId,
@@ -351,15 +377,15 @@ function createEdgeWindow(srcWindowId, dstWindowId) {
     },
     items: [getNewEdgePanel(edgeId)],
     tbar: [{
-        text: captionDelete,
-        listeners: {
-          click: function() { 
-            removeEdge(edgeId);
-            //Redraw edges
-            alignAllEdgeWindows();
-          }
+      text: captionDelete,
+      listeners: {
+        click: function() {
+          removeEdge(edgeId);
+          //Redraw edges
+          alignAllEdgeWindows();
         }
       }
+    }
     ]
   });
 			
@@ -411,7 +437,7 @@ function getNewNodePanel(nodeWindowId) {
               this.toggle(true);
               this.enable();
             }
-            //toogle this button
+          //toogle this button
           } else {
             if(!this.pressed) {
               //create edge to this point
@@ -440,46 +466,46 @@ function getNewNodePanel(nodeWindowId) {
   });
   nodeProperties[nodeWindowId].store = store;
   var cm = new Ext.grid.ColumnModel([
-    {
-      id:'name',
-      header: "Field",
-      dataIndex: 'name',
-      //width: 124,
-      editor: new Ext.form.ComboBox({
-        store: storeNodeAttributes,
-        displayField: 'name',
-        typeAhead: true,
-        mode: 'local',
-        triggerAction: 'all',
-        selectOnFocus:true,
-        allowBlank: true
-      })
+  {
+    id:'name',
+    header: "Field",
+    dataIndex: 'name',
+    //width: 124,
+    editor: new Ext.form.ComboBox({
+      store: storeNodeAttributes,
+      displayField: 'name',
+      typeAhead: true,
+      mode: 'local',
+      triggerAction: 'all',
+      selectOnFocus:true,
+      allowBlank: true
+    })
 			
 			
-    },
-    {
-      id:'operator',
-      header: 'op',
-      dataIndex: 'operator',
-      width: 45,
-      editor: new Ext.form.ComboBox({
-        store: storeFieldOperators,
-        displayField: 'operator',
-        mode: 'local',
-        triggerAction: 'all',
-        editable: false,
-        selectOnFocus:true
-      })
-    },
-    {
-      id:'value',
-      header: "Value",
-      dataIndex: 'value',
-      //width: 90,
-      editor: new Ext.form.TextField({
-        allowBlank: true
-      })
-    }
+  },
+  {
+    id:'operator',
+    header: 'op',
+    dataIndex: 'operator',
+    width: 45,
+    editor: new Ext.form.ComboBox({
+      store: storeFieldOperators,
+      displayField: 'operator',
+      mode: 'local',
+      triggerAction: 'all',
+      editable: false,
+      selectOnFocus:true
+    })
+  },
+  {
+    id:'value',
+    header: "Value",
+    dataIndex: 'value',
+    //width: 90,
+    editor: new Ext.form.TextField({
+      allowBlank: true
+    })
+  }
   ]);
 			
   var grid = new Ext.grid.EditorGridPanel({
@@ -492,39 +518,39 @@ function getNewNodePanel(nodeWindowId) {
     },
     //width: 265,
     tbar: [	button,
-      {
-        text: captionAddField,
-        handler : function(){
-          var f = new AnnisSearchField({
-            name: '',
-            operator: '=',
-            value: ''
-          });
-          grid.stopEditing();
-          store.insert(0, f);
-          grid.startEditing(0, 0);
-        }
-      },
-      {
-        text: captionClear,
-        handler : function(){
-          grid.stopEditing();
-          try {		
-            store.removeAll();
-          } catch (e) {
-            alert(e);
-          }
-          //store.remove(grid.getSelectionModel().getSelected());
-        }
-      },
-      {
-        text: captionDelete,
-        handler : function(){
-          var nodeWindow = Ext.WindowMgr.get(nodeWindowId);
-          nodeWindow.fireEvent('close');
-          nodeWindow.destroy();
-        }
+    {
+      text: captionAddField,
+      handler : function(){
+        var f = new AnnisSearchField({
+          name: '',
+          operator: '=',
+          value: ''
+        });
+        grid.stopEditing();
+        store.insert(0, f);
+        grid.startEditing(0, 0);
       }
+    },
+    {
+      text: captionClear,
+      handler : function(){
+        grid.stopEditing();
+        try {
+          store.removeAll();
+        } catch (e) {
+          alert(e);
+        }
+      //store.remove(grid.getSelectionModel().getSelected());
+      }
+    },
+    {
+      text: captionDelete,
+      handler : function(){
+        var nodeWindow = Ext.WindowMgr.get(nodeWindowId);
+        nodeWindow.fireEvent('close');
+        nodeWindow.destroy();
+      }
+    }
     ],
     listeners : {
       'afteredit' : {
@@ -538,11 +564,14 @@ function getNewNodePanel(nodeWindowId) {
   return grid;
 }
 		
-		
 function createNodeWindow() {
   nodeCount++;
   var nodeId = 'node' + nodeCount;
-  nodeProperties[nodeId] = {edgeInIdList : [], edgeOutIdList: [], operator: ''};
+  nodeProperties[nodeId] = {
+    edgeInIdList : [],
+    edgeOutIdList: [],
+    operator: ''
+  };
   var nodeWindow = new Ext.Window({
     title: 'Node Specification ' + nodeCount,
     id: nodeId,
@@ -593,7 +622,7 @@ function createNodeWindow() {
 											
             nodeProperties[itemId] = null;
           } catch (e) {
-            //ignore
+          //ignore
           }
 											
           //Disabling last create edge button
