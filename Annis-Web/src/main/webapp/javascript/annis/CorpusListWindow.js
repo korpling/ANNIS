@@ -114,7 +114,7 @@ Ext.onReady(function()
         items: [
         this.corpusGrid
         ]
-      }
+      };
 
       // superclass constructor
       CorpusListWindow.superclass.constructor.call(this, config);
