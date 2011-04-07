@@ -36,6 +36,7 @@
 		<property name="annisDao" ref="springAnnisDao"/>
 		<property name="externalFileMgr" ref="externalFileManager"/>
     <property name="wekaHelper" ref="wekaHelper"/>
+    <property name="maxContext" value="${annis.max-context}" />
 	</bean>
 
 	<!-- Exception handling aspect for AnnisService -->

@@ -365,7 +365,7 @@ Ext.onReady(function()
   //The pad store ;)
   var padStore = new Ext.data.SimpleStore({
     fields: ['pad'],
-    data : [[0], [1], [2], [5], [10]]
+    data : search_context
   });
 	    
   var padLeftComboBox = new Ext.form.ComboBox({
@@ -376,7 +376,7 @@ Ext.onReady(function()
     displayField:'pad',
     mode: 'local',
     triggerAction: 'all',
-    value: '5',
+    value: '' + search_context_default,
     selectOnFocus:true,
     editable: false,
     listeners: {
@@ -395,7 +395,7 @@ Ext.onReady(function()
     displayField:'pad',
     mode: 'local',
     triggerAction: 'all',
-    value: '5',
+    value: '' + search_context_default,
     selectOnFocus:true,
     editable: false,
     listeners: {
