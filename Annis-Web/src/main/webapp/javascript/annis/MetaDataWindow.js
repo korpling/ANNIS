@@ -227,7 +227,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "values",
         renderer : readableExample
       },
@@ -272,7 +272,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "values",
         renderer : edgeAnnotation       
       }, {
@@ -317,7 +317,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "edge_name",
         renderer : edgeTypes
       }, {
