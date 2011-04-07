@@ -85,11 +85,11 @@ Ext.onReady(function()
       return killNameSpaces(value);
     }
   }
-
+  
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
     return '<p style=\'white-space: normal;\'>' + killNameSpaces(record.get('name')) + "=\""
-        + record.get('name') + "\"</p>";
+        + record.get('name') + "</p>";
   }
 
   function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
@@ -108,9 +108,20 @@ Ext.onReady(function()
         + " #2</p>";
   }  
   
+  function annotationUrl (value, metadata, record, rowIndex, colIndex, store)
+  {    
+    return "<a href='#' onclick='getCitationWindow()'><img src='" + conf_context + "/images/url.png'></a>";
+  }
+  
+  // this must be global for using in DOM
+  getCitationWindow = function () 
+  {
+    Ext.Msg.alert('Citation', '<textarea readonly="f" wrap="virtual" rows="5" cols="60">' + Citation.generate() + "</textarea>");
+  };
+  
   // listener
-  function queryToAnnisQL (row,  rowIndex,  record) {
-    
+  function queryToAnnisQL (row,  rowIndex,  record) 
+  {    
     // filter html-tags  
     var reg = /(\<[a-z]+( [a-z]*\=\'[a-z\-\:\; ]*\')*\>)|(\<\/[a-z]*\>)/g;
     var query;    
@@ -219,7 +230,13 @@ Ext.onReady(function()
         header : "example",
         dataIndex : "values",
         renderer : readableExample
-      } ]);
+      },
+      {
+        header : "url",
+        width : 20,
+        dataIndex : "id",
+        renderer : annotationUrl
+      }]);
 
       var gridNodeAnnotations = new Ext.grid.GridPanel({
         ds : storeNodeAnnotations,
@@ -258,6 +275,11 @@ Ext.onReady(function()
         header : "example",
         dataIndex : "values",
         renderer : edgeAnnotation       
+      }, {
+        header : "url",
+        width : 20,
+        dataIndex : "id",
+        renderer : annotationUrl
       } ]);
 
       var gridEdgeAnnotations = new Ext.grid.GridPanel({
@@ -298,6 +320,11 @@ Ext.onReady(function()
         header : "example",
         dataIndex : "edge_name",
         renderer : edgeTypes
+      }, {
+        header : "url",
+        width : 20,
+        dataIndex : "id",
+        renderer : annotationUrl
       } ]);
 
       var gridEdgeTypes = new Ext.grid.GridPanel({
