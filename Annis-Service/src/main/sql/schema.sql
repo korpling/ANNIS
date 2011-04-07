@@ -214,3 +214,18 @@ COMMENT ON COLUMN resolver_vis_map.vis_type IS 'the abstract type of visualizati
 COMMENT ON COLUMN resolver_vis_map.display_name IS 'the name of the layer which shall be shown for display';
 COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
 COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';
+
+CREATE TABLE annotations
+(
+  id bigserial NOT NULL,
+  namespace varchar(150),
+  "name" varchar(150),
+  "value" varchar(1500),
+  occurences bigint,
+  "type" varchar(10),
+  "subtype" char(1),
+  edge_namespace varchar(150),
+  edge_name varchar(150),
+  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  PRIMARY KEY (id)
+);

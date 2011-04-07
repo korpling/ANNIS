@@ -80,6 +80,9 @@ public class CorpusAdministration {
       administrationDao.analyzeStagingTables();
 
 			administrationDao.insertCorpus();
+
+      administrationDao.createAnnotations(corpusID);
+
       // create the new facts table partition
       administrationDao.createFacts(corpusID);
 

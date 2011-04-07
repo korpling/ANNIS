@@ -344,6 +344,16 @@ public class SpringAnnisAdministrationDao {
     }
   }
 
+  void createAnnotations(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+    log.info("creating annotations table for corpus with ID " + corpusID);
+    executeSqlFromScript("annotations.sql", args);
+
+    log.info("indexing annotations table for corpus with ID " + corpusID);
+    executeSqlFromScript("indexes_annotations.sql", args);
+  }
+
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
@@ -358,9 +368,7 @@ public class SpringAnnisAdministrationDao {
 //		log.info("creating node table for corpus with ID " + corpusID);
 //
 //    executeSqlFromScript("node.sql", args);
-//
-//    log.info("creating node_annotation table for corpus with ID " + corpusID);
-//    executeSqlFromScript("node_annotation.sql", args);
+
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("facts.sql", args);
