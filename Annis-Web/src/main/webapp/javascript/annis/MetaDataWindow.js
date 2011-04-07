@@ -88,14 +88,14 @@ Ext.onReady(function()
 
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
-    return '<p style=\'white-space: normal\'>' + killNameSpaces(record.get('name')) + "=\""
-        + value + "\"</p>";
+    return '<p style=\'white-space: normal;\'>' + killNameSpaces(record.get('name')) + "=\""
+        + record.get('name') + "\"</p>";
   }
 
   function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
   {    
     var operator = (record.get('subtype') === "d") ? '>' : '->' + killNameSpaces(record.get('edge_name'));
-    return '<p style=\'white-space: normal\'> node & node & #1 ' + operator
+    return '<p style=\'white-space: normal;\'> node & node & #1 ' + operator
         + '[' + killNameSpaces(record.get('name')) + "=\"" + record.get('values')
         + "\"] #2</p>";
   }
@@ -103,9 +103,31 @@ Ext.onReady(function()
   function edgeTypes(value, metadata, record, rowIndex, colIndex, store)
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->';
-    return '<p style=\'white-space: normal\'> node & node & #1 ' + operator + 
+    return  '<p style=\'white-space: normal;\'>node & node & #1 ' + operator + 
         killNameSpaces(record.get('edge_name'))
         + " #2</p>";
+  }  
+  
+  // listener
+  function queryToAnnisQL (row,  rowIndex,  record) {
+    
+    // filter html-tags  
+    var reg = /(\<[a-z]+( [a-z]*\=\'[a-z\-\:\; ]*\')*\>)|(\<\/[a-z]*\>)/g;
+    var query;    
+
+    switch (row.store.storeId)
+    {
+      case 'storeEdgeTypes':
+        query = edgeTypes(null, null, record, null, null, null);
+        break;
+      case 'storeEdgeAnnotations':
+        query = edgeAnnotation(null, null, record, null, null, null);
+        break;
+      case 'storeNodeAnnotations':
+        query = readableExample(null, null, record, null, null, null);
+    }
+    
+    Ext.getCmp('queryAnnisQL').setValue(query.replace(reg, ''));
   }
 
   MetaDataWindow = function(id, name)
@@ -136,7 +158,7 @@ Ext.onReady(function()
       fields : [ 'key', 'value' ],
       // turn on remote sorting
       remoteSort : true
-    });
+    });    
 
     var colModel = new Ext.grid.ColumnModel([ {
       header : "Name",
@@ -153,7 +175,7 @@ Ext.onReady(function()
 
     var gridMeta = new Ext.grid.GridPanel({
       ds : storeMeta,
-      cm : colModel,
+      cm : colModel,      
       title : 'meta data',
       loadMask : true,
       viewConfig : {
@@ -174,8 +196,8 @@ Ext.onReady(function()
     {
 
       // height of accordion components
-      var height = 300;
-
+      var height = 300;      
+      
       var storeAttributes = new Ext.data.JsonStore({
         url : conf_context + '/secure/AttributeList?corpusIds=' + id,
         // turn on remote sorting
@@ -202,6 +224,13 @@ Ext.onReady(function()
       var gridNodeAnnotations = new Ext.grid.GridPanel({
         ds : storeNodeAnnotations,
         cm : colModelNodeAnnotations,
+        sm : new Ext.grid.RowSelectionModel({
+          singleSelect : true,
+          store : storeNodeAnnotations,
+          listeners : {            
+            'rowselect' : queryToAnnisQL
+          }
+        }),
         loadMask : true,
         title : 'node annotations',
         viewConfig : {
@@ -228,12 +257,20 @@ Ext.onReady(function()
       }, {
         header : "example",
         dataIndex : "values",
-        renderer : edgeAnnotation
+        renderer : edgeAnnotation       
       } ]);
 
       var gridEdgeAnnotations = new Ext.grid.GridPanel({
         ds : storeEdgeAnnotations,
         cm : colModelEdgeAnnotation,
+        sm : new Ext.grid.RowSelectionModel({
+          singleSelect : true,
+          store : storeEdgeAnnotations,
+          listeners : {  
+            singleSelect : true,
+            'rowselect' : queryToAnnisQL
+          }
+        }),
         loadMask : true,
         title : 'edge annotations',
         viewConfig : {
@@ -266,6 +303,13 @@ Ext.onReady(function()
       var gridEdgeTypes = new Ext.grid.GridPanel({
         ds : storeEdgeTypes,
         cm : colEdgeTypes,
+        sm : new Ext.grid.RowSelectionModel({
+          singleSelect : true, 
+          store : storeEdgeTypes,
+          listeners : {      
+            'rowselect' : queryToAnnisQL
+          }
+        }),
         loadMask : true,
         title : 'edge types',
         viewConfig : {
