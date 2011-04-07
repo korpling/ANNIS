@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -90,10 +91,28 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append("<table class=\"partitur_table\" >\n");
       }
 
-      for (int iterator = 0; iterator < partitur.getNameslist().size(); iterator++)
+      LinkedHashSet<String> keys = new LinkedHashSet<String>();
+      String mapping = getMappings().getProperty("annos");
+      if(mapping == null)
       {
+        // default to the alphabetical order
+        keys.addAll(partitur.getNameslist());
+      }
+      else
+      {
+        String[] splitted = mapping.split(",");
+        for(int k=0; k < splitted.length; k++)
+        {
+          String s = splitted[k].trim();
+          if(partitur.getNameslist().contains(s))
+          {
+            keys.add(s);
+          }
+        }
+      }
 
-        String tier = (String) partitur.getNameslist().toArray()[iterator];
+      for (String tier : keys)
+      {
         List<String> indexlist = new ArrayList<String>();
 
         for (List<PartiturParser.ResultElement> span : partitur.getResultlist())

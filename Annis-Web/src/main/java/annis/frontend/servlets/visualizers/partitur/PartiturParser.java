@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -39,13 +40,13 @@ public class PartiturParser implements Serializable
   private List<Token> token;
   private Set<String> knownTiers;
   private HashMap<String, String> tier2ns;
-  private HashSet<String> nameslist;
+  private TreeSet<String> nameslist;
   private List<List<ResultElement>> resultlist;
 
   public PartiturParser(AnnotationGraph graph, String namespace)
   {
     resultlist = new LinkedList<List<ResultElement>>();
-    nameslist = new HashSet<String>();
+    nameslist = new TreeSet<String>();
 
     for (AnnisNode n : graph.getTokens())
     {
@@ -127,7 +128,7 @@ public class PartiturParser implements Serializable
 
   }
 
-  public HashSet<String> getNameslist()
+  public TreeSet<String> getNameslist()
   {
     return nameslist;
   }
