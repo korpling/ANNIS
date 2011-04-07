@@ -1,3 +1,4 @@
+BEGIN; -- transaction
 ----------
 --facts --
 ----------
@@ -51,5 +52,10 @@ CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref,left_token, right_token);
 CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
 
 -- allow search for nodes
-CREATE INDEX idx__sample_node__:id ON facts_:id(sample_node);
-CREATE INDEX idx__sample_node_anno__:id ON facts_:id(sample_node_annotation);
+CREATE INDEX idx__sample_n__:id ON facts_:id((sample & B'10000'));
+CREATE INDEX idx__sample_n_na__:id ON facts_:id((sample & B'01000'));
+CREATE INDEX idx__sample_n_r_c__:id ON facts_:id((sample & B'00100'));
+CREATE INDEX idx__sample_n_r_c_ea__:id ON facts_:id((sample & B'00010'));
+CREATE INDEX idx__sample_n_r_c_na__:id ON facts_:id((sample & B'00001'));
+
+END; -- transaction

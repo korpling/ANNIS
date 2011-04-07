@@ -82,7 +82,7 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 
 CREATE TABLE facts
 (
-  fid SERIAL PRIMARY KEY,
+  fid BIGSERIAL PRIMARY KEY,
   id			numeric(38),
 	text_ref	numeric(38),
 	corpus_ref	numeric(38),
@@ -117,8 +117,7 @@ CREATE TABLE facts
 	edge_annotation_name		varchar(150),
 	edge_annotation_value		varchar(1500),
 
-  sample_node BOOLEAN,
-  sample_node_annotation BOOLEAN
+  sample bit(5)
 );
 
 -- from component
@@ -134,6 +133,7 @@ COMMENT ON COLUMN facts.parent IS 'foreign key to rank.pre of the parent node, o
 COMMENT ON COLUMN facts.edge_annotation_namespace IS 'optional namespace of annotation key';
 COMMENT ON COLUMN facts.edge_annotation_name IS 'annotation key';
 COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
+COMMENT ON COLUMN facts.sample IS 'Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]';
 
 -- external data
 CREATE TABLE extData

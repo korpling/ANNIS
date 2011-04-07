@@ -1,12 +1,17 @@
-UPDATE facts_:id SET is_token=true WHERE token_index IS NOT NULL;
-
--- select the samples from the partition row number
-UPDATE facts_:id SET sample_node=true
-WHERE node_rownum = 1;
-
-UPDATE facts_:id SET sample_node_annotation=true
-WHERE node_anno_rownum = 1;
+UPDATE facts_:id
+SET
+is_token=(CASE WHEN token_index IS NOT NULL THEN true ELSE false END),
+sample = 
+  ((n_rownum = 1)::integer::bit(5) << 4)
+  |  ((n_na_rownum = 1)::integer::bit(5) << 3)
+  |  ((n_r_c_rownum = 1)::integer::bit(5) << 2)
+  |  ((n_r_c_ea_rownum = 1)::integer::bit(5) << 1 )
+  |  ((n_r_c_na_rownum = 1)::integer::bit(5) )
+;
 
 -- remove the obsolete columns
-ALTER TABLE facts_:id DROP COLUMN node_rownum;
-ALTER TABLE facts_:id DROP COLUMN node_anno_rownum;
+ALTER TABLE facts_:id DROP COLUMN n_rownum;
+ALTER TABLE facts_:id DROP COLUMN n_na_rownum;
+ALTER TABLE facts_:id DROP COLUMN n_r_c_rownum;
+ALTER TABLE facts_:id DROP COLUMN n_r_c_ea_rownum;
+ALTER TABLE facts_:id DROP COLUMN n_r_c_na_rownum;
