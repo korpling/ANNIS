@@ -51,7 +51,7 @@ var Citation = {
           var selection = new Array();
           for(i=0;i<cids.length;i++)
           {
-            var index = store.findExact('name',cids[i])
+            var index = store.findExact('name',cids[i]);
             selection[i] = store.getAt(index);
           }
           selectionModel.selectRecords(selection, false);
