@@ -7,3 +7,6 @@ Ext.SSL_SECURE_URL='https://korpling.german.hu-berlin.de' + conf_context + '/emp
 
 // defacto do never a timeout (10 minutes)
 var global_timeout=600000;
+
+var search_context = [[0], [1], [2], [5], [10]];
+var search_context_default = 5;
