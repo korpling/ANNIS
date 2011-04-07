@@ -89,7 +89,7 @@ Ext.onReady(function()
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
     return '<p style=\'white-space: normal;\'>' + killNameSpaces(record.get('name')) + "=\""
-        + record.get('name') + "</p>";
+        + record.get('values')[0] + "\"</p>";
   }
 
   function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
