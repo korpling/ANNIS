@@ -2,6 +2,20 @@ var windowSearchFormWidth = 347;
 var lastQuery = '';
 var lastStatus = '';
 
+function corpusStringListFromSelection(selections)
+{
+  var result = "";
+  for(var i=0;i<selections.length;i++)
+  {
+    if(i !== 0)
+    {
+      result += ",";
+    }
+    result += selections[i].id;
+  }
+  return result;
+}
+
 var Citation = {
   generate : function() {
     var formPanelSearch = Ext.ComponentMgr.get('formPanelSearch');
@@ -154,15 +168,7 @@ Ext.onReady(function()
 			
     //Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = "";
-    for(var i=0;i<selections.length;i++) 
-    {
-      if(i !== 0) 
-      {
-        corpusIdString += ",";
-      }
-      corpusIdString += selections[i].id;
-    }
+    var corpusIdString = corpusStringListFromSelection(selections);
 
     lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
 				
@@ -223,15 +229,7 @@ Ext.onReady(function()
 
     //Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = "";
-    for(var i=0;i<selections.length;i++)
-    {
-      if(i !== 0)
-      {
-        corpusIdString += ",";
-      }
-      corpusIdString += selections[i].id;
-    }
+    var corpusIdString = corpusStringListFromSelection(selections);
 
     var exporterSelection = formPanelExporter.getComponent("exportSelection").getValue();
 
@@ -823,6 +821,7 @@ var exportSelection = new Ext.form.ComboBox({
     listeners: {
       'showQueryBuilder': {
         fn: function() {
+          window.frames.iframeQueryBuilder.queryBuilderUpdateNodeAnnos(corpusStringListFromSelection(corpusListSelectionModel.getSelections()));
           windowSearchForm.setWidth(windowSearchFormWidthQueryBuilder);
           var nodeMaximize = Ext.DomQuery.selectNode('div[class~=x-tool-maximize]', document.getElementById(windowSearchForm.id));
           nodeMaximize.style.visibility = 'visible';
