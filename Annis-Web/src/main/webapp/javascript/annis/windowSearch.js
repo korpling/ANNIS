@@ -855,7 +855,6 @@ var exportSelection = new Ext.form.ComboBox({
     dropAllowed: 'x-dd-drop-ok', 
     ddGroup: 'corpusList', 
     notifyDrop: function(dd, e, data) { 
-      //
       var ds=data.grid.getStore();
       var dt = corpusGrid.getStore();					
       dt.add(data.selections);
