@@ -134,9 +134,6 @@ public class SearchResultServlet extends HttpServlet
       int contextLeft = (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_LEFT);
       int contextRight = (Integer) session.getAttribute(SubmitQueryServlet.KEY_CONTEXT_RIGHT);
 
-      contextLeft = Math.min(10, contextLeft);
-      contextRight = Math.min(10, contextRight);
-
       queryAnnisQL = session.getAttribute(SubmitQueryServlet.KEY_QUERY_ANNIS_QL).toString();
 
       service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));

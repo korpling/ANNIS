@@ -42,6 +42,8 @@ public class AnnisServiceImpl implements AnnisService
   private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
 
+  private int maxContext = 10;
+
   /**
    * Log the successful initialization of this bean.
    *
@@ -72,6 +74,9 @@ public class AnnisServiceImpl implements AnnisService
   public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
     throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
+    contextLeft = Math.min(maxContext, contextLeft);
+    contextRight = Math.min(maxContext, contextRight);
+
     List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseAQL(annisQuery, corpusList), offset, limit, contextLeft, contextRight);
     AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
     for(AnnotationGraph annotationGraph : annotationGraphs)
@@ -196,4 +201,16 @@ public class AnnisServiceImpl implements AnnisService
   {
     this.wekaHelper = wekaHelper;
   }
+
+  public int getMaxContext()
+  {
+    return maxContext;
+  }
+
+  public void setMaxContext(int maxContext)
+  {
+    this.maxContext = maxContext;
+  }
+
+  
 }
