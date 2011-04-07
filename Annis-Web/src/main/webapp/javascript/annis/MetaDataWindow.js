@@ -89,7 +89,7 @@ Ext.onReady(function()
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
     return '<p style=\'white-space: normal;\'>' + killNameSpaces(record.get('name')) + "=\""
-        + record.get('name') + "</p>";
+        + record.get('values')[0] + "\"</p>";
   }
 
   function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
@@ -227,7 +227,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "values",
         renderer : readableExample
       },
@@ -272,7 +272,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "values",
         renderer : edgeAnnotation       
       }, {
@@ -317,7 +317,7 @@ Ext.onReady(function()
         dataIndex : "name",
         renderer: nameRenderer
       }, {
-        header : "example",
+        header : "example (click to use query)",
         dataIndex : "edge_name",
         renderer : edgeTypes
       }, {
