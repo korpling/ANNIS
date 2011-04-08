@@ -881,6 +881,13 @@ var exportSelection = new Ext.form.ComboBox({
   //}
   });
   
+  //added ctrl + enter for getting search results
+  new Ext.KeyMap(Ext.get('queryAnnisQL'), {
+    key : Ext.EventObject.ENTER,
+    ctrl : true,
+    fn : getResult
+  });
+  
   // highlight tutorial
   Ext.get('tutorial').frame('ff0000', 2);
   
