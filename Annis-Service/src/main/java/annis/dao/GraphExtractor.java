@@ -50,6 +50,7 @@ public class GraphExtractor implements ResultSetExtractor
 
   private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
+  private boolean allowIslands;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
@@ -176,43 +177,59 @@ public class GraphExtractor implements ResultSetExtractor
       sb.append(") AND\n");
     }
     sb.append("\t(\n");
-    sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
-      .append(left).append(" AND facts.right_token <= matches.right_token1 + ")
-      .append(right).append(") OR (facts.left_token <= matches.left_token1 - ")
-      .append(left).append(" AND matches.left_token1 - ").append(left)
-      .append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ")
-      .append(right).append(" AND matches.right_token1 + ")
-      .append(right).append(" <= facts.right_token)))");
-    for (int i = 2; i <= nodeCount; ++i)
+    for (int i = 1;  i <= nodeCount; ++i)
     {
-      sb.append(" OR\n");
-      sb.append("\t(facts.text_ref = matches.text_ref");
+      if(i > 1)
+      {
+        sb.append("\n\t\tOR\n");
+      }
+
+
+      sb.append("\t\t(\n"
+        + "\t\t\tfacts.text_ref = matches.text_ref");
       sb.append(i);
-      sb.append(" AND ((facts.left_token >= matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" AND facts.right_token <= matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(") OR (facts.left_token <= matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" AND matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" <= facts.right_token) OR (facts.left_token <= matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(" AND matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(" <= facts.right_token)))");
+      sb.append("\n"
+        + "\t\t\tAND\n");
+
+      if(false && allowIslands)
+      {
+
+      }
+      else
+      {
+        sb.append("\t\t\t(\n"
+          + "\t\t\t\t(facts.left_token >= matches.left_token");
+        sb.append(i);
+        sb.append(" - ");
+        sb.append(left);
+        sb.append(" AND facts.right_token <= matches.right_token");
+        sb.append(i);
+        sb.append(" + ");
+        sb.append(right);
+        sb.append(")\n"
+          + "\t\t\t\tOR (facts.left_token <= matches.left_token");
+        sb.append(i);
+        sb.append(" - ");
+        sb.append(left);
+        sb.append(" AND matches.left_token");
+        sb.append(i);
+        sb.append(" - ");
+        sb.append(left);
+        sb.append(" <= facts.right_token)\n"
+          + "\t\t\t\tOR (facts.left_token <= matches.right_token");
+        sb.append(i);
+        sb.append(" + ");
+        sb.append(right);
+        sb.append(" AND matches.right_token");
+        sb.append(i);
+        sb.append(" + ");
+        sb.append(right);
+        sb.append(" <= facts.right_token)\n"
+          + "\t\t\t)");
+      }
+
+      sb.append("\n"
+        + "\t\t)");
     }
     sb.append("\n\t)\n");
     sb.append("\nORDER BY key, facts.pre");
@@ -395,4 +412,18 @@ public class GraphExtractor implements ResultSetExtractor
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
+
+  public boolean isAllowIslands()
+  {
+    return allowIslands;
+  }
+
+  public void setAllowIslands(boolean allowIslands)
+  {
+    this.allowIslands = allowIslands;
+  }
+
+
+
+  
 }
