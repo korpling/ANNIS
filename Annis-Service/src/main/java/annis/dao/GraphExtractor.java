@@ -184,53 +184,52 @@ public class GraphExtractor implements ResultSetExtractor
         sb.append("\n\t\tOR\n");
       }
 
-
       sb.append("\t\t(\n"
         + "\t\t\tfacts.text_ref = matches.text_ref");
       sb.append(i);
-      sb.append("\n"
-        + "\t\t\tAND\n");
-
-      if(false && allowIslands)
+      
+      if(true || allowIslands)
       {
-
-      }
-      else
-      {
-        sb.append("\t\t\t(\n"
-          + "\t\t\t\t(facts.left_token >= matches.left_token");
+        sb.append("\n"
+          + "\t\t\tAND\n"
+          +"\t\t\t(\n");
+        // left token inside context range
+        sb.append("\t\t\t\t(facts.left_token BETWEEN matches.left_token");
         sb.append(i);
         sb.append(" - ");
         sb.append(left);
-        sb.append(" AND facts.right_token <= matches.right_token");
-        sb.append(i);
-        sb.append(" + ");
-        sb.append(right);
-        sb.append(")\n"
-          + "\t\t\t\tOR (facts.left_token <= matches.left_token");
-        sb.append(i);
-        sb.append(" - ");
-        sb.append(left);
-        sb.append(" AND matches.left_token");
-        sb.append(i);
-        sb.append(" - ");
-        sb.append(left);
-        sb.append(" <= facts.right_token)\n"
-          + "\t\t\t\tOR (facts.left_token <= matches.right_token");
-        sb.append(i);
-        sb.append(" + ");
-        sb.append(right);
         sb.append(" AND matches.right_token");
         sb.append(i);
         sb.append(" + ");
         sb.append(right);
-        sb.append(" <= facts.right_token)\n"
-          + "\t\t\t)");
+        sb.append(")\n");
+        // right token inside context range
+        sb.append("\t\t\t\tOR(facts.right_token BETWEEN matches.left_token");
+        sb.append(i);
+        sb.append(" - ");
+        sb.append(left);
+        sb.append(" AND matches.right_token");
+        sb.append(i);
+        sb.append(" + ");
+        sb.append(right);
+        sb.append(")\n");
+        // context range completly covered
+        sb.append("\t\t\t\tOR(facts.left_token <= matches.left_token");
+        sb.append(i);
+        sb.append(" - ");
+        sb.append(left);
+        sb.append(" AND facts.right_token >= matches.right_token");
+        sb.append(i);
+        sb.append(" + ");
+        sb.append(right);
+        sb.append(")\n");
+        sb.append("\t\t\t)\n");
       }
 
       sb.append("\n"
         + "\t\t)");
     }
+
     sb.append("\n\t)\n");
     sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
