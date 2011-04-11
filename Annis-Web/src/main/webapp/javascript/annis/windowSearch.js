@@ -141,631 +141,669 @@ Ext.onReady(function()
 
     }
 
-  } // end updateStatus
-	
+  } // end updateStatus	
   
+
   function getResult()
   {
     delayKeyTask.cancel();
-    //run only if at least one corpus is selected
-    if("" === formPanelSearch.getComponent('queryAnnisQL').getValue()) 
+    // run only if at least one corpus is selected
+    if ("" === formPanelSearch.getComponent('queryAnnisQL').getValue())
     {
       formPanelSearch.getComponent('matchCount').setValue("0");
       return;
     }
-			
-    if(!corpusListSelectionModel.hasSelection()) 
+
+    if (!corpusListSelectionModel.hasSelection())
     {
-      formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");
+      formPanelSearch.getComponent('matchCount').setValue(
+          "Please select a corpus!");
       return;
     }
-		
+
     // no double requests...
     setSearchButtonDisabled(true);
 
-    //set info box to something neutral
-    formPanelSearch.getComponent('matchCount').setValue("Submitting query...");
-			
-    //Gather selections
+    // set info box to something neutral
+    formPanelSearch.getComponent('matchCount').setValue(
+        "Submitting query...");
+
+    // Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = corpusStringListFromSelection(selections);
+    var corpusIdString = "";
+    for ( var i = 0; i < selections.length; i++)
+    {
+      if (i !== 0)
+      {
+        corpusIdString += ",";
+      }
+      corpusIdString += selections[i].id;
+    }
 
     lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
-				
+
     // submitting query to Server
-    Ext.Ajax.request({
-      url: conf_context + '/secure/SubmitQuery',
-      method: 'GET',
-      params: {
-        'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL').getValue(),
-        'corpusIds': corpusIdString,
-        'padLeft': formPanelSimpleSearch.getComponent('padLeft').getValue(),
-        'padRight': formPanelSimpleSearch.getComponent('padRight').getValue()
-      },
-      success: function(response) 
-      {
-        isLoadingSearchResult = true;
-        showCount();
-        showWindowSearchResult();
-      },
-      failure: function() 
-      {
-        Ext.MessageBox.show({
-          title: 'FATAL ERROR',
-          msg: 'Unable to submit query. This may be caused by a connection problem.',
-          icon: Ext.MessageBox.ERROR,
-          buttons: Ext.MessageBox.OK
+    Ext.Ajax
+        .request({
+          url : conf_context + '/secure/SubmitQuery',
+          method : 'GET',
+          params : {
+            'queryAnnisQL' : formPanelSearch.getComponent('queryAnnisQL')
+                .getValue(),
+            'corpusIds' : corpusIdString,
+            'padLeft' : formPanelSimpleSearch.getComponent('padLeft')
+                .getValue(),
+            'padRight' : formPanelSimpleSearch.getComponent('padRight')
+                .getValue()
+          },
+          success : function(response)
+          {
+            isLoadingSearchResult = true;
+            showCount();
+            showWindowSearchResult();
+          },
+          failure : function()
+          {
+            Ext.MessageBox
+                .show({
+                  title : 'FATAL ERROR',
+                  msg : 'Unable to submit query. This may be caused by a connection problem.',
+                  icon : Ext.MessageBox.ERROR,
+                  buttons : Ext.MessageBox.OK
+                });
+            formPanelSearch.getComponent('matchCount').setValue("");
+            lastStatus = "";
+            setSearchButtonDisabled(false);
+          },
+          autoAbort : true,
+          timeout : global_timeout
         });
-        formPanelSearch.getComponent('matchCount').setValue("");
-        lastStatus="";
-        setSearchButtonDisabled(false);
-      },
-      autoAbort: true,
-      timeout: global_timeout
+
+    queryHistory.menu.add({
+      text : lastQuery,
+      handler : function(b, e)
+      {
+        formPanelSearch.getComponent('queryAnnisQL').setValue(b.text);
+      }
     });
 
-    
+    var items = queryHistory.menu.items;
+    if (items.getCount() === 2)
+    {
+      items.removeAt(0);
+    }
   }
   // end getResult
 
   function doExport()
   {
-    if("" === formPanelSearch.getComponent('queryAnnisQL').getValue())
+    if ("" === formPanelSearch.getComponent('queryAnnisQL').getValue())
     {
       Ext.MessageBox.show({
-        title: 'ERROR',
-        msg: 'Empty query',
-        icon: Ext.MessageBox.ERROR,
-        buttons: Ext.MessageBox.OK
+        title : 'ERROR',
+        msg : 'Empty query',
+        icon : Ext.MessageBox.ERROR,
+        buttons : Ext.MessageBox.OK
       });
       return;
     }
 
-    if(!corpusListSelectionModel.hasSelection())
+    if (!corpusListSelectionModel.hasSelection())
     {
-      formPanelSearch.getComponent('matchCount').setValue("Please select a corpus!");
+      formPanelSearch.getComponent('matchCount').setValue(
+          "Please select a corpus!");
       return;
     }
 
-    //Gather selections
+    // Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = corpusStringListFromSelection(selections);
+    var corpusIdString = "";
+    for ( var i = 0; i < selections.length; i++)
+    {
+      if (i !== 0)
+      {
+        corpusIdString += ",";
+      }
+      corpusIdString += selections[i].id;
+    }
 
-    var exporterSelection = formPanelExporter.getComponent("exportSelection").getValue();
-
+    var exporterSelection = formPanelExporter.getComponent(
+        "exportSelection").getValue();
 
     // open a new browser window/tab
-    var url = conf_context + '/secure/' + exporterSelection + '?queryAnnisQL='
-      + encodeURIComponent(formPanelSearch.getComponent('queryAnnisQL').getValue())
-      + '&corpusIds=' + corpusIdString
-      + '&padLeft=' + formPanelExporter.getComponent('padLeftExport').getValue()
-      + '&padRight=' + formPanelExporter.getComponent('padRightExport').getValue();
+    var url = conf_context
+        + '/secure/'
+        + exporterSelection
+        + '?queryAnnisQL='
+        + encodeURIComponent(formPanelSearch.getComponent('queryAnnisQL')
+            .getValue()) + '&corpusIds=' + corpusIdString + '&padLeft='
+        + formPanelExporter.getComponent('padLeftExport').getValue()
+        + '&padRight='
+        + formPanelExporter.getComponent('padRightExport').getValue();
 
-    var additionalParams = formPanelExporter.getComponent('additionalParamsExport').getValue();
-    if(additionalParams !== "")
+    var additionalParams = formPanelExporter.getComponent(
+        'additionalParamsExport').getValue();
+    if (additionalParams !== "")
     {
       url += '&' + additionalParams;
-    }    
+    }
     window.open(url, 'Export');
   }
-   		
-  function setSearchButtonDisabled(disabled) 
+
+  function setSearchButtonDisabled(disabled)
   {
     Ext.ComponentMgr.get('btnSearch').setDisabled(disabled);
     Ext.ComponentMgr.get('btnExport').setDisabled(disabled);
   }
   // end setSearchButtonDisabled
 
-  /** A function that displays or updated the count for a search (after submitting it) */
+  /**
+   * A function that displays or updated the count for a search (after
+   * submitting it)
+   */
   function showCount()
   {
     lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
     lastStatus = formPanelSearch.getComponent('matchCount').getValue();
-    formPanelSearch.getComponent('matchCount').setValue("Getting match count...");
+    formPanelSearch.getComponent('matchCount').setValue(
+        "Getting match count...");
     // submitting query to Server
-    Ext.Ajax.request({
-      url: conf_context + '/secure/SearchResult',
-      method: 'GET',
-      params: {
-        'count' : '1'
-      },
-      success: function(response)
-      {
-        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
-        lastStatus = formPanelSearch.getComponent('matchCount').getValue();
-        formPanelSearch.getComponent('matchCount').getEl().
-        frame('ff0000', 1, {
-          duration:3
-        });
-
-        //the submit button
-        setSearchButtonDisabled(false);
-        if((response.responseText*1) <= 0 )
-        {
-          Ext.MessageBox.show({
-            title: 'Info',
-            msg: 'No search results',
-            icon: Ext.MessageBox.INFO,
-            buttons: Ext.MessageBox.OK
-          });
-        }
-        else
-        {
-          
-          if(!isLoadingSearchResult)
+    Ext.Ajax
+        .request({
+          url : conf_context + '/secure/SearchResult',
+          method : 'GET',
+          params : {
+            'count' : '1'
+          },
+          success : function(response)
           {
-            // update existing search result window totalCount
-            var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
-            
-            storeSearchResult.reader.jsonData.totalCount  = (response.responseText*1);
-            // load the slightly changed data (and don't ask the server again)
-            storeSearchResult.loadData(storeSearchResult.reader.jsonData, false);
-          }
-        }
-      },
-      failure: function(response)
-      {
-        formPanelSearch.getComponent('matchCount').setValue(response.responseText);
-        lastStatus = formPanelSearch.getComponent('matchCount').getValue();
-        setSearchButtonDisabled(false);
-      },
-      autoAbort: true,
-      timeout: global_timeout
-    });
+            formPanelSearch.getComponent('matchCount').setValue(
+                response.responseText);
+            lastStatus = formPanelSearch.getComponent('matchCount')
+                .getValue();
+            formPanelSearch.getComponent('matchCount').getEl().frame(
+                'ff0000', 1, {
+                  duration : 3
+                });
+
+            // the submit button
+            setSearchButtonDisabled(false);
+            if ((response.responseText * 1) <= 0)
+            {
+              Ext.MessageBox.show({
+                title : 'Info',
+                msg : 'No search results',
+                icon : Ext.MessageBox.INFO,
+                buttons : Ext.MessageBox.OK
+              });
+            } else
+            {
+
+              if (!isLoadingSearchResult)
+              {
+                // update existing search result window totalCount
+                var storeSearchResult = Ext.StoreMgr
+                    .get('storeSearchResult');
+
+                storeSearchResult.reader.jsonData.totalCount = (response.responseText * 1);
+                // load the slightly changed data (and don't ask the server
+                // again)
+                storeSearchResult.loadData(
+                    storeSearchResult.reader.jsonData, false);
+              }
+            }
+          },
+          failure : function(response)
+          {
+            formPanelSearch.getComponent('matchCount').setValue(
+                response.responseText);
+            lastStatus = formPanelSearch.getComponent('matchCount')
+                .getValue();
+            setSearchButtonDisabled(false);
+          },
+          autoAbort : true,
+          timeout : global_timeout
+        });
   }
 
   /** A function that displays or updates the search result window */
-  function showWindowSearchResult() 
+  function showWindowSearchResult()
   {
     var windowSearchResult = Ext.WindowMgr.get('windowSearchResult');
     var storeSearchResult = Ext.StoreMgr.get('storeSearchResult');
 
     var myLimit = 10;
-    if("" !== resultLengthComboBox.getValue())
+    if ("" !== resultLengthComboBox.getValue())
     {
-      myLimit = (resultLengthComboBox.getValue()*1);
+      myLimit = (resultLengthComboBox.getValue() * 1);
     }
 
     // adjust page size
-    var gridSearchResult = windowSearchResult.getComponent('gridSearchResult');
+    var gridSearchResult = windowSearchResult
+        .getComponent('gridSearchResult');
     gridSearchResult.getTopToolbar().pageSize = myLimit;
 
-    //open result window and update data store
-    windowSearchResult.setTitle('Search Result - ' + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' (' + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', ' + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
+    // open result window and update data store
+    windowSearchResult.setTitle('Search Result - '
+        + formPanelSearch.getComponent('queryAnnisQL').getValue() + ' ('
+        + formPanelSimpleSearch.getComponent('padLeft').getValue() + ', '
+        + formPanelSimpleSearch.getComponent('padRight').getValue() + ')');
     windowSearchResult.show();
-    windowSearchResult.alignTo('windowSearchForm', 'tl', [windowSearchFormWidth + 5,0]);
+    windowSearchResult.alignTo('windowSearchForm', 'tl', [
+        windowSearchFormWidth + 5, 0 ]);
 
-    storeSearchResult.load({
-      params:{
-        start:0,
-        limit:myLimit
-      },
-      callback: function(r, options, success)
-      {
-        if(!success)
-        {
-          Ext.MessageBox.show({
-            title: 'FATAL ERROR: result',
-            msg: 'Unable to fetch result. This may be caused by a timeout or connection problem.',
-            icon: Ext.MessageBox.ERROR,
-            buttons: Ext.MessageBox.OK
-          });
-          windowSearchResult.hide();
-          setSearchButtonDisabled(false);
-        }
-      }
-    });
+    storeSearchResult
+        .load({
+          params : {
+            start : 0,
+            limit : myLimit
+          },
+          callback : function(r, options, success)
+          {
+            if (!success)
+            {
+              Ext.MessageBox
+                  .show({
+                    title : 'FATAL ERROR: result',
+                    msg : 'Unable to fetch result. This may be caused by a timeout or connection problem.',
+                    icon : Ext.MessageBox.ERROR,
+                    buttons : Ext.MessageBox.OK
+                  });
+              windowSearchResult.hide();
+              setSearchButtonDisabled(false);
+            }
+          }
+        });
 
   }
   // end showWindowSearchResult
 
-
-  //The pad store ;)
+  // The pad store ;)
   var padStore = new Ext.data.SimpleStore({
-    fields: ['pad'],
-    data : search_context
+    fields : [ 'pad' ],
+    data : [ [ 0 ], [ 1 ], [ 2 ], [ 5 ], [ 10 ] ]
   });
-	    
+
   var padLeftComboBox = new Ext.form.ComboBox({
-    store: padStore,
-    name: 'padLeft',
-    id: 'padLeft',
-    fieldLabel: 'Context Left',
-    displayField:'pad',
-    mode: 'local',
-    triggerAction: 'all',
-    value: '' + search_context_default,
-    selectOnFocus:true,
-    editable: false,
-    listeners: {
-      'select': {
-        fn: updateStatus,
-        scope: this
+    store : padStore,
+    name : 'padLeft',
+    id : 'padLeft',
+    fieldLabel : 'Context Left',
+    displayField : 'pad',
+    mode : 'local',
+    triggerAction : 'all',
+    value : '5',
+    selectOnFocus : true,
+    editable : false,
+    listeners : {
+      'select' : {
+        fn : updateStatus,
+        scope : this
       }
     }
   });
-	    
+
   var padRightComboBox = new Ext.form.ComboBox({
-    store: padStore,
-    name: 'padRight',
-    id: 'padRight',
-    fieldLabel: 'Context Right',
-    displayField:'pad',
-    mode: 'local',
-    triggerAction: 'all',
-    value: '' + search_context_default,
-    selectOnFocus:true,
-    editable: false,
-    listeners: {
-      'select': {
-        fn: updateStatus,
-        scope: this
+    store : padStore,
+    name : 'padRight',
+    id : 'padRight',
+    fieldLabel : 'Context Right',
+    displayField : 'pad',
+    mode : 'local',
+    triggerAction : 'all',
+    value : '5',
+    selectOnFocus : true,
+    editable : false,
+    listeners : {
+      'select' : {
+        fn : updateStatus,
+        scope : this
       }
     }
   });
 
   var padLeftComboBoxExport = new Ext.form.ComboBox({
-    store: padStore,
-    name: 'padLeftExport',
-    id: 'padLeftExport',
-    fieldLabel: 'Context Left',
-    displayField:'pad',
-    mode: 'local',
-    triggerAction: 'all',
-    value: '5',
-    selectOnFocus:true,
-    editable: false,
-    listeners: {
-      'select': {
-        fn: updateStatus,
-        scope: this
+    store : padStore,
+    name : 'padLeftExport',
+    id : 'padLeftExport',
+    fieldLabel : 'Context Left',
+    displayField : 'pad',
+    mode : 'local',
+    triggerAction : 'all',
+    value : '5',
+    selectOnFocus : true,
+    editable : false,
+    listeners : {
+      'select' : {
+        fn : updateStatus,
+        scope : this
       }
     }
   });
 
   var padRightComboBoxExport = new Ext.form.ComboBox({
-    store: padStore,
-    name: 'padRightExport',
-    id: 'padRightExport',
-    fieldLabel: 'Context Right',
-    displayField:'pad',
-    mode: 'local',
-    triggerAction: 'all',
-    value: '5',
-    selectOnFocus:true,
-    editable: false,
-    listeners: {
-      'select': {
-        fn: updateStatus,
-        scope: this
+    store : padStore,
+    name : 'padRightExport',
+    id : 'padRightExport',
+    fieldLabel : 'Context Right',
+    displayField : 'pad',
+    mode : 'local',
+    triggerAction : 'all',
+    value : '5',
+    selectOnFocus : true,
+    editable : false,
+    listeners : {
+      'select' : {
+        fn : updateStatus,
+        scope : this
       }
     }
   });
 
-var additionalParamsExport = new Ext.form.TextField({
-    name: 'additionalParamsExport',
-    id: 'additionalParamsExport',
-    fieldLabel: 'Parameters',
-    value: '',
-    selectOnFocus:true,
-    listeners: {
-      'select': {
-        fn: updateStatus,
-        scope: this
+  var additionalParamsExport = new Ext.form.TextField({
+    name : 'additionalParamsExport',
+    id : 'additionalParamsExport',
+    fieldLabel : 'Parameters',
+    value : '',
+    selectOnFocus : true,
+    listeners : {
+      'select' : {
+        fn : updateStatus,
+        scope : this
       }
     }
   });
 
-var exportStore = new Ext.data.SimpleStore({
-    fields: ['type'],
-    data : [['SimpleTextExporter'], ['TextExporter'], ['WekaExporter'], ['GridExporter']]
+  var exportStore = new Ext.data.SimpleStore({
+    fields : [ 'type' ],
+    data : [ [ 'SimpleTextExporter' ], [ 'TextExporter' ],
+        [ 'WekaExporter' ], [ 'GridExporter' ] ]
   });
-var exportSelection = new Ext.form.ComboBox({
-    store: exportStore,
-    displayField:'type',
-    mode: 'local',
-    name: 'exportSelection',
-    id: 'exportSelection',
-    fieldLabel: 'Exporter',
-    triggerAction: 'all',
-    value: 'WekaExporter',
-    selectOnFocus:true,
-    editable: false
+  var exportSelection = new Ext.form.ComboBox({
+    store : exportStore,
+    displayField : 'type',
+    mode : 'local',
+    name : 'exportSelection',
+    id : 'exportSelection',
+    fieldLabel : 'Exporter',
+    triggerAction : 'all',
+    value : 'WekaExporter',
+    selectOnFocus : true,
+    editable : false
   });
 
   var resultLengthStore = new Ext.data.SimpleStore({
-    fields: ['length'],
-    data : [[1], [2], [5], [10], [15], [20], [25]]
+    fields : [ 'length' ],
+    data : [ [ 1 ], [ 2 ], [ 5 ], [ 10 ], [ 15 ], [ 20 ], [ 25 ] ]
   });
 
   var resultLengthComboBox = new Ext.form.ComboBox({
-    store: resultLengthStore,
-    name: 'resultLength',
-    id: 'resultLength',
-    fieldLabel: 'Results per page',
-    displayField:'length',
-    mode: 'local',
-    triggerAction: 'all',
-    value: '10',
-    selectOnFocus:true,
-    editable: false
+    store : resultLengthStore,
+    name : 'resultLength',
+    id : 'resultLength',
+    fieldLabel : 'Results per page',
+    displayField : 'length',
+    mode : 'local',
+    triggerAction : 'all',
+    value : '10',
+    selectOnFocus : true,
+    editable : false
   });
 
-  //The Search Window
+  // The Search Window
 
-  Ext.override(Ext.form.TextArea, 
-  {
-    fireKey : function(e) 
+  Ext.override(Ext.form.TextArea, {
+    fireKey : function(e)
     {
-      if(((Ext.isIE && e.type == 'keydown') || e.type == 'keypress') && e.isSpecialKey()) 
+      if (((Ext.isIE && e.type == 'keydown') || e.type == 'keypress')
+          && e.isSpecialKey())
       {
         this.fireEvent('specialkey', this, e);
-      }
-      else 
+      } else
       {
         this.fireEvent(e.type, this, e);
       }
     },
     initEvents : function()
     {
-      //                this.el.on(Ext.isIE ? "keydown" : "keypress", this.fireKey,  this);
-      this.el.on("focus", this.onFocus,  this);
-      this.el.on("blur", this.onBlur,  this);
+      // this.el.on(Ext.isIE ? "keydown" : "keypress", this.fireKey, this);
+      this.el.on("focus", this.onFocus, this);
+      this.el.on("blur", this.onBlur, this);
       this.el.on("keydown", this.fireKey, this);
       this.el.on("keypress", this.fireKey, this);
       this.el.on("keyup", this.fireKey, this);
-        
+
       // reference to original value for reset
       this.originalValue = this.getValue();
     }
   });
-		
+
   Ext.QuickTips.init();
 
   // turn on validation errors beside the field globally
-  Ext.form.Field.prototype.msgTarget = 'side';	
-		
-  //Corpus Grid View
+  Ext.form.Field.prototype.msgTarget = 'side';
+
+  // Corpus Grid View
   var storeFavoriteCorpusList = new Ext.data.JsonStore({
-    url: conf_context + '/secure/CorpusList/Favorites',
-    totalProperty: 'size',
-    root: 'list',
-    id: 'id',
-    fields: [
-    {
-      name:'id',
-      type:'int'
-    },
-    'name',
-    {
-      name:'textCount',
-      type:'int'
+    url : conf_context + '/secure/CorpusList/Favorites',
+    totalProperty : 'size',
+    root : 'list',
+    id : 'id',
+    fields : [ {
+      name : 'id',
+      type : 'int'
+    }, 'name', {
+      name : 'textCount',
+      type : 'int'
     },
 
     {
-      name:'tokenCount',
-      type:'int'
-    }
-    ],
+      name : 'tokenCount',
+      type : 'int'
+    } ],
     // turn on remote sorting
-    remoteSort: false,
-    listeners: {
-      'load': {
-        fn: Citation.setFromCookie
+    remoteSort : false,
+    listeners : {
+      'load' : {
+        fn : Citation.setFromCookie
       }
     }
   });
-  
+
   storeFavoriteCorpusList.setDefaultSort('name', 'asc');
-		
-  var corpusListSelectionModel = new Ext.grid.CheckboxSelectionModel(
-  {
+
+  var corpusListSelectionModel = new Ext.grid.CheckboxSelectionModel({
     singleSelect : false,
-    listeners: {
-      'rowselect': {
-        fn: updateStatus,
-        scope: this
+    listeners : {
+      'rowselect' : {
+        fn : updateStatus,
+        scope : this
       },
-      'rowdeselect': {
-        fn: updateStatus,
-        scope: this
-      }    
+      'rowdeselect' : {
+        fn : updateStatus,
+        scope : this
+      }
     }
-  }
-  );
-		
-  var corpusListCm = new Ext.grid.ColumnModel([
-    corpusListSelectionModel, 
-    {
-      id: "name",
-      header: "Name",
-      dataIndex: 'name',
-      align: 'left'
-    },
-    {
-      id: "texts",
-      header: "Texts",
-      dataIndex: 'textCount',
-      align: 'right',
-      width: 50
-    },
-    {
-      id: "tokens",
-      header: "Tokens",
-      dataIndex: 'tokenCount',
-      align: 'right',
-      width: 50
-    },
-    {
-      id: "id",
-      header: "",
-      dataIndex:'id',
-      align: 'right',
-      renderer: renderCorpusInfo,
-      width: 30
-    }
-    ]);
+  });
+
+  var corpusListCm = new Ext.grid.ColumnModel([ corpusListSelectionModel, {
+    id : "name",
+    header : "Name",
+    dataIndex : 'name',
+    align : 'left'
+  }, {
+    id : "texts",
+    header : "Texts",
+    dataIndex : 'textCount',
+    align : 'right',
+    width : 50
+  }, {
+    id : "tokens",
+    header : "Tokens",
+    dataIndex : 'tokenCount',
+    align : 'right',
+    width : 50
+  }, {
+    id : "id",
+    header : "",
+    dataIndex : 'id',
+    align : 'right',
+    renderer : renderCorpusInfo,
+    width : 30
+  } ]);
   corpusListCm.defaultSortable = true;
-		
+
   // create the Grid
   var corpusGrid = new Ext.grid.GridPanel({
-    id: 'gridPanelCorpus',
-    autoExpandColumn: 'name',
-    enableDragDrop:true,
-    ddGroup: 'corpusList',
-    store: storeFavoriteCorpusList,
-    viewConfig: {
-      //forceFit:true
-      autoFill: true
+    id : 'gridPanelCorpus',
+    autoExpandColumn : 'name',
+    enableDragDrop : true,
+    ddGroup : 'corpusList',
+    store : storeFavoriteCorpusList,
+    viewConfig : {
+      // forceFit:true
+      autoFill : true
     },
-    loadMask: true,
-    cm: corpusListCm,
-    sm: corpusListSelectionModel,
-    flex: 1,
-    stripeRows: true,
-    title:'Available Corpora',
-    header: false,
-    tbar: new Ext.Toolbar({
-      items: [
-      new Ext.Toolbar.Button({
-        text: 'More Corpora',
-        handler: function() {
+    loadMask : true,
+    cm : corpusListCm,
+    sm : corpusListSelectionModel,
+    flex : 1,
+    stripeRows : true,
+    title : 'Available Corpora',
+    header : false,
+    tbar : new Ext.Toolbar({
+      items : [ new Ext.Toolbar.Button({
+        text : 'More Corpora',
+        handler : function()
+        {
           var windowCorpusList = Ext.WindowMgr.get('windowCorpusList');
           windowCorpusList.show();
-          windowCorpusList.alignTo('windowSearchForm', 'tr', [10,0]);
+          windowCorpusList.alignTo('windowSearchForm', 'tr', [ 10, 0 ]);
         },
-        disabled: false,
-        ctCls: 'annis-toolbar-btn',
-        tooltip: {
-          text:'Click here to open the corpus selection Window.',
-          title:'More Corpora',
-          autoHide:true
+        disabled : false,
+        ctCls : 'annis-toolbar-btn',
+        tooltip : {
+          text : 'Click here to open the corpus selection Window.',
+          title : 'More Corpora',
+          autoHide : true
         }
-      })
-      ]
+      }) ]
     })
   });
-		
+
   var formPanelSimpleSearch = new Ext.FormPanel({
-    id: 'formPanelSimpleSearch',
-    frame:true,
-    title: 'Search',
-    items: [ 
-    padLeftComboBox,
-    padRightComboBox,
-    resultLengthComboBox
-    ],
-    buttons: [{
-      id: 'btnSearch',
-      text: 'Show Result',
-      disabled: false,
-      listeners: {
-        click: getResult
+    id : 'formPanelSimpleSearch',
+    frame : true,
+    title : 'Search',
+    items : [ padLeftComboBox, padRightComboBox, resultLengthComboBox ],
+    buttons : [ {
+      id : 'btnSearch',
+      text : 'Show Result',
+      disabled : false,
+      listeners : {
+        click : getResult
       }
-    }],
-    buttonAlign:'center'
+    } ],
+    buttonAlign : 'center'
   });
 
   var formPanelExporter = new Ext.FormPanel({
-    id: 'formPanelExport',
-    frame:true,
-    title: 'Export',
-    items: [
-      exportSelection,
-      padLeftComboBoxExport,
-      padRightComboBoxExport,
-      additionalParamsExport
-    ],
-    buttons: [{
-      id: 'btnExport',
-      text: 'Perform Export',
-      disabled: false,
-      listeners: {
-        click: doExport
+    id : 'formPanelExport',
+    frame : true,
+    title : 'Export',
+    items : [ exportSelection, padLeftComboBoxExport,
+        padRightComboBoxExport, additionalParamsExport ],
+    buttons : [ {
+      id : 'btnExport',
+      text : 'Perform Export',
+      disabled : false,
+      listeners : {
+        click : doExport
       }
-    }],
-    buttonAlign:'center'
+    } ],
+    buttonAlign : 'center'
   });
 
   var btnQueryBuilder = new Ext.Button({
-    id: 'btnQueryBuilder',
-    text: 'Show >>',
-    fieldLabel: 'Query Builder',
-    enableToggle: true,
-    toggleHandler: function(button, state) {
-      if(state)
+    id : 'btnQueryBuilder',
+    text : 'Show >>',
+    fieldLabel : 'Query Builder',
+    enableToggle : true,
+    toggleHandler : function(button, state)
+    {
+      if (state)
       {
         button.setText('Hide <<');
         windowSearchForm.fireEvent('showQueryBuilder');
-      }
-      else
+      } else
       {
         button.setText('Show >>');
         windowSearchForm.fireEvent('hideQueryBuilder');
       }
     }
   });
-		
-  var formPanelSearch = new Ext.FormPanel({
-    id: 'formPanelSearch', 
-    frame:true,
-    title: 'AnnisQL',
-    header: false,
-    width: 340,
-    height: 165,
-    defaultType: 'textfield',
-    monitorValid: true,
-    items: [{
-      id: 'queryAnnisQL',
-      width: 200,
-      height: 80,
-      fieldLabel: 'AnnisQL',
-      name: 'queryAnnisQL',
-      allowBlank:true,
-      xtype: 'textarea',
-      listeners: {
-        'keyup': {
-          fn: function() {
-            formPanelSearch.getComponent('matchCount').setValue("Delay...");
-            delayKeyTask.delay(keyDelay, updateStatus);
-          },
-          scope: this
-        }
+
+  var queryAnnisSQL = {
+    id : 'queryAnnisQL',
+    width : 200,
+    height : 80,
+    fieldLabel : 'AnnisQL',
+    name : 'queryAnnisQL',
+    allowBlank : true,
+    xtype : 'textarea',
+    listeners : {
+      'keyup' : {
+        fn : function()
+        {
+          formPanelSearch.getComponent('matchCount').setValue("Delay...");
+          delayKeyTask.delay(keyDelay, updateStatus);
+        },
+        scope : this
       }
-    },
-    btnQueryBuilder,
-    {
-      id: 'matchCount',
-      width: 200,
-      height: 40,
-      xtype: 'textarea',
-      fieldLabel: 'Result',
-      name: 'matchCount',
-      allowBlank:true,
-      readOnly: true
-    }]
-	           	
+    }
+  };
+
+  var queryHistory = new Ext.SplitButton({
+    fieldLabel : 'History',
+    text : 'Query History',
+    menu : new Ext.menu.Menu()
   });
 
-		    
+  var formPanelSearch = new Ext.FormPanel({
+    id : 'formPanelSearch',
+    frame : true,
+    title : 'AnnisQL',
+    header : false,
+    width : 340,
+    height : 200,
+    defaultType : 'textfield',
+    monitorValid : true,
+    items : [ queryAnnisSQL, btnQueryBuilder, {
+      id : 'matchCount',
+      width : 200,
+      height : 40,
+      xtype : 'textarea',
+      fieldLabel : 'Result',
+      name : 'matchCount',
+      allowBlank : true,
+      readOnly : true
+    }, queryHistory ]
+  });
+
   var panelSearchModes = new Ext.TabPanel({
-    width: 340,
-    height: 180,
-    activeTab: 0,
-    items: [
-      formPanelSimpleSearch,
-      formPanelExporter
-    ]
+    width : 340,
+    height : 180,
+    activeTab : 0,
+    items : [ formPanelSimpleSearch, formPanelExporter ]
   });
 
-			
   var panelSearch = new Ext.Panel({
-    region: 'west',
-    width: 330,
-    layout: "vbox",
-    items: [formPanelSearch,corpusGrid, panelSearchModes]
+    region : 'west',
+    width : 330,
+    layout : "vbox",
+    items : [ formPanelSearch, corpusGrid, panelSearchModes ]
   });
-	
+
   var queryBuilderURL = conf_context + '/queryBuilder.html';
 
   var panelQueryBuilder = new Ext.Panel({
@@ -785,7 +823,7 @@ var exportSelection = new Ext.form.ComboBox({
           text:'Click here to add a new node specification window.',
           title:'Create Node',
           autoHide:true
-															
+                              
         },
         ctCls: 'annis-toolbar-btn'
       })
@@ -803,96 +841,98 @@ var exportSelection = new Ext.form.ComboBox({
 
   // the main window
   var windowSearchForm = new Ext.Window({
-    title: 'Search Form',
-    id: 'windowSearchForm',
-    closable:false,
-    collapsible: false,
-    maximizable: true,
-    resizable: false,
-    width: windowSearchFormWidth,
-    height: Math.max(500,Ext.getBody().getViewSize().height - 35),
-    //border:false,
-    plain:true,
-    closeAction: 'hide',
-    layout: 'border',
-    items: [
-    panelSearch,
-    panelQueryBuilder
-    ],
-    listeners: {
-      'showQueryBuilder': {
-        fn: function() {
-          window.frames.iframeQueryBuilder.queryBuilderUpdateNodeAnnos(corpusStringListFromSelection(corpusListSelectionModel.getSelections()));
+    title : 'Search Form',
+    id : 'windowSearchForm',
+    closable : false,
+    collapsible : false,
+    maximizable : true,
+    resizable : false,
+    width : windowSearchFormWidth,
+    height : Math.max(500, Ext.getBody().getViewSize().height - 35),
+    // border:false,
+    plain : true,
+    closeAction : 'hide',
+    layout : 'border',
+    items : [ panelSearch, panelQueryBuilder ],
+    listeners : {
+      'showQueryBuilder' : {
+        fn : function()
+        {
           windowSearchForm.setWidth(windowSearchFormWidthQueryBuilder);
-          var nodeMaximize = Ext.DomQuery.selectNode('div[class~=x-tool-maximize]', document.getElementById(windowSearchForm.id));
+          var nodeMaximize = Ext.DomQuery.selectNode(
+              'div[class~=x-tool-maximize]', document
+                  .getElementById(windowSearchForm.id));
           nodeMaximize.style.visibility = 'visible';
         },
-        scope: this
+        scope : this
       },
-      'hideQueryBuilder': {
-        fn: function() {
+      'hideQueryBuilder' : {
+        fn : function()
+        {
           windowSearchForm.setWidth(windowSearchFormWidth);
-          var nodeMaximize = Ext.DomQuery.selectNode('div[class~=x-tool-maximize]', document.getElementById(windowSearchForm.id));
+          var nodeMaximize = Ext.DomQuery.selectNode(
+              'div[class~=x-tool-maximize]', document
+                  .getElementById(windowSearchForm.id));
           nodeMaximize.style.visibility = 'hidden';
         },
-        scope: this
+        scope : this
       }
     }
   });
-		 
+
   windowSearchForm.setPosition(0, 30);
   windowSearchForm.show();
-		 
-  //hide the maximize button
+
+  // hide the maximize button
   windowSearchForm.fireEvent('hideQueryBuilder');
-		 
-  //loading corpus list
+
+  // loading corpus list
   storeFavoriteCorpusList.load();
-		 
-		 
-  //extend dnd extender to allow dnd from corpus window
-  var myDrop = new Ext.dd.DropTarget(corpusGrid.container, { 				   
-    dropAllowed: 'x-dd-drop-ok', 
-    ddGroup: 'corpusList', 
-    notifyDrop: function(dd, e, data) { 
-      var ds=data.grid.getStore();
-      var dt = corpusGrid.getStore();					
+
+  // extend dnd extender to allow dnd from corpus window
+  var myDrop = new Ext.dd.DropTarget(corpusGrid.container, {
+    dropAllowed : 'x-dd-drop-ok',
+    ddGroup : 'corpusList',
+    notifyDrop : function(dd, e, data)
+    {
+      //
+      var ds = data.grid.getStore();
+      var dt = corpusGrid.getStore();
       dt.add(data.selections);
       var dtSortState = dt.getSortState();
-      dt.sort(dtSortState.field,dtSortState.direction);
+      dt.sort(dtSortState.field, dtSortState.direction);
       var addedIds = [];
-      for(var i=0;i<data.selections.length;i++) {
-        ds.remove(data.selections[i]);		
-        addedIds.push(data.selections[i].id);	
+      for ( var i = 0; i < data.selections.length; i++)
+      {
+        ds.remove(data.selections[i]);
+        addedIds.push(data.selections[i].id);
       }
       Ext.Ajax.request({
-        url: conf_context + '/secure/CorpusList/Favorites',
-        method: 'post',
-        //success: someFn,
-        //failure: otherFn,
-        params: { 
-          add: addedIds.join(",")
+        url : conf_context + '/secure/CorpusList/Favorites',
+        method : 'post',
+        // success: someFn,
+        // failure: otherFn,
+        params : {
+          add : addedIds.join(",")
         }
-      });			
+      });
       return true;
     }
-  //,
-  //notifyOver: function(dd, e, data) {
-  //   //check if the row is allowed, return true or false
-  //}
+  // ,
+  // notifyOver: function(dd, e, data) {
+  // //check if the row is allowed, return true or false
+  // }
   });
-  
-  //added ctrl + enter for getting search results
+
+  // added ctrl + enter for getting search results
   new Ext.KeyMap(Ext.get('queryAnnisQL'), {
     key : Ext.EventObject.ENTER,
     ctrl : true,
-    fn : getResult
+    fn : getResult    
   });
-  
+
   // highlight tutorial
   Ext.get('tutorial').frame('ff0000', 2);
-  
 });
-
 // end onReady
 
