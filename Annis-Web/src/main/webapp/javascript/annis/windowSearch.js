@@ -786,7 +786,8 @@ var exportSelection = new Ext.form.ComboBox({
           title:'Create Node',
           autoHide:true
 															
-        }
+        },
+        ctCls: 'annis-toolbar-btn'
       })
       ]
     })
