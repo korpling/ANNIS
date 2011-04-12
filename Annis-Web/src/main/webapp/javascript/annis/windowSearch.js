@@ -16,6 +16,24 @@ function corpusStringListFromSelection(selections)
   return result;
 }
 
+function updateHistory(historyButton) 
+{
+  var items = historyButton.menu.items;
+  var entry = {
+    text : lastQuery,
+    handler : function(b, e)
+    {
+      Ext.getCmp('queryAnnisQL').setValue(b.text);
+    }
+  };
+  
+  historyButton.menu.insert(0, entry);  
+  
+  if (items !== undefined && items.getCount() > 5) {    
+    historyButton.menu.remove(items.last());
+  }  
+}
+
 var Citation = {
   generate : function() {
     var formPanelSearch = Ext.ComponentMgr.get('formPanelSearch');
@@ -218,22 +236,8 @@ Ext.onReady(function()
           autoAbort : true,
           timeout : global_timeout
         });
-
-    queryHistory.menu.add({
-      text : lastQuery,
-      handler : function(b, e)
-      {
-        formPanelSearch.getComponent('queryAnnisQL').setValue(b.text);
-      }
-    });
-
-    var items = queryHistory.menu.items;
-    if (items.getCount() === 2)
-    {
-      items.removeAt(0);
-    }
-  }
-  // end getResult
+    updateHistory(queryHistory);
+  } // end getResult
 
   function doExport()
   {
