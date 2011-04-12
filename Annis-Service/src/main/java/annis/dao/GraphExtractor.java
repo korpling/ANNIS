@@ -33,9 +33,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -51,17 +54,17 @@ public class GraphExtractor implements ResultSetExtractor
   public enum IslandPolicies
   {
     context,
-    none,
-    number
+    number,
+    none    
   }
 
   private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
-  private IslandPolicies islandsPolicy = IslandPolicies.context;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
   private AnnisNodeRowMapper annisNodeRowMapper;
+  private String defaultIslandsPolicy;
 
   public GraphExtractor()
   {
@@ -111,19 +114,26 @@ public class GraphExtractor implements ResultSetExtractor
     edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
   }
 
-  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right, boolean analyze)
+  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList,
+    int nodeCount, long offset, long limit, int left, int right,
+    boolean analyze, Map<Long,Properties> corpusProperties)
   {
     ParameterizedSingleColumnRowMapper<String> planRowMapper =
       new ParameterizedSingleColumnRowMapper<String>();
 
     List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n" + getContextQuery(corpusList, left, right, limit, offset, nodeCount), planRowMapper);
+      + "\n" + getContextQuery(corpusList, left, right, limit, offset, nodeCount, corpusProperties), planRowMapper);
     return StringUtils.join(plan, "\n");
   }
 
-  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
+  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate,
+    List<Long> corpusList, int nodeCount, long offset, long limit, int left,
+    int right, Map<Long,Properties> corpusProperties)
   {
-    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(corpusList, left, right, limit, offset, nodeCount), this);
+    return (List<AnnotationGraph>) jdbcTemplate.query(
+      getContextQuery(corpusList, left, right, limit, offset, nodeCount,
+        corpusProperties),
+     this);
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, long textID)
@@ -131,8 +141,30 @@ public class GraphExtractor implements ResultSetExtractor
     return (List<AnnotationGraph>) jdbcTemplate.query(getTextQuery(textID), this);
   }
 
-  public String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
+  private IslandPolicies getMostRestrictivePolicy(List<Long> corpora, Map<Long,Properties> props)
   {
+    IslandPolicies[] all = IslandPolicies.values();
+    IslandPolicies result = all[all.length-1];
+
+    for(Long l : corpora)
+    {
+      if(props.get(l) != null)
+      {
+        IslandPolicies newPolicy = IslandPolicies.valueOf(props.get(l).getProperty("islands-policy", defaultIslandsPolicy));
+        if(newPolicy.ordinal() < result.ordinal())
+        {
+          result = newPolicy;
+        }
+      }
+    }
+    return result;
+  }
+
+  public String getContextQuery(List<Long> corpusList, int left, int right, 
+    long limit, long offset, int nodeCount, Map<Long,Properties> corpusProperties)
+  {
+
+    IslandPolicies islandsPolicy = getMostRestrictivePolicy(corpusList, corpusProperties);
 
     // key for annotation graph matches
     StringBuilder keySb = new StringBuilder();
@@ -470,24 +502,14 @@ public class GraphExtractor implements ResultSetExtractor
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public IslandPolicies getIslandsPolicy()
+  public String getDefaultIslandsPolicy()
   {
-    return islandsPolicy;
+    return defaultIslandsPolicy;
   }
 
-  public void setIslandsPolicy(IslandPolicies islandsPolicy)
+  public void setDefaultIslandsPolicy(String defaultIslandsPolicy)
   {
-    this.islandsPolicy = islandsPolicy;
-  }
-  
-  public String getIslandsPolicyString()
-  {
-    return islandsPolicy.name();
-  }
-
-  public void setIslandsPolicyString(String islandsPolicy)
-  {
-    this.islandsPolicy = IslandPolicies.valueOf(islandsPolicy.toLowerCase().trim());
+    this.defaultIslandsPolicy = defaultIslandsPolicy;
   }
 
   

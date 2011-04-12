@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Properties;
 import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -131,7 +132,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     int nodeCount = queryData.getMaxWidth();
     return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
-      offset, limit, left, right, analyze);
+      offset, limit, left, right, analyze, corpusConfiguration);
   }
 
   @SuppressWarnings("unchecked")
@@ -144,7 +145,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     int nodeCount = queryData.getMaxWidth();
 
     // create the Annis graphs
-    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList, nodeCount, offset, limit, left, right);
+    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(),
+      corpusList, nodeCount, offset, limit, left, right, corpusConfiguration);
   }
 
   private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
@@ -290,6 +292,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
             try
             {
               p.load(new FileReader(conf));
+
             }
             catch (IOException ex)
             {

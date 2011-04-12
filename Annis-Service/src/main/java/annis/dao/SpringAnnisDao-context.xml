@@ -46,7 +46,7 @@
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-    <property name="islandsPolicyString" value="${annis.islands-policy}" />
+    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
   </bean>
 
 
