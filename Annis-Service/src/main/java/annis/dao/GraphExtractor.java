@@ -48,9 +48,16 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 public class GraphExtractor implements ResultSetExtractor
 {
 
+  public enum IslandPolicies
+  {
+    context,
+    none,
+    number
+  }
+
   private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
-  private boolean allowIslands;
+  private IslandPolicies islandsPolicy = IslandPolicies.context;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
@@ -177,62 +184,114 @@ public class GraphExtractor implements ResultSetExtractor
       sb.append(") AND\n");
     }
     sb.append("\t(\n");
-    for (int i = 1;  i <= nodeCount; ++i)
-    {
-      if(i > 1)
-      {
-        sb.append("\n\t\tOR\n");
-      }
 
-      sb.append("\t\t(\n"
-        + "\t\t\tfacts.text_ref = matches.text_ref");
-      sb.append(i);
-      
-      if(true || allowIslands)
+    System.out.println("ISLAND POLICY: " + islandsPolicy.toString());
+    if(islandsPolicy == IslandPolicies.context)
+    {
+      for (int i = 1;  i <= nodeCount; ++i)
       {
+        if(i > 1)
+        {
+          sb.append("\n\t\tOR\n");
+        }
+
+        sb.append("\t\t(\n"
+          + "\t\t\tfacts.text_ref = matches.text_ref");
+        sb.append(i);
+
+        String rangeStart = "matches.left_token" + i + " - " + left;
+        String rangeEnd = "matches.right_token" + i + " + " + right;
+
         sb.append("\n"
           + "\t\t\tAND\n"
           +"\t\t\t(\n");
-        // left token inside context range
-        sb.append("\t\t\t\t(facts.left_token BETWEEN matches.left_token");
-        sb.append(i);
-        sb.append(" - ");
-        sb.append(left);
-        sb.append(" AND matches.right_token");
-        sb.append(i);
-        sb.append(" + ");
-        sb.append(right);
-        sb.append(")\n");
-        // right token inside context range
-        sb.append("\t\t\t\tOR(facts.right_token BETWEEN matches.left_token");
-        sb.append(i);
-        sb.append(" - ");
-        sb.append(left);
-        sb.append(" AND matches.right_token");
-        sb.append(i);
-        sb.append(" + ");
-        sb.append(right);
-        sb.append(")\n");
-        // context range completly covered
-        sb.append("\t\t\t\tOR(facts.left_token <= matches.left_token");
-        sb.append(i);
-        sb.append(" - ");
-        sb.append(left);
-        sb.append(" AND facts.right_token >= matches.right_token");
-        sb.append(i);
-        sb.append(" + ");
-        sb.append(right);
-        sb.append(")\n");
+        sb.append(contextRangeSubquery(rangeStart, rangeEnd, "\t\t\t\t"));
         sb.append("\t\t\t)\n");
+
+
+        sb.append("\n"
+          + "\t\t)");
+      }
+    }
+    else if(islandsPolicy == IslandPolicies.none)
+    {
+      sb.append("\t\tfacts.text_ref IN(");
+      for(int i=1; i <= nodeCount; i++)
+      {
+        if(i > 1)
+        {
+          sb.append(",");
+        }
+        sb.append("matches.text_ref");
+        sb.append(i);
+      }
+      sb.append(")\n\t\tAND\n\t\t(\n");
+
+      StringBuilder rangeStart = new StringBuilder();
+      StringBuilder rangeEnd = new StringBuilder();
+
+      rangeStart.append("ANY(ARRAY[");
+      rangeEnd.append("ANY(ARRAY[");
+
+      for(int i=1; i <= nodeCount; i++)
+      {
+        if(i > 1)
+        {
+          rangeStart.append(",");
+          rangeEnd.append(",");
+        }
+        rangeStart.append("matches.left_token");
+        rangeStart.append(i);
+        rangeStart.append(" - ");
+        rangeStart.append(left);
+
+        rangeEnd.append("matches.right_token");
+        rangeEnd.append(i);
+        rangeEnd.append(" + ");
+        rangeEnd.append(right);
       }
 
-      sb.append("\n"
-        + "\t\t)");
-    }
+      rangeStart.append("])");
+      rangeEnd.append("])");
 
+      sb.append(contextRangeSubquery(rangeStart.toString(), rangeEnd.toString(), 
+        "\t\t\t"));
+
+      sb.append("\t\t)\n");
+    }
     sb.append("\n\t)\n");
     sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
+  }
+
+  private StringBuilder contextRangeSubquery(String rangeStart, String rangeEnd, String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+
+
+    // left token inside context range
+    sb.append(indent);
+    sb.append("(facts.left_token >= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.left_token <= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+    // right token inside context range
+    sb.append(indent);
+    sb.append("OR(facts.right_token >= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.right_token <= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+    // context range completly covered
+    sb.append(indent);
+    sb.append("OR(facts.left_token <= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.right_token >= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+
+    return sb;
   }
 
   public String getTextQuery(long textID)
@@ -412,17 +471,15 @@ public class GraphExtractor implements ResultSetExtractor
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public boolean isAllowIslands()
+  public String getIslandsPolicy()
   {
-    return allowIslands;
+    return islandsPolicy.name();
   }
 
-  public void setAllowIslands(boolean allowIslands)
+  public void setIslandsPolicy(String islandsPolicy)
   {
-    this.allowIslands = allowIslands;
+    this.islandsPolicy = IslandPolicies.valueOf(islandsPolicy.toLowerCase().trim());
   }
-
-
 
   
 }
