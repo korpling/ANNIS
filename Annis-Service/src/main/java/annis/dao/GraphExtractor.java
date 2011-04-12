@@ -185,7 +185,6 @@ public class GraphExtractor implements ResultSetExtractor
     }
     sb.append("\t(\n");
 
-    System.out.println("ISLAND POLICY: " + islandsPolicy.toString());
     if(islandsPolicy == IslandPolicies.context)
     {
       for (int i = 1;  i <= nodeCount; ++i)
@@ -471,12 +470,22 @@ public class GraphExtractor implements ResultSetExtractor
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public String getIslandsPolicy()
+  public IslandPolicies getIslandsPolicy()
+  {
+    return islandsPolicy;
+  }
+
+  public void setIslandsPolicy(IslandPolicies islandsPolicy)
+  {
+    this.islandsPolicy = islandsPolicy;
+  }
+  
+  public String getIslandsPolicyString()
   {
     return islandsPolicy.name();
   }
 
-  public void setIslandsPolicy(String islandsPolicy)
+  public void setIslandsPolicyString(String islandsPolicy)
   {
     this.islandsPolicy = IslandPolicies.valueOf(islandsPolicy.toLowerCase().trim());
   }

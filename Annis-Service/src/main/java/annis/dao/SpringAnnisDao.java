@@ -1,6 +1,8 @@
 package annis.dao;
 
 import annis.executors.DefaultQueryExecutor;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,8 +28,15 @@ import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListNodeAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
+import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Properties;
+import org.apache.log4j.Level;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -54,11 +63,17 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private AnnisParser aqlParser;
   private DddQueryParser dddqueryParser;
   private de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis;
+  private HashMap<Long, Properties> corpusConfiguration;
 
   public SpringAnnisDao()
   {
     planRowMapper = new ParameterizedSingleColumnRowMapper<String>();
     sqlSessionModifiers = new ArrayList<SqlSessionModifier>();
+  }
+
+  public void init()
+  {
+    parseCorpusConfiguration();
   }
 
   @Override
@@ -121,7 +136,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
+  public List<AnnotationGraph> retrieveAnnotationGraph(
+    List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
@@ -225,6 +241,64 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       return new LinkedList<ResolverEntry>();
     }
 
+  }
+
+  private void parseCorpusConfiguration()
+  {
+    corpusConfiguration = new HashMap<Long, Properties>();
+    List<AnnisCorpus> corpora = listCorpora();
+    for(AnnisCorpus c : corpora)
+    {
+      // put in empty default properties
+      corpusConfiguration.put(c.getId(), new Properties());
+
+      // parse from configuration folder
+      if(System.getProperty("annis.home") != null)
+      {
+        File confFolder = new File(System.getProperty("annis.home") + "/conf/corpora");
+        if(confFolder.isDirectory())
+        {
+
+          // try corpus ID first
+          File conf = new File(confFolder, "" + c.getId() + ".properties" );
+          if(!conf.isFile())
+          {
+            try
+            {
+              // try hash of corpus name
+              conf = new File(confFolder, Utils.calculateSHAHash(c.getName()) + ".properties");
+              if(!conf.isFile())
+              {
+                // try corpus name
+                conf = new File(confFolder, c.getName() + ".properties");
+              }
+            }
+            catch (NoSuchAlgorithmException ex)
+            {
+              log.log(Level.WARN, null, ex);
+            }
+            catch (UnsupportedEncodingException ex)
+            {
+              log.log(Level.WARN, null, ex);
+            }
+          }
+
+          // parse property file if found
+          if(conf.isFile())
+          {
+            Properties p = corpusConfiguration.get(c.getId());
+            try
+            {
+              p.load(new FileReader(conf));
+            }
+            catch (IOException ex)
+            {
+              log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
+            }
+          }
+        }
+      }
+    }
   }
 
   public AnnisParser getAqlParser()

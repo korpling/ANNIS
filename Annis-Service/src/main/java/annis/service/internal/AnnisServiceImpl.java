@@ -28,8 +28,6 @@ import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSetImpl;
 import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
-import de.deutschdiachrondigital.dddquery.DddQueryMapper;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
