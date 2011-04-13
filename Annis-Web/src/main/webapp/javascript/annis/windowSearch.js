@@ -16,24 +16,6 @@ function corpusStringListFromSelection(selections)
   return result;
 }
 
-function updateHistory(historyButton) 
-{
-  var items = historyButton.menu.items;
-  var entry = {
-    text : lastQuery,
-    handler : function(b, e)
-    {
-      Ext.getCmp('queryAnnisQL').setValue(b.text);
-    }
-  };
-  
-  historyButton.menu.insert(0, entry);  
-  
-  if (items !== undefined && items.getCount() > 5) {    
-    historyButton.menu.remove(items.last());
-  }  
-}
-
 var Citation = {
   generate : function() {
     var formPanelSearch = Ext.ComponentMgr.get('formPanelSearch');
@@ -115,7 +97,8 @@ Ext.onReady(function()
   var delayKeyTask = new Ext.util.DelayedTask();
   var keyDelay = 1000;
   var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-20;
-
+  var history = new History(lastQuery);
+  
   
   function updateStatus()
   {
@@ -236,7 +219,7 @@ Ext.onReady(function()
           autoAbort : true,
           timeout : global_timeout
         });
-    updateHistory(queryHistory);
+    history.update(lastQuery);
   } // end getResult
 
   function doExport()
@@ -767,13 +750,7 @@ Ext.onReady(function()
     }
   };
 
-  var queryHistory = new Ext.SplitButton({
-    fieldLabel : 'History',
-    text : 'Query History',
-    menu : new Ext.menu.Menu()
-  });
-
-  var formPanelSearch = new Ext.FormPanel({
+ var formPanelSearch = new Ext.FormPanel({
     id : 'formPanelSearch',
     frame : true,
     title : 'AnnisQL',
@@ -791,7 +768,7 @@ Ext.onReady(function()
       name : 'matchCount',
       allowBlank : true,
       readOnly : true
-    }, queryHistory ]
+    }, history.splitButton ]
   });
 
   var panelSearchModes = new Ext.TabPanel({
