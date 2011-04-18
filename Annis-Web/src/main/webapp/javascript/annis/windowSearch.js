@@ -97,7 +97,7 @@ Ext.onReady(function()
   var delayKeyTask = new Ext.util.DelayedTask();
   var keyDelay = 1000;
   var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-20;
-  var history = new History(lastQuery);
+  var history = new History();
   
   
   function updateStatus()
@@ -749,8 +749,8 @@ Ext.onReady(function()
       }
     }
   };
-
- var formPanelSearch = new Ext.FormPanel({
+  
+  var formPanelSearch = new Ext.FormPanel({
     id : 'formPanelSearch',
     frame : true,
     title : 'AnnisQL',
@@ -909,7 +909,7 @@ Ext.onReady(function()
   new Ext.KeyMap(Ext.get('queryAnnisQL'), {
     key : Ext.EventObject.ENTER,
     ctrl : true,
-    fn : getResult    
+    fn : getResult
   });
 
   // highlight tutorial
