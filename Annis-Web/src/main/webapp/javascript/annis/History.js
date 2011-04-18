@@ -60,34 +60,35 @@ Ext.onReady(function()
 
     var grid = new Ext.grid.GridPanel({
       store : store,
-      columns : [
-          {
-            header : '#',
-            width : 30,
-            renderer : function(value, metadata, record, rowIndex, colIndex,
-                store)
-            {
-              return (rowIndex + 1);
-            }
-          },
-          {
-            id : 'query',
-            header : 'Query',
-            sortable : true,
-            width : 330,
-            dataIndex : 'query'
-          },
-          {
-            header : "url",
-            width : 30,
-            dataIndex : "id",
-            renderer : function(value, metadata, record, rowIndex, colIndex,
-                store)
-            {
-              return "<a href='#' onclick='getCitationWindow()'><img src='"
-                  + conf_context + "/images/url.png'></a>";
-            }
-          } ],
+      columns : [ {
+        header : '#',
+        width : 30,
+        renderer : function(value, metadata, record, rowIndex, colIndex)
+        {
+          return (rowIndex + 1);
+        }
+      }, {
+        id : 'query',
+        header : 'Query',
+        sortable : true,
+        width : 330,
+        dataIndex : 'query',
+        renderer : function(value)
+        {
+          return "<p class='hover'>" + value + "</p>";
+        }
+      }, {
+        header : "url",
+        width : 30,
+        dataIndex : "id",
+        renderer : function()
+        {
+          var action = 'getCitationWindow()';
+          var linkStart = "<a href='#' onclick='" + action + "'><img src='";
+          var linkEnd = "/images/url.png'></a>";
+          return linkStart + conf_context + linkEnd;
+        }
+      } ],
       sm : new Ext.grid.RowSelectionModel({
         singleSelect : true,
         store : store,
