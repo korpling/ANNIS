@@ -35,9 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -53,7 +51,6 @@ public class GraphExtractor implements ResultSetExtractor
   public enum IslandPolicies
   {
     context,
-    number,
     none    
   }
 
