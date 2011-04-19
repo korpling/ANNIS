@@ -74,11 +74,7 @@ Ext.onReady(function()
         header : 'Query',
         sortable : true,
         width : 330,
-        dataIndex : 'query',
-        renderer : function(value)
-        {
-          return "<p class='hover'>" + value + "</p>";
-        }
+        dataIndex : 'query'
       }, {
         header : "url",
         width : 30,
@@ -101,6 +97,9 @@ Ext.onReady(function()
           }
         }
       }),
+      viewConfig : {
+        rowOverCls : 'history-hover'
+      },
       stripeRows : true,
       width : 400,
       height : 300

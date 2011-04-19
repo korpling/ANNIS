@@ -106,7 +106,7 @@ div.annis-level-body {
 }
 
 /* for hover effect in clickable grids */
-p.hover {
+.history-hover {
   cursor : pointer;	
 }
 
