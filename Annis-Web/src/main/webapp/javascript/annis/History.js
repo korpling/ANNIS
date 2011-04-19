@@ -123,6 +123,7 @@ Ext.onReady(function()
       store.insert(0, new store.recordType({
         query : lastQuery
       }, lastQuery));
+      grid.getView().refresh(false);
     };
 
     this.splitButton = new Ext.SplitButton({
