@@ -248,59 +248,67 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private void parseCorpusConfiguration()
   {
     corpusConfiguration = new HashMap<Long, Properties>();
-    List<AnnisCorpus> corpora = listCorpora();
-    for(AnnisCorpus c : corpora)
+
+    try
     {
-      // put in empty default properties
-      corpusConfiguration.put(c.getId(), new Properties());
-
-      // parse from configuration folder
-      if(System.getProperty("annis.home") != null)
+      List<AnnisCorpus> corpora = listCorpora();
+      for(AnnisCorpus c : corpora)
       {
-        File confFolder = new File(System.getProperty("annis.home") + "/conf/corpora");
-        if(confFolder.isDirectory())
-        {
+        // put in empty default properties
+        corpusConfiguration.put(c.getId(), new Properties());
 
-          // try corpus ID first
-          File conf = new File(confFolder, "" + c.getId() + ".properties" );
-          if(!conf.isFile())
+        // parse from configuration folder
+        if(System.getProperty("annis.home") != null)
+        {
+          File confFolder = new File(System.getProperty("annis.home") + "/conf/corpora");
+          if(confFolder.isDirectory())
           {
-            try
+
+            // try corpus ID first
+            File conf = new File(confFolder, "" + c.getId() + ".properties" );
+            if(!conf.isFile())
             {
-              // try hash of corpus name
-              conf = new File(confFolder, Utils.calculateSHAHash(c.getName()) + ".properties");
-              if(!conf.isFile())
+              try
               {
-                // try corpus name
-                conf = new File(confFolder, c.getName() + ".properties");
+                // try hash of corpus name
+                conf = new File(confFolder, Utils.calculateSHAHash(c.getName()) + ".properties");
+                if(!conf.isFile())
+                {
+                  // try corpus name
+                  conf = new File(confFolder, c.getName() + ".properties");
+                }
+              }
+              catch (NoSuchAlgorithmException ex)
+              {
+                log.log(Level.WARN, null, ex);
+              }
+              catch (UnsupportedEncodingException ex)
+              {
+                log.log(Level.WARN, null, ex);
               }
             }
-            catch (NoSuchAlgorithmException ex)
-            {
-              log.log(Level.WARN, null, ex);
-            }
-            catch (UnsupportedEncodingException ex)
-            {
-              log.log(Level.WARN, null, ex);
-            }
-          }
 
-          // parse property file if found
-          if(conf.isFile())
-          {
-            Properties p = corpusConfiguration.get(c.getId());
-            try
+            // parse property file if found
+            if(conf.isFile())
             {
-              p.load(new FileReader(conf));
+              Properties p = corpusConfiguration.get(c.getId());
+              try
+              {
+                p.load(new FileReader(conf));
 
-            }
-            catch (IOException ex)
-            {
-              log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
+              }
+              catch (IOException ex)
+              {
+                log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
+              }
             }
           }
         }
       }
+    }
+    catch(org.springframework.jdbc.CannotGetJdbcConnectionException ex)
+    {
+      log.log(Level.WARN, "No corpus configuration loaded due to missing database connection.");
     }
   }
 
