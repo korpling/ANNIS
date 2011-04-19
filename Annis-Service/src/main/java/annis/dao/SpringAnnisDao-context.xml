@@ -46,6 +46,7 @@
 
   <bean id="graphExtractor" class="annis.dao.GraphExtractor">
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
   </bean>
 
 
@@ -100,7 +101,7 @@
   </bean>
 
 	<!-- exported bean: AnnisDao -->
-  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao">
+  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
 		<!--<property name="dataSource" ref="dataSource"/>-->
 

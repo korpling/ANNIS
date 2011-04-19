@@ -32,9 +32,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -47,12 +50,20 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 public class GraphExtractor implements ResultSetExtractor
 {
 
+  public enum IslandPolicies
+  {
+    context,
+    number,
+    none    
+  }
+
   private static final Logger log = Logger.getLogger(GraphExtractor.class);
   private String matchedNodesViewName;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
   private EdgeRowMapper edgeRowMapper;
   private AnnisNodeRowMapper annisNodeRowMapper;
+  private String defaultIslandsPolicy;
 
   public GraphExtractor()
   {
@@ -102,19 +113,26 @@ public class GraphExtractor implements ResultSetExtractor
     edgeAnnotationRowMapper.setTableAccessStrategy(tableAccessStrategy);
   }
 
-  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right, boolean analyze)
+  public String explain(JdbcTemplate jdbcTemplate, List<Long> corpusList,
+    int nodeCount, long offset, long limit, int left, int right,
+    boolean analyze, Map<Long,Properties> corpusProperties)
   {
     ParameterizedSingleColumnRowMapper<String> planRowMapper =
       new ParameterizedSingleColumnRowMapper<String>();
 
     List<String> plan = jdbcTemplate.query((analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n" + getContextQuery(corpusList, left, right, limit, offset, nodeCount), planRowMapper);
+      + "\n" + getContextQuery(corpusList, left, right, limit, offset, nodeCount, corpusProperties), planRowMapper);
     return StringUtils.join(plan, "\n");
   }
 
-  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, List<Long> corpusList, int nodeCount, long offset, long limit, int left, int right)
+  public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate,
+    List<Long> corpusList, int nodeCount, long offset, long limit, int left,
+    int right, Map<Long,Properties> corpusProperties)
   {
-    return (List<AnnotationGraph>) jdbcTemplate.query(getContextQuery(corpusList, left, right, limit, offset, nodeCount), this);
+    return (List<AnnotationGraph>) jdbcTemplate.query(
+      getContextQuery(corpusList, left, right, limit, offset, nodeCount,
+        corpusProperties),
+     this);
   }
 
   public List<AnnotationGraph> queryAnnotationGraph(JdbcTemplate jdbcTemplate, long textID)
@@ -122,8 +140,30 @@ public class GraphExtractor implements ResultSetExtractor
     return (List<AnnotationGraph>) jdbcTemplate.query(getTextQuery(textID), this);
   }
 
-  public String getContextQuery(List<Long> corpusList, int left, int right, long limit, long offset, int nodeCount)
+  private IslandPolicies getMostRestrictivePolicy(List<Long> corpora, Map<Long,Properties> props)
   {
+    IslandPolicies[] all = IslandPolicies.values();
+    IslandPolicies result = all[all.length-1];
+
+    for(Long l : corpora)
+    {
+      if(props.get(l) != null)
+      {
+        IslandPolicies newPolicy = IslandPolicies.valueOf(props.get(l).getProperty("islands-policy", defaultIslandsPolicy));
+        if(newPolicy.ordinal() < result.ordinal())
+        {
+          result = newPolicy;
+        }
+      }
+    }
+    return result;
+  }
+
+  public String getContextQuery(List<Long> corpusList, int left, int right, 
+    long limit, long offset, int nodeCount, Map<Long,Properties> corpusProperties)
+  {
+
+    IslandPolicies islandsPolicy = getMostRestrictivePolicy(corpusList, corpusProperties);
 
     // key for annotation graph matches
     StringBuilder keySb = new StringBuilder();
@@ -175,47 +215,113 @@ public class GraphExtractor implements ResultSetExtractor
       sb.append(") AND\n");
     }
     sb.append("\t(\n");
-    sb.append("\t(facts.text_ref = matches.text_ref1 AND ((facts.left_token >= matches.left_token1 - ")
-      .append(left).append(" AND facts.right_token <= matches.right_token1 + ")
-      .append(right).append(") OR (facts.left_token <= matches.left_token1 - ")
-      .append(left).append(" AND matches.left_token1 - ").append(left)
-      .append(" <= facts.right_token) OR (facts.left_token <= matches.right_token1 + ")
-      .append(right).append(" AND matches.right_token1 + ")
-      .append(right).append(" <= facts.right_token)))");
-    for (int i = 2; i <= nodeCount; ++i)
+
+    if(islandsPolicy == IslandPolicies.context)
     {
-      sb.append(" OR\n");
-      sb.append("\t(facts.text_ref = matches.text_ref");
-      sb.append(i);
-      sb.append(" AND ((facts.left_token >= matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" AND facts.right_token <= matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(") OR (facts.left_token <= matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" AND matches.left_token");
-      sb.append(i);
-      sb.append(" - ");
-      sb.append(left);
-      sb.append(" <= facts.right_token) OR (facts.left_token <= matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(" AND matches.right_token");
-      sb.append(i);
-      sb.append(" + ");
-      sb.append(right);
-      sb.append(" <= facts.right_token)))");
+      for (int i = 1;  i <= nodeCount; ++i)
+      {
+        if(i > 1)
+        {
+          sb.append("\n\t\tOR\n");
+        }
+
+        sb.append("\t\t(\n"
+          + "\t\t\tfacts.text_ref = matches.text_ref");
+        sb.append(i);
+
+        String rangeStart = "matches.left_token" + i + " - " + left;
+        String rangeEnd = "matches.right_token" + i + " + " + right;
+
+        sb.append("\n"
+          + "\t\t\tAND\n"
+          +"\t\t\t(\n");
+        sb.append(contextRangeSubquery(rangeStart, rangeEnd, "\t\t\t\t"));
+        sb.append("\t\t\t)\n");
+
+
+        sb.append("\n"
+          + "\t\t)");
+      }
+    }
+    else if(islandsPolicy == IslandPolicies.none)
+    {
+      sb.append("\t\tfacts.text_ref IN(");
+      for(int i=1; i <= nodeCount; i++)
+      {
+        if(i > 1)
+        {
+          sb.append(",");
+        }
+        sb.append("matches.text_ref");
+        sb.append(i);
+      }
+      sb.append(")\n\t\tAND\n\t\t(\n");
+
+      StringBuilder rangeStart = new StringBuilder();
+      StringBuilder rangeEnd = new StringBuilder();
+
+      rangeStart.append("ANY(ARRAY[");
+      rangeEnd.append("ANY(ARRAY[");
+
+      for(int i=1; i <= nodeCount; i++)
+      {
+        if(i > 1)
+        {
+          rangeStart.append(",");
+          rangeEnd.append(",");
+        }
+        rangeStart.append("matches.left_token");
+        rangeStart.append(i);
+        rangeStart.append(" - ");
+        rangeStart.append(left);
+
+        rangeEnd.append("matches.right_token");
+        rangeEnd.append(i);
+        rangeEnd.append(" + ");
+        rangeEnd.append(right);
+      }
+
+      rangeStart.append("])");
+      rangeEnd.append("])");
+
+      sb.append(contextRangeSubquery(rangeStart.toString(), rangeEnd.toString(), 
+        "\t\t\t"));
+
+      sb.append("\t\t)\n");
     }
     sb.append("\n\t)\n");
     sb.append("\nORDER BY key, facts.pre");
     return sb.toString();
+  }
+
+  private StringBuilder contextRangeSubquery(String rangeStart, String rangeEnd, String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+
+
+    // left token inside context range
+    sb.append(indent);
+    sb.append("(facts.left_token >= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.left_token <= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+    // right token inside context range
+    sb.append(indent);
+    sb.append("OR(facts.right_token >= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.right_token <= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+    // context range completly covered
+    sb.append(indent);
+    sb.append("OR(facts.left_token <= ");
+    sb.append(rangeStart);
+    sb.append(" AND facts.right_token >= ");
+    sb.append(rangeEnd);
+    sb.append(")\n");
+
+    return sb;
   }
 
   public String getTextQuery(long textID)
@@ -394,4 +500,16 @@ public class GraphExtractor implements ResultSetExtractor
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
+
+  public String getDefaultIslandsPolicy()
+  {
+    return defaultIslandsPolicy;
+  }
+
+  public void setDefaultIslandsPolicy(String defaultIslandsPolicy)
+  {
+    this.defaultIslandsPolicy = defaultIslandsPolicy;
+  }
+
+  
 }

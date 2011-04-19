@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -166,7 +167,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
     GraphExtractor ge = new GraphExtractor();
     ge.setMatchedNodesViewName("matched_nodes");
-    out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth())
+    out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
+      new HashMap<Long, Properties>())
       + ";");
   }
 
