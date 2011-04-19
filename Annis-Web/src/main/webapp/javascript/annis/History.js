@@ -9,6 +9,8 @@ Ext.onReady(function()
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
+      const
+      MAX_MENU_ITEMS = 5;
 
       // only insert if, store has really stored a new element
       if ((items === undefined) || (store.getCount() > items.getCount()))
@@ -28,12 +30,12 @@ Ext.onReady(function()
          * 
          */
         finalThis.splitButton.menu.removeAll();
-
+        var recordsArray = store.getRange([ 0 ], [ MAX_MENU_ITEMS - 1 ]);
         // count the other way around for ascending sorted menu
-        for ( var i = store.getCount() - 1; i >= 0; i--)
+        for ( var i = recordsArray.length - 1; i >= 0; i--)
         {
           finalThis.splitButton.menu.insert(0, {
-            text : (store.getAt(0)).data['query'],
+            text : recordsArray[i].data['query'],
             handler : function(b, e)
             {
               Ext.getCmp('queryAnnisQL').setValue(b.text);
@@ -43,8 +45,8 @@ Ext.onReady(function()
       }
 
       // delete least added element
-      if (items !== undefined && items.getCount() > 5)
-        finalThis.splitButton.remove(items.last());
+      if (items !== undefined && items.getCount() > MAX_MENU_ITEMS)
+        finalThis.splitButton.menu.remove(items.last());
 
     };
 
@@ -120,9 +122,11 @@ Ext.onReady(function()
 
     this.update = function(lastQuery)
     {
+      // insert query into arraystore and use query for index
       store.insert(0, new store.recordType({
         query : lastQuery
       }, lastQuery));
+
       grid.getView().refresh(false);
     };
 
