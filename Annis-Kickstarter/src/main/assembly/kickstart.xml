@@ -30,7 +30,7 @@
       <directory>src/main/resources/</directory>
       <includes>
         <include>database.properties</include>
-        <include>webxmloverride.xml</include>
+        <include>override-web.xml</include>
       </includes>
       <outputDirectory>/conf/</outputDirectory>
     </fileSet>

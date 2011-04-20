@@ -360,7 +360,7 @@ public class MainFrame extends javax.swing.JFrame
     Map<String, String> initParams = new HashMap<String, String>();
     initParams.put("managerClassName", "annis.security.TestSecurityManager");
     context.setInitParams(initParams);
-    String webxmlOverrride = System.getProperty("annis.home")  + "/conf/webxmloverride.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
+    String webxmlOverrride = System.getProperty("annis.home")  + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
     context.setOverrideDescriptor(webxmlOverrride);
 
     jetty.setHandler(context);
