@@ -105,18 +105,21 @@ Ext.onReady(function()
       height : 300
     });
 
+    // initiate window
+    var win = new Ext.Window({
+      autoDestroy : true,
+      title : 'history',
+      width : 400,
+      height : 300,
+      items : grid,
+      closeAction : 'hide',
+      stateful : true,
+      stateId : 'grid'
+    });
+
     var historyWindow = function()
     {
-      new Ext.Window({
-        autoDestroy : true,
-        title : 'history',
-        width : 400,
-        height : 300,
-        items : grid,
-        closeAction : 'hide',
-        stateful : true,
-        stateId : 'grid'
-      }).show();
+      win.show();
     };
 
     this.update = function(lastQuery)
