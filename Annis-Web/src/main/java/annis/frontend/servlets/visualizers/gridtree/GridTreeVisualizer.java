@@ -28,10 +28,10 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 			writer.append("<link href=\""
 					+ getContextPath()
-					+ "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
+					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<body>");
-			writer.append("<table class=\"partitur_table\">\n");
-			writer.append(findRoot());
+			writer.append("<table class=\"grid-tree\">\n");
+			writer.append(findRoot("cat"));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
@@ -41,7 +41,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 	}
 
-	private String findRoot() {
+	private String findRoot(String anno) {
 
 		AnnotationGraph graph = getResult().getGraph();
 		List<AnnisNode> nodes = graph.getNodes();
@@ -49,7 +49,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		Set<AnnisNode> roots = new HashSet<AnnisNode>();
 
 		for (AnnisNode n : nodes)
-			if (hasAnno(n, "cat"))
+			if (hasAnno(n, anno))
 				roots.add(n);
 
 		StringBuffer sb = new StringBuffer();
@@ -60,19 +60,27 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			Set<AnnisNode> tokens = new HashSet<AnnisNode>();
 			getTokens(n, tokens);
 
-			for (AnnisNode tok : tokens)
-				tok.setMarker("db0505");
-
 			// print result
+			String rootAnnotation = getAnnoValue(n, anno);
 			sb.append("<tr>\n");
-			sb.append("<td>" + getAnnoValue(n, "cat") + "</td>");
-			HTMLTableCell(sb, result, tokens);
+			sb.append("<th>" + rootAnnotation + "</th>");
+			htmlTableCell(sb, result, tokens, rootAnnotation);
 			sb.append("</tr>\n");
 		}
 
+		sb.append("<tr>\n");
+		htmlTableCell(sb, result);
+		sb.append("</tr>\n");
 		return sb.toString();
 	};
 
+	/**
+	 * Returns the annotation of a {@link AnnisNode}
+	 * 
+	 * @param n
+	 * @param anno
+	 * @return null, if the annotation not exists.
+	 */
 	private String getAnnoValue(AnnisNode n, String anno) {
 
 		for (Annotation a : n.getNodeAnnotations()) {
@@ -80,20 +88,29 @@ public class GridTreeVisualizer extends WriterVisualizer {
 				return a.getName() + " : " + a.getValue();
 		}
 
-		return "this Annotation does not exist";
+		return " ";
 	}
 
 	private boolean hasAnno(AnnisNode n, String annotation) {
 
 		Set<Annotation> annos = n.getNodeAnnotations();
 
-		for (Iterator<Annotation> it = annos.iterator(); it.hasNext();)
-			if (it.next().getName().equals(annotation))
+		for (Annotation x : annos)
+			if (x.getName().equals(annotation))
 				return true;
 
 		return false;
 	}
 
+	/**
+	 * Steps from the root recursive through all children nodes to find the
+	 * tokens.
+	 * 
+	 * @param n
+	 *            is the root
+	 * @param nodes
+	 *            the references of the tokens
+	 */
 	private void getTokens(AnnisNode n, Set<AnnisNode> nodes) {
 		Set<Edge> edges = n.getOutgoingEdges();
 
@@ -106,11 +123,37 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 	}
 
-	private void HTMLTableCell(StringBuffer sb, List<AnnisNode> result,
-			Set<AnnisNode> ts) {
+	private void htmlTableCell(StringBuffer sb, List<AnnisNode> result,
+			Set<AnnisNode> s, String rootAnnotation) {
+
+		int colspan = 0;
+
 		for (AnnisNode n : result) {
-			if (ts.contains(n))
-				sb.append("<td>" + n.getSpannedText() + "</td>");
+
+			if (s.contains(n) && colspan > 0) {
+				colspan++;
+			}
+
+			if (s.contains(n) && colspan == 0) {
+				colspan = 1;
+			}
+
+			if (!s.contains(n) && colspan > 0) {
+				sb.append("<td colspan=\"" + colspan
+						+ "\" class=\"gridtree-result\">" + rootAnnotation
+						+ "</td>");
+				colspan = 0;
+			}
+
+			if (!s.contains(n))
+				sb.append("<td> </td>");
+		}
+	}
+
+	private void htmlTableCell(StringBuffer sb, List<AnnisNode> result) {
+		sb.append("<th> tok </th>");
+		for (AnnisNode n : result) {
+			sb.append("<td>" + n.getSpannedText() + "</td>");
 		}
 	}
 }
