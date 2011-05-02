@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.aspectj.tools.ant.taskdefs.Ajdoc.Link;
+
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -25,12 +28,14 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	public void writeOutput(Writer writer) {
 		try {
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-
+			writer.append("<link href=\""
+					+ getContextPath()
+					+ "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<link href=\""
 					+ getContextPath()
 					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<body>");
-			writer.append("<table class=\"grid-tree\">\n");
+			writer.append("<table class=\"grid-tree partitur_table\">\n");
 			writer.append(findRoot("cat"));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
@@ -62,15 +67,11 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 			// print result
 			String rootAnnotation = getAnnoValue(n, anno);
-			sb.append("<tr>\n");
-			sb.append("<th>" + rootAnnotation + "</th>");
-			htmlTableCell(sb, result, tokens, rootAnnotation);
-			sb.append("</tr>\n");
+			htmlTableRow(sb, result, tokens, rootAnnotation);
 		}
 
-		sb.append("<tr>\n");
-		htmlTableCell(sb, result);
-		sb.append("</tr>\n");
+		htmlTableRow(sb, result);
+
 		return sb.toString();
 	};
 
@@ -91,6 +92,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		return " ";
 	}
 
+	
 	private boolean hasAnno(AnnisNode n, String annotation) {
 
 		Set<Annotation> annos = n.getNodeAnnotations();
@@ -123,37 +125,68 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 	}
 
-	private void htmlTableCell(StringBuffer sb, List<AnnisNode> result,
+	/**
+	 * Build a html-table-row.
+	 * 
+	 * @param sb
+	 *            the html-code, where the row is embedded
+	 * @param result List of all markable nodes
+	 * @param s set of dominated nodes
+	 * @param rootAnnotation node, which dominated all members of s
+	 */
+	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result,
 			Set<AnnisNode> s, String rootAnnotation) {
 
 		int colspan = 0;
 
+		sb.append("<tr>\n");
+		sb.append("<th>" + rootAnnotation + "</th>");
+
 		for (AnnisNode n : result) {
 
-			if (s.contains(n) && colspan > 0) {
+			if (s.contains(n) && colspan >= 0) {
 				colspan++;
 			}
 
-			if (s.contains(n) && colspan == 0) {
-				colspan = 1;
-			}
+			if (!s.contains(n) && colspan == 0)
+				sb.append("<td> </td>");
 
 			if (!s.contains(n) && colspan > 0) {
+
+				// build table-cell for span
 				sb.append("<td colspan=\"" + colspan
 						+ "\" class=\"gridtree-result\">" + rootAnnotation
 						+ "</td>");
+
+				// build table-cell for current node
+				sb.append("<td> </td>");
 				colspan = 0;
 			}
-
-			if (!s.contains(n))
-				sb.append("<td> </td>");
 		}
+
+		// build tag, if a span is not closed
+		if (colspan > 0)
+			sb.append("<td colspan=\"" + colspan
+					+ "\" class=\"gridtree-result\">" + rootAnnotation
+					+ "</td>");
+
+		sb.append("</tr>\n");
 	}
 
-	private void htmlTableCell(StringBuffer sb, List<AnnisNode> result) {
+	/**
+	 * Build a simple html-row
+	 * @param sb
+	 * @param result
+	 */
+	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result) {
+
+		sb.append("<tr>\n");
 		sb.append("<th> tok </th>");
+
 		for (AnnisNode n : result) {
 			sb.append("<td>" + n.getSpannedText() + "</td>");
 		}
+
+		sb.append("</tr>\n");
 	}
 }
