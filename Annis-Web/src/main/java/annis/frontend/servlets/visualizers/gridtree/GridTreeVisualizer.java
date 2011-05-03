@@ -24,6 +24,33 @@ import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 public class GridTreeVisualizer extends WriterVisualizer {
 
+	/**
+	 * This helper-class saves the span from a specific Node. The span is
+	 * represented as tokenIndex from the most and the most right Token of the
+	 * root.
+	 * 
+	 * @author benjamin
+	 * 
+	 */
+	private class Span {
+
+		Long left;
+		Long right;
+		AnnisNode root;
+
+		/**
+		 * left and right should be initiate with null, when root is not a
+		 * token.
+		 * 
+		 * @param root
+		 * @param r
+		 *            must be a sorted List of the result
+		 */
+		public Span(AnnisNode root) {
+			this.root = root;
+		}
+	}
+
 	@Override
 	public void writeOutput(Writer writer) {
 		try {
@@ -36,7 +63,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<body>");
 			writer.append("<table class=\"grid-tree partitur_table\">\n");
-			writer.append(findRoot("cat"));
+			writer.append(findAnnotation("cat"));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
@@ -46,7 +73,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 	}
 
-	private String findRoot(String anno) {
+	private String findAnnotation(String anno) {
 
 		AnnotationGraph graph = getResult().getGraph();
 		List<AnnisNode> nodes = graph.getNodes();
@@ -62,12 +89,12 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		for (AnnisNode n : roots) {
 
 			// catch the result
-			Set<AnnisNode> tokens = new HashSet<AnnisNode>();
-			getTokens(n, tokens);
+			Span span = new Span(n);
+			getTokens(span);
 
 			// print result
 			String rootAnnotation = getAnnoValue(n, anno);
-			htmlTableRow(sb, result, tokens, rootAnnotation);
+			htmlTableRow(sb, result, span, rootAnnotation);
 		}
 
 		htmlTableRow(sb, result);
@@ -92,7 +119,16 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		return " ";
 	}
 
-	
+	/**
+	 * Returns true when the node is annotated with the string. It is not
+	 * sensitive to namespaces.
+	 * 
+	 * @param n
+	 *            the node to check
+	 * @param annotation
+	 *            String to check, without namespaces
+	 * @return
+	 */
 	private boolean hasAnno(AnnisNode n, String annotation) {
 
 		Set<Annotation> annos = n.getNodeAnnotations();
@@ -113,15 +149,33 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param nodes
 	 *            the references of the tokens
 	 */
-	private void getTokens(AnnisNode n, Set<AnnisNode> nodes) {
-		Set<Edge> edges = n.getOutgoingEdges();
+	private void getTokens(Span n) {
+		Set<Edge> edges = n.root.getOutgoingEdges();
 
 		for (Edge e : edges) {
+
 			AnnisNode x;
-			if ((x = e.getDestination()).isToken())
-				nodes.add(x);
-			else
-				getTokens(x, nodes);
+
+			if ((x = e.getDestination()).isToken()) {
+
+				Long tokenIndex = x.getTokenIndex();
+
+				if (n.left == null)
+					n.left = tokenIndex;
+				else
+					n.left = Math.min(n.left, tokenIndex);
+
+				if (n.right == null)
+					n.right = tokenIndex;
+				else
+					n.right = Math.max(n.right, tokenIndex);
+
+			}
+
+			else {
+				n.root = e.getDestination();
+				getTokens(n);
+			}
 		}
 	}
 
@@ -130,51 +184,40 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * 
 	 * @param sb
 	 *            the html-code, where the row is embedded
-	 * @param result List of all markable nodes
-	 * @param s set of dominated nodes
-	 * @param rootAnnotation node, which dominated all members of s
+	 * @param result
+	 *            List of all results, the list must be sorted by the
+	 *            token-index
+	 * @param s
+	 *            Span object with left and right limit
+	 * @param rootAnnotation
+	 *            node, which dominated all members of s
 	 */
-	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result,
-			Set<AnnisNode> s, String rootAnnotation) {
-
-		int colspan = 0;
+	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result, Span s,
+			String rootAnnotation) {
 
 		sb.append("<tr>\n");
 		sb.append("<th>" + rootAnnotation + "</th>");
 
-		for (AnnisNode n : result) {
-
-			if (s.contains(n) && colspan >= 0) {
-				colspan++;
-			}
-
-			if (!s.contains(n) && colspan == 0)
-				sb.append("<td> </td>");
-
-			if (!s.contains(n) && colspan > 0) {
-
-				// build table-cell for span
-				sb.append("<td colspan=\"" + colspan
-						+ "\" class=\"gridtree-result\">" + rootAnnotation
-						+ "</td>");
-
-				// build table-cell for current node
-				sb.append("<td> </td>");
-				colspan = 0;
-			}
+		// fill with empty cell
+		for (long i = result.get(0).getTokenIndex(); i < s.left; i++) {
+			sb.append("<td> </td>");
 		}
 
-		// build tag, if a span is not closed
-		if (colspan > 0)
-			sb.append("<td colspan=\"" + colspan
-					+ "\" class=\"gridtree-result\">" + rootAnnotation
-					+ "</td>");
+		// build table-cell for span
+		sb.append("<td colspan=\"" + (Math.abs(s.right - s.left) + 1)
+				+ "\" class=\"gridtree-result\">" + rootAnnotation + "</td>");
 
+		// fill with empty cells
+		long lastTokenIndex = result.get(result.size() - 1).getTokenIndex();
+		for (long i = s.right; i < lastTokenIndex; i++) {
+			sb.append("<td> </td>");
+		}
 		sb.append("</tr>\n");
 	}
 
 	/**
 	 * Build a simple html-row
+	 * 
 	 * @param sb
 	 * @param result
 	 */
