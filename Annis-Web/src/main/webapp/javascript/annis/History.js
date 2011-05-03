@@ -6,6 +6,11 @@ Ext.onReady(function()
     // need this pointer for event-function
     var finalThis = this;
 
+    var openCitationWindow = function()
+    {
+      
+    }
+    
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
@@ -53,7 +58,8 @@ Ext.onReady(function()
     // initiate GridView for all queries
     var store = new Ext.data.ArrayStore({
       fields : [ {
-        name : 'query'
+        name : 'query', 
+        name : 'citation'
       } ],
       listeners : {
         'add' : updateDropDownMenu
@@ -78,13 +84,10 @@ Ext.onReady(function()
       }, {
         header : "url",
         width : 30,
-        dataIndex : "id",
-        renderer : function()
-        {
-          var action = 'getCitationWindow()';
-          var linkStart = "<a href='#' onclick='" + action + "'><img src='";
-          var linkEnd = "/images/url.png'></a>";
-          return linkStart + conf_context + linkEnd;
+        dataIndex : "citation",
+        renderer : function(value)
+        {           
+          return "<a href='#' onclick=\"getCitationWindow('" + value + "');\"><img src='" + conf_context + "/images/url.png'></a>";          
         }
       } ],
       sm : new Ext.grid.RowSelectionModel({
@@ -121,12 +124,13 @@ Ext.onReady(function()
     {
       win.show();
     };
-
+        
     this.update = function(lastQuery)
     {
       // insert query into arraystore and use query for index
       store.insert(0, new store.recordType({
-        query : lastQuery
+        query : lastQuery,
+        citation : Citation.generate(),
       }, lastQuery));
       
       if (win.isVisible())
