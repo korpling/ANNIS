@@ -210,10 +210,12 @@
     </init-param>
     -->
   </filter>
+  <!--
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>
     <url-pattern>/search.html</url-pattern>
   </filter-mapping>
+  -->
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>
     <url-pattern>/LoginLogout</url-pattern>
