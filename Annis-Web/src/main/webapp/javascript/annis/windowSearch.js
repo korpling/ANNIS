@@ -37,17 +37,21 @@ var Citation = {
       var store = Ext.ComponentMgr.get('gridPanelCorpus').getStore();
       var selectionModel = Ext.ComponentMgr.get('gridPanelCorpus').selModel;
 			
-      Ext.each(citation.split('),'), function(item){
-        item=item.replace(')', '');
-        var pair = item.split('(');
-        var key = pair[0];
-        var value = pair[1];
-					
-        if("AQL" == key) {
-          formPanelSearch.getComponent('queryAnnisQL').setValue(Url.decode(value.replace('"', '')));
-        } else if("CIDS" == key)
+      // regular expression matching, CLEFT and CRIGHT are optional
+      // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
+      var params = /AQL\((.*)\),CIDS\(([^)]*)\)(,CLEFT\(([^)]*)\),)?(CRIGHT\(([^)]*)\))?/.exec(citation);
+      if(params != null)
+      {
+        // AQL
+        if(params[1] != undefined)
         {
-          var cids = value.split(',');
+          formPanelSearch.getComponent('queryAnnisQL').setValue(Url.decode(params[1]));
+        }
+        
+        // CIDS
+        if(params[2] != undefined)
+        {
+          var cids = params[2].split(',');
           var selection = new Array();
           for(i=0;i<cids.length;i++)
           {
@@ -55,16 +59,19 @@ var Citation = {
             selection[i] = store.getAt(index);
           }
           selectionModel.selectRecords(selection, false);
-        } 
-        else if("CLEFT" == key)
-        {
-          formPanelSimpleSearch.getComponent('padLeft').setValue(value);
-        } 
-        else if("CRIGHT" == key)
-        {
-          formPanelSimpleSearch.getComponent('padRight').setValue(value);
         }
-      });
+        
+        // CLEFT
+        if(params[4] != undefined)
+        {
+          formPanelSimpleSearch.getComponent('padLeft').setValue(params[4]);
+        }
+        // CRIGHT
+        if(params[6] != undefined)
+        {
+          formPanelSimpleSearch.getComponent('padRight').setValue(params[6]);
+        }
+      }
     }
     //todo delete cookie
     document.cookie = "citation=; path=/;-1";
