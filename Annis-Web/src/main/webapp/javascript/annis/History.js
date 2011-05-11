@@ -6,11 +6,6 @@ Ext.onReady(function()
     // need this pointer for event-function
     var finalThis = this;
 
-    var openCitationWindow = function()
-    {
-      
-    }
-    
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
@@ -127,6 +122,9 @@ Ext.onReady(function()
         
     this.update = function(lastQuery)
     {
+      
+      finalThis.splitButton.enable();
+      
       // insert query into arraystore and use query for index
       store.insert(0, new store.recordType({
         query : lastQuery,
@@ -143,7 +141,8 @@ Ext.onReady(function()
       menu : new Ext.menu.Menu(),
       listeners : {
         'click' : historyWindow
-      }
+      },
+      disabled : true      
     });
   };
 });
