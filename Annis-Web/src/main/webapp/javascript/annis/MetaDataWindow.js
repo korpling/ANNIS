@@ -255,7 +255,11 @@ Ext.onReady(function()
         title : 'node annotations',
         viewConfig : {
           forceFit : true,
-          autoFill : true
+          autoFill : true,
+          templates : {
+            cell : selectableCell
+          },
+          rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
         height : height
@@ -297,7 +301,15 @@ Ext.onReady(function()
         title : 'edge annotations',
         viewConfig : {
           forceFit : true,
+<<<<<<< TREE
           autoFill : true
+=======
+          autoFill : true,
+          templates : {
+            cell : selectableCell
+          },
+          rowOverCls : 'corpusbrowser-hover'
+>>>>>>> MERGE-SOURCE
         },
         autoWidth : true,
         height : height
@@ -338,7 +350,15 @@ Ext.onReady(function()
         title : 'edge types',
         viewConfig : {
           forceFit : true,
+<<<<<<< TREE
           autoFill : true
+=======
+          autoFill : true,
+          templates : {
+            cell : selectableCell
+          },
+          rowOverCls : 'corpusbrowser-hover'
+>>>>>>> MERGE-SOURCE
         },
         autoWidth : true,
         height : height
