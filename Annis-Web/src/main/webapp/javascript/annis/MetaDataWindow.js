@@ -255,7 +255,8 @@ Ext.onReady(function()
           autoFill : true,
           templates : {
             cell : selectableCell
-          }
+          },
+          rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
         height : height
@@ -300,7 +301,8 @@ Ext.onReady(function()
           autoFill : true,
           templates : {
             cell : selectableCell
-          }
+          },
+          rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
         height : height
@@ -344,7 +346,8 @@ Ext.onReady(function()
           autoFill : true,
           templates : {
             cell : selectableCell
-          }
+          },
+          rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
         height : height

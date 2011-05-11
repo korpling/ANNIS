@@ -105,3 +105,6 @@ div.annis-level-body {
   -khtml-user-select: text!important;
 }
 
+.corpusbrowser-hover {
+  cursor : pointer;	
+}
