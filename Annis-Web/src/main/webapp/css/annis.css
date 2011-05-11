@@ -105,3 +105,8 @@ div.annis-level-body {
   -khtml-user-select: text!important;
 }
 
+/* for hover effect in clickable grids */
+.history-hover {
+  cursor : pointer;	
+}
+
