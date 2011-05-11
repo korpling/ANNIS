@@ -301,15 +301,11 @@ Ext.onReady(function()
         title : 'edge annotations',
         viewConfig : {
           forceFit : true,
-<<<<<<< TREE
-          autoFill : true
-=======
           autoFill : true,
           templates : {
             cell : selectableCell
           },
           rowOverCls : 'corpusbrowser-hover'
->>>>>>> MERGE-SOURCE
         },
         autoWidth : true,
         height : height
@@ -350,15 +346,11 @@ Ext.onReady(function()
         title : 'edge types',
         viewConfig : {
           forceFit : true,
-<<<<<<< TREE
-          autoFill : true
-=======
           autoFill : true,
           templates : {
             cell : selectableCell
           },
           rowOverCls : 'corpusbrowser-hover'
->>>>>>> MERGE-SOURCE
         },
         autoWidth : true,
         height : height
