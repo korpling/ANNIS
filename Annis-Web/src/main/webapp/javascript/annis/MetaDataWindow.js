@@ -353,10 +353,13 @@ Ext.onReady(function()
         }
 
         // copy and filter for the several annotation-stores
-        storeEdgeAnnotations.add(store.getRange(0, store.getCount()));
-        storeEdgeTypes.add(store.getRange(0, store.getCount()));
-        storeNodeAnnotations.add(store.getRange(0, store.getCount()));
-
+        recordArray = store.getRange(0, store.getCount());
+        for (var i = 0; i < recordArray.length; i++){
+          storeEdgeAnnotations.add(recordArray[i].copy()); 
+          storeEdgeTypes.add(recordArray[i].copy());
+          storeNodeAnnotations.add(recordArray[i].copy());
+        }
+        
         var knownEdgeAnnotations = {};
         storeEdgeAnnotations.filterBy(function(record, id)
         {
