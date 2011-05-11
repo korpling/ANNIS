@@ -4,9 +4,9 @@ Ext.onReady(function()
     "Content-Type" : "application/x-www-form-urlencoded; charset=utf-8"
   };
 
-  //helper functions
-  function killNameSpaces(name) 
-  {    
+  // helper functions
+  function killNameSpaces(name)
+  {
     var edgeNameArray = name.split(":");
     return edgeNameArray[edgeNameArray.length - 1];
   }
@@ -15,16 +15,15 @@ Ext.onReady(function()
   {
     var names = {};
     var i;
-    for(i=0; i < records.length; i++)
+    for (i = 0; i < records.length; i++)
     {
       var n = killNameSpaces(records[i].get(field));
-      if(n)
+      if (n)
       {
-        if(names[n] === true)
+        if (names[n] === true)
         {
           return true;
-        }
-        else
+        } else
         {
           names[n] = true;
         }
@@ -36,10 +35,10 @@ Ext.onReady(function()
   function hasDominanceEdges(records)
   {
     var i;
-    for(i=0; i < records.length; i++)
+    for (i = 0; i < records.length; i++)
     {
       var r = records[i];
-      if(r.get("type") === 'edge' && r.get("subtype") === 'd')
+      if (r.get("type") === 'edge' && r.get("subtype") === 'd')
       {
         return true;
       }
@@ -51,18 +50,18 @@ Ext.onReady(function()
   var edge_names = {};
   function edgeNames(record, id)
   {
-    
+
     if (record.get("edge_name"))
     {
       var eName = record.get('edge_name');
-      
-      if(Ext.util.Format.trim(eName) !== '')
+
+      if (Ext.util.Format.trim(eName) !== '')
       {
         record.set('name', eName);
       }
       record.commit();
 
-      if(edge_names.eName === true)
+      if (edge_names.eName === true)
       {
         return false;
       }
@@ -72,78 +71,81 @@ Ext.onReady(function()
     }
     return false;
   }
-  
-  //render functions
+
+  // render functions
   function nameRenderer(value, metadata, record, rowIndex, colIndex, store)
   {
-    if(isAmbiguous(store, store.getRange(), 'name') === true)
+    if (isAmbiguous(store, store.getRange(), 'name') === true)
     {
       return value;
-    }
-    else
+    } else
     {
       return killNameSpaces(value);
     }
   }
-  
+
   function readableExample(value, metadata, record, rowIndex, colIndex, store)
   {
-    return '<p style=\'white-space: normal;\'>' + killNameSpaces(record.get('name')) + "=\""
-        + record.get('values')[0] + "\"</p>";
+    return '<p style=\'white-space: normal;\'>'
+        + killNameSpaces(record.get('name')) + "=\"" + record.get('values')[0]
+        + "\"</p>";
   }
 
   function edgeAnnotation(value, metadata, record, rowIndex, colIndex, store)
-  {    
-    var operator = (record.get('subtype') === "d") ? '>' : '->' + killNameSpaces(record.get('edge_name'));
+  {
+    var operator = (record.get('subtype') === "d") ? '>' : '->'
+        + killNameSpaces(record.get('edge_name'));
     return '<p style=\'white-space: normal;\'> node & node & #1 ' + operator
-        + '[' + killNameSpaces(record.get('name')) + "=\"" + record.get('values')
-        + "\"] #2</p>";
+        + '[' + killNameSpaces(record.get('name')) + "=\""
+        + record.get('values') + "\"] #2</p>";
   }
 
   function edgeTypes(value, metadata, record, rowIndex, colIndex, store)
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->';
-    return  '<p style=\'white-space: normal;\'>node & node & #1 ' + operator + 
-        killNameSpaces(record.get('edge_name'))
-        + " #2</p>";
-  }  
-  
-  function annotationUrl (value, metadata, record, rowIndex, colIndex, store)
-  {    
-    return "<a href='#' onclick='getCitationWindow()'><img src='" + conf_context + "/images/url.png'></a>";
+    return '<p style=\'white-space: normal;\'>node & node & #1 ' + operator
+        + killNameSpaces(record.get('edge_name')) + " #2</p>";
   }
-  
-  // this must be global for using in DOM
-  getCitationWindow = function () 
+
+  function annotationUrl(value, metadata, record, rowIndex, colIndex, store)
   {
-    Ext.Msg.alert('Citation', '<textarea readonly="f" wrap="virtual" rows="5" cols="60">' + Citation.generate() + "</textarea>");
+    return "<a href='#' onclick='getCitationWindow()'><img src='"
+        + conf_context + "/images/url.png'></a>";
+  }
+
+  // this must be global for using in DOM
+  getCitationWindow = function()
+  {
+    Ext.Msg.alert('Citation',
+        '<textarea readonly="f" wrap="virtual" rows="5" cols="60">'
+            + Citation.generate() + "</textarea>");
   };
-  
+
   // listener
-  function queryToAnnisQL (row,  rowIndex,  record) 
-  {    
-    // filter html-tags  
+  function queryToAnnisQL(row, rowIndex, record)
+  {
+    // filter html-tags
     var reg = /(\<[a-z]+( [a-z]*\=\'[a-z\-\:\; ]*\')*\>)|(\<\/[a-z]*\>)/g;
-    var query;    
+    var query;
 
     switch (row.store.storeId)
     {
-      case 'storeEdgeTypes':
-        query = edgeTypes(null, null, record, null, null, null);
-        break;
-      case 'storeEdgeAnnotations':
-        query = edgeAnnotation(null, null, record, null, null, null);
-        break;
-      case 'storeNodeAnnotations':
-        query = readableExample(null, null, record, null, null, null);
+    case 'storeEdgeTypes':
+      query = edgeTypes(null, null, record, null, null, null);
+      break;
+    case 'storeEdgeAnnotations':
+      query = edgeAnnotation(null, null, record, null, null, null);
+      break;
+    case 'storeNodeAnnotations':
+      query = readableExample(null, null, record, null, null, null);
     }
-    
+
     Ext.getCmp('queryAnnisQL').setValue(query.replace(reg, ''));
   }
 
   MetaDataWindow = function(id, name)
   {
-    
+
     var hideAttr = (name === "Search Result") ? true : false;
 
     var config = {};
@@ -153,13 +155,6 @@ Ext.onReady(function()
 
     var grid = null;
 
-    // needed for selecting content of grids
-    var selectableCell = new Ext.Template(
-        '<td class="x-grid3-col x-grid3-cell x-grid3-td-{id} x-selectable {css}" style="{style}" tabIndex="0" {cellAttr}>',
-        '<div class="x-grid3-cell-inner x-grid3-col-{id}" {attr}>{value}</div>',
-        '</td>'
-     );
-    
     // get datastore
     var storeMeta = new Ext.data.JsonStore({
       url : conf_context + '/secure/MetaData?mID=' + id,
@@ -169,7 +164,7 @@ Ext.onReady(function()
       fields : [ 'key', 'value' ],
       // turn on remote sorting
       remoteSort : true
-    });    
+    });
 
     var colModel = new Ext.grid.ColumnModel([ {
       header : "Name",
@@ -186,15 +181,12 @@ Ext.onReady(function()
 
     var gridMeta = new Ext.grid.GridPanel({
       ds : storeMeta,
-      cm : colModel,      
+      cm : colModel,
       title : 'meta data',
       loadMask : true,
       viewConfig : {
         forceFit : true,
         autoFill : true,
-        templates : {
-          cell : selectableCell
-        }
       },
       height : 370,
       flex : 1
@@ -207,8 +199,8 @@ Ext.onReady(function()
     {
 
       // height of accordion components
-      var height = 300;      
-      
+      var height = 300;
+
       var storeAttributes = new Ext.data.JsonStore({
         url : conf_context + '/secure/AttributeList?corpusIds=' + id,
         // turn on remote sorting
@@ -219,24 +211,23 @@ Ext.onReady(function()
       var storeNodeAnnotations = new Ext.data.JsonStore({
         remoteSort : false,
         fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
-        storeId: 'storeNodeAnnotations'
+        storeId : 'storeNodeAnnotations'
       });
 
       var colModelNodeAnnotations = new Ext.grid.ColumnModel([ {
         header : "name",
         dataIndex : "name",
-        renderer: nameRenderer
+        renderer : nameRenderer
       }, {
         header : "example (click to use query)",
         dataIndex : "values",
         renderer : readableExample
-      },
-      {
+      }, {
         header : "url",
         width : 20,
         dataIndex : "id",
         renderer : annotationUrl
-      }]);
+      } ]);
 
       var gridNodeAnnotations = new Ext.grid.GridPanel({
         ds : storeNodeAnnotations,
@@ -244,7 +235,7 @@ Ext.onReady(function()
         sm : new Ext.grid.RowSelectionModel({
           singleSelect : true,
           store : storeNodeAnnotations,
-          listeners : {            
+          listeners : {
             'rowselect' : queryToAnnisQL
           }
         }),
@@ -265,17 +256,17 @@ Ext.onReady(function()
       var storeEdgeAnnotations = new Ext.data.JsonStore({
         remoteSort : false,
         fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
-        storeId: 'storeEdgeAnnotations'
+        storeId : 'storeEdgeAnnotations'
       });
 
       var colModelEdgeAnnotation = new Ext.grid.ColumnModel([ {
         header : "name",
         dataIndex : "name",
-        renderer: nameRenderer
+        renderer : nameRenderer
       }, {
         header : "example (click to use query)",
         dataIndex : "values",
-        renderer : edgeAnnotation       
+        renderer : edgeAnnotation
       }, {
         header : "url",
         width : 20,
@@ -289,7 +280,7 @@ Ext.onReady(function()
         sm : new Ext.grid.RowSelectionModel({
           singleSelect : true,
           store : storeEdgeAnnotations,
-          listeners : {  
+          listeners : {
             singleSelect : true,
             'rowselect' : queryToAnnisQL
           }
@@ -299,9 +290,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
@@ -311,13 +299,13 @@ Ext.onReady(function()
       var storeEdgeTypes = new Ext.data.JsonStore({
         remoteSort : false,
         fields : [ 'name', 'values', 'type', 'edge_name', 'subtype' ],
-        storeId: 'storeEdgeTypes'
+        storeId : 'storeEdgeTypes'
       });
 
       var colEdgeTypes = new Ext.grid.ColumnModel([ {
         header : "name",
         dataIndex : "name",
-        renderer: nameRenderer
+        renderer : nameRenderer
       }, {
         header : "example (click to use query)",
         dataIndex : "edge_name",
@@ -333,9 +321,9 @@ Ext.onReady(function()
         ds : storeEdgeTypes,
         cm : colEdgeTypes,
         sm : new Ext.grid.RowSelectionModel({
-          singleSelect : true, 
+          singleSelect : true,
           store : storeEdgeTypes,
-          listeners : {      
+          listeners : {
             'rowselect' : queryToAnnisQL
           }
         }),
@@ -344,9 +332,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
@@ -357,7 +342,7 @@ Ext.onReady(function()
       storeAttributes.on("load", function(store, records, options)
       {
 
-        if(hasDominanceEdges(records))
+        if (hasDominanceEdges(records))
         {
           var a = [];
           a[0] = '';
@@ -367,26 +352,29 @@ Ext.onReady(function()
           domEdgeType.subtype = 'd';
           domEdgeType.edge_name = ' ';
           domEdgeType.values = a;
-          var domEdgeTypeRecord = new storeEdgeTypes.recordType(domEdgeType, Ext.id());
-          
+          var domEdgeTypeRecord = new storeEdgeTypes.recordType(domEdgeType,
+              Ext.id());
+
           storeEdgeTypes.add(domEdgeTypeRecord);
         }
 
         // copy and filter for the several annotation-stores
         recordArray = store.getRange(0, store.getCount());
-        for (var i = 0; i < recordArray.length; i++){
-          storeEdgeAnnotations.add(recordArray[i].copy()); 
+        for ( var i = 0; i < recordArray.length; i++)
+        {
+          storeEdgeAnnotations.add(recordArray[i].copy());
           storeEdgeTypes.add(recordArray[i].copy());
           storeNodeAnnotations.add(recordArray[i].copy());
         }
-        
+
         var knownEdgeAnnotations = {};
-        storeEdgeAnnotations.filterBy(function(record, id){
-          if(record.get("type") === 'edge')
+        storeEdgeAnnotations.filterBy(function(record, id)
+        {
+          if (record.get("type") === 'edge')
           {
-            var annoName = record.get('subtype')
-              + '.' + record.get('edge_type') + '.' + record.get("name");
-            if(knownEdgeAnnotations[annoName] !== true)
+            var annoName = record.get('subtype') + '.'
+                + record.get('edge_type') + '.' + record.get("name");
+            if (knownEdgeAnnotations[annoName] !== true)
             {
               knownEdgeAnnotations[annoName] = true;
               return true;
@@ -397,11 +385,10 @@ Ext.onReady(function()
         storeEdgeTypes.filterBy(edgeNames);
 
         storeNodeAnnotations.filter("type", "node", false, true);
-        
+
       }); // end on load storeAttributes
 
       storeAttributes.load();
-      
 
       rightPanel = new Ext.Panel({
         layout : 'accordion',
