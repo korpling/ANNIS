@@ -113,6 +113,7 @@ Ext.onReady(function()
         + conf_context + "/images/url.png'></a>";
   }
 
+
   /**
    * this must be global for using in DOM, this function also works when value
    * is undefined. If value is undefinded the function use Citation.generate()
@@ -198,7 +199,7 @@ Ext.onReady(function()
       loadMask : true,
       viewConfig : {
         forceFit : true,
-        autoFill : true
+        autoFill : true,
       },
       height : 370,
       flex : 1
@@ -256,9 +257,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
@@ -302,9 +300,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
@@ -347,9 +342,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
@@ -378,12 +370,13 @@ Ext.onReady(function()
 
         // copy and filter for the several annotation-stores
         recordArray = store.getRange(0, store.getCount());
-        for (var i = 0; i < recordArray.length; i++){
-          storeEdgeAnnotations.add(recordArray[i].copy()); 
+        for ( var i = 0; i < recordArray.length; i++)
+        {
+          storeEdgeAnnotations.add(recordArray[i].copy());
           storeEdgeTypes.add(recordArray[i].copy());
           storeNodeAnnotations.add(recordArray[i].copy());
         }
-        
+
         var knownEdgeAnnotations = {};
         storeEdgeAnnotations.filterBy(function(record, id)
         {
