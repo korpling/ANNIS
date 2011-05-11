@@ -6,11 +6,6 @@ Ext.onReady(function()
     // need this pointer for event-function
     var finalThis = this;
 
-    var openCitationWindow = function()
-    {
-      
-    }
-    
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
