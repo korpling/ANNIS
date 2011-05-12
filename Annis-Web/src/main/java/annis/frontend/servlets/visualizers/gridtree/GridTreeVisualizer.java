@@ -2,13 +2,14 @@ package annis.frontend.servlets.visualizers.gridtree;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.aspectj.tools.ant.taskdefs.Ajdoc.Link;
-
+import java.util.SortedSet;
+import java.util.TreeSet;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -24,6 +25,8 @@ import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 public class GridTreeVisualizer extends WriterVisualizer {
 
+	private LinkedList<Span> spans = new LinkedList<GridTreeVisualizer.Span>();
+
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
 	 * represented as tokenIndex from the most and the most right Token of the
@@ -32,11 +35,13 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @author benjamin
 	 * 
 	 */
-	private class Span {
+	private class Span implements Comparable<Span>, Cloneable {
 
 		Long left;
 		Long right;
 		AnnisNode root;
+		AnnisNode current;
+		int height;
 
 		/**
 		 * left and right should be initiate with null, when root is not a
@@ -48,6 +53,16 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		 */
 		public Span(AnnisNode root) {
 			this.root = root;
+			this.current = root;
+		}
+
+		@Override
+		public int compareTo(Span sp) {
+			if (this.height < sp.height)
+				return 1;
+			if (this.height == sp.height)
+				return 0;
+			return -1;
 		}
 	}
 
@@ -90,12 +105,15 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 			// catch the result
 			Span span = new Span(n);
-			getTokens(span);
+			getTokens(span, roots);
+			spans.add(span);
 
-			// print result
-			String rootAnnotation = getAnnoValue(n, anno);
-			htmlTableRow(sb, result, span, rootAnnotation);
 		}
+
+		Collections.sort(spans);
+
+		// print result
+		htmlTableRow(sb, result, spans, anno);
 
 		htmlTableRow(sb, result);
 
@@ -142,15 +160,27 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 	/**
 	 * Steps from the root recursive through all children nodes to find the
-	 * tokens.
+	 * tokens. This function is a straight forward DFS-Algorithm. It also
+	 * calculate the max-depth with this functional pseudo-algorithm:<br/>
+	 * 
+	 * data Tree a = Node [Tree a] | Leaf a<br />
+	 * 
+	 * maxDepth :: Tree a -> Int <br />
+	 * maxDepth (Leaf a) = 0 <br />
+	 * maxDepth (Node ls) = maximum (map maxDepth ls) + 1
 	 * 
 	 * @param n
 	 *            is the root
-	 * @param nodes
-	 *            the references of the tokens
+	 * @param roots
+	 *            List of root nodes
+	 * 
 	 */
-	private void getTokens(Span n) {
-		Set<Edge> edges = n.root.getOutgoingEdges();
+	public void getTokens(Span n, Set<AnnisNode> roots) {
+		getTokens(n, roots, 0);
+	}
+
+	private void getTokens(Span n, Set<AnnisNode> roots, int height) {
+		Set<Edge> edges = n.current.getOutgoingEdges();
 
 		for (Edge e : edges) {
 
@@ -170,11 +200,14 @@ public class GridTreeVisualizer extends WriterVisualizer {
 				else
 					n.right = Math.max(n.right, tokenIndex);
 
+				n.height = Math.max(n.height, height);
+
 			}
 
+			// recursive step
 			else {
-				n.root = e.getDestination();
-				getTokens(n);
+				n.current = x;
+				getTokens(n, roots, height + 1);
 			}
 		}
 	}
@@ -187,32 +220,35 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param result
 	 *            List of all results, the list must be sorted by the
 	 *            token-index
-	 * @param s
-	 *            Span object with left and right limit
-	 * @param rootAnnotation
-	 *            node, which dominated all members of s
+	 * @param spans
+	 *            Sorted List of Span objects with left and right limit
+	 * @param anno
+	 *            the anno, which matches to all Span-Objects
 	 */
-	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result, Span s,
-			String rootAnnotation) {
+	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result,
+			LinkedList<Span> spans, String anno) {
 
-		sb.append("<tr>\n");
-		sb.append("<th>" + rootAnnotation + "</th>");
+		for (Span sp : spans) {
+			sb.append("<tr>\n");
+			sb.append("<th>" + sp.height + "</th>");
 
-		// fill with empty cell
-		for (long i = result.get(0).getTokenIndex(); i < s.left; i++) {
-			sb.append("<td> </td>");
+			// fill with empty cell
+			for (long i = result.get(0).getTokenIndex(); i < sp.left; i++) {
+				sb.append("<td> </td>");
+			}
+
+			// build table-cell for span
+			sb.append("<td colspan=\"" + (Math.abs(sp.right - sp.left) + 1)
+					+ "\" class=\"gridtree-result\">"
+					+ getAnnoValue(sp.root, anno) + " " + sp.height + "</td>");
+
+			// fill with empty cells
+			long lastTokenIndex = result.get(result.size() - 1).getTokenIndex();
+			for (long i = sp.right; i < lastTokenIndex; i++) {
+				sb.append("<td> </td>");
+			}
+			sb.append("</tr>\n");
 		}
-
-		// build table-cell for span
-		sb.append("<td colspan=\"" + (Math.abs(s.right - s.left) + 1)
-				+ "\" class=\"gridtree-result\">" + rootAnnotation + "</td>");
-
-		// fill with empty cells
-		long lastTokenIndex = result.get(result.size() - 1).getTokenIndex();
-		for (long i = s.right; i < lastTokenIndex; i++) {
-			sb.append("<td> </td>");
-		}
-		sb.append("</tr>\n");
 	}
 
 	/**
