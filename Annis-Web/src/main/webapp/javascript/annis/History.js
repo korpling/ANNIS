@@ -119,6 +119,7 @@ Ext.onReady(function()
     var historyWindow = function()
     {
       win.show();
+      grid.getView().refresh(false);
     };
         
     this.update = function(lastQuery)
