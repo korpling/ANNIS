@@ -112,7 +112,8 @@ Ext.onReady(function()
       items : grid,
       closeAction : 'hide',
       stateful : true,
-      stateId : 'grid'
+      stateId : 'grid',
+      resizable : false
     });
 
     var historyWindow = function()
