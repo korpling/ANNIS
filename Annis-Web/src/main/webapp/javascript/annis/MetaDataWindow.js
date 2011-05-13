@@ -95,7 +95,7 @@ Ext.onReady(function()
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->'
         + killNameSpaces(record.get('edge_name'));
-    return '<p style=\'white-space: normal;\'> node & node & #1 ' + operator
+    return '<p style=\'white-space: normal;\'>node & node & #1 ' + operator
         + '[' + killNameSpaces(record.get('name')) + "=\""
         + record.get('values') + "\"] #2</p>";
   }
