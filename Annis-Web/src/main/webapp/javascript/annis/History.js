@@ -66,6 +66,7 @@ Ext.onReady(function()
       columns : [ {
         header : '#',
         width : 30,
+        fixed: true,
         renderer : function(value, metadata, record, rowIndex, colIndex)
         {
           return (rowIndex + 1);
@@ -74,11 +75,11 @@ Ext.onReady(function()
         id : 'query',
         header : 'Query',
         sortable : true,
-        width : 330,
         dataIndex : 'query'
       }, {
         header : "url",
         width : 30,
+        fixed: true,
         dataIndex : "citation",
         renderer : function(value)
         {           
@@ -96,11 +97,14 @@ Ext.onReady(function()
         }
       }),
       viewConfig : {
-        rowOverCls : 'history-hover'
-      },
-      stripeRows : true,
-      width : 400,
-      height : 300
+        rowOverCls : 'history-hover',
+        forceFit:true,
+        autoFill: true
+      },      
+      loadMask: true,
+      autoHeight: true,
+      autoWidth: true,
+      stripeRows : true
     });
 
     // initiate window
@@ -113,7 +117,8 @@ Ext.onReady(function()
       closeAction : 'hide',
       stateful : true,
       stateId : 'grid',
-      resizable : false
+      layout : 'fit',
+      autoScroll : true
     });
 
     var historyWindow = function()
