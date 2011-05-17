@@ -244,9 +244,6 @@ Ext.onReady(function()
         viewConfig : {
           forceFit : true,
           autoFill : true,
-          templates : {
-            cell : selectableCell
-          },
           rowOverCls : 'corpusbrowser-hover'
         },
         autoWidth : true,
