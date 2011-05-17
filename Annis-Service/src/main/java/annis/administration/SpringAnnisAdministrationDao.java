@@ -127,16 +127,6 @@ public class SpringAnnisAdministrationDao {
       log.warn("plpqsql was already installed: " + ex.getMessage());
     }
 	}
-
-	void createFunctionComputeRankLevel() {
-		log.info("creating stored procedure: compute_rank");
-		executeSqlFromScript("compute_rank_level.sql");
-	}
-
-	void createFunctionComputeSpannedTokens() {
-		log.info("creating stored procedure: compute_spanned_tokens");
-		executeSqlFromScript("compute_spanned_tokens.sql");
-	}
 	
 	void createFunctionUniqueToplevelCorpusName() {
 		log.info("creating trigger function: unique_toplevel_corpus_name");
