@@ -9,8 +9,7 @@ Ext.onReady(function()
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
-      const
-      MAX_MENU_ITEMS = 5;
+      var MAX_MENU_ITEMS = 5;
 
       // only insert if, store has really stored a new element
       if ((items === undefined) || (store.getCount() > items.getCount()))
@@ -75,7 +74,11 @@ Ext.onReady(function()
         id : 'query',
         header : 'Query',
         sortable : true,
-        dataIndex : 'query'
+        dataIndex : 'query',   
+        renderer : function(value)
+        {
+          return "<span style='white-space: normal;'>" + value + "</span>";
+        }
       }, {
         header : "url",
         width : 30,
@@ -104,7 +107,7 @@ Ext.onReady(function()
       loadMask: true,
       autoHeight: true,
       autoWidth: true,
-      stripeRows : true
+      stripeRows : true      
     });
 
     // initiate window
