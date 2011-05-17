@@ -11,7 +11,7 @@
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
 
   <scm>
-    <developerConnection>scm:svn:https://korpling.german.hu-berlin.de/svn/annis/trunk</developerConnection>
+    <developerConnection>scm:bazaar:bzr+ssh://korpling.german.hu-berlin.de/srv/bzr/annis/trunk</developerConnection>
   </scm>
 
   <organization>
