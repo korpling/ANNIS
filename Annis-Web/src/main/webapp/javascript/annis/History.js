@@ -75,7 +75,11 @@ Ext.onReady(function()
         id : 'query',
         header : 'Query',
         sortable : true,
-        dataIndex : 'query'
+        dataIndex : 'query',   
+        renderer : function(value)
+        {
+          return "<span style='white-space: normal;'>" + value + "</span>";
+        }
       }, {
         header : "url",
         width : 30,
@@ -104,7 +108,7 @@ Ext.onReady(function()
       loadMask: true,
       autoHeight: true,
       autoWidth: true,
-      stripeRows : true
+      stripeRows : true      
     });
 
     // initiate window
