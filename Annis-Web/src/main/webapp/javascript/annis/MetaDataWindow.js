@@ -95,16 +95,22 @@ Ext.onReady(function()
   {
     var operator = (record.get('subtype') === "d") ? '>' : '->'
         + killNameSpaces(record.get('edge_name'));
-    return '<p style=\'white-space: normal;\'> node & node & #1 ' + operator
+    return '<p style=\'white-space: normal;\'>node & node & #1 ' + operator
         + '[' + killNameSpaces(record.get('name')) + "=\""
         + record.get('values') + "\"] #2</p>";
   }
 
   function edgeTypes(value, metadata, record, rowIndex, colIndex, store)
-  {
+  {    
+    // filter white-space that come from edgeName() when filter for dominance
+    // edges
+    var edge_name = killNameSpaces(record.get('edge_name'));
+    if(edge_name === " ")
+      edge_name = '';
+    
     var operator = (record.get('subtype') === "d") ? '>' : '->';
     return '<p style=\'white-space: normal;\'>node & node & #1 ' + operator
-        + killNameSpaces(record.get('edge_name')) + " #2</p>";
+        + edge_name + " #2</p>";
   }
 
   function annotationUrl(value, metadata, record, rowIndex, colIndex, store)
