@@ -9,8 +9,7 @@ Ext.onReady(function()
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
-      const
-      MAX_MENU_ITEMS = 5;
+      var MAX_MENU_ITEMS = 5;
 
       // only insert if, store has really stored a new element
       if ((items === undefined) || (store.getCount() > items.getCount()))
