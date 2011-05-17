@@ -113,12 +113,24 @@ Ext.onReady(function()
         + conf_context + "/images/url.png'></a>";
   }
 
-  // this must be global for using in DOM
-  getCitationWindow = function()
+  /**
+   * this must be global for using in DOM, this function also works when value
+   * is undefined. If value is undefinded the function use Citation.generate()
+   * for the Citation window.
+   */
+  getCitationWindow = function(value)
   {
-    Ext.Msg.alert('Citation',
-        '<textarea readonly="f" wrap="virtual" rows="5" cols="60">'
-            + Citation.generate() + "</textarea>");
+    if (value === undefined)
+    {
+      Ext.Msg.alert('Citation',
+          '<textarea readonly="f" wrap="virtual" rows="5" cols="60">'
+              + Citation.generate() + "</textarea>");
+    } else
+    {
+      Ext.Msg.alert("Citation",
+          "<textarea readonly='f' wrap='virtual' rows='5' cols='60'>" + value
+              + "</textarea>");
+    }
   };
 
   // listener
@@ -186,7 +198,7 @@ Ext.onReady(function()
       loadMask : true,
       viewConfig : {
         forceFit : true,
-        autoFill : true,
+        autoFill : true
       },
       height : 370,
       flex : 1

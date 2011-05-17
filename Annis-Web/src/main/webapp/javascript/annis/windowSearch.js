@@ -104,7 +104,8 @@ Ext.onReady(function()
   var delayKeyTask = new Ext.util.DelayedTask();
   var keyDelay = 1000;
   var windowSearchFormWidthQueryBuilder = Ext.getBody().getViewSize().width-20;
-
+  var history = new History();
+  
   
   function updateStatus()
   {
@@ -211,9 +212,8 @@ Ext.onReady(function()
       timeout: global_timeout
     });
 
-    
-  }
-  // end getResult
+    history.update(lastQuery);
+  } // end getResult
 
   function doExport()
   {
@@ -712,14 +712,13 @@ var exportSelection = new Ext.form.ComboBox({
       }
     }
   });
-		
   var formPanelSearch = new Ext.FormPanel({
     id: 'formPanelSearch', 
     frame:true,
     title: 'AnnisQL',
     header: false,
     width: 340,
-    height: 165,
+    height: 200,
     defaultType: 'textfield',
     monitorValid: true,
     items: [{
@@ -749,9 +748,8 @@ var exportSelection = new Ext.form.ComboBox({
       fieldLabel: 'Result',
       name: 'matchCount',
       allowBlank:true,
-      readOnly: true
-    }]
-	           	
+      readOnly: true         	
+    }, history.splitButton ]
   });
 
 		    
@@ -887,6 +885,13 @@ var exportSelection = new Ext.form.ComboBox({
   //notifyOver: function(dd, e, data) {
   //   //check if the row is allowed, return true or false
   //}
+  });
+
+  // added ctrl + enter for getting search results
+  new Ext.KeyMap(Ext.get('queryAnnisQL'), {
+    key : Ext.EventObject.ENTER,
+    ctrl : true,
+    fn : getResult
   });
   
   // highlight tutorial
