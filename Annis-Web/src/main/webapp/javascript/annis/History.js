@@ -9,8 +9,7 @@ Ext.onReady(function()
     var updateDropDownMenu = function()
     {
       var items = finalThis.splitButton.menu.items;
-      const
-      MAX_MENU_ITEMS = 5;
+      var MAX_MENU_ITEMS = 5;
 
       // only insert if, store has really stored a new element
       if ((items === undefined) || (store.getCount() > items.getCount()))
@@ -66,6 +65,7 @@ Ext.onReady(function()
       columns : [ {
         header : '#',
         width : 30,
+        fixed: true,
         renderer : function(value, metadata, record, rowIndex, colIndex)
         {
           return (rowIndex + 1);
@@ -74,11 +74,15 @@ Ext.onReady(function()
         id : 'query',
         header : 'Query',
         sortable : true,
-        width : 330,
-        dataIndex : 'query'
+        dataIndex : 'query',   
+        renderer : function(value)
+        {
+          return "<span style='white-space: normal;'>" + value + "</span>";
+        }
       }, {
         header : "url",
         width : 30,
+        fixed: true,
         dataIndex : "citation",
         renderer : function(value)
         {           
@@ -96,11 +100,14 @@ Ext.onReady(function()
         }
       }),
       viewConfig : {
-        rowOverCls : 'history-hover'
-      },
-      stripeRows : true,
-      width : 400,
-      height : 300
+        rowOverCls : 'history-hover',
+        forceFit:true,
+        autoFill: true
+      },      
+      loadMask: true,
+      autoHeight: true,
+      autoWidth: true,
+      stripeRows : true      
     });
 
     // initiate window
@@ -112,12 +119,15 @@ Ext.onReady(function()
       items : grid,
       closeAction : 'hide',
       stateful : true,
-      stateId : 'grid'
+      stateId : 'grid',
+      layout : 'fit',
+      autoScroll : true
     });
 
     var historyWindow = function()
     {
       win.show();
+      grid.getView().refresh(false);
     };
         
     this.update = function(lastQuery)
