@@ -47,6 +47,8 @@ public class AttributeListServlet extends HttpServlet
   @SuppressWarnings("unchecked")
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
+    response.setCharacterEncoding("utf-8");
+    
     String corpusIdsParam = request.getParameter("corpusIds");
 
     List<Long> corpusIdList = new Vector<Long>();
