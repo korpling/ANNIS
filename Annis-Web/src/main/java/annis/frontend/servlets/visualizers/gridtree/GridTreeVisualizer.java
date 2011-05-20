@@ -3,13 +3,12 @@ package annis.frontend.servlets.visualizers.gridtree;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.HashMap;
+
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -57,12 +56,41 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 
 		@Override
+		/**
+		 * this function assumes the spans doesn't have conflicts which, means
+		 * that: <br />
+		 * sp.height == this.height => [sp.left, sp.right] &cap; [this.left,
+		 * sp.right] == &empty;
+		 * 
+		 * 
+		 */
 		public int compareTo(Span sp) {
 			if (this.height < sp.height)
 				return 1;
-			if (this.height == sp.height)
-				return 0;
+			if (this.height == sp.height) {
+				if (this.left > sp.right) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
 			return -1;
+		}
+
+		public void colpan(StringBuffer sb, String anno) {
+			sb.append("<td colspan=\"");
+			sb.append(Math.abs(this.right - this.left) + 1);
+			sb.append("\" class=\"gridtree-result\">");
+			sb.append(getAnnoValue(this.root, anno));
+			sb.append(" ");
+			sb.append(this.height);
+			sb.append("</td>");
+		}
+
+		public boolean isInIntervall(long l) {
+			if (this.left <= l && l <= this.right)
+				return true;
+			return false;
 		}
 	}
 
@@ -228,25 +256,36 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result,
 			LinkedList<Span> spans, String anno) {
 
-		for (Span sp : spans) {
-			sb.append("<tr>\n");
-			sb.append("<th>" + sp.height + "</th>");
+		int j = 0;
+		while (j < spans.size()) {
 
-			// fill with empty cell
-			for (long i = result.get(0).getTokenIndex(); i < sp.left; i++) {
-				sb.append("<td> </td>");
+			Span tmp = spans.get(j);
+			int level = tmp.height;
+
+			// start table line
+			sb.append("<tr>\n<th>");
+			sb.append(level);
+			sb.append("</th>");
+
+			for (int i = 0; i < result.size(); i++) {
+
+				if (j < spans.size()) // check if there is a span left
+					tmp = spans.get(j);
+
+				// shift the index
+				long index = i + result.get(0).getTokenIndex();
+				if (tmp.isInIntervall(index) && level == tmp.height) {
+					tmp.colpan(sb, anno);
+					// skip iteration which where covered by colspan
+					i += Math.abs(tmp.right - tmp.left);
+					j++; // take next span
+				} else {
+					sb.append("<td></td>");
+				}
+
 			}
 
-			// build table-cell for span
-			sb.append("<td colspan=\"" + (Math.abs(sp.right - sp.left) + 1)
-					+ "\" class=\"gridtree-result\">"
-					+ getAnnoValue(sp.root, anno) + " " + sp.height + "</td>");
-
-			// fill with empty cells
-			long lastTokenIndex = result.get(result.size() - 1).getTokenIndex();
-			for (long i = sp.right; i < lastTokenIndex; i++) {
-				sb.append("<td> </td>");
-			}
+			// end table line
 			sb.append("</tr>\n");
 		}
 	}
