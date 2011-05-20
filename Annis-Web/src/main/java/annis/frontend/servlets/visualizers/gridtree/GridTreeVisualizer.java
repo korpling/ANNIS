@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.HashMap;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -34,7 +33,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @author benjamin
 	 * 
 	 */
-	private class Span implements Comparable<Span>, Cloneable {
+	private class Span implements Comparable<Span> {
 
 		Long left;
 		Long right;
@@ -77,6 +76,11 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			return -1;
 		}
 
+		@Override
+		public boolean equals(Object obj){
+			return super.equals(obj);
+		}
+		
 		public void colpan(StringBuffer sb, String anno) {
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
