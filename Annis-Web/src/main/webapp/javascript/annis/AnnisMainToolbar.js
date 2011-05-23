@@ -120,12 +120,10 @@ Ext.onReady(function()
         layout: 'fit',
         maximizable: true,
         width: 800,
-        height: 600
+        height: Ext.getBody().getViewSize().height - 20
       });
       windowTutorial.show();
-    }
-  
+    }     
     // END CLASS AnnisMainToolbar
-
     var toolbarMain = new AnnisMainToolbar('toolbar');
   });
