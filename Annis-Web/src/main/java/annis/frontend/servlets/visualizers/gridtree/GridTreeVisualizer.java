@@ -2,12 +2,11 @@ package annis.frontend.servlets.visualizers.gridtree;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.HashMap;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -24,7 +23,7 @@ import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 public class GridTreeVisualizer extends WriterVisualizer {
 
-	private LinkedList<Span> spans = new LinkedList<GridTreeVisualizer.Span>();
+	private ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
 
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
@@ -34,7 +33,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @author benjamin
 	 * 
 	 */
-	private class Span implements Comparable<Span>, Cloneable {
+	private class Span implements Comparable<Span> {
 
 		Long left;
 		Long right;
@@ -77,13 +76,16 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			return -1;
 		}
 
-		public void colpan(StringBuffer sb, String anno) {
+		@Override
+		public boolean equals(Object obj){
+			return super.equals(obj);
+		}
+		
+		public void colpan(StringBuilder sb, String anno) {
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
 			sb.append("\" class=\"gridtree-result\">");
 			sb.append(getAnnoValue(this.root, anno));
-			sb.append(" ");
-			sb.append(this.height);
 			sb.append("</td>");
 		}
 
@@ -127,7 +129,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			if (hasAnno(n, anno))
 				roots.add(n);
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (AnnisNode n : roots) {
 
@@ -159,7 +161,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 		for (Annotation a : n.getNodeAnnotations()) {
 			if (a.getName().equals(anno))
-				return a.getName() + " : " + a.getValue();
+				return a.getValue();
 		}
 
 		return " ";
@@ -253,8 +255,8 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param anno
 	 *            the anno, which matches to all Span-Objects
 	 */
-	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result,
-			LinkedList<Span> spans, String anno) {
+	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
+			ArrayList<Span> spans, String anno) {
 
 		int j = 0;
 		while (j < spans.size()) {
@@ -263,7 +265,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			int level = tmp.height;
 
 			// start table line
-			sb.append("<tr>\n<th>");
+			sb.append("<tr>\n<th>level: ");
 			sb.append(level);
 			sb.append("</th>");
 
@@ -296,7 +298,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param sb
 	 * @param result
 	 */
-	private void htmlTableRow(StringBuffer sb, List<AnnisNode> result) {
+	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result) {
 
 		sb.append("<tr>\n");
 		sb.append("<th> tok </th>");
