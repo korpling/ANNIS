@@ -161,7 +161,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 		for (Annotation a : n.getNodeAnnotations()) {
 			if (a.getName().equals(anno))
-				return a.getName() + " : " + a.getValue();
+				return a.getValue();
 		}
 
 		return " ";
@@ -265,7 +265,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			int level = tmp.height;
 
 			// start table line
-			sb.append("<tr>\n<th>");
+			sb.append("<tr>\n<th>level: ");
 			sb.append(level);
 			sb.append("</th>");
 
