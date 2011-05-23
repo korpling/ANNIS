@@ -2,9 +2,9 @@ package annis.frontend.servlets.visualizers.gridtree;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +23,7 @@ import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 public class GridTreeVisualizer extends WriterVisualizer {
 
-	private LinkedList<Span> spans = new LinkedList<GridTreeVisualizer.Span>();
+	private ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
 
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
@@ -256,7 +256,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 *            the anno, which matches to all Span-Objects
 	 */
 	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
-			LinkedList<Span> spans, String anno) {
+			ArrayList<Span> spans, String anno) {
 
 		int j = 0;
 		while (j < spans.size()) {
