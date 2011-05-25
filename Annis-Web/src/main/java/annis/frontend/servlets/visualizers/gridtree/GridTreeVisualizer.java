@@ -27,8 +27,8 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
-	 * represented as tokenIndex from the most and the most right Token of the
-	 * root.
+	 * represented as tokenIndex from the most left and the most right Token of
+	 * the root.
 	 * 
 	 * @author benjamin
 	 * 
@@ -38,7 +38,6 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		Long left;
 		Long right;
 		AnnisNode root;
-		AnnisNode current;
 		int height;
 
 		/**
@@ -51,7 +50,6 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		 */
 		public Span(AnnisNode root) {
 			this.root = root;
-			this.current = root;
 		}
 
 		@Override
@@ -77,10 +75,10 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 
 		@Override
-		public boolean equals(Object obj){
+		public boolean equals(Object obj) {
 			return super.equals(obj);
 		}
-		
+
 		public void colpan(StringBuilder sb, String anno) {
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
@@ -206,11 +204,12 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * 
 	 */
 	public void getTokens(Span n, Set<AnnisNode> roots) {
-		getTokens(n, roots, 0);
+		getTokens(n, n.root, roots, 0);
 	}
 
-	private void getTokens(Span n, Set<AnnisNode> roots, int height) {
-		Set<Edge> edges = n.current.getOutgoingEdges();
+	private void getTokens(Span n, AnnisNode current, Set<AnnisNode> roots,
+			int height) {
+		Set<Edge> edges = current.getOutgoingEdges();
 
 		for (Edge e : edges) {
 
@@ -236,8 +235,7 @@ public class GridTreeVisualizer extends WriterVisualizer {
 
 			// recursive step
 			else {
-				n.current = x;
-				getTokens(n, roots, height + 1);
+				getTokens(n, x, roots, height + 1);
 			}
 		}
 	}
