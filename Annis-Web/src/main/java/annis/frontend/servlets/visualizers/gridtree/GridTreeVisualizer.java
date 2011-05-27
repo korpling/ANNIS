@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,25 +23,28 @@ import annis.frontend.servlets.visualizers.WriterVisualizer;
  * 
  */
 
-public class GridTreeVisualizer extends WriterVisualizer {
+public class GridTreeVisualizer extends WriterVisualizer
+{
 
 	private ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
 
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
-	 * represented as tokenIndex from the most and the most right Token of the
-	 * root.
+	 * represented as tokenIndex from the most left and the most right Token of
+	 * the root.
 	 * 
 	 * @author benjamin
 	 * 
 	 */
-	private class Span implements Comparable<Span> {
+	private class Span implements Comparable<Span>
+	{
 
 		Long left;
 		Long right;
 		AnnisNode root;
-		AnnisNode current;
 		int height;
+		int visits;
+		HashMap<Span, Span> nodes = new HashMap<Span, Span>();
 
 		/**
 		 * left and right should be initiate with null, when root is not a
@@ -49,9 +54,9 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		 * @param r
 		 *            must be a sorted List of the result
 		 */
-		public Span(AnnisNode root) {
+		public Span(AnnisNode root)
+		{
 			this.root = root;
-			this.current = root;
 		}
 
 		@Override
@@ -63,13 +68,17 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		 * 
 		 * 
 		 */
-		public int compareTo(Span sp) {
+		public int compareTo(Span sp)
+		{
 			if (this.height < sp.height)
 				return 1;
-			if (this.height == sp.height) {
-				if (this.left > sp.right) {
+			if (this.height == sp.height)
+			{
+				if (this.left > sp.right)
+				{
 					return 1;
-				} else {
+				} else
+				{
 					return -1;
 				}
 			}
@@ -77,11 +86,19 @@ public class GridTreeVisualizer extends WriterVisualizer {
 		}
 
 		@Override
-		public boolean equals(Object obj){
+		public boolean equals(Object obj)
+		{
 			return super.equals(obj);
 		}
-		
-		public void colpan(StringBuilder sb, String anno) {
+
+		@Override
+		public int hashCode()
+		{
+			return super.hashCode();
+		}
+
+		public void colpan(StringBuilder sb, String anno)
+		{
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
 			sb.append("\" class=\"gridtree-result\">");
@@ -89,7 +106,8 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			sb.append("</td>");
 		}
 
-		public boolean isInIntervall(long l) {
+		public boolean isInIntervall(long l)
+		{
 			if (this.left <= l && l <= this.right)
 				return true;
 			return false;
@@ -97,8 +115,10 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	}
 
 	@Override
-	public void writeOutput(Writer writer) {
-		try {
+	public void writeOutput(Writer writer)
+	{
+		try
+		{
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 			writer.append("<link href=\""
 					+ getContextPath()
@@ -112,34 +132,35 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private String findAnnotation(String anno) {
+	private String findAnnotation(String anno)
+	{
 
 		AnnotationGraph graph = getResult().getGraph();
 		List<AnnisNode> nodes = graph.getNodes();
 		List<AnnisNode> result = graph.getTokens();
-		Set<AnnisNode> roots = new HashSet<AnnisNode>();
+		Set<Span> roots = new HashSet<Span>();
 
 		for (AnnisNode n : nodes)
 			if (hasAnno(n, anno))
-				roots.add(n);
+				roots.add(new Span(n));
 
 		StringBuilder sb = new StringBuilder();
 
-		for (AnnisNode n : roots) {
-
+		for (Span n : roots)
+		{
 			// catch the result
-			Span span = new Span(n);
-			getTokens(span, roots);
-			spans.add(span);
-
+			getTokens(n, roots);
+			spans.add(n);
 		}
 
+		adaptTreeHeightToMax(roots);
 		Collections.sort(spans);
 
 		// print result
@@ -157,14 +178,16 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param anno
 	 * @return null, if the annotation not exists.
 	 */
-	private String getAnnoValue(AnnisNode n, String anno) {
+	private String getAnnoValue(AnnisNode n, String anno)
+	{
 
-		for (Annotation a : n.getNodeAnnotations()) {
+		for (Annotation a : n.getNodeAnnotations())
+		{
 			if (a.getName().equals(anno))
 				return a.getValue();
 		}
 
-		return " ";
+		return null;
 	}
 
 	/**
@@ -177,7 +200,8 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 *            String to check, without namespaces
 	 * @return
 	 */
-	private boolean hasAnno(AnnisNode n, String annotation) {
+	private boolean hasAnno(AnnisNode n, String annotation)
+	{
 
 		Set<Annotation> annos = n.getNodeAnnotations();
 
@@ -205,18 +229,33 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 *            List of root nodes
 	 * 
 	 */
-	public void getTokens(Span n, Set<AnnisNode> roots) {
-		getTokens(n, roots, 0);
+	public void getTokens(Span n, Set<Span> roots)
+	{
+		getTokens(n, n.root, roots, 0);
 	}
 
-	private void getTokens(Span n, Set<AnnisNode> roots, int height) {
-		Set<Edge> edges = n.current.getOutgoingEdges();
+	private void getTokens(Span n, AnnisNode current, Set<Span> roots,
+			int height)
+	{
+		Set<Edge> edges = current.getOutgoingEdges();
 
-		for (Edge e : edges) {
+		for (Edge e : edges)
+		{
 
-			AnnisNode x;
+			AnnisNode x = e.getDestination();
 
-			if ((x = e.getDestination()).isToken()) {
+			for (Span r : roots)
+			{
+				if (r.root == x)
+				{
+					n.nodes.put(r, r);
+					r.visits++;
+					break;
+				}
+			}
+
+			if (x.isToken())
+			{
 
 				Long tokenIndex = x.getTokenIndex();
 
@@ -235,10 +274,40 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			}
 
 			// recursive step
-			else {
-				n.current = x;
-				getTokens(n, roots, height + 1);
+			else
+			{
+				getTokens(n, x, roots, height + 1);
 			}
+		}
+	}
+
+	private void adaptTreeHeightToMax(Set<Span> roots)
+	{
+		int maxHeight = 0;
+		LinkedList<Span> trees = new LinkedList<Span>();
+
+		// find trees
+		for (Span s : roots)
+		{
+			if (maxHeight < s.height)
+				maxHeight = s.height;
+			if (s.visits == 0)
+				trees.add(s);
+		}
+
+		// sum offset to trees, which are lower than the highest tree
+		for (Span t : trees)
+			if (t.height < maxHeight)
+				sumHeight(t, maxHeight - t.height);
+
+	}
+
+	private void sumHeight(Span t, int distance)
+	{
+		t.height += distance;
+		for (Span s : t.nodes.values())
+		{
+			s.height = s.height + distance;
 		}
 	}
 
@@ -256,10 +325,12 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 *            the anno, which matches to all Span-Objects
 	 */
 	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
-			ArrayList<Span> spans, String anno) {
+			ArrayList<Span> spans, String anno)
+	{
 
 		int j = 0;
-		while (j < spans.size()) {
+		while (j < spans.size())
+		{
 
 			Span tmp = spans.get(j);
 			int level = tmp.height;
@@ -269,19 +340,22 @@ public class GridTreeVisualizer extends WriterVisualizer {
 			sb.append(level);
 			sb.append("</th>");
 
-			for (int i = 0; i < result.size(); i++) {
+			for (int i = 0; i < result.size(); i++)
+			{
 
 				if (j < spans.size()) // check if there is a span left
 					tmp = spans.get(j);
 
 				// shift the index
 				long index = i + result.get(0).getTokenIndex();
-				if (tmp.isInIntervall(index) && level == tmp.height) {
+				if (tmp.isInIntervall(index) && level == tmp.height)
+				{
 					tmp.colpan(sb, anno);
 					// skip iteration which where covered by colspan
 					i += Math.abs(tmp.right - tmp.left);
 					j++; // take next span
-				} else {
+				} else
+				{
 					sb.append("<td></td>");
 				}
 
@@ -298,12 +372,14 @@ public class GridTreeVisualizer extends WriterVisualizer {
 	 * @param sb
 	 * @param result
 	 */
-	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result) {
+	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result)
+	{
 
 		sb.append("<tr>\n");
 		sb.append("<th> tok </th>");
 
-		for (AnnisNode n : result) {
+		for (AnnisNode n : result)
+		{
 			sb.append("<td>" + n.getSpannedText() + "</td>");
 		}
 
