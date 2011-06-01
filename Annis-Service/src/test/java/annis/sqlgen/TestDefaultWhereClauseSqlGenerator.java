@@ -285,9 +285,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeDirectDominance() {
 		node23.addJoin(new Dominance(node42, 1));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL",
+				join("=", "_component42.type", "'d'"),
+				"_component42.name IS NULL",
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
 	}
@@ -297,9 +296,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseDirectDominanceNamed() {
 		node23.addJoin(new Dominance(node42, NAME, 1));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				join("=", "_component23.name", "'" + NAME + "'"),
+				join("=", "_component42.type", "'d'"),
+				join("=", "_component42.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
 	}
@@ -310,9 +308,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23.addJoin(new Dominance(node42, NAME, 1));
 		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				join("=", "_component23.name", "'" + NAME + "'"),
+				join("=", "_component42.type", "'d'"),
+				join("=", "_component42.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 		);
 		checkWhereCondition(node42,
@@ -327,9 +324,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeIndirectDominance() {
 		node23.addJoin(new Dominance(node42));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL",
+				join("=", "_component42.type", "'d'"),
+				"_component42.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join("<", "_rank42.pre", "_rank23.post")
 		);
@@ -340,9 +336,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeExactDominance() {
 		node23.addJoin(new Dominance(node42, 10));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL",
+				join("=", "_component42.type", "'d'"),
+				"_component42.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join("<", "_rank42.pre", "_rank23.post"),
 				join("=", "_rank23.level", "_rank42.level", -10)
@@ -354,9 +349,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeRangedDominance() {
 		node23.addJoin(new Dominance(node42, 10, 20));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL",
+				join("=", "_component42.type", "'d'"),
+				"_component42.name IS NULL",
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join("<", "_rank42.pre", "_rank23.post"),
 				"_rank23.level BETWEEN SYMMETRIC _rank42.level - 10 AND _rank42.level - 20"
@@ -369,9 +363,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeLeftDominance() {
 		node23.addJoin(new LeftDominance(node42));
 		checkWhereCondition(
-				join("=", "_rank23.pre", "_rank42.pre", -1),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL"
+				join("=", "_component42.type", "'d'"),
+        join("=", "_rank23.pre", "_rank42.parent"),
+				"_component42.name IS NULL",
+        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref)"
 		);
 	}
 	
@@ -380,9 +375,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseForNodeRightDominance() {
 		node23.addJoin(new RightDominance(node42));
 		checkWhereCondition(
-				join("=", "_rank23.post", "_rank42.post", 1),
-				join("=", "_component23.type", "'d'"),
-				"_component23.name IS NULL"
+				join("=", "_component42.type", "'d'"),
+        join("=", "_rank23.pre", "_rank42.parent"),
+				"_component42.name IS NULL",
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref)"
 		);
 	}
 	
@@ -391,9 +387,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseDirectPointingRelation() {
 		node23.addJoin(new PointingRelation(node42, NAME, 1));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'p'"),
-				join("=", "_component23.name", "'" + NAME + "'"),
+				join("=", "_component42.type", "'p'"),
+				join("=", "_component42.name", "'" + NAME + "'"),
 				join("=", "_rank23.pre", "_rank42.parent")
 
 		);
@@ -404,9 +399,8 @@ public class TestDefaultWhereClauseSqlGenerator {
 	public void whereClauseIndirectPointingRelation() {
 		node23.addJoin(new PointingRelation(node42, NAME));
 		checkWhereCondition(
-//				join("=", "_rank23.component_ref", "_rank42.component_ref"),
-				join("=", "_component23.type", "'p'"),
-				join("=", "_component23.name", "'" + NAME + "'"),
+				join("=", "_component42.type", "'p'"),
+				join("=", "_component42.name", "'" + NAME + "'"),
 				join("<", "_rank23.pre", "_rank42.pre"),
 				join("<", "_rank42.pre", "_rank23.post")
 		);
