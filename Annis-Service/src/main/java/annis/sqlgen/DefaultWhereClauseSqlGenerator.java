@@ -198,33 +198,11 @@ public class DefaultWhereClauseSqlGenerator
       }
       else if (join instanceof LeftDominance)
       {
-        conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
-        RankTableJoin rankTableJoin = (RankTableJoin) join;
-        if (rankTableJoin.getName() != null)
-        {
-          conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(rankTableJoin.getName())));
-        }
-        else
-        {
-          conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
-        }
-        conditions.add(numberJoin("=", tables(node).aliasedColumn(RANK_TABLE, "pre"), tables(target).aliasedColumn(RANK_TABLE, "pre"), -1));
-
+        addLeftRightDominance(node, target, conditions, true, (RankTableJoin) join);
       }
       else if (join instanceof RightDominance)
       {
-        conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
-        RankTableJoin rankTableJoin = (RankTableJoin) join;
-        if (rankTableJoin.getName() != null)
-        {
-          conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(rankTableJoin.getName())));
-        }
-        else
-        {
-          conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
-        }
-        conditions.add(numberJoin("=", tables(node).aliasedColumn(RANK_TABLE, "post"), tables(target).aliasedColumn(RANK_TABLE, "post"), 1));
-
+        addLeftRightDominance(node, target, conditions, false, (RankTableJoin) join);
       }
       else if (join instanceof Dominance)
       {
@@ -241,17 +219,16 @@ public class DefaultWhereClauseSqlGenerator
 
   protected void addSingleEdgeCondition(AnnisNode node, AnnisNode target, List<String> conditions, Join join, final String edgeType)
   {
-//		conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "component_ref"), tables(target).aliasedColumn(RANK_TABLE, "component_ref")));				
-    conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
+    conditions.add(join("=", tables(target).aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
 
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     if (rankTableJoin.getName() != null)
     {
-      conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(rankTableJoin.getName())));
+      conditions.add(join("=", tables(target).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(rankTableJoin.getName())));
     }
     else
     {
-      conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
+      conditions.add(tables(target).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
     }
 
     int min = rankTableJoin.getMinDistance();
@@ -279,8 +256,6 @@ public class DefaultWhereClauseSqlGenerator
       else if (min > 0 && min < max)
       {
         conditions.add(between(tables(node).aliasedColumn(RANK_TABLE, "level"), tables(target).aliasedColumn(RANK_TABLE, "level"), -min, -max));
-//				conditions.add(numberJoin("<=", tables(node).aliasedColumn(RANK_TABLE, "level"), tables(target).aliasedColumn(RANK_TABLE, "level"), -(min + 1)));
-//				conditions.add(numberJoin(">=", tables(node).aliasedColumn(RANK_TABLE, "level"), tables(target).aliasedColumn(RANK_TABLE, "level"), -(max + 1)));
       }
     }
   }
@@ -429,6 +404,33 @@ public class DefaultWhereClauseSqlGenerator
         tables(target).aliasedColumn(FACTS_TABLE, rightColumn), offset));
     }
   }
+  
+  protected void addLeftRightDominance(AnnisNode node, AnnisNode target , 
+    List<String> conditions, boolean left, RankTableJoin rankTableJoin)
+  {
+    conditions.add(join("=", tables(target).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
+    conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"), tables(target).aliasedColumn(RANK_TABLE, "parent")));
+    
+    if (rankTableJoin.getName() != null)
+    {
+      conditions.add(join("=", tables(target).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(rankTableJoin.getName())));
+    }
+    else
+    {
+      conditions.add(tables(target).aliasedColumn(COMPONENT_TABLE, "name") + " IS NULL");
+    }
+    
+    String agg = left ? "min" : "max";
+    String tok = left ? "left_token" : "right_token";
+
+    conditions.add(
+      in(tables(target).aliasedColumn(NODE_TABLE, tok),
+        "SELECT " + agg + "(lrsub." + tok + ") FROM " + FACTS_TABLE + " as lrsub "
+        + "WHERE parent=" + tables(node).aliasedColumn(RANK_TABLE, "pre")
+        + " AND corpus_ref=" + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref") 
+    ));
+  }
+  
 
   @Override
   public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
