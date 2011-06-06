@@ -9,3 +9,7 @@ td.gridtree-result {
 	border: 1px solid black;
 	background: #AFAFAF;
 }
+
+td.hover {
+	cursor: pointer;
+}
