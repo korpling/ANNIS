@@ -455,10 +455,12 @@ public class SearchResultServlet extends HttpServlet
 
         for (long i = left; i <= right; i++)
         {
-          Long oldTokenPosition = matchedAndCovered.get(graph.getToken(i));
-          if(oldTokenPosition == null || matchPosition.compareTo(oldTokenPosition) >= 0 )
+          AnnisNode tok = graph.getToken(i);
+          Long oldTokenPosition = matchedAndCovered.get(tok);
+          if(oldTokenPosition == null 
+            || (!matchedNodes.contains(tok.getId()) && matchPosition.compareTo(oldTokenPosition) >= 0) )
           {
-            matchedAndCovered.put(graph.getToken(i), matchPosition);
+            matchedAndCovered.put(tok, matchPosition);
           }
         }
       }
