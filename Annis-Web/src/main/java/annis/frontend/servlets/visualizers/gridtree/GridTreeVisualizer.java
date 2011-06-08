@@ -104,11 +104,13 @@ public class GridTreeVisualizer extends WriterVisualizer
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
 
-//			 cell-index for hover-effect
+			// cell-index for hover-effect
 			sb.append("\" id=\"intervall:");
-			sb.append(++left - offset);
+			sb.append(this.hashCode());
+			sb.append(":");
+			sb.append(left + 1 - offset);
 			sb.append("-");
-			sb.append(++right - offset);
+			sb.append(right + 1 - offset);
 
 			sb.append("\" class=\"gridtree-result\">");
 			sb.append(getAnnoValue(this.root, anno));
