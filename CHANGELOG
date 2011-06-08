@@ -24,6 +24,9 @@ bugfixes:
 (#69) whitespacenormalisation of \t in AQL queries
 (#135) "Add node" in the query builder should look like a button, not a menu
 
+other:
+ Semantics of >@l and >@r clarified (now returns all children of a node aligned with its leftmost or rightmost covered tokens; in special cases of graphs with multiple parentage this may lead to multiple hits per parent!)
+
 Version 2.1.8
 =============
 
