@@ -13,6 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package annis.externalFiles;
+
+import annis.service.ifaces.AnnisBinary;
+import annis.service.objects.AnnisBinaryImpl;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class ExternalFileMgrImpl implements ExternalFileMgr
 {
 //	 ============================================== private Variablen ==============================================
