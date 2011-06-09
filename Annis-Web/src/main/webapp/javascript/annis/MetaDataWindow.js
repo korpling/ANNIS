@@ -205,7 +205,7 @@ Ext.onReady(function()
       loadMask : true,
       viewConfig : {
         forceFit : true,
-        autoFill : true,
+        autoFill : true
       },
       height : 370,
       flex : 1

@@ -19,29 +19,28 @@
 
   <step id="stop service" description="Stop the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/stopService.sh" />
-    <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis/trunk" />
+    <sh:exec file="buildbot_scripts/stopService.sh" args="/opt/annis/stable22" />
   </step>
 
   
   <step id="copy webapp" description="Copy the Annis2-webapp">
    <sh:exec file="chmod" args="u+x buildbot_scripts/copyWebapp.sh" /> 
-   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/tomcat/Annis-trunk"/>
+   <sh:exec file="buildbot_scripts/copyWebapp.sh" args="/srv/tomcat/Annis2.2"/>
   </step>
 
   <step id="patch webapp" description="Patch the Annis2-webapp with some korpling relative configuration">
-    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/tomcat/Annis-trunk ${revision} /etc/annis/user_config_trunk"/>
+    <python:exec file="buildbot_scripts/patchWebapp.py" args="/srv/tomcat/Annis2.2 ${revision} /etc/annis/user_config"/>
   </step>
 
   <step id="copy service" description="Copy the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/copyService.sh" />
-    <sh:exec file="buildbot_scripts/copyService.sh" args="/opt/annis/trunk"/>
+    <sh:exec file="buildbot_scripts/copyService.sh" args="/opt/annis/stable22"/>
   </step>
 
   <step id="start service" description="Start the AnnisService">
     <sh:exec file="chmod" args="u+x buildbot_scripts/startService.sh" />
-    <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis/trunk" />
+    <sh:exec file="buildbot_scripts/startService.sh" args="/opt/annis/stable22" />
   </step>
 
 </build>
-
 

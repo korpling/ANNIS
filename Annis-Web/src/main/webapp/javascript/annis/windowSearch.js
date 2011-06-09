@@ -178,15 +178,7 @@ Ext.onReady(function()
 
     // Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = "";
-    for ( var i = 0; i < selections.length; i++)
-    {
-      if (i !== 0)
-      {
-        corpusIdString += ",";
-      }
-      corpusIdString += selections[i].id;
-    }
+    var corpusIdString = corpusStringListFromSelection(selections);
 
     lastQuery = formPanelSearch.getComponent('queryAnnisQL').getValue();
 
@@ -251,18 +243,10 @@ Ext.onReady(function()
 
     // Gather selections
     var selections = corpusListSelectionModel.getSelections();
-    var corpusIdString = "";
-    for ( var i = 0; i < selections.length; i++)
-    {
-      if (i !== 0)
-      {
-        corpusIdString += ",";
-      }
-      corpusIdString += selections[i].id;
-    }
+    var corpusIdString = corpusStringListFromSelection(selections);
 
-    var exporterSelection = formPanelExporter.getComponent(
-        "exportSelection").getValue();
+    var exporterSelection = formPanelExporter.getComponent("exportSelection").getValue();
+
 
     // open a new browser window/tab
     var url = conf_context
@@ -414,44 +398,44 @@ Ext.onReady(function()
 
   // The pad store ;)
   var padStore = new Ext.data.SimpleStore({
-    fields : [ 'pad' ],
-    data : [ [ 0 ], [ 1 ], [ 2 ], [ 5 ], [ 10 ] ]
+    fields: ['pad'],
+    data : search_context
   });
 
   var padLeftComboBox = new Ext.form.ComboBox({
-    store : padStore,
-    name : 'padLeft',
-    id : 'padLeft',
-    fieldLabel : 'Context Left',
-    displayField : 'pad',
-    mode : 'local',
-    triggerAction : 'all',
-    value : '5',
-    selectOnFocus : true,
-    editable : false,
-    listeners : {
-      'select' : {
-        fn : updateStatus,
-        scope : this
+    store: padStore,
+    name: 'padLeft',
+    id: 'padLeft',
+    fieldLabel: 'Context Left',
+    displayField:'pad',
+    mode: 'local',
+    triggerAction: 'all',
+    value: '' + search_context_default,
+    selectOnFocus:true,
+    editable: false,
+    listeners: {
+      'select': {
+        fn: updateStatus,
+        scope: this
       }
     }
   });
 
   var padRightComboBox = new Ext.form.ComboBox({
-    store : padStore,
-    name : 'padRight',
-    id : 'padRight',
-    fieldLabel : 'Context Right',
-    displayField : 'pad',
-    mode : 'local',
-    triggerAction : 'all',
-    value : '5',
-    selectOnFocus : true,
-    editable : false,
-    listeners : {
-      'select' : {
-        fn : updateStatus,
-        scope : this
+    store: padStore,
+    name: 'padRight',
+    id: 'padRight',
+    fieldLabel: 'Context Right',
+    displayField:'pad',
+    mode: 'local',
+    triggerAction: 'all',
+    value: '' + search_context_default,
+    selectOnFocus:true,
+    editable: false,
+    listeners: {
+      'select': {
+        fn: updateStatus,
+        scope: this
       }
     }
   });
@@ -758,23 +742,24 @@ Ext.onReady(function()
   };
   
   var formPanelSearch = new Ext.FormPanel({
-    id : 'formPanelSearch',
-    frame : true,
-    title : 'AnnisQL',
-    header : false,
-    width : 340,
-    height : 200,
-    defaultType : 'textfield',
-    monitorValid : true,
-    items : [ queryAnnisSQL, btnQueryBuilder, {
-      id : 'matchCount',
-      width : 200,
-      height : 40,
-      xtype : 'textarea',
-      fieldLabel : 'Result',
-      name : 'matchCount',
-      allowBlank : true,
-      readOnly : true
+    id: 'formPanelSearch', 
+    frame:true,
+    title: 'AnnisQL',
+    header: false,
+    width: 340,
+    height: 200,
+    defaultType: 'textfield',
+    monitorValid: true,
+    items: [queryAnnisSQL, btnQueryBuilder,
+    {
+      id: 'matchCount',
+      width: 200,
+      height: 40,
+      xtype: 'textarea',
+      fieldLabel: 'Result',
+      name: 'matchCount',
+      allowBlank:true,
+      readOnly: true       
     }, history.splitButton ]
   });
 
@@ -829,23 +814,26 @@ Ext.onReady(function()
 
   // the main window
   var windowSearchForm = new Ext.Window({
-    title : 'Search Form',
-    id : 'windowSearchForm',
-    closable : false,
-    collapsible : false,
-    maximizable : true,
-    resizable : false,
-    width : windowSearchFormWidth,
-    height : Math.max(500, Ext.getBody().getViewSize().height - 35),
-    // border:false,
-    plain : true,
-    closeAction : 'hide',
-    layout : 'border',
-    items : [ panelSearch, panelQueryBuilder ],
-    listeners : {
-      'showQueryBuilder' : {
-        fn : function()
-        {
+    title: 'Search Form',
+    id: 'windowSearchForm',
+    closable:false,
+    collapsible: false,
+    maximizable: true,
+    resizable: false,
+    width: windowSearchFormWidth,
+    height: Math.max(500,Ext.getBody().getViewSize().height - 35),
+    //border:false,
+    plain:true,
+    closeAction: 'hide',
+    layout: 'border',
+    items: [
+    panelSearch,
+    panelQueryBuilder
+    ],
+    listeners: {
+      'showQueryBuilder': {
+        fn: function() {
+          window.frames.iframeQueryBuilder.queryBuilderUpdateNodeAnnos(corpusStringListFromSelection(corpusListSelectionModel.getSelections()));
           windowSearchForm.setWidth(windowSearchFormWidthQueryBuilder);
           var nodeMaximize = Ext.DomQuery.selectNode(
               'div[class~=x-tool-maximize]', document
@@ -875,16 +863,14 @@ Ext.onReady(function()
   windowSearchForm.fireEvent('hideQueryBuilder');
 
   // loading corpus list
-  storeFavoriteCorpusList.load();
-
-  // extend dnd extender to allow dnd from corpus window
-  var myDrop = new Ext.dd.DropTarget(corpusGrid.container, {
-    dropAllowed : 'x-dd-drop-ok',
-    ddGroup : 'corpusList',
-    notifyDrop : function(dd, e, data)
-    {
-      //
-      var ds = data.grid.getStore();
+  storeFavoriteCorpusList.load();		 
+		 
+  //extend dnd extender to allow dnd from corpus window
+  var myDrop = new Ext.dd.DropTarget(corpusGrid.container, { 				   
+    dropAllowed: 'x-dd-drop-ok', 
+    ddGroup: 'corpusList', 
+    notifyDrop: function(dd, e, data) { 
+      var ds=data.grid.getStore();
       var dt = corpusGrid.getStore();
       dt.add(data.selections);
       var dtSortState = dt.getSortState();

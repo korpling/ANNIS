@@ -1,3 +1,32 @@
+Version 2.2.0
+=============
+
+enhancements:
+
+* Corpus browser feature
+* Gridview allows resolver mappings to determine order of layers
+* Query history
+* Keyboard Shortcut to "Show Results" (CTRL-ENTER)
+* Possible context size settings configurable
+* Login timeout removed in Kickstarter
+* Schema improvements, especially for corpora with a lot of annotations per 
+  node (like token annotations)
+  
+bugfixes:
+
+(#105) Queries with two different components for same node don't work
+(#121) Coref vis highlights tokens from wrong namespace
+(#118) Negative regex search doesn't assume initial ^ and final $
+(#124) NullPointerException in annis.WekaHelper.exportAsArff
+(#126) Query builder should suggest anno-names only from selected corpora
+(#130) Time outs on comparatively simple precedence queries in Falko
+(#137) Citation with "(" is handled wrong
+(#69) whitespacenormalisation of \t in AQL queries
+(#135) "Add node" in the query builder should look like a button, not a menu
+
+other:
+ Semantics of >@l and >@r clarified (now returns all children of a node aligned with its leftmost or rightmost covered tokens; in special cases of graphs with multiple parentage this may lead to multiple hits per parent!)
+
 Version 2.1.8
 =============
 

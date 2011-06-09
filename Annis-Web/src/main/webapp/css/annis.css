@@ -100,7 +100,7 @@ div.annis-level-body {
   background-position: -3px -3px;
 }
 
-.x-grid3-cell-inner td, .x-grid3-row td {
+.x-selectable, .x-selectable *, .x-grid3-cell-inner td, .x-grid3-row td {
   -moz-user-select: text!important;
   -khtml-user-select: text!important;
 }
@@ -109,3 +109,4 @@ div.annis-level-body {
 .history-hover, .corpusbrowser-hover {
   cursor : pointer;	
 }
+
