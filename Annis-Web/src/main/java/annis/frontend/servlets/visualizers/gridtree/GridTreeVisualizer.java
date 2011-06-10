@@ -44,6 +44,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 		AnnisNode root;
 		int height;
 		int visits;
+		long offset;
 		HashMap<Span, Span> nodes = new HashMap<Span, Span>();
 
 		/**
@@ -54,9 +55,10 @@ public class GridTreeVisualizer extends WriterVisualizer
 		 * @param r
 		 *            must be a sorted List of the result
 		 */
-		public Span(AnnisNode root)
+		public Span(AnnisNode root, long offset)
 		{
 			this.root = root;
+			this.offset = offset;
 		}
 
 		@Override
@@ -101,6 +103,15 @@ public class GridTreeVisualizer extends WriterVisualizer
 		{
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
+
+			// cell-index for hover-effect
+			sb.append("\" id=\"intervall:");
+			sb.append(this.hashCode());
+			sb.append(":");
+			sb.append(left + 1 - offset);
+			sb.append("-");
+			sb.append(right + 1 - offset);
+
 			sb.append("\" class=\"gridtree-result\">");
 			sb.append(getAnnoValue(this.root, anno));
 			sb.append("</td>");
@@ -126,8 +137,17 @@ public class GridTreeVisualizer extends WriterVisualizer
 			writer.append("<link href=\""
 					+ getContextPath()
 					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
+			writer.append("<script type=\"text/javascript\" src=\""
+					+ getContextPath()
+					+ "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+			writer.append("<script type=\"text/javascript\" src=\""
+					+ getContextPath()
+					+ "/javascript/extjs/ext-all.js\"></script>");
+			writer.append("<script type=\"text/javascript\" src=\""
+					+ getContextPath()
+					+ "/javascript/annis/visualizer/gridtreeVisualizer.js\"></script>");
 			writer.append("<body>");
-			writer.append("<table class=\"grid-tree partitur_table\">\n");
+			writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
 			writer.append(findAnnotation("cat"));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
@@ -149,7 +169,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
 		for (AnnisNode n : nodes)
 			if (hasAnno(n, anno))
-				roots.add(new Span(n));
+				roots.add(new Span(n, result.get(0).getTokenIndex()));
 
 		StringBuilder sb = new StringBuilder();
 
