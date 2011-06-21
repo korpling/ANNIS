@@ -36,99 +36,103 @@ import org.json.JSONWriter;
 
 /**
  * Servlet that gives returns you metadata for a given token.
- * @author thomas
+ * 
+ * @author thomas, benjamin
  */
 public class MetaDataServlet extends HttpServlet
 {
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
-    doGet(req, resp);
-  }
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException
+	{
+		doGet(req, resp);
+	}
 
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException
+	{
 
-    resp.setCharacterEncoding("UTF-8");
-    resp.setContentType("application/x-json");
+		resp.setCharacterEncoding("UTF-8");
+		resp.setContentType("application/x-json");
 
-    OutputStreamWriter outWriter = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
-    
-    JSONWriter json = new JSONWriter(outWriter);
-    
-    String idAsString = req.getParameter("mID");
-    if(idAsString != null)
-    {
-      try
-      {
-        long id = Long.parseLong(idAsString);
-        List<Annotation> queryResult = createData(id);
-        
-        int size = 0;
-        try
-        {
-          json.object();
+		OutputStreamWriter outWriter = new OutputStreamWriter(
+				resp.getOutputStream(), "UTF-8");
 
-          json.key("metadata");
-          json.array();
+		JSONWriter json = new JSONWriter(outWriter);
 
-          for(Annotation a : queryResult)
-          {
-            json.object();
-            size++;
-            json.key("key");
-            json.value(a.getQualifiedName());
-            json.key("value");
-            json.value(a.getValue());
+		String idAsString = req.getParameter("mID");
+		if (idAsString != null)
+		{
+			try
+			{
+				long id = Long.parseLong(idAsString);
+				List<Annotation> queryResult = createData(id);
 
-            json.endObject();
-          }
+				int size = 0;
+				try
+				{
+					json.object();
 
-          json.endArray();
+					json.key("metadata");
+					json.array();
 
+					for (Annotation a : queryResult)
+					{
+						json.object();
+						size++;
+						json.key("name");
+						json.value(a.getNamespace());
+						json.key("key");
+						json.value(a.getName());
+						json.key("value");
+						json.value(a.getValue());
 
-          json.key("size");
-          json.value(size);
+						json.endObject();
+					}
 
-          json.endObject();
+					json.endArray();
 
-        }
-        catch(JSONException ex)
-        {
-          Logger.getLogger(MetaDataServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+					json.key("size");
+					json.value(size);
 
-      }
-      catch(NumberFormatException ex)
-      {
-      }
-    }
-    outWriter.flush();
-  }
+					json.endObject();
 
-  private List<Annotation> createData(long id)
-  {
-    List<Annotation> md = new LinkedList<Annotation>();
+				} catch (JSONException ex)
+				{
+					Logger.getLogger(MetaDataServlet.class.getName()).log(
+							Level.SEVERE, null, ex);
+				}
 
-    try
-    {
-      AnnisService service = 
-        AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+			} catch (NumberFormatException ex)
+			{
+			}
+		}
+		outWriter.flush();
+	}
 
-      md = service.getMetadata(id);
-    }
-    catch(RemoteException ex)
-    {
-      Logger.getLogger(MetaDataServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch(AnnisServiceFactoryException ex)
-    {
-      Logger.getLogger(MetaDataServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
+	private List<Annotation> createData(long id)
+	{
+		List<Annotation> md = new LinkedList<Annotation>();
 
-    return md;
-  }
+		try
+		{
+			AnnisService service = AnnisServiceFactory.getClient(this
+					.getServletContext().getInitParameter(
+							"AnnisRemoteService.URL"));
+
+			md = service.getMetadata(id);
+		} catch (RemoteException ex)
+		{
+			Logger.getLogger(MetaDataServlet.class.getName()).log(Level.SEVERE,
+					null, ex);
+		} catch (AnnisServiceFactoryException ex)
+		{
+			Logger.getLogger(MetaDataServlet.class.getName()).log(Level.SEVERE,
+					null, ex);
+		}
+
+		return md;
+	}
 }
-

@@ -101,13 +101,13 @@ Ext.onReady(function()
   }
 
   function edgeTypes(value, metadata, record, rowIndex, colIndex, store)
-  {    
+  {
     // filter white-space that come from edgeName() when filter for dominance
     // edges
     var edge_name = killNameSpaces(record.get('edge_name'));
-    if(edge_name === " ")
+    if (edge_name === " ")
       edge_name = '';
-    
+
     var operator = (record.get('subtype') === "d") ? '>' : '->';
     return '<p style=\'white-space: normal;\'>node & node & #1 ' + operator
         + edge_name + " #2</p>";
@@ -118,7 +118,6 @@ Ext.onReady(function()
     return "<a href='#' onclick='getCitationWindow()'><img src='"
         + conf_context + "/images/url.png'></a>";
   }
-
 
   /**
    * this must be global for using in DOM, this function also works when value
@@ -174,18 +173,46 @@ Ext.onReady(function()
 
     var grid = null;
 
+    // store for document-meta
+    var storeDocumentMeta = new Ext.data.JsonStore({
+      remoteSort : false,
+      fields : [ 'name', 'key', 'value' ],
+      storeId : 'docMeta'
+    });
+
+    var storeCorpusMeta = new Ext.data.JsonStore({
+      remoteSort : false,
+      fields : [ 'name', 'key', 'value' ],
+      storeId : 'corpusMeta'
+    })
+
     // get datastore
     var storeMeta = new Ext.data.JsonStore({
       url : conf_context + '/secure/MetaData?mID=' + id,
       totalProperty : 'size',
       root : 'metadata',
       id : 'id',
-      fields : [ 'key', 'value' ],
+      fields : [ 'name', 'key', 'value' ],
       // turn on remote sorting
       remoteSort : true
     });
 
-    var colModel = new Ext.grid.ColumnModel([ {
+    // copy and
+    storeMeta.on('load', function(store, records, options)
+    {
+      recordArray = storeMeta.getRange(0, store.getCount());
+      for ( var i = 0; i < recordArray.length; i++)
+      {
+        if (recordArray[i].get('name') === 'DOCUMENT')
+          storeDocumentMeta.add(recordArray[i].copy());
+        else
+          storeCorpusMeta.add(recordArray[i].copy());
+      }
+    });
+
+    storeMeta.load();
+
+    var documentColModel = new Ext.grid.ColumnModel([ {
       header : "Name",
       dataIndex : 'key'
     }, {
@@ -198,24 +225,70 @@ Ext.onReady(function()
       }
     } ]);
 
-    var gridMeta = new Ext.grid.GridPanel({
-      ds : storeMeta,
-      cm : colModel,
-      title : 'meta data',
+    
+    var corpusColModel = new Ext.grid.ColumnModel([ {
+      header : "Name",
+      dataIndex : 'key'
+    }, {
+      header : "Value",
+      dataIndex : 'value',
+      renderer : function(value)
+      {
+        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
+        return '<p style=\'' + css + '\'>' + value + '</p>';
+      }
+    } ]);
+
+    var documentMeta = new Ext.grid.GridPanel({
+      ds : storeDocumentMeta,
+      cm : documentColModel,
+      title : 'document',
       loadMask : true,
       viewConfig : {
         forceFit : true,
         autoFill : true
       },
-      height : 370,
+      height : 348
+    });
+
+    var corpusMeta = new Ext.grid.GridPanel({
+      ds : storeCorpusMeta,
+      cm : corpusColModel,
+      title : 'corpus',
+      loadMask : true,
+      viewConfig : {
+        forceFit : true,
+        autoFill : true
+      },
+      height : 348
+    });
+
+    gridMeta = new Ext.Panel({
+      layout : 'accordion',
+      layoutConfig : {
+        animate : true
+      },
+      items : [ documentMeta, corpusMeta ],
       flex : 1
     });
 
-    storeMeta.load();
     var gridPanel = {};
 
     if (!hideAttr)
     {
+
+      var gridMeta = new Ext.grid.GridPanel({
+        ds : storeMeta,
+        cm : corpusColModel,
+        title : 'meta data',
+        loadMask : true,
+        viewConfig : {
+          forceFit : true,
+          autoFill : true
+        },
+        height : 370,
+        flex : 1
+      });
 
       // height of accordion components
       var height = 300;
