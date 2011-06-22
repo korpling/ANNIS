@@ -22,24 +22,29 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.model.Annotation;
 
-public class ListCorpusAnnotationsSqlHelper implements ParameterizedRowMapper<Annotation> {
+public class ListCorpusAnnotationsSqlHelper implements
+		ParameterizedRowMapper<Annotation>
+{
 
-	public String createSqlQuery(long corpusId) {
-		String template =
-			"SELECT corpus_annotation.* " +
-			"FROM corpus_annotation, corpus this, corpus parent " +
-			"WHERE this.id = :id " +
-			"AND this.pre >= parent.pre AND this.post <= parent.post " +
-			"AND corpus_annotation.corpus_ref = parent.id";
+	public String createSqlQuery(long corpusId)
+	{
+		String template = "SELECT  parent.type, ca.name as key, ca.value, ca.namespace "
+				+ "FROM corpus_annotation ca, corpus this, corpus parent "
+				+ "WHERE this.id = :id "
+				+ "AND this.pre >= parent.pre "
+				+ "AND this.post <= parent.post "
+				+ "AND ca.corpus_ref = parent.id " + "ORDER BY parent.pre DESC";
 		String sql = template.replaceAll(":id", String.valueOf(corpusId));
 		return sql;
 	}
-	
-	public Annotation mapRow(ResultSet rs, int rowNum) throws SQLException {
-		String namespace = rs.getString("namespace");
-		String name = rs.getString("name");
+
+	public Annotation mapRow(ResultSet rs, int rowNum) throws SQLException
+	{
+
+		String namespace = rs.getString("type");
+		String name = (rs.getString("namespace") == null) ? rs.getString("key")
+				: rs.getString("namespace") + ":" + rs.getString("key");
 		String value = rs.getString("value");
 		return new Annotation(namespace, name, value);
 	}
-
 }
