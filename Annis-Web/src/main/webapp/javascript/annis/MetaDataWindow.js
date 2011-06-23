@@ -199,25 +199,22 @@ Ext.onReady(function()
 
     storeMeta.on('load', function(store, records, options)
     {
+      // this is for Subcorpora. If there is more than one, its name is concated
+      // with the key
+      var types = {};
       store.each(function(record)
       {
+        types[record.get('name')] = record.get('type');
         if (record.get('type') === 'DOCUMENT')
           storeDocumentMeta.add(record.copy());
         else
           storeCorpusMeta.add(record.copy());
       });
 
-      // this is for Subcorpora. If there is more than one, its name is concated
-      // with the key
-      var corpura = {};
       var count = 0;
-      storeCorpusMeta.each(function(record)
-      {
-        if (!corpura[record.get('name')])
+      for ( var corpus in types)
+        if (types[corpus] === 'CORPUS')
           count++;
-
-        corpura[record.get('name')] = true;
-      });
 
       if (count > 1)
       {
@@ -227,7 +224,6 @@ Ext.onReady(function()
           record.commit();
         });
       } // end counting Subcorpora
-
     });
 
     storeMeta.load();
@@ -282,7 +278,7 @@ Ext.onReady(function()
       height : 348
     });
 
-    gridMeta = new Ext.Panel({
+    var gridMeta = new Ext.Panel({
       layout : 'accordion',
       layoutConfig : {
         animate : true
@@ -296,7 +292,7 @@ Ext.onReady(function()
     if (!hideAttr)
     {
 
-      var gridMeta = new Ext.grid.GridPanel({
+      gridMeta = new Ext.grid.GridPanel({
         ds : storeMeta,
         cm : corpusColModel,
         title : 'meta data',
