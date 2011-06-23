@@ -22,36 +22,53 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import annis.model.AnnisNode.TextMatching;
 
-public class Annotation implements Comparable<Annotation>, Serializable {
-	
+public class Annotation implements Comparable<Annotation>, Serializable
+{
+
 	// this class is sent to the front end
 	private static final long serialVersionUID = -7594536903324312228L;
-	
+
 	private String namespace;
 	private String name;
 	private String value;
+	private String type;
+	private String corpusName;
 	private TextMatching textMatching;
-	
-	public Annotation(String namespace, String name) {
+
+	public Annotation(String namespace, String name)
+	{
 		this(namespace, name, null, null);
 	}
-	
-	public Annotation(String namespace, String name, String value) {
+
+	public Annotation(String namespace, String name, String value)
+	{
 		this(namespace, name, value, TextMatching.EXACT_EQUAL);
 	}
-	
-	public Annotation(String namespace, String name, String value, TextMatching textMatching) {
+
+	public Annotation(String namespace, String name, String value,
+			TextMatching textMatching)
+	{
 		this.namespace = namespace;
 		this.name = name;
 		this.value = value;
 		this.textMatching = textMatching;
 	}
-	
+
+	public Annotation(String namespace, String name, String value, String type,
+			String corpusName)
+	{
+		this(namespace, name, value);
+		this.type = type;
+		this.corpusName = corpusName;
+	}
+
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(AnnisNode.qName(namespace, name));
-		if (value != null) {
+		if (value != null)
+		{
 			sb.append(" ");
 			sb.append(textMatching);
 			sb.append(" ");
@@ -60,68 +77,87 @@ public class Annotation implements Comparable<Annotation>, Serializable {
 		return sb.toString();
 	}
 
-	public int compareTo(Annotation o) {
+	public int compareTo(Annotation o)
+	{
 		String name1 = getQualifiedName();
 		String name2 = o.getQualifiedName();
 		return name1.compareTo(name2);
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+	{
 		if (obj == null || !(obj instanceof Annotation))
 			return false;
 
 		Annotation other = (Annotation) obj;
-		
-		return new EqualsBuilder()
-			.append(this.namespace, other.namespace)
-			.append(this.name, other.name)
-			.append(this.value, other.value)
-			.append(this.textMatching, other.textMatching)
-			.isEquals();
+
+		return new EqualsBuilder().append(this.namespace, other.namespace)
+				.append(this.name, other.name).append(this.value, other.value)
+				.append(this.textMatching, other.textMatching).isEquals();
 	}
-	
+
 	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(namespace).append(name).append(value).append(textMatching).toHashCode();
+	public int hashCode()
+	{
+		return new HashCodeBuilder().append(namespace).append(name)
+				.append(value).append(textMatching).toHashCode();
 	}
-	
-	///// Getter / Setter
-	
-	public String getValue() {
+
+	// /// Getter / Setter
+
+	public String getValue()
+	{
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(String value)
+	{
 		this.value = value;
 	}
 
-	public TextMatching getTextMatching() {
+	public TextMatching getTextMatching()
+	{
 		return textMatching;
 	}
 
-	public void setTextMatching(TextMatching textMatching) {
+	public void setTextMatching(TextMatching textMatching)
+	{
 		this.textMatching = textMatching;
 	}
 
-	public String getNamespace() {
+	public String getNamespace()
+	{
 		return namespace;
 	}
 
-	public void setNamespace(String namespace) {
+	public void setNamespace(String namespace)
+	{
 		this.namespace = namespace;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
-	
-	public String getQualifiedName() {
+
+	public String getQualifiedName()
+	{
 		return AnnisNode.qName(namespace, name);
 	}
-	
+
+	public String getType()
+	{
+		return type;
+	}
+
+	public String getCorpusName()
+	{
+		return corpusName;
+	}
 }

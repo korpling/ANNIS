@@ -24,7 +24,6 @@ import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -83,7 +82,9 @@ public class MetaDataServlet extends HttpServlet
 						json.object();
 						size++;
 						json.key("name");
-						json.value(a.getNamespace());
+						json.value(a.getCorpusName());
+						json.key("type");
+						json.value(a.getType());
 						json.key("key");
 						json.value(a.getName());
 						json.key("value");
@@ -121,7 +122,6 @@ public class MetaDataServlet extends HttpServlet
 			AnnisService service = AnnisServiceFactory.getClient(this
 					.getServletContext().getInitParameter(
 							"AnnisRemoteService.URL"));
-
 			md = service.getMetadata(id);
 		} catch (RemoteException ex)
 		{

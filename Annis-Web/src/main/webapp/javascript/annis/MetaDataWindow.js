@@ -73,6 +73,12 @@ Ext.onReady(function()
   }
 
   // render functions
+  function linebreak(value)
+  {
+    var css = 'white-space: normal; overflow: normal; padding-right: 5px';
+    return '<p style=\'' + css + '\'>' + value + '</p>';
+  }
+
   function nameRenderer(value, metadata, record, rowIndex, colIndex, store)
   {
     if (isAmbiguous(store, store.getRange(), 'name') === true)
@@ -171,111 +177,137 @@ Ext.onReady(function()
     config.width = (!hideAttr) ? 800 : 400;
     config.height = 402;
 
-    var grid = null;
-
-    // store for document-meta
-    var storeDocumentMeta = new Ext.data.JsonStore({
-      remoteSort : false,
-      fields : [ 'name', 'key', 'value' ],
-      storeId : 'docMeta'
-    });
-
-    var storeCorpusMeta = new Ext.data.JsonStore({
-      remoteSort : false,
-      fields : [ 'name', 'key', 'value' ],
-      storeId : 'corpusMeta'
-    })
-
     // get datastore
     var storeMeta = new Ext.data.JsonStore({
       url : conf_context + '/secure/MetaData?mID=' + id,
       totalProperty : 'size',
       root : 'metadata',
       id : 'id',
-      fields : [ 'name', 'key', 'value' ],
+      fields : [ 'type', 'name', 'key', 'value' ],
       // turn on remote sorting
       remoteSort : true
     });
 
-    // copy and
-    storeMeta.on('load', function(store, records, options)
+    if (hideAttr)
     {
-      recordArray = storeMeta.getRange(0, store.getCount());
-      for ( var i = 0; i < recordArray.length; i++)
+      // intialize sub-store
+      var storeDocumentMeta = new Ext.data.JsonStore({
+        remoteSort : false,
+        fields : [ 'type', 'name', 'key', 'value' ],
+        storeId : 'docMeta'
+      });
+
+      var storeCorpusMeta = new Ext.data.JsonStore({
+        remoteSort : false,
+        fields : [ 'type', 'name', 'key', 'value' ],
+        storeId : 'corpusMeta'
+      });
+
+      // initialize stuff for the view
+      var documentColModel = new Ext.grid.ColumnModel([ {
+        header : "Name",
+        dataIndex : 'key'
+      }, {
+        header : "Value",
+        dataIndex : 'value',
+        renderer : linebreak
+      } ]);
+
+      var corpusColModel = new Ext.grid.ColumnModel([ {
+        header : "Name",
+        dataIndex : 'key'
+      }, {
+        header : "Value",
+        dataIndex : 'value',
+        renderer : linebreak
+      } ]);
+
+      var documentMeta = new Ext.grid.GridPanel({
+        ds : storeDocumentMeta,
+        cm : documentColModel,
+        title : 'document',
+        loadMask : true,
+        viewConfig : {
+          forceFit : true,
+          autoFill : true
+        },
+        height : 348
+      });
+
+      var corpusMeta = new Ext.grid.GridPanel({
+        ds : storeCorpusMeta,
+        cm : corpusColModel,
+        title : 'corpus',
+        loadMask : true,
+        viewConfig : {
+          forceFit : true,
+          autoFill : true
+        },
+        height : 348
+      }); // end initialize sub-corpora
+
+      storeMeta.on('load', function(store, records, options)
       {
-        if (recordArray[i].get('name') === 'DOCUMENT')
-          storeDocumentMeta.add(recordArray[i].copy());
-        else
-          storeCorpusMeta.add(recordArray[i].copy());
-      }
-    });
+        /*
+         * this is for Subcorpora. If there is more than one, its name is
+         * concated with the key
+         */
+        var types = {};
+        store.each(function(record)
+        {
+          types[record.get('name')] = record.get('type');
+          if (record.get('type') === 'DOCUMENT')
+            storeDocumentMeta.add(record.copy());
+          else
+            storeCorpusMeta.add(record.copy());
+        });
 
-    storeMeta.load();
+        var count = 0;
+        var corpusTitle = [];
+        var doctitle;
+        for ( var keys in types)
+        {
+          if (types[keys] === 'CORPUS')
+          {
+            count++;
+            corpusTitle.push(keys);
+          } else
+            doctitle = keys;
+        }
 
-    var documentColModel = new Ext.grid.ColumnModel([ {
-      header : "Name",
-      dataIndex : 'key'
-    }, {
-      header : "Value",
-      dataIndex : 'value',
-      renderer : function(value)
-      {
-        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
-        return '<p style=\'' + css + '\'>' + value + '</p>';
-      }
-    } ]);
+        if (count > 1)
+        {
+          storeCorpusMeta.each(function(record)
+          {
+            record.set('key', record.get('name') + ":" + record.get('key'));
+            record.commit();
+          });
+        } // end counting Subcorpora
 
-    
-    var corpusColModel = new Ext.grid.ColumnModel([ {
-      header : "Name",
-      dataIndex : 'key'
-    }, {
-      header : "Value",
-      dataIndex : 'value',
-      renderer : function(value)
-      {
-        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
-        return '<p style=\'' + css + '\'>' + value + '</p>';
-      }
-    } ]);
+        // set Title for Corpora-Panel and for Document-Panel
+        documentMeta.setTitle("document: " + doctitle);
+        corpusMeta.setTitle(corpusTitle.length < 1 ? "corpus: "
+            + corpusTitle[0] : "corpora: " + corpusTitle.join(", "));
+      });
 
-    var documentMeta = new Ext.grid.GridPanel({
-      ds : storeDocumentMeta,
-      cm : documentColModel,
-      title : 'document',
-      loadMask : true,
-      viewConfig : {
-        forceFit : true,
-        autoFill : true
-      },
-      height : 348
-    });
-
-    var corpusMeta = new Ext.grid.GridPanel({
-      ds : storeCorpusMeta,
-      cm : corpusColModel,
-      title : 'corpus',
-      loadMask : true,
-      viewConfig : {
-        forceFit : true,
-        autoFill : true
-      },
-      height : 348
-    });
-
-    gridMeta = new Ext.Panel({
-      layout : 'accordion',
-      layoutConfig : {
-        animate : true
-      },
-      items : [ documentMeta, corpusMeta ],
-      flex : 1
-    });
-
-    var gridPanel = {};
-
-    if (!hideAttr)
+      var gridMeta = new Ext.Panel({
+        layout : 'accordion',
+        layoutConfig : {
+          animate : true
+        },
+        items : [ documentMeta, corpusMeta ],
+        flex : 1
+      });
+    } else
     {
+      var corpusColModel = new Ext.grid.ColumnModel([ {
+        header : "Name",
+        dataIndex : 'key'
+      }, {
+        header : "Value",
+        dataIndex : 'value',
+        renderer : linebreak
+      } ]);
 
       var gridMeta = new Ext.grid.GridPanel({
         ds : storeMeta,
@@ -489,6 +521,9 @@ Ext.onReady(function()
         flex : 1
       });
     }
+
+    // finally fetch metadata
+    storeMeta.load();
 
     // init config
     config.items = (!hideAttr) ? [ gridMeta, rightPanel ] : [ gridMeta ];
