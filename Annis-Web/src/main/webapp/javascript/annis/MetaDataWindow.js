@@ -263,9 +263,17 @@ Ext.onReady(function()
         });
 
         var count = 0;
-        for ( var corpus in types)
-          if (types[corpus] === 'CORPUS')
+        var corpusTitle = [];
+        var doctitle;
+        for ( var keys in types)
+        {
+          if (types[keys] === 'CORPUS')
+          {
             count++;
+            corpusTitle.push(keys);
+          } else
+            doctitle = keys;
+        }
 
         if (count > 1)
         {
@@ -275,6 +283,11 @@ Ext.onReady(function()
             record.commit();
           });
         } // end counting Subcorpora
+
+        // set Title for Corpora-Panel and for Document-Panel
+        documentMeta.setTitle("document: " + doctitle);
+        corpusMeta.setTitle(corpusTitle.length < 1 ? "corpus: "
+            + corpusTitle[0] : "corpora: " + corpusTitle.join(", "));
       });
 
       var gridMeta = new Ext.Panel({
