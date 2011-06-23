@@ -197,17 +197,15 @@ Ext.onReady(function()
       remoteSort : true
     });
 
-    // copy and
     storeMeta.on('load', function(store, records, options)
     {
-      recordArray = storeMeta.getRange(0, store.getCount());
-      for ( var i = 0; i < recordArray.length; i++)
+      store.each(function(record)
       {
-        if (recordArray[i].get('type') === 'DOCUMENT')
-          storeDocumentMeta.add(recordArray[i].copy());
+        if (record.get('type') === 'DOCUMENT')
+          storeDocumentMeta.add(record.copy());
         else
-          storeCorpusMeta.add(recordArray[i].copy());
-      }
+          storeCorpusMeta.add(record.copy());
+      });
 
       // this is for Subcorpora. If there is more than one, its name is concated
       // with the key
@@ -217,7 +215,7 @@ Ext.onReady(function()
       {
         if (!corpura[record.get('name')])
           count++;
-        
+
         corpura[record.get('name')] = true;
       });
 
