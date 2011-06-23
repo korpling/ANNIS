@@ -24,8 +24,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
-import java.util.Map;
-import java.util.Properties;
 
 public interface AnnisDao
 {

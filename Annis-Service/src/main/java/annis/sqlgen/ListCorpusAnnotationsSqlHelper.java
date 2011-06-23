@@ -28,12 +28,12 @@ public class ListCorpusAnnotationsSqlHelper implements
 
 	public String createSqlQuery(long corpusId)
 	{
-		String template = "SELECT  parent.type, ca.name as key, ca.value, ca.namespace "
-				+ "FROM corpus_annotation ca, corpus this, corpus parent "
+		String template = "SELECT parent.type, parent.name AS parent_name, ca.name, ca.value, ca.namespace "
+				+ "FROM corpus_annotation ca, corpus parent, corpus this "
 				+ "WHERE this.id = :id "
 				+ "AND this.pre >= parent.pre "
 				+ "AND this.post <= parent.post "
-				+ "AND ca.corpus_ref = parent.id " + "ORDER BY parent.pre DESC";
+				+ "AND ca.corpus_ref = parent.id " + "ORDER BY parent.pre ASC";
 		String sql = template.replaceAll(":id", String.valueOf(corpusId));
 		return sql;
 	}
@@ -41,10 +41,11 @@ public class ListCorpusAnnotationsSqlHelper implements
 	public Annotation mapRow(ResultSet rs, int rowNum) throws SQLException
 	{
 
-		String namespace = rs.getString("type");
-		String name = (rs.getString("namespace") == null) ? rs.getString("key")
-				: rs.getString("namespace") + ":" + rs.getString("key");
+		String namespace = rs.getString("namespace");
+		String name = rs.getString("name");
 		String value = rs.getString("value");
-		return new Annotation(namespace, name, value);
+		String type = rs.getString("type");
+		String corpusName = rs.getString("parent_name");
+		return new Annotation(namespace, name, value, type, corpusName);
 	}
 }

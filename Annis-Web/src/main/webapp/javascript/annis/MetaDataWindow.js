@@ -176,13 +176,13 @@ Ext.onReady(function()
     // store for document-meta
     var storeDocumentMeta = new Ext.data.JsonStore({
       remoteSort : false,
-      fields : [ 'name', 'key', 'value' ],
+      fields : [ 'type', 'name', 'key', 'value' ],
       storeId : 'docMeta'
     });
 
     var storeCorpusMeta = new Ext.data.JsonStore({
       remoteSort : false,
-      fields : [ 'name', 'key', 'value' ],
+      fields : [ 'type', 'name', 'key', 'value' ],
       storeId : 'corpusMeta'
     })
 
@@ -192,7 +192,7 @@ Ext.onReady(function()
       totalProperty : 'size',
       root : 'metadata',
       id : 'id',
-      fields : [ 'name', 'key', 'value' ],
+      fields : [ 'type', 'name', 'key', 'value' ],
       // turn on remote sorting
       remoteSort : true
     });
@@ -203,11 +203,33 @@ Ext.onReady(function()
       recordArray = storeMeta.getRange(0, store.getCount());
       for ( var i = 0; i < recordArray.length; i++)
       {
-        if (recordArray[i].get('name') === 'DOCUMENT')
+        if (recordArray[i].get('type') === 'DOCUMENT')
           storeDocumentMeta.add(recordArray[i].copy());
         else
           storeCorpusMeta.add(recordArray[i].copy());
       }
+
+      // this is for Subcorpora. If there is more than one, its name is concated
+      // with the key
+      var corpura = {};
+      var count = 0;
+      storeCorpusMeta.each(function(record)
+      {
+        if (!corpura[record.get('name')])
+          count++;
+        
+        corpura[record.get('name')] = true;
+      });
+
+      if (count > 1)
+      {
+        storeCorpusMeta.each(function(record)
+        {
+          record.set('key', record.get('name') + ":" + record.get('key'));
+          record.commit();
+        });
+      } // end counting Subcorpora
+
     });
 
     storeMeta.load();
@@ -225,7 +247,6 @@ Ext.onReady(function()
       }
     } ]);
 
-    
     var corpusColModel = new Ext.grid.ColumnModel([ {
       header : "Name",
       dataIndex : 'key'
