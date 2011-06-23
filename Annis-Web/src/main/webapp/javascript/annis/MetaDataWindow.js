@@ -73,6 +73,12 @@ Ext.onReady(function()
   }
 
   // render functions
+  function linebreak(value)
+  {
+    var css = 'white-space: normal; overflow: normal; padding-right: 5px';
+    return '<p style=\'' + css + '\'>' + value + '</p>';
+  }
+
   function nameRenderer(value, metadata, record, rowIndex, colIndex, store)
   {
     if (isAmbiguous(store, store.getRange(), 'name') === true)
@@ -234,11 +240,7 @@ Ext.onReady(function()
     }, {
       header : "Value",
       dataIndex : 'value',
-      renderer : function(value)
-      {
-        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
-        return '<p style=\'' + css + '\'>' + value + '</p>';
-      }
+      renderer : linebreak
     } ]);
 
     var corpusColModel = new Ext.grid.ColumnModel([ {
@@ -247,11 +249,7 @@ Ext.onReady(function()
     }, {
       header : "Value",
       dataIndex : 'value',
-      renderer : function(value)
-      {
-        var css = 'white-space: normal; overflow: normal; padding-right: 5px';
-        return '<p style=\'' + css + '\'>' + value + '</p>';
-      }
+      renderer : linebreak
     } ]);
 
     var documentMeta = new Ext.grid.GridPanel({
