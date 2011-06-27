@@ -279,7 +279,7 @@ Ext.onReady(function()
         {
           storeCorpusMeta.each(function(record)
           {
-            record.set('key', record.get('name') + ":" + record.get('key'));
+            record.set('key', record.get('name') + "::" + record.get('key'));
             record.commit();
           });
         } // end counting Subcorpora
