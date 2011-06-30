@@ -245,12 +245,14 @@ Ext.onReady(function() {
         items: [
         {
           text:'Token Annotations',
-          iconCls: 'windowSearchResult menu tokenAnnotations',
+          xtype: 'button',
+          ctCls: 'annis-toolbar-btn',
           menu: tokenLevelSelectionMenu
         },
         {
           id: 'btnShowCitation',
           text: 'Show Citation URL',
+          ctCls: 'annis-toolbar-btn',
           disabled: false,
           listeners: {
             click: function() {
