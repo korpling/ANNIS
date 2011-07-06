@@ -34,6 +34,8 @@ public class AnnotationGraph implements Serializable {
 	// this class is sent to the front end
 	private static final long serialVersionUID = -1525612317405210436L;
 
+	private String documentName;
+	
 	// graph is defined by list of nodes and tokens
 	private List<AnnisNode> nodes;
 	private List<Edge> edges;
@@ -142,6 +144,14 @@ public class AnnotationGraph implements Serializable {
 	
 	public Set<Long> getMatchedNodeIds() {
 		return matchedNodeIds;
+	}
+	
+	public String getDocumentName() {
+		return documentName;
+	}
+	
+	public void setDocumentName(String documentName) {
+		this.documentName = documentName;
 	}
 
 }

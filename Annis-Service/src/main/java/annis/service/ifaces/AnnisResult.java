@@ -24,9 +24,13 @@ import java.util.Set;
  * This is the actual container for a single search result.
  * 
  * @author k.huetter
- *
+ * 
  */
-public interface AnnisResult extends Serializable {
+public interface AnnisResult extends Serializable
+{
+
+	/** get Document Name */
+	public String getDocumentName();
 	
 	/** PAULA-Unart representation */
 	public String getPaula();
@@ -39,10 +43,10 @@ public interface AnnisResult extends Serializable {
 
 	/** ordered list of tokens */
 	public List<AnnisToken> getTokenList();
-	
+
 	/** non-token annotation names */
 	public Set<String> getAnnotationLevelSet();
-	
+
 	/** token annotation names */
 	public Set<String> getTokenAnnotationLevelSet();
 
@@ -52,7 +56,7 @@ public interface AnnisResult extends Serializable {
 	/** is there a node with marker markerID **/
 	public boolean hasMarker(String markerId);
 
-  /** Get the underlying annotation graph */
-  public AnnotationGraph getGraph();
-	
+	/** Get the underlying annotation graph */
+	public AnnotationGraph getGraph();
+
 }
