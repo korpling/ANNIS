@@ -360,7 +360,6 @@ public class AnnisResultImpl implements AnnisResult
 	@Override
 	public String getDocumentName()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return graph.getDocumentName();
 	}
 }

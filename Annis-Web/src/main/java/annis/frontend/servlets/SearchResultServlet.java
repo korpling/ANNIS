@@ -305,7 +305,10 @@ public class SearchResultServlet extends HttpServlet
       {
         json.putOnce("corpusId", "" + n.getCorpus());
       }
-
+      
+      if(!json.has("documentName"))
+    	  json.putOnce("documentName", result.getDocumentName());
+      
       textIdListFromResult.add(n.getTextId());
       
       JSONObject tok = new JSONObject();
