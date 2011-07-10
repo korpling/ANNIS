@@ -5,8 +5,14 @@
 
 .SearchResultWindow.kwic {
 	text-align: center;
-  width: 100%;
-  overflow: hidden;
+  	width: 100%;
+  	overflow: hidden;
+}
+
+.SearchResultWindow.kwic h1 {
+	text-align: left;
+	font-weight: normal;	
+	color: gray;
 }
 
 .SearchResultWindow.visualizers {

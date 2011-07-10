@@ -148,7 +148,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker', 'markerExact'],
+    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker', 'markerExact', 'documentName'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -348,6 +348,7 @@ Ext.onReady(function() {
       var output = '';
 
       output += '<div id="kwic-' + rowData.callbackId + '" class="SearchResultWindow kwic">\n';
+      output += '<h1>Document: ' + rowData.documentName + '</h1>';
       output += '<table id="table-' + rowData.callbackId + '">\n';
 
       for(var i=0; i < rowData.textIdList.length; i++)
