@@ -410,8 +410,12 @@ public class GraphExtractor implements ResultSetExtractor
 
 			AnnotationGraph graph = graphByMatchGroup.get(key);
 
+			
 			graph.setDocumentName(new DocumentNameMapRow().mapRow(resultSet,
 					rowNum));
+			
+			Array path = resultSet.getArray("path");
+			graph.setPath((String []) path.getArray());
 
 			// get node data
 			AnnisNode node = annisNodeRowMapper.mapRow(resultSet, rowNum);

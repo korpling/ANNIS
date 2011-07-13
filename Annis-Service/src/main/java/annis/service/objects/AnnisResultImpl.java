@@ -362,4 +362,10 @@ public class AnnisResultImpl implements AnnisResult
 	{
 		return graph.getDocumentName();
 	}
+
+	@Override
+	public String[] getPath()
+	{
+		return graph.getPath();
+	}
 }

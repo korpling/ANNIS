@@ -29,28 +29,33 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class AnnotationGraph implements Serializable {
+public class AnnotationGraph implements Serializable
+{
 
 	// this class is sent to the front end
 	private static final long serialVersionUID = -1525612317405210436L;
 
+	// metadata for searchresult
 	private String documentName;
-	
+	private String[] path;
+
 	// graph is defined by list of nodes and tokens
 	private List<AnnisNode> nodes;
 	private List<Edge> edges;
-	
+
 	// annotation graph for nodes with these ids
 	private Set<Long> matchedNodeIds;
-	
+
 	// fn: token index -> token
 	private Map<Long, AnnisNode> tokenByIndex;
-	
-	public AnnotationGraph() {
+
+	public AnnotationGraph()
+	{
 		this(new ArrayList<AnnisNode>(), new ArrayList<Edge>());
 	}
-	
-	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> edges) {
+
+	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> edges)
+	{
 		this.nodes = nodes;
 		this.edges = edges;
 		this.matchedNodeIds = new HashSet<Long>();
@@ -58,100 +63,129 @@ public class AnnotationGraph implements Serializable {
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		List<Long> ids = new ArrayList<Long>();
 		for (AnnisNode node : nodes)
 			ids.add(node.getId());
 		List<String> _edges = new ArrayList<String>();
-		for (Edge edge : edges) {
-			Long src = edge.getSource() != null ? edge.getSource().getId() : null;
+		for (Edge edge : edges)
+		{
+			Long src = edge.getSource() != null ? edge.getSource().getId()
+					: null;
 			long dst = edge.getDestination().getId();
-			String edgeType = edge.getEdgeType() != null ? edge.getEdgeType().toString() : null;
+			String edgeType = edge.getEdgeType() != null ? edge.getEdgeType()
+					.toString() : null;
 			String name = edge.getQualifiedName();
 			_edges.add(src + "->" + dst + " " + name + " " + edgeType);
 		}
-		return "match: " + StringUtils.join(matchedNodeIds, "-") + "; nodes: " + ids + "; edges: " + _edges;
+		return "match: " + StringUtils.join(matchedNodeIds, "-") + "; nodes: "
+				+ ids + "; edges: " + _edges;
 	}
-	
-	public void addMatchedNodeId(Long id) {
+
+	public void addMatchedNodeId(Long id)
+	{
 		matchedNodeIds.add(id);
 	}
-	
-	public boolean addNode(AnnisNode node) {
+
+	public boolean addNode(AnnisNode node)
+	{
 		// save the graph in node
 		node.setGraph(this);
-		
+
 		// save tokens
 		if (node.isToken())
 			tokenByIndex.put(node.getTokenIndex(), node);
-		
-		// add node to graph	
+
+		// add node to graph
 		return nodes.add(node);
 	}
-	
-	public boolean addEdge(Edge edge) {
+
+	public boolean addEdge(Edge edge)
+	{
 		return edges.add(edge);
 	}
-	
-	public AnnisNode getToken(long tokenIndex) {
+
+	public AnnisNode getToken(long tokenIndex)
+	{
 		return tokenByIndex.get(tokenIndex);
 	}
 
-	public List<AnnisNode> getTokens() {
+	public List<AnnisNode> getTokens()
+	{
 		List<AnnisNode> tokens = new ArrayList<AnnisNode>();
-		for (AnnisNode node : nodes) {
+		for (AnnisNode node : nodes)
+		{
 			if (node.isToken())
 				tokens.add(node);
 		}
-		Collections.sort(tokens, new Comparator<AnnisNode>() {
+		Collections.sort(tokens, new Comparator<AnnisNode>()
+		{
 
-			public int compare(AnnisNode o1, AnnisNode o2) {
+			public int compare(AnnisNode o1, AnnisNode o2)
+			{
 				return o1.getTokenIndex().compareTo(o2.getTokenIndex());
 			}
-			
+
 		});
 		return tokens;
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+	{
 		if (obj == null || !(obj instanceof AnnotationGraph))
 			return false;
 
 		AnnotationGraph other = (AnnotationGraph) obj;
-		
-		return new EqualsBuilder()
-			.append(this.nodes, other.nodes)
-			.append(this.edges, other.edges)
-			.append(this.matchedNodeIds, other.matchedNodeIds)
-			.isEquals();
-	}
-	
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(nodes).append(edges).append(matchedNodeIds).toHashCode();
+
+		return new EqualsBuilder().append(this.nodes, other.nodes)
+				.append(this.edges, other.edges)
+				.append(this.matchedNodeIds, other.matchedNodeIds).isEquals();
 	}
 
-	///// Getter / Setter
-	
-	public List<AnnisNode> getNodes() {
+	@Override
+	public int hashCode()
+	{
+		return new HashCodeBuilder().append(nodes).append(edges)
+				.append(matchedNodeIds).toHashCode();
+	}
+
+	// /// Getter / Setter
+
+	public List<AnnisNode> getNodes()
+	{
 		return nodes;
 	}
 
-	public List<Edge> getEdges() {
+	public List<Edge> getEdges()
+	{
 		return edges;
 	}
-	
-	public Set<Long> getMatchedNodeIds() {
+
+	public Set<Long> getMatchedNodeIds()
+	{
 		return matchedNodeIds;
 	}
-	
-	public String getDocumentName() {
+
+	public String getDocumentName()
+	{
 		return documentName;
 	}
-	
-	public void setDocumentName(String documentName) {
+
+	public void setDocumentName(String documentName)
+	{
 		this.documentName = documentName;
+	}
+
+	public String[] getPath()
+	{
+		return path;
+	}
+
+	public void setPath(String[] path)
+	{
+		this.path = path;
 	}
 
 }
