@@ -302,12 +302,14 @@ public class SearchResultServlet extends HttpServlet
     {
       // put first match corpus id into result
       if(!json.has("corpusId") && markedAndCoveredNodes.containsKey(n))
-      {
-        json.putOnce("corpusId", "" + n.getCorpus());
-      }
+    	  json.putOnce("corpusId", "" + n.getCorpus());
+      
       
       if(!json.has("documentName"))
     	  json.putOnce("documentName", result.getDocumentName());
+      
+      if(!json.has("documentPath"))
+    	  json.putOnce("documentPath", result.getPath());
       
       textIdListFromResult.add(n.getTextId());
       
