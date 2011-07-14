@@ -310,6 +310,7 @@ Ext.onReady(function() {
         {
           id : 'documentInfo',
           text : 'Document Info',
+          ctCls: 'annis-toolbar-btn',
           menu : documentNameSelectionMenu          
         }
         ]
