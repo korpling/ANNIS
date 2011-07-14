@@ -134,9 +134,58 @@ Ext.onReady(function() {
   }
   var tokenLevelSelectionMenu = new Ext.menu.Menu({
     id: 'mainMenu',
-    items: [ ]
+    items: []
   }); // end tokenLevelSelectionMenu
 
+  
+  var docNameChecked = true;
+  var docPathChecked = true;  
+  var elHeight; 
+
+  var documentNameSelectionMenu = new Ext.menu.Menu({
+  id : 'documentInfoMenu',
+  items : [ new Ext.menu.CheckItem({
+    id : 'docName',
+    text : 'show Document Name',
+    checked : true,
+    checkHandler : function(item, checked)
+    {
+      var el = Ext.select("#gridSearchResult div.docName");
+      if (!checked) {        
+        elHeight = el.first().getHeight();        
+        el.setHeight(0, true);
+        el.hide(true);
+      } else
+      {
+        console.log(elHeight);
+        el.setHeight(elHeight, true);
+        el.show(true);
+      }
+      docNameChecked = checked;
+    }
+  }), new Ext.menu.CheckItem({
+    id : 'docPath',
+    text : 'show Document Path',
+    checked : true,
+    checkHandler : function(item, checked)
+    {
+      var el = Ext.select("#gridSearchResult div.docPath");
+      if (!checked) {        
+        elHeight = el.first().getHeight();        
+        el.setHeight(0, true);
+        el.hide(true);
+      } else
+      {
+        console.log(elHeight);
+        el.setHeight(elHeight, true);
+        el.show(true);
+      }
+      docPathChecked = checked;
+    }
+
+  }) ]
+});
+  
 
   /** The JsonStore for the search result */
   var storeSearchResult = new Ext.data.JsonStore({
@@ -148,7 +197,7 @@ Ext.onReady(function() {
     id: 'storeSearchResult',
     root: 'resultSet',
     totalProperty: 'totalCount',
-    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker', 'markerExact', 'documentName'],
+    fields: ['id', 'callbackId', 'textIdList', 'token', 'tokenNamespaces', 'visualizer', 'corpusId', 'marker', 'markerExact', 'documentName', 'documentPath'],
 
     // turn on remote sorting
     remoteSort: true,
@@ -257,6 +306,11 @@ Ext.onReady(function() {
               Ext.Msg.alert('Citation', '<textarea readonly="f" wrap="virtual" rows="5" cols="60">' + Citation.generate() + "</textarea>");
             }
           }
+        },
+        {
+          id : 'documentInfo',
+          text : 'Document Info',
+          menu : documentNameSelectionMenu          
         }
         ]
       }); // end pagingToolbar
@@ -346,9 +400,21 @@ Ext.onReady(function() {
 
 
       var output = '';
+      // this is for showing document-name or paths
+      var displayNone = 'style="display : none;"';       
 
-      output += '<div id="kwic-' + rowData.callbackId + '" class="SearchResultWindow kwic">\n';
-      output += '<h1>Document: ' + rowData.documentName + '</h1>';
+      output += '<div id="kwic-' + rowData.callbackId
+          + '" class="SearchResultWindow kwic">\n';
+      
+      // check if we should show the docname or path
+      output += '<div class="docName" '
+          + ((docNameChecked) ? '' : displayNone) + '>Document: '
+          + rowData.documentName + '</div>';
+      output += '<div class="docPath"'
+          + ((docPathChecked) ? '' : displayNone) + '>Path: '
+          + rowData.documentPath.reverse().join(" > ") + '</div>';
+      // end check if we should show the docname or path
+      
       output += '<table id="table-' + rowData.callbackId + '">\n';
 
       for(var i=0; i < rowData.textIdList.length; i++)
