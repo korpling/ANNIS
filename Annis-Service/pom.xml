@@ -35,6 +35,13 @@
       <version>1.4</version>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.5</version>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
