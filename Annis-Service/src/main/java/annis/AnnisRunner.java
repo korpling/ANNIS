@@ -18,6 +18,7 @@ package annis;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.GraphExtractor;
+import annis.dao.MatrixExtractor;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -178,12 +179,27 @@ public class AnnisRunner extends AnnisBaseRunner
 
     String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
 
-    out.println("CREATE TEMPORARY VIEW matched_nodes AS " + sql + ";");
+    out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
     GraphExtractor ge = new GraphExtractor();
     ge.setMatchedNodesViewName("matched_nodes");
     out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
       new HashMap<Long, Properties>())
+      + ";");
+  }
+  
+  public void doSqlMatrix(String annisQuery)
+  {
+    // sql query
+    QueryData queryData = parse(annisQuery);
+
+    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+
+    out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
+
+    MatrixExtractor me = new MatrixExtractor();
+    me.setMatchedNodesViewName("matched_nodes");
+    out.println(me.getMatrixQuery(corpusList, queryData.getMaxWidth())
       + ";");
   }
 

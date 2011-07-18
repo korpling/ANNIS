@@ -26,6 +26,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -92,14 +93,14 @@ public class WekaHelper
             valueByName.put(annotation.getQualifiedName(), annotation.getValue());
           }
           line.add("'" + span.getId() + "'");
-          line.add("'" + span.getCoveredText() + "'");
+          line.add("'" + StringEscapeUtils.escapeJavaScript(span.getCoveredText()) + "'");
         }
 
         for (String name : columnsByNodePos.get(k))
         {
           if (valueByName.containsKey(name))
           {
-            line.add("'" + valueByName.get(name) + "'");
+            line.add("'" + StringEscapeUtils.escapeJavaScript(valueByName.get(name)) + "'");
           }
           else
           {

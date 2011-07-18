@@ -17,10 +17,8 @@ package annis.dao;
 
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import annis.model.Annotation;
-import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -95,18 +93,27 @@ public class MatrixExtractor implements ResultSetExtractor
           String value = null;
 
           // fugly, but array_agg(ARRAY['a'::varchar, 'b', 'c']) does not work
-          String[] split1 = annotationString.split("=");
-          String[] split2 = split1[0].split(":");
-          if (split2.length > 1)
+          String[] split = annotationString.split(":");
+          if (split.length > 2)
           {
-            namespace = split2[0];
-            name = split2[1];
+            namespace = split[0];
+            name = split[1];
+            value = split[2];
+          }
+          else if(split.length > 1)
+          {
+            name = split[0];
+            value = split[1];
           }
           else
           {
-            name = split2[0];
+            name = split[0];
           }
-          value = split1[1];
+          
+          if(value != null)
+          {
+            value = new String(Base64.decodeBase64(value));
+          }
 
           annotations.add(new Annotation(namespace, name, value));
         }
@@ -147,7 +154,7 @@ public class MatrixExtractor implements ResultSetExtractor
 
   }
 
-  private String getContextQuery(List<Long> corpusList, int maxWidth)
+  public String getMatrixQuery(List<Long> corpusList, int maxWidth)
   {
     StringBuilder keySb = new StringBuilder();
     keySb.append("ARRAY[matches.id1");
@@ -167,7 +174,9 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append(key);
     sb.append(",\nfacts.id AS id,\n");
     sb.append("min(substr(text.text, facts.left+1,facts.right-facts.left)) AS span,\n");
-    sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace || ':', '') || facts.node_annotation_name || '=' || facts.node_annotation_value) AS annotations");
+    sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace || ':', '') "
+      + "|| facts.node_annotation_name || ':' "
+      + "|| encode(facts.node_annotation_value::bytea, 'base64')) AS annotations");
     sb.append("\nFROM\n");
     sb.append("\t");
     sb.append(matchedNodesViewName);
@@ -176,7 +185,7 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append("\t");
     sb.append(FACTS_TABLE);
     sb.append(" AS facts,\n");
-    sb.append("text AS text\n");
+    sb.append("\t\"text\" AS \"text\"\n");
 
     sb.append("WHERE\n");
 
@@ -207,7 +216,7 @@ public class MatrixExtractor implements ResultSetExtractor
 
   public List<AnnotatedMatch> queryMatrix(JdbcTemplate jdbcTemplate, List<Long> corpusList, int maxWidth)
   {
-    return (List<AnnotatedMatch>) jdbcTemplate.query(getContextQuery(corpusList, maxWidth), this);
+    return (List<AnnotatedMatch>) jdbcTemplate.query(getMatrixQuery(corpusList, maxWidth), this);
   }
 
   public String getMatchedNodesViewName()

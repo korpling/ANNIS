@@ -21,6 +21,7 @@ carefully, which is located in the "3RD_PARTY_LICENCES" folder.
 
 List of included software:
  * Apache Commons CLI
+ * Apache Commons Codec
  * Apache Commons Collections
  * Apache Commons IO
  * Apache Commons Lang
