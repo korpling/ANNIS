@@ -66,14 +66,6 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
           conditions.add(join("=",
             tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
             tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref")));
-
-          // check if we have to apply this constraint on the facts table as well
-          if (tables(copyNodes[left]).usesPartialFacts() && tables(copyNodes[right]).usesPartialFacts())
-          {
-            conditions.add(join("=",
-              tables(copyNodes[left]).aliasedColumn(FACTS_TABLE, "corpus_ref"),
-              tables(copyNodes[right]).aliasedColumn(FACTS_TABLE, "corpus_ref")));
-          }
         }
       }
     }
