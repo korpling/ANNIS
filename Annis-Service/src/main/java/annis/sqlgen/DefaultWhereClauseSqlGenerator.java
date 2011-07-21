@@ -64,12 +64,6 @@ public class DefaultWhereClauseSqlGenerator
     addAnnotationConditions(node, conditions, node.getNodeAnnotations(),
       NODE_ANNOTATION_TABLE, "node_annotation_");
 
-    if (tables(node).usesPartialFacts())
-    {
-      addAnnotationConditions(node, conditions, node.getNodeAnnotations(), FACTS_TABLE,
-        "node_annotation_");
-    }
-
     addNodeJoinConditions(node, conditions);
     addEdgeJoinConditions(node, conditions, corpusList);
 
@@ -283,25 +277,16 @@ public class DefaultWhereClauseSqlGenerator
   protected void addNodeConditions(AnnisNode node,
     List<String> conditions, Set<Annotation> annotations, List<Long> corpusList)
   {
-    boolean usesFacts = tables(node).usesPartialFacts();
 
     if (node.getSpannedText() != null)
     {
       TextMatching textMatching = node.getSpanTextMatching();
       conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(NODE_TABLE, "span"), sqlString(node.getSpannedText(), textMatching)));
-      if (usesFacts)
-      {
-        conditions.add(join(textMatching.sqlOperator(), tables(node).aliasedColumn(FACTS_TABLE, "span"), sqlString(node.getSpannedText(), textMatching)));
-      }
     }
 
     if (node.isToken())
     {
       conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
-      if (usesFacts)
-      {
-        conditions.add(tables(node).aliasedColumn(FACTS_TABLE, "is_token") + " IS TRUE");
-      }
     }
     if (node.isRoot())
     {
@@ -311,18 +296,10 @@ public class DefaultWhereClauseSqlGenerator
     if (node.getNamespace() != null)
     {
       conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "namespace"), sqlString(node.getNamespace())));
-      if (usesFacts)
-      {
-        conditions.add(join("=", tables(node).aliasedColumn(FACTS_TABLE, "namespace"), sqlString(node.getNamespace())));
-      }
     }
     if (node.getName() != null)
     {
       conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "name"), sqlString(node.getName())));
-      if (usesFacts)
-      {
-        conditions.add(join("=", tables(node).aliasedColumn(FACTS_TABLE, "name"), sqlString(node.getName())));
-      }
     }
     if (node.getArity() != null)
     {
@@ -388,13 +365,6 @@ public class DefaultWhereClauseSqlGenerator
   {
     conditions.add(join(operator, tables(node).aliasedColumn(NODE_TABLE, leftColumn),
       tables(target).aliasedColumn(NODE_TABLE, rightColumn)));
-
-    // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
-    {
-      conditions.add(join(operator, tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
-        tables(target).aliasedColumn(FACTS_TABLE, rightColumn)));
-    }
   }
 
   protected void betweenJoinOnNode(List<String> conditions, AnnisNode node, AnnisNode target,
@@ -402,13 +372,6 @@ public class DefaultWhereClauseSqlGenerator
   {
     conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
-
-    // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
-    {
-      conditions.add(between(tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
-        tables(target).aliasedColumn(FACTS_TABLE, rightColumn), min, max));
-    }
   }
 
   protected void numberJoinOnNode(List<String> conditions, AnnisNode node, AnnisNode target,
@@ -416,13 +379,6 @@ public class DefaultWhereClauseSqlGenerator
   {
     conditions.add(numberJoin(operator, tables(node).aliasedColumn(NODE_TABLE, leftColumn),
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), offset));
-
-    // if both nodes are used in a facts-table relation also apply this constraint to facts
-    if (tables(node).usesPartialFacts() && tables(target).usesPartialFacts())
-    {
-      conditions.add(numberJoin(operator, tables(node).aliasedColumn(FACTS_TABLE, leftColumn),
-        tables(target).aliasedColumn(FACTS_TABLE, rightColumn), offset));
-    }
   }
   
   protected void addLeftRightDominance(AnnisNode node, AnnisNode target , 
