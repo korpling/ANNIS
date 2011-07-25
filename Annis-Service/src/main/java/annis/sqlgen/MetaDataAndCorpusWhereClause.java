@@ -46,12 +46,6 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     {
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
         documents));
-
-      if (tables(node).usesPartialFacts())
-      {
-        conditions.add(in(tables(node).aliasedColumn(FACTS_TABLE, "corpus_ref"),
-          documents));
-      }
     }
 
     if (corpusList != null)
@@ -59,11 +53,6 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "toplevel_corpus"),
         corpusList));
 
-      if (tables(node).usesPartialFacts())
-      {
-        conditions.add(in(tables(node).aliasedColumn(FACTS_TABLE, "toplevel_corpus"),
-          corpusList));
-      }
 
       if (tables(node).usesNodeAnnotationTable() && 
         !tables(node).isMaterialized(NODE_ANNOTATION_TABLE, FACTS_TABLE))

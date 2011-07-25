@@ -40,6 +40,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
@@ -431,6 +432,13 @@ public class TestDefaultWhereClauseSqlGenerator {
         join("<>", "_node23.id", "_node42.id")
 		);
 	}
+  
+  @Test
+  public void whereClauseForIdentity() 
+  {
+    node23.addJoin(new Identical(node42));
+    checkWhereCondition(join("=", "_node23.id", "_node42.id"));
+  }
 	
 	///// Helper
 	
