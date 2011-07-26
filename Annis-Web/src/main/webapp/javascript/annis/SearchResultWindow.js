@@ -137,55 +137,9 @@ Ext.onReady(function() {
     items: []
   }); // end tokenLevelSelectionMenu
 
-  
-  var docNameChecked = true;
-  var docPathChecked = true;  
+  // save the state of doc path
   var elHeight; 
-
-  var documentNameSelectionMenu = new Ext.menu.Menu({
-  id : 'documentInfoMenu',
-  items : [ new Ext.menu.CheckItem({
-    id : 'docName',
-    text : 'show Document Name',
-    checked : true,
-    checkHandler : function(item, checked)
-    {
-      var el = Ext.select("#gridSearchResult div.docName");
-      if (!checked) {        
-        elHeight = el.first().getHeight();        
-        el.setHeight(0, true);
-        el.hide(true);
-      } else
-      {
-        console.log(elHeight);
-        el.setHeight(elHeight, true);
-        el.show(true);
-      }
-      docNameChecked = checked;
-    }
-  }), new Ext.menu.CheckItem({
-    id : 'docPath',
-    text : 'show Document Path',
-    checked : true,
-    checkHandler : function(item, checked)
-    {
-      var el = Ext.select("#gridSearchResult div.docPath");
-      if (!checked) {        
-        elHeight = el.first().getHeight();        
-        el.setHeight(0, true);
-        el.hide(true);
-      } else
-      {
-        console.log(elHeight);
-        el.setHeight(elHeight, true);
-        el.show(true);
-      }
-      docPathChecked = checked;
-    }
-
-  }) ]
-});
-  
+  var docPathStatus = true;  
 
   /** The JsonStore for the search result */
   var storeSearchResult = new Ext.data.JsonStore({
@@ -309,9 +263,27 @@ Ext.onReady(function() {
         },
         {
           id : 'documentInfo',
-          text : 'Document Info',
+          text : 'Document Path',
           ctCls: 'annis-toolbar-btn',
-          menu : documentNameSelectionMenu          
+          listeners : {
+            click : function () 
+            {
+              var el = Ext.select("#gridSearchResult div.docPath");
+
+              if (docPathStatus) {
+                elHeight = el.first().getHeight();
+                el.setHeight(0, true);
+                el.hide(true);
+                docPathStatus = !docPathStatus;
+              } else 
+              {                
+                console.log("been here");
+                el.setHeight(elHeight, true);
+                el.show(true);                
+                docPathStatus = !docPathStatus;
+              }
+            }
+          }
         }
         ]
       }); // end pagingToolbar
@@ -407,14 +379,10 @@ Ext.onReady(function() {
       output += '<div id="kwic-' + rowData.callbackId
           + '" class="SearchResultWindow kwic">\n';
       
-      // check if we should show the docname or path
-      output += '<div class="docName" '
-          + ((docNameChecked) ? '' : displayNone) + '>Document: '
-          + rowData.documentName + '</div>';
+      // check if we should show the doc path
       output += '<div class="docPath"'
-          + ((docPathChecked) ? '' : displayNone) + '>Path: '
+          + ((docPathStatus) ? '' : displayNone) + '>Path: '
           + rowData.documentPath.reverse().join(" > ") + '</div>';
-      // end check if we should show the docname or path
       
       output += '<table id="table-' + rowData.callbackId + '">\n';
 

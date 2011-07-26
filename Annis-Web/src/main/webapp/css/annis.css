@@ -9,10 +9,12 @@
   	overflow: hidden;
 }
 
-.SearchResultWindow.kwic .docName, .SearchResultWindow .docPath {
+.SearchResultWindow .docPath {
 	text-align: left;
-	font-weight: normal;	
-	color: gray;
+	font-weight: normal;
+	margin: 0 0 4px;	
+	padding: 2px 3px;
+	background: #EBF3FD;
 }
 
 .SearchResultWindow.visualizers {
