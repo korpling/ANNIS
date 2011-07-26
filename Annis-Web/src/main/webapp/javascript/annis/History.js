@@ -15,7 +15,7 @@ Ext.onReady(function()
       if ((items === undefined) || (store.getCount() > items.getCount()))
       {
         finalThis.splitButton.menu.insert(0, {
-          text : (store.getAt(0)).data['query'],
+          text : (store.getAt(0)).data.query,
           handler : function(b, e)
           {
             Ext.getCmp('queryAnnisQL').setValue(b.text);
@@ -34,7 +34,7 @@ Ext.onReady(function()
         for ( var i = recordsArray.length - 1; i >= 0; i--)
         {
           finalThis.splitButton.menu.insert(0, {
-            text : recordsArray[i].data['query'],
+            text : recordsArray[i].data.query,
             handler : function(b, e)
             {
               Ext.getCmp('queryAnnisQL').setValue(b.text);
@@ -52,7 +52,8 @@ Ext.onReady(function()
     // initiate GridView for all queries
     var store = new Ext.data.ArrayStore({
       fields : [ {
-        name : 'query', 
+        name : 'query'
+      }, {
         name : 'citation'
       } ],
       listeners : {
@@ -138,7 +139,7 @@ Ext.onReady(function()
       // insert query into arraystore and use query for index
       store.insert(0, new store.recordType({
         query : lastQuery,
-        citation : Citation.generate(),
+        citation : Citation.generate()
       }, lastQuery));
       
       if (win.isVisible())
