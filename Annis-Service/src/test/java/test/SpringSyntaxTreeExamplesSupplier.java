@@ -22,19 +22,20 @@ import java.util.Map.Entry;
 
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
+import org.junit.experimental.theories.PotentialAssignment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class SpringSyntaxTreeExamplesSupplier extends ParameterSupplier {
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List getValueSources(Object test, ParameterSignature signature) {
-		SpringSyntaxTreeExamples annotation = (SpringSyntaxTreeExamples) signature.getSupplierAnnotation();
+	public List<PotentialAssignment> getValueSources(ParameterSignature signature) {
+		SpringSyntaxTreeExamples annotation = signature.getAnnotation(SpringSyntaxTreeExamples.class);
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		@SuppressWarnings("unchecked")
 		Map<String, String> exampleMap = (Map<String, String>) ctx.getBean(annotation.exampleMap());
-		List<SyntaxTreeExample> examples = new ArrayList<SyntaxTreeExample>();
+		List<PotentialAssignment> examples = new ArrayList<PotentialAssignment>();
 		for (Entry<String, String> exampleEntry : exampleMap.entrySet()) {
 			SyntaxTreeExample example = new SyntaxTreeExample();
 			example.setQuery(exampleEntry.getKey());

@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.junit.matchers.JUnitMatchers.each;
+import static org.junit.internal.matchers.Each.each;
 import static org.mockito.Mockito.mock;
 import static test.IsCollection.isCollection;
 import static test.IsCollectionEmpty.empty;
@@ -275,20 +275,20 @@ public class TestDnfTransformer {
 		dnfTransformer.normalize(unknownPExpr);
 	}
 	
-	@DataPoint public final Start SIMPLE_PATH = newStart(newPathExpr());
-	@DataPoint public final Start SIMPLE_AND = 
+	@DataPoint public final static Start SIMPLE_PATH = newStart(newPathExpr());
+	@DataPoint public final static Start SIMPLE_AND = 
 		newStart(newAndExpr(newPathExpr(), newPathExpr()));
-	@DataPoint public final Start SIMPLE_OR =
+	@DataPoint public final static Start SIMPLE_OR =
 		newStart(newOrExpr(newPathExpr(), newPathExpr()));
-	@DataPoint public final Start NESTED_AND = 
+	@DataPoint public final static Start NESTED_AND = 
 		newStart(newAndExpr(newAndExpr(newPathExpr(), newPathExpr()), newPathExpr()));
-	@DataPoint public final Start NESTED_OR =
+	@DataPoint public final static Start NESTED_OR =
 		newStart(newOrExpr(newOrExpr(), newPathExpr()));
-	@DataPoint public final Start AND_IN_OR =
+	@DataPoint public final static Start AND_IN_OR =
 		newStart(newOrExpr(newAndExpr(newPathExpr(), newPathExpr()), newPathExpr()));
-	@DataPoint public final Start OR_IN_AND = 
+	@DataPoint public final static Start OR_IN_AND = 
 		newStart(newAndExpr(newOrExpr(newPathExpr(), newPathExpr()), newPathExpr()));
-	@DataPoint public final Start COMPLEX_EXAMPLE = 
+	@DataPoint public final static Start COMPLEX_EXAMPLE = 
 		newStart(newAndExpr(newOrExpr(newAndExpr(newPathExpr(), newPathExpr()), 
 				newOrExpr(newPathExpr(), newPathExpr())), newPathExpr()));
 	
