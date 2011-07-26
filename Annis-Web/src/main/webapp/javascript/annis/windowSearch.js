@@ -519,7 +519,7 @@ Ext.onReady(function()
     store : resultLengthStore,
     name : 'resultLength',
     id : 'resultLength',
-    fieldLabel : 'Results per page',
+    fieldLabel : 'Results Per Page',
     displayField : 'length',
     mode : 'local',
     triggerAction : 'all',
