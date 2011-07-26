@@ -15,9 +15,9 @@
  */
 package test;
 
-import org.junit.experimental.theories.PotentialParameterValue;
+import org.junit.experimental.theories.PotentialAssignment;
 
-public class SyntaxTreeExample extends PotentialParameterValue {
+public class SyntaxTreeExample extends PotentialAssignment {
 	private String query;
 	private String syntaxTree;
 
@@ -37,5 +37,10 @@ public class SyntaxTreeExample extends PotentialParameterValue {
 	}
 	public void setSyntaxTree(String syntaxTree) {
 		this.syntaxTree = syntaxTree;
+	}
+
+	@Override
+	public String getDescription() throws CouldNotGenerateValueException {
+		return "query = " + query;
 	}
 }

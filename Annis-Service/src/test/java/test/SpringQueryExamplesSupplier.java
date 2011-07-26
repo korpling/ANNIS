@@ -20,26 +20,32 @@ import java.util.List;
 
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
-import org.junit.experimental.theories.PotentialParameterValue;
+import org.junit.experimental.theories.PotentialAssignment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringQueryExamplesSupplier extends ParameterSupplier {
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List getValueSources(Object test, ParameterSignature signature) {
-		SpringQueryExamples annotation = (SpringQueryExamples) signature.getSupplierAnnotation();
+	public List<PotentialAssignment> getValueSources(ParameterSignature signature) {
+		SpringQueryExamples annotation = signature.getAnnotation(SpringQueryExamples.class);
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		@SuppressWarnings("unchecked")
 		List<String> exampleList = (List<String>) ctx.getBean(annotation.exampleList());
-		List<PotentialParameterValue> examples = new ArrayList<PotentialParameterValue>();
+		List<PotentialAssignment> examples = new ArrayList<PotentialAssignment>();
 		for (final String example : exampleList)
-			examples.add(new PotentialParameterValue() {
+			examples.add(new PotentialAssignment() {
 
 				@Override
 				public Object getValue()
 						throws CouldNotGenerateValueException {
 					return example;
+				}
+
+				@Override
+				public String getDescription()
+						throws CouldNotGenerateValueException {
+					return "query = " + example;
 				}
 				
 			});
