@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -66,14 +67,14 @@
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-      <version>1.6.5</version>
+      <version>1.6.11</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjtools</artifactId>
-      <version>1.6.5</version>
+      <version>1.6.11</version>
       <scope>compile</scope>
     </dependency>
 
@@ -108,13 +109,13 @@
       <artifactId>hamcrest-all</artifactId>
       <version>1.1</version>
     </dependency>
-
+    
     <dependency>
       <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.1_3</version>
-      <scope>compile</scope>
+      <artifactId>cglib-nodep</artifactId>
+      <version>2.2</version>
     </dependency>
+
 
     <dependency>
       <groupId>jline</groupId>
@@ -244,7 +245,7 @@
     </plugins>
   </build>
 
-   <reporting>
+  <reporting>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
