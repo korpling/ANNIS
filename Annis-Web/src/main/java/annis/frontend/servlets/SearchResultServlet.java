@@ -246,19 +246,17 @@ public class SearchResultServlet extends HttpServlet
       this.cleanSession(session);
       out.println("Please select a Corpus.");
     }
-    catch (AnnisServiceException e)
+    catch(DataAccessResourceFailureException ex)
     {
       this.cleanSession(session);
-      Throwable secondLevelCause = e.getCause();
-      if(secondLevelCause != null && secondLevelCause.getCause() != null && secondLevelCause.getCause() instanceof DataAccessResourceFailureException)
-      {
-        out.println("Timeout or connection error");
-      }
-      else
-      {
-        out.println(e.getMessage());
-      }
+      out.println("Timeout or connection error");
       response.setStatus(504);
+    }
+    catch (Exception ex)
+    {
+      this.cleanSession(session);
+      out.println(ex.getMessage());
+      response.setStatus(500);
     }
 
 

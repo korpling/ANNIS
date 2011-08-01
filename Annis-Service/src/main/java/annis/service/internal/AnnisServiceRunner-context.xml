@@ -39,9 +39,6 @@
     <property name="maxContext" value="${annis.max-context}" />
 	</bean>
 
-	<!-- Exception handling aspect for AnnisService -->
-	<bean class="annis.service.AnnisServiceExceptionHandler"/>
-
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
 		<property name="serviceName" value="AnnisService"/>
 		<property name="service" ref="annisService"/>

@@ -76,10 +76,7 @@
 	
 	<!-- SqlGenerator -->
   <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
-	
-	<!-- Timing Aspect for DAO methods -->
-  <bean class="annis.dao.DaoTiming"/>
-	
+		
   <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
     <property name="requiredType" value="java.lang.Long"/>
   </bean>
