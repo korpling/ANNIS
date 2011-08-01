@@ -54,93 +54,35 @@ public class MatrixExtractor implements ResultSetExtractor
     {
       long id = resultSet.getLong("id");
       String coveredText = resultSet.getString("span");
-      List<Annotation> annotations = new ArrayList<Annotation>();
+      
+      Array arrayAnnotation = resultSet.getArray("annotations");
+      Array arrayMeta = resultSet.getArray("metadata");
+      
+      List<Annotation> annotations =  extractAnnotations(arrayAnnotation);
+      List<Annotation> metaData = extractAnnotations(arrayMeta);
 
-      Array array = resultSet.getArray("annotations");
-      if (array != null)
+      // create key
+      Array sqlKey = resultSet.getArray("key");
+      Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
+      Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+        "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
+
+      Long[] keyArray = (Long[]) sqlKey.getArray();
+      int matchWidth = keyArray.length;
+      List<Long> key = Arrays.asList(keyArray);
+      
+      if (!matchesByGroup.containsKey(key))
       {
-        /* I'd rather get the type components directly, but PostgreSQL doesn't support this?
-         * A CSV parser that handles quoted elements would work!
-         * Try: http://opencsv.sourceforge.net/
-        System.out.println(array.getBaseTypeName());
-        ResultSet annotationRs = array.getResultSet();
-        ResultSetMetaData meta = annotationRs.getMetaData();
-        int count = meta.getColumnCount();
-        System.out.println("columns in annotation type: " + count);
-        for (int j = 1; j <= count; ++j) {
-        System.out.println("column[" + j + "]: " + meta.getColumnName(j) + "(" + meta.getColumnTypeName(j) + ")");
-        }
-        int k = 0;
-        while (annotationRs.next()) {
-        PGobject anno = (PGobject) annotationRs.getObject("value");
-        PGtokenizer t = new PGtokenizer(PGtokenizer.remove(anno.getValue(), "(", ")"), ',');
-        if (t.getSize() != 3)
-        throw new DataRetrievalFailureException("Could not read to annotation type: " + anno.getValue());
-        String namespace = t.getToken(0);
-        String name = t.getToken(1);
-        String value = t.getToken(2);
-        annotations.add(new Annotation(namespace, name, value));
-        }
-        System.out.println("rows: " + k);
-         */
-
-        String[] annotationStrings = (String[]) array.getArray();
-
-        for (String annotationString : annotationStrings)
+        matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
+      }
+      
+      // set annotation spans for *all* positions of the id
+      // (node could have matched several times)
+      for(int posInMatch=0; posInMatch < key.size(); posInMatch++)
+      {
+        if(key.get(posInMatch) == id)
         {
-          String namespace = null;
-          String name = null;
-          String value = null;
-
-          // fugly, but array_agg(ARRAY['a'::varchar, 'b', 'c']) does not work
-          String[] split = annotationString.split(":");
-          if (split.length > 2)
-          {
-            namespace = split[0];
-            name = split[1];
-            value = split[2];
-          }
-          else if(split.length > 1)
-          {
-            name = split[0];
-            value = split[1];
-          }
-          else
-          {
-            name = split[0];
-          }
-          
-          if(value != null)
-          {
-            value = new String(Base64.decodeBase64(value));
-          }
-
-          annotations.add(new Annotation(namespace, name, value));
-        }
-
-        // create key
-        Array sqlKey = resultSet.getArray("key");
-        Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
-        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-          "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
-
-        Long[] keyArray = (Long[]) sqlKey.getArray();
-        int matchWidth = keyArray.length;
-        List<Long> key = Arrays.asList(keyArray);
-
-        if (!matchesByGroup.containsKey(key))
-        {
-          matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
-        }
-
-        // set annotation spans for *all* positions of the id
-        // (node could have matched several times)
-        for(int posInMatch=0; posInMatch < key.size(); posInMatch++)
-        {
-          if(key.get(posInMatch) == id)
-          {
-            matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations);
-          }
+          matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations, metaData);
         }
       }
     }
@@ -218,6 +160,43 @@ public class MatrixExtractor implements ResultSetExtractor
     Logger.getLogger(MatrixExtractor.class).debug("generated SQL for matrix:\n" + sb.toString());
 
     return sb.toString();
+  }
+  
+  private List<Annotation> extractAnnotations(Array array) throws SQLException
+  {
+    List<Annotation> result = new ArrayList<Annotation>();
+    
+    if(array != null)
+    {
+      String[] arrayLines = (String[]) array.getArray();
+      
+      for(String line : arrayLines)
+      {
+        String namespace;
+        String name;
+        String value;
+        
+        String[] split = line.split(":");
+        if(split.length > 2)
+        {
+          namespace = split[0];
+          name = split[1];
+          value = split[2];
+        }
+        else if(split.length > 1)
+        {
+          name = split[0];
+          value = split[1];
+        }
+        else
+        {
+          name = split[0];
+        }
+        
+      }
+    }
+    
+    return result;
   }
 
   public List<AnnotatedMatch> queryMatrix(JdbcTemplate jdbcTemplate, List<Long> corpusList, int maxWidth)
