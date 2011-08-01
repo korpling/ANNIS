@@ -704,21 +704,35 @@ Ext.onReady(function()
 
   var btnQueryBuilder = new Ext.Button({
     id : 'btnQueryBuilder',
-    text : 'Show >>',
-    fieldLabel : 'Query Builder',
+    text : 'Query Builder',
     enableToggle : true,
     toggleHandler : function(button, state)
     {
       if (state)
-      {
-        button.setText('Hide <<');
         windowSearchForm.fireEvent('showQueryBuilder');
-      } else
-      {
-        button.setText('Show >>');
-        windowSearchForm.fireEvent('hideQueryBuilder');
-      }
+      else
+        windowSearchForm.fireEvent('hideQueryBuilder');      
     }
+  });
+  
+  var searchResultButton = new Ext.Button({
+    id : 'btnSearchResult',
+    text : 'Show Result',
+    listeners : {
+      click : getResult
+    },
+    margins : {
+      top:0, right:10, bottom:0, left:0
+    }
+  });
+
+  var groupButtons = new Ext.Panel({
+    layout : {
+      type : 'hbox'
+    },
+    fieldLabel : 'Search', 
+    xtype : 'textfield',
+    items : [ searchResultButton, btnQueryBuilder ]
   });
 
   var queryAnnisSQL = {
@@ -750,7 +764,7 @@ Ext.onReady(function()
     height: 200,
     defaultType: 'textfield',
     monitorValid: true,
-    items: [queryAnnisSQL, btnQueryBuilder,
+    items: [queryAnnisSQL, groupButtons,
     {
       id: 'matchCount',
       width: 200,
