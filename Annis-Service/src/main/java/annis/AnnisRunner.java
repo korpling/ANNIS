@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -132,11 +133,11 @@ public class AnnisRunner extends AnnisBaseRunner
             }
           }
         }
-
-        for (String table : output.keySet())
+        
+        for (Entry<String,List<String>> entry: output.entrySet())
         {
-          File fOutput = new File(table + "_attributes.csv");
-          FileUtils.writeLines(fOutput, output.get(table));
+          File fOutput = new File(entry.getKey() + "_attributes.csv");
+          FileUtils.writeLines(fOutput, entry.getValue());
         }
 
       }
