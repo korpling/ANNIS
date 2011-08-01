@@ -93,14 +93,14 @@ public class WekaHelper
             valueByName.put(annotation.getQualifiedName(), annotation.getValue());
           }
           line.add("'" + span.getId() + "'");
-          line.add("'" + StringEscapeUtils.escapeJavaScript(span.getCoveredText()) + "'");
+          line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
         }
 
         for (String name : columnsByNodePos.get(k))
         {
           if (valueByName.containsKey(name))
           {
-            line.add("'" + StringEscapeUtils.escapeJavaScript(valueByName.get(name)) + "'");
+            line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
           }
           else
           {
