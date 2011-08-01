@@ -18,18 +18,29 @@ package annis.dao;
 import java.util.List;
 
 import annis.model.Annotation;
+import java.util.LinkedList;
 
 public class AnnotatedSpan {
 
 	private long id;
 	private String coveredText;
 	private List<Annotation> annotations;
+  private List<Annotation> metadata;
 
-	public AnnotatedSpan(long id, String coveredText, List<Annotation> annotations) {
+  public AnnotatedSpan(long id, String coveredText,
+    List<Annotation> annotations)
+  {
+    this(id, coveredText, annotations, new LinkedList<Annotation>());
+  }
+  
+	public AnnotatedSpan(long id, String coveredText, 
+    List<Annotation> annotations, List<Annotation> metadata) 
+  {
 		super();
 		this.id = id;
 		this.coveredText = coveredText;
 		this.annotations = annotations;
+    this.metadata = metadata;
 	}
 
 	public long getId() {
@@ -55,5 +66,16 @@ public class AnnotatedSpan {
 	public void setAnnotations(List<Annotation> annotations) {
 		this.annotations = annotations;
 	}
+
+  public List<Annotation> getMetadata()
+  {
+    return metadata;
+  }
+
+  public void setMetadata(List<Annotation> metadata)
+  {
+    this.metadata = metadata;
+  }
 	
+  
 }
