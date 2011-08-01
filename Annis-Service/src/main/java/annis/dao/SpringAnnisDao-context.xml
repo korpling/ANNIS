@@ -76,15 +76,7 @@
 	
 	<!-- SqlGenerator -->
   <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
-	
-	<!-- Timing Aspect for DAO methods -->
-  <bean class="annis.dao.DaoTiming"/>
-	
-	<!-- Custom transaction management, so that all AnnisDao methods are read-only -->
-  <bean class="annis.dao.DaoTransactionManagement">
-    <property name="transactionManager" ref="transactionManager"/>
-  </bean>
-	
+		
   <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
     <property name="requiredType" value="java.lang.Long"/>
   </bean>
