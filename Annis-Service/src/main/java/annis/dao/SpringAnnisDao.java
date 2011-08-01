@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Properties;
 import org.apache.log4j.Level;
+import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -109,6 +110,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional
   public int countMatches(final List<Long> corpusList, final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
@@ -117,6 +119,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional
   public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
@@ -127,6 +130,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
@@ -136,6 +140,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional
   public String planGraph(QueryData aql, List<Long> corpusList,
     long offset, long limit, int left, int right,
     boolean analyze)
@@ -149,8 +154,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       offset, limit, left, right, analyze, corpusConfiguration);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @Transactional
   public List<AnnotationGraph> retrieveAnnotationGraph(
     List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
   {
@@ -188,16 +193,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return queryData;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @Transactional(readOnly=true)
   public List<AnnisCorpus> listCorpora()
   {
     return (List<AnnisCorpus>) getJdbcTemplate().query(
       listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @Transactional(readOnly=true)
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues)
   {
@@ -206,8 +211,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       listValues, onlyMostFrequentValues), listAnnotationsSqlHelper);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @Transactional(readOnly=true)
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
     List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(getJdbcTemplate(), textId);
@@ -222,8 +227,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return graphs.get(0);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @Transactional(readOnly=true)
   public List<Annotation> listCorpusAnnotations(long corpusId)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
@@ -233,6 +238,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional(readOnly=true)
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
@@ -241,6 +247,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
+  @Transactional(readOnly=true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
   {
     try
