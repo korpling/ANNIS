@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,68 @@ import javax.swing.SwingWorker;
 public class InitDialog extends javax.swing.JDialog
 {
 
+  private class InitDialogWorker extends SwingWorker<String, Void>
+    implements Serializable
+  {
+
+    private InitDialog parent;
+
+    public InitDialogWorker(InitDialog parent)
+    {
+      this.parent = parent;
+    }
+
+    @Override
+    protected String doInBackground() throws Exception
+    {
+      try
+      {
+        corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
+          "anniskickstart", "annisKickstartPassword", "postgres",
+          txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
+
+        return "";
+      }
+      catch(Exception ex)
+      {
+        parent.setVisible(false);
+        ExceptionDialog dlg = new ExceptionDialog(parent, ex);
+        dlg.setVisible(true);
+      }
+
+      return "ERROR";
+    }
+
+    @Override
+    protected void done()
+    {
+      pbInit.setIndeterminate(false);
+      btOk.setEnabled(true);
+      btCancel.setEnabled(true);
+      try
+      {
+        if("".equals(this.get()))
+        {
+          pbInit.setValue(100);
+          JOptionPane.showMessageDialog(null, "Database initialized.", "INFO",
+            JOptionPane.INFORMATION_MESSAGE);
+          setVisible(false);
+        }
+        else
+        {
+          pbInit.setValue(0);
+        }
+      }
+      catch(InterruptedException ex)
+      {
+        Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      catch(ExecutionException ex)
+      {
+        Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+  }
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, Void> initWorker;
 
@@ -40,60 +103,7 @@ public class InitDialog extends javax.swing.JDialog
 
     this.corpusAdministration = corpusAdministration;
 
-    final InitDialog finalThis = this;
-
-    initWorker = new SwingWorker<String, Void>()
-    {
-
-      @Override
-      protected String doInBackground() throws Exception
-      {
-        try
-        {
-          corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
-            "anniskickstart", "annisKickstartPassword", "postgres",
-            txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
-
-          return "";
-        } catch (Exception ex)
-        {
-          finalThis.setVisible(false);
-          ExceptionDialog dlg = new ExceptionDialog(finalThis, ex);
-          dlg.setVisible(true);
-        }
-
-        return "ERROR";
-      }
-
-      @Override
-      protected void done()
-      {
-        pbInit.setIndeterminate(false);
-        btOk.setEnabled(true);
-        btCancel.setEnabled(true);
-        try
-        {
-          if ("".equals(this.get()))
-          {
-            pbInit.setValue(100);
-            JOptionPane.showMessageDialog(null, "Database initialized.", "INFO",
-              JOptionPane.INFORMATION_MESSAGE);
-            setVisible(false);
-          }
-          else
-          {
-            pbInit.setValue(0);
-          }
-        }
-        catch (InterruptedException ex)
-        {
-          Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex)
-        {
-          Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      }
-    };
+    initWorker = new InitDialogWorker(this);
 
   }
 
@@ -194,14 +204,13 @@ public class InitDialog extends javax.swing.JDialog
 
     private void btOkActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btOkActionPerformed
     {//GEN-HEADEREND:event_btOkActionPerformed
-      
+
       pbInit.setIndeterminate(true);
       btOk.setEnabled(false);
       btCancel.setEnabled(false);
       initWorker.execute();
 
     }//GEN-LAST:event_btOkActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton btCancel;
   private javax.swing.JButton btOk;
