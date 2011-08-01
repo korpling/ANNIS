@@ -40,9 +40,8 @@ public class TestAnnisServiceImpl extends AnnisHomeTest {
 	
 	@Test
 	public void springManagedInstanceHasAllDependencies() {
-		// Spring exports only the AnnisService interface, because
-		// the bean is wrapped using RmiServiceExporter
-		AnnisServiceImpl annisServiceImpl = (AnnisServiceImpl) TestHelper.proxyTarget(springManagedAnnisServiceImpl);
+    
+		AnnisServiceImpl annisServiceImpl = (AnnisServiceImpl)springManagedAnnisServiceImpl;
 		assertThat(annisServiceImpl.getAnnisDao(), is(not(nullValue())));
 		assertThat(annisServiceImpl.getExternalFileMgr(), is(not(nullValue())));
 		
