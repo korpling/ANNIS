@@ -52,7 +52,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Properties;
 import org.apache.log4j.Level;
-import org.apache.log4j.Priority;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao

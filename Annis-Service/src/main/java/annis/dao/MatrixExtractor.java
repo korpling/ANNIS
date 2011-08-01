@@ -176,16 +176,22 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append("min(substr(text.text, facts.left+1,facts.right-facts.left)) AS span,\n");
     sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace || ':', '') "
       + "|| facts.node_annotation_name || ':' "
-      + "|| encode(facts.node_annotation_value::bytea, 'base64')) AS annotations");
-    sb.append("\nFROM\n");
+      + "|| encode(facts.node_annotation_value::bytea, 'base64')) AS annotations,\n");
+    sb.append("array_agg(DISTINCT coalesce(ca.namespace || ':', '') "
+      + "|| ca.name || ':' "
+      + "|| encode(ca.value::bytea, 'base64')) AS metadata\n");
+    
+    sb.append("FROM\n");
     sb.append("\t");
     sb.append(matchedNodesViewName);
     sb.append(" AS matches,\n");
 
+    sb.append("\t\"text\" AS \"text\",\n");
+    
     sb.append("\t");
     sb.append(FACTS_TABLE);
-    sb.append(" AS facts,\n");
-    sb.append("\t\"text\" AS \"text\"\n");
+    sb.append(" AS facts\n");
+    sb.append("\t LEFT OUTER JOIN corpus_annotation AS ca ON (ca.corpus_ref = facts.corpus_ref)\n");
 
     sb.append("WHERE\n");
 
