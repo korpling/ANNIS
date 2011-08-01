@@ -100,7 +100,7 @@ public class WekaHelper
         {
           if (valueByName.containsKey(name))
           {
-            line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
+            line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
           }
           else
           {
