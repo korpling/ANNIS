@@ -718,7 +718,16 @@ Ext.onReady(function()
   var searchResultButton = new Ext.Button({
     id : 'btnSearchResult',
     text : 'Show Result',
+    autoWidth : false,
     listeners : {
+      mouseover : function(e, t, o) {
+        var width = e.getWidth();
+        e.setText('Ctrl + Enter');
+        e.setWidth(width);
+      },
+      mouseout : function(e, t, o) {        
+        e.setText('Show Result');        
+      },
       click : getResult
     },
     margins : {
