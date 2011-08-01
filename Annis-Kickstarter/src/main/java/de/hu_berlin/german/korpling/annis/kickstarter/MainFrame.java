@@ -21,6 +21,7 @@ import java.awt.Cursor;
 import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,55 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class MainFrame extends javax.swing.JFrame
 {
 
+  private class MainFrameWorker extends SwingWorker<String, String>
+    implements Serializable
+  {
+
+    @Override
+    protected String doInBackground() throws Exception
+    {
+      setProgress(1);
+      try
+      {
+        startService();
+        setProgress(2);
+        startJetty();
+      }
+      catch(Exception ex)
+      {
+        return ex.getLocalizedMessage();
+      }
+      return "";
+    }
+
+    @Override
+    protected void done()
+    {
+      try
+      {
+        wasStarted = true;
+        pbStart.setIndeterminate(false);
+        pbStart.setValue(100);
+        if("".equals(this.get()))
+        {
+          lblStatusService.setText("Annis started");
+          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
+          btLaunch.setEnabled(true);
+          btLaunch.setForeground(Color.blue);
+        }
+        else
+        {
+          lblStatusService.setText("Annis start failed: " + this.get());
+          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
+        }
+      }
+      catch(Exception ex)
+      {
+        new ExceptionDialog(ex).setVisible(true);
+      }
+    }
+  }
+  
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, String> serviceWorker;
   private boolean wasStarted = false;
@@ -60,57 +110,11 @@ public class MainFrame extends javax.swing.JFrame
     {
       Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
-    
+
     initComponents();
 
 
-    serviceWorker = new SwingWorker<String, String>()
-    {
-
-      @Override
-      protected String doInBackground() throws Exception
-      {
-        setProgress(1);
-        try
-        {
-          startService();
-          setProgress(2);
-          startJetty();
-        }
-        catch(Exception ex)
-        {
-          return ex.getLocalizedMessage();
-        }
-        return "";
-      }
-
-      @Override
-      protected void done()
-      {
-        try
-        {
-          wasStarted = true;
-          pbStart.setIndeterminate(false);
-          pbStart.setValue(100);
-          if("".equals(this.get()))
-          {
-            lblStatusService.setText("Annis started");
-            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
-            btLaunch.setEnabled(true);
-            btLaunch.setForeground(Color.blue);
-          }
-          else
-          {
-            lblStatusService.setText("Annis start failed: " + this.get());
-            lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
-          }
-        }
-        catch(Exception ex)
-        {
-          new ExceptionDialog(ex).setVisible(true);
-        }
-      }
-    };
+    serviceWorker = new MainFrameWorker();
     serviceWorker.addPropertyChangeListener(new PropertyChangeListener()
     {
 
@@ -294,24 +298,24 @@ public class MainFrame extends javax.swing.JFrame
     {//GEN-HEADEREND:event_btListActionPerformed
 
       ListDialog dlg = new ListDialog(this, true, corpusAdministration);
-      dlg.setVisible(true);      
+      dlg.setVisible(true);
 
     }//GEN-LAST:event_btListActionPerformed
 
     private void btLaunchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btLaunchActionPerformed
     {//GEN-HEADEREND:event_btLaunchActionPerformed
-    try
-    {
-      JOptionPane.showMessageDialog(this,
-        "Use username \"test\" and password \"test\" in order to login.",
-        "INFO", JOptionPane.INFORMATION_MESSAGE);
-      
-      Desktop.getDesktop().browse(new URI("http://localhost:8080/Annis-web"));
-    }
-    catch(Exception ex)
-    {
-      new ExceptionDialog(this, ex).setVisible(true);
-    }
+      try
+      {
+        JOptionPane.showMessageDialog(this,
+          "Use username \"test\" and password \"test\" in order to login.",
+          "INFO", JOptionPane.INFORMATION_MESSAGE);
+
+        Desktop.getDesktop().browse(new URI("http://localhost:8080/Annis-web"));
+      }
+      catch(Exception ex)
+      {
+        new ExceptionDialog(this, ex).setVisible(true);
+      }
 
     }//GEN-LAST:event_btLaunchActionPerformed
 
@@ -353,7 +357,7 @@ public class MainFrame extends javax.swing.JFrame
     Map<String, String> initParams = new HashMap<String, String>();
     initParams.put("managerClassName", "annis.security.TestSecurityManager");
     context.setInitParams(initParams);
-    String webxmlOverrride = System.getProperty("annis.home")  + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
+    String webxmlOverrride = System.getProperty("annis.home") + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
     context.setOverrideDescriptor(webxmlOverrride);
 
     jetty.setHandler(context);

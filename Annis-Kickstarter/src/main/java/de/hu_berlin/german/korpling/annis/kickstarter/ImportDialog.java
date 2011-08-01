@@ -18,6 +18,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 import annis.administration.CorpusAdministration;
 import annis.administration.SpringAnnisAdministrationDao;
 import java.io.File;
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -33,6 +34,53 @@ import org.apache.log4j.spi.LoggingEvent;
 public class ImportDialog extends javax.swing.JDialog
 {
 
+  private class ImportDialogWorker extends SwingWorker<String, Void> implements
+    Serializable
+  {
+    @Override
+    protected String doInBackground() throws Exception
+    {
+      try
+      {
+        corpusAdministration.importCorpora(false, txtInputDir.getText());
+      }
+      catch(Exception ex)
+      {
+        ex.printStackTrace();
+        return ex.getMessage();
+      }
+      return "";
+    }
+
+    @Override
+    protected void done()
+    {
+      isImporting = false;
+      btOk.setEnabled(true);
+      btSearchInputDir.setEnabled(true);
+      txtInputDir.setEnabled(true);
+      pbImport.setIndeterminate(false);
+      try
+      {
+        if("".equals(this.get()))
+        {
+          JOptionPane.showMessageDialog(null,
+            "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);
+          setVisible(false);
+        }
+        else
+        {
+          new ExceptionDialog(new Exception(
+            "Import failed: " + this.get())).setVisible(true);
+          setVisible(false);
+        }
+      }
+      catch(Exception ex)
+      {
+        Logger.getLogger(ImportDialog.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+  }
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, Void> worker;
   private boolean isImporting;
@@ -47,77 +95,32 @@ public class ImportDialog extends javax.swing.JDialog
     initComponents();
 
     isImporting = false;
-    worker = new SwingWorker<String, Void>()
-    {
-
-      @Override
-      protected String doInBackground() throws Exception
-      {
-        try
-        {
-          corpusAdministration.importCorpora(false, txtInputDir.getText());
-        }
-        catch (Exception ex)
-        {
-          ex.printStackTrace();
-          return ex.getMessage();
-        }
-        return "";
-      }
-
-      @Override
-      protected void done()
-      {
-        isImporting = false;
-        btOk.setEnabled(true);
-        btSearchInputDir.setEnabled(true);
-        txtInputDir.setEnabled(true);
-        pbImport.setIndeterminate(false);
-        try
-        {
-          if ("".equals(this.get()))
-          {
-            JOptionPane.showMessageDialog(null,
-              "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);
-            setVisible(false);
-          }
-          else
-          {
-            new ExceptionDialog(new Exception(
-              "Import failed: " + this.get())).setVisible(true);
-            setVisible(false);
-          }
-        }
-        catch (Exception ex)
-        {
-          Logger.getLogger(ImportDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      }
-    };
+    worker = new ImportDialogWorker();
 
     org.apache.log4j.Logger.getLogger(SpringAnnisAdministrationDao.class).addAppender(
-      new AppenderSkeleton() {
-
-      @Override
-      protected void append(LoggingEvent event)
+      new AppenderSkeleton()
       {
-        if(event.getLevel().isGreaterOrEqual(org.apache.log4j.Level.INFO))
+
+        @Override
+        protected void append(LoggingEvent event)
         {
-          lblStatus.setText(event.getMessage().toString());
+          if(event.getLevel().isGreaterOrEqual(org.apache.log4j.Level.INFO))
+          {
+            lblStatus.setText(event.getMessage().toString());
+          }
         }
-      }
 
-      @Override
-      public boolean requiresLayout()
-      {
-        return false;
-      }
+        @Override
+        public boolean requiresLayout()
+        {
+          return false;
+        }
 
-      @Override
-      public void close()
-      {
-      }
-    });
+        @Override
+        public void close()
+        {
+        }
+      });
   }
 
   /** This method is called from within the constructor to
@@ -223,7 +226,7 @@ public class ImportDialog extends javax.swing.JDialog
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btCancelActionPerformed
     {//GEN-HEADEREND:event_btCancelActionPerformed
 
-      if (isImporting)
+      if(isImporting)
       {
         worker.cancel(true);
       }
@@ -247,16 +250,16 @@ public class ImportDialog extends javax.swing.JDialog
     private void btSearchInputDirActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btSearchInputDirActionPerformed
     {//GEN-HEADEREND:event_btSearchInputDirActionPerformed
 
-      if (!"".equals(txtInputDir.getText()))
+      if(!"".equals(txtInputDir.getText()))
       {
         File dir = new File(txtInputDir.getText());
-        if (dir.exists() && dir.isDirectory())
+        if(dir.exists() && dir.isDirectory())
         {
           fileChooser.setSelectedFile(dir);
         }
       }
 
-      if (fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION)
+      if(fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION)
       {
         File f = fileChooser.getSelectedFile();
         txtInputDir.setText(f.getAbsolutePath());

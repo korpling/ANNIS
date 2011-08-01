@@ -34,7 +34,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pbImport" alignment="0" pref="484" max="32767" attributes="0"/>
+                  <Component id="pbImport" alignment="0" pref="495" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -44,13 +44,13 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btCancel" min="-2" pref="105" max="-2" attributes="0"/>
-                      <EmptySpace pref="274" max="32767" attributes="0"/>
+                      <EmptySpace pref="285" max="32767" attributes="0"/>
                       <Component id="btOk" min="-2" pref="105" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lblStatus" pref="434" max="32767" attributes="0"/>
+                      <Component id="lblStatus" pref="442" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
