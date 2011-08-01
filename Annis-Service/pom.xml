@@ -205,8 +205,6 @@
       </plugin>
 
 
-
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -242,11 +240,6 @@
         </configuration>
       </plugin>
 
-    </plugins>
-  </build>
-
-  <reporting>
-    <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
@@ -255,7 +248,12 @@
           <excludeFilterFile>${basedir}/../Misc/findBugsExcludeFilter.xml</excludeFilterFile>
         </configuration>
       </plugin>
-      
+
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
