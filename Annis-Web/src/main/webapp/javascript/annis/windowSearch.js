@@ -712,6 +712,9 @@ Ext.onReady(function()
         windowSearchForm.fireEvent('showQueryBuilder');
       else
         windowSearchForm.fireEvent('hideQueryBuilder');      
+    },
+    margins : {
+      top:0, right:5, bottom:0, left:0
     }
   });
   
@@ -731,7 +734,7 @@ Ext.onReady(function()
       click : getResult
     },
     margins : {
-      top:0, right:10, bottom:0, left:0
+      top:0, right:5, bottom:0, left:0
     }
   });
 
@@ -742,14 +745,14 @@ Ext.onReady(function()
     fieldLabel : 'Search', 
     labelStyle : 'display : none;',
     xtype : 'textfield',
-    items : [ searchResultButton, btnQueryBuilder ]
+    items : [ searchResultButton, btnQueryBuilder, history.splitButton ]
   });
 
   var queryAnnisSQL = {
     id : 'queryAnnisQL',
-    width : 200,
+    width : 240,
     height : 80,
-    fieldLabel : 'AnnisQL',
+    fieldLabel : 'AnnisQL',    
     name : 'queryAnnisQL',
     allowBlank : true,
     xtype : 'textarea',
@@ -771,20 +774,21 @@ Ext.onReady(function()
     title: 'AnnisQL',
     header: false,
     width: 340,
-    height: 200,
+    height: 165,
     defaultType: 'textfield',
+    labelWidth: 70,
     monitorValid: true,
     items: [queryAnnisSQL, groupButtons,
     {
       id: 'matchCount',
-      width: 200,
+      width: 240,
       height: 40,
       xtype: 'textarea',
       fieldLabel: 'Result',
       name: 'matchCount',
       allowBlank:true,
       readOnly: true       
-    }, history.splitButton ]
+    } ]
   });
 
   var panelSearchModes = new Ext.TabPanel({
