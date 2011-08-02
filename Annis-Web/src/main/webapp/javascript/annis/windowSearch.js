@@ -740,6 +740,7 @@ Ext.onReady(function()
       type : 'hbox'
     },
     fieldLabel : 'Search', 
+    labelStyle : 'display : none;',
     xtype : 'textfield',
     items : [ searchResultButton, btnQueryBuilder ]
   });
