@@ -146,14 +146,15 @@ Ext.onReady(function()
         grid.getView().refresh(false);
     };
 
-    this.splitButton = new Ext.SplitButton({
-      fieldLabel : 'History',
-      text : 'Query History',
+    this.splitButton = new Ext.SplitButton({      
+      text : 'History',
+      align : 'right',
       menu : new Ext.menu.Menu(),
       listeners : {
         'click' : historyWindow
       },
-      disabled : true      
+      disabled : true,
+      flex : 1
     });
   };
 });

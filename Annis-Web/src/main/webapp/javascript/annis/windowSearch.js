@@ -714,8 +714,9 @@ Ext.onReady(function()
         windowSearchForm.fireEvent('hideQueryBuilder');      
     },
     margins : {
-      top:0, right:5, bottom:0, left:0
-    }
+      top:0, right:0, bottom:0, left:0
+    },
+    flex : 1
   });
   
   var searchResultButton = new Ext.Button({
@@ -734,17 +735,18 @@ Ext.onReady(function()
       click : getResult
     },
     margins : {
-      top:0, right:5, bottom:0, left:0
-    }
+      top:0, right:0, bottom:0, left:0
+    },
+    flex : 1
   });
 
   var groupButtons = new Ext.Panel({
     layout : {
       type : 'hbox'
     },
+    width : 240,
     fieldLabel : 'Search', 
     labelStyle : 'display : none;',
-    xtype : 'textfield',
     items : [ searchResultButton, btnQueryBuilder, history.splitButton ]
   });
 
