@@ -726,7 +726,7 @@ Ext.onReady(function()
     listeners : {
       mouseover : function(e, t, o) {
         var width = e.getWidth();
-        e.setText('Ctrl + Enter');
+        e.setText('(Ctrl + Enter)');
         e.setWidth(width);
       },
       mouseout : function(e, t, o) {        
