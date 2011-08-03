@@ -663,6 +663,7 @@ Ext.onReady(function()
         tooltip : {
           text : 'Click here to open the corpus selection Window.',
           title : 'More Corpora',
+          showDelay : 0,
           autoHide : true
         }
       }) ]
@@ -673,16 +674,7 @@ Ext.onReady(function()
     id : 'formPanelSimpleSearch',
     frame : true,
     title : 'Search',
-    items : [ padLeftComboBox, padRightComboBox, resultLengthComboBox ],
-    buttons : [ {
-      id : 'btnSearch',
-      text : 'Show Result',
-      disabled : false,
-      listeners : {
-        click : getResult
-      }
-    } ],
-    buttonAlign : 'center'
+    items : [ padLeftComboBox, padRightComboBox, resultLengthComboBox ]
   });
 
   var formPanelExporter = new Ext.FormPanel({
@@ -723,15 +715,12 @@ Ext.onReady(function()
     id : 'btnSearchResult',
     text : 'Show Result',
     autoWidth : false,
+    tooltip : {
+      title : 'Show Result',
+      text : 'Ctrl + Enter',
+      showDelay : 0
+    },
     listeners : {
-      mouseover : function(e, t, o) {
-        var width = e.getWidth();
-        e.setText('(Ctrl + Enter)');
-        e.setWidth(width);
-      },
-      mouseout : function(e, t, o) {        
-        e.setText('Show Result');        
-      },
       click : getResult
     },
     margins : {
