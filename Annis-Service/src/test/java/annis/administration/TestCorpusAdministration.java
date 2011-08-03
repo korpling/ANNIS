@@ -127,6 +127,8 @@ public class TestCorpusAdministration {
 		// insert the corpus from the staging area to the main db
 		inOrder.verify(administrationDao).insertCorpus();
 
+    inOrder.verify(administrationDao).computeCorpusPath(corpusID);
+    
     inOrder.verify(administrationDao).createAnnotations(corpusID);
 
     // the facts child table must be created
