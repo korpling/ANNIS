@@ -712,7 +712,7 @@ Ext.onReady(function()
   });
   
   var searchResultButton = new Ext.Button({
-    id : 'btnSearchResult',
+    id : 'btnSearch',
     text : 'Show Result',
     autoWidth : false,
     tooltip : {
