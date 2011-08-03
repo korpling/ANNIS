@@ -93,6 +93,8 @@ public class CorpusAdministration {
       administrationDao.analyzeStagingTables();
 
 			administrationDao.insertCorpus();
+      
+      administrationDao.computeCorpusPath(corpusID);
 
       administrationDao.createAnnotations(corpusID);
 

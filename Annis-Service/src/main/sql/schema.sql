@@ -1,26 +1,28 @@
 -- (modified) source tables
 CREATE TABLE corpus
 (
-	id			bigint PRIMARY KEY,
-	name		varchar(100) NOT NULL, -- UNIQUE,
-	type		varchar(100) NOT NULL,
-	version 	varchar(100),
-	pre			bigint NOT NULL UNIQUE,
-	post		bigint NOT NULL UNIQUE,
-	top_level	boolean NOT NULL	-- true for roots of the corpus forest
+  id         bigint PRIMARY KEY,
+  name       varchar(100) NOT NULL, -- UNIQUE,
+  type       varchar(100) NOT NULL,
+  version    varchar(100),
+  pre        bigint NOT NULL UNIQUE,
+  post       bigint NOT NULL UNIQUE,
+  top_level  boolean NOT NULL,  -- true for roots of the corpus forest
+  path_name  varchar(100)[]
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
 COMMENT ON COLUMN corpus.pre IS 'pre-order value';
 COMMENT ON COLUMN corpus.post IS 'post-order value';
+COMMENT ON COLUMN corpus.path_name IS 'path of this corpus in the corpus tree (names)';
 
 CREATE TABLE corpus_annotation
 (
-	corpus_ref	bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-	namespace	varchar(100),
-	name		varchar(1000) NOT NULL,
-	value		varchar(2000),
-	UNIQUE (corpus_ref, namespace, name)
+  corpus_ref  bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  namespace   varchar(100),
+  name        varchar(1000) NOT NULL,
+  value       varchar(2000),
+  UNIQUE (corpus_ref, namespace, name)
 );
 COMMENT ON COLUMN corpus_annotation.corpus_ref IS 'foreign key to corpus.id';
 COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotation key';
@@ -29,9 +31,9 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-	id		bigint PRIMARY KEY,
-	name	varchar(1000),
-	text	text
+  id    bigint PRIMARY KEY,
+  name  varchar(1000),
+  text  text
 );
 COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
@@ -39,20 +41,20 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 
 --CREATE TABLE node
 --(
---	id			bigint	PRIMARY KEY,
---	text_ref	bigint NOT NULL REFERENCES text (id) ON DELETE CASCADE,
---	corpus_ref	bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
---	namespace	varchar(100),
---	name		varchar(100) NOT NULL,
---	"left"		integer NOT NULL,
---	"right"		integer NOT NULL,
---	token_index	integer,
+--  id      bigint  PRIMARY KEY,
+--  text_ref  bigint NOT NULL REFERENCES text (id) ON DELETE CASCADE,
+--  corpus_ref  bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--  namespace  varchar(100),
+--  name    varchar(100) NOT NULL,
+--  "left"    integer NOT NULL,
+--  "right"    integer NOT NULL,
+--  token_index  integer,
 --  is_token boolean,
---	continuous	boolean,
---	span		varchar(2000),
---	toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
---	left_token	integer NULL,	-- token_index of left-most token in tree under this node
---	right_token	integer	NULL	-- token_index of right-most token in tree under this node
+--  continuous  boolean,
+--  span    varchar(2000),
+--  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+--  left_token  integer NULL,  -- token_index of left-most token in tree under this node
+--  right_token  integer  NULL  -- token_index of right-most token in tree under this node
 --);
 --COMMENT ON COLUMN node.id IS 'primary key';
 --COMMENT ON COLUMN node.corpus_ref IS 'foreign key to corpus.id';
@@ -68,11 +70,11 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 --
 --CREATE TABLE node_annotation
 --(
---	node_ref	bigint, -- REFERENCES node (id) ON DELETE CASCADE,
+--  node_ref  bigint, -- REFERENCES node (id) ON DELETE CASCADE,
 --  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
---	namespace	varchar(150),
---	name		varchar(150) NOT NULL,
---	value		varchar(1500)
+--  namespace  varchar(150),
+--  name    varchar(150) NOT NULL,
+--  value    varchar(1500)
 --);
 --COMMENT ON COLUMN node_annotation.node_ref IS 'foreign key to node.id';
 --COMMENT ON COLUMN node_annotation.namespace IS 'optional namespace of annotation key';
@@ -83,39 +85,39 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 CREATE TABLE facts
 (
   fid BIGSERIAL PRIMARY KEY,
-  id			bigint,
-	text_ref	bigint,
-	corpus_ref	bigint,
-	toplevel_corpus bigint,
-  node_namespace	varchar(100),
-	node_name		varchar(100),
-	"left"		integer,
-	"right"		integer,
-	token_index	integer,
+  id      bigint,
+  text_ref  bigint,
+  corpus_ref  bigint,
+  toplevel_corpus bigint,
+  node_namespace  varchar(100),
+  node_name    varchar(100),
+  "left"    integer,
+  "right"    integer,
+  token_index  integer,
   is_token boolean,
-	continuous	boolean,
-	span		varchar(2000),
-	left_token	integer,
-	right_token	integer,
+  continuous  boolean,
+  span    varchar(2000),
+  left_token  integer,
+  right_token  integer,
 
-  pre				bigint,
-	post			bigint,
-	parent		bigint,
-	root			boolean,
-	level			bigint,
+  pre        bigint,
+  post      bigint,
+  parent    bigint,
+  root      boolean,
+  level      bigint,
 
-  component_id			bigint,
-	edge_type		char(1),
-	edge_namespace	varchar(255),
-	edge_name		varchar(255),
+  component_id      bigint,
+  edge_type    char(1),
+  edge_namespace  varchar(255),
+  edge_name    varchar(255),
 
-	node_annotation_namespace	varchar(150),
-	node_annotation_name		varchar(150),
-	node_annotation_value		varchar(1500),
+  node_annotation_namespace  varchar(150),
+  node_annotation_name    varchar(150),
+  node_annotation_value    varchar(1500),
 
-  edge_annotation_namespace	varchar(150),
-	edge_annotation_name		varchar(150),
-	edge_annotation_value		varchar(1500),
+  edge_annotation_namespace  varchar(150),
+  edge_annotation_name    varchar(150),
+  edge_annotation_value    varchar(1500),
 
   sample bit(5)
 );
@@ -138,13 +140,13 @@ COMMENT ON COLUMN facts.sample IS 'Bit mask if sample for join of original table
 -- external data
 CREATE TABLE extData
 (
-	id			serial PRIMARY KEY,
-	filename	varchar(500) NOT NULL,
-	orig_name	varchar(100) NOT NULL,
-	branch		varchar(100) NOT NULL,
-	mime		varchar(100) NOT NULL,
-	comment		varchar(1500) NOT NULL,
-	UNIQUE (filename, branch)
+  id      serial PRIMARY KEY,
+  filename  varchar(500) NOT NULL,
+  orig_name  varchar(100) NOT NULL,
+  branch    varchar(100) NOT NULL,
+  mime    varchar(100) NOT NULL,
+  comment    varchar(1500) NOT NULL,
+  UNIQUE (filename, branch)
    
 );
 
@@ -152,58 +154,58 @@ CREATE TABLE extData
 -- stats
 CREATE TABLE corpus_stats
 (
-	name				varchar,
-	id					bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
-	corpus				bigint,
-	text				bigint,
-	node				bigint,
-	rank				bigint,
-	component			bigint,
-	corpus_annotation	bigint,
-	node_annotation		bigint,
-	edge_annotation		bigint,
-	tokens				bigint,
-	roots				bigint,
-	edges				bigint,
-	depth				bigint,
-	c_comps				bigint,
-	c_edges				bigint,
-	d_comps				bigint,
-	d_edges				bigint,
-	p_comps				bigint,
-	p_edges				bigint,
-	u_comps				bigint,
-	u_edges				bigint,
-	avg_level			real,
-	avg_children		real,
-	avg_duplicates		real
+  name        varchar,
+  id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
+  corpus        bigint,
+  text        bigint,
+  node        bigint,
+  rank        bigint,
+  component      bigint,
+  corpus_annotation  bigint,
+  node_annotation    bigint,
+  edge_annotation    bigint,
+  tokens        bigint,
+  roots        bigint,
+  edges        bigint,
+  depth        bigint,
+  c_comps        bigint,
+  c_edges        bigint,
+  d_comps        bigint,
+  d_edges        bigint,
+  p_comps        bigint,
+  p_edges        bigint,
+  u_comps        bigint,
+  u_edges        bigint,
+  avg_level      real,
+  avg_children    real,
+  avg_duplicates    real
 );
 
 CREATE VIEW corpus_info AS SELECT 
-	name,
-	id, 
-	tokens,
-	roots,
-	depth,
-	to_char(avg_level, '990.99') as avg_level,
-	to_char(avg_children, '990.99') as avg_children,
-	to_char(avg_duplicates, '990.99') as avg_duplicates
+  name,
+  id, 
+  tokens,
+  roots,
+  depth,
+  to_char(avg_level, '990.99') as avg_level,
+  to_char(avg_children, '990.99') as avg_children,
+  to_char(avg_duplicates, '990.99') as avg_duplicates
 FROM 
-	corpus_stats;
-	
+  corpus_stats;
+  
 
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
   "corpus"   varchar(100),
-  "version" 	varchar(100),
-  "namespace"	varchar(100),
+  "version"   varchar(100),
+  "namespace"  varchar(100),
   "element"    varchar(4) CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar(100) NOT NULL,
   "display_name"   varchar(100) NOT NULL,
   "order" bigint default '0',
   "mappings" varchar(100),
-   UNIQUE (corpus,version,namespace,element,vis_type)  				    
+   UNIQUE (corpus,version,namespace,element,vis_type)              
 );
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
 COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
