@@ -210,7 +210,7 @@ public class GraphExtractor implements ResultSetExtractor
 		sb.append("\t");
 		sb.append(key);
 		sb.append(", facts.*");
-		sb.append(", paths.path, parent.name as document_name \n");
+		sb.append(", corpus.path_name as path, corpus.path_name[1] as document_name \n");
 		sb.append("FROM\n");
 		sb.append("\t(");
 		sb.append(matchSql);
@@ -218,15 +218,7 @@ public class GraphExtractor implements ResultSetExtractor
 		sb.append("\t");
 		sb.append(FACTS_TABLE);
 		sb.append(" AS facts,\n");
-		
-		// calculate paths
-		sb.append("\t(SELECT array_agg(corpus.name) as path,\n\t");
-		sb.append("this.id FROM corpus, corpus AS this\n\t");
-		sb.append("WHERE \n\t\t");
-		sb.append("this.post <= corpus.post\n\t\t");
-		sb.append("AND this.pre >= corpus.pre GROUP BY this.id) AS paths,\n\t\t");
-		sb.append("corpus as parent \n");
-		// end calculate paths
+		sb.append("corpus\n");
 		
 		sb.append("WHERE\n");
 		if (corpusList != null)
@@ -306,7 +298,7 @@ public class GraphExtractor implements ResultSetExtractor
 			sb.append("\t\t)\n");
 		}
 		sb.append("\n\t)\n");
-		sb.append("\tAND paths.id = parent.id AND paths.id = corpus_ref\n");
+		sb.append("\tAND corpus.id = corpus_ref\n");
 		sb.append("\nORDER BY key, facts.pre");
 		return sb.toString();
 	}
