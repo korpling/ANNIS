@@ -8,9 +8,9 @@
     <version>2.3.0-SNAPSHOT</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
-  <artifactId>annis-service-interface</artifactId>
+  <artifactId>annis-service-rmi</artifactId>
   <version>2.3.0-SNAPSHOT</version>
-  <name>annis-service-interface</name>
+  <name>annis-service-rmi</name>
   <build>
     <plugins>
       <plugin>

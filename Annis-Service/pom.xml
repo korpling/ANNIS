@@ -11,7 +11,7 @@
 
   <modules>
     <module>annis-service-impl</module>
-    <module>annis-service-interface</module>
+    <module>annis-service-rmi</module>
   </modules>
 
 </project>
