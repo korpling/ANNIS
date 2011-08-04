@@ -1,0 +1,25 @@
+
+<assembly>
+  <id>distribution-lite</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet>
+      <directory>src/main/distribution/</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/sql/</directory>
+      <outputDirectory>scripts/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/scripts/</directory>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0774</fileMode>
+    </fileSet>
+  </fileSets>
+</assembly>
