@@ -230,6 +230,7 @@
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/annis.xml</descriptor>
+            <descriptor>src/main/assembly/annis_lite.xml</descriptor>
           </descriptors>
           <finalName />
         </configuration>

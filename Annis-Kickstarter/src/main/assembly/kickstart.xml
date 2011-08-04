@@ -45,18 +45,24 @@
   <dependencySets>
     <!-- our dependcies -->
     <dependencySet>
-      <excludes>
-        <exclude>*:war</exclude>
-        <exclude>*:tar.gz</exclude>
-        <exclude>*:zip</exclude>
-      </excludes>
+      <includes>
+        <include>*:jar</include>
+      </includes>
       <outputDirectory>lib/</outputDirectory>
       <unpack>false</unpack>
+    </dependencySet>
+    <!-- service -->
+    <dependencySet>
+      <includes>
+        <include>annis-service*:war</include> 
+      </includes>
+      <outputDirectory>webapp/</outputDirectory>
+      <unpack>true</unpack>
     </dependencySet>
     <!-- webapp -->
     <dependencySet>
       <includes>
-        <include>*:war</include> 
+        <include>annis-web*:war</include> 
       </includes>
       <outputDirectory>webapp/</outputDirectory>
       <unpack>true</unpack>

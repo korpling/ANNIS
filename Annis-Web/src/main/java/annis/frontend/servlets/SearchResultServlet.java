@@ -39,7 +39,6 @@ import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.security.AnnisUser;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceException;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
@@ -59,7 +58,6 @@ import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.dao.DataAccessResourceFailureException;
 
 public class SearchResultServlet extends HttpServlet
 {
@@ -246,19 +244,12 @@ public class SearchResultServlet extends HttpServlet
       this.cleanSession(session);
       out.println("Please select a Corpus.");
     }
-    catch(DataAccessResourceFailureException ex)
+    catch(Exception ex)
     {
       this.cleanSession(session);
       out.println("Timeout or connection error");
       response.setStatus(504);
     }
-    catch (Exception ex)
-    {
-      this.cleanSession(session);
-      out.println(ex.getMessage());
-      response.setStatus(500);
-    }
-
 
   }
 

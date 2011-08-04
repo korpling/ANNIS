@@ -15,7 +15,6 @@
  */
 package annis.frontend.servlets.exporter;
 
-import annis.dao.AnnotatedSpan;
 import java.io.IOException;
 import javax.servlet.http.*;
 
@@ -24,7 +23,6 @@ import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
