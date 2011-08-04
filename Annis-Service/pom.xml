@@ -218,6 +218,13 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-distribution</id>
+            <phase>package</phase>
+            <goals><goal>single</goal></goals>
+          </execution>
+        </executions>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/annis.xml</descriptor>

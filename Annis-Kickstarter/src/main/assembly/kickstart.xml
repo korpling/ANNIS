@@ -3,7 +3,7 @@
   <id>distribution</id>
   <formats>
     <format>dir</format>
-    <format>zip</format>
+<!--    <format>zip</format> -->
   </formats>
   <fileSets>
     <fileSet>
@@ -12,19 +12,7 @@
         <include>splashscreen.gif</include>
       </includes>
       <outputDirectory>/</outputDirectory>
-    </fileSet>
-    <!-- we need all the config files of the service -->
-    <fileSet>
-      <directory>../Annis-Service/src/main/distribution/</directory>
-      <outputDirectory>/</outputDirectory>
-      <excludes>
-        <exclude>conf/database.properties</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>../Annis-Service/src/main/sql/</directory>
-      <outputDirectory>scripts/</outputDirectory>
-    </fileSet>
+    </fileSet>    
      <!-- overwrite the database.properties -->
     <fileSet>
       <directory>src/main/resources/</directory>
@@ -40,17 +28,38 @@
       <outputDirectory></outputDirectory>
       <fileMode>0774</fileMode>
     </fileSet>
-    <!-- copy (hopefully compiled, TODO) web application -->
+    <!-- we need all the config files of the service -->
     <fileSet>
-      <directory>../Annis-Web/target/Annis-web/</directory>
-      <outputDirectory>/webapp/</outputDirectory>
+      <directory>../Annis-Service/src/main/distribution/</directory>
+      <outputDirectory>/</outputDirectory>
+      <excludes>
+        <exclude>conf/database.properties</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>../Annis-Service/src/main/sql/</directory>
+      <outputDirectory>scripts/</outputDirectory>
     </fileSet>
   </fileSets>
+  
   <dependencySets>
+    <!-- our dependcies -->
     <dependencySet>
+      <excludes>
+        <exclude>*:war</exclude>
+        <exclude>*:tar.gz</exclude>
+        <exclude>*:zip</exclude>
+      </excludes>
       <outputDirectory>lib/</outputDirectory>
       <unpack>false</unpack>
-      <scope>runtime</scope>
+    </dependencySet>
+    <!-- webapp -->
+    <dependencySet>
+      <includes>
+        <include>*:war</include> 
+      </includes>
+      <outputDirectory>webapp/</outputDirectory>
+      <unpack>true</unpack>
     </dependencySet>
   </dependencySets>
 </assembly>
