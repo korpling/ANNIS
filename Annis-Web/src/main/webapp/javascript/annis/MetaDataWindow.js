@@ -173,7 +173,7 @@ Ext.onReady(function()
     var hideAttr = (name === "Search Result") ? true : false;
 
     var config = {};
-    config.title = 'Meta Data for ' + name;
+    config.title = 'Metadata for ' + name;
     config.width = (!hideAttr) ? 800 : 400;
     config.height = 402;
 
@@ -279,15 +279,16 @@ Ext.onReady(function()
         {
           storeCorpusMeta.each(function(record)
           {
-            record.set('key', record.get('name') + ":" + record.get('key'));
-            record.commit();
+            record.set('key', "(" + record.get('name') + ") "
+                + record.get('key'));
+            record.commit(); 
           });
         } // end counting Subcorpora
 
         // set Title for Corpora-Panel and for Document-Panel
-        documentMeta.setTitle("document: " + doctitle);
-        corpusMeta.setTitle(corpusTitle.length < 1 ? "corpus: "
-            + corpusTitle[0] : "corpora: " + corpusTitle.join(", "));
+        documentMeta.setTitle("Document: " + doctitle);
+        corpusMeta.setTitle(corpusTitle.length < 2 ? "Corpus: "
+            + corpusTitle[0] : "Corpora: " + corpusTitle.join(" > "));
       });
 
       var gridMeta = new Ext.Panel({
@@ -312,7 +313,7 @@ Ext.onReady(function()
       var gridMeta = new Ext.grid.GridPanel({
         ds : storeMeta,
         cm : corpusColModel,
-        title : 'meta data',
+        title : 'Metadata',
         loadMask : true,
         viewConfig : {
           forceFit : true,
@@ -339,15 +340,15 @@ Ext.onReady(function()
       });
 
       var colModelNodeAnnotations = new Ext.grid.ColumnModel([ {
-        header : "name",
+        header : "Name",
         dataIndex : "name",
         renderer : nameRenderer
       }, {
-        header : "example (click to use query)",
+        header : "Example (click to use query)",
         dataIndex : "values",
         renderer : readableExample
       }, {
-        header : "url",
+        header : "URL",
         width : 20,
         dataIndex : "id",
         renderer : annotationUrl
@@ -364,7 +365,7 @@ Ext.onReady(function()
           }
         }),
         loadMask : true,
-        title : 'node annotations',
+        title : 'Node annotations',
         viewConfig : {
           forceFit : true,
           autoFill : true,
@@ -381,15 +382,15 @@ Ext.onReady(function()
       });
 
       var colModelEdgeAnnotation = new Ext.grid.ColumnModel([ {
-        header : "name",
+        header : "Name",
         dataIndex : "name",
         renderer : nameRenderer
       }, {
-        header : "example (click to use query)",
+        header : "Example (click to use query)",
         dataIndex : "values",
         renderer : edgeAnnotation
       }, {
-        header : "url",
+        header : "URL",
         width : 20,
         dataIndex : "id",
         renderer : annotationUrl
@@ -407,7 +408,7 @@ Ext.onReady(function()
           }
         }),
         loadMask : true,
-        title : 'edge annotations',
+        title : 'Edge annotations',
         viewConfig : {
           forceFit : true,
           autoFill : true,
@@ -424,15 +425,15 @@ Ext.onReady(function()
       });
 
       var colEdgeTypes = new Ext.grid.ColumnModel([ {
-        header : "name",
+        header : "Name",
         dataIndex : "name",
         renderer : nameRenderer
       }, {
-        header : "example (click to use query)",
+        header : "Example (click to use query)",
         dataIndex : "edge_name",
         renderer : edgeTypes
       }, {
-        header : "url",
+        header : "URL",
         width : 20,
         dataIndex : "id",
         renderer : annotationUrl
@@ -449,7 +450,7 @@ Ext.onReady(function()
           }
         }),
         loadMask : true,
-        title : 'edge types',
+        title : 'Edge types',
         viewConfig : {
           forceFit : true,
           autoFill : true,
@@ -513,7 +514,7 @@ Ext.onReady(function()
 
       rightPanel = new Ext.Panel({
         layout : 'accordion',
-        title : 'available annotations',
+        title : 'Available annotations',
         layoutConfig : {
           animate : true
         },
