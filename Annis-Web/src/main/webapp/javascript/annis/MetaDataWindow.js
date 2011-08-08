@@ -173,7 +173,7 @@ Ext.onReady(function()
     var hideAttr = (name === "Search Result") ? true : false;
 
     var config = {};
-    config.title = 'Metadata for 1' + name;
+    config.title = 'Metadata for ' + name;
     config.width = (!hideAttr) ? 800 : 400;
     config.height = 402;
 
