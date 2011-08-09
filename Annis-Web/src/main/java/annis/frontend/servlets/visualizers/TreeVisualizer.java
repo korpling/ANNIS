@@ -230,45 +230,7 @@ public class TreeVisualizer extends WriterVisualizer {
 				nodeBufferList.put(levelString, new StringBuffer());
 				edgeBufferList.put(levelString, new StringBuffer());
 			}
-			
-			//Fetching edge Label from _relations._rel
-//			if("_rel".equals(node.getNodeName())) {
-//				//process this labeled edge
-//				try {
-//					NamedNodeMap attributes = node.getAttributes();
-//					Edge edge = new Edge();
-//					try {
-//						edge.srcId = attributes.getNamedItem("_src").getNodeValue();
-//					} catch (NullPointerException e) {
-//						edge.srcId = node.getParentNode().getParentNode().getAttributes().getNamedItem("_id").getNodeValue();
-//					}
-//					try {
-//						edge.dstId = attributes.getNamedItem("_dst").getNodeValue();
-//					} catch (NullPointerException e) {
-//						try {
-//							edge.dstId = attributes.getNamedItem("_target").getNodeValue();
-//						} catch (NullPointerException e2) {
-//							edge.dstId = ""; //The target definition of this edge is empty
-//						}
-//					}
-//
-//					System.out.println("Found edge: " + edge.srcId + " -> " + edge.dstId);
-//					//Constructing lable
-//					for(int i=0; i<attributes.getLength(); i++) {
-//						if(edge.label.length() > 0)
-//							edge.label += ", ";
-//						Node attribute = attributes.item(i);
-//						if(!attribute.getNodeName().startsWith("_"))
-//							edge.label += attribute.getNodeValue();
-//					}
-//					edgeSet.add(edge);
-//				} catch (NullPointerException e) {		
-//					//TODO implement
-//					System.out.println("Something is wrong... ");
-//					e.printStackTrace();
-//				}
-//			}
-			
+						
 
 			//TODO implement edges -> labels
 			
