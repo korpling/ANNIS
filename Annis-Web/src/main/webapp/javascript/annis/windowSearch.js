@@ -663,6 +663,7 @@ Ext.onReady(function()
         tooltip : {
           text : 'Click here to open the corpus selection Window.',
           title : 'More Corpora',
+          showDelay : 0,
           autoHide : true
         }
       }) ]
@@ -673,16 +674,7 @@ Ext.onReady(function()
     id : 'formPanelSimpleSearch',
     frame : true,
     title : 'Search',
-    items : [ padLeftComboBox, padRightComboBox, resultLengthComboBox ],
-    buttons : [ {
-      id : 'btnSearch',
-      text : 'Show Result',
-      disabled : false,
-      listeners : {
-        click : getResult
-      }
-    } ],
-    buttonAlign : 'center'
+    items : [ padLeftComboBox, padRightComboBox, resultLengthComboBox ]
   });
 
   var formPanelExporter = new Ext.FormPanel({
@@ -705,6 +697,11 @@ Ext.onReady(function()
   var btnQueryBuilder = new Ext.Button({
     id : 'btnQueryBuilder',
     text : 'Query Builder',
+    tooltip : {
+      title : 'Show Query Builder',
+      text : 'Ctrl + Q',
+      showDelay : 0
+    },
     enableToggle : true,
     toggleHandler : function(button, state)
     {
@@ -712,34 +709,46 @@ Ext.onReady(function()
         windowSearchForm.fireEvent('showQueryBuilder');
       else
         windowSearchForm.fireEvent('hideQueryBuilder');      
-    }
+    },
+    margins : {
+      top:0, right:0, bottom:0, left:0
+    },
+    flex : 1
   });
   
   var searchResultButton = new Ext.Button({
-    id : 'btnSearchResult',
+    id : 'btnSearch',
     text : 'Show Result',
+    autoWidth : false,
+    tooltip : {
+      title : 'Show Result',
+      text : 'Ctrl + Enter',
+      showDelay : 0
+    },
     listeners : {
       click : getResult
     },
     margins : {
-      top:0, right:10, bottom:0, left:0
-    }
+      top:0, right:0, bottom:0, left:0
+    },
+    flex : 1
   });
 
   var groupButtons = new Ext.Panel({
     layout : {
       type : 'hbox'
     },
+    width : 240,
     fieldLabel : 'Search', 
-    xtype : 'textfield',
-    items : [ searchResultButton, btnQueryBuilder ]
+    labelStyle : 'display : none;',
+    items : [ searchResultButton, btnQueryBuilder, history.splitButton ]
   });
 
   var queryAnnisSQL = {
     id : 'queryAnnisQL',
-    width : 200,
+    width : 240,
     height : 80,
-    fieldLabel : 'AnnisQL',
+    fieldLabel : 'AnnisQL',    
     name : 'queryAnnisQL',
     allowBlank : true,
     xtype : 'textarea',
@@ -761,20 +770,21 @@ Ext.onReady(function()
     title: 'AnnisQL',
     header: false,
     width: 340,
-    height: 200,
+    height: 165,
     defaultType: 'textfield',
+    labelWidth: 70,
     monitorValid: true,
     items: [queryAnnisSQL, groupButtons,
     {
       id: 'matchCount',
-      width: 200,
+      width: 240,
       height: 40,
       xtype: 'textarea',
       fieldLabel: 'Result',
       name: 'matchCount',
       allowBlank:true,
       readOnly: true       
-    }, history.splitButton ]
+    } ]
   });
 
   var panelSearchModes = new Ext.TabPanel({
@@ -912,11 +922,39 @@ Ext.onReady(function()
   // }
   });
 
-  // added ctrl + enter for getting search results
-  new Ext.KeyMap(Ext.get('queryAnnisQL'), {
+  
+  // Shortcuts for the most used functions of annis  
+  new Ext.KeyMap(Ext.getBody(), {
     key : Ext.EventObject.ENTER,
     ctrl : true,
     fn : getResult
+  });
+  
+  new Ext.KeyMap(Ext.getBody(), {
+    key : Ext.EventObject.Q,
+    ctrl : true,
+    fn : function()
+    {       
+      button = Ext.getCmp('btnQueryBuilder');
+      if (!button.pressed) {
+        windowSearchForm.fireEvent('showQueryBuilder');
+        button.toggle();
+      } 
+      else {
+        windowSearchForm.fireEvent('hideQueryBuilder');
+        button.toggle();
+      }
+      
+    }
+  });
+  
+  new Ext.KeyMap(Ext.getBody(), {
+    key : Ext.EventObject.G,
+    ctrl : true,
+    fn : function () 
+    {
+      Ext.getCmp('btnHistory').fireEvent('click');
+    }
   });
 
   // highlight tutorial
