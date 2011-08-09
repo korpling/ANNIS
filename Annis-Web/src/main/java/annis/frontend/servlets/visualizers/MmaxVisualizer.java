@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
+import java.util.logging.Logger;
 import paula.parser.coreference.CoreferenceProvider;
 import paula.parser.coreference.MMAXCoreferenceProvider;
 import paula.parser.coreference.CoreferenceProvider.Reference;
@@ -182,7 +183,7 @@ public class MmaxVisualizer extends WriterVisualizer
         }
         if("".equals(groupId))
         {
-          System.out.println("Empty: " + ref.type + ": " + ref.id + " -> " + ref.refersTo);
+          Logger.getLogger(MmaxVisualizer.class.getName()).warning("Empty: " + ref.type + ": " + ref.id + " -> " + ref.refersTo);
         }
         else
         {

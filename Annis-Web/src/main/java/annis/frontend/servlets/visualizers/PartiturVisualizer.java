@@ -489,7 +489,6 @@ public class PartiturVisualizer extends WriterVisualizer
             else
             {
               //this is a new annotation
-              //System.out.println("Unknown: " + id);
               long tokenId = getId(tokenNodeList.item(0));
               SpanAnnotation span = new SpanAnnotation(id, node.getNodeName(), tokenId, partitur.getTokenOffset(tokenId), tokenNodeList.getLength());
               NamedNodeMap attributes = node.getAttributes();
