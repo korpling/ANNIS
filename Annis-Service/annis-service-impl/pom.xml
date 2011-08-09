@@ -68,14 +68,7 @@
 
     <dependency>
       <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-      <version>1.6.11</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjtools</artifactId>
+      <artifactId>aspectjweaver</artifactId>
       <version>1.6.11</version>
       <scope>compile</scope>
     </dependency>
