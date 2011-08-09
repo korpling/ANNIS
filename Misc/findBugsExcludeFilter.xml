@@ -5,4 +5,6 @@
   <Class name="de.deutschdiachrondigital.dddquery.parser.Parser"/>
   <Class name="annis.ql.lexer.Lexer"/>
   <Class name="de.deutschdiachrondigital.dddquery.lexer.Lexer"/>
+  <Field name="System.out" />
+  <Field name="System.err" />
 </FindBugsFilter>
