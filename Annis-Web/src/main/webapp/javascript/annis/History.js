@@ -146,10 +146,16 @@ Ext.onReady(function()
         grid.getView().refresh(false);
     };
 
-    this.splitButton = new Ext.SplitButton({      
+    this.splitButton = new Ext.SplitButton({  
+      id : 'btnHistory',
       text : 'History',
       align : 'right',
       menu : new Ext.menu.Menu(),
+      tooltip : {
+        title : 'Show History',
+        text : 'Ctrl + U',
+        showDelay : 0
+      },
       listeners : {
         'click' : historyWindow
       },

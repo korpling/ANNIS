@@ -697,6 +697,11 @@ Ext.onReady(function()
   var btnQueryBuilder = new Ext.Button({
     id : 'btnQueryBuilder',
     text : 'Query Builder',
+    tooltip : {
+      title : 'Show Query Builder',
+      text : 'Ctrl + Q',
+      showDelay : 0
+    },
     enableToggle : true,
     toggleHandler : function(button, state)
     {
@@ -917,11 +922,39 @@ Ext.onReady(function()
   // }
   });
 
-  // added ctrl + enter for getting search results
-  new Ext.KeyMap(Ext.get('queryAnnisQL'), {
+  
+  // Shortcuts for the most used functions of annis  
+  new Ext.KeyMap(Ext.getBody(), {
     key : Ext.EventObject.ENTER,
     ctrl : true,
     fn : getResult
+  });
+  
+  new Ext.KeyMap(Ext.getBody(), {
+    key : Ext.EventObject.Q,
+    ctrl : true,
+    fn : function()
+    {       
+      button = Ext.getCmp('btnQueryBuilder');
+      if (!button.pressed) {
+        windowSearchForm.fireEvent('showQueryBuilder');
+        button.toggle();
+      } 
+      else {
+        windowSearchForm.fireEvent('hideQueryBuilder');
+        button.toggle();
+      }
+      
+    }
+  });
+  
+  new Ext.KeyMap(Ext.getBody(), {
+    key : Ext.EventObject.G,
+    ctrl : true,
+    fn : function () 
+    {
+      Ext.getCmp('btnHistory').fireEvent('click');
+    }
   });
 
   // highlight tutorial
