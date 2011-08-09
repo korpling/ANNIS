@@ -62,4 +62,11 @@
        <Method name="daemonize" />
     </Or>
   </Match>
+    <Match>
+    <Class name="annis.service.internal.AnnisServiceRunner" />
+    <Bug pattern="NP_CLOSING_NULL" />
+    <Or>
+       <Method name="closeSystemStreams" />
+    </Or>
+  </Match>
 </FindBugsFilter>
