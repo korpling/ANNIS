@@ -246,9 +246,9 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>1.2</version>
         <configuration>
-          <excludeFilterFile>${basedir}/../Misc/findBugsExcludeFilter.xml</excludeFilterFile>
+          <excludeFilterFile>${basedir}/../../Misc/findBugsExcludeFilter.xml</excludeFilterFile>
         </configuration>
       </plugin>
 
