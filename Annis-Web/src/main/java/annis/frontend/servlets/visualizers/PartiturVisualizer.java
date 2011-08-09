@@ -336,7 +336,14 @@ public class PartiturVisualizer extends WriterVisualizer
         try
         {
           SpanAnnotation span = (SpanAnnotation) o;
-          return (this.id == span.id);
+          if(this.id == null && span.id != null)
+          {
+            return false;
+          }
+          else
+          {
+            return (this.id.equals(span.id));
+          }
         }
         catch(ClassCastException e)
         {
