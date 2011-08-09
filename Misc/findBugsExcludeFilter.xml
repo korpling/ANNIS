@@ -56,6 +56,7 @@
   </Match>
   <Match>
     <Class name="annis.service.internal.AnnisServiceRunner" />
+    <Bug pattern="NP_ALWAYS_NULL" />
     <Or>
        <Method name="startAndDetach" />
        <Method name="daemonize" />
