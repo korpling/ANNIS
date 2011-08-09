@@ -166,7 +166,14 @@ public class TreeVisualizer extends WriterVisualizer
       @Override
       public boolean equals(Object o)
       {
-        return new Integer(this.hashCode()).equals(o.hashCode());
+        if(o == null)
+        {
+          return false;
+        }
+        else
+        { 
+          return new Integer(this.hashCode()).equals(o.hashCode());
+        }
       }
     }
 
