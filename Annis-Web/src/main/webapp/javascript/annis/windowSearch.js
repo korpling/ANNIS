@@ -949,8 +949,9 @@ Ext.onReady(function()
   });
   
   new Ext.KeyMap(Ext.getBody(), {
-    key : Ext.EventObject.G,
+    key : Ext.EventObject.H,
     ctrl : true,
+    shift : true,
     fn : function () 
     {
       Ext.getCmp('btnHistory').fireEvent('click');

@@ -153,7 +153,7 @@ Ext.onReady(function()
       menu : new Ext.menu.Menu(),
       tooltip : {
         title : 'Show History',
-        text : 'Ctrl + U',
+        text : 'Ctrl + Shift + H',
         showDelay : 0
       },
       listeners : {
