@@ -336,9 +336,9 @@ public class GraphExtractor implements ResultSetExtractor
 	public String getTextQuery(long textID)
 	{
 		String template = "SELECT DISTINCT \n"
-				+ "\tARRAY[-1::bigint] AS key, facts.*\n" + "FROM\n"
-				+ "\tfacts AS facts\n" + "WHERE\n"
-				+ "\tfacts.text_ref = :text_id\n" + "ORDER BY facts.pre";
+				+ "\tARRAY[-1::bigint] AS key, facts.*, c.path_name as path, c.path_name[1] as document_name\n" + "FROM\n"
+				+ "\tfacts AS facts, corpus as c\n" + "WHERE\n"
+				+ "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n" + "ORDER BY facts.pre";
 		String sql = template.replace(":text_id", String.valueOf(textID));
 		return sql;
 	}
@@ -402,7 +402,6 @@ public class GraphExtractor implements ResultSetExtractor
 
 			AnnotationGraph graph = graphByMatchGroup.get(key);
 
-			
 			graph.setDocumentName(new DocumentNameMapRow().mapRow(resultSet,
 					rowNum));
 			
