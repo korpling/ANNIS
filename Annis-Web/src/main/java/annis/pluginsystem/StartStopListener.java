@@ -39,7 +39,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
 public class StartStopListener implements ServletContextListener
 {
   
-  public static PluginManager pluginManager = null;
+  private PluginManager pluginManager;
 
   @Override
   public void contextInitialized(ServletContextEvent sce)
@@ -92,6 +92,9 @@ public class StartStopListener implements ServletContextListener
   @Override
   public void contextDestroyed(ServletContextEvent sce)
   {
-    pluginManager.shutdown();
+    if(pluginManager != null)
+    {
+      pluginManager.shutdown();
+    }
   }
 }
