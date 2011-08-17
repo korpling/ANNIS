@@ -20,12 +20,9 @@ import javax.servlet.http.*;
 
 import annis.cache.Cache;
 import annis.cache.CacheException;
-import annis.cache.CacheInitializationException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.frontend.servlets.visualizers.Visualizer;
 import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.frontend.servlets.visualizers.VisualizerPlugin;
-import annis.pluginsystem.StartStopListener;
 import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
@@ -42,7 +39,6 @@ import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.PluginLoaded;
-import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  * This servlet dispatches visualization requests to the according visualizer Classes.<br/><br>
