@@ -17,6 +17,7 @@ package annis.frontend.servlets.visualizers.dependency;
 
 import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
@@ -30,12 +31,21 @@ import java.util.Set;
 public class ProielDependecyTree extends AbstractDotVisualizer
 {
 
+  @Override
+  public String getShortName()
+  {
+    return "hierarchical_dependency";
+  }
+  
+
+  private VisualizerInput input;
   private StringBuilder dot;
   private Set<String> alreadyWrittenEdge;
 
   @Override
-  public void createDotContent(StringBuilder sb)
+  public void createDotContent(VisualizerInput input, StringBuilder sb)
   {
+    this.input = input;
     this.dot = sb;
     alreadyWrittenEdge = new HashSet<String>();
 
@@ -53,7 +63,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
   private void writeAllNodes()
   {
 
-    for (AnnisNode n : getResult().getGraph().getNodes())
+    for (AnnisNode n : input.getResult().getGraph().getNodes())
     {
       boolean isDepNode = false;
       String word = null;
@@ -77,7 +87,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
 
   private void writeAllEdges()
   {
-    for (Edge e : getResult().getGraph().getEdges())
+    for (Edge e : input.getResult().getGraph().getEdges())
     {
       boolean isDepEdge = false;
       for (Annotation anno : e.getAnnotations())
@@ -203,7 +213,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     }
 
     // check coloring
-    String matchColorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    String matchColorAsString = input.getMarkableExactMap().get(Long.toString(n.getId()));
     if (matchColorAsString == null)
     {
       // check if there mighte be a matching token that is directly belonging to
@@ -211,7 +221,7 @@ public class ProielDependecyTree extends AbstractDotVisualizer
       AnnisNode token = getCorrespondingRealToken(n);
       if (token != null)
       {
-        matchColorAsString = getMarkableExactMap().get(Long.toString(token.getId()));
+        matchColorAsString = input.getMarkableExactMap().get(Long.toString(token.getId()));
       }
     }
 

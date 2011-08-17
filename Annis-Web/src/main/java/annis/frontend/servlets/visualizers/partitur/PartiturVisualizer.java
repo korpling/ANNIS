@@ -15,6 +15,7 @@
  */
 package annis.frontend.servlets.visualizers.partitur;
 
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
@@ -28,12 +29,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer
 {
 
@@ -48,24 +51,33 @@ public class PartiturVisualizer extends WriterVisualizer
   }
 
   @Override
-  public void writeOutput(Writer writer)
+  public String getShortName()
+  {
+    return "grid";
+  }
+
+  
+  
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
       // get partitur
-      PartiturParser partitur = new PartiturParser(getResult().getGraph(), getNamespace());
+      PartiturParser partitur = new PartiturParser(input.getResult().getGraph(), 
+        input.getNamespace());
 
       // check right to left
-      boolean isRTL = checkRTL(getResult().getTokenList());
+      boolean isRTL = checkRTL(input.getResult().getTokenList());
 
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
 
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-      writer.append("<link href=\"" + getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
+      writer.append("<link href=\"" + input.getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + input.getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -74,7 +86,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
 
       writer.append("</head>");
       writer.append("<body>\n");
@@ -92,7 +104,7 @@ public class PartiturVisualizer extends WriterVisualizer
       }
 
       LinkedHashSet<String> keys = new LinkedHashSet<String>();
-      String mapping = getMappings().getProperty("annos");
+      String mapping = input.getMappings().getProperty("annos");
       if(mapping == null)
       {
         // default to the alphabetical order
@@ -260,9 +272,9 @@ public class PartiturVisualizer extends WriterVisualizer
               }
 
               String color = "black";
-              if (getMarkableExactMap().containsKey("" + element.getNodeId()))
+              if (input.getMarkableExactMap().containsKey("" + element.getNodeId()))
               {
-                color = getMarkableExactMap().get("" + element.getNodeId());
+                color = input.getMarkableExactMap().get("" + element.getNodeId());
               }
               if (found)
               {
@@ -295,9 +307,9 @@ public class PartiturVisualizer extends WriterVisualizer
       {
         String color = "black";
 
-        if (getMarkableExactMap().containsKey("" + token.getId()))
+        if (input.getMarkableExactMap().containsKey("" + token.getId()))
         {
-          color = getMarkableExactMap().get("" + token.getId());
+          color = input.getMarkableExactMap().get("" + token.getId());
         }
         writer.append("<td class=\"tok\" style=\"color:" + color + ";\" "
           + "id=\"token_" + token.getId() + "\" "

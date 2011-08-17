@@ -23,22 +23,35 @@ import annis.service.ifaces.AnnisBinary;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
- * @author thomas
+ * Visualizer for external files.
+ * 
+ * Currently it can files with the mime type "audio/mpeg" and "video/x-flv"
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class ExternalFileVisualizer extends WriterVisualizer
 {
 
   private long externalID = -1;
+  private VisualizerInput theInput;
 
   @Override
-  public void writeOutput(Writer writer)
+  public String getShortName()
+  {
+    return "file";
+  }
+
+  
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     externalID = -1;
-
-    for (AnnisNode n : getResult().getGraph().getNodes())
+    this.theInput = input;
+    
+    for (AnnisNode n : theInput.getResult().getGraph().getNodes())
     {
       if (externalID < 0)
       {
@@ -63,7 +76,7 @@ public class ExternalFileVisualizer extends WriterVisualizer
     {
       try
       {
-        AnnisService service = AnnisServiceFactory.getClient(getAnnisRemoteServiceURL());
+        AnnisService service = AnnisServiceFactory.getClient(theInput.getAnnisRemoteServiceURL());
         AnnisBinary binary = service.getBinary(externalID);
 
         if("audio/mpeg".equalsIgnoreCase(binary.getMimeType()))
@@ -98,8 +111,9 @@ public class ExternalFileVisualizer extends WriterVisualizer
         + "&amp;width=85&amp;showstop=1&amp;showvolume=1&amp;showslider=0&amp;bgcolor1=dfe8f6&amp;bgcolor2=bad0ee&amp;sliderovercolor=ffffff&amp;buttoncolor=000000&amp;buttonovercolor=ffffff&amp;textcolor=000000\" />\n"
        + "</object>";
 
-    return String.format(template, getContextPath(), getContextPath(),
-      getContextPath(), externalID);
+    return String.format(template, theInput.getContextPath(), 
+      theInput.getContextPath(),
+      theInput.getContextPath(), externalID);
   }
 
   private String generateVideo()
@@ -113,8 +127,9 @@ public class ExternalFileVisualizer extends WriterVisualizer
         + "&amp;showstop=1&amp;showvolume=1&amp;showtime=1&amp;showfullscreen=1\" />\n"
        + "</object>";
 
-    return String.format(template, getContextPath(), getContextPath(),
-      getContextPath(), externalID);
+    return String.format(template, theInput.getContextPath(), 
+      theInput.getContextPath(),
+      theInput.getContextPath(), externalID);
   }
 
 }

@@ -15,6 +15,7 @@
  */
 package annis.frontend.servlets.visualizers.dependency;
 
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -26,32 +27,42 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class VakyarthaDependencyTree extends WriterVisualizer
 {
 
   private Writer theWriter;
 
   @Override
-  public void writeOutput(Writer writer)
+  public String getShortName()
+  {
+    return "arch_dependency";
+  }
+
+  
+  
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     theWriter = writer;
     try
     {
-      AnnisResult result = getResult();
+      AnnisResult result = input.getResult();
 
       println("<html>");
       println("<head>");
 
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/jquery-1.4.2.min.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/raphael.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/vakyarthaDependency.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/jquery-1.4.2.min.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/raphael.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/vakyarthaDependency.js\"></script>");
 
       // output the data for the javascript
       println("<script type=\"text/javascript\">");
@@ -107,9 +118,9 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         JSONObject tAttris = new JSONObject();
         String tokenColor = "black";
-        if(getMarkableExactMap().containsKey("" + tok.getId()))
+        if(input.getMarkableExactMap().containsKey("" + tok.getId()))
         {
-          tokenColor = getMarkableExactMap().get("" + tok.getId());
+          tokenColor = input.getMarkableExactMap().get("" + tok.getId());
         }
         tAttris.put("fill", tokenColor);
         tAttris.put("font", "11px Arial,Tahoma,Helvetica,Sans-Serif");

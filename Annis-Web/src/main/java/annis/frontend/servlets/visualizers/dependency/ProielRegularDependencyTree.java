@@ -17,6 +17,7 @@ package annis.frontend.servlets.visualizers.dependency;
 
 import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
@@ -27,14 +28,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class ProielRegularDependencyTree extends AbstractDotVisualizer
 {
 
+  private VisualizerInput input;
   private StringBuilder dot;
   private List<AnnisNode> realToken;
   private List<AnnisNode> pseudoToken;
@@ -42,10 +46,18 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
   private Random rand = new Random();
 
   @Override
-  public void createDotContent(StringBuilder sb)
+  public String getShortName()
   {
-    dot = sb;
+    return "ordered_dependency";
+  }
 
+  
+  
+  @Override
+  public void createDotContent(VisualizerInput input, StringBuilder sb)
+  {
+    this.dot = sb;
+    this.input = input;
 
     w("digraph G {\n");
     w("charset=\"UTF-8\";\n");
@@ -69,7 +81,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     // Token are in a subgraph
     w("  {\n \trank=max;\n");
 
-    for (AnnisNode n : getResult().getGraph().getTokens())
+    for (AnnisNode n : input.getResult().getGraph().getTokens())
     {
       realToken.add(n);
       writeToken(n);
@@ -81,7 +93,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
   private void writeAllPseudoToken()
   {
     // write out pseudo token nodes
-    for (AnnisNode n : getResult().getGraph().getNodes())
+    for (AnnisNode n : input.getResult().getGraph().getNodes())
     {
       if (!n.isToken())
       {
@@ -108,7 +120,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
 
   private void writeAllDepEdges()
   {
-    for (Edge e : getResult().getGraph().getEdges())
+    for (Edge e : input.getResult().getGraph().getEdges())
     {
       if(e.getDestination() != null && !e.getDestination().isToken())
       {
@@ -199,7 +211,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     String color = "#000000";
     String shape = "point";
 
-    String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    String colorAsString = input.getMarkableExactMap().get(Long.toString(n.getId()));
     if (colorAsString != null)
     {
       MatchedNodeColors matchedColor = MatchedNodeColors.valueOf(colorAsString);
@@ -223,7 +235,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     // background color
     w("style=filled, ");
     w("fillcolor=\"");
-    String colorAsString = getMarkableExactMap().get(Long.toString(n.getId()));
+    String colorAsString = input.getMarkableExactMap().get(Long.toString(n.getId()));
     if (colorAsString != null)
     {
       MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);

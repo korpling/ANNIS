@@ -1,5 +1,6 @@
 package annis.frontend.servlets.visualizers.gridtree;
 
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -125,30 +126,38 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
+  @Override
+  public String getShortName()
+  {
+    return "grid_tree";
+  }
+  
+  
+
 	@Override
-	public void writeOutput(Writer writer)
+	public void writeOutput(VisualizerInput input, Writer writer)
 	{
 		try
 		{
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 			writer.append("<link href=\""
-					+ getContextPath()
+					+ input.getContextPath()
 					+ "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<link href=\""
-					+ getContextPath()
+					+ input.getContextPath()
 					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<script type=\"text/javascript\" src=\""
-					+ getContextPath()
+					+ input.getContextPath()
 					+ "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
 			writer.append("<script type=\"text/javascript\" src=\""
-					+ getContextPath()
+					+ input.getContextPath()
 					+ "/javascript/extjs/ext-all.js\"></script>");
 			writer.append("<script type=\"text/javascript\" src=\""
-					+ getContextPath()
+					+ input.getContextPath()
 					+ "/javascript/annis/visualizer/gridtreeVisualizer.js\"></script>");
 			writer.append("<body>");
 			writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
-			writer.append(findAnnotation("cat"));
+			writer.append(findAnnotation("cat", input.getResult().getGraph()));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
@@ -159,10 +168,9 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
-	private String findAnnotation(String anno)
+	private String findAnnotation(String anno, AnnotationGraph graph)
 	{
 
-		AnnotationGraph graph = getResult().getGraph();
 		List<AnnisNode> nodes = graph.getNodes();
 		List<AnnisNode> result = graph.getTokens();
 		Set<Span> roots = new HashSet<Span>();

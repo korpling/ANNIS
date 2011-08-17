@@ -23,7 +23,10 @@
     <param-value>dot</param-value>
   </context-param>
 	<!-- END Application Configuration -->
-	  
+  <listener>
+    <listener-class>annis.pluginsystem.StartStopListener</listener-class>
+  </listener>
+    
 	<!-- USED -->
   <servlet>
     <servlet-name>WekaExporterServlet</servlet-name>
@@ -43,7 +46,7 @@
     <url-pattern>/secure/TextExporter</url-pattern>
   </servlet-mapping>
 
- <servlet>
+  <servlet>
     <servlet-name>SimpleTextExporterServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.exporter.GeneralTextExporter</servlet-class>
   </servlet>
@@ -52,7 +55,7 @@
     <url-pattern>/secure/SimpleTextExporter</url-pattern>
   </servlet-mapping>
 
- <servlet>
+  <servlet>
     <servlet-name>GridExporterServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.exporter.GridExporterServlet</servlet-class>
   </servlet>

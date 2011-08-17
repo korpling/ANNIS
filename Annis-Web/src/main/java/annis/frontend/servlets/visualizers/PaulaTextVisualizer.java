@@ -15,33 +15,24 @@
  */
 package annis.frontend.servlets.visualizers;
 
-import java.io.OutputStream;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-public abstract class Visualizer implements VisualizerPlugin
+@PluginImplementation
+public class PaulaTextVisualizer extends PaulaVisualizer
 {
 
   @Override
-  public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
-
-  @Override
-  public String getContentType()
+  public String getShortName()
   {
-    return "text/html";
-  }
-
-  @Override
-  public String getCharacterEncoding()
-  {
-    return "utf-8";
+    return "paula_text";
   }
 
   @Override
   public boolean isUsingText()
   {
-    return false;
+    return true;
   }
+
   
   
-
-
 }

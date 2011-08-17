@@ -30,16 +30,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.StringUtils;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause
  * @author Christian Schulz-Hanke
  */
+@PluginImplementation
 public class CorefVisualizer extends WriterVisualizer
 {
 
+  VisualizerInput theInput;
   Writer theWriter;
   long globalIndex;
   List<TReferent> ReferentList;
@@ -99,25 +101,47 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
+  @Override
+  public String getShortName()
+  {
+    return "discourse";
+  }
+
+  @Override
+  public boolean isUsingText()
+  {
+    return true;
+  }
+  
+  
+
   /**
    * writes Output for the CorefVisualizer
    * @param writer writer to write with
    */
   @Override
-  public void writeOutput(Writer writer)
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
-    theWriter = writer;
+    this.theInput = input;
+    this.theWriter = writer;
     try
     {
       println("<html>");
       println("<head>");
 
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + theInput.getContextPath() 
+        + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + theInput.getContextPath() 
+        + "/javascript/extjs/ext-all.js\"></script>");
 
-      println("<link href=\"" + getContextPath() + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      println("<link href=\"" + getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");//new
-      println("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/CorefVisualizer.js\"></script>");
+      println("<link href=\"" + theInput.getContextPath() 
+        + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      println("<link href=\"" + theInput.getContextPath() 
+        + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");//new
+      println("<script type=\"text/javascript\" src=\"" + theInput.getContextPath() 
+        + "/javascript/annis/visualizer/CorefVisualizer.js\"></script>");
 
       println("</head>");
       println("<body>");
@@ -131,7 +155,7 @@ public class CorefVisualizer extends WriterVisualizer
       ReferentOfToken = new HashMap<Long, HashMap<Long, Integer>>();
       ComponentOfToken = new HashMap<Long, List<Long>>();
       Componenttype = new LinkedList<TComponenttype>();
-      AnnisResult anResult = getResult();
+      AnnisResult anResult = input.getResult();
       if (anResult == null)
       {
         println("An Error occured: Could not get Result (Result == null)</body>");
@@ -216,7 +240,7 @@ public class CorefVisualizer extends WriterVisualizer
       List<Long> finalpositions = null;
       int maxlinkcount = 0;
       Long lastId = null, currentId = null;
-      for (AnnisToken tok : getResult().getTokenList())
+      for (AnnisToken tok : input.getResult().getTokenList())
       {
 
         prevpositions = finalpositions;
@@ -287,7 +311,7 @@ public class CorefVisualizer extends WriterVisualizer
         }
 
         String onclick = "", style = "";
-        if (getMarkableMap().containsKey("" + tok.getId()))
+        if (input.getMarkableMap().containsKey("" + tok.getId()))
         {
           style += "color:red; ";
         }
@@ -842,7 +866,8 @@ public class CorefVisualizer extends WriterVisualizer
     if (e != null && e.getName() != null
           && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
           && e.getDestination() != null
-          && e.getNamespace() != null && e.getNamespace().equals(getNamespace()))
+          && e.getNamespace() != null 
+          && e.getNamespace().equals(theInput.getNamespace()))
     {
       return true;
     }

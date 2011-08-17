@@ -17,17 +17,27 @@ package annis.frontend.servlets.visualizers;
 
 import java.io.IOException;
 import java.io.Writer;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class PaulaVisualizer extends WriterVisualizer
 {
 
   @Override
-  public void writeOutput(Writer writer)
+  public String getShortName()
+  {
+    return "paula";
+  }
+
+  
+  
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
       writer.append("<html><head><style> body { font-family: verdana, arial; font-size: 10px; } </style><body>");
-      writer.append(getPaula().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</body></html>");
+      writer.append(input.getPaula().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</body></html>");
     }
     catch(IOException e)
     {

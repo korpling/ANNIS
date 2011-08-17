@@ -42,12 +42,21 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer
 {
 
   @Override
-  public void writeOutput(Writer writer)
+  public String getShortName()
+  {
+    return "old_grid";
+  }
+
+  
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
@@ -55,11 +64,11 @@ public class PartiturVisualizer extends WriterVisualizer
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
 
-      Document document = builder.parse(new InputSource(new StringReader(getPaula())));
+      Document document = builder.parse(new InputSource(new StringReader(input.getPaula())));
       PaulaInline2PartiturWriter paula2Partitur = new PaulaInline2PartiturWriter(document);
 
       Set<String> namespaceSet = new HashSet<String>();
-      namespaceSet.add(getNamespace());
+      namespaceSet.add(input.getNamespace());
 
       paula2Partitur.setNamespaceSet(namespaceSet);
 
@@ -141,7 +150,8 @@ public class PartiturVisualizer extends WriterVisualizer
               {
                 tokenIdsArray.append((tokenCount++ > 0 ? "," : "") + tokenId);
               }
-              String color = getMarkableMap().containsKey(Long.toString(span.getId())) ? getMarkableMap().get(Long.toString(span.getId())) : "black";
+              String color = input.getMarkableMap()
+                .containsKey(Long.toString(span.getId())) ? input.getMarkableMap().get(Long.toString(span.getId())) : "black";
               markup.append("<td colspan=\"" + span.getLength() + "\" class=\"x-grid3-row x-grid3-row-alt\" style=\"width: auto;\" annis:tokenIds=\"" + tokenIdsArray + "\" onMouseOver=\"toggleAnnotation(this, true);\" onMouseOut=\"toggleAnnotation(this, false);\"><div style=\"display: none;\">(id: " + span.getId() + ", token: " + span.getTokenId() + ", length: " + span.getLength() + ", offset: " + span.getOffset() + ") " + levelName + "</div><table style=\"width: 100%;\">");
               for(Entry<String, String> entry : span.entrySet())
               {
@@ -171,9 +181,9 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append("\n");
       }
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
-        "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" />");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
+        "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + input.getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" />");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
       writer.append("</head><body>");
       writer.append("<div id=\"toolbar\"></div><div id=\"partiture\" style=\"position: absolute; top: 30px; left: 0px;\"><table>\n");
 
@@ -192,7 +202,7 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("\t<tr class=\"x-grid3-row\"><td></td>\n\t\t");
       for(PaulaInline2PartiturWriter.Token token : tokenList)
       {
-        String color = getMarkableMap().containsKey(Long.toString(token.getId())) ? getMarkableMap().get(Long.toString(token.getId())) : "black";
+        String color = input.getMarkableMap().containsKey(Long.toString(token.getId())) ? input.getMarkableMap().get(Long.toString(token.getId())) : "black";
         writer.append("<td id=\"token_" + token.getId() + "\" class=\"x-grid3-row\" style=\"font-weight: bold; width: auto; color: " + color + ";\">" + token.getText() + "</td>");
       }
       writer.append("\n\t</tr>\n");
@@ -204,7 +214,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer.js\"></script>");
       writer.append("</body></html>");
       //END
     }
