@@ -36,14 +36,16 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
   {
    
     StringBuilder dot = new StringBuilder();
-
+    OutputStreamWriter stdin = null;
+    InputStream stdout = null;
+    InputStream stderr = null;
     try
     {
       String cmd = input.getMappings().getProperty("dotpath", "dot") 
         + " -s" + scale + ".0 -Tpng";
       Runtime runTime = Runtime.getRuntime();
       Process p = runTime.exec(cmd);
-      OutputStreamWriter stdin = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
+      stdin = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
 
       createDotContent(input, dot);
       
@@ -53,9 +55,10 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
       stdin.append(dot);
       stdin.flush();
 
-      p.getOutputStream().close();
+      stdin.close();
+      
       int chr;
-      InputStream stdout = p.getInputStream();
+      stdout = p.getInputStream();
       StringBuilder outMessage = new StringBuilder();
       while ((chr = stdout.read()) != -1)
       {
@@ -64,7 +67,7 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
       }
 
       StringBuilder errorMessage = new StringBuilder();
-      InputStream stderr = p.getErrorStream();
+      stderr = p.getErrorStream();
       while ((chr = stderr.read()) != -1)
       {
         errorMessage.append((char) chr);
@@ -88,6 +91,42 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
     catch (IOException ex)
     {
       Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    finally
+    {
+      if(stdin != null)
+      {
+        try
+        {
+          stdin.close();
+        }
+        catch(IOException ex)
+        {
+          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+      if(stdout != null)
+      {
+        try
+        {
+          stdout.close();
+        }
+        catch(IOException ex)
+        {
+          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+      if(stderr != null)
+      {
+        try
+        {
+          stderr.close();
+        }
+        catch(IOException ex)
+        {
+          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
     }
 
   }

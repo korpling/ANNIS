@@ -48,7 +48,7 @@ public class StartStopListener implements ServletContextListener
     
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-    URI classpath = ClassURI.CLASSPATH;
+    URI classpath = ClassURI.CLASSPATH("annis.**");
     if(classpath != null)
     {
       pluginManager.addPluginsFrom(classpath);
