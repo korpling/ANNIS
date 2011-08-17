@@ -37,12 +37,14 @@ public class MarkableVisualizer extends WriterVisualizer
 
     private StringBuffer sBuffer = new StringBuffer();
     private Writer writer;
+    private VisualizerInput input;
     private Set<String> markerSet = new HashSet<String>();
     private boolean marked = false;
     private Set<String> alreadySeen = new HashSet<String>();
 
-    public MarkableHandler(Writer writer, Set<String> markerSet)
+    public MarkableHandler(VisualizerInput input, Writer writer, Set<String> markerSet)
     {
+      this.input = input;
       this.writer = writer;
       this.markerSet = markerSet;
     }
@@ -105,16 +107,17 @@ public class MarkableVisualizer extends WriterVisualizer
   }
 
   @Override
-  public void writeOutput(Writer writer)
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
-      writer.append("<result id=\"" + getId() + "\">\n");
+      writer.append("<result id=\"" + input.getId() + "\">\n");
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
 
-      DefaultHandler handler = new MarkableHandler(writer, getMarkableMap().keySet());
-      saxParser.parse(new ByteArrayInputStream(getPaula().getBytes()), handler);
+      DefaultHandler handler = new MarkableHandler(input, writer, 
+        input.getMarkableMap().keySet());
+      saxParser.parse(new ByteArrayInputStream(input.getPaula().getBytes()), handler);
       writer.append("</result>\n");
       writer.flush();
     }

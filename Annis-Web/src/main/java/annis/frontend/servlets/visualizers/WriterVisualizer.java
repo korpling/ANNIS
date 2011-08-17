@@ -34,12 +34,12 @@ public abstract class WriterVisualizer extends Visualizer
    * @param outstream
    */
   @Override
-  public void writeOutput(OutputStream outstream)
+  public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
     try
     {
       OutputStreamWriter writer = new OutputStreamWriter(outstream, getCharacterEncoding());
-      writeOutput(writer);
+      writeOutput(input, writer);
       writer.flush();
     }
     catch(IOException ex)
@@ -52,6 +52,6 @@ public abstract class WriterVisualizer extends Visualizer
    * Writes the final output to passed Wriiter. The writer should remain open.
    * @param writer
    */
-  public abstract void writeOutput(Writer writer);
+  public abstract void writeOutput(VisualizerInput input, Writer writer);
 
 }

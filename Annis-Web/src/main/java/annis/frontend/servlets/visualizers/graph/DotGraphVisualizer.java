@@ -17,6 +17,7 @@ package annis.frontend.servlets.visualizers.graph;
 
 import annis.frontend.servlets.MatchedNodeColors;
 import annis.frontend.servlets.visualizers.AbstractDotVisualizer;
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
@@ -32,7 +33,8 @@ import java.util.List;
  */
 public class DotGraphVisualizer extends AbstractDotVisualizer
 {
-
+  
+  private VisualizerInput input;
   private String outputFormat = "png";
   private int scale = 50;
   private StringBuilder dot;
@@ -41,12 +43,14 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
   private String requiredEdgeNS;
 
   @Override
-  public void createDotContent(StringBuilder sb)
+  public void createDotContent(VisualizerInput input, StringBuilder sb)
   {
+    this.input = input;
+    
     // initialization
-    displayAllNamespaces = Boolean.parseBoolean(getMappings().getProperty("all_ns", "false"));
-    requiredNodeNS = getMappings().getProperty("node_ns", getNamespace());
-    requiredEdgeNS = getMappings().getProperty("edge_ns", getNamespace());
+    displayAllNamespaces = Boolean.parseBoolean(input.getMappings().getProperty("all_ns", "false"));
+    requiredNodeNS = input.getMappings().getProperty("node_ns", input.getNamespace());
+    requiredEdgeNS = input.getMappings().getProperty("edge_ns", input.getNamespace());
 
     if(requiredEdgeNS == null && requiredNodeNS == null)
     {
@@ -65,7 +69,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     w("\tnode [shape=box];\n");
      // node definitions
     List<AnnisNode> token = new LinkedList<AnnisNode>();
-    for (AnnisNode n : getResult().getGraph().getNodes())
+    for (AnnisNode n : input.getResult().getGraph().getNodes())
     {
       if(n.isToken())
       {
@@ -90,7 +94,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     writeInvisibleTokenEdges(token);
     w("\t}\n");
 
-    for (Edge e : getResult().getGraph().getEdges())
+    for (Edge e : input.getResult().getGraph().getEdges())
     {
       if(e != null && testEdge(e))
       {
@@ -158,7 +162,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     // background color
     w("style=filled, ");
     w("fillcolor=\"");
-    String colorAsString = getMarkableExactMap().get(Long.toString(node.getId()));
+    String colorAsString = input.getMarkableExactMap().get(Long.toString(node.getId()));
     if (colorAsString != null)
     {
       MatchedNodeColors color = MatchedNodeColors.valueOf(colorAsString);

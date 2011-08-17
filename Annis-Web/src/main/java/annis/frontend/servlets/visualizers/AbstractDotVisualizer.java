@@ -32,19 +32,20 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
   public final int scale = 50;
 
   @Override
-  public final void writeOutput(Writer writer)
+  public final void writeOutput(VisualizerInput input, Writer writer)
   {
    
     StringBuilder dot = new StringBuilder();
 
     try
     {
-      String cmd = getMappings().getProperty("dotpath", "dot") + " -s" + scale + ".0 -Tpng";
+      String cmd = input.getMappings().getProperty("dotpath", "dot") 
+        + " -s" + scale + ".0 -Tpng";
       Runtime runTime = Runtime.getRuntime();
       Process p = runTime.exec(cmd);
       OutputStreamWriter stdin = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
 
-      createDotContent(dot);
+      createDotContent(input, dot);
       
       Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.FINE,
         "outputting dot graph:\n{0}", dot.toString());
@@ -91,7 +92,7 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
 
   }
   
-  public abstract void createDotContent(StringBuilder sb);
+  public abstract void createDotContent(VisualizerInput input, StringBuilder sb);
 
   @Override
   public String getContentType()

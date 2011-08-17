@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Collaborative Research Centre SFB 632 
+ * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,9 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 
 /**
- *
- * @author thomas
+ * Loads plugins from several places on webapp startup.
+ * 
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
 public class StartStopListener implements ServletContextListener
 {

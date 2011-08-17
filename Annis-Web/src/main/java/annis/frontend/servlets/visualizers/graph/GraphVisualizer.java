@@ -49,9 +49,10 @@ public class GraphVisualizer extends Visualizer
 {
 
   @Override
-  public void writeOutput(OutputStream outstream)
+  public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
-    DirectedGraph<AnnisNode, Edge> g = generateGraphFromModel(getResult().getGraph());
+    DirectedGraph<AnnisNode, Edge> g = 
+      generateGraphFromModel(input.getResult().getGraph(), input.getNamespace());
     
     SuperDAGLayout dagLayout = new SuperDAGLayout(g);
     dagLayout.initialize();
@@ -81,7 +82,7 @@ public class GraphVisualizer extends Visualizer
           {
             for(Annotation a : input.getNodeAnnotations())
             {
-              if(getNamespace().equals(a.getNamespace()))
+              if(input.getNamespace().equals(a.getNamespace()))
               {
                 result.append(a.getValue());
                 result.append("\n");
@@ -98,7 +99,7 @@ public class GraphVisualizer extends Visualizer
       }
     });
 
-    final Map<String, String> markableMapFinal = getMarkableExactMap();
+    final Map<String, String> markableMapFinal = input.getMarkableExactMap();
 
     VertexLabelAsShapeRenderer<AnnisNode, Edge> vertexTrans =
       new VertexLabelAsShapeRenderer<AnnisNode, Edge>(vv.getRenderContext());
@@ -154,7 +155,7 @@ public class GraphVisualizer extends Visualizer
 
         for(Annotation a : input.getAnnotations())
         {
-          if(getNamespace().equals(a.getNamespace())
+          if(input.getNamespace().equals(a.getNamespace())
             && !"--".equals(a.getValue()))
           {
             result.append(a.getValue());
@@ -204,7 +205,8 @@ public class GraphVisualizer extends Visualizer
     return "latin1";
   }
 
-  public DirectedGraph<AnnisNode, Edge> generateGraphFromModel(AnnotationGraph annoGraph)
+  public DirectedGraph<AnnisNode, Edge> generateGraphFromModel(
+    AnnotationGraph annoGraph, String namespace)
   {
     DirectedGraph<AnnisNode, Edge> g =
       new DirectedOrderedSparseMultigraph<AnnisNode, Edge>();
@@ -231,7 +233,7 @@ public class GraphVisualizer extends Visualizer
       boolean nsFound = false;
       for(Annotation a : e.getAnnotations())
       {
-        if(getNamespace().equals(a.getNamespace()))
+        if(namespace.equals(a.getNamespace()))
         {
           nsFound = true;
           break;

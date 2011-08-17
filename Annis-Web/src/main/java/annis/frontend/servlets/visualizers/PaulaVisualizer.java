@@ -22,12 +22,12 @@ public class PaulaVisualizer extends WriterVisualizer
 {
 
   @Override
-  public void writeOutput(Writer writer)
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
       writer.append("<html><head><style> body { font-family: verdana, arial; font-size: 10px; } </style><body>");
-      writer.append(getPaula().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</body></html>");
+      writer.append(input.getPaula().replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</body></html>");
     }
     catch(IOException e)
     {

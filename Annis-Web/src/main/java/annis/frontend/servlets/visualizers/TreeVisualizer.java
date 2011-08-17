@@ -51,30 +51,30 @@ public class TreeVisualizer extends WriterVisualizer
 {
 
   @Override
-  public void writeOutput(Writer writer)
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
       //Converting paulaInline to SVG Tree
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
-      Document document = builder.parse(new InputSource(new StringReader(getPaula())));
+      Document document = builder.parse(new InputSource(new StringReader(input.getPaula())));
 
       //Using PaulaInline2DotWriter
       PaulaInline2DotWriter paula2Dot = new PaulaInline2DotWriter(document);
 
       Set<String> namespaceSet = new HashSet<String>();
-      namespaceSet.add(getNamespace());
+      namespaceSet.add(input.getNamespace());
 
       paula2Dot.setNamespaceSet(namespaceSet);
-      paula2Dot.setFillMap(getMarkableMap());
+      paula2Dot.setFillMap(input.getMarkableMap());
       paula2Dot.run();
 
       //width: 125 -> 80
       //depth: 90 -> 45
       paula2Dot.setScale(50);
       paula2Dot.setOutputFormat("png");
-      paula2Dot.writeOutput(writer);
+      paula2Dot.writeOutput(input, writer);
     }
     catch(RemoteException e)
     {
@@ -553,12 +553,12 @@ public class TreeVisualizer extends WriterVisualizer
       this.scale = scale;
     }
 
-    public void writeOutput(Writer writer)
+    public void writeOutput(VisualizerInput input, Writer writer)
     {
       try
       {
         //Initiating External Process
-        String cmd = getDotPath() + " -s" + scale + ".0 -T" + outputFormat;
+        String cmd = input.getDotPath() + " -s" + scale + ".0 -T" + outputFormat;
         Runtime runTime = Runtime.getRuntime();
 
         //check if neato exists

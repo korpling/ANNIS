@@ -19,11 +19,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 import annis.cache.Cache;
-import annis.cache.FilesystemCache;
 import annis.cache.CacheException;
 import annis.cache.CacheInitializationException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.frontend.servlets.visualizers.Visualizer;
+import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
@@ -34,6 +34,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This servlet dispatches visualization requests to the according visualizer Classes.<br/><br>
@@ -143,13 +145,14 @@ public class VisualizerServlet extends HttpServlet
         }
       }
 
+      VisualizerInput input = new VisualizerInput();
       Visualizer visualizer = (Visualizer) classLoader.loadClass(className).newInstance();
-      visualizer.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
-      visualizer.setMarkableMap(markableMap);
-      visualizer.setMarkableExactMap(markableExactMap);
-      visualizer.setContextPath(getServletContext().getContextPath());
-      visualizer.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-      visualizer.setDotPath(path2Dot);
+      input.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
+      input.setMarkableMap(markableMap);
+      input.setMarkableExactMap(markableExactMap);
+      input.setContextPath(getServletContext().getContextPath());
+      input.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+      input.setDotPath(path2Dot);
 
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());
@@ -161,14 +164,15 @@ public class VisualizerServlet extends HttpServlet
         {
           AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
           AnnisResult r = service.getAnnisResult(Long.parseLong(textId));
-          visualizer.setResult(r);
+          input.setResult(r);
         } catch (AnnisServiceFactoryException e)
         {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, 
+            "Could not generate ANNIS service from factory", e);
         } catch (Exception e)
         {
-          e.printStackTrace();
+          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, 
+            "General remote service exception", e);
         }
       } else
       {
@@ -180,21 +184,21 @@ public class VisualizerServlet extends HttpServlet
           byte[] resultAsBytes = cacheAnnisResult.getBytes(callbackId);
           ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
 
-          visualizer.setResult((AnnisResult) inStream.readObject());
+          input.setResult((AnnisResult) inStream.readObject());
           ResolverEntry[] resolverEntries = (ResolverEntry[])inStream.readObject();
 
           if(resolverEntries != null && visId < resolverEntries.length)
           {
-            visualizer.setMappings(resolverEntries[visId].getMappings());
+            input.setMappings(resolverEntries[visId].getMappings());
           }
           else
           {
-            visualizer.setMappings(new Properties());
+            input.setMappings(new Properties());
           }
         }
       }
 
-      visualizer.writeOutput(outStream);
+      visualizer.writeOutput(input, outStream);
       outStream.flush();
     } catch (InstantiationException e1)
     {

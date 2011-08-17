@@ -34,12 +34,12 @@ public class AudioVisualizer extends WriterVisualizer
 {
 
   private long audioID = 0;
-  
+
   @Override
-  public void writeOutput(Writer writer)
+  public void writeOutput(VisualizerInput input, Writer writer)
   {
     audioID = -1;
-    
+
     SAXParserFactory factory = SAXParserFactory.newInstance();
     SAXParser saxParser;
 
@@ -60,7 +60,6 @@ public class AudioVisualizer extends WriterVisualizer
             }
             catch(NumberFormatException ex)
             {
-
             }
           }
           else if(attributes.getValue("audio:audioFile") != null)
@@ -71,35 +70,34 @@ public class AudioVisualizer extends WriterVisualizer
             }
             catch(NumberFormatException ex)
             {
-              
             }
           }
         }
       }
-      
     };
     try
     {
       saxParser = factory.newSAXParser();
-      saxParser.parse(new ByteArrayInputStream(getPaula().getBytes()), handler);
+      saxParser.parse(new ByteArrayInputStream(input.getPaula().getBytes()), handler);
 
     }
     catch(Exception ex)
     {
       Logger.getLogger(AudioVisualizer.class.getName()).log(Level.SEVERE, null, ex);
     }
-    
+
     try
     {
 
       writer.append(
-        "<object type=\"application/x-shockwave-flash\" data=\"" + getContextPath() + "/mediaplayer/player_mp3_maxi.swf\" width=\"200\" height=\"20\">\n"
-       + "<param name=\"movie\" value=\"" + getContextPath() + "/secure/Binary/" + audioID + ".mp3\" />\n"
-       + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
-       + "<param name=\"FlashVars\" value=\"mp3=" 
-        + getContextPath() + "/secure/Binary/" + audioID + ".mp3"
+        "<object type=\"application/x-shockwave-flash\" data=\""
+        + input.getContextPath() + "/mediaplayer/player_mp3_maxi.swf\" width=\"200\" height=\"20\">\n"
+        + "<param name=\"movie\" value=\"" + input.getContextPath() + "/secure/Binary/" + audioID + ".mp3\" />\n"
+        + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
+        + "<param name=\"FlashVars\" value=\"mp3="
+        + input.getContextPath() + "/secure/Binary/" + audioID + ".mp3"
         + "&amp;width=85&amp;showstop=1&amp;showvolume=1&amp;showslider=0&amp;bgcolor1=dfe8f6&amp;bgcolor2=bad0ee&amp;sliderovercolor=ffffff&amp;buttoncolor=000000&amp;buttonovercolor=ffffff&amp;textcolor=000000\" />\n"
-       + "</object>");
+        + "</object>");
 
     }
     catch(IOException ex)
