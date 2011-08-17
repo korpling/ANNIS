@@ -31,6 +31,13 @@ import java.util.Set;
 public class ProielDependecyTree extends AbstractDotVisualizer
 {
 
+  @Override
+  public String getShortName()
+  {
+    return "hierarchical_dependency";
+  }
+  
+
   private VisualizerInput input;
   private StringBuilder dot;
   private Set<String> alreadyWrittenEdge;

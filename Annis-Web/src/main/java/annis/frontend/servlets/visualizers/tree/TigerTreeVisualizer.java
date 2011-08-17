@@ -45,7 +45,9 @@ import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class TigerTreeVisualizer extends Visualizer
 {
 
@@ -271,6 +273,14 @@ public class TigerTreeVisualizer extends Visualizer
     graphtools = new AnnisGraphTools();
   }
 
+  @Override
+  public String getShortName()
+  {
+    return "tree";
+  }
+
+  
+  
   @Override
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {

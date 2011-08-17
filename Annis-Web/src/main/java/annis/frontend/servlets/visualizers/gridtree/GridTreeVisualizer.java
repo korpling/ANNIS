@@ -126,6 +126,14 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
+  @Override
+  public String getShortName()
+  {
+    return "grid_tree";
+  }
+  
+  
+
 	@Override
 	public void writeOutput(VisualizerInput input, Writer writer)
 	{

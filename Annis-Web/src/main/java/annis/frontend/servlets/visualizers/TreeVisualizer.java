@@ -46,9 +46,19 @@ import org.xml.sax.SAXException;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class TreeVisualizer extends WriterVisualizer
 {
+
+  @Override
+  public String getShortName()
+  {
+    return "old_tree";
+  }
+  
+  
 
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)

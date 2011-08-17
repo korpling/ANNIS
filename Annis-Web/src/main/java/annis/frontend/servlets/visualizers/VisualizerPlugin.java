@@ -46,4 +46,17 @@ public interface VisualizerPlugin extends Plugin
    * @return the ContentType
    */
   public String getContentType();
+  
+  /**
+   * Get the shorted name of the linguistic type of this visualizer ("partitur", 
+   * "tree", etc.)
+   * @return 
+   */
+  public String getShortName();
+  
+  /**
+   * Return if this visualizer is using the complete text.
+   * @return 
+   */
+  public boolean isUsingText();
 }

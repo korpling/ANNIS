@@ -23,17 +23,28 @@ import annis.service.ifaces.AnnisBinary;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
- * @author thomas
+ * Visualizer for external files.
+ * 
+ * Currently it can files with the mime type "audio/mpeg" and "video/x-flv"
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class ExternalFileVisualizer extends WriterVisualizer
 {
 
   private long externalID = -1;
   private VisualizerInput theInput;
 
+  @Override
+  public String getShortName()
+  {
+    return "file";
+  }
+
+  
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {

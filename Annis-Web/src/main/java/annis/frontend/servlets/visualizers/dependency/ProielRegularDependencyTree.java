@@ -28,11 +28,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class ProielRegularDependencyTree extends AbstractDotVisualizer
 {
 
@@ -43,6 +45,14 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
   private Set<String> alreadyWrittenEdge;
   private Random rand = new Random();
 
+  @Override
+  public String getShortName()
+  {
+    return "ordered_dependency";
+  }
+
+  
+  
   @Override
   public void createDotContent(VisualizerInput input, StringBuilder sb)
   {

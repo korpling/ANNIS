@@ -15,17 +15,7 @@
  */
 package annis.frontend.servlets.visualizers;
 
-import annis.service.ifaces.AnnisResult;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.xml.sax.InputSource;
 
 public abstract class Visualizer implements VisualizerPlugin
 {
@@ -44,6 +34,14 @@ public abstract class Visualizer implements VisualizerPlugin
   {
     return "utf-8";
   }
+
+  @Override
+  public boolean isUsingText()
+  {
+    return false;
+  }
+  
+  
 
 
 }

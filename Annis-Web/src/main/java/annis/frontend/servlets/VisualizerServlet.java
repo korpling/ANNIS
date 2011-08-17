@@ -24,18 +24,25 @@ import annis.cache.CacheInitializationException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.frontend.servlets.visualizers.Visualizer;
 import annis.frontend.servlets.visualizers.VisualizerInput;
+import annis.frontend.servlets.visualizers.VisualizerPlugin;
+import annis.pluginsystem.StartStopListener;
 import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import java.io.*;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.Plugin;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.events.PluginLoaded;
+import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  * This servlet dispatches visualization requests to the according visualizer Classes.<br/><br>
@@ -53,14 +60,17 @@ import java.util.logging.Logger;
  * 
  * <p><strong>It currently does not use the AnnisResolver Service. This is an urgent task to complete.</strong></p>
  * 
- * 
  * @author Karsten Huetter
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  *
  */
-public class VisualizerServlet extends HttpServlet
+@PluginImplementation
+public class VisualizerServlet extends HttpServlet implements Plugin
 {
 
   private static final long serialVersionUID = -8182635617256833563L;
+  private static final Map<String, VisualizerPlugin> visualizerRegistry =
+    Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
 
   @Override
   @SuppressWarnings("unchecked")
@@ -75,7 +85,7 @@ public class VisualizerServlet extends HttpServlet
     int visId = checkAndGetMandatoryIntParam("visId", request);
 
     String path2Dot = getInitParameter("DotPath");
-    if (path2Dot == null || "".equals(path2Dot))
+    if(path2Dot == null || "".equals(path2Dot))
     {
       path2Dot = "dot";
     }
@@ -85,17 +95,17 @@ public class VisualizerServlet extends HttpServlet
 
     //fetching node marker properties from query string to set up fill/colorMap
     Enumeration<String> parameterNamesEnum = request.getParameterNames();
-    while (parameterNamesEnum.hasMoreElements())
+    while(parameterNamesEnum.hasMoreElements())
     {
       String parameterName = parameterNamesEnum.nextElement();
       String parameterValue = request.getParameter(parameterName);
       String color = parameterName.replaceFirst("^.*?:", "");
-      if (parameterValue != null)
+      if(parameterValue != null)
       {
         String[] elementNames = parameterValue.split(",");
-        for (String elementName : elementNames)
+        for(String elementName : elementNames)
         {
-          if (parameterName.startsWith("mark:"))
+          if(parameterName.startsWith("mark:"))
           {
             //set up colorMap
             markableMap.put(elementName, color);
@@ -108,56 +118,28 @@ public class VisualizerServlet extends HttpServlet
       }
     }
 
-    try
+    VisualizerInput input = new VisualizerInput();
+    input.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
+    input.setMarkableMap(markableMap);
+    input.setMarkableExactMap(markableExactMap);
+    input.setContextPath(getServletContext().getContextPath());
+    input.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+    input.setDotPath(path2Dot);
+    
+    // default to grid if vistype is unknown
+    if(!visualizerRegistry.containsKey(vistype))
     {
-      ClassLoader classLoader = Visualizer.class.getClassLoader();
-
-      // load from property file
-      String path = getServletContext().getRealPath("/");
-      Properties propsVisualizers = new Properties();
-      File propVisualizersFile = new File(path + "/WEB-INF/config/visualizers.properties");
-
-      Properties propsUseText = new Properties();
-      File propUseTextFile = new File(path + "/WEB-INF/config/usetext.properties");
-
-      String className = "annis.frontend.servlets.visualizers.partitur.PartiturVisualizer";
-      boolean isUseTextId = false;
-
-
-      // class to load
-      if (propVisualizersFile.canRead())
-      {
-        propsVisualizers.load(new FileReader(propVisualizersFile));
-
-        if (propsVisualizers.containsKey(vistype))
-        {
-          className = propsVisualizers.getProperty(vistype);
-        }
-      }
-
-      // using complete text?
-      if (propUseTextFile.canRead())
-      {
-        propsUseText.load(new FileReader(propUseTextFile));
-        if (propsUseText.containsKey(vistype))
-        {
-          isUseTextId = true;
-        }
-      }
-
-      VisualizerInput input = new VisualizerInput();
-      Visualizer visualizer = (Visualizer) classLoader.loadClass(className).newInstance();
-      input.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
-      input.setMarkableMap(markableMap);
-      input.setMarkableExactMap(markableExactMap);
-      input.setContextPath(getServletContext().getContextPath());
-      input.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-      input.setDotPath(path2Dot);
-
+      vistype = "grid";
+    }
+    
+    VisualizerPlugin visualizer = visualizerRegistry.get(vistype);
+    if(visualizer != null)
+    {
+    
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());
 
-      if (isUseTextId)
+      if(visualizer.isUsingText())
       {
         //gather whole text from backend an use this for visualization
         try
@@ -165,70 +147,76 @@ public class VisualizerServlet extends HttpServlet
           AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
           AnnisResult r = service.getAnnisResult(Long.parseLong(textId));
           input.setResult(r);
-        } catch (AnnisServiceFactoryException e)
+        }
+        catch(AnnisServiceFactoryException e)
         {
-          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, 
+          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE,
             "Could not generate ANNIS service from factory", e);
-        } catch (Exception e)
+        }
+        catch(Exception e)
         {
-          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, 
+          Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE,
             "General remote service exception", e);
         }
-      } else
+      }
+      else
       {
         //we can use the cached span for visualization
-        if (session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT) != null)
+        if(session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT) != null)
         {
-          Cache cacheAnnisResult =  (Cache) session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT);
-
-          byte[] resultAsBytes = cacheAnnisResult.getBytes(callbackId);
-          ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
-
-          input.setResult((AnnisResult) inStream.readObject());
-          ResolverEntry[] resolverEntries = (ResolverEntry[])inStream.readObject();
-
-          if(resolverEntries != null && visId < resolverEntries.length)
+          try
           {
-            input.setMappings(resolverEntries[visId].getMappings());
+            Cache cacheAnnisResult = (Cache) session.getAttribute(SearchResultServlet.FILESYSTEM_CACHE_RESULT);
+
+            byte[] resultAsBytes = cacheAnnisResult.getBytes(callbackId);
+            ObjectInputStream inStream = new ObjectInputStream(new ByteArrayInputStream(resultAsBytes));
+
+            input.setResult((AnnisResult) inStream.readObject());
+            ResolverEntry[] resolverEntries = (ResolverEntry[]) inStream.readObject();
+
+            if(resolverEntries != null && visId < resolverEntries.length)
+            {
+              input.setMappings(resolverEntries[visId].getMappings());
+            }
+            else
+            {
+              input.setMappings(new Properties());
+            }
           }
-          else
+          catch(ClassNotFoundException ex)
           {
-            input.setMappings(new Properties());
+            Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, null, ex);
+          } 
+          catch(CacheException ex)
+          {
+            Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, null, ex);
           }
         }
       }
 
       visualizer.writeOutput(input, outStream);
       outStream.flush();
-    } catch (InstantiationException e1)
-    {
-      e1.printStackTrace(new PrintWriter(outStream));
-    } catch (IllegalAccessException e1)
-    {
-      e1.printStackTrace(new PrintWriter(outStream));
-    } catch (CacheInitializationException e)
-    {
-      e.printStackTrace(new PrintWriter(outStream));
-    } catch (CacheException e)
-    {
-      e.printStackTrace(new PrintWriter(outStream));
-    } catch (ClassNotFoundException e)
-    {
-      e.printStackTrace(new PrintWriter(outStream));
     }
+    else
+    {
+      String error = "Could not find visualizer with type \"" + vistype + "\"";
+      outStream.write(error.getBytes());
+      response.setContentType("text/plain");
+      response.setCharacterEncoding("UTF-8");
+      outStream.flush();
+    } // if visualizer found in registry
   }
 
   private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
   {
     String result = request.getParameter(name);
-    if (result == null)
+    if(result == null)
     {
       throw new NullPointerException("Parameter '" + name + "' must no be null.");
     }
     return result;
   }
 
-  
   private int checkAndGetMandatoryIntParam(String name, HttpServletRequest request)
   {
     String asString = checkAndGetMandatoryStringParam(name, request);
@@ -242,5 +230,13 @@ public class VisualizerServlet extends HttpServlet
       throw new NumberFormatException("Could not cast the parameter '" + name
         + "' to an integer (parameter value was '" + asString + "')");
     }
+  }
+
+  @PluginLoaded
+  public void newVisualizerAdded(VisualizerPlugin vis)
+  {
+    Logger.getLogger(VisualizerServlet.class.getName())
+      .log(Level.INFO, "loading visualizer {0}", vis.getShortName());
+    visualizerRegistry.put(vis.getShortName(), vis);
   }
 }

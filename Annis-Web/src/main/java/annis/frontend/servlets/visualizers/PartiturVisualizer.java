@@ -42,10 +42,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer
 {
 
+  @Override
+  public String getShortName()
+  {
+    return "old_grid";
+  }
+
+  
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {

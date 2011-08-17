@@ -24,8 +24,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
+import net.xeoh.plugins.base.options.addpluginsfrom.OptionReportAfter;
+import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 
 /**
@@ -35,22 +38,29 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  */
 public class StartStopListener implements ServletContextListener
 {
+  
+  public static PluginManager pluginManager = null;
 
   @Override
   public void contextInitialized(ServletContextEvent sce)
   {
-    PluginManager pm = PluginManagerFactory.createPluginManager();
-    URI classpath = ClassURI.CLASSPATH("annis.plugins.**");
+    Logger log = Logger.getLogger(StartStopListener.class.getName());
+    
+    log.info("Adding plugins");
+    pluginManager = PluginManagerFactory.createPluginManager();
+    URI classpath = ClassURI.CLASSPATH;
     if(classpath != null)
     {
-      pm.addPluginsFrom(classpath);
+      pluginManager.addPluginsFrom(classpath);
+      log.info("added plugins from classpath");
     }
     try
     {
       URL basicPlugins = sce.getServletContext().getResource("plugins");
       if(basicPlugins != null)
       {
-        pm.addPluginsFrom(basicPlugins.toURI());
+        pluginManager.addPluginsFrom(basicPlugins.toURI());
+        log.log(Level.INFO, "added plugins from {0}", basicPlugins.getPath());
       }
     }
     catch(MalformedURLException ex)
@@ -65,12 +75,23 @@ public class StartStopListener implements ServletContextListener
     String globalPlugins = System.getenv("ANNIS_PLUGINS");
     if(globalPlugins != null)
     {
-      pm.addPluginsFrom(new File(globalPlugins).toURI());
+      pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
+      log.log(Level.INFO, "added plugins from {0}", globalPlugins);
     }
+    
+    StringBuilder listOfPlugins = new StringBuilder();
+    listOfPlugins.append("loaded plugins:\n");
+    PluginManagerUtil util = new PluginManagerUtil(pluginManager);
+    for(Plugin p : util.getPlugins())
+    {
+      listOfPlugins.append(p.getClass().getName()).append("\n");
+    }
+    log.info(listOfPlugins.toString());
   }
 
   @Override
   public void contextDestroyed(ServletContextEvent sce)
   {
+    pluginManager.shutdown();
   }
 }

@@ -27,18 +27,28 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class VakyarthaDependencyTree extends WriterVisualizer
 {
 
   private Writer theWriter;
 
+  @Override
+  public String getShortName()
+  {
+    return "arch_dependency";
+  }
+
+  
+  
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {

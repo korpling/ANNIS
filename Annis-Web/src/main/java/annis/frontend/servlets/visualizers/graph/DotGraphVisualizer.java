@@ -26,11 +26,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
  * @author Thomas Krause
  */
+@PluginImplementation
 public class DotGraphVisualizer extends AbstractDotVisualizer
 {
   
@@ -42,6 +44,14 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
   private String requiredNodeNS;
   private String requiredEdgeNS;
 
+  @Override
+  public String getShortName()
+  {
+    return "dot_vis";
+  }
+
+  
+  
   @Override
   public void createDotContent(VisualizerInput input, StringBuilder sb)
   {

@@ -30,12 +30,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause
  * @author Christian Schulz-Hanke
  */
+@PluginImplementation
 public class CorefVisualizer extends WriterVisualizer
 {
 
@@ -98,6 +100,20 @@ public class CorefVisualizer extends WriterVisualizer
       Annotations = new HashSet<Annotation>();
     }
   }
+
+  @Override
+  public String getShortName()
+  {
+    return "discourse";
+  }
+
+  @Override
+  public boolean isUsingText()
+  {
+    return true;
+  }
+  
+  
 
   /**
    * writes Output for the CorefVisualizer

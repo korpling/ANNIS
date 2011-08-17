@@ -29,12 +29,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
+@PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer
 {
 
@@ -48,6 +50,14 @@ public class PartiturVisualizer extends WriterVisualizer
     noEvent
   }
 
+  @Override
+  public String getShortName()
+  {
+    return "grid";
+  }
+
+  
+  
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {
