@@ -1,5 +1,7 @@
 $(document).ready(function(){
   
+  $(".single_event").tooltip();
+  
   $("#toolbar").append('<li><a href="#">Select Displayed Annotation Levels</a>'
     + '<ul id="levelselector"></ul>');
 
@@ -31,6 +33,7 @@ $(document).ready(function(){
   });
 
   $("#toolbar").jbar();
+  
 
 });
 

@@ -82,3 +82,7 @@ td.middle_event {
 .uncheckedItem:before {
   content : "\2610\00A0";
 }
+
+#tooltip {
+  font-size: 9pt;
+}

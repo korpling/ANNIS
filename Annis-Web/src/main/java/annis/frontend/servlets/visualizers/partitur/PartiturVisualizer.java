@@ -286,7 +286,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "colspan=" + length + " "
                   + "annis:tokenIds=\"" + tokenIdsArray + "\" "
                   + "annis:eventIds=\"" + eventIdsArray + "\" "
-                  + "annis:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
+                  + "title=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\""
                   + ">" + element.getValue() + "</td>");
