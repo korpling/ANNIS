@@ -1,51 +1,42 @@
-function highlightedToken(e, t, lastRow, changeClass)
+function highlightedToken(element, lastRow, changeClass)
 {
 
-  var element = Ext.get(t);
   element.addClass("hover");
-  var colspan = element.getAttribute('colspan');
-
+  
   // fetch the intervall for highlight the tokens. the form is:
   // id="interval:hashcode:n-m"
-  var intervall = element.getAttribute('id').split(':');
+  var intervall = element.attr('id').split(':');
   var left = intervall[intervall.length - 1].split('-')[0];
   var right = intervall[intervall.length - 1].split('-')[1];
 
-  lastRow.each(function(td)
+  $.each(lastRow, function(unusedIndex, td)
   {
-    var index = td.getAttribute('cellIndex');
+    var index = td.cellIndex;
     if (index >= left && index <= right)
-      changeClass(td);
+      changeClass($(td));
   });
 }
 
-Ext.onReady(function()
+$(document).ready(function()
 {
-  var tableCells = Ext.select("#gridtree-partitur *[colspan]", true);
-  var lastRow = Ext.select("#gridtree-partitur tr:last td");
+  var lastRow = $("#gridtree-partitur tr:last td");
 
-  tableCells.each(function(el)
-  {
-    el.on({
-      'mouseover' : {
-        fn : function(e, t)
-        {
-          highlightedToken(e, t, lastRow, function(element)
-          {
-            element.addClass("highlightedToken");
-          });
-        }
-      },
-      'mouseout' : {
-        fn : function(e, t)
-        {
-          highlightedToken(e, t, lastRow, function(element)
-          {
-            element.removeClass("highlightedToken");
-          });
-        }
-      }
-    });
-  })
+    
+  $("#gridtree-partitur *[colspan]").bind({
+    mouseover : function(e)
+    {
+      highlightedToken($(this), lastRow, function(element)
+      {
+        element.addClass("highlightedToken");
+      });
+    },
+    mouseout : function(e)
+    {
+      highlightedToken($(this), lastRow, function(element)
+      {
+        element.removeClass("highlightedToken");
+      });
+    }
+  });
 
 });
