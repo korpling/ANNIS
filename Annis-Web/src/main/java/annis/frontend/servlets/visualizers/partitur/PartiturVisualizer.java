@@ -88,7 +88,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer.js\"></script>");
 
       writer.append("</head>");
       writer.append("<body>\n");
