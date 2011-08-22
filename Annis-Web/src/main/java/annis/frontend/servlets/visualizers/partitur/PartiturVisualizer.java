@@ -75,9 +75,11 @@ public class PartiturVisualizer extends WriterVisualizer
 
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
       writer.append("<link href=\"" + input.getContextPath() + "/javascript/jquery/jbar.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.css\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
       writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.jbar.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -284,7 +286,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "colspan=" + length + " "
                   + "annis:tokenIds=\"" + tokenIdsArray + "\" "
                   + "annis:eventIds=\"" + eventIdsArray + "\" "
-                  + "ext:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
+                  + "annis:qtip=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\""
                   + ">" + element.getValue() + "</td>");
