@@ -5,9 +5,11 @@ var colorMap = new Array();
 
 var currentNumberIndex = 1;//0;
 
-Ext.onReady(function()
+$(document).ready(function()
 {
-  Ext.QuickTips.init();
+  $("td[title]").tooltip({
+    showBody: " - "
+  });
 });
 
 function getRGBFromNumber(i)
@@ -43,14 +45,13 @@ function getRGBFromNumber(i)
 
 function togglePRAuto(el)
 {
-  togglePRAutoWithClass(el, "highlightedToken");
+  
+  togglePRAutoWithClass($(el), "highlightedToken");
 }
 
-function togglePRAutoWithClass(el, className)
+function togglePRAutoWithClass(element, className)
 {
-  var element = Ext.get(el);
-  //var isOn = element.hasClass(className);
-  var idAtt = element.getAttributeNS("annis","pr_right");
+  var idAtt = element.attr("annis:pr_right");
   var isOn = linkMap[idAtt]==1;
   if (linkMap[idAtt]==1) {
       linkMap[idAtt]=-1;
@@ -61,25 +62,19 @@ function togglePRAutoWithClass(el, className)
   togglePRWithClass(element, !isOn, className);
 }
 
-function togglePRWithClass(el, on, className)
+function togglePRWithClass(element, on, className)
 {
-  var element = Ext.get(el);
-  var idAtt = element.getAttributeNS("","id");
-
-  if(element != null && idAtt != null)
+  if(element != null)
   {
-    var attLeft = element.getAttributeNS("annis", "pr_left");
+    var attLeft = element.attr("annis:pr_left");
     if(attLeft != null)
     {
       var prIDsL = attLeft.split(',');
 
-      Ext.each(prIDsL, function(pr)
+      $.each(prIDsL, function(index, pr)
       {
-        var elToken = Ext.get("tok_" + pr);
-        if(elToken != null)
-        {
-          togglePRWithClassFinal(elToken, on, className, el);
-        }
+        var elToken = $("#tok_" + pr);
+        togglePRWithClassFinal(elToken, on, className, element);
       });
     }
 
@@ -87,15 +82,18 @@ function togglePRWithClass(el, on, className)
 
 }
 
-function togglePRWithClassFinal(el, on, className, superEl)
+function togglePRWithClassFinal(element, on, className, superEl)
 {
-  var element = Ext.get(el);
-  var idAtt = element.getAttributeNS("","id");
-  var sElement = Ext.get(superEl);
-  var superIdAtt = sElement.getAttributeNS("annis","pr_right");
+  
+  var idAtt = element.attr("id");
+  
+  var sElement = superEl;
+  var superIdAtt = sElement.attr("annis:pr_right");
+
 
   if(element != null && idAtt != null)
   {
+    
     var id = 1*(idAtt.substring("tok_".length));
 
     if(on)
@@ -106,7 +104,7 @@ function togglePRWithClassFinal(el, on, className, superEl)
         }
         activationOrderMap[idAtt] += superIdAtt+",";
         colorMap[superIdAtt] = currentNumberIndex;
-        element.setStyle("background-color", getRGBFromNumber(currentNumberIndex));
+        element.attr("style", "background-color:" + getRGBFromNumber(currentNumberIndex));
         activationMap[id] = 1;
     }
     else
@@ -125,10 +123,10 @@ function togglePRWithClassFinal(el, on, className, superEl)
           }
       }
       if (recolor==0){
-        element.setStyle("background-color", "rgb(255,255,255)");
+        element.attr("style" ,"background-color: rgb(255,255,255)");
         activationMap[id] = -1;
       } else {
-        element.setStyle("background-color", getRGBFromNumber(colorMap[recolor]));//colorMap[superIdAtt]));//"rgb(150,255,150)");
+        element.attr("style", "background-color:" + getRGBFromNumber(colorMap[recolor]));//colorMap[superIdAtt]));//"rgb(150,255,150)");
       }
     }
   }
