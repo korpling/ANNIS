@@ -9,6 +9,9 @@
  *
  * Copyright 2010+ Javan Makhmali :: javan@javan.us
  *
+ * Modified 2011 by Thomas Krause <krause@informatik.hu-berlin>:
+ *   - changed colors to match it the ANNIS scheme
+ *   - removed some browser-specific stuff (like gradients)
  */
 
 ul.jbar {

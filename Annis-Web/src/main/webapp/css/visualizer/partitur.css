@@ -76,11 +76,11 @@ td.middle_event {
 }
 
 .checkedItem:before {
-  content : "\2611\00A0";
+  content: url('check.gif');  
 }
 
 .uncheckedItem:before {
-  content : "\2610\00A0";
+  content: url('empty.gif');
 }
 
 #tooltip {
