@@ -17,13 +17,14 @@ import annis.model.AnnotationGraph;
 import annis.model.Edge;
 
 import annis.frontend.servlets.visualizers.WriterVisualizer;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * 
  * @author benjamin
  * 
  */
-
+@PluginImplementation
 public class GridTreeVisualizer extends WriterVisualizer
 {
 
@@ -146,12 +147,11 @@ public class GridTreeVisualizer extends WriterVisualizer
 			writer.append("<link href=\""
 					+ input.getContextPath()
 					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
-			writer.append("<script type=\"text/javascript\" src=\""
-					+ input.getContextPath()
-					+ "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-			writer.append("<script type=\"text/javascript\" src=\""
-					+ input.getContextPath()
-					+ "/javascript/extjs/ext-all.js\"></script>");
+			
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
+
+      
 			writer.append("<script type=\"text/javascript\" src=\""
 					+ input.getContextPath()
 					+ "/javascript/annis/visualizer/gridtreeVisualizer.js\"></script>");

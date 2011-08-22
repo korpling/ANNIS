@@ -129,13 +129,11 @@ public class CorefVisualizer extends WriterVisualizer
       println("<html>");
       println("<head>");
 
-      println("<script type=\"text/javascript\" src=\"" 
-        + theInput.getContextPath() 
-        + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" 
-        + theInput.getContextPath() 
-        + "/javascript/extjs/ext-all.js\"></script>");
-
+      println("<link href=\"" + theInput.getContextPath() + "/javascript/jquery/jquery.tooltip.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      
+      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
+      
       println("<link href=\"" + theInput.getContextPath() 
         + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
       println("<link href=\"" + theInput.getContextPath() 
@@ -374,7 +372,7 @@ public class CorefVisualizer extends WriterVisualizer
                       break;
                     }
                   }
-                  tooltip = "ext:qtip=\"<b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + Annotations2 + "\"";
+                  tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + Annotations2 + "\"";
                   if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
                   {
                     toolTipMaxLineCount = tooltip.length() / 40 + 1;
@@ -388,7 +386,7 @@ public class CorefVisualizer extends WriterVisualizer
                 }
                 else
                 {//easier
-                  tooltip = "ext:qtip=\"<b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
+                  tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
                   if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
                   {
                     toolTipMaxLineCount = tooltip.length() / 40 + 1;
@@ -433,7 +431,7 @@ public class CorefVisualizer extends WriterVisualizer
                   }
                 }
 
-                tooltip = "ext:qtip=\"<b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
+                tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
                 if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
                 {
                   toolTipMaxLineCount = tooltip.length() / 40 + 1;

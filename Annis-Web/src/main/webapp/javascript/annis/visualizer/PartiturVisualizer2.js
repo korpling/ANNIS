@@ -1,56 +1,53 @@
-Ext.onReady(function(){
-  Ext.QuickTips.init();
-	
+$(document).ready(function(){
   
-  var menu = new Ext.menu.Menu({
-    id: 'levelSelectionMenu'
-  });
+  $(".single_event").tooltip();
+  
+  $("#toolbar").append('<li><a href="#">Select Displayed Annotation Levels</a>'
+    + '<ul id="levelselector"></ul>');
 
-  var toolbarPartiture = new Ext.Toolbar();
-  toolbarPartiture.render('toolbar');
-  
-  Ext.each(levelNames, function(levelName) {
-    menu.add({
-      text: levelName,
-      id: levelName,
-      checked: true,
-      checkHandler: onItemCheck
+  $.each(levelNames, function(index, levelName) { 
+        
+    $("#levelselector").append(
+      '<li><a href="#" class="checkedItem" id="a_' + levelName +'" >'
+      + levelName + '</a></li>');
+    
+    var linkElem = $("#a_" + levelName);
+    
+    linkElem.click(function(){
+      var checked = !linkElem.hasClass("checkedItem");
+            
+      linkElem.removeClass("checkedItem");
+      linkElem.removeClass("uncheckedItem");
+      
+      linkElem.addClass(checked ? "checkedItem" : "uncheckedItem");      
+
+      if(checked)
+      {
+        $(".level_" + levelName).show();
+      }
+      else
+      {
+        $(".level_" + levelName).hide();
+      }
     });
   });
 
-  toolbarPartiture.add({
-    text:'Select Displayed Annotation Levels',
-    iconCls: 'bmenu',  // <-- icon
-    menu: menu  // assign menu by instance
-  });
-
-
-  toolbarPartiture.doLayout();
-
-  function onItemCheck(item, checked){
-    var elements = Ext.query(".level_" + item.getId());
-    Ext.each(elements, function(domitem,index)     {
-       var item = Ext.get(domitem);
-       item.setVisible(checked);
-       item.setDisplayed(checked ? "" : "none")
-    });
- }
-
-  //var element = Ext.get("level_" + item.getId());
+  $("#toolbar").jbar();
+  
 
 });
 
 function toggleAnnotation(element, isOver) {
-  //  var extClassOver = "x-grid3-row-over";
-  var el = Ext.get(element);
+
+  var el = $(element);
   
-  var tmpAtt = el.getAttributeNS("annis", "tokenIds");
+  var tmpAtt = el.attr("annis:tokenIds");
   if(tmpAtt != null)
   {
     var tokenIds = tmpAtt.split(",");
-    Ext.each(tokenIds, function(tokenId) 
+    $.each(tokenIds, function(index, tokenId) 
     {
-      var elToken = Ext.get("token_" + tokenId);
+      var elToken = $("#token_" + tokenId);
       if(elToken != null)
       {
         if(isOver) {
@@ -62,13 +59,13 @@ function toggleAnnotation(element, isOver) {
     });
   }
 
-  tmpAtt = el.getAttributeNS("annis", "eventIds");
+  tmpAtt = el.attr("annis:eventIds");
   if(tmpAtt != null)
   {
     var eventIds = tmpAtt.split(",");
-    Ext.each(eventIds, function(eventId) 
+    $.each(eventIds, function(index, eventId) 
     {
-      var elToken = Ext.get("event_" + eventId);
+      var elToken = $("#event_" + eventId);
       if(elToken != null)
       {
         if(isOver) {
