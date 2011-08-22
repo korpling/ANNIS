@@ -74,10 +74,10 @@ public class PartiturVisualizer extends WriterVisualizer
       Collections.sort(tierNames);
 
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append("<link href=\"" + input.getContextPath() + "/javascript/jquery/jbar.css\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + input.getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.jbar.js\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -91,8 +91,8 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("</head>");
       writer.append("<body>\n");
 
-      writer.append("<div id=\"toolbar\"></div>");
-      writer.append("<div id=\"partiture\" style=\"position: absolute; top: 30px; left: 0px;\">");
+      writer.append("<ul id=\"toolbar\"></ul>");
+      writer.append("<div id=\"partiture\">");
 
       if (isRTL)
       {
