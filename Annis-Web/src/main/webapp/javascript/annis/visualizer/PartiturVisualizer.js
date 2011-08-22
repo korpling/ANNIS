@@ -1,79 +1,60 @@
-$(document).ready(function(){
-  
-  $(".single_event").tooltip();
-  
-  $("#toolbar").append('<li><a href="#">Select Displayed Annotation Levels</a>'
-    + '<ul id="levelselector"></ul>');
-
-  $.each(levelNames, function(index, levelName) { 
-        
-    $("#levelselector").append(
-      '<li><a href="#" class="checkedItem" id="a_' + levelName +'" >'
-      + levelName + '</a></li>');
-    
-    var linkElem = $("#a_" + levelName);
-    
-    linkElem.click(function(){
-      var checked = !linkElem.hasClass("checkedItem");
-            
-      linkElem.removeClass("checkedItem");
-      linkElem.removeClass("uncheckedItem");
-      
-      linkElem.addClass(checked ? "checkedItem" : "uncheckedItem");      
-
-      if(checked)
-      {
-        $(".level_" + levelName).show();
-      }
-      else
-      {
-        $(".level_" + levelName).hide();
-      }
+Ext.onReady(function(){
+  Ext.QuickTips.init();
+	
+  var toolbarPartiture = new Ext.Toolbar({
+    applyTo: 'toolbar'
+  });
+	
+  var menu = new Ext.menu.Menu({
+    id: 'levelSelectionMenu'
+  });
+	
+  Ext.each(levelNames, function(levelName) {
+    menu.add({
+      text: levelName,
+      id: levelName,
+      checked: true,
+      checkHandler: onItemCheck
     });
   });
+	
+  toolbarPartiture.add(
+  {
+    text:'Select Displayed Annotation Levels',
+    iconCls: 'bmenu',  // <-- icon
+    menu: menu  // assign menu by instance
+  }
+);
 
-  $("#toolbar").jbar();
-  
+  function onItemCheck(item, checked){
+    var element = Ext.get("level_" + item.getId());
+    element.setVisibilityMode(Element.DISPLAY);
+    if(checked) {
+      element.show(true);
+    } else {
+      element.hide(true);
+    }
+  }
 
 });
 
 function toggleAnnotation(element, isOver) {
-
-  var el = $(element);
-  
-  var tmpAtt = el.attr("annis:tokenIds");
-  if(tmpAtt != null)
-  {
-    var tokenIds = tmpAtt.split(",");
-    $.each(tokenIds, function(index, tokenId) 
-    {
-      var elToken = $("#token_" + tokenId);
-      if(elToken != null)
-      {
-        if(isOver) {
-          elToken.addClass('highlightedToken');
-        } else {
-          elToken.removeClass('highlightedToken');
-        }
-      }
-    });
+  var extClassOver = "x-grid3-row-over";
+  var el = Ext.get(element);
+  var cellIndex = el.getAttributeNS("", "cellIndex") * 1;
+  var colSpan = el.getAttributeNS("", "colSpan") * 1;
+  var tokenIds = el.getAttributeNS("annis", "tokenIds").split(",");
+  if(isOver) {
+    el.addClass(extClassOver);
+  } else {
+    el.removeClass(extClassOver);
   }
-
-  tmpAtt = el.attr("annis:eventIds");
-  if(tmpAtt != null)
-  {
-    var eventIds = tmpAtt.split(",");
-    $.each(eventIds, function(index, eventId) 
-    {
-      var elToken = $("#event_" + eventId);
-      if(elToken != null)
-      {
-        if(isOver) {
-          elToken.addClass('highlightedEvent');
-        } else {
-          elToken.removeClass('highlightedEvent');
-        }
-      }
-    });
-  }
+  Ext.each(tokenIds, function(tokenId) {
+    var elToken = Ext.get("token_" + tokenId);
+    if(isOver) {
+      elToken.applyStyles('background-color:#faf755');
+    } else {
+      elToken.applyStyles('background-color:#ffffff');
+    }
+  });
 }
