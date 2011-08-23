@@ -135,17 +135,6 @@ public class ResourceServlet extends HttpServlet implements Plugin
   
   }
 
-  private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
-  {
-    String result = request.getParameter(name);
-    if(result == null)
-    {
-      throw new NullPointerException("Parameter '" + name + "' must no be null.");
-    }
-    return result;
-  }
-
-
   @PluginLoaded
   public void newResourceAdded(ResourcePlugin vis)
   {

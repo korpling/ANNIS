@@ -271,15 +271,6 @@ public class VisualizerInput
    */
   public String getResourcePath(String resource)
   {
-    try
-    {
-      return String.format(resourcePathTemplate, URLEncoder.encode(resource, "UTF-8"));
-    }
-    catch(UnsupportedEncodingException ex)
-    {
-      Logger.getLogger(VisualizerInput.class.getName()).log(Level.SEVERE, 
-        "Could not properly encode URL parameter \"resource\" for resource", ex);
-      return String.format(resourcePathTemplate, resource);
-    }
+    return String.format(resourcePathTemplate, resource);
   }
 }

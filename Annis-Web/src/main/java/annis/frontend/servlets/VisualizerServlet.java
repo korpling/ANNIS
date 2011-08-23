@@ -134,16 +134,6 @@ public class VisualizerServlet extends HttpServlet implements Plugin
 
     String template = getServletContext().getContextPath()
       + "/secure/Resource/" + vistype + "/%s";
-    try
-    {
-      template = getServletContext().getContextPath()
-        + "/secure/Resource/" + URLEncoder.encode(vistype, "UTF-8") + "/%s";
-    }
-    catch(UnsupportedEncodingException ex)
-    {
-      Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE,
-        "Could not properly encode URL parameter \"vistype\" for resource", ex);
-    }
     input.setResourcePathTemplate(template);
 
 

@@ -60,9 +60,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("<html>");
       println("<head>");
 
-      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/jquery-1.4.2.min.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/raphael.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/VakyarthaDependencyTree/vakyarthaDependency.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("vakyartha/jquery-1.4.2.min.js") +"\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("vakyartha/raphael.js") + "\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("vakyartha/vakyarthaDependency.js") + "\"></script>");
 
       // output the data for the javascript
       println("<script type=\"text/javascript\">");
