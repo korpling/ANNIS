@@ -108,9 +108,16 @@ public class ResourceServlet extends HttpServlet implements Plugin
         else
         {
           response.addDateHeader("Last-Modified", resourceLastModified);
-          // expires in one minute per default
-          response.addDateHeader("Expires", new Date().getTime() + 60000);
-          
+          if("localhost".equals(request.getServerName()))
+          {
+            // does always expire right now
+            response.addDateHeader("Expires", new Date().getTime());
+          }
+          else
+          {
+            // expires in one minute per default
+            response.addDateHeader("Expires", new Date().getTime() + 60000);
+          }
           // not in cache, stream out
           String mimeType = getServletContext().getMimeType(path);
           response.setContentType(mimeType);
