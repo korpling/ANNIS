@@ -13,7 +13,7 @@ $(document).ready(function(){
     
     var linkElem = $("#a_" + levelName);
     
-    linkElem.click(function(){
+    linkElem.click(function(ev){
       var checked = !linkElem.hasClass("checkedItem");
             
       linkElem.removeClass("checkedItem");
@@ -29,6 +29,9 @@ $(document).ready(function(){
       {
         $(".level_" + levelName).hide();
       }
+      
+      // ignore the "#" href-information (and therefore do not jump on page)
+      ev.preventDefault();
     });
   });
 
