@@ -45,7 +45,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class PartiturVisualizer extends WriterVisualizer
+public class OldPartiturVisualizer extends WriterVisualizer
 {
 
   @Override
