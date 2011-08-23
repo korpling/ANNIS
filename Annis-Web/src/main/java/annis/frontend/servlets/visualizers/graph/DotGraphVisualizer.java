@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -54,7 +55,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
   
   @Override
   public void createDotContent(VisualizerInput input, StringBuilder sb)
-  {
+  {    
     this.input = input;
     
     // initialization
@@ -217,7 +218,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
   {
     if (node.isToken())
     {
-      w(node.getSpannedText());
+      w(node.getSpannedText().replace("\"", "\\\""));
     }
     else
     {
@@ -236,7 +237,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
 
         w(anno.getQualifiedName());
         w("=");
-        w(anno.getValue());
+        w(anno.getValue().replace("\"", "\\\""));
       }
     }
   }

@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implentation of Visualizer which uses Writers instead of OutputStream
@@ -44,6 +46,8 @@ public abstract class WriterVisualizer extends Visualizer
     }
     catch(IOException ex)
     {
+      Logger.getLogger(WriterVisualizer.class.getName())
+        .log(Level.SEVERE, "Exception when writing visualizer output.", ex);
       ex.printStackTrace(new PrintWriter(outstream));
     }
   }
