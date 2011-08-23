@@ -141,20 +141,28 @@ public class GridTreeVisualizer extends WriterVisualizer
 		try
 		{
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-			writer.append("<link href=\""
-					+ input.getContextPath()
-					+ "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
-			writer.append("<link href=\""
-					+ input.getContextPath()
-					+ "/css/visualizer/gridtree.css\" rel=\"stylesheet\" type=\"text/css\" >");
 			
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
+      writer.append("<link href=\""
+					+ input.getResourcePath("jquery.tooltip.css")
+          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\""
+					+ input.getResourcePath("partitur.css")
+          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+			writer.append("<link href=\""
+					+ input.getResourcePath("gridtree.css")
+          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+			
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("jquery-1.6.2.min.js")
+        + "\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("/javascript/jquery/jquery.tooltip.min.js") 
+        + "\"></script>");
 
       
 			writer.append("<script type=\"text/javascript\" src=\""
-					+ input.getContextPath()
-					+ "/javascript/annis/visualizer/gridtreeVisualizer.js\"></script>");
+					+ input.getResourcePath("gridtreeVisualizer.js")
+          + "\"></script>");
 			writer.append("<body>");
 			writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
 			writer.append(findAnnotation("cat", input.getResult().getGraph()));
