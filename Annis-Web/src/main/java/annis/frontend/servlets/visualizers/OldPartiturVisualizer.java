@@ -45,7 +45,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class PartiturVisualizer extends WriterVisualizer
+public class OldPartiturVisualizer extends WriterVisualizer
 {
 
   @Override
@@ -116,7 +116,7 @@ public class PartiturVisualizer extends WriterVisualizer
               //start new row if there is an overlap
               if(span.overlap(lastSpan.get(levelName)))
               {
-                markup.append("\t<tr class=\"x-grid3-row\">\n\t\t");
+                markup.append("\t<tr>\n\t\t");
                 currentOffset = null;
               }
               else
@@ -152,10 +152,10 @@ public class PartiturVisualizer extends WriterVisualizer
               }
               String color = input.getMarkableMap()
                 .containsKey(Long.toString(span.getId())) ? input.getMarkableMap().get(Long.toString(span.getId())) : "black";
-              markup.append("<td colspan=\"" + span.getLength() + "\" class=\"x-grid3-row x-grid3-row-alt\" style=\"width: auto;\" annis:tokenIds=\"" + tokenIdsArray + "\" onMouseOver=\"toggleAnnotation(this, true);\" onMouseOut=\"toggleAnnotation(this, false);\"><div style=\"display: none;\">(id: " + span.getId() + ", token: " + span.getTokenId() + ", length: " + span.getLength() + ", offset: " + span.getOffset() + ") " + levelName + "</div><table style=\"width: 100%;\">");
+              markup.append("<td colspan=\"" + span.getLength() + "\" class=\"single_event\" style=\"width: auto;\" annis:tokenIds=\"" + tokenIdsArray + "\" onMouseOver=\"toggleAnnotation(this, true);\" onMouseOut=\"toggleAnnotation(this, false);\"><div style=\"display: none;\">(id: " + span.getId() + ", token: " + span.getTokenId() + ", length: " + span.getLength() + ", offset: " + span.getOffset() + ") " + levelName + "</div><table style=\"width: 100%;\">");
               for(Entry<String, String> entry : span.entrySet())
               {
-                markup.append("<tr><td ext:qtip=\"" + entry.getKey() + " = " + entry.getValue() + "\" style=\"width: 100%; color: " + color + ";\">" + entry.getValue() + "</td></tr>");
+                markup.append("<tr><td title=\" - " + entry.getKey() + " = " + entry.getValue() + "\" style=\"width: 100%; color: " + color + ";\">" + entry.getValue() + "</td></tr>");
               }
               markup.append("</table></td></tr>");
 
@@ -180,30 +180,44 @@ public class PartiturVisualizer extends WriterVisualizer
         }
         writer.append("\n");
       }
-      writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">" +
-        "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + input.getContextPath() + "/javascript/extjs/resources/css/ext-all.css\" />");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/adapter/ext/ext-base.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/extjs/ext-all.js\"></script>");
+      writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"); 
+      
+      writer.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" 
+        + input.getResourcePath("old_grid/jbar.css") + "\" />");
+      writer.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" 
+        + input.getResourcePath("old_grid/jquery.tooltip.css") + "\" />");      
+      writer.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" 
+        + input.getResourcePath("old_grid/partitur.css") + "\" />");
+      
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("old_grid/jquery-1.6.2.min.js") + "\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("old_grid/jquery.jbar.js") + "\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("old_grid/jquery.tooltip.min.js") + "\"></script>");
+      
       writer.append("</head><body>");
-      writer.append("<div id=\"toolbar\"></div><div id=\"partiture\" style=\"position: absolute; top: 30px; left: 0px;\"><table>\n");
+      writer.append("<ul id=\"toolbar\"></ul>\n");
+      writer.append("<div id=\"partiture\">\n");
+      writer.append("<table class=\"partitur_table\">\n");
 
 
       List<String> levelNameList = new ArrayList<String>();
       for(Entry<String, StringBuffer> entry : levelMarkup.entrySet())
       {
         String levelName = entry.getKey().replaceAll("^.*?[.:]", "");
-        writer.append("\t<tr class=\"x-grid3-row\" id=\"level_" + levelName + "\"><td><i>" + levelName + "</i></td>\n\t\t");
+        writer.append("\t<tr id=\"level_" + levelName + "\"><td><i>" + levelName + "</i></td>\n\t\t");
         writer.append(entry.getValue() + "");
         if(!levelNameList.contains(levelName))
         {
           levelNameList.add(levelName);
         }
       }
-      writer.append("\t<tr class=\"x-grid3-row\"><td></td>\n\t\t");
+      writer.append("\t<tr><td></td>\n\t\t");
       for(PaulaInline2PartiturWriter.Token token : tokenList)
       {
         String color = input.getMarkableMap().containsKey(Long.toString(token.getId())) ? input.getMarkableMap().get(Long.toString(token.getId())) : "black";
-        writer.append("<td id=\"token_" + token.getId() + "\" class=\"x-grid3-row\" style=\"font-weight: bold; width: auto; color: " + color + ";\">" + token.getText() + "</td>");
+        writer.append("<td id=\"token_" + token.getId() + "\" style=\"font-weight: bold; width: auto; color: " + color + ";\">" + token.getText() + "</td>");
       }
       writer.append("\n\t</tr>\n");
       writer.append("</table></div>");
@@ -214,7 +228,9 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("old_grid/PartiturVisualizer.js") 
+        + "\"></script>");
       writer.append("</body></html>");
       //END
     }

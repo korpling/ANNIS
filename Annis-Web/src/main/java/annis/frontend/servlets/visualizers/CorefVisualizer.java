@@ -129,17 +129,23 @@ public class CorefVisualizer extends WriterVisualizer
       println("<html>");
       println("<head>");
 
-      println("<link href=\"" + theInput.getContextPath() + "/javascript/jquery/jquery.tooltip.css\" rel=\"stylesheet\" type=\"text/css\" >");
+      println("<link href=\"" 
+        + theInput.getResourcePath("coref/jquery.tooltip.css")
+        +"\" rel=\"stylesheet\" type=\"text/css\" >");
       
-      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
-      println("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("coref/jquery-1.6.2.min.js")
+        +"\"></script>");
+      println("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("coref/jquery.tooltip.min.js") 
+        +"\"></script>");
       
-      println("<link href=\"" + theInput.getContextPath() 
-        + "/css/visualizer/coref.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      println("<link href=\"" + theInput.getContextPath() 
-        + "/javascript/extjs/resources/css/ext-all.css\" rel=\"stylesheet\" type=\"text/css\" >");//new
-      println("<script type=\"text/javascript\" src=\"" + theInput.getContextPath() 
-        + "/javascript/annis/visualizer/CorefVisualizer.js\"></script>");
+      println("<link href=\"" 
+        + theInput.getResourcePath("coref/coref.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      println("<script type=\"text/javascript\" src=\"" 
+        + theInput.getResourcePath("coref/CorefVisualizer.js")
+        + "\"></script>");
 
       println("</head>");
       println("<body>");

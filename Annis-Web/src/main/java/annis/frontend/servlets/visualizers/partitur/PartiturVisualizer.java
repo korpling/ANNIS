@@ -74,12 +74,12 @@ public class PartiturVisualizer extends WriterVisualizer
       Collections.sort(tierNames);
 
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-      writer.append("<link href=\"" + input.getContextPath() + "/javascript/jquery/jbar.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + input.getContextPath() + "/css/visualizer/partitur.css\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery-1.6.2.min.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.jbar.js\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/jquery/jquery.tooltip.min.js\"></script>");
+      writer.append("<link href=\"" + input.getResourcePath("jbar.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + input.getResourcePath("jquery.tooltip.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + input.getResourcePath("partitur.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery.jbar.js") + "\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -88,7 +88,9 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getContextPath() + "/javascript/annis/visualizer/PartiturVisualizer2.js\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"" 
+        + input.getResourcePath("PartiturVisualizer.js")
+        + "\"></script>");
 
       writer.append("</head>");
       writer.append("<body>\n");

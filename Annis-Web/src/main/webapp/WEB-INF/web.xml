@@ -104,6 +104,16 @@
     <servlet-name>VisualizerServlet</servlet-name>
     <url-pattern>/secure/Visualizer</url-pattern>
   </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>ResourceServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.ResourceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ResourceServlet</servlet-name>
+    <url-pattern>/secure/Resource/*</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <servlet-name>BinaryServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.BinaryServlet</servlet-class>

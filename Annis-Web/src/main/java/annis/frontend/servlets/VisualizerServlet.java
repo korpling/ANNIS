@@ -29,7 +29,9 @@ import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +69,8 @@ public class VisualizerServlet extends HttpServlet implements Plugin
   private static final long serialVersionUID = -8182635617256833563L;
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
+  private static final Map<String, Date> resourceAddedDate =
+    Collections.synchronizedMap(new HashMap<String, Date>());
 
   @Override
   @SuppressWarnings("unchecked")
@@ -113,6 +117,12 @@ public class VisualizerServlet extends HttpServlet implements Plugin
         }
       }
     }
+    
+    // default to grid if vistype is unknown
+    if(!visualizerRegistry.containsKey(vistype))
+    {
+      vistype = "grid";
+    }
 
     VisualizerInput input = new VisualizerInput();
     input.setNamespace(request.getParameter("namespace") == null ? "" : request.getParameter("namespace"));
@@ -121,17 +131,16 @@ public class VisualizerServlet extends HttpServlet implements Plugin
     input.setContextPath(getServletContext().getContextPath());
     input.setAnnisRemoteServiceURL(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
     input.setDotPath(path2Dot);
-    
-    // default to grid if vistype is unknown
-    if(!visualizerRegistry.containsKey(vistype))
-    {
-      vistype = "grid";
-    }
-    
+
+    String template = getServletContext().getContextPath()
+      + "/secure/Resource/" + vistype + "/%s";
+    input.setResourcePathTemplate(template);
+
+
     VisualizerPlugin visualizer = visualizerRegistry.get(vistype);
     if(visualizer != null)
     {
-    
+
       response.setCharacterEncoding(visualizer.getCharacterEncoding());
       response.setContentType(visualizer.getContentType());
 
@@ -182,7 +191,7 @@ public class VisualizerServlet extends HttpServlet implements Plugin
           catch(ClassNotFoundException ex)
           {
             Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, null, ex);
-          } 
+          }
           catch(CacheException ex)
           {
             Logger.getLogger(VisualizerServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -201,6 +210,7 @@ public class VisualizerServlet extends HttpServlet implements Plugin
       response.setCharacterEncoding("UTF-8");
       outStream.flush();
     } // if visualizer found in registry
+
   }
 
   private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
@@ -231,8 +241,10 @@ public class VisualizerServlet extends HttpServlet implements Plugin
   @PluginLoaded
   public void newVisualizerAdded(VisualizerPlugin vis)
   {
-    Logger.getLogger(VisualizerServlet.class.getName())
-      .log(Level.INFO, "loading visualizer {0}", vis.getShortName());
+    Logger.getLogger(VisualizerServlet.class.getName()).log(Level.INFO, "loading visualizer {0}", vis.getShortName());
     visualizerRegistry.put(vis.getShortName(), vis);
+
+    resourceAddedDate.put(vis.getShortName(), new Date());
+
   }
 }
