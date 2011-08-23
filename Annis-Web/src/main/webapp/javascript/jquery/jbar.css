@@ -126,7 +126,7 @@ ul.jbar div.submenu_container {
   position: absolute;
   z-index: 1000;
   left: -1px;
-  width: 150px;
+  width: 100%;
   opacity: .97;
   text-align: left;
   padding-top: 12px;
