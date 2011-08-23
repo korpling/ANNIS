@@ -199,20 +199,6 @@
         </init-param>
         -->
   </filter>
-  <filter>
-    <filter-name>GZIP</filter-name>
-    <filter-class>org.mortbay.servlet.GzipFilter</filter-class>
-    <!--
-    <init-param>
-      <param-name>userAgent</param-name>
-      <param-value>(?:Mozilla[^\(]*\(compatible;\s*+([^;]*);.*)|(?:.*?([^\s]+/[^\s]+).*)</param-value>
-    </init-param>
-    <init-param>
-      <param-name>excludedAgents</param-name>
-      <param-value>MSIE 5.5,MSIE 5.0,MSIE 6.0,MSIE 7.0,MSIE 7.0b</param-value>
-    </init-param>
-    -->
-  </filter>
   <!--
   <filter-mapping>
     <filter-name>AuthenticationFilter</filter-name>
@@ -227,10 +213,4 @@
     <filter-name>AuthenticationFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
-  <!--
-  <filter-mapping>
-    <filter-name>GZIP</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  -->
 </web-app>
