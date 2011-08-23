@@ -17,6 +17,9 @@ package annis.frontend.servlets.visualizers;
 
 import annis.service.ifaces.AnnisResult;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -45,6 +48,7 @@ public class VisualizerInput
   private Document paulaJDOM = null;
   private AnnisResult result;
   private Properties mappings;
+  private String resourcePathTemplate = "%s";
 
   /**
    * Get the URL which is configured for the Annis installation.
@@ -245,5 +249,37 @@ public class VisualizerInput
   public void setResult(AnnisResult result)
   {
     this.result = result;
+  }
+
+  public String getResourcePathTemplate()
+  {
+    return resourcePathTemplate;
+  }
+
+  public void setResourcePathTemplate(String resourcePathTemplate)
+  {
+    this.resourcePathTemplate = resourcePathTemplate;
+  }
+  
+  
+  /**
+   * Returns a valid URL/path for which a relative (from the class package) resource
+   * can be accessed.
+   * 
+   * @param resource
+   * @return 
+   */
+  public String getResourcePath(String resource)
+  {
+    try
+    {
+      return String.format(resourcePathTemplate, URLEncoder.encode(resource, "UTF-8"));
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      Logger.getLogger(VisualizerInput.class.getName()).log(Level.SEVERE, 
+        "Could not properly encode URL parameter \"resource\" for resource", ex);
+      return String.format(resourcePathTemplate, resource);
+    }
   }
 }

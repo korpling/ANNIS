@@ -351,7 +351,7 @@ public class MainFrame extends javax.swing.JFrame
   private void startJetty() throws Exception
   {
     Server jetty = new Server(8080);
-
+    
     // add context for our bundled webapp
     WebAppContext context = new WebAppContext("./webapp/", "/Annis-web");
     Map<String, String> initParams = new HashMap<String, String>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,19 @@
  */
 package annis.frontend.servlets.visualizers;
 
-import java.io.OutputStream;
+import net.xeoh.plugins.base.Plugin;
 
-public abstract class Visualizer implements VisualizerPlugin, ResourcePlugin
+/**
+ * Base interface for all plugins that have resources in their package
+ * @author Thomas Krause <krause@informatik.hu-berlin.>
+ */
+public interface ResourcePlugin extends Plugin
 {
-
-  @Override
-  public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
-
-  @Override
-  public String getContentType()
-  {
-    return "text/html";
-  }
-
-  @Override
-  public String getCharacterEncoding()
-  {
-    return "utf-8";
-  }
-
-  @Override
-  public boolean isUsingText()
-  {
-    return false;
-  }
-  
-  
-
+  /**
+   * Get the shorted name of the linguistic type of this plugin ("partitur", 
+   * "tree", etc.)
+   * @return 
+   */
+  public String getShortName();
 
 }
