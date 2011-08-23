@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import net.xeoh.plugins.base.Plugin;
@@ -106,6 +107,10 @@ public class ResourceServlet extends HttpServlet implements Plugin
         }
         else
         {
+          response.addDateHeader("Last-Modified", resourceLastModified);
+          // expires in one minute per default
+          response.addDateHeader("Expires", new Date().getTime() + 60000);
+          
           // not in cache, stream out
           String mimeType = getServletContext().getMimeType(path);
           response.setContentType(mimeType);
