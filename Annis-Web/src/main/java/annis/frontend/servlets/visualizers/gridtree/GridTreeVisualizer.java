@@ -27,9 +27,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class GridTreeVisualizer extends WriterVisualizer
 {
-
-	private ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
-
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
 	 * represented as tokenIndex from the most left and the most right Token of
@@ -137,6 +134,8 @@ public class GridTreeVisualizer extends WriterVisualizer
 	@Override
 	public void writeOutput(VisualizerInput input, Writer writer)
 	{
+    ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
+    
 		try
 		{
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
@@ -164,7 +163,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 			writer.append("<body>");
 			writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
 			writer.append(findAnnotation(input.getNamespace(), input
-					.getResult().getGraph(), input));
+					.getResult().getGraph(), input, spans));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
@@ -175,7 +174,8 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
-	private String findAnnotation(String anno, AnnotationGraph graph, VisualizerInput input)
+	private String findAnnotation(String anno, AnnotationGraph graph, VisualizerInput input,
+    ArrayList<Span> spans)
 	{
 
 		List<AnnisNode> nodes = graph.getNodes();
@@ -237,7 +237,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 	 */
 	private boolean hasAnno(AnnisNode n, String annotation)
 	{
-
+    
 		Set<Annotation> annos = n.getNodeAnnotations();
 
 		for (Annotation x : annos)
@@ -276,43 +276,45 @@ public class GridTreeVisualizer extends WriterVisualizer
 
 		for (Edge e : edges)
 		{
+      if("edge".equals(e.getName()))
+      {
+        AnnisNode x = e.getDestination();
 
-			AnnisNode x = e.getDestination();
+        for (Span r : roots)
+        {
+          if (r.root == x)
+          {
+            n.nodes.put(r, r);
+            r.visits++;
+            break;
+          }
+        }
 
-			for (Span r : roots)
-			{
-				if (r.root == x)
-				{
-					n.nodes.put(r, r);
-					r.visits++;
-					break;
-				}
-			}
+        if (x.isToken())
+        {
 
-			if (x.isToken())
-			{
+          Long tokenIndex = x.getTokenIndex();
 
-				Long tokenIndex = x.getTokenIndex();
+          if (n.left == null)
+            n.left = tokenIndex;
+          else
+            n.left = Math.min(n.left, tokenIndex);
 
-				if (n.left == null)
-					n.left = tokenIndex;
-				else
-					n.left = Math.min(n.left, tokenIndex);
+          if (n.right == null)
+            n.right = tokenIndex;
+          else
+            n.right = Math.max(n.right, tokenIndex);
 
-				if (n.right == null)
-					n.right = tokenIndex;
-				else
-					n.right = Math.max(n.right, tokenIndex);
+          n.height = Math.max(n.height, height);
 
-				n.height = Math.max(n.height, height);
+        }
 
-			}
-
-			// recursive step
-			else
-			{
-				getTokens(n, x, roots, height + 1);
-			}
+        // recursive step
+        else
+        {
+          getTokens(n, x, roots, height + 1);
+        }
+      }
 		}
 	}
 
