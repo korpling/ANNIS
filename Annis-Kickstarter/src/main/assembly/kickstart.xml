@@ -3,7 +3,7 @@
   <id>distribution</id>
   <formats>
     <format>dir</format>
-<!--    <format>zip</format> -->
+    <format>zip</format>
   </formats>
   <fileSets>
     <fileSet>
