@@ -42,13 +42,15 @@ Ext.onReady(function(){
       id: 'username',
       fieldLabel: 'User Name',
       name: 'user',
-      allowBlank:true
+      allowBlank:true,
+      emptyText: 'test'
     },{
       id: 'password',
       fieldLabel: 'Password',
       name: 'password',
       inputType: 'password',
       allowBlank:true,
+      emptyText: 'test',
       listeners:{
         specialkey:function(f,o){
           if(o.getKey()===13)
