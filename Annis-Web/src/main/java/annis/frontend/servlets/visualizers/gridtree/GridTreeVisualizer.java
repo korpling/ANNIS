@@ -27,9 +27,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class GridTreeVisualizer extends WriterVisualizer
 {
-
-	private ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
-
 	/**
 	 * This helper-class saves the span from a specific Node. The span is
 	 * represented as tokenIndex from the most left and the most right Token of
@@ -101,7 +98,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 			return super.hashCode();
 		}
 
-		public void colpan(StringBuilder sb, String anno)
+		public void colpan(StringBuilder sb, String anno, VisualizerInput input)
 		{
 			sb.append("<td colspan=\"");
 			sb.append(Math.abs(this.right - this.left) + 1);
@@ -115,7 +112,8 @@ public class GridTreeVisualizer extends WriterVisualizer
 			sb.append(right + 1 - offset);
 
 			sb.append("\" class=\"gridtree-result\">");
-			sb.append(getAnnoValue(this.root, anno));
+			sb.append(getAnnoValue(this.root,
+					input.getMappings().getProperty("node_key", "cat")));
 			sb.append("</td>");
 		}
 
@@ -127,45 +125,45 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
-  @Override
-  public String getShortName()
-  {
-    return "grid_tree";
-  }
-  
-  
+	@Override
+	public String getShortName()
+	{
+		return "grid_tree";
+	}
 
 	@Override
 	public void writeOutput(VisualizerInput input, Writer writer)
 	{
+    ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
+    
 		try
 		{
 			writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-			
-      writer.append("<link href=\""
+
+			writer.append("<link href=\""
 					+ input.getResourcePath("jquery.tooltip.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\""
+					+ "\" rel=\"stylesheet\" type=\"text/css\" >");
+			writer.append("<link href=\""
 					+ input.getResourcePath("partitur.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+					+ "\" rel=\"stylesheet\" type=\"text/css\" >");
 			writer.append("<link href=\""
 					+ input.getResourcePath("gridtree.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
-			
-      writer.append("<script type=\"text/javascript\" src=\"" 
-        + input.getResourcePath("jquery-1.6.2.min.js")
-        + "\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" 
-        + input.getResourcePath("/javascript/jquery/jquery.tooltip.min.js") 
-        + "\"></script>");
+					+ "\" rel=\"stylesheet\" type=\"text/css\" >");
 
-      
+			writer.append("<script type=\"text/javascript\" src=\""
+					+ input.getResourcePath("jquery-1.6.2.min.js")
+					+ "\"></script>");
+			writer.append("<script type=\"text/javascript\" src=\""
+					+ input.getResourcePath("/javascript/jquery/jquery.tooltip.min.js")
+					+ "\"></script>");
+
 			writer.append("<script type=\"text/javascript\" src=\""
 					+ input.getResourcePath("gridtreeVisualizer.js")
-          + "\"></script>");
+					+ "\"></script>");
 			writer.append("<body>");
 			writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
-			writer.append(findAnnotation("cat", input.getResult().getGraph()));
+			writer.append(findAnnotation(input.getNamespace(), input
+					.getResult().getGraph(), input, spans));
 			writer.append("</table>\n");
 			writer.append("</body></html>");
 
@@ -176,7 +174,8 @@ public class GridTreeVisualizer extends WriterVisualizer
 		}
 	}
 
-	private String findAnnotation(String anno, AnnotationGraph graph)
+	private String findAnnotation(String anno, AnnotationGraph graph, VisualizerInput input,
+    ArrayList<Span> spans)
 	{
 
 		List<AnnisNode> nodes = graph.getNodes();
@@ -200,7 +199,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 		Collections.sort(spans);
 
 		// print result
-		htmlTableRow(sb, result, spans, anno);
+		htmlTableRow(sb, result, spans, anno, input);
 
 		htmlTableRow(sb, result);
 
@@ -238,11 +237,11 @@ public class GridTreeVisualizer extends WriterVisualizer
 	 */
 	private boolean hasAnno(AnnisNode n, String annotation)
 	{
-
+    
 		Set<Annotation> annos = n.getNodeAnnotations();
 
 		for (Annotation x : annos)
-			if (x.getName().equals(annotation))
+			if (x.getNamespace().equals(annotation))
 				return true;
 
 		return false;
@@ -277,43 +276,45 @@ public class GridTreeVisualizer extends WriterVisualizer
 
 		for (Edge e : edges)
 		{
+      if("edge".equals(e.getName()))
+      {
+        AnnisNode x = e.getDestination();
 
-			AnnisNode x = e.getDestination();
+        for (Span r : roots)
+        {
+          if (r.root == x)
+          {
+            n.nodes.put(r, r);
+            r.visits++;
+            break;
+          }
+        }
 
-			for (Span r : roots)
-			{
-				if (r.root == x)
-				{
-					n.nodes.put(r, r);
-					r.visits++;
-					break;
-				}
-			}
+        if (x.isToken())
+        {
 
-			if (x.isToken())
-			{
+          Long tokenIndex = x.getTokenIndex();
 
-				Long tokenIndex = x.getTokenIndex();
+          if (n.left == null)
+            n.left = tokenIndex;
+          else
+            n.left = Math.min(n.left, tokenIndex);
 
-				if (n.left == null)
-					n.left = tokenIndex;
-				else
-					n.left = Math.min(n.left, tokenIndex);
+          if (n.right == null)
+            n.right = tokenIndex;
+          else
+            n.right = Math.max(n.right, tokenIndex);
 
-				if (n.right == null)
-					n.right = tokenIndex;
-				else
-					n.right = Math.max(n.right, tokenIndex);
+          n.height = Math.max(n.height, height);
 
-				n.height = Math.max(n.height, height);
+        }
 
-			}
-
-			// recursive step
-			else
-			{
-				getTokens(n, x, roots, height + 1);
-			}
+        // recursive step
+        else
+        {
+          getTokens(n, x, roots, height + 1);
+        }
+      }
 		}
 	}
 
@@ -361,7 +362,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 	 *            the anno, which matches to all Span-Objects
 	 */
 	private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
-			ArrayList<Span> spans, String anno)
+			ArrayList<Span> spans, String anno, VisualizerInput input)
 	{
 
 		int j = 0;
@@ -386,7 +387,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 				long index = i + result.get(0).getTokenIndex();
 				if (tmp.isInIntervall(index) && level == tmp.height)
 				{
-					tmp.colpan(sb, anno);
+					tmp.colpan(sb, anno, input);
 					// skip iteration which where covered by colspan
 					i += Math.abs(tmp.right - tmp.left);
 					j++; // take next span
