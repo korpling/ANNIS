@@ -241,9 +241,7 @@ public class VisualizerServlet extends HttpServlet implements Plugin
   @PluginLoaded
   public void newVisualizerAdded(VisualizerPlugin vis)
   {
-    Logger.getLogger(VisualizerServlet.class.getName()).log(Level.INFO, "loading visualizer {0}", vis.getShortName());
     visualizerRegistry.put(vis.getShortName(), vis);
-
     resourceAddedDate.put(vis.getShortName(), new Date());
 
   }

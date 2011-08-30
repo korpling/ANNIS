@@ -31,7 +31,6 @@ import annis.frontend.servlets.visualizers.partitur.PartiturVisualizer;
 import annis.frontend.servlets.visualizers.tree.TigerTreeVisualizer;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -90,7 +89,7 @@ public class StartStopListener implements ServletContextListener
      */
     try
     {
-      URL basicPlugins = sce.getServletContext().getResource("plugins");
+      URL basicPlugins = sce.getServletContext().getResource("/plugins");
       if(basicPlugins != null)
       {
         pluginManager.addPluginsFrom(basicPlugins.toURI());
