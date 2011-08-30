@@ -1,5 +1,5 @@
 // the context path used by this installation
-var conf_context='/Annis-web';
+var conf_context='${annis.webcontext}';
 var conf_revision='Annis ${project.version} ${annis.versionExtra}';
 
 Ext.BLANK_IMAGE_URL='images/s.gif';

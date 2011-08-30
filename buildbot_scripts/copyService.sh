@@ -8,5 +8,5 @@ DIST_DIR=Annis-Service/annis-service-impl/target/annis-service-impl-$ANNIS_VERSI
 
 #code
 cp -Rf $DIST_DIR/lib/* $ANNIS_HOME/lib/
-cp -Rf $DIST_DIR/scripts/* $ANNIS_HOME/scripts/
+cp -Rf $DIST_DIR/sql/* $ANNIS_HOME/sql/
 cp -Rf $DIST_DIR/bin/* $ANNIS_HOME/bin/
