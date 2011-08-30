@@ -18,6 +18,8 @@
   
   <properties>
     <annis.versionExtra></annis.versionExtra>
+    <annis.securityManager>annis.security.TestSecurityManager</annis.securityManager>
+    <annis.userConfig>/etc/annis/user_config_trunk/</annis.userConfig>
     
     <!-- netbeans gui support -->
     <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
