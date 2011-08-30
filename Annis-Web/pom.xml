@@ -17,6 +17,7 @@
   </repositories>
   
   <properties>
+    <annis.webcontext>/Annis-web</annis.webcontext>
     <annis.versionExtra></annis.versionExtra>
     <annis.securityManager>annis.security.TestSecurityManager</annis.securityManager>
     <annis.userConfig>/etc/annis/user_config_trunk/</annis.userConfig>
