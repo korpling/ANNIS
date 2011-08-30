@@ -16,6 +16,13 @@
     </repository>
   </repositories>
   
+  <properties>
+    <annis.versionExtra></annis.versionExtra>
+    
+    <!-- netbeans gui support -->
+    <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
+  </properties>
+  
   <dependencies>
 
     <dependency>
@@ -96,7 +103,7 @@
   <build>
     <plugins>
 
-
+     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -155,9 +162,6 @@
     </plugins>
     <finalName>Annis-web</finalName>
   </build>
-  <properties>
-    <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
-  </properties>
   <description>The web frontend for the Annis Corpus Search</description>
 </project>
 
