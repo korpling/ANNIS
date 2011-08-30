@@ -116,6 +116,20 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp_filtered</directory>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
 
       <!-- jetty configuration -->
       <plugin>
