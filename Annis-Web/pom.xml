@@ -22,6 +22,7 @@
     <annis.securityManager>annis.security.TestSecurityManager</annis.securityManager>
     <annis.userConfig>/etc/annis/user_config_trunk/</annis.userConfig>
     
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- netbeans gui support -->
     <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
   </properties>

@@ -57,7 +57,7 @@ Ext.onReady(function()
               msg: '<img src=\"images/annis-logo.jpg\" /><br /><br />' +
               'Annis&sup2; is a project of the ' +
               '<a href=\"http://www.sfb632.uni-potsdam.de/\" target=\"_blank\">SFB 632</a><br /><br />'+
-              'Software revision: ' + conf_revision,
+              'Version: ' + conf_revision,
               buttons: Ext.Msg.OK,
               icon: Ext.MessageBox.INFO
             });
