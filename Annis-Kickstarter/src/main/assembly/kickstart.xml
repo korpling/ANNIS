@@ -25,20 +25,8 @@
     <!-- start scripts -->
     <fileSet>
       <directory>src/main/startscripts/</directory>
-      <outputDirectory></outputDirectory>
-      <fileMode>0774</fileMode>
-    </fileSet>
-    <!-- we need all the config files of the service -->
-    <fileSet>
-      <directory>../Annis-Service/annis-service-impl/src/main/distribution/</directory>
       <outputDirectory>/</outputDirectory>
-      <excludes>
-        <exclude>conf/database.properties</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>../Annis-Service/annis-service-impl/src/main/sql/</directory>
-      <outputDirectory>scripts/</outputDirectory>
+      <fileMode>0774</fileMode>
     </fileSet>
   </fileSets>
   
@@ -54,10 +42,15 @@
     <!-- service -->
     <dependencySet>
       <includes>
-        <include>annis-service*:war</include> 
+        <include>annis-service*:zip</include> 
       </includes>
-      <outputDirectory>webapp/</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>conf/database.properties</exclude>
+        </excludes>
+      </unpackOptions>
     </dependencySet>
     <!-- webapp -->
     <dependencySet>
