@@ -13,11 +13,6 @@
     <param-value>rmi://localhost:4711/AnnisService</param-value>
   </context-param>
   <context-param>
-    <description>URL of the AnnisResolverService</description>
-    <param-name>AnnisResolverService.URL</param-name>
-    <param-value>rmi://localhost:4711/AnnisResolverService</param-value>
-  </context-param>
-  <context-param>
     <description>Path (or command) of the "dot" programm</description>
     <param-name>DotPath</param-name>
     <param-value>dot</param-value>
@@ -172,7 +167,7 @@
 
     <init-param>
       <param-name>managerClassName</param-name>
-      <param-value>annis.security.TestSecurityManager</param-value>
+      <param-value>${annis.securityManager}</param-value>
     </init-param>
       
       <!--
@@ -185,7 +180,7 @@
       <!-- only needed if simple authentification or demo is used -->
     <init-param>
       <param-name>config_path</param-name>
-      <param-value>/etc/annis/user_config_trunk/</param-value>
+      <param-value>${annis.userConfig}/</param-value>
     </init-param>
       
       

@@ -8,10 +8,6 @@ chmod u+x buildbot_scripts/stopService.sh
 chmod u+x buildbot_scripts/copyWebapp.sh
 buildbot_scripts/copyWebapp.sh /srv/tomcat/Annis-trunk
 
-# Patch webapp
-chmod u+x buildbot_scripts/patchWebapp.py
-buildbot_scripts/patchWebapp.py /srv/tomcat/Annis-trunk $BUILD_ID /etc/annis/user_config_trunk
-
 # Copy Annis Service
 chmod u+x buildbot_scripts/copyService.sh
 buildbot_scripts/copyService.sh /opt/annis/trunk
