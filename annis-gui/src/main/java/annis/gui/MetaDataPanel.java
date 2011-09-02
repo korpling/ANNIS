@@ -45,6 +45,8 @@ public class MetaDataPanel extends Panel
   
   public MetaDataPanel(long id)
   {
+    super("Metadata");
+    
     this.id = id;
     
     setSizeFull();
@@ -69,7 +71,7 @@ public class MetaDataPanel extends Panel
           qName = anno.getNamespace() + ":" + qName;
         }
         Label l = new Label(qName);
-        l.setWidth(-1, UNITS_PIXELS);
+        l.setSizeUndefined();
         return l;
       }
     });
@@ -80,7 +82,6 @@ public class MetaDataPanel extends Panel
       {
         Annotation anno = metaContainer.getItem(itemId).getBean();
         Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
-        l.setWidth(-1, UNITS_PIXELS);
         return l;
       }
     });
@@ -89,7 +90,8 @@ public class MetaDataPanel extends Panel
     tblMeta.setVisibleColumns(new String[] {"genname", "genvalue"});
     tblMeta.setColumnHeaders(new String[] {"Name", "Value"});
     tblMeta.setSizeFull();
-    
+    tblMeta.setColumnWidth("genname", -1);
+    tblMeta.setColumnExpandRatio("genvalue", 1.0f);
   }
 
   @Override

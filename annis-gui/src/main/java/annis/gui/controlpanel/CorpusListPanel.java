@@ -170,7 +170,7 @@ public class CorpusListPanel extends Panel
           Window window = new Window("Metadata for " + c.getName(), meta);
           window.setWidth(60, UNITS_EM);
           window.setHeight(40, UNITS_EM);
-          window.setResizable(true);
+          window.setResizable(false);
           getWindow().addWindow(window);
           window.center();
         }

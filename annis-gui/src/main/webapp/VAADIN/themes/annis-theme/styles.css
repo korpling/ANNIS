@@ -6,9 +6,6 @@
  *
  **/
 
-.control .v-panel-content {
-  background-color: #DCE5EE; 
-}
 
 /* Application background */
 .v-app {
@@ -338,3 +335,14 @@ td.v-datefield-calendarpanel-month,
 .sidebar-menu .selected {
 	text-shadow: 0 1px 0 rgb(46,90,132);
 	}
+  
+/* defined by hand */
+
+.control .v-panel-content {
+  background-color: #DCE5EE; 
+}
+
+.v-table-cell-wrapper {
+  white-space: normal;
+  word-wrap: break-word;
+}

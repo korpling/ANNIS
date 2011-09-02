@@ -15,11 +15,16 @@
  */
 package annis.gui;
 
+import com.vaadin.ui.Panel;
+
 /**
  *
  * @author thomas
  */
-public class CorpusBrowserPanel
+public class CorpusBrowserPanel extends Panel
 {
-  
+  public CorpusBrowserPanel()
+  {
+    super("Available annotations");
+  }
 }

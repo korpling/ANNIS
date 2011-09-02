@@ -39,7 +39,7 @@ public class MainApp extends Application
   {
     setTheme("annis-theme");
     
-    window = new Window("Annis GUI");
+    window = new Window("Annis² Corpus Search");
     setMainWindow(window);
     
     window.getContent().setSizeFull();
