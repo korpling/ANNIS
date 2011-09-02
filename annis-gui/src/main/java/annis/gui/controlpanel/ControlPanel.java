@@ -39,7 +39,7 @@ public class ControlPanel extends Panel
     
     QueryPanel queryPanel = new QueryPanel();
     addComponent(queryPanel);
-    queryPanel.setHeight(15f, Layout.UNITS_EM);
+    queryPanel.setHeight(18f, Layout.UNITS_EM);
     
     Accordion accordion = new Accordion();
     addComponent(accordion);
