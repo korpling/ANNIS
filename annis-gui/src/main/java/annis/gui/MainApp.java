@@ -16,9 +16,12 @@
 package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.ExportPanel;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import com.vaadin.Application;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Accordion;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
@@ -64,9 +67,12 @@ public class MainApp extends Application
     window.addComponent(hLayout);
     ((VerticalLayout) window.getContent()).setExpandRatio(hLayout, 1.0f);
 
-    
-    hLayout.addComponent(new ControlPanel());
-    hLayout.addComponent(new Label("TODO"));
+    ControlPanel controlPanel = new ControlPanel();
+    controlPanel.setWidth(25f, Layout.UNITS_EM);
+    hLayout.addComponent(controlPanel);
+    Label testLabel = new Label("TODO");
+    hLayout.addComponent(testLabel);
+    hLayout.setExpandRatio(testLabel, 1.0f);
     
   }
 }

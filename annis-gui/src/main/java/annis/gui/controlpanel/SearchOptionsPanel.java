@@ -15,36 +15,20 @@
  */
 package annis.gui.controlpanel;
 
-import com.vaadin.ui.Accordion;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 
 /**
  *
  * @author thomas
  */
-public class ControlPanel extends Panel
+public class SearchOptionsPanel extends Panel
 {
-  public ControlPanel()
+
+  public SearchOptionsPanel()
   {
-    super("Search Form");
-    
-    addStyleName("control");
-    
-    QueryPanel queryPanel = new QueryPanel();
-    addComponent(queryPanel);
-    queryPanel.setHeight(200f, Layout.UNITS_PIXELS);
-    
-    Accordion accordion = new Accordion();
-    addComponent(accordion);
-    accordion.setHeight(400f, Layout.UNITS_PIXELS);
-    
-    accordion.addTab(new CorpusListPanel(), "Corpus List", null);
-    accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
-    accordion.addTab(new ExportPanel(), "Export", null);
-    
+    setSizeFull();
   }
+  
 }
