@@ -16,11 +16,10 @@
 package annis.gui.controlpanel;
 
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.util.Set;
 
 /**
  *
@@ -28,6 +27,9 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class ControlPanel extends Panel
 {
+  private QueryPanel queryPanel;
+  private CorpusListPanel corpusList;
+  
   public ControlPanel()
   {
     super("Search Form");
@@ -37,7 +39,7 @@ public class ControlPanel extends Panel
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setHeight(100f, UNITS_PERCENTAGE);
     
-    QueryPanel queryPanel = new QueryPanel();
+    queryPanel = new QueryPanel();
     addComponent(queryPanel);
     queryPanel.setHeight(18f, Layout.UNITS_EM);
     
@@ -45,11 +47,20 @@ public class ControlPanel extends Panel
     addComponent(accordion);
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     
-    accordion.addTab(new CorpusListPanel(), "Corpus List", null);
+    corpusList = new CorpusListPanel();
+    accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
     accordion.addTab(new ExportPanel(), "Export", null);
     
-    layout.setExpandRatio(accordion, 1.0f);
-        
+    layout.setExpandRatio(accordion, 1.0f);       
+  }
+  
+  public void setQuery(String query, Set<Long> corpora)
+  {
+    if(queryPanel != null && corpusList != null)
+    {
+      queryPanel.setQuery(query);
+      corpusList.selectCorpora(corpora);
+    }
   }
 }

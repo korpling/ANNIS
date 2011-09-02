@@ -75,4 +75,12 @@ public class QueryPanel extends Panel
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
     buttonPanel.addComponent(btHistory);
   }
+  
+  public void setQuery(String query)
+  {
+    if(txtQuery != null)
+    {
+      txtQuery.setValue(query);
+    }
+  }
 }

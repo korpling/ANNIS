@@ -24,23 +24,21 @@ import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisCorpusSet;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -183,6 +181,7 @@ public class CorpusListPanel extends Panel
           window.setWidth(70, UNITS_EM);
           window.setHeight(40, UNITS_EM);
           window.setResizable(false);
+          window.setModal(true);
           
           getWindow().addWindow(window);
           window.center();
@@ -192,5 +191,17 @@ public class CorpusListPanel extends Panel
       return l;
     }
     
+  }
+  
+  public void selectCorpora(Set<Long> corpora)
+  {
+    if(tblCorpora != null)
+    {
+      tblCorpora.setValue(null);
+      for(Long l : corpora)
+      {
+        tblCorpora.select(l);
+      }
+    }
   }
 }

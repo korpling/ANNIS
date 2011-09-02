@@ -24,6 +24,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.Set;
 
 /**
  * The Application's "main" class
@@ -33,7 +34,7 @@ public class MainApp extends Application
 {
 
   private Window window;
-
+  private ControlPanel controlPanel;
   @Override
   public void init()
   {
@@ -62,13 +63,20 @@ public class MainApp extends Application
     window.addComponent(hLayout);
     ((VerticalLayout) window.getContent()).setExpandRatio(hLayout, 1.0f);
 
-    ControlPanel controlPanel = new ControlPanel();
+    controlPanel = new ControlPanel();
     controlPanel.setWidth(30f, Layout.UNITS_EM);
     controlPanel.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(controlPanel);
     Label testLabel = new Label("TODO");
     hLayout.addComponent(testLabel);
     hLayout.setExpandRatio(testLabel, 1.0f);
-    
+  }
+  
+  public void setQuery(String query, Set<Long> corpora)
+  {
+    if(controlPanel != null)
+    {
+      controlPanel.setQuery(query, corpora);
+    }
   }
 }
