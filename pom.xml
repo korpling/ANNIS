@@ -29,6 +29,7 @@
     <module>Annis-Service</module>
     <module>Annis-Web</module>
     <module>Annis-Kickstarter</module>
+    <module>annis-gui</module>
   </modules>
 
 </project>
