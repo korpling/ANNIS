@@ -33,7 +33,7 @@ public class QueryPanel extends Panel
   private TextField txtQuery;
   private TextField txtResult;
   private Button btShowResult;
-  private Button btQueryBuilder;
+  private Button btHistory;
   
   public QueryPanel()
   {
@@ -42,6 +42,8 @@ public class QueryPanel extends Panel
     GridLayout layout = new GridLayout(2, 3);
     setContent(layout);
     layout.setSizeFull();
+    layout.setSpacing(true);
+    layout.setMargin(true);
     
     layout.addComponent(new Label("AnnisQL:"), 0, 0);    
     layout.addComponent(new Label("Result:"), 0, 2);
@@ -56,7 +58,7 @@ public class QueryPanel extends Panel
     
     txtResult = new TextField();
     txtResult.setWidth(100, UNITS_PERCENTAGE);
-    txtResult.setHeight(3, UNITS_EM);
+    txtResult.setHeight(3.5f, UNITS_EM);
     layout.addComponent(txtResult, 1, 2);
     txtResult.setValue("Hello World");
     //txtResult.setReadOnly(true);
@@ -71,8 +73,8 @@ public class QueryPanel extends Panel
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
     buttonPanel.addComponent(btShowResult);
     
-    btQueryBuilder = new Button("Query Builder");
-    btQueryBuilder.setWidth(100f, UNITS_PERCENTAGE);
-    buttonPanel.addComponent(btQueryBuilder);
+    btHistory = new Button("History");
+    btHistory.setWidth(100f, UNITS_PERCENTAGE);
+    buttonPanel.addComponent(btHistory);
   }
 }

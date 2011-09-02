@@ -34,17 +34,22 @@ public class ControlPanel extends Panel
     
     addStyleName("control");
     
+    VerticalLayout layout = (VerticalLayout) getContent();
+    layout.setHeight(100f, UNITS_PERCENTAGE);
+    
     QueryPanel queryPanel = new QueryPanel();
     addComponent(queryPanel);
-    queryPanel.setHeight(200f, Layout.UNITS_PIXELS);
+    queryPanel.setHeight(15f, Layout.UNITS_EM);
     
     Accordion accordion = new Accordion();
     addComponent(accordion);
-    accordion.setHeight(400f, Layout.UNITS_PIXELS);
+    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     
     accordion.addTab(new CorpusListPanel(), "Corpus List", null);
     accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
     accordion.addTab(new ExportPanel(), "Export", null);
     
+    layout.setExpandRatio(accordion, 1.0f);
+        
   }
 }
