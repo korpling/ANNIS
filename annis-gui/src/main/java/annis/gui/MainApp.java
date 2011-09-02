@@ -46,15 +46,25 @@ public class MainApp extends Application
     window.getContent().setSizeFull();
     
     MenuBar menu = new MenuBar();
-    menu.addItem("Test", new MenuBar.Command() {
+    MenuItem mainMenuItem = menu.addItem("Main", null);
+    mainMenuItem.addItem("Logout", new MenuBar.Command() {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
-        window.showNotification("Just a dummy", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        window.showNotification("Cannot logout, programmer needs sleep", Window.Notification.TYPE_ERROR_MESSAGE);
       }
     });
-    
+    MenuItem about = mainMenuItem.addItem("About", new MenuBar.Command() {
+
+      @Override
+      public void menuSelected(MenuItem selectedItem)
+      {
+        window.showNotification("The is a prototype to tests vaadins capabilities in regards to the need of ANNIS", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    mainMenuItem.addSeparatorBefore(about);
+
     window.addComponent(menu);
     menu.setWidth(100f, Layout.UNITS_PERCENTAGE);
     
