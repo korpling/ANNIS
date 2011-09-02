@@ -6,7 +6,6 @@
  *
  **/
 
-
 /* Application background */
 .v-app {
 	background: rgb(249,249,249);
@@ -74,7 +73,7 @@ body.v-ie7 .v-menubar-submenu,
 .v-table-header-drag,
 .v-filterselect-select-button .v-filterselect-input,
 .v-drag-element {
-	font-size: 11px;
+	font-size: 9pt;
 	color: rgb(34,34,34);
 	}
 
@@ -82,7 +81,7 @@ body.v-ie7 .v-menubar-submenu,
 .v-window select,
 .v-popupview-popup select,
 .v-datefield-popup select {
-	font-size: 11px;
+	font-size: 9pt;
 	}
 
 .v-label,
@@ -344,5 +343,4 @@ td.v-datefield-calendarpanel-month,
 
 .v-table-cell-wrapper {
   white-space: normal;
-  word-wrap: break-word;
 }

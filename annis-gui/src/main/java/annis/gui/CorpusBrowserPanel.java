@@ -15,6 +15,8 @@
  */
 package annis.gui;
 
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
 /**
@@ -23,8 +25,19 @@ import com.vaadin.ui.Panel;
  */
 public class CorpusBrowserPanel extends Panel
 {
-  public CorpusBrowserPanel()
+  public CorpusBrowserPanel(long corpusId)
   {
     super("Available annotations");
+    
+    setSizeFull();
+    
+    Accordion accordion = new Accordion();
+    setContent(accordion);
+    
+    accordion.setSizeFull();
+    
+    accordion.addTab(new Label("test"), "Node annotations", null);
+    accordion.addTab(new Label("test"), "Edge types", null);
+    accordion.addTab(new Label("test"), "Edge annotations", null);
   }
 }

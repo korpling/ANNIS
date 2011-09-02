@@ -16,6 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
@@ -29,6 +30,7 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -167,10 +169,21 @@ public class CorpusListPanel extends Panel
         public void buttonClick(ClickEvent event)
         {
           MetaDataPanel meta = new MetaDataPanel(c.getId());
-          Window window = new Window("Metadata for " + c.getName(), meta);
-          window.setWidth(60, UNITS_EM);
+          CorpusBrowserPanel browse = new CorpusBrowserPanel(c.getId());
+          
+          HorizontalLayout layout = new HorizontalLayout();
+          layout.addComponent(meta);
+          layout.addComponent(browse);
+          layout.setSizeFull();
+          layout.setExpandRatio(meta, 0.5f);
+          layout.setExpandRatio(browse, 0.5f);
+          
+          Window window = new Window("Corpus information for " + c.getName() 
+            + " (ID: " + c.getId() + ")", layout);
+          window.setWidth(70, UNITS_EM);
           window.setHeight(40, UNITS_EM);
           window.setResizable(false);
+          
           getWindow().addWindow(window);
           window.center();
         }
