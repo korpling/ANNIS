@@ -16,24 +16,29 @@
 package annis.gui.controlpanel;
 
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.gui.MetaDataPanel;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisCorpusSet;
 import com.vaadin.data.Item;
-import com.vaadin.data.util.AbstractBeanContainer.BeanIdResolver;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.DefaultItemSorter;
-import com.vaadin.ui.AbstractSelect.MultiSelectMode;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +49,7 @@ import java.util.logging.Logger;
 public class CorpusListPanel extends Panel
 {
 
+  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   BeanContainer<Long, AnnisCorpus> corpusContainer;
   private Table tblCorpora;
 
@@ -62,18 +68,26 @@ public class CorpusListPanel extends Panel
     corpusContainer.setItemSorter(new CorpusSorter());
 
     tblCorpora.setContainerDataSource(corpusContainer);
+    
+    tblCorpora.addGeneratedColumn("info", new InfoGenerator());
+    
     tblCorpora.setVisibleColumns(new String[]
       {
-        "name", "textCount", "tokenCount"
+        "name", "textCount", "tokenCount", "info"
       });
     tblCorpora.setColumnHeaders(new String[]
       {
-        "Name", "Texts", "Tokens"
+        "Name", "Texts", "Tokens", ""
       });
     tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
+    tblCorpora.setColumnExpandRatio("name", 0.7f);
+    tblCorpora.setColumnExpandRatio("textCount", 0.15f);
+    tblCorpora.setColumnExpandRatio("tokenCount", 0.15f);
+    tblCorpora.setColumnWidth("info", 18);
+    
   }
 
   @Override
@@ -133,5 +147,37 @@ public class CorpusListPanel extends Panel
         return super.compareProperty(propertyId, sortDirection, item1, item2);
       }
     }
+  }
+  
+  public class InfoGenerator implements Table.ColumnGenerator
+  {
+
+    @Override
+    public Component generateCell(Table source, Object itemId, Object columnId)
+    {
+      final AnnisCorpus c = corpusContainer.getItem(itemId).getBean();
+      Button l = new Button();
+      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setIcon(INFO_ICON);
+      l.setDescription(c.getName());
+      
+      l.addListener(new Button.ClickListener() {
+
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          MetaDataPanel meta = new MetaDataPanel(c.getId());
+          Window window = new Window("Metadata for " + c.getName(), meta);
+          window.setWidth(60, UNITS_EM);
+          window.setHeight(40, UNITS_EM);
+          window.setResizable(true);
+          getWindow().addWindow(window);
+          window.center();
+        }
+      });
+      
+      return l;
+    }
+    
   }
 }
