@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.beans.CorpusBrowserEntry;
+import annis.gui.controlpanel.ControlPanel;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
@@ -26,7 +27,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
-import com.vaadin.event.ActionManager;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
@@ -34,7 +34,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,7 +53,7 @@ public class CorpusBrowserPanel extends Panel
   private Table tblNodeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
 
-  public CorpusBrowserPanel(final long corpusId)
+  public CorpusBrowserPanel(final long corpusId, final ControlPanel controlPanel)
   {
     super("Available annotations");
     this.corpusId = corpusId;
@@ -101,7 +100,10 @@ public class CorpusBrowserPanel extends Panel
         CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
         HashSet<Long> corpus = new HashSet<Long>();
         corpus.add(corpusId);
-        ((MainApp) getApplication()).setQuery(cbe.getExample(), corpus);
+        if(controlPanel != null)
+        {
+          controlPanel.setQuery(cbe.getExample(), corpus);
+        }
       }
     });
 

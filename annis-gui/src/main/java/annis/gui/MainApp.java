@@ -26,13 +26,14 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.List;
 import java.util.Set;
 
 /**
  * The Application's "main" class
  */
 @SuppressWarnings("serial")
-public class MainApp extends Application
+public class MainApp extends Application 
 {
 
   private Window window;
@@ -79,29 +80,44 @@ public class MainApp extends Application
     window.addComponent(hLayout);
     ((VerticalLayout) window.getContent()).setExpandRatio(hLayout, 1.0f);
 
-    control = new ControlPanel();
+    control = new ControlPanel(this);
     control.setWidth(30f, Layout.UNITS_EM);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);
     
     tutorial = new TutorialPanel();
     
-    resultView = new ResultViewPanel();
     
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
-    mainTab.addTab(resultView, "Query Result", null);
     
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
   }
   
-  public void setQuery(String query, Set<Long> corpora)
-  {
-    if(control != null)
+
+  public void executeQuery(String aql, Set<Long> corpora, int contextLeft, int contextRight)
+  {  
+    if(corpora.isEmpty())
     {
-      control.setQuery(query, corpora);
+      window.showNotification("Please select a corpus", 
+        Window.Notification.TYPE_WARNING_MESSAGE);
+      return;
     }
+    if(aql == null || "".equals(aql))
+    {
+      window.showNotification("Empty query", 
+        Window.Notification.TYPE_WARNING_MESSAGE);
+      return;
+    }
+    // remove old result from view
+    if(resultView != null)
+    {
+      mainTab.removeComponent(resultView);
+    }
+    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight);
+    mainTab.addTab(resultView, "Query Result", null);
+    mainTab.setSelectedTab(resultView);
   }
 }

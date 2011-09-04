@@ -16,6 +16,7 @@
 package annis.gui.resultview;
 
 import com.vaadin.ui.Panel;
+import java.util.Set;
 
 /**
  *
@@ -24,4 +25,8 @@ import com.vaadin.ui.Panel;
 public class ResultViewPanel extends Panel
 {
   
+  public ResultViewPanel(String aql, Set<Long> corpora, int contextLeft, int contextRight)
+  {
+    
+  }
 }

@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.MainApp;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
@@ -30,7 +31,7 @@ public class ControlPanel extends Panel
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
   
-  public ControlPanel()
+  public ControlPanel(MainApp app)
   {
     super("Search Form");
     
@@ -39,18 +40,20 @@ public class ControlPanel extends Panel
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setHeight(100f, UNITS_PERCENTAGE);
     
-    queryPanel = new QueryPanel();
-    addComponent(queryPanel);
-    queryPanel.setHeight(18f, Layout.UNITS_EM);
-    
     Accordion accordion = new Accordion();
-    addComponent(accordion);
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     
-    corpusList = new CorpusListPanel();
+    corpusList = new CorpusListPanel(this);
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
     accordion.addTab(new ExportPanel(), "Export", null);
+    
+    queryPanel = new QueryPanel(app, corpusList);
+    queryPanel.setHeight(18f, Layout.UNITS_EM);
+    
+    addComponent(queryPanel);
+    addComponent(accordion);
+    
     
     layout.setExpandRatio(accordion, 1.0f);       
   }

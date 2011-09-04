@@ -37,6 +37,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -48,25 +49,28 @@ import java.util.logging.Logger;
  */
 public class CorpusListPanel extends Panel
 {
-
+  
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   BeanContainer<Long, AnnisCorpus> corpusContainer;
   private Table tblCorpora;
-
-  public CorpusListPanel()
+  private ControlPanel controlPanel;
+  
+  public CorpusListPanel(ControlPanel controlPanel)
   {
+    this.controlPanel = controlPanel;
+    
     setSizeFull();
-
+    
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
-
+    
     tblCorpora = new Table();
     addComponent(tblCorpora);
-
+    
     corpusContainer = new BeanContainer<Long, AnnisCorpus>(AnnisCorpus.class);
     corpusContainer.setBeanIdProperty("id");
     corpusContainer.setItemSorter(new CorpusSorter());
-
+    
     tblCorpora.setContainerDataSource(corpusContainer);
     
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
@@ -83,23 +87,24 @@ public class CorpusListPanel extends Panel
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
+    tblCorpora.setNullSelectionAllowed(false);
     tblCorpora.setColumnExpandRatio("name", 0.7f);
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.15f);
     tblCorpora.setColumnWidth("info", 18);
     
   }
-
+  
   @Override
   public void attach()
   {
     super.attach();
-
+    
     corpusContainer.addAll(getCorpusList());    
     tblCorpora.setSortContainerPropertyId("name");
     tblCorpora.sort();
   }
-
+  
   private List<AnnisCorpus> getCorpusList()
   {
     List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
@@ -121,10 +126,10 @@ public class CorpusListPanel extends Panel
     }
     return result;
   }
-
+  
   public class CorpusSorter extends DefaultItemSorter
   {
-
+    
     @Override
     protected int compareProperty(Object propertyId, boolean sortDirection, Item item1, Item item2)
     {
@@ -132,7 +137,7 @@ public class CorpusListPanel extends Panel
       {
         String val1 = (String) item1.getItemProperty(propertyId).getValue();
         String val2 = (String) item2.getItemProperty(propertyId).getValue();
-
+        
         if(sortDirection)
         {
           return val1.compareToIgnoreCase(val2);
@@ -151,7 +156,7 @@ public class CorpusListPanel extends Panel
   
   public class InfoGenerator implements Table.ColumnGenerator
   {
-
+    
     @Override
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
@@ -161,36 +166,39 @@ public class CorpusListPanel extends Panel
       l.setIcon(INFO_ICON);
       l.setDescription(c.getName());
       
-      l.addListener(new Button.ClickListener() {
-
+      l.addListener(new Button.ClickListener()
+      {
+        
         @Override
         public void buttonClick(ClickEvent event)
         {
           MetaDataPanel meta = new MetaDataPanel(c.getId());
-          CorpusBrowserPanel browse = new CorpusBrowserPanel(c.getId());
-          
-          HorizontalLayout layout = new HorizontalLayout();
-          layout.addComponent(meta);
-          layout.addComponent(browse);
-          layout.setSizeFull();
-          layout.setExpandRatio(meta, 0.5f);
-          layout.setExpandRatio(browse, 0.5f);
-          
-          Window window = new Window("Corpus information for " + c.getName() 
-            + " (ID: " + c.getId() + ")", layout);
-          window.setWidth(70, UNITS_EM);
-          window.setHeight(40, UNITS_EM);
-          window.setResizable(false);
-          window.setModal(true);
-          
-          getWindow().addWindow(window);
-          window.center();
+          if(controlPanel != null)
+          {
+            CorpusBrowserPanel browse = new CorpusBrowserPanel(c.getId(), controlPanel);
+            HorizontalLayout layout = new HorizontalLayout();
+            layout.addComponent(meta);
+            layout.addComponent(browse);
+            layout.setSizeFull();
+            layout.setExpandRatio(meta, 0.5f);
+            layout.setExpandRatio(browse, 0.5f);
+            
+            Window window = new Window("Corpus information for " + c.getName()
+              + " (ID: " + c.getId() + ")", layout);
+            window.setWidth(70, UNITS_EM);
+            window.setHeight(40, UNITS_EM);
+            window.setResizable(false);
+            window.setModal(true);
+            
+            getWindow().addWindow(window);
+            window.center();
+            
+          }
         }
       });
       
       return l;
     }
-    
   }
   
   public void selectCorpora(Set<Long> corpora)
@@ -203,5 +211,20 @@ public class CorpusListPanel extends Panel
         tblCorpora.select(l);
       }
     }
+  }
+  
+  public Set<Long> getSelectedCorpora()
+  {
+    HashSet<Long> result = new HashSet<Long>();
+    
+    for(Long id : corpusContainer.getItemIds())
+    {
+      if(tblCorpora.isSelected(id))
+      {
+        result.add(id);
+      }
+    }
+      
+    return result;
   }
 }

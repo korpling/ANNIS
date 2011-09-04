@@ -18,12 +18,16 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.gui.MainApp;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -45,9 +49,14 @@ public class QueryPanel extends Panel implements TextChangeListener
   private Label lblStatus;
   private Button btShowResult;
   private Button btHistory;
+  private MainApp app;
+  private CorpusListPanel corpusListPanel;
   
-  public QueryPanel()
+  public QueryPanel(MainApp app, CorpusListPanel corpusListPanel)
   {
+    this.app = app;
+    this.corpusListPanel = corpusListPanel;
+    
     setSizeFull();
     
     GridLayout layout = new GridLayout(2, 3);
@@ -94,6 +103,10 @@ public class QueryPanel extends Panel implements TextChangeListener
     
     btShowResult = new Button("Show Result");
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
+    btShowResult.addListener(new ShowResultClickListener());
+    btShowResult.setDescription("<b>Show Result</b><br />Ctrl+Enter");
+    btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
+    
     buttonPanel.addComponent(btShowResult);
     
     btHistory = new Button("History");
@@ -151,5 +164,20 @@ public class QueryPanel extends Panel implements TextChangeListener
       getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(), 
         Notification.TYPE_TRAY_NOTIFICATION);
     }
+  }
+  
+  public class ShowResultClickListener implements Button.ClickListener
+  {
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(app != null && corpusListPanel != null)
+      {
+        app.executeQuery((String) txtQuery.getValue(), 
+          corpusListPanel.getSelectedCorpora(), 5, 5);
+      }
+    }
+    
   }
 }
