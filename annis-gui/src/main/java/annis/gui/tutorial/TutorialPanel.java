@@ -15,17 +15,11 @@
  */
 package annis.gui.tutorial;
 
-import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -57,7 +51,7 @@ public class TutorialPanel extends Panel
     HttpSession session = webappcontext.getHttpSession();
     String contextPath = session.getServletContext().getContextPath();
     embedded.setType(Embedded.TYPE_BROWSER);
-    embedded.setSource(new ExternalResource(contextPath + "/tutorial/"));
+    embedded.setSource(new ExternalResource(contextPath + "/tutorial/index.html"));
   }
   
   
