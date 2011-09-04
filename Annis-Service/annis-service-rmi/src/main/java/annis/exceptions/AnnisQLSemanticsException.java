@@ -23,17 +23,10 @@ public class AnnisQLSemanticsException extends AnnisException {
 		super();
 	}
 
-	public AnnisQLSemanticsException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 	public AnnisQLSemanticsException(String message) {
 		super(message);
 	}
 
-	public AnnisQLSemanticsException(Throwable cause) {
-		super(cause);
-	}
 
 	
 }

@@ -226,6 +226,5 @@ public class AnnisServiceImpl implements AnnisService
   {
     this.maxContext = maxContext;
   }
-
   
 }
