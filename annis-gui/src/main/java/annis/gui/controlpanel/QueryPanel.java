@@ -15,12 +15,14 @@
  */
 package annis.gui.controlpanel;
 
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -63,6 +65,7 @@ public class QueryPanel extends Panel implements TextChangeListener
     
     txtQuery = new TextField();
     txtQuery.setSizeFull();
+    txtQuery.setTextChangeTimeout(1000);
     layout.addComponent(txtQuery, 1, 0);
     
     Panel panelStatus = new Panel();
@@ -123,12 +126,16 @@ public class QueryPanel extends Panel implements TextChangeListener
     try
     {
       AnnisService service = AnnisServiceFactory.getClient(getApplication().getProperty("AnnisRemoteService.URL"));
-      if(service.isValidQuery((String) txtQuery.getValue()))
+      if(service.isValidQuery(event.getText()))
       {
         lblStatus.setValue("Ok");
       }
     }
     catch(AnnisQLSyntaxException ex)
+    {
+      lblStatus.setValue(ex.getMessage());
+    }
+    catch(AnnisQLSemanticsException ex)
     {
       lblStatus.setValue(ex.getMessage());
     }

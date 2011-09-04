@@ -39,6 +39,7 @@ public class MainApp extends Application
   private ControlPanel control;
   private TutorialPanel tutorial;
   private ResultViewPanel resultView;
+  private TabSheet mainTab;
   
   @Override
   public void init()
@@ -58,7 +59,7 @@ public class MainApp extends Application
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
-        window.showNotification("Tutorial", Window.Notification.TYPE_ERROR_MESSAGE);
+        mainTab.setSelectedTab(tutorial);
       }
     });
     helpMenuItem.addItem("About", new MenuBar.Command() {
@@ -87,7 +88,7 @@ public class MainApp extends Application
     
     resultView = new ResultViewPanel();
     
-    TabSheet mainTab = new TabSheet();
+    mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
     mainTab.addTab(resultView, "Query Result", null);
