@@ -15,21 +15,32 @@
  */
 package annis.gui.controlpanel;
 
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.exceptions.AnnisServiceFactoryException;
+import annis.service.AnnisService;
+import annis.service.AnnisServiceFactory;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author thomas
  */
-public class QueryPanel extends Panel
+public class QueryPanel extends Panel implements TextChangeListener
 {
   private TextField txtQuery;
-  private TextField txtResult;
+  private Label lblStatus;
   private Button btShowResult;
   private Button btHistory;
   
@@ -44,7 +55,7 @@ public class QueryPanel extends Panel
     layout.setMargin(true);
     
     layout.addComponent(new Label("AnnisQL:"), 0, 0);    
-    layout.addComponent(new Label("Result:"), 0, 2);
+    layout.addComponent(new Label("Status:"), 0, 2);
     
     layout.setRowExpandRatio(0, 1.0f);
     layout.setColumnExpandRatio(0, 0.2f);
@@ -54,12 +65,23 @@ public class QueryPanel extends Panel
     txtQuery.setSizeFull();
     layout.addComponent(txtQuery, 1, 0);
     
-    txtResult = new TextField();
-    txtResult.setWidth(100, UNITS_PERCENTAGE);
-    txtResult.setHeight(3.5f, UNITS_EM);
-    layout.addComponent(txtResult, 1, 2);
-    txtResult.setValue("Hello World");
-    //txtResult.setReadOnly(true);
+    Panel panelStatus = new Panel();
+    panelStatus.setWidth(100f, UNITS_PERCENTAGE);
+    panelStatus.setHeight(3.5f, UNITS_EM);
+    ((VerticalLayout) panelStatus.getContent()).setMargin(false);
+    ((VerticalLayout) panelStatus.getContent()).setSpacing(false);
+    
+    lblStatus = new Label();
+    lblStatus.setContentMode(Label.CONTENT_PREFORMATTED);
+    lblStatus.setValue("Ok");
+    lblStatus.setSizeFull();
+    
+    panelStatus.addComponent(lblStatus);
+    
+    layout.addComponent(panelStatus, 1, 2);
+    
+    setScrollable(true);
+    
     
     Panel buttonPanel = new Panel();
     HorizontalLayout buttonPanelLayout = new HorizontalLayout();
@@ -75,12 +97,52 @@ public class QueryPanel extends Panel
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
     buttonPanel.addComponent(btHistory);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    txtQuery.addListener(this);
+  }
+  
+  
   
   public void setQuery(String query)
   {
     if(txtQuery != null)
     {
       txtQuery.setValue(query);
+    }
+  }
+
+  @Override
+  public void textChange(TextChangeEvent event)
+  {
+    // validate query
+    try
+    {
+      AnnisService service = AnnisServiceFactory.getClient(getApplication().getProperty("AnnisRemoteService.URL"));
+      if(service.isValidQuery((String) txtQuery.getValue()))
+      {
+        lblStatus.setValue("Ok");
+      }
+    }
+    catch(AnnisQLSyntaxException ex)
+    {
+      lblStatus.setValue(ex.getMessage());
+    }
+    catch(AnnisServiceFactoryException ex)
+    {
+      Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE, "Could not connect to service", ex);
+      getWindow().showNotification("Could not connect to service: " + ex.getMessage(), 
+        Notification.TYPE_TRAY_NOTIFICATION);
+    }    catch(RemoteException ex)
+    {
+      Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
+        "Remote exception when communicating with service", ex);
+      getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(), 
+        Notification.TYPE_TRAY_NOTIFICATION);
     }
   }
 }

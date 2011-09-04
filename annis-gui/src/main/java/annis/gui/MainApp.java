@@ -17,19 +17,16 @@ package annis.gui;
 
 import annis.gui.tutorial.TutorialPanel;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.resultview.ResultViewPanel;
 import com.vaadin.Application;
-import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.io.File;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * The Application's "main" class
@@ -39,8 +36,9 @@ public class MainApp extends Application
 {
 
   private Window window;
-  private ControlPanel controlPanel;
-  private TutorialPanel tutorialPanel;
+  private ControlPanel control;
+  private TutorialPanel tutorial;
+  private ResultViewPanel resultView;
   
   @Override
   public void init()
@@ -80,16 +78,19 @@ public class MainApp extends Application
     window.addComponent(hLayout);
     ((VerticalLayout) window.getContent()).setExpandRatio(hLayout, 1.0f);
 
-    controlPanel = new ControlPanel();
-    controlPanel.setWidth(30f, Layout.UNITS_EM);
-    controlPanel.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    hLayout.addComponent(controlPanel);
+    control = new ControlPanel();
+    control.setWidth(30f, Layout.UNITS_EM);
+    control.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    hLayout.addComponent(control);
     
-    tutorialPanel = new TutorialPanel();
+    tutorial = new TutorialPanel();
+    
+    resultView = new ResultViewPanel();
     
     TabSheet mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(tutorialPanel, "Tutorial", null);
+    mainTab.addTab(tutorial, "Tutorial", null);
+    mainTab.addTab(resultView, "Query Result", null);
     
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
@@ -97,9 +98,9 @@ public class MainApp extends Application
   
   public void setQuery(String query, Set<Long> corpora)
   {
-    if(controlPanel != null)
+    if(control != null)
     {
-      controlPanel.setQuery(query, corpora);
+      control.setQuery(query, corpora);
     }
   }
 }
