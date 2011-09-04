@@ -90,7 +90,7 @@ public class QueryPanel extends Panel implements TextChangeListener
     ((VerticalLayout) panelStatus.getContent()).setSizeFull();
     
     lblStatus = new Label();
-    lblStatus.setContentMode(Label.CONTENT_PREFORMATTED);
+    lblStatus.setContentMode(Label.CONTENT_DEFAULT);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setSizeFull();
     
