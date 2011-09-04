@@ -18,24 +18,25 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.gui.MainApp;
+import annis.gui.ServiceHelper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
-import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
+import java.security.Provider.Service;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,57 +50,68 @@ public class QueryPanel extends Panel implements TextChangeListener
   private Label lblStatus;
   private Button btShowResult;
   private Button btHistory;
-  private MainApp app;
-  private CorpusListPanel corpusListPanel;
+  private ControlPanel controlPanel;
+  private ProgressIndicator piCount;
+  private HorizontalLayout buttonPanelLayout;
+  private GridLayout mainLayout;
+  private Panel panelStatus;
+  private String lastPublicStatus;
   
-  public QueryPanel(MainApp app, CorpusListPanel corpusListPanel)
+  public QueryPanel(ControlPanel controlPanel)
   {
-    this.app = app;
-    this.corpusListPanel = corpusListPanel;
+    this.controlPanel = controlPanel;
+    this.lastPublicStatus = "Ok";
     
     setSizeFull();
     
-    GridLayout layout = new GridLayout(2, 3);
-    setContent(layout);
-    layout.setSizeFull();
-    layout.setSpacing(true);
-    layout.setMargin(true);
+    mainLayout = new GridLayout(2, 3);
+    setContent(mainLayout);
+    mainLayout.setSizeFull();
+    mainLayout.setSpacing(true);
+    mainLayout.setMargin(true);
     
-    layout.addComponent(new Label("AnnisQL:"), 0, 0);    
-    layout.addComponent(new Label("Status:"), 0, 2);
+    mainLayout.addComponent(new Label("AnnisQL:"), 0, 0);    
+    mainLayout.addComponent(new Label("Status:"), 0, 2);
     
-    layout.setRowExpandRatio(0, 1.0f);
-    layout.setColumnExpandRatio(0, 0.2f);
-    layout.setColumnExpandRatio(1, 0.8f);
+    mainLayout.setRowExpandRatio(0, 1.0f);
+    mainLayout.setColumnExpandRatio(0, 0.2f);
+    mainLayout.setColumnExpandRatio(1, 0.8f);
     
     txtQuery = new TextField();
     txtQuery.setSizeFull();
     txtQuery.setTextChangeTimeout(1000);
-    layout.addComponent(txtQuery, 1, 0);
+    mainLayout.addComponent(txtQuery, 1, 0);
     
-    Panel panelStatus = new Panel();
+    panelStatus = new Panel();
     panelStatus.setWidth(100f, UNITS_PERCENTAGE);
     panelStatus.setHeight(3.5f, UNITS_EM);
     ((VerticalLayout) panelStatus.getContent()).setMargin(false);
     ((VerticalLayout) panelStatus.getContent()).setSpacing(false);
+    ((VerticalLayout) panelStatus.getContent()).setSizeFull();
     
     lblStatus = new Label();
     lblStatus.setContentMode(Label.CONTENT_PREFORMATTED);
-    lblStatus.setValue("Ok");
+    lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setSizeFull();
     
     panelStatus.addComponent(lblStatus);
     
-    layout.addComponent(panelStatus, 1, 2);
+    mainLayout.addComponent(panelStatus, 1, 2);
     
     setScrollable(true);
     
     
     Panel buttonPanel = new Panel();
-    HorizontalLayout buttonPanelLayout = new HorizontalLayout();
+    buttonPanelLayout = new HorizontalLayout();
     buttonPanel.setContent(buttonPanelLayout);
     buttonPanelLayout.setWidth(100f, UNITS_PERCENTAGE);
-    layout.addComponent(buttonPanel, 1, 1);
+    mainLayout.addComponent(buttonPanel, 1, 1);
+    
+    piCount = new ProgressIndicator();
+    piCount.setIndeterminate(true);
+    piCount.setEnabled(false);
+    piCount.setVisible(false);
+    piCount.setPollingInterval(500);
     
     btShowResult = new Button("Show Result");
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
@@ -112,6 +124,7 @@ public class QueryPanel extends Panel implements TextChangeListener
     btHistory = new Button("History");
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
     buttonPanel.addComponent(btHistory);
+    
   }
 
   @Override
@@ -131,6 +144,15 @@ public class QueryPanel extends Panel implements TextChangeListener
       txtQuery.setValue(query);
     }
   }
+  
+  public String getQuery()
+  {
+    if(txtQuery != null)
+    {
+      return (String) txtQuery.getValue();
+    }
+    return "";
+  }
 
   @Override
   public void textChange(TextChangeEvent event)
@@ -138,10 +160,10 @@ public class QueryPanel extends Panel implements TextChangeListener
     // validate query
     try
     {
-      AnnisService service = AnnisServiceFactory.getClient(getApplication().getProperty("AnnisRemoteService.URL"));
-      if(service.isValidQuery(event.getText()))
+      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+      if(service != null && service.isValidQuery(event.getText()))
       {
-        lblStatus.setValue("Ok");
+        lblStatus.setValue(lastPublicStatus);
       }
     }
     catch(AnnisQLSyntaxException ex)
@@ -151,13 +173,8 @@ public class QueryPanel extends Panel implements TextChangeListener
     catch(AnnisQLSemanticsException ex)
     {
       lblStatus.setValue(ex.getMessage());
-    }
-    catch(AnnisServiceFactoryException ex)
-    {
-      Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE, "Could not connect to service", ex);
-      getWindow().showNotification("Could not connect to service: " + ex.getMessage(), 
-        Notification.TYPE_TRAY_NOTIFICATION);
-    }    catch(RemoteException ex)
+    }  
+    catch(RemoteException ex)
     {
       Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
         "Remote exception when communicating with service", ex);
@@ -172,12 +189,39 @@ public class QueryPanel extends Panel implements TextChangeListener
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(app != null && corpusListPanel != null)
+      if(controlPanel != null)
       {
-        app.executeQuery((String) txtQuery.getValue(), 
-          corpusListPanel.getSelectedCorpora(), 5, 5);
+        controlPanel.executeQuery();
       }
+    }    
+  }
+  
+  public void setCountIndicatorEnabled(boolean enabled)
+  {
+    if(piCount != null && btShowResult != null)
+    {
+      if(enabled)
+      {
+        panelStatus.removeComponent(lblStatus);
+        panelStatus.addComponent(piCount);
+      }
+      else
+      {
+        panelStatus.removeComponent(piCount);
+        panelStatus.addComponent(lblStatus);
+      }
+      piCount.setVisible(enabled);
+      piCount.setEnabled(enabled);
+      
     }
-    
+  }
+  
+  protected void setStatus(String status)
+  {
+    if(lblStatus != null)
+    {
+      lblStatus.setValue(status);
+      lastPublicStatus = status;
+    }
   }
 }

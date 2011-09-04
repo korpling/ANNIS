@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
+import annis.gui.ServiceHelper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
@@ -34,6 +35,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -110,19 +112,19 @@ public class CorpusListPanel extends Panel
     List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
     try
     {
-      AnnisService service = AnnisServiceFactory.getClient(getApplication().getProperty("AnnisRemoteService.URL"));
-      AnnisCorpusSet corpora = service.getCorpusSet();
-      result.addAll(corpora);
+      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+      if(service != null)
+      {
+        AnnisCorpusSet corpora = service.getCorpusSet();
+        result.addAll(corpora);
+      }
     }
     catch(RemoteException ex)
     {
       Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
-        "Remote exception when communicating with service", ex);
-    }
-    catch(AnnisServiceFactoryException e1)
-    {
-      Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
-        "Could not instanciate service", e1);
+        null, ex);
+      getWindow().showNotification("Remote exception: " + ex.getLocalizedMessage(),
+        Notification.TYPE_WARNING_MESSAGE);
     }
     return result;
   }
@@ -201,7 +203,7 @@ public class CorpusListPanel extends Panel
     }
   }
   
-  public void selectCorpora(Set<Long> corpora)
+  protected void selectCorpora(Set<Long> corpora)
   {
     if(tblCorpora != null)
     {
@@ -213,7 +215,7 @@ public class CorpusListPanel extends Panel
     }
   }
   
-  public Set<Long> getSelectedCorpora()
+  protected Set<Long> getSelectedCorpora()
   {
     HashSet<Long> result = new HashSet<Long>();
     

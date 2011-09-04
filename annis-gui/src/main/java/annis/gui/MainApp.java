@@ -23,6 +23,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -97,20 +98,8 @@ public class MainApp extends Application
   }
   
 
-  public void executeQuery(String aql, Set<Long> corpora, int contextLeft, int contextRight)
+  public void showQueryResult(String aql, Set<Long> corpora, int contextLeft, int contextRight)
   {  
-    if(corpora.isEmpty())
-    {
-      window.showNotification("Please select a corpus", 
-        Window.Notification.TYPE_WARNING_MESSAGE);
-      return;
-    }
-    if(aql == null || "".equals(aql))
-    {
-      window.showNotification("Empty query", 
-        Window.Notification.TYPE_WARNING_MESSAGE);
-      return;
-    }
     // remove old result from view
     if(resultView != null)
     {

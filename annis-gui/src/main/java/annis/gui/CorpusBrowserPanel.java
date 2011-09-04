@@ -32,6 +32,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -159,21 +160,21 @@ public class CorpusBrowserPanel extends Panel
     List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
     try
     {
-      AnnisService service = AnnisServiceFactory.getClient(getApplication().getProperty("AnnisRemoteService.URL"));
+      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
       List<Long> ids = new LinkedList<Long>();
       ids.add(corpusId);
-      AnnisAttributeSet attributes = service.getAttributeSet(ids, true, true);
-      result.addAll(attributes);
+      if(service != null)
+      {
+        AnnisAttributeSet attributes = service.getAttributeSet(ids, true, true);
+        result.addAll(attributes);
+      }
     }
     catch(RemoteException ex)
     {
-      Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
-        "Remote exception when communicating with service", ex);
-    }
-    catch(AnnisServiceFactoryException e1)
-    {
-      Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
-        "Could not instanciate service", e1);
+      Logger.getLogger(CorpusBrowserPanel.class.getName()).log(Level.SEVERE,
+        null, ex);
+      getWindow().showNotification("Remote exception: " + ex.getLocalizedMessage(),
+        Notification.TYPE_WARNING_MESSAGE);
     }
     return result;
   }
