@@ -43,6 +43,9 @@ public class ControlPanel extends Panel
   private CorpusListPanel corpusList;
   private MainApp app;
   private Window window;
+ 
+  private String lastQuery;
+  Set<Long> lastCorpusSelection;
 
   public ControlPanel(MainApp app)
   {
@@ -95,16 +98,16 @@ public class ControlPanel extends Panel
   {
     if(app != null && corpusList != null && queryPanel != null)
     {
-      Set<Long> corpora = corpusList.getSelectedCorpora();
-      String aql = queryPanel.getQuery();
-
-      if(corpora.isEmpty())
+      
+      lastCorpusSelection = corpusList.getSelectedCorpora();
+      lastQuery = queryPanel.getQuery();
+      if(lastCorpusSelection.isEmpty())
       {
         getWindow().showNotification("Please select a corpus",
           Window.Notification.TYPE_WARNING_MESSAGE);
         return;
       }
-      if("".equals(aql))
+      if("".equals(lastQuery))
       {
         getWindow().showNotification("Empty query",
           Window.Notification.TYPE_WARNING_MESSAGE);
@@ -112,29 +115,17 @@ public class ControlPanel extends Panel
       }
       
       queryPanel.setCountIndicatorEnabled(true);      
-      CountThread countThread = new CountThread(aql, corpora, queryPanel);
+      CountThread countThread = new CountThread();
       countThread.start();
       
-      // TODO
-//      app.showQueryResult(aql, corpora, 5, 5);
+      app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5);
     }
   }
   
-  public class CountThread extends Thread
+  private class CountThread extends Thread
   {
-    private String aql;
-    private Set<Long> corpora;
-    private int count;
-    private QueryPanel queryPanel;
+    private int count = -1;
 
-    public CountThread(String aql, Set<Long> corpora, QueryPanel queryPanel)
-    {
-      this.aql = aql;
-      this.corpora = corpora;
-      this.count = -1;
-      this.queryPanel = queryPanel;
-    }
-    
     @Override
     public void run()
     {
@@ -143,7 +134,8 @@ public class ControlPanel extends Panel
       {
         try
         {
-          count = service.getCount(new LinkedList<Long>(corpora), aql);
+         
+          count = service.getCount(new LinkedList<Long>(lastCorpusSelection), lastQuery);
           
         }
         catch(RemoteException ex)
@@ -153,18 +145,15 @@ public class ControlPanel extends Panel
         }
         catch(AnnisQLSemanticsException ex)
         {
-          window.showNotification("Sematic error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
+          // handled by result query
         }
         catch(AnnisQLSyntaxException ex)
         {
-          window.showNotification("Syntax error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
+          // handled by result query
         }
         catch(AnnisCorpusAccessException ex)
         {
-          window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
+          // handled by result query
         }
       }
 
