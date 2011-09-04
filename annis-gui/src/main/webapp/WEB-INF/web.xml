@@ -1,26 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-  <display-name>Vaadin Web Application</display-name>
-  <context-param>
-    <description>Vaadin production mode</description>
-    <param-name>productionMode</param-name>
-    <param-value>false</param-value>
-  </context-param>
-  <servlet>
-    <servlet-name>MainApp</servlet-name>
-    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
-    <init-param>
-      <param-name>application</param-name>
-      <param-value>annis.gui.MainApp</param-value>
-    </init-param>
-    <init-param>
-      <description>URL of the AnnisRMIServer</description>
-      <param-name>AnnisRemoteService.URL</param-name>
-      <param-value>rmi://localhost:4711/AnnisService</param-value>
-    </init-param>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MainApp</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>Annis corpus Search gui</display-name>
+    <context-param>
+        <description>Vaadin production mode</description>
+        <param-name>productionMode</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>MainApp</servlet-name>
+        <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+        <init-param>
+            <param-name>application</param-name>
+            <param-value>annis.gui.MainApp</param-value>
+        </init-param>
+        <init-param>
+            <description>URL of the AnnisRMIServer</description>
+            <param-name>AnnisRemoteService.URL</param-name>
+            <param-value>rmi://localhost:4711/AnnisService</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MainApp</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MainApp</servlet-name>
+        <url-pattern>/VAADIN/*</url-pattern>
+    </servlet-mapping>
+    
+    <welcome-file-list>
+      <welcome-file>app</welcome-file>
+    </welcome-file-list>
 </web-app>

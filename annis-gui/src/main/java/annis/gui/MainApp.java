@@ -15,16 +15,21 @@
  */
 package annis.gui;
 
+import annis.gui.tutorial.TutorialPanel;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.Application;
+import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.io.File;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * The Application's "main" class
@@ -35,6 +40,8 @@ public class MainApp extends Application
 
   private Window window;
   private ControlPanel controlPanel;
+  private TutorialPanel tutorialPanel;
+  
   @Override
   public void init()
   {
@@ -44,18 +51,19 @@ public class MainApp extends Application
     setMainWindow(window);
     
     window.getContent().setSizeFull();
+    ((VerticalLayout)window.getContent()).setMargin(false);
     
     MenuBar menu = new MenuBar();
-    MenuItem mainMenuItem = menu.addItem("Main", null);
-    mainMenuItem.addItem("Logout", new MenuBar.Command() {
+    MenuItem helpMenuItem = menu.addItem("Help", null);
+    helpMenuItem.addItem("Tutorial", new MenuBar.Command() {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
-        window.showNotification("Cannot logout, programmer needs sleep", Window.Notification.TYPE_ERROR_MESSAGE);
+        window.showNotification("Tutorial", Window.Notification.TYPE_ERROR_MESSAGE);
       }
     });
-    MenuItem about = mainMenuItem.addItem("About", new MenuBar.Command() {
+    helpMenuItem.addItem("About", new MenuBar.Command() {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
@@ -63,7 +71,6 @@ public class MainApp extends Application
         window.showNotification("The is a prototype to tests vaadins capabilities in regards to the need of ANNIS", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
-    mainMenuItem.addSeparatorBefore(about);
 
     window.addComponent(menu);
     menu.setWidth(100f, Layout.UNITS_PERCENTAGE);
@@ -77,9 +84,15 @@ public class MainApp extends Application
     controlPanel.setWidth(30f, Layout.UNITS_EM);
     controlPanel.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(controlPanel);
-    Label testLabel = new Label("TODO");
-    hLayout.addComponent(testLabel);
-    hLayout.setExpandRatio(testLabel, 1.0f);
+    
+    tutorialPanel = new TutorialPanel();
+    
+    TabSheet mainTab = new TabSheet();
+    mainTab.setSizeFull();
+    mainTab.addTab(tutorialPanel, "Tutorial", null);
+    
+    hLayout.addComponent(mainTab);
+    hLayout.setExpandRatio(mainTab, 1.0f);
   }
   
   public void setQuery(String query, Set<Long> corpora)
