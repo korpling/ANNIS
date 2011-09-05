@@ -43,7 +43,6 @@ public class ControlPanel extends Panel
   private CorpusListPanel corpusList;
   private MainApp app;
   private Window window;
- 
   private String lastQuery;
   Set<Long> lastCorpusSelection;
 
@@ -79,11 +78,9 @@ public class ControlPanel extends Panel
   public void attach()
   {
     super.attach();
-    
+
     this.window = getWindow();
   }
-  
-  
 
   public void setQuery(String query, Set<Long> corpora)
   {
@@ -98,7 +95,7 @@ public class ControlPanel extends Panel
   {
     if(app != null && corpusList != null && queryPanel != null)
     {
-      
+
       lastCorpusSelection = corpusList.getSelectedCorpora();
       lastQuery = queryPanel.getQuery();
       if(lastCorpusSelection.isEmpty())
@@ -113,17 +110,18 @@ public class ControlPanel extends Panel
           Window.Notification.TYPE_WARNING_MESSAGE);
         return;
       }
-      
-      queryPanel.setCountIndicatorEnabled(true);      
+
+      queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
-      
-      app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5);
+
+      app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5, 10);
     }
   }
-  
+
   private class CountThread extends Thread
   {
+
     private int count = -1;
 
     @Override
@@ -134,9 +132,9 @@ public class ControlPanel extends Panel
       {
         try
         {
-         
+
           count = service.getCount(new LinkedList<Long>(lastCorpusSelection), lastQuery);
-          
+
         }
         catch(RemoteException ex)
         {
@@ -145,25 +143,27 @@ public class ControlPanel extends Panel
         }
         catch(AnnisQLSemanticsException ex)
         {
-          // handled by result query
+          window.showNotification("Sematic error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
         }
         catch(AnnisQLSyntaxException ex)
         {
-          // handled by result query
+          window.showNotification("Syntax error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
         }
         catch(AnnisCorpusAccessException ex)
         {
-          // handled by result query
+          window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
         }
       }
 
       queryPanel.setStatus("" + count + " matches");
+      app.updateQueryCount(count);
+
       queryPanel.setCountIndicatorEnabled(false);
     }
 
     public int getCount()
     {
       return count;
-    }    
+    }
   }
 }

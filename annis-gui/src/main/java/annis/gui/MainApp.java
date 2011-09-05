@@ -98,15 +98,25 @@ public class MainApp extends Application
   }
   
 
-  public void showQueryResult(String aql, Set<Long> corpora, int contextLeft, int contextRight)
+  public void showQueryResult(String aql, Set<Long> corpora, int contextLeft, 
+    int contextRight, int pageSize)
   {  
     // remove old result from view
     if(resultView != null)
     {
       mainTab.removeComponent(resultView);
     }
-    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight);
+    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
+      pageSize);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
+  }
+  
+  public void updateQueryCount(int count)
+  {
+    if(resultView != null)
+    {
+      resultView.setCount(count);
+    }
   }
 }

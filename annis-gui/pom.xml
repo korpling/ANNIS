@@ -66,12 +66,12 @@
   </build>
 
   <repositories>
-    <!--
+    
     <repository>
       <id>vaadin-addons</id>
       <url>http://maven.vaadin.com/vaadin-addons</url>
     </repository>
-    -->
+    
     <repository>
       <id>korpling</id>
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
@@ -129,6 +129,13 @@
       <version>2.3.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.vaadin.addons.lazyquerycontainer</groupId>
+      <artifactId>vaadin-lazyquerycontainer</artifactId>
+      <version>1.2.9</version>
+    </dependency>
+
     
     <!--
     <dependency>

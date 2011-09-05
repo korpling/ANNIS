@@ -15,20 +15,17 @@
  */
 package annis.gui.resultview;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.ServiceHelper;
-import annis.service.AnnisService;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.Window;
-import java.rmi.RemoteException;
+import com.vaadin.ui.Table;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
+import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
+import org.vaadin.addons.lazyquerycontainer.LazyQueryView;
 
 /**
  *
@@ -36,87 +33,68 @@ import java.util.logging.Logger;
  */
 public class ResultViewPanel extends Panel
 {
-  private ProgressIndicator piResult;
+
   private Label lblInfo;
-  
   private String aql;
   private Set<Long> corpora;
-  private int contextLeft, contextRight;
+  private int contextLeft, contextRight, pageSize;
+  private Table tblResults;
+  private LazyQueryContainer containerResult;
+  private Map<String,Object> queryConfiguration;
+  private BeanQueryFactory<AnnisResultQuery> queryFactory;
   
-  public ResultViewPanel(String aql, Set<Long> corpora, int contextLeft, int contextRight)
+  public ResultViewPanel(String aql, Set<Long> corpora, int contextLeft, int contextRight, int pageSize)
   {
     this.aql = aql;
     this.corpora = corpora;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
-    
-    piResult = new ProgressIndicator();
-    piResult.setIndeterminate(true);
-    piResult.setVisible(true);
-    piResult.setEnabled(true);
-    
+    this.pageSize = pageSize;
+
     lblInfo = new Label();
     lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + " is calculated.");
+
+    tblResults = new Table();
     
-    addComponent(piResult);
-    addComponent(lblInfo);
     
+    addComponent(lblInfo);    
+    addComponent(tblResults);
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    
-    new ResultThread().start();
-  }
-  
-  
-  
-  private class ResultThread extends Thread
-  {
 
-    @Override
-    public void run()
-    {
-      long startTime = System.currentTimeMillis();
-      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
-      if(service != null)
-      {
-        try
-        {
-          service.getResultSet(new LinkedList<Long>(corpora), 
-            aql, 0, 20, contextLeft, contextRight);
-        }
-        catch(RemoteException ex)
-        {
-          Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, null, ex);
-          getWindow().showNotification(ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch(AnnisQLSemanticsException ex)
-        {
-          getWindow().showNotification("Sematic error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch(AnnisQLSyntaxException ex)
-        {
-          getWindow().showNotification("Syntax error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch(AnnisCorpusAccessException ex)
-        {
-          getWindow().showNotification("Corpus access error: " + ex.getLocalizedMessage(), 
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-      }
-      long endTime = System.currentTimeMillis();
-      
-      piResult.setEnabled(false);
-      
-      lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") 
-        + " finished in " + ((endTime - startTime) / 1000.0) + " seconds");
-    }
+    queryConfiguration=new HashMap<String,Object>();
+    queryConfiguration.put("service", ServiceHelper.getService(getApplication(), getWindow()));
+    queryConfiguration.put("window", getWindow());
+    queryConfiguration.put("aql", aql);
+    queryConfiguration.put("corpora", new LinkedList<Long>(corpora));
+    queryConfiguration.put("count", -1);
+    queryConfiguration.put("pageSize", pageSize);
+    queryConfiguration.put("contextLeft", contextLeft);
+    queryConfiguration.put("contextRight", contextRight);
+    
+    queryFactory =
+      new BeanQueryFactory<AnnisResultQuery>(AnnisResultQuery.class);
+    queryFactory.setQueryConfiguration(queryConfiguration);
+    containerResult = new LazyQueryContainer(queryFactory, true, pageSize);
+    containerResult.addContainerProperty(LazyQueryView.DEBUG_PROPERTY_ID_BATCH_INDEX, 
+      Integer.class, 0, true, false);
+    
+    tblResults.setContainerDataSource(containerResult);
+    
+    tblResults.setVisibleColumns(new String[] {LazyQueryView.DEBUG_PROPERTY_ID_BATCH_INDEX});
+    tblResults.setPageLength(pageSize);
     
     
+  }
+
+  public void setCount(int count)
+  {
+    queryConfiguration.put("count", count);
+    tblResults.setContainerDataSource(containerResult);
+
   }
 }
