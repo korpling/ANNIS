@@ -16,6 +16,17 @@
     </repository>
   </repositories>
   
+  <properties>
+    <annis.webcontext>/Annis-web</annis.webcontext>
+    <annis.versionExtra></annis.versionExtra>
+    <annis.securityManager>annis.security.TestSecurityManager</annis.securityManager>
+    <annis.userConfig>/etc/annis/user_config_trunk/</annis.userConfig>
+    
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- netbeans gui support -->
+    <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
+  </properties>
+  
   <dependencies>
 
     <dependency>
@@ -96,7 +107,7 @@
   <build>
     <plugins>
 
-
+     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -114,6 +125,20 @@
           <encoding>UTF-8</encoding>
           <source>1.6</source>
           <target>1.6</target>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp_filtered</directory>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
         </configuration>
       </plugin>
 
@@ -141,9 +166,6 @@
     </plugins>
     <finalName>Annis-web</finalName>
   </build>
-  <properties>
-    <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
-  </properties>
   <description>The web frontend for the Annis Corpus Search</description>
 </project>
 

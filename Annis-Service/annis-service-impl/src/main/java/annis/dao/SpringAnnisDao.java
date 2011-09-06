@@ -97,7 +97,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     // parse the query
     Start statement = aqlParser.parse(aql);
-
     // analyze it
     return queryAnalysis.analyzeQuery(statement, corpusList);
   }
@@ -172,7 +171,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
 
     // execute session modifiers
-    for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+    for(SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
     {
       sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
     }
@@ -180,9 +179,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
 
     // generate the view with the matched node IDs
-    for (QueryExecutor e : executorList)
+    for(QueryExecutor e : executorList)
     {
-      if (e.checkIfApplicable(queryData))
+      if(e.checkIfApplicable(queryData))
       {
         e.createMatchView(getJdbcTemplate(), corpusList, documents, queryData);
         // leave the loop
@@ -194,7 +193,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<AnnisCorpus> listCorpora()
   {
     return (List<AnnisCorpus>) getJdbcTemplate().query(
@@ -202,7 +201,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues)
   {
@@ -212,15 +211,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
     List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(getJdbcTemplate(), textId);
-    if (graphs.isEmpty())
+    if(graphs.isEmpty())
     {
       return null;
     }
-    if (graphs.size() > 1)
+    if(graphs.size() > 1)
     {
       throw new IllegalStateException("Expected only one annotation graph");
     }
@@ -228,7 +227,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(long corpusId)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
@@ -238,7 +237,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
@@ -247,7 +246,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
   {
     try
@@ -258,7 +257,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;
     }
-    catch (SQLException ex)
+    catch(SQLException ex)
     {
       log.error("Could not get resolver entries from database", ex);
       return new LinkedList<ResolverEntry>();
@@ -286,7 +285,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
           {
 
             // try corpus ID first
-            File conf = new File(confFolder, "" + c.getId() + ".properties" );
+            File conf = new File(confFolder, "" + c.getId() + ".properties");
             if(!conf.isFile())
             {
               try
@@ -299,11 +298,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
                   conf = new File(confFolder, c.getName() + ".properties");
                 }
               }
-              catch (NoSuchAlgorithmException ex)
+              catch(NoSuchAlgorithmException ex)
               {
                 log.log(Level.WARN, null, ex);
               }
-              catch (UnsupportedEncodingException ex)
+              catch(UnsupportedEncodingException ex)
               {
                 log.log(Level.WARN, null, ex);
               }
@@ -318,7 +317,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
                 p.load(new FileReader(conf));
 
               }
-              catch (IOException ex)
+              catch(IOException ex)
               {
                 log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
               }
@@ -343,11 +342,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.aqlParser = aqlParser;
   }
 
-  
-
   // /// Getter / Setter
-  
-
   public SqlGenerator getSqlGenerator()
   {
     return sqlGenerator;
@@ -368,7 +363,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.planRowMapper = planRowMapper;
   }
-  
+
   public ListCorpusSqlHelper getListCorpusSqlHelper()
   {
     return listCorpusSqlHelper;
@@ -521,5 +516,4 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.dddqueryParser = dddqueryParser;
   }
-
 }

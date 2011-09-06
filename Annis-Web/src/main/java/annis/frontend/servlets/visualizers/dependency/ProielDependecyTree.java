@@ -23,11 +23,13 @@ import annis.model.Annotation;
 import annis.model.Edge;
 import java.util.HashSet;
 import java.util.Set;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
  * @author thomas
  */
+@PluginImplementation
 public class ProielDependecyTree extends AbstractDotVisualizer
 {
 

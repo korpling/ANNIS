@@ -10,14 +10,13 @@
   <fileSets>
     <fileSet>
       <directory>src/main/distribution/</directory>
+      <excludes>
+        <exclude>bin/</exclude>
+      </excludes>
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/sql/</directory>
-      <outputDirectory>scripts/</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/scripts/</directory>
+      <directory>src/main/distribution/bin/</directory>
       <outputDirectory>bin/</outputDirectory>
       <fileMode>0774</fileMode>
     </fileSet>

@@ -154,7 +154,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 					+ input.getResourcePath("jquery-1.6.2.min.js")
 					+ "\"></script>");
 			writer.append("<script type=\"text/javascript\" src=\""
-					+ input.getResourcePath("/javascript/jquery/jquery.tooltip.min.js")
+					+ input.getResourcePath("jquery.tooltip.min.js")
 					+ "\"></script>");
 
 			writer.append("<script type=\"text/javascript\" src=\""

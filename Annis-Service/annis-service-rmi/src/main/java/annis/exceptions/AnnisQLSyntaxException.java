@@ -23,17 +23,11 @@ public class AnnisQLSyntaxException extends AnnisException {
 		super();
 	}
 
-	public AnnisQLSyntaxException(String message, Throwable cause) {
-		super(message, cause);
-	}
 
 	public AnnisQLSyntaxException(String message) {
 		super(message);
 	}
 
-	public AnnisQLSyntaxException(Throwable cause) {
-		super(cause);
-	}
 	
 	
 }

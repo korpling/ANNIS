@@ -15,9 +15,22 @@
  */
 package annis.pluginsystem;
 
+import annis.frontend.servlets.ResourceServlet;
+import annis.frontend.servlets.VisualizerServlet;
+import annis.frontend.servlets.visualizers.CorefVisualizer;
+import annis.frontend.servlets.visualizers.ExternalFileVisualizer;
+import annis.frontend.servlets.visualizers.OldPartiturVisualizer;
+import annis.frontend.servlets.visualizers.PaulaTextVisualizer;
+import annis.frontend.servlets.visualizers.PaulaVisualizer;
+import annis.frontend.servlets.visualizers.dependency.ProielDependecyTree;
+import annis.frontend.servlets.visualizers.dependency.ProielRegularDependencyTree;
+import annis.frontend.servlets.visualizers.dependency.VakyarthaDependencyTree;
+import annis.frontend.servlets.visualizers.graph.DotGraphVisualizer;
+import annis.frontend.servlets.visualizers.gridtree.GridTreeVisualizer;
+import annis.frontend.servlets.visualizers.partitur.PartiturVisualizer;
+import annis.frontend.servlets.visualizers.tree.TigerTreeVisualizer;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -27,7 +40,6 @@ import javax.servlet.ServletContextListener;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
-import net.xeoh.plugins.base.options.addpluginsfrom.OptionReportAfter;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 
@@ -48,15 +60,36 @@ public class StartStopListener implements ServletContextListener
     
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
+    
+    // TODO: package core plugins as extra project/jar and load them as jar
+    // add our core plugins by hand
+    pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ExternalFileVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(OldPartiturVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(PaulaTextVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(PaulaVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(VisualizerServlet.class).toURI());
+    
+    // TODO: classpath is very large and it takes too much time
+    /*
     URI classpath = ClassURI.CLASSPATH("annis.**");
     if(classpath != null)
     {
       pluginManager.addPluginsFrom(classpath);
       log.info("added plugins from classpath");
     }
+     */
     try
     {
-      URL basicPlugins = sce.getServletContext().getResource("plugins");
+      URL basicPlugins = sce.getServletContext().getResource("/plugins");
       if(basicPlugins != null)
       {
         pluginManager.addPluginsFrom(basicPlugins.toURI());

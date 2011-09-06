@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSyntaxException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.PushbackReader;
@@ -25,98 +26,116 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import annis.exceptions.ParseException;
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.lexer.Lexer;
 import annis.ql.lexer.LexerException;
 import annis.ql.node.Start;
 
-public class AnnisParser {
+public class AnnisParser
+{
 
-	private static Logger log = Logger.getLogger(AnnisParser.class);
-	
-	// extra class to allow stubbing in tests
-	public static class InternalParser {
+  private static Logger log = Logger.getLogger(AnnisParser.class);
 
-		public Start parse(String input) throws ParserException, LexerException, IOException {
-			return new Parser(new Lexer(new PushbackReader(new StringReader(input), 3000))).parse();
-		}
+  // extra class to allow stubbing in tests
+  public static class InternalParser
+  {
 
-	}
-	private InternalParser internalParser;
-	
-	// holds a list of post-processors
-	private List<DepthFirstAdapter> postProcessors;
-	
-	/**
-	 * Creates a parser for AnnisQL statements.
-	 */
-	public AnnisParser() {
-		postProcessors = new ArrayList<DepthFirstAdapter>();
-		postProcessors.add(new NodeSearchNormalizer());
-		postProcessors.add(new TokenSearchNormalizer());
-		postProcessors.add(new QueryValidator());
-		internalParser = new InternalParser();
-	}
+    public Start parse(String input) throws ParserException, LexerException, IOException
+    {
+      return new Parser(new Lexer(new PushbackReader(new StringReader(input), 3000))).parse();
+    }
+  }
+  private InternalParser internalParser;
+  // holds a list of post-processors
+  private List<DepthFirstAdapter> postProcessors;
 
-	public Start parse(String annisQuery) {
-		try {
-			log.debug("parsing Annis query: " + annisQuery);
+  /**
+   * Creates a parser for AnnisQL statements.
+   */
+  public AnnisParser()
+  {
+    postProcessors = new ArrayList<DepthFirstAdapter>();
+    postProcessors.add(new NodeSearchNormalizer());
+    postProcessors.add(new TokenSearchNormalizer());
+    postProcessors.add(new QueryValidator());
+    internalParser = new InternalParser();
+  }
 
-			// build and post-process syntax tree
-			Start start = getInternalParser().parse(annisQuery);
-			
-			for (DepthFirstAdapter postProcessor : getPostProcessors()) {
-				log.debug("applying post processor to syntax tree: " + postProcessor.getClass().getSimpleName());
-				start.apply(postProcessor);
-			}
-			
-			log.debug("syntax tree is:\n" + dumpTree(start));
-			return start;
+  public Start parse(String annisQuery)
+  {
+    try
+    {
+      log.debug("parsing Annis query: " + annisQuery);
 
-		} catch (ParserException e) {
-			log.warn("an exception occured on the query: " + annisQuery, e);
-      throw new ParseException(e.getLocalizedMessage(), e);
-		} catch (LexerException e) {
-			log.warn("an exception occured on the query: " + annisQuery, e);
-			throw new ParseException(e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			log.warn("an exception occured on the query: " + annisQuery, e);
-			throw new ParseException(e);
-		}
-	}
-	
-	public String dumpTree(String annisQuery) {
-		return dumpTree(parse(annisQuery));
-	}
-	
-	public static String dumpTree(Start start) {
-		try {
-			StringWriter result = new StringWriter();
-			start.apply(new TreeDumper(new PrintWriter(result)));
-			return result.toString();
-		} catch (RuntimeException e) {
-			String errorMessage = "could not serialize syntax tree";
-			log.warn(errorMessage, e);
-			return errorMessage;
-		}
-	}
+      // build and post-process syntax tree
+      Start start = getInternalParser().parse(annisQuery);
 
-	///// Getter / Setter
-	
-	public List<DepthFirstAdapter> getPostProcessors() {
-		return postProcessors;
-	}
+      for(DepthFirstAdapter postProcessor : getPostProcessors())
+      {
+        log.debug("applying post processor to syntax tree: " + postProcessor.getClass().getSimpleName());
+        start.apply(postProcessor);
+      }
 
-	public void setPostProcessors(List<DepthFirstAdapter> postProcessors) {
-		this.postProcessors = postProcessors;
-	}
+      log.debug("syntax tree is:\n" + dumpTree(start));
+      return start;
 
-	protected void setInternalParser(InternalParser parser) {
-		this.internalParser = parser;
-	}
+    }
+    catch(ParserException e)
+    {
+      log.warn("an exception occured on the query: " + annisQuery, e);
+      throw new AnnisQLSyntaxException(e.getLocalizedMessage());
+    }
+    catch(LexerException e)
+    {
+      log.warn("an exception occured on the query: " + annisQuery, e);
+      throw new AnnisQLSyntaxException(e.getLocalizedMessage());
+    }
+    catch(IOException e)
+    {
+      log.warn("an exception occured on the query: " + annisQuery, e);
+      throw new AnnisQLSyntaxException(e.getLocalizedMessage());
+    }
+  }
 
-	protected InternalParser getInternalParser() {
-		return internalParser;
-	}
+  public String dumpTree(String annisQuery)
+  {
+    return dumpTree(parse(annisQuery));
+  }
+
+  public static String dumpTree(Start start)
+  {
+    try
+    {
+      StringWriter result = new StringWriter();
+      start.apply(new TreeDumper(new PrintWriter(result)));
+      return result.toString();
+    }
+    catch(RuntimeException e)
+    {
+      String errorMessage = "could not serialize syntax tree";
+      log.warn(errorMessage, e);
+      return errorMessage;
+    }
+  }
+
+  ///// Getter / Setter
+  public List<DepthFirstAdapter> getPostProcessors()
+  {
+    return postProcessors;
+  }
+
+  public void setPostProcessors(List<DepthFirstAdapter> postProcessors)
+  {
+    this.postProcessors = postProcessors;
+  }
+
+  protected void setInternalParser(InternalParser parser)
+  {
+    this.internalParser = parser;
+  }
+
+  protected InternalParser getInternalParser()
+  {
+    return internalParser;
+  }
 }
