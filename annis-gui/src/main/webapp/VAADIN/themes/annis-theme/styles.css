@@ -344,3 +344,11 @@ td.v-datefield-calendarpanel-month,
 .v-table-cell-wrapper {
   white-space: normal;
 }
+
+.v-panel-content-kwic-panel {
+  background-color: white !important;
+}
+
+.kwic-anno {
+  color: grey;
+}

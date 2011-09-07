@@ -16,14 +16,19 @@
 package annis.gui.resultview;
 
 import annis.gui.ServiceHelper;
+import annis.service.ifaces.AnnisResult;
+import com.vaadin.data.util.BeanItem;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
+import org.vaadin.addons.lazyquerycontainer.CompositeItem;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryView;
 
@@ -51,14 +56,24 @@ public class ResultViewPanel extends Panel
     this.contextRight = contextRight;
     this.pageSize = pageSize;
 
+    setSizeFull();
+    
+    VerticalLayout layout = (VerticalLayout) getContent();
+    layout.setMargin(false);
+    layout.setSizeFull();
+    
+    
     lblInfo = new Label();
-    lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + " is calculated.");
+    lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
 
     tblResults = new Table();
-    
+    tblResults.setPageLength(pageSize);
+    tblResults.setSizeFull();
     
     addComponent(lblInfo);    
     addComponent(tblResults);
+    
+    layout.setExpandRatio(tblResults, 1.0f);
   }
 
   @Override
@@ -79,16 +94,24 @@ public class ResultViewPanel extends Panel
     queryFactory =
       new BeanQueryFactory<AnnisResultQuery>(AnnisResultQuery.class);
     queryFactory.setQueryConfiguration(queryConfiguration);
-    containerResult = new LazyQueryContainer(queryFactory, true, pageSize);
-    containerResult.addContainerProperty(LazyQueryView.DEBUG_PROPERTY_ID_BATCH_INDEX, 
-      Integer.class, 0, true, false);
-    
+    containerResult = new LazyQueryContainer(queryFactory, false, pageSize);
+        
     tblResults.setContainerDataSource(containerResult);
     
-    tblResults.setVisibleColumns(new String[] {LazyQueryView.DEBUG_PROPERTY_ID_BATCH_INDEX});
-    tblResults.setPageLength(pageSize);
+    tblResults.addGeneratedColumn("panel", new Table.ColumnGenerator() {
+
+      @Override
+      public Component generateCell(Table source, Object itemId, Object columnId)
+      {
+        BeanItem<AnnisResult> item = (BeanItem<AnnisResult>) containerResult.getItem(itemId);
+       
+        return new SingleResultPanel(item.getBean());
+      }
+    });
     
-    
+    tblResults.setVisibleColumns(new String[] {"panel"});
+    tblResults.setColumnHeader("panel", "");
+    tblResults.setColumnExpandRatio("panel", 1.0f);
   }
 
   public void setCount(int count)

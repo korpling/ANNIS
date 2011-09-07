@@ -18,7 +18,6 @@ package annis.gui.resultview;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.ServiceHelper;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
