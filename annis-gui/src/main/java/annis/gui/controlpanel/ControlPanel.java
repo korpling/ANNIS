@@ -153,6 +153,10 @@ public class ControlPanel extends Panel
         {
           window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
         }
+        catch(Exception ex)
+        {
+          window.showNotification("unknown exception: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
+        }
       }
 
       queryPanel.setStatus("" + count + " matches");

@@ -15,9 +15,6 @@
  */
 package annis.gui.resultview;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
@@ -38,6 +35,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
  */
 public class AnnisResultQuery extends AbstractBeanQuery<AnnisResult> implements Serializable
 {
+  private boolean failure = false;
 
   public AnnisResultQuery(QueryDefinition definition, Map<String, Object> queryConfiguration, Object[] sortPropertyIds, boolean[] sortStates)
   {
@@ -88,20 +86,34 @@ public class AnnisResultQuery extends AbstractBeanQuery<AnnisResult> implements 
       }
       catch(RemoteException ex)
       {
-        Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, null, ex);
-      }      
-      catch(AnnisQLSemanticsException ex)
-      {
-         Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE, null, ex);
       }
-      catch(AnnisQLSyntaxException ex)
-      {
-        window.showNotification("Syntax error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-      }
-      catch(AnnisCorpusAccessException ex)
-      {
-        window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-      }
+        /*      
+        try
+        {
+          result.addAll(service.getResultSet(corpora, aql, count, startIndex, contextLeft, contextRight));
+        }
+        catch(RemoteException ex)
+        {
+          Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }      
+        catch(AnnisQLSemanticsException ex)
+        {
+          window.showNotification("Semantic error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
+        }
+        catch(AnnisQLSyntaxException ex)
+        {
+          window.showNotification("Syntax error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
+        }
+        catch(AnnisCorpusAccessException ex)
+        {
+          window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
+        }
+        catch(Exception ex)
+        {
+          window.showNotification("unknown exception: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+         */
     }
     return result;
   }

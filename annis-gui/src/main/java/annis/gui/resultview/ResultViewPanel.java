@@ -15,6 +15,9 @@
  */
 package annis.gui.resultview;
 
+import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.ServiceHelper;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.data.util.BeanItem;
@@ -80,7 +83,7 @@ public class ResultViewPanel extends Panel
   public void attach()
   {
     super.attach();
-
+    
     queryConfiguration=new HashMap<String,Object>();
     queryConfiguration.put("service", ServiceHelper.getService(getApplication(), getWindow()));
     queryConfiguration.put("window", getWindow());
@@ -95,7 +98,7 @@ public class ResultViewPanel extends Panel
       new BeanQueryFactory<AnnisResultQuery>(AnnisResultQuery.class);
     queryFactory.setQueryConfiguration(queryConfiguration);
     containerResult = new LazyQueryContainer(queryFactory, false, pageSize);
-        
+    
     tblResults.setContainerDataSource(containerResult);
     
     tblResults.addGeneratedColumn("panel", new Table.ColumnGenerator() {
@@ -103,9 +106,35 @@ public class ResultViewPanel extends Panel
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
-        BeanItem<AnnisResult> item = (BeanItem<AnnisResult>) containerResult.getItem(itemId);
-       
-        return new SingleResultPanel(item.getBean());
+        try
+        {
+          BeanItem<AnnisResult> item = (BeanItem<AnnisResult>) containerResult.getItem(itemId);
+          return new SingleResultPanel(item.getBean());
+        }    
+        catch(AnnisQLSemanticsException ex)
+        {
+          lblInfo.setValue("Semantic error: " + ex.getLocalizedMessage());
+          tblResults.setVisible(false);
+          return new Label("");
+        }
+        catch(AnnisQLSyntaxException ex)
+        {
+          lblInfo.setValue("Syntax error: " + ex.getLocalizedMessage());
+          tblResults.setVisible(false);
+          return new Label("");
+        }
+        catch(AnnisCorpusAccessException ex)
+        {
+          lblInfo.setValue("Corpus access error: " + ex.getLocalizedMessage());
+          tblResults.setVisible(false);
+          return new Label("");
+        }
+        catch(Exception ex)
+        {
+          lblInfo.setValue("unknown exception: " + ex.getLocalizedMessage());
+          tblResults.setVisible(false);
+          return new Label("");
+        }
       }
     });
     

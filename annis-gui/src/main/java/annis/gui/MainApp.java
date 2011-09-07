@@ -114,7 +114,7 @@ public class MainApp extends Application
   
   public void updateQueryCount(int count)
   {
-    if(resultView != null)
+    if(resultView != null && count >= 0)
     {
       resultView.setCount(count);
     }
