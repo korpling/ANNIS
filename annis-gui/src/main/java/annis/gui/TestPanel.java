@@ -40,12 +40,15 @@ public class TestPanel extends Panel
         
     Panel p = new Panel();
     p.setSizeFull();
-    GridLayout g = new GridLayout(1, 1);
-    Label lbl = new Label("Inner Label                                                                      sfs                sdfsf                 sdfsdf");
-    lbl.setContentMode(Label.CONTENT_PREFORMATTED);
-    g.addComponent(lbl, 0, 0);
-    g.setSizeUndefined();
-    p.setContent(g);
+    VerticalLayout sublayout = new VerticalLayout();
+    
+    Label lbl = new Label("<table style='width:1000px'><tr><td>abc</td></tr></table>");
+    lbl.setContentMode(Label.CONTENT_RAW);
+    
+    sublayout.addComponent(lbl);
+    
+    sublayout.setSizeUndefined();
+    p.setContent(sublayout);
     
     addComponent(p);
   }

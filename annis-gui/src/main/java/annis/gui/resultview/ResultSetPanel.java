@@ -15,10 +15,11 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.TestPanel;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *
@@ -28,7 +29,12 @@ public class ResultSetPanel extends Panel
 {
   public ResultSetPanel(AnnisResultSet resultSet, int start)
   {
-    addComponent(new Label("start: " + start));
+    setWidth("100%");
+    setHeight("-1px");
+    
+    ((VerticalLayout) getContent()).setWidth("100%");
+    ((VerticalLayout) getContent()).setHeight("-1px");
+    
     int i=start; 
     for(AnnisResult r : resultSet)
     {

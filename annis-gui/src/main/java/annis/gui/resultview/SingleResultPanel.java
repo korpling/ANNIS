@@ -15,7 +15,9 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.TestPanel;
 import annis.service.ifaces.AnnisResult;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -33,15 +35,30 @@ public class SingleResultPanel extends Panel
 
     setWidth("100%");
     setHeight("-1px");
-        
+       
     setScrollable(true);
     
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
+    HorizontalLayout hLayout = new HorizontalLayout();
+    setContent(hLayout);
+    
+    hLayout.setWidth("100%");
+    hLayout.setHeight("-1px");
+    hLayout.setMargin(true);
+    
+    Label lblNumber = new Label("" + resultNumber);
+    hLayout.addComponent(lblNumber);
+    lblNumber.setSizeUndefined();
+    
+    VerticalLayout vLayout = new VerticalLayout();
+    hLayout.addComponent(vLayout);
+    
     
     KWICPanel kwic = new KWICPanel(result, resultNumber);
-    addComponent(kwic);
-    addComponent(new VisualizerPanel(result, resultNumber));
+    vLayout.addComponent(kwic);
+    vLayout.addComponent(new VisualizerPanel(result, resultNumber));
+    vLayout.setWidth("100%");
+    vLayout.setHeight("-1px");
+    
+    hLayout.setExpandRatio(vLayout, 1.0f);
   }
 }

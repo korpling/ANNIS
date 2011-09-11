@@ -42,7 +42,8 @@ public class KWICPanel extends Panel
     //addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     //addStyleName("kwic");
    
-    setSizeFull();
+    setWidth("100%");
+    setHeight("-1px");
     
     TreeSet<String> annos = new TreeSet<String>();
     List<AnnisNode> token = result.getGraph().getTokens();
@@ -55,6 +56,7 @@ public class KWICPanel extends Panel
       }      
     }
 
+    
     GridLayout tokenGrid = new GridLayout(token.size(), 1+ annos.size());    
     setContent(tokenGrid);
     tokenGrid.setSizeUndefined();

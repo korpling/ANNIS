@@ -19,6 +19,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.ServiceHelper;
+import annis.gui.TestPanel;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.service.ifaces.AnnisResultSet;
@@ -76,6 +77,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout = (VerticalLayout) scrollPanel.getContent();
     layout.setMargin(false);
+    layout.setWidth("100%");
+    layout.setHeight("-1px");
 
     mainLayout.addComponent(lblInfo);
     mainLayout.addComponent(paging);
@@ -128,8 +131,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
             resultPanel = new ResultSetPanel(result, start);
             
             progressResult.setEnabled(false);
-            layout.removeAllComponents();
-            
+            layout.removeAllComponents();            
             layout.addComponent(resultPanel);
           }
           catch(AnnisQLSemanticsException ex)
