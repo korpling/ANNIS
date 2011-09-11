@@ -15,12 +15,18 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.TestPanel;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -29,10 +35,16 @@ import com.vaadin.ui.VerticalLayout;
 public class SingleResultPanel extends Panel
 {
   private AnnisResult result;
+  private Map<AnnisNode,Long> markedAndCovered;
+  private Set<String> tokenAnnos;
+  private Set<String> nodeAnnos;
+  
   public SingleResultPanel(AnnisResult result, int resultNumber)
   {
     this.result = result;
 
+    calculateHelperVariables();
+    
     setWidth("100%");
     setHeight("-1px");
        
@@ -44,8 +56,9 @@ public class SingleResultPanel extends Panel
     hLayout.setWidth("100%");
     hLayout.setHeight("-1px");
     hLayout.setMargin(true);
+    hLayout.setSpacing(true);
     
-    Label lblNumber = new Label("" + resultNumber);
+    Label lblNumber = new Label("" + (resultNumber+1));
     hLayout.addComponent(lblNumber);
     lblNumber.setSizeUndefined();
     
@@ -53,12 +66,76 @@ public class SingleResultPanel extends Panel
     hLayout.addComponent(vLayout);
     
     
-    KWICPanel kwic = new KWICPanel(result, resultNumber);
+    KWICPanel kwic = new KWICPanel(result, tokenAnnos, markedAndCovered);
     vLayout.addComponent(kwic);
     vLayout.addComponent(new VisualizerPanel(result, resultNumber));
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
     
     hLayout.setExpandRatio(vLayout, 1.0f);
+  }
+  
+  private void calculateHelperVariables()
+  {
+    nodeAnnos = new TreeSet<String>();
+    tokenAnnos = new TreeSet<String>();
+    
+    for(AnnisNode n : result.getGraph().getNodes())
+    {
+      // add to annotation overview      
+      for(Annotation a : n.getNodeAnnotations())
+      {
+        nodeAnnos.add(a.getQualifiedName());
+        if(n.isToken())
+        {
+          tokenAnnos.add(a.getQualifiedName());
+        }
+      }      
+    }
+    
+    markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
+  }
+  
+  private Map<AnnisNode,Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)
+  {
+    Set<Long> matchedNodes = graph.getMatchedNodeIds();
+    Map<AnnisNode,Long> matchedAndCovered = new HashMap<AnnisNode, Long>();
+
+    // add all covered nodes
+    for (AnnisNode n : graph.getNodes())
+    {
+      if (matchedNodes.contains(n.getId()) && n.getMatchedNodeInQuery() != null)
+      {
+        Long matchPosition = n.getMatchedNodeInQuery();
+        matchedAndCovered.put(n,matchPosition);
+
+        long left = n.getLeftToken();
+        long right = n.getRightToken();
+
+        for (long i = left; i <= right; i++)
+        {
+          AnnisNode tok = graph.getToken(i);
+          Long oldTokenPosition = matchedAndCovered.get(tok);
+          if(oldTokenPosition == null 
+            || (!matchedNodes.contains(tok.getId()) && matchPosition.compareTo(oldTokenPosition) >= 0) )
+          {
+            matchedAndCovered.put(tok, matchPosition);
+          }
+        }
+      }
+    }
+
+    return matchedAndCovered;
+  }
+ 
+  public static String colorClassByMatch(Long match)
+  {
+    if(match == null)
+    {
+      return null;
+    }
+    long m = match;
+    m = Math.min(m, 8);
+    return "match_" + m;
   }
 }

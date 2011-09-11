@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
+import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
@@ -26,6 +27,8 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -38,42 +41,44 @@ public class KWICPanel extends Panel
   
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
+  private Map<AnnisNode,Long> markedAndCovered;
   
-  
-  public KWICPanel(AnnisResult result, int resultNumber)
+  public KWICPanel(AnnisResult result, Set<String> tokenAnnos, 
+    Map<AnnisNode,Long> markedAndCovered)
   {
     this.result = result;
+    this.markedAndCovered = markedAndCovered;
     
     this.addStyleName("kwic");
     setSizeFull();
+    
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
     
     containerAnnos = new BeanItemContainer<String>(String.class);
-        
+    
+    containerAnnos.addItem("tok");
+    
     tblToken = new Table();
     tblToken.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+    tblToken.addStyleName(ChameleonTheme.TABLE_BORDERLESS);
     tblToken.setWidth("100%");
     tblToken.setHeight("100%");
     tblToken.setPageLength(0);
     
-    TreeSet<String> annos = new TreeSet<String>();
     List<AnnisNode> token = result.getGraph().getTokens();
     ArrayList<Object> visible = new ArrayList<Object>(10);
     for(AnnisNode t : token)
     {
-      // add to annotation overview      
-      for(Annotation a : t.getNodeAnnotations())
-      {
-        annos.add(a.getQualifiedName());
-      }
-      
       // add a column for each token
       tblToken.addGeneratedColumn(t, new TokenColumnGenerator());
       visible.add(t);
     }
-    containerAnnos.addAll(annos);    
+    
+    containerAnnos.addAll(tokenAnnos);
+    
     tblToken.setContainerDataSource(containerAnnos);
     tblToken.setVisibleColumns(visible.toArray());
     
@@ -89,18 +94,30 @@ public class KWICPanel extends Panel
       Label l = new Label("");
       l.setSizeUndefined();
       AnnisNode t = (AnnisNode) columnId;
-      for(Annotation a : t.getNodeAnnotations())
+      
+      if("tok".equals(itemId))
       {
-        if(a.getQualifiedName().equals(itemId))
+        l.setValue(t.getSpannedText());
+        if(markedAndCovered.containsKey(t))
         {
-          // this is the right annotation
-          l.setValue(a.getValue());
-          l.setDescription(a.getQualifiedName());
-          l.addStyleName("kwic-anno");
-          break;
+          // add color
+          l.addStyleName(SingleResultPanel.colorClassByMatch(markedAndCovered.get(t)));
         }
       }
-
+      else
+      {
+        for(Annotation a : t.getNodeAnnotations())
+        {
+          if(a.getQualifiedName().equals(itemId))
+          {
+            // this is the right annotation
+            l.setValue(a.getValue());
+            l.setDescription(a.getQualifiedName());
+            l.addStyleName("kwic-anno");
+            break;
+          }
+        }
+      }
       return l;
     }
   }

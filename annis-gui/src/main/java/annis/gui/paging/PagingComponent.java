@@ -18,9 +18,10 @@ package annis.gui.paging;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
@@ -34,14 +35,14 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class PagingComponent extends CustomComponent implements 
-  Button.ClickListener, TextChangeListener
+public class PagingComponent extends CustomComponent implements
+  Button.ClickListener
 {
+
   public static final ThemeResource LEFT_ARROW = new ThemeResource("left_arrow.png");
   public static final ThemeResource RIGHT_ARROW = new ThemeResource("right_arrow.png");
   public static final ThemeResource FIRST = new ThemeResource("first.png");
   public static final ThemeResource LAST = new ThemeResource("last.png");
-  
   private HorizontalLayout layout;
   private Button btFirst;
   private Button btLast;
@@ -49,13 +50,12 @@ public class PagingComponent extends CustomComponent implements
   private Button btPrevious;
   private TextField txtPage;
   private Label lblMaxPages;
-  
+  private Label lblInfo;
   private Set<PagingCallback> callbacks;
-  
   private int count;
   private int pageSize;
   private int currentPage;
-  
+
   public PagingComponent(int count, int pageSize)
   {
     if(pageSize <= 0)
@@ -68,61 +68,61 @@ public class PagingComponent extends CustomComponent implements
     }
     currentPage = 1;
     this.count = count;
-    this.pageSize = pageSize;    
-    
+    this.pageSize = pageSize;
+
     callbacks = new HashSet<PagingCallback>();
-    
+
     layout = new HorizontalLayout();
-    
     layout.setSpacing(true);
-    
+
+
     setCompositionRoot(layout);
-    
+
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    
-    
+
+
     btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
     btFirst.addListener(this);
     btFirst.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    
+
     btLast = new Button();
     btLast.setIcon(LAST);
     btLast.setDescription("jump to last page");
     btLast.addListener(this);
     btLast.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    
+
     btNext = new Button();
     btNext.setIcon(RIGHT_ARROW);
     btNext.setDescription("jump to next page");
     btNext.addListener(this);
     btNext.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    
+
     btPrevious = new Button();
     btPrevious.setIcon(LEFT_ARROW);
     btPrevious.setDescription("jump to previous page");
     btPrevious.addListener(this);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    
+
     txtPage = new TextField();
     txtPage.setDescription("current page");
-    txtPage.addListener(this);
+    txtPage.setHeight("-1px");
     txtPage.setWidth(3.f, UNITS_EM);
-    
-    Validator pageValidator = new AbstractStringValidator("must be an integer greater than zero") {
+    Validator pageValidator = new AbstractStringValidator("must be an integer greater than zero")
+    {
 
       @Override
       protected boolean isValidString(String value)
       {
         try
         {
-          int v = Integer.parseInt(value);    
+          int v = Integer.parseInt(value);
           if(v > 0)
           {
             return true;
@@ -139,10 +139,14 @@ public class PagingComponent extends CustomComponent implements
       }
     };
     txtPage.addValidator(pageValidator);
-    txtPage.addListener(this);
-    
+    txtPage.addShortcutListener(new EnterListener(txtPage));
+
     lblMaxPages = new Label();
     lblMaxPages.setDescription("maximal pages");
+    lblMaxPages.setSizeUndefined();
+
+    lblInfo = new Label();
+    lblInfo.setSizeUndefined();
     
     layout.addComponent(btFirst);
     layout.addComponent(btPrevious);
@@ -150,41 +154,53 @@ public class PagingComponent extends CustomComponent implements
     layout.addComponent(lblMaxPages);
     layout.addComponent(btNext);
     layout.addComponent(btLast);
-        
+    layout.addComponent(lblInfo);
+    
+    layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_LEFT);
+    layout.setComponentAlignment(lblMaxPages, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(txtPage, Alignment.MIDDLE_RIGHT);
+    
+    layout.setExpandRatio(lblInfo, 1.0f);
+    
     update(false);
   }
-  
-  
-  
+
   private void update(boolean informCallbacks)
   {
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
-    
+    lblInfo.setValue("Displaying Results " + (getStartNumber() + 1) 
+      + " - " + Math.min(getStartNumber() + pageSize, count) + " of " + count);
+
     if(informCallbacks)
     {
       for(PagingCallback c : callbacks)
       {
-        c.createPage((currentPage-1)*pageSize, pageSize);
+        c.createPage(getStartNumber(), pageSize);
       }
     }
   }
-  
+
   public void addCallback(PagingCallback callback)
   {
     callbacks.add(callback);
   }
-  
+
   public boolean removeCallback(PagingCallback callback)
   {
     return callbacks.remove(callback);
   }
 
-  
   public int getMaxPage()
   {
-    return (1+(count/pageSize));
+    return (1 + (count / pageSize));
   }
+  
+  public int getStartNumber()
+  {
+    return (currentPage - 1) * pageSize;
+  }
+
   public int getCount()
   {
     return count;
@@ -210,7 +226,7 @@ public class PagingComponent extends CustomComponent implements
     if(pageSize <= 0)
     {
       pageSize = 1;
-    }  
+    }
     this.pageSize = pageSize;
     update(true);
   }
@@ -234,25 +250,38 @@ public class PagingComponent extends CustomComponent implements
     {
       currentPage--;
     }
-    
+
     // sanitize
     currentPage = sanitizePage(currentPage);
-    
+
     update(true);
   }
-  
+
   private int sanitizePage(int page)
   {
-    int val =  Math.max(1, page);
-    val = Math.min(1+(count/pageSize), page);
+    int val = Math.max(1, page);
+    val = Math.min(1 + (count / pageSize), page);
     return val;
   }
 
-  @Override
-  public void textChange(TextChangeEvent event)
+
+  public class EnterListener extends ShortcutListener
   {
-    if(event.getSource() == txtPage)
+    private Object registeredTarget;
+
+    public EnterListener(Object registeredTarget)
     {
+      super("set page", KeyCode.ENTER, null);
+      this.registeredTarget = registeredTarget;
+    }
+
+    @Override
+    public void handleAction(Object sender, Object target)
+    {
+      if(target != registeredTarget)
+      {
+        return;
+      }
       try
       {
         int newPage = Integer.parseInt((String) txtPage.getValue());
@@ -265,6 +294,4 @@ public class PagingComponent extends CustomComponent implements
       }
     }
   }
-  
-  
 }
