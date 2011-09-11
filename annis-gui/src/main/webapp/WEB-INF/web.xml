@@ -18,6 +18,12 @@
             <param-name>AnnisRemoteService.URL</param-name>
             <param-value>rmi://localhost:4711/AnnisService</param-value>
         </init-param>
+        <init-param>
+        	<description>
+        	Application widgetset</description>
+        	<param-name>widgetset</param-name>
+-        	<param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>MainApp</servlet-name>

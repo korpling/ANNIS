@@ -72,7 +72,17 @@ public class MainApp extends Application
         window.showNotification("The is a prototype to tests vaadins capabilities in regards to the need of ANNIS", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
+    helpMenuItem.addItem("Test", new MenuBar.Command() {
 
+      @Override
+      public void menuSelected(MenuItem selectedItem)
+      {
+        Window w = new Window("Test", new TestPanel());
+        w.setModal(true);
+        window.addWindow(w);
+      }
+    });
+    
     window.addComponent(menu);
     menu.setWidth(100f, Layout.UNITS_PERCENTAGE);
     

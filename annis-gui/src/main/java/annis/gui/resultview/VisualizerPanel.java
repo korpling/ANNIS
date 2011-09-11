@@ -16,32 +16,26 @@
 package annis.gui.resultview;
 
 import annis.service.ifaces.AnnisResult;
+
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 
 /**
- *
  * @author thomas
+ *
  */
-public class SingleResultPanel extends Panel
+public class VisualizerPanel extends Panel
 {
+
   private AnnisResult result;
-  public SingleResultPanel(AnnisResult result, int resultNumber)
+  private int resultNumber;
+
+  public VisualizerPanel(AnnisResult result, int resultNumber)
   {
     this.result = result;
-
-    setWidth("100%");
-    setHeight("-1px");
-        
-    setScrollable(true);
-    
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
-    
-    KWICPanel kwic = new KWICPanel(result, resultNumber);
-    addComponent(kwic);
-    addComponent(new VisualizerPanel(result, resultNumber));
+    this.resultNumber = resultNumber;
+    //this.setSizeFull();
+    //addComponent(new MyComponent());
+    addComponent(new Label("TODO"));
   }
 }

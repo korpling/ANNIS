@@ -13,35 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.resultview;
+package annis.gui;
 
-import annis.service.ifaces.AnnisResult;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 /**
  *
  * @author thomas
  */
-public class SingleResultPanel extends Panel
+public class TestPanel extends Panel
 {
-  private AnnisResult result;
-  public SingleResultPanel(AnnisResult result, int resultNumber)
-  {
-    this.result = result;
 
-    setWidth("100%");
-    setHeight("-1px");
-        
-    setScrollable(true);
-    
+  public TestPanel()
+  {
+    setSizeFull();
     VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
     
-    KWICPanel kwic = new KWICPanel(result, resultNumber);
-    addComponent(kwic);
-    addComponent(new VisualizerPanel(result, resultNumber));
+    layout.setSizeFull();
+    
+    Label l = new Label("ABC");
+    addComponent(l);
+        
+    Panel p = new Panel();
+    p.setSizeFull();
+    GridLayout g = new GridLayout(1, 1);
+    Label lbl = new Label("Inner Label                                                                      sfs                sdfsf                 sdfsdf");
+    lbl.setContentMode(Label.CONTENT_PREFORMATTED);
+    g.addComponent(lbl, 0, 0);
+    g.setSizeUndefined();
+    p.setContent(g);
+    
+    addComponent(p);
   }
 }

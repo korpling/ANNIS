@@ -17,111 +17,52 @@ package annis.gui.resultview;
 
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
-import annis.service.objects.AnnisResultImpl;
-import com.vaadin.ui.Window;
+import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.AnnisResultSetImpl;
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
-import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
 /**
  *
  * @author thomas
  */
-public class AnnisResultQuery extends AbstractBeanQuery<AnnisResult> implements Serializable
+public class AnnisResultQuery implements Serializable
 {
-  private boolean failure = false;
-
-  public AnnisResultQuery(QueryDefinition definition, Map<String, Object> queryConfiguration, Object[] sortPropertyIds, boolean[] sortStates)
+  private List<Long> corpora;
+  private String aql;
+  private AnnisService service;
+  private int contextLeft, contextRight;
+  
+  public AnnisResultQuery(List<Long> corpora, String aql, int contextLeft, 
+    int contextRight, AnnisService service)
   {
-    super(definition, queryConfiguration, sortPropertyIds, sortStates);
+    this.corpora = corpora;
+    this.aql = aql;
+    this.service = service;
+    this.contextLeft = contextLeft;
+    this.contextRight = contextRight;
   }
 
-  @Override
-  protected AnnisResult constructBean()
-  {
-    return new AnnisResultImpl();
-  }
-
-  @Override
-  public int size()
-  {
-    Integer count = (Integer) getQueryConfiguration().get("count");
-    Integer pageSize = (Integer) getQueryConfiguration().get("pageSize");
-    if(count == null || pageSize == null)
-    {
-      return 0;
-    }
-    if(count < 0)
-    {
-      return pageSize;
-    }
-    else
-    {
-      return count;
-    }
-  }
-
-  @Override
-  protected List<AnnisResult> loadBeans(int startIndex, int count)
-  {
-    AnnisService service = (AnnisService) getQueryConfiguration().get("service");
-    Window window = (Window) getQueryConfiguration().get("window");
-    List<Long> corpora = (List<Long>) getQueryConfiguration().get("corpora");
-    String aql = (String) getQueryConfiguration().get("aql");
-    int contextLeft = (Integer) getQueryConfiguration().get("contextLeft");
-    int contextRight = (Integer) getQueryConfiguration().get("contextRight");
-    
-    List<AnnisResult> result = new LinkedList<AnnisResult>();
+  public AnnisResultSet loadBeans(int startIndex, int count)
+  { 
+    AnnisResultSet result = new AnnisResultSetImpl();
     if(service != null)
     {
       try
       {
-        result.addAll(service.getResultSet(corpora, aql, count, startIndex, contextLeft, contextRight));
+        result = service.getResultSet(corpora, aql, count, startIndex, contextLeft, contextRight);
       }
       catch(RemoteException ex)
       {
         Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE, null, ex);
       }
-        /*      
-        try
-        {
-          result.addAll(service.getResultSet(corpora, aql, count, startIndex, contextLeft, contextRight));
-        }
-        catch(RemoteException ex)
-        {
-          Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }      
-        catch(AnnisQLSemanticsException ex)
-        {
-          window.showNotification("Semantic error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
-        }
-        catch(AnnisQLSyntaxException ex)
-        {
-          window.showNotification("Syntax error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
-        }
-        catch(AnnisCorpusAccessException ex)
-        {
-          window.showNotification("Corpus access error: " + ex.getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
-        }
-        catch(Exception ex)
-        {
-          window.showNotification("unknown exception: " + ex.getLocalizedMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-         */
     }
     return result;
-  }
-
-  @Override
-  protected void saveBeans(List<AnnisResult> addedBeans, List<AnnisResult> modifiedBeans, List<AnnisResult> removedBeans)
-  {
-    throw new UnsupportedOperationException("Not supported yet.");
   }
   
 }

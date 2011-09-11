@@ -19,38 +19,38 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.ServiceHelper;
-import annis.service.ifaces.AnnisResult;
-import com.vaadin.data.util.BeanItem;
-import com.vaadin.ui.Component;
+import annis.gui.paging.PagingCallback;
+import annis.gui.paging.PagingComponent;
+import annis.service.ifaces.AnnisResultSet;
+import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
-import java.util.HashMap;
+import com.vaadin.ui.themes.BaseTheme;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
-import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
-import org.vaadin.addons.lazyquerycontainer.CompositeItem;
-import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
-import org.vaadin.addons.lazyquerycontainer.LazyQueryView;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author thomas
  */
-public class ResultViewPanel extends Panel
+public class ResultViewPanel extends Panel implements PagingCallback
 {
 
   private Label lblInfo;
+  private PagingComponent paging;
+  private ResultSetPanel resultPanel;
   private String aql;
   private Set<Long> corpora;
   private int contextLeft, contextRight, pageSize;
-  private Table tblResults;
-  private LazyQueryContainer containerResult;
-  private Map<String,Object> queryConfiguration;
-  private BeanQueryFactory<AnnisResultQuery> queryFactory;
-  
+  private AnnisResultQuery query;
+  private VerticalLayout layout;
+  private Panel scrollPanel;
+  private ProgressIndicator progressResult;
+
   public ResultViewPanel(String aql, Set<Long> corpora, int contextLeft, int contextRight, int pageSize)
   {
     this.aql = aql;
@@ -60,93 +60,110 @@ public class ResultViewPanel extends Panel
     this.pageSize = pageSize;
 
     setSizeFull();
-    
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setMargin(false);
-    layout.setSizeFull();
-    
-    
+
+    VerticalLayout mainLayout = (VerticalLayout) getContent();
+    mainLayout.setMargin(false);
+    mainLayout.setSizeFull();
+
+
     lblInfo = new Label();
     lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
 
-    tblResults = new Table();
-    tblResults.setPageLength(pageSize);
-    tblResults.setSizeFull();
-    
-    addComponent(lblInfo);    
-    addComponent(tblResults);
-    
-    layout.setExpandRatio(tblResults, 1.0f);
+    paging = new PagingComponent(0, pageSize);
+
+    scrollPanel = new Panel();
+    scrollPanel.setSizeFull();
+    scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    layout = (VerticalLayout) scrollPanel.getContent();
+    layout.setMargin(false);
+
+    mainLayout.addComponent(lblInfo);
+    mainLayout.addComponent(paging);
+    mainLayout.addComponent(scrollPanel);
+
+    mainLayout.setSizeFull();
+    mainLayout.setExpandRatio(scrollPanel, 1.0f);
+
+    progressResult = new ProgressIndicator();
+    progressResult.setIndeterminate(true);
+    progressResult.setEnabled(false);
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    
-    queryConfiguration=new HashMap<String,Object>();
-    queryConfiguration.put("service", ServiceHelper.getService(getApplication(), getWindow()));
-    queryConfiguration.put("window", getWindow());
-    queryConfiguration.put("aql", aql);
-    queryConfiguration.put("corpora", new LinkedList<Long>(corpora));
-    queryConfiguration.put("count", -1);
-    queryConfiguration.put("pageSize", pageSize);
-    queryConfiguration.put("contextLeft", contextLeft);
-    queryConfiguration.put("contextRight", contextRight);
-    
-    queryFactory =
-      new BeanQueryFactory<AnnisResultQuery>(AnnisResultQuery.class);
-    queryFactory.setQueryConfiguration(queryConfiguration);
-    containerResult = new LazyQueryContainer(queryFactory, false, pageSize);
-    
-    tblResults.setContainerDataSource(containerResult);
-    
-    tblResults.addGeneratedColumn("panel", new Table.ColumnGenerator() {
 
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        try
-        {
-          BeanItem<AnnisResult> item = (BeanItem<AnnisResult>) containerResult.getItem(itemId);
-          return new SingleResultPanel(item.getBean());
-        }    
-        catch(AnnisQLSemanticsException ex)
-        {
-          lblInfo.setValue("Semantic error: " + ex.getLocalizedMessage());
-          tblResults.setVisible(false);
-          return new Label("");
-        }
-        catch(AnnisQLSyntaxException ex)
-        {
-          lblInfo.setValue("Syntax error: " + ex.getLocalizedMessage());
-          tblResults.setVisible(false);
-          return new Label("");
-        }
-        catch(AnnisCorpusAccessException ex)
-        {
-          lblInfo.setValue("Corpus access error: " + ex.getLocalizedMessage());
-          tblResults.setVisible(false);
-          return new Label("");
-        }
-        catch(Exception ex)
-        {
-          lblInfo.setValue("unknown exception: " + ex.getLocalizedMessage());
-          tblResults.setVisible(false);
-          return new Label("");
-        }
-      }
-    });
-    
-    tblResults.setVisibleColumns(new String[] {"panel"});
-    tblResults.setColumnHeader("panel", "");
-    tblResults.setColumnExpandRatio("panel", 1.0f);
+    paging.addCallback(this);
+
+    query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
+      contextLeft, contextRight, ServiceHelper.getService(getApplication(), getWindow()));
+    createPage(0, pageSize);
   }
 
   public void setCount(int count)
   {
-    queryConfiguration.put("count", count);
-    tblResults.setContainerDataSource(containerResult);
+    paging.setCount(count);
+  }
 
+  @Override
+  public void createPage(final int start, final int limit)
+  {
+    if(query != null)
+    {
+
+      layout.removeAllComponents();
+      progressResult.setEnabled(true);
+      layout.addComponent(progressResult);
+
+      Runnable r = new Runnable()
+      {
+
+        @Override
+        public void run()
+        {
+          try
+          {
+            AnnisResultSet result = query.loadBeans(start, limit);
+            resultPanel = new ResultSetPanel(result, start);
+            
+            progressResult.setEnabled(false);
+            layout.removeAllComponents();
+            
+            layout.addComponent(resultPanel);
+          }
+          catch(AnnisQLSemanticsException ex)
+          {
+            lblInfo.setValue("Semantic error: " + ex.getLocalizedMessage());
+          }
+          catch(AnnisQLSyntaxException ex)
+          {
+            lblInfo.setValue("Syntax error: " + ex.getLocalizedMessage());
+          }
+          catch(AnnisCorpusAccessException ex)
+          {
+            lblInfo.setValue("Corpus access error: " + ex.getLocalizedMessage());
+          }
+          catch(Exception ex)
+          {
+            Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, "unknown exception in result view", ex);
+            lblInfo.setValue("unknown exception: " + ex.getLocalizedMessage());
+          }
+        }
+      };
+      Thread t = new Thread(r);
+      t.start();
+      
+    }
+  }
+
+  private class WorkerThread extends Thread
+  {
+
+    @Override
+    public void run()
+    {
+      super.run();
+    }
   }
 }

@@ -44,177 +44,188 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * 
  * @author thomas
  */
 public class CorpusBrowserPanel extends Panel
 {
 
-  private long corpusId;
-  private Table tblNodeAnno;
-  private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1029743017413951838L;
+    private long corpusId;
+    private Table tblNodeAnno;
+    private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
 
-  public CorpusBrowserPanel(final long corpusId, final ControlPanel controlPanel)
-  {
-    super("Available annotations");
-    this.corpusId = corpusId;
+    public CorpusBrowserPanel(final long corpusId,
+            final ControlPanel controlPanel)
+    {
+        super("Available annotations");
+        this.corpusId = corpusId;
 
-    setSizeFull();
+        setSizeFull();
 
-    Accordion accordion = new Accordion();
-    setContent(accordion);
-    accordion.setSizeFull();
+        Accordion accordion = new Accordion();
+        setContent(accordion);
+        accordion.setSizeFull();
 
-    containerNodeAnno = new BeanItemContainer<CorpusBrowserEntry>(CorpusBrowserEntry.class);
-    containerNodeAnno.setItemSorter(new ExampleSorter());
-    
-    tblNodeAnno = new Table();
-    tblNodeAnno.setSizeFull();
-    tblNodeAnno.setSelectable(true);
-    tblNodeAnno.setMultiSelect(false);
-    tblNodeAnno.setContainerDataSource(containerNodeAnno);
-    tblNodeAnno.addGeneratedColumn("genlink", new Table.ColumnGenerator() {
+        containerNodeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+                CorpusBrowserEntry.class);
+        containerNodeAnno.setItemSorter(new ExampleSorter());
 
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        return new Label("X");
-      }
-    });    
-    tblNodeAnno.setVisibleColumns(new String[]
-      {
-        "name", "example", "genlink"
-      });
-    tblNodeAnno.setColumnHeaders(new String[]
-      {
-        "Name", "Example (click to use query)", "Url"
-      });
-    tblNodeAnno.setColumnExpandRatio("name", 0.5f);
-    tblNodeAnno.setColumnExpandRatio("example", 0.5f);
-    tblNodeAnno.setColumnWidth("genlink", 18);
-    tblNodeAnno.setImmediate(true);
-    tblNodeAnno.addListener(new Table.ValueChangeListener() {
-
-      @Override
-      public void valueChange(ValueChangeEvent event)
-      {
-        CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
-        HashSet<Long> corpus = new HashSet<Long>();
-        corpus.add(corpusId);
-        if(controlPanel != null)
+        tblNodeAnno = new Table();
+        tblNodeAnno.setSizeFull();
+        tblNodeAnno.setSelectable(true);
+        tblNodeAnno.setMultiSelect(false);
+        tblNodeAnno.setContainerDataSource(containerNodeAnno);
+        tblNodeAnno.addGeneratedColumn("genlink", new Table.ColumnGenerator()
         {
-          controlPanel.setQuery(cbe.getExample(), corpus);
-        }
-      }
-    });
 
-    accordion.addTab(tblNodeAnno, "Node annotations", null);
-    accordion.addTab(new Label("test"), "Edge types", null);
-    accordion.addTab(new Label("test"), "Edge annotations", null);
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-
-    boolean stripNodeAnno = true;
-    HashSet<String> nodeAnnoNames = new HashSet<String>();
-
-    List<AnnisAttribute> attributes = fetchAnnos(corpusId);
-    // check for ambigous names first
-    for(AnnisAttribute a : attributes)
-    {
-      if(stripNodeAnno && a.getType() == AnnisAttribute.Type.node)
-      {
-        String name = killNamespace(a.getName());
-        if(nodeAnnoNames.contains(name))
+            @Override
+            public Component generateCell(Table source, Object itemId,
+                    Object columnId)
+            {
+                return new Label("X");
+            }
+        });
+        tblNodeAnno.setVisibleColumns(new String[] { "name", "example",
+                "genlink" });
+        tblNodeAnno.setColumnHeaders(new String[] { "Name",
+                "Example (click to use query)", "Url" });
+        tblNodeAnno.setColumnExpandRatio("name", 0.5f);
+        tblNodeAnno.setColumnExpandRatio("example", 0.5f);
+        tblNodeAnno.setColumnWidth("genlink", 18);
+        tblNodeAnno.setImmediate(true);
+        tblNodeAnno.addListener(new Table.ValueChangeListener()
         {
-          stripNodeAnno = false;
-        }
-        nodeAnnoNames.add(name);
-      }
 
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                CorpusBrowserEntry cbe = (CorpusBrowserEntry) event
+                        .getProperty().getValue();
+                HashSet<Long> corpus = new HashSet<Long>();
+                corpus.add(corpusId);
+                if (controlPanel != null)
+                {
+                    controlPanel.setQuery(cbe.getExample(), corpus);
+                }
+            }
+        });
+
+        accordion.addTab(tblNodeAnno, "Node annotations", null);
+        accordion.addTab(new Label("test"), "Edge types", null);
+        accordion.addTab(new Label("test"), "Edge annotations", null);
     }
-
-    // secound round, fill the actual containers
-    for(AnnisAttribute a : attributes)
-    {
-      if(a.getType() == AnnisAttribute.Type.node)
-      {
-        String name = stripNodeAnno ? killNamespace(a.getName()) : a.getName();
-        CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-        cbe.setName(name);
-        cbe.setExample(name + "=\"" + getFirst(a.getValueSet()) + "\"");
-        cbe.setCorpusId(corpusId);
-        containerNodeAnno.addBean(cbe);
-      }
-
-    }
-    
-    tblNodeAnno.setSortContainerPropertyId("name");
-  }
-
-  private List<AnnisAttribute> fetchAnnos(long corpusId)
-  {
-    List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
-    try
-    {
-      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
-      List<Long> ids = new LinkedList<Long>();
-      ids.add(corpusId);
-      if(service != null)
-      {
-        AnnisAttributeSet attributes = service.getAttributeSet(ids, true, true);
-        result.addAll(attributes);
-      }
-    }
-    catch(RemoteException ex)
-    {
-      Logger.getLogger(CorpusBrowserPanel.class.getName()).log(Level.SEVERE,
-        null, ex);
-      getWindow().showNotification("Remote exception: " + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
-    }
-    return result;
-  }
-
-  public class ExampleSorter extends DefaultItemSorter
-  {
 
     @Override
-    protected int compareProperty(Object propertyId, boolean sortDirection, Item item1, Item item2)
+    public void attach()
     {
-      if("name".equals(propertyId))
-      {
-        String val1 = (String) item1.getItemProperty(propertyId).getValue();
-        String val2 = (String) item2.getItemProperty(propertyId).getValue();
+        super.attach();
 
-        if(sortDirection)
+        boolean stripNodeAnno = true;
+        HashSet<String> nodeAnnoNames = new HashSet<String>();
+
+        List<AnnisAttribute> attributes = fetchAnnos(corpusId);
+        // check for ambigous names first
+        for (AnnisAttribute a : attributes)
         {
-          return val1.compareToIgnoreCase(val2);
+            if (stripNodeAnno && a.getType() == AnnisAttribute.Type.node)
+            {
+                String name = killNamespace(a.getName());
+                if (nodeAnnoNames.contains(name))
+                {
+                    stripNodeAnno = false;
+                }
+                nodeAnnoNames.add(name);
+            }
+
         }
-        else
+
+        // secound round, fill the actual containers
+        for (AnnisAttribute a : attributes)
         {
-          return val2.compareToIgnoreCase(val1);
+            if (a.getType() == AnnisAttribute.Type.node)
+            {
+                String name = stripNodeAnno ? killNamespace(a.getName()) : a
+                        .getName();
+                CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                cbe.setName(name);
+                cbe.setExample(name + "=\"" + getFirst(a.getValueSet()) + "\"");
+                cbe.setCorpusId(corpusId);
+                containerNodeAnno.addBean(cbe);
+            }
+
         }
-      }
-      else
-      {
-        return super.compareProperty(propertyId, sortDirection, item1, item2);
-      }
+
+        tblNodeAnno.setSortContainerPropertyId("name");
     }
-  }
-  
-  private String killNamespace(String qName)
-  {
-    String[] splitted = qName.split(":");
-    return splitted[splitted.length-1];
-  }
-  
-  private String getFirst(Set<String> set)
-  {
-    Iterator<String> it = set.iterator();
-    return it.hasNext() ? it.next() : null;
-  }
+
+    private List<AnnisAttribute> fetchAnnos(long corpusId)
+    {
+        List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
+        try
+        {
+            AnnisService service = ServiceHelper.getService(getApplication(),
+                    getWindow());
+            List<Long> ids = new LinkedList<Long>();
+            ids.add(corpusId);
+            if (service != null)
+            {
+                AnnisAttributeSet attributes = service.getAttributeSet(ids,
+                        true, true);
+                result.addAll(attributes);
+            }
+        } catch (RemoteException ex)
+        {
+            Logger.getLogger(CorpusBrowserPanel.class.getName()).log(
+                    Level.SEVERE, null, ex);
+            getWindow().showNotification(
+                    "Remote exception: " + ex.getLocalizedMessage(),
+                    Notification.TYPE_WARNING_MESSAGE);
+        }
+        return result;
+    }
+
+    public class ExampleSorter extends DefaultItemSorter
+    {
+
+        @Override
+        protected int compareProperty(Object propertyId, boolean sortDirection,
+                Item item1, Item item2)
+        {
+            if ("name".equals(propertyId))
+            {
+                String val1 = (String) item1.getItemProperty(propertyId)
+                        .getValue();
+                String val2 = (String) item2.getItemProperty(propertyId)
+                        .getValue();
+
+                if (sortDirection)
+                {
+                    return val1.compareToIgnoreCase(val2);
+                } else
+                {
+                    return val2.compareToIgnoreCase(val1);
+                }
+            } else
+            {
+                return super.compareProperty(propertyId, sortDirection, item1,
+                        item2);
+            }
+        }
+    }
+
+    private String killNamespace(String qName)
+    {
+        String[] splitted = qName.split(":");
+        return splitted[splitted.length - 1];
+    }
+
+    private String getFirst(Set<String> set)
+    {
+        Iterator<String> it = set.iterator();
+        return it.hasNext() ? it.next() : null;
+    }
 }
