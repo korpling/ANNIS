@@ -169,16 +169,6 @@ public class SingleResultPanel extends Panel
     return matchedAndCovered;
   }
  
-  public static String colorClassByMatch(Long match)
-  {
-    if(match == null)
-    {
-      return null;
-    }
-    long m = match;
-    m = Math.min(m, 8);
-    return "match_" + m;
-  }
-  
+ 
   
 }

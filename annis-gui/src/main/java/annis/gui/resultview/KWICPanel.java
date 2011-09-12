@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  *
@@ -101,7 +101,7 @@ public class KWICPanel extends Panel
         if(markedAndCovered.containsKey(t))
         {
           // add color
-          l.addStyleName(SingleResultPanel.colorClassByMatch(markedAndCovered.get(t)));
+          l.addStyleName(MatchedNodeColors.colorClassByMatch(markedAndCovered.get(t)));
         }
       }
       else

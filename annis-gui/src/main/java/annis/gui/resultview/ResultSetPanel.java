@@ -42,6 +42,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 {
   private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   
+  public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+  
   public ResultSetPanel(AnnisResultSet resultSet, int start)
   {
     cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
