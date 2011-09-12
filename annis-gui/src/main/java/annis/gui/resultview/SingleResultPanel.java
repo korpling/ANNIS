@@ -15,18 +15,25 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.ServiceHelper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.resolver.ResolverEntry;
+import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,11 +45,15 @@ public class SingleResultPanel extends Panel
   private Map<AnnisNode,Long> markedAndCovered;
   private Set<String> tokenAnnos;
   private Set<String> nodeAnnos;
-  
-  public SingleResultPanel(AnnisResult result, int resultNumber)
+  private VerticalLayout vLayout;
+  private ResolverProvider resolverProvider;
+    
+  public SingleResultPanel(AnnisResult result, int resultNumber, 
+    ResolverProvider resolverProvider)
   {
     this.result = result;
-
+    this.resolverProvider = resolverProvider;
+    
     calculateHelperVariables();
     
     setWidth("100%");
@@ -62,18 +73,48 @@ public class SingleResultPanel extends Panel
     hLayout.addComponent(lblNumber);
     lblNumber.setSizeUndefined();
     
-    VerticalLayout vLayout = new VerticalLayout();
+    vLayout = new VerticalLayout();
     hLayout.addComponent(vLayout);
     
     
     KWICPanel kwic = new KWICPanel(result, tokenAnnos, markedAndCovered);
     vLayout.addComponent(kwic);
-    vLayout.addComponent(new VisualizerPanel(result, resultNumber));
+    
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
     
     hLayout.setExpandRatio(vLayout, 1.0f);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+    if(service != null && resolverProvider != null)
+    {
+      try
+      {
+        ResolverEntry[] entries = 
+          resolverProvider.getResolverEntries(result, service);
+        for(ResolverEntry e : entries)
+        {
+          vLayout.addComponent(new VisualizerPanel(e));
+        }
+      }
+      catch(RemoteException ex)
+      {
+        Logger.getLogger(SingleResultPanel.class.getName()).log(Level.SEVERE, 
+          "could not get resolver entries", ex);
+        getWindow().showNotification("could not get resolver entries: " + 
+          ex.getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
+      }
+    }
+    
+  }
+  
+  
   
   private void calculateHelperVariables()
   {
@@ -138,4 +179,6 @@ public class SingleResultPanel extends Panel
     m = Math.min(m, 8);
     return "match_" + m;
   }
+  
+  
 }

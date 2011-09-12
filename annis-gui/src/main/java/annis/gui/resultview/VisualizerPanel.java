@@ -16,9 +16,14 @@
 package annis.gui.resultview;
 
 import annis.gui.widgets.AutoHeightIFrame;
-import annis.service.ifaces.AnnisResult;
+import annis.resolver.ResolverEntry;
 
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.BaseTheme;
 
 /**
  * @author thomas
@@ -27,16 +32,53 @@ import com.vaadin.ui.Panel;
 public class VisualizerPanel extends Panel
 {
 
-  private AnnisResult result;
-  private int resultNumber;
+  public static final ThemeResource ICON_COLLAPSE = new ThemeResource("icon-collapse.gif");
+  public static final ThemeResource ICON_EXPAND = new ThemeResource("icon-expand.gif");
 
-  public VisualizerPanel(AnnisResult result, int resultNumber)
+  private AutoHeightIFrame iframe;
+
+  public VisualizerPanel(final ResolverEntry entry)
   {
-    this.result = result;
-    this.resultNumber = resultNumber;
+
     this.setSizeFull();
     
-    AutoHeightIFrame frame = new AutoHeightIFrame("/annis-gui/tutorial/interface.html");
-    addComponent(frame);
+    ((VerticalLayout) getContent()).setMargin(false);
+    ((VerticalLayout) getContent()).setSpacing(false);
+
+    final Button btEntry = new Button(entry.getDisplayName());
+    btEntry.setIcon(ICON_EXPAND);
+    btEntry.setStyleName(BaseTheme.BUTTON_LINK);
+    btEntry.addListener(new Button.ClickListener()
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        if(btEntry.getIcon() == ICON_EXPAND)
+        {
+          // expand
+          if(iframe == null)
+          {
+            // TODO: calculate real url
+            iframe = new AutoHeightIFrame("/index.html");
+            addComponent(iframe);
+          }
+          
+          btEntry.setIcon(ICON_COLLAPSE);
+          iframe.setVisible(true);
+        }
+        else if(btEntry.getIcon() == ICON_COLLAPSE)
+        {
+          // collapse
+          if(iframe != null)
+          {
+            iframe.setVisible(false);
+          }
+          btEntry.setIcon(ICON_EXPAND);
+        }
+      }
+    });
+    addComponent(btEntry);
+
   }
+
 }
