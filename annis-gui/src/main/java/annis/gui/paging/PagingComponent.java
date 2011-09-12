@@ -172,6 +172,12 @@ public class PagingComponent extends CustomComponent implements
     lblInfo.setValue("Displaying Results " + (getStartNumber() + 1) 
       + " - " + Math.min(getStartNumber() + pageSize, count) + " of " + count);
 
+    btFirst.setEnabled(currentPage > 1);
+    btPrevious.setEnabled(currentPage > 1);
+    btLast.setEnabled(currentPage < getMaxPage());
+    btNext.setEnabled(currentPage < getMaxPage());
+    
+    
     if(informCallbacks)
     {
       for(PagingCallback c : callbacks)
