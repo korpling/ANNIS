@@ -15,9 +15,9 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.widgets.AutoHeightIFrame;
 import annis.service.ifaces.AnnisResult;
 
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
 /**
@@ -34,8 +34,9 @@ public class VisualizerPanel extends Panel
   {
     this.result = result;
     this.resultNumber = resultNumber;
-    //this.setSizeFull();
-    //addComponent(new MyComponent());
-    addComponent(new Label("TODO"));
+    this.setSizeFull();
+    
+    AutoHeightIFrame frame = new AutoHeightIFrame("/annis-gui/tutorial/interface.html");
+    addComponent(frame);
   }
 }

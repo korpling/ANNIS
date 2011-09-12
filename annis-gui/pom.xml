@@ -37,64 +37,6 @@
         </configuration>
       </plugin>
 
-      <!-- Compiles your custom GWT components with the GWT compiler -->
-      <!-- A hosted mode browser for client-side widget debugging can be run with the goal gwt:run after uncommenting the 
-        correct line below. A remote debugger can then be connected to port 8998. Note that e.g. a Jetty server should be running 
-        with the server side parts - use the goal jetty:run . -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <version>2.3.0-1</version>
-        <configuration>
-          <!-- if you don't specify any modules, the plugin will find them -->
-          <modules> <module>annis.gui.widgets.gwt.AnnisWidgetSet</module> </modules>
-          <webappDirectory>${project.build.directory}/${project.build.finalName}/VAADIN/widgetsets</webappDirectory>
-          <!-- On Mac running Snow Leopard, add "-d32" -->
-          <!-- This causes error messages (but build works) in phase "package": two processes would use the same debug 
-            port -->
-          <!--extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs -->
-          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>annis-gui</runTarget>
-          <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
-          <noServer>true</noServer>
-          <port>8080</port>
-          <compileReport>false</compileReport>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>resources</goal>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>  
-          <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <version>2.3.0</version>
-          </dependency>
-          <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>2.3.0</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-maven-plugin</artifactId>
-        <version>1.0.2</version>
-        <executions>
-          <execution>
-            <configuration></configuration>
-            <goals>
-              <goal>update-widgetset</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-     
      <!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
           be launched with the Maven goal jetty:run and stopped with jetty:stop -->
       <plugin>
@@ -130,6 +72,76 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>compile-widgetset</id>
+      <build>
+        <plugins>
+        <!-- Compiles your custom GWT components with the GWT compiler -->
+      <!-- A hosted mode browser for client-side widget debugging can be run with the goal gwt:run after uncommenting the 
+        correct line below. A remote debugger can then be connected to port 8998. Note that e.g. a Jetty server should be running 
+        with the server side parts - use the goal jetty:run . -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>gwt-maven-plugin</artifactId>
+            <version>2.3.0-1</version>
+            <configuration>
+          <!-- if you don't specify any modules, the plugin will find them -->
+              <modules> 
+                <module>annis.gui.widgets.gwt.AnnisWidgetSet</module> 
+              </modules>
+              <webappDirectory>src/main/webapp/VAADIN/widgetsets</webappDirectory>
+          <!--<webappDirectory>${project.build.directory}/${project.build.finalName}/VAADIN/widgetsets</webappDirectory>-->
+          <!-- On Mac running Snow Leopard, add "-d32" -->
+          <!-- This causes error messages (but build works) in phase "package": two processes would use the same debug 
+            port -->
+          <!--extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs -->
+              <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+              <runTarget>annis-gui</runTarget>
+              <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
+              <noServer>true</noServer>
+              <port>8080</port>
+              <compileReport>false</compileReport>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>resources</goal>
+                  <goal>compile</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>  
+              <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-dev</artifactId>
+                <version>2.3.0</version>
+              </dependency>
+              <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-user</artifactId>
+                <version>2.3.0</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-maven-plugin</artifactId>
+            <version>1.0.2</version>
+            <executions>
+              <execution>
+                <configuration></configuration>
+                <goals>
+                  <goal>update-widgetset</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <repositories>
 
