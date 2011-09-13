@@ -138,7 +138,7 @@ public class SingleResultPanel extends Panel
       if(match != null)
       {     
         markedExactMap.put("" + n.getId(), 
-          MatchedNodeColors.colorClassByMatch(match));
+          MatchedNodeColors.values()[(int) match.longValue() - 1].name());
       }
       // add to annotation overview      
       for(Annotation a : n.getNodeAnnotations())
@@ -155,8 +155,8 @@ public class SingleResultPanel extends Panel
     
     for(Entry<AnnisNode,Long> markedEntry : markedAndCovered.entrySet())
     {
-      markedCoveredMap.put("" + markedEntry.getKey().getId(), 
-        MatchedNodeColors.colorClassByMatch(markedEntry.getValue()));
+      markedCoveredMap.put("" + markedEntry.getKey().getId(),
+        MatchedNodeColors.values()[(int) markedEntry.getValue().longValue() -1 ].name());
     }
   }
   
