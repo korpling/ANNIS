@@ -24,15 +24,15 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.xeoh.plugins.base.PluginManager;
 
 /**
  *
@@ -40,7 +40,7 @@ import net.xeoh.plugins.base.PluginManager;
  */
 public class ResultViewPanel extends Panel implements PagingCallback
 {
-
+  
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
@@ -71,8 +71,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     
     paging = new PagingComponent(0, pageSize);
-
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
+    paging.addCallback((PagingCallback) this);
+
 
     scrollPanel = new Panel();
     scrollPanel.setSizeFull();
@@ -96,7 +97,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {
-    paging.addCallback(this);
 
     query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
       contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
@@ -107,19 +107,21 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
   public void setCount(int count)
   {
-    paging.setCount(count);
+    paging.setCount(count, false);
   }
 
   @Override
   public void createPage(final int start, final int limit)
   {
+    
     if(query != null)
     {
-
+      
       layout.removeAllComponents();
       progressResult.setEnabled(true);
       layout.addComponent(progressResult);
 
+      
       Runnable r = new Runnable()
       {
 
@@ -128,12 +130,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
         {
           try
           {
+            
             AnnisResultSet result = query.loadBeans(start, limit);
             resultPanel = new ResultSetPanel(result, start, ps);
             
-            progressResult.setEnabled(false);
             layout.removeAllComponents();            
             layout.addComponent(resultPanel);
+            
           }
           catch(AnnisQLSemanticsException ex)
           {
@@ -151,6 +154,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
           {
             Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, "unknown exception in result view", ex);
             paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+          }
+          finally
+          {
+            progressResult.setEnabled(false);
           }
         }
       };

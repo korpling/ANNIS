@@ -96,10 +96,12 @@ public class MetaDataPanel extends Panel
   @Override
   public void attach()
   {    
+    
+    super.attach();
+    
     // load meta data from service
     metaContainer.addAll(getMetaData(id));
     
-    super.attach();
   }
   
   private List<Annotation> getMetaData(long id)

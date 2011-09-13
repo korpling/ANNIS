@@ -30,6 +30,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -52,7 +53,7 @@ public class PagingComponent extends CustomComponent implements
   private Label lblMaxPages;
   private Label lblStatus;
   private Set<PagingCallback> callbacks;
-  private int count;
+  private AtomicInteger count;
   private int pageSize;
   private int currentPage;
   private Label lblInfo;
@@ -68,7 +69,7 @@ public class PagingComponent extends CustomComponent implements
       count = 0;
     }
     currentPage = 1;
-    this.count = count;
+    this.count = new AtomicInteger(pageSize);
     this.pageSize = pageSize;
     
     setWidth("100%");
@@ -88,33 +89,29 @@ public class PagingComponent extends CustomComponent implements
     lblInfo.addStyleName("right-aligned-text");
     
     layout.setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-    btFirst = new Button();
+    
+        btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
-    btFirst.addListener(this);
+    btFirst.addListener((Button.ClickListener) this);
     btFirst.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 
     btLast = new Button();
     btLast.setIcon(LAST);
     btLast.setDescription("jump to last page");
-    btLast.addListener(this);
+    btLast.addListener((Button.ClickListener) this);
     btLast.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 
     btNext = new Button();
     btNext.setIcon(RIGHT_ARROW);
     btNext.setDescription("jump to next page");
-    btNext.addListener(this);
+    btNext.addListener((Button.ClickListener) this);
     btNext.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 
     btPrevious = new Button();
     btPrevious.setIcon(LEFT_ARROW);
     btPrevious.setDescription("jump to previous page");
-    btPrevious.addListener(this);
+    btPrevious.addListener((Button.ClickListener) this);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 
     txtPage = new TextField();
@@ -172,17 +169,18 @@ public class PagingComponent extends CustomComponent implements
     layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
     layout.setExpandRatio(lblInfo, 10.0f);
     
-    update(false);
     
-    super.attach();
+    update(false);
   }
+
 
   private void update(boolean informCallbacks)
   {
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
+    int myCount = count.get();
     lblStatus.setValue("Displaying Results " + (getStartNumber() + 1) 
-      + " - " + Math.min(getStartNumber() + pageSize, count) + " of " + count);
+      + " - " + Math.min(getStartNumber() + pageSize, myCount) + " of " + myCount);
 
     btFirst.setEnabled(currentPage > 1);
     btPrevious.setEnabled(currentPage > 1);
@@ -211,7 +209,7 @@ public class PagingComponent extends CustomComponent implements
 
   public int getMaxPage()
   {
-    return (1 + (count / pageSize));
+    return (1 + (count.get() / pageSize));
   }
   
   public int getStartNumber()
@@ -221,17 +219,17 @@ public class PagingComponent extends CustomComponent implements
 
   public int getCount()
   {
-    return count;
+    return count.get();
   }
 
-  public void setCount(int count)
+  public void setCount(int count, boolean update)
   {
     if(count < 0)
     {
       count = 0;
     }
-    this.count = count;
-    update(true);
+    this.count.set(count);
+    update(update);
   }
 
   public int getPageSize()
@@ -278,7 +276,7 @@ public class PagingComponent extends CustomComponent implements
   private int sanitizePage(int page)
   {
     int val = Math.max(1, page);
-    val = Math.min(1 + (count / pageSize), page);
+    val = Math.min(1 + (count.get() / pageSize), page);
     return val;
   }
 

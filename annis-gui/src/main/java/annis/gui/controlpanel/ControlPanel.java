@@ -76,10 +76,9 @@ public class ControlPanel extends Panel
 
   @Override
   public void attach()
-  {
-    this.window = getWindow();
-    
+  {    
     super.attach();
+    this.window = getWindow(); 
   }
 
   public void setQuery(String query, Set<Long> corpora)

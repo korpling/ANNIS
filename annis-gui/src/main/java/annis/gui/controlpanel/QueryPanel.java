@@ -79,7 +79,9 @@ public class QueryPanel extends Panel implements TextChangeListener
     
     txtQuery = new TextField();
     txtQuery.setSizeFull();
-    txtQuery.setTextChangeTimeout(1000);
+    txtQuery.setTextChangeTimeout(1000);    
+    txtQuery.addListener((TextChangeListener) this);
+    
     mainLayout.addComponent(txtQuery, 1, 0);
     
     panelStatus = new Panel();
@@ -126,16 +128,6 @@ public class QueryPanel extends Panel implements TextChangeListener
     buttonPanel.addComponent(btHistory);
     
   }
-
-  @Override
-  public void attach()
-  {    
-    txtQuery.addListener(this);
-    
-    super.attach();
-  }
-  
-  
   
   public void setQuery(String query)
   {
