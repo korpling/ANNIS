@@ -695,7 +695,7 @@ td.v-datefield-calendarpanel-month,
   color: grey;
 }
 
-.paging {
+.paging .v-panel-content {
   background-color: #e9eafb;
 }
 

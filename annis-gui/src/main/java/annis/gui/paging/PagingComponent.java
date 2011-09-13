@@ -27,6 +27,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
@@ -82,15 +83,18 @@ public class PagingComponent extends CustomComponent implements
     layout.setSpacing(true);
     layout.setMargin(true);
 
+    Panel root = new Panel(layout);
+    root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    setCompositionRoot(layout);
+    setCompositionRoot(root);
+    
     
     lblInfo = new Label();
     lblInfo.addStyleName("right-aligned-text");
     
     layout.setSizeFull();
     
-        btFirst = new Button();
+    btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
     btFirst.addListener((Button.ClickListener) this);
@@ -143,7 +147,7 @@ public class PagingComponent extends CustomComponent implements
       }
     };
     txtPage.addValidator(pageValidator);
-    txtPage.addShortcutListener(new EnterListener(txtPage));
+    root.addAction(new EnterListener(txtPage));
 
     lblMaxPages = new Label();
     lblMaxPages.setDescription("maximal pages");
@@ -168,6 +172,7 @@ public class PagingComponent extends CustomComponent implements
     layout.setExpandRatio(lblStatus, 1.0f);    
     layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
     layout.setExpandRatio(lblInfo, 10.0f);
+    
     
     
     update(false);
