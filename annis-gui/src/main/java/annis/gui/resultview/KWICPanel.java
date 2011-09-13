@@ -39,6 +39,8 @@ public class KWICPanel extends Panel
 {
   private AnnisResult result;
   
+  private final String DUMMY_COLUMN = "dummyColumn"; 
+  
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode,Long> markedAndCovered;
@@ -74,9 +76,23 @@ public class KWICPanel extends Panel
     {
       // add a column for each token
       tblToken.addGeneratedColumn(t, new TokenColumnGenerator());
+      tblToken.setColumnWidth(t, -1);
+      tblToken.setColumnExpandRatio(t, 0.0f);
       visible.add(t);
     }
     
+    tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator() {
+
+      @Override
+      public Component generateCell(Table source, Object itemId, Object columnId)
+      {
+        Label lbl = new Label("");
+        return lbl;
+      }
+    });
+    tblToken.setColumnWidth(DUMMY_COLUMN, 0);
+    tblToken.setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
+    visible.add(DUMMY_COLUMN);
     containerAnnos.addAll(tokenAnnos);
     
     tblToken.setContainerDataSource(containerAnnos);

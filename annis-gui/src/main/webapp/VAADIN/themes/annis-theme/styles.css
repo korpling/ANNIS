@@ -687,6 +687,10 @@ td.v-datefield-calendarpanel-month,
   background-color: white;
 }
 
+.kwic {
+  font-size: 11px;
+}
+
 .kwic-anno {
   color: grey;
 }
