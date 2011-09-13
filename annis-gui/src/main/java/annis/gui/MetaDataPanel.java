@@ -108,7 +108,7 @@ public class MetaDataPanel extends Panel
     List<Annotation> result = new ArrayList<Annotation>();
     try
     {
-      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+      AnnisService service = Helper.getService(getApplication(), getWindow());
       if(service != null)
       {
         result = service.getMetadata(id);

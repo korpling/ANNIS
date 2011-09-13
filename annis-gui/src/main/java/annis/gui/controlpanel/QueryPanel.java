@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.gui.ServiceHelper;
+import annis.gui.Helper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -160,7 +160,7 @@ public class QueryPanel extends Panel implements TextChangeListener
     // validate query
     try
     {
-      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+      AnnisService service = Helper.getService(getApplication(), getWindow());
       if(service != null && service.isValidQuery(event.getText()))
       {
         lblStatus.setValue(lastPublicStatus);

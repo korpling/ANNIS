@@ -167,7 +167,7 @@ public class CorpusBrowserPanel extends Panel
         List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
         try
         {
-            AnnisService service = ServiceHelper.getService(getApplication(),
+            AnnisService service = Helper.getService(getApplication(),
                     getWindow());
             List<Long> ids = new LinkedList<Long>();
             ids.add(corpusId);

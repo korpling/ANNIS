@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
-import annis.gui.ServiceHelper;
+import annis.gui.Helper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
@@ -112,7 +112,7 @@ public class CorpusListPanel extends Panel
     List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
     try
     {
-      AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+      AnnisService service = Helper.getService(getApplication(), getWindow());
       if(service != null)
       {
         AnnisCorpusSet corpora = service.getCorpusSet();

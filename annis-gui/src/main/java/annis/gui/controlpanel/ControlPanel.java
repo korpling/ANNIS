@@ -19,7 +19,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.MainApp;
-import annis.gui.ServiceHelper;
+import annis.gui.Helper;
 import annis.service.AnnisService;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Layout;
@@ -128,7 +128,7 @@ public class ControlPanel extends Panel
         @Override
         public void run()
         {
-            AnnisService service = ServiceHelper.getService(app, window);
+            AnnisService service = Helper.getService(app, window);
             if (service != null)
             {
                 try

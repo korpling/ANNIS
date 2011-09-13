@@ -345,6 +345,13 @@ td.v-datefield-calendarpanel-month,
   white-space: normal;
 }
 
+.result-view .v-panel-content {
+  background-color: white;
+}
+.result-view .v-table-body {
+  background-color: white;
+}
+
 .kwic {
   background-color: white !important;
 }

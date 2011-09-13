@@ -19,6 +19,7 @@ import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.Application;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  *
  * @author thomas
  */
-public class ServiceHelper
+public class Helper
 {
 
   public static AnnisService getService(Application app, Window window)
@@ -41,11 +42,17 @@ public class ServiceHelper
     }
     catch(AnnisServiceFactoryException ex)
     {
-      Logger.getLogger(ServiceHelper.class.getName()).log(Level.SEVERE, "Could not connect to service", ex);
+      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, "Could not connect to service", ex);
       window.showNotification("Could not connect to service: " + ex.getMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
     }
 
     return service;
+  }
+  
+  public static String getContext(Application app)
+  {
+    WebApplicationContext context = (WebApplicationContext) app.getContext();
+    return context.getHttpSession().getServletContext().getContextPath();
   }
 }

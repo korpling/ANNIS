@@ -18,7 +18,8 @@ package annis.gui.resultview;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.ServiceHelper;
+import annis.gui.PluginSystem;
+import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.service.ifaces.AnnisResultSet;
@@ -31,6 +32,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.xeoh.plugins.base.PluginManager;
 
 /**
  *
@@ -49,15 +51,19 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private VerticalLayout layout;
   private Panel scrollPanel;
   private ProgressIndicator progressResult;
+  private PluginSystem ps;
 
-  public ResultViewPanel(String aql, Set<Long> corpora, int contextLeft, int contextRight, int pageSize)
+  public ResultViewPanel(String aql, Set<Long> corpora, 
+    int contextLeft, int contextRight, int pageSize,
+    PluginSystem ps)
   {
     this.aql = aql;
     this.corpora = corpora;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
     this.pageSize = pageSize;
-
+    this.ps = ps;
+    
     setSizeFull();
 
     VerticalLayout mainLayout = (VerticalLayout) getContent();
@@ -98,7 +104,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging.addCallback(this);
 
     query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
-      contextLeft, contextRight, ServiceHelper.getService(getApplication(), getWindow()));
+      contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
     createPage(0, pageSize);
   }
 
@@ -126,7 +132,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
           try
           {
             AnnisResultSet result = query.loadBeans(start, limit);
-            resultPanel = new ResultSetPanel(result, start);
+            resultPanel = new ResultSetPanel(result, start, ps);
             
             progressResult.setEnabled(false);
             layout.removeAllComponents();            

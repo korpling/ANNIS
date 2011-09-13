@@ -15,7 +15,9 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.ServiceHelper;
+import annis.gui.PluginSystem;
+import annis.gui.Helper;
+import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -30,6 +32,7 @@ import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -43,14 +46,19 @@ public class SingleResultPanel extends Panel
 {
   private AnnisResult result;
   private Map<AnnisNode,Long> markedAndCovered;
+  private Map<String,String> markedCoveredMap;
+  private Map<String,String> markedExactMap;
+  
   private Set<String> tokenAnnos;
   private Set<String> nodeAnnos;
   private VerticalLayout vLayout;
   private ResolverProvider resolverProvider;
+  private PluginSystem ps;
     
   public SingleResultPanel(AnnisResult result, int resultNumber, 
-    ResolverProvider resolverProvider)
+    ResolverProvider resolverProvider, PluginSystem ps)
   {
+    this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
     
@@ -91,7 +99,7 @@ public class SingleResultPanel extends Panel
   {
     super.attach();
     
-    AnnisService service = ServiceHelper.getService(getApplication(), getWindow());
+    AnnisService service = Helper.getService(getApplication(), getWindow());
     if(service != null && resolverProvider != null)
     {
       try
@@ -100,7 +108,8 @@ public class SingleResultPanel extends Panel
           resolverProvider.getResolverEntries(result, service);
         for(ResolverEntry e : entries)
         {
-          vLayout.addComponent(new VisualizerPanel(e));
+          vLayout.addComponent(new VisualizerPanel(e, result, ps, markedExactMap, 
+            markedCoveredMap));
         }
       }
       catch(RemoteException ex)
@@ -121,8 +130,17 @@ public class SingleResultPanel extends Panel
     nodeAnnos = new TreeSet<String>();
     tokenAnnos = new TreeSet<String>();
     
+    markedExactMap = new HashMap<String, String>();
+    markedCoveredMap = new HashMap<String, String>();
+    
     for(AnnisNode n : result.getGraph().getNodes())
     {
+      Long match = n.getMatchedNodeInQuery();
+      if(match != null)
+      {     
+        markedExactMap.put("" + n.getId(), 
+          MatchedNodeColors.colorClassByMatch(match));
+      }
       // add to annotation overview      
       for(Annotation a : n.getNodeAnnotations())
       {
@@ -135,6 +153,12 @@ public class SingleResultPanel extends Panel
     }
     
     markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
+    
+    for(Entry<AnnisNode,Long> markedEntry : markedAndCovered.entrySet())
+    {
+      markedCoveredMap.put("" + markedEntry.getKey().getId(), 
+        MatchedNodeColors.colorClassByMatch(markedEntry.getValue()));
+    }
   }
   
   private Map<AnnisNode,Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)

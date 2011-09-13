@@ -23,6 +23,7 @@ public class AutoHeightIFrame extends AbstractComponent
     this.url = url;    
     urlUpdated = false;
     setWidth("100%");
+    
   }
   
   @Override

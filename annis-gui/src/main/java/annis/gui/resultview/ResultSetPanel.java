@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.PluginSystem;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.xeoh.plugins.base.PluginManager;
 
 /**
  *
@@ -44,12 +46,14 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   
   public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
   
-  public ResultSetPanel(AnnisResultSet resultSet, int start)
+  public ResultSetPanel(AnnisResultSet resultSet, int start, PluginSystem ps)
   {
     cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
     
     setWidth("100%");
     setHeight("-1px");
+    
+    addStyleName("result-view");
     
     ((VerticalLayout) getContent()).setWidth("100%");
     ((VerticalLayout) getContent()).setHeight("-1px");
@@ -57,7 +61,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     int i=start; 
     for(AnnisResult r : resultSet)
     {
-      SingleResultPanel panel = new SingleResultPanel(r, i, this);
+      SingleResultPanel panel = new SingleResultPanel(r, i, this, ps);
       addComponent(panel);
       i++;
     }
