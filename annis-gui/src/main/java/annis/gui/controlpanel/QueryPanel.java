@@ -129,10 +129,10 @@ public class QueryPanel extends Panel implements TextChangeListener
 
   @Override
   public void attach()
-  {
-    super.attach();
-    
+  {    
     txtQuery.addListener(this);
+    
+    super.attach();
   }
   
   

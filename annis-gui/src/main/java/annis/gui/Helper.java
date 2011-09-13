@@ -36,6 +36,12 @@ public class Helper
   public static AnnisService getService(Application app, Window window)
   {
     AnnisService service = null;
+    
+    if(app == null || window == null)
+    {
+      return service;
+    }
+    
     try
     {
       service = AnnisServiceFactory.getClient(app.getProperty("AnnisRemoteService.URL"));

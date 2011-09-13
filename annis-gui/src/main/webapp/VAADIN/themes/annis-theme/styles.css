@@ -695,6 +695,14 @@ td.v-datefield-calendarpanel-month,
   color: grey;
 }
 
+.paging {
+  background-color: #e9eafb;
+}
+
+.right-aligned-text {
+  text-align: right;
+}
+
 /* matched node colors by match index*/
 .match_1 {
   color: rgb(255,0,0);

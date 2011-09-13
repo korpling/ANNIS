@@ -39,142 +39,146 @@ import java.util.logging.Logger;
 public class ControlPanel extends Panel
 {
 
-    private static final long serialVersionUID = -2220211539424865671L;
+  private static final long serialVersionUID = -2220211539424865671L;
+  private QueryPanel queryPanel;
+  private CorpusListPanel corpusList;
+  private MainApp app;
+  private Window window;
+  private String lastQuery;
+  Set<Long> lastCorpusSelection;
 
-    private QueryPanel queryPanel;
-    private CorpusListPanel corpusList;
-    private MainApp app;
-    private Window window;
-    private String lastQuery;
-    Set<Long> lastCorpusSelection;
+  public ControlPanel(MainApp app)
+  {
+    super("Search Form");
+    this.app = app;
 
-    public ControlPanel(MainApp app)
+    addStyleName("control");
+
+    VerticalLayout layout = (VerticalLayout) getContent();
+    layout.setHeight(100f, UNITS_PERCENTAGE);
+
+    Accordion accordion = new Accordion();
+    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
+
+    corpusList = new CorpusListPanel(this);
+    accordion.addTab(corpusList, "Corpus List", null);
+    accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
+    accordion.addTab(new ExportPanel(), "Export", null);
+
+    queryPanel = new QueryPanel(this);
+    queryPanel.setHeight(18f, Layout.UNITS_EM);
+
+    addComponent(queryPanel);
+    addComponent(accordion);
+
+    layout.setExpandRatio(accordion, 1.0f);
+  }
+
+  @Override
+  public void attach()
+  {
+    this.window = getWindow();
+    
+    super.attach();
+  }
+
+  public void setQuery(String query, Set<Long> corpora)
+  {
+    if(queryPanel != null && corpusList != null)
     {
-        super("Search Form");
-        this.app = app;
-
-        addStyleName("control");
-
-        VerticalLayout layout = (VerticalLayout) getContent();
-        layout.setHeight(100f, UNITS_PERCENTAGE);
-
-        Accordion accordion = new Accordion();
-        accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
-
-        corpusList = new CorpusListPanel(this);
-        accordion.addTab(corpusList, "Corpus List", null);
-        accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
-        accordion.addTab(new ExportPanel(), "Export", null);
-
-        queryPanel = new QueryPanel(this);
-        queryPanel.setHeight(18f, Layout.UNITS_EM);
-
-        addComponent(queryPanel);
-        addComponent(accordion);
-
-        layout.setExpandRatio(accordion, 1.0f);
+      queryPanel.setQuery(query);
+      corpusList.selectCorpora(corpora);
     }
+  }
+
+  public void executeQuery()
+  {
+    if(app != null && corpusList != null && queryPanel != null)
+    {
+
+      lastCorpusSelection = corpusList.getSelectedCorpora();
+      lastQuery = queryPanel.getQuery();
+      if(lastCorpusSelection.isEmpty())
+      {
+        getWindow().showNotification("Please select a corpus",
+          Window.Notification.TYPE_WARNING_MESSAGE);
+        return;
+      }
+      if("".equals(lastQuery))
+      {
+        getWindow().showNotification("Empty query",
+          Window.Notification.TYPE_WARNING_MESSAGE);
+        return;
+      }
+
+      queryPanel.setCountIndicatorEnabled(true);
+      CountThread countThread = new CountThread();
+      countThread.start();
+
+      app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5, 10);
+    }
+  }
+
+  private class CountThread extends Thread
+  {
+
+    private int count = -1;
 
     @Override
-    public void attach()
+    public void run()
     {
-        super.attach();
-
-        this.window = getWindow();
-    }
-
-    public void setQuery(String query, Set<Long> corpora)
-    {
-        if (queryPanel != null && corpusList != null)
-        {
-            queryPanel.setQuery(query);
-            corpusList.selectCorpora(corpora);
-        }
-    }
-
-    public void executeQuery()
-    {
-        if (app != null && corpusList != null && queryPanel != null)
+      AnnisService service = Helper.getService(app, window);
+      if(service != null)
+      {
+        try
         {
 
-            lastCorpusSelection = corpusList.getSelectedCorpora();
-            lastQuery = queryPanel.getQuery();
-            if (lastCorpusSelection.isEmpty())
-            {
-                getWindow().showNotification("Please select a corpus",
-                        Window.Notification.TYPE_WARNING_MESSAGE);
-                return;
-            }
-            if ("".equals(lastQuery))
-            {
-                getWindow().showNotification("Empty query",
-                        Window.Notification.TYPE_WARNING_MESSAGE);
-                return;
-            }
+          count = service.getCount(new LinkedList<Long>(
+            lastCorpusSelection), lastQuery);
 
-            queryPanel.setCountIndicatorEnabled(true);
-            CountThread countThread = new CountThread();
-            countThread.start();
-
-            app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5, 10);
         }
+        catch(RemoteException ex)
+        {
+          Logger.getLogger(ControlPanel.class.getName()).log(
+            Level.SEVERE, null, ex);
+          window.showNotification(ex.getLocalizedMessage(),
+            Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+        catch(AnnisQLSemanticsException ex)
+        {
+          window.showNotification(
+            "Sematic error: " + ex.getLocalizedMessage(),
+            Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+        catch(AnnisQLSyntaxException ex)
+        {
+          window.showNotification(
+            "Syntax error: " + ex.getLocalizedMessage(),
+            Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+        catch(AnnisCorpusAccessException ex)
+        {
+          window.showNotification(
+            "Corpus access error: " + ex.getLocalizedMessage(),
+            Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+        catch(Exception ex)
+        {
+          window.showNotification(
+            "unknown exception: " + ex.getLocalizedMessage(),
+            Window.Notification.TYPE_ERROR_MESSAGE);
+        }
+      }
+
+      queryPanel.setStatus("" + count + " matches");
+      app.updateQueryCount(count);
+
+      queryPanel.setCountIndicatorEnabled(false);
     }
 
-    private class CountThread extends Thread
+    public int getCount()
     {
-
-        private int count = -1;
-
-        @Override
-        public void run()
-        {
-            AnnisService service = Helper.getService(app, window);
-            if (service != null)
-            {
-                try
-                {
-
-                    count = service.getCount(new LinkedList<Long>(
-                            lastCorpusSelection), lastQuery);
-
-                } catch (RemoteException ex)
-                {
-                    Logger.getLogger(ControlPanel.class.getName()).log(
-                            Level.SEVERE, null, ex);
-                    window.showNotification(ex.getLocalizedMessage(),
-                            Window.Notification.TYPE_ERROR_MESSAGE);
-                } catch (AnnisQLSemanticsException ex)
-                {
-                    window.showNotification(
-                            "Sematic error: " + ex.getLocalizedMessage(),
-                            Window.Notification.TYPE_ERROR_MESSAGE);
-                } catch (AnnisQLSyntaxException ex)
-                {
-                    window.showNotification(
-                            "Syntax error: " + ex.getLocalizedMessage(),
-                            Window.Notification.TYPE_ERROR_MESSAGE);
-                } catch (AnnisCorpusAccessException ex)
-                {
-                    window.showNotification(
-                            "Corpus access error: " + ex.getLocalizedMessage(),
-                            Window.Notification.TYPE_ERROR_MESSAGE);
-                } catch (Exception ex)
-                {
-                    window.showNotification(
-                            "unknown exception: " + ex.getLocalizedMessage(),
-                            Window.Notification.TYPE_ERROR_MESSAGE);
-                }
-            }
-
-            queryPanel.setStatus("" + count + " matches");
-            app.updateQueryCount(count);
-
-            queryPanel.setCountIndicatorEnabled(false);
-        }
-
-        public int getCount()
-        {
-            return count;
-        }
+      return count;
     }
+  }
 }

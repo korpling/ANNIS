@@ -41,7 +41,6 @@ import net.xeoh.plugins.base.PluginManager;
 public class ResultViewPanel extends Panel implements PagingCallback
 {
 
-  private Label lblInfo;
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
@@ -70,10 +69,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
 
-    lblInfo = new Label();
-    lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
-
+    
     paging = new PagingComponent(0, pageSize);
+
+    paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
 
     scrollPanel = new Panel();
     scrollPanel.setSizeFull();
@@ -83,7 +82,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     layout.setWidth("100%");
     layout.setHeight("-1px");
 
-    mainLayout.addComponent(lblInfo);
     mainLayout.addComponent(paging);
     mainLayout.addComponent(scrollPanel);
 
@@ -98,13 +96,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {
-    super.attach();
-
     paging.addCallback(this);
 
     query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
       contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
     createPage(0, pageSize);
+    
+    super.attach();
   }
 
   public void setCount(int count)
@@ -139,20 +137,20 @@ public class ResultViewPanel extends Panel implements PagingCallback
           }
           catch(AnnisQLSemanticsException ex)
           {
-            lblInfo.setValue("Semantic error: " + ex.getLocalizedMessage());
+            paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
           }
           catch(AnnisQLSyntaxException ex)
           {
-            lblInfo.setValue("Syntax error: " + ex.getLocalizedMessage());
+            paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
           }
           catch(AnnisCorpusAccessException ex)
           {
-            lblInfo.setValue("Corpus access error: " + ex.getLocalizedMessage());
+            paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
           }
           catch(Exception ex)
           {
             Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, "unknown exception in result view", ex);
-            lblInfo.setValue("unknown exception: " + ex.getLocalizedMessage());
+            paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
           }
         }
       };

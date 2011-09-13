@@ -99,12 +99,12 @@ public class CorpusListPanel extends Panel
   
   @Override
   public void attach()
-  {
-    super.attach();
-    
+  {    
     corpusContainer.addAll(getCorpusList());    
     tblCorpora.setSortContainerPropertyId("name");
     tblCorpora.sort();
+    
+    super.attach();
   }
   
   private List<AnnisCorpus> getCorpusList()

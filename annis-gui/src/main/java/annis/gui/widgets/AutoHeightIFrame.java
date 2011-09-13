@@ -18,7 +18,7 @@ public class AutoHeightIFrame extends AbstractComponent
   private String url;
   private boolean urlUpdated = false;
   
-  public static final int ADDITIONAL_HEIGHT = 30;
+  public static final int ADDITIONAL_HEIGHT = 25;
 
   public AutoHeightIFrame(String url)
   {

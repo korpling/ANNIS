@@ -45,13 +45,14 @@ public class TutorialPanel extends Panel
   @Override
   public void attach()
   {
-    super.attach();
     
     WebApplicationContext webappcontext = (WebApplicationContext) getApplication().getContext();
     HttpSession session = webappcontext.getHttpSession();
     String contextPath = session.getServletContext().getContextPath();
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setSource(new ExternalResource(contextPath + "/tutorial/index.html"));
+    
+    super.attach();
   }
   
   

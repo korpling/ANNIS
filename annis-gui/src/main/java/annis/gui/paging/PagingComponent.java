@@ -50,11 +50,12 @@ public class PagingComponent extends CustomComponent implements
   private Button btPrevious;
   private TextField txtPage;
   private Label lblMaxPages;
-  private Label lblInfo;
+  private Label lblStatus;
   private Set<PagingCallback> callbacks;
   private int count;
   private int pageSize;
   private int currentPage;
+  private Label lblInfo;
 
   public PagingComponent(int count, int pageSize)
   {
@@ -69,7 +70,11 @@ public class PagingComponent extends CustomComponent implements
     currentPage = 1;
     this.count = count;
     this.pageSize = pageSize;
+    
+    setWidth("100%");
 
+    addStyleName("paging");
+    
     callbacks = new HashSet<PagingCallback>();
 
     layout = new HorizontalLayout();
@@ -78,15 +83,16 @@ public class PagingComponent extends CustomComponent implements
 
 
     setCompositionRoot(layout);
-
+    
+    lblInfo = new Label();
+    lblInfo.addStyleName("right-aligned-text");
+    
+    layout.setSizeFull();
   }
 
   @Override
   public void attach()
   {
-    super.attach();
-
-
     btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
@@ -146,8 +152,8 @@ public class PagingComponent extends CustomComponent implements
     lblMaxPages.setDescription("maximal pages");
     lblMaxPages.setSizeUndefined();
 
-    lblInfo = new Label();
-    lblInfo.setSizeUndefined();
+    lblStatus = new Label();
+    lblStatus.setSizeUndefined();
     
     layout.addComponent(btFirst);
     layout.addComponent(btPrevious);
@@ -155,22 +161,27 @@ public class PagingComponent extends CustomComponent implements
     layout.addComponent(lblMaxPages);
     layout.addComponent(btNext);
     layout.addComponent(btLast);
+    layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
     
-    layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_LEFT);
+    layout.setComponentAlignment(lblStatus, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblMaxPages, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(txtPage, Alignment.MIDDLE_RIGHT);
     
-    layout.setExpandRatio(lblInfo, 1.0f);
+    layout.setExpandRatio(lblStatus, 1.0f);    
+    layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
+    layout.setExpandRatio(lblInfo, 10.0f);
     
     update(false);
+    
+    super.attach();
   }
 
   private void update(boolean informCallbacks)
   {
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
-    lblInfo.setValue("Displaying Results " + (getStartNumber() + 1) 
+    lblStatus.setValue("Displaying Results " + (getStartNumber() + 1) 
       + " - " + Math.min(getStartNumber() + pageSize, count) + " of " + count);
 
     btFirst.setEnabled(currentPage > 1);
@@ -300,5 +311,10 @@ public class PagingComponent extends CustomComponent implements
         // ignore
       }
     }
+  }
+  
+  public void setInfo(String text)
+  {
+    lblInfo.setValue(text);
   }
 }

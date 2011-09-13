@@ -96,9 +96,7 @@ public class SingleResultPanel extends Panel
 
   @Override
   public void attach()
-  {
-    super.attach();
-    
+  {    
     AnnisService service = Helper.getService(getApplication(), getWindow());
     if(service != null && resolverProvider != null)
     {
@@ -121,6 +119,7 @@ public class SingleResultPanel extends Panel
       }
     }
     
+    super.attach();
   }
   
   
