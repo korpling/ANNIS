@@ -92,6 +92,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
+    
+    layout.addComponent(progressResult);
   }
 
   @Override
@@ -116,11 +118,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     if(query != null)
     {
-      
-      layout.removeAllComponents();
       progressResult.setEnabled(true);
-      layout.addComponent(progressResult);
-
+      progressResult.setVisible(true);
+      if(resultPanel != null )
+      {
+        resultPanel.setVisible(false);
+      }
       
       Runnable r = new Runnable()
       {
@@ -132,10 +135,16 @@ public class ResultViewPanel extends Panel implements PagingCallback
           {
             
             AnnisResultSet result = query.loadBeans(start, limit);
+            
+            if(resultPanel != null)
+            {
+              layout.removeComponent(resultPanel);
+            }
             resultPanel = new ResultSetPanel(result, start, ps);
             
-            layout.removeAllComponents();            
+            layout.replaceComponent(layout, resultPanel);
             layout.addComponent(resultPanel);
+            resultPanel.setVisible(true);
             
           }
           catch(AnnisQLSemanticsException ex)
@@ -157,7 +166,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
           }
           finally
           {
-            progressResult.setEnabled(false);
+            progressResult.setVisible(false);
+            progressResult.setEnabled(false);            
           }
         }
       };

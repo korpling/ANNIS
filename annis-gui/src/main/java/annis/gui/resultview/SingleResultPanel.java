@@ -137,8 +137,10 @@ public class SingleResultPanel extends Panel
       Long match = n.getMatchedNodeInQuery();
       if(match != null)
       {     
+        int color = Math.max(0, Math.min((int) match.longValue()-1, 
+          MatchedNodeColors.values().length-1));
         markedExactMap.put("" + n.getId(), 
-          MatchedNodeColors.values()[(int) match.longValue() - 1].name());
+          MatchedNodeColors.values()[color].name());
       }
       // add to annotation overview      
       for(Annotation a : n.getNodeAnnotations())
@@ -155,8 +157,10 @@ public class SingleResultPanel extends Panel
     
     for(Entry<AnnisNode,Long> markedEntry : markedAndCovered.entrySet())
     {
+      int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()-1, 
+          MatchedNodeColors.values().length-1));
       markedCoveredMap.put("" + markedEntry.getKey().getId(),
-        MatchedNodeColors.values()[(int) markedEntry.getValue().longValue() -1 ].name());
+        MatchedNodeColors.values()[color].name());
     }
   }
   
