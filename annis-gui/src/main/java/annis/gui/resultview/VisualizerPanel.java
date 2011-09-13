@@ -24,6 +24,7 @@ import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
+import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
@@ -75,6 +76,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.setWidth("100%");
     this.setHeight("-1px");
 
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setMargin(false);
     layout.setSpacing(false);
@@ -83,7 +86,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(BaseTheme.BUTTON_LINK);
+    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btEntry.addListener((Button.ClickListener) this);
     addComponent(btEntry);
   }
@@ -121,7 +124,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       {
         return new ByteArrayInputStream(byteStream.toByteArray());
       }
-    }, entry.getVisType() + "_" + rand.nextLong(), getApplication());
+    }, entry.getVisType() + rand.nextLong(), getApplication());
     r.setMIMEType(mimeType);
 
     return r;

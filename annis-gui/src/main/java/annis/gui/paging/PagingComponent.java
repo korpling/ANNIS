@@ -74,6 +74,7 @@ public class PagingComponent extends CustomComponent implements
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);
+    layout.setMargin(true);
 
 
     setCompositionRoot(layout);

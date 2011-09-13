@@ -70,7 +70,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
 
-
     lblInfo = new Label();
     lblInfo.setValue("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
 
