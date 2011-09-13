@@ -249,12 +249,7 @@ public class MainApp extends Application implements PluginSystem
   @Override
   public VisualizerPlugin getVisualizer(String shortName)
   {
-    VisualizerPlugin result = visualizerRegistry.get(shortName);
-    if(result == null)
-    {
-      result = visualizerRegistry.get("grid");
-    }
-    return result;
+    return visualizerRegistry.get(shortName);
   }
 
   

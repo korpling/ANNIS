@@ -54,7 +54,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public static final ThemeResource ICON_COLLAPSE = new ThemeResource("icon-collapse.gif");
   public static final ThemeResource ICON_EXPAND = new ThemeResource("icon-expand.gif");
   private ApplicationResource resource = null;
-  private Component embedded;
+  private AutoHeightIFrame iframe;
   private AnnisResult result;
   private PluginSystem ps;
   private ResolverEntry entry;
@@ -121,7 +121,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       {
         return new ByteArrayInputStream(byteStream.toByteArray());
       }
-    }, entry.getVisType(), getApplication());
+    }, entry.getVisType() + "_" + rand.nextLong(), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
@@ -133,7 +133,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
-      result = service.getAnnisResult(textId);
+      text = service.getAnnisResult(textId);
     }
     catch(Exception e)
     {
@@ -166,10 +166,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     if(btEntry.getIcon() == ICON_EXPAND)
     {
       // expand
-      if(embedded == null)
+      if(iframe == null)
       {
-        VisualizerInput input = createInput();
+        
         VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
+        if(vis == null)
+        {
+          entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+          vis = ps.getVisualizer(entry.getVisType());
+        }
+        VisualizerInput input = createInput();
         if(vis.isUsingText() && result.getGraph().getNodes().size() > 0)
         {
           input.setResult(getText(result.getGraph().getNodes().get(0).getTextId()));
@@ -180,57 +186,25 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         }
 
         
-        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
           vis.writeOutput(input, outStream);
-        
-        if(vis.getContentType().startsWith("image/"))
-        {
-          Embedded emb = new Embedded();
-          emb.setType(Embedded.TYPE_IMAGE);
-          resource = createResource(outStream, vis.getContentType());
-          emb.setSource(resource);          
-          emb.setSizeUndefined();
-          ((VerticalLayout) getContent()).setSizeUndefined();
-          
-          embedded = emb;
-        }
-        else if(vis.getContentType().equals("plain/text"))
-        {
-          Label lblEmbedded = new Label();
-          lblEmbedded.setContentMode(Label.CONTENT_RAW);
-          
-          try
-          {
-            lblEmbedded.setValue(new String(outStream.toByteArray(), vis.getCharacterEncoding()));
-          }
-          catch(UnsupportedEncodingException ex)
-          {
-            Logger.getLogger(VisualizerPanel.class.getName()).log(Level.SEVERE, 
-              "invalid visualizer encoding (" + vis.getShortName() + ")", ex);
-            lblEmbedded.setValue(new String(outStream.toByteArray()));
-            
-          }          
-          embedded = lblEmbedded;          
-        }
-        else
-        {
-          resource = createResource(outStream, vis.getContentType());
-          String url = getApplication().getRelativeLocation(resource);
-          embedded = new AutoHeightIFrame(url == null ? "/error.html" : url);
-        }
-        
-        addComponent(embedded);
+       
+        resource = createResource(outStream, vis.getContentType());
+        String url = getApplication().getRelativeLocation(resource);
+        iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+
+        addComponent(iframe);
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
-      embedded.setVisible(true);
+      iframe.setVisible(true);
     }
     else if(btEntry.getIcon() == ICON_COLLAPSE)
     {
       // collapse
-      if(embedded != null)
+      if(iframe != null)
       {
-        embedded.setVisible(false);
+        iframe.setVisible(false);
       }
       btEntry.setIcon(ICON_EXPAND);
     }

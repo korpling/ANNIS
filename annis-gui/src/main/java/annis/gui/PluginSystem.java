@@ -26,6 +26,9 @@ import net.xeoh.plugins.base.PluginManager;
  */
 public interface PluginSystem
 {
+  
+  public final static String DEFAULT_VISUALIZER = "grid";
+  
   /** Get the JSPF Plugin Manager */
   public PluginManager getPluginManager();
   

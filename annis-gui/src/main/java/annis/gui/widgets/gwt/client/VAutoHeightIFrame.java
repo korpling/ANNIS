@@ -25,6 +25,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
   /** Reference to the server connection object. */
   ApplicationConnection gClient;
   private IFrameElement iframe;
+  private int additionalHeight;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -50,7 +51,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
       public void onLoad(LoadEvent event)
       {
         //VConsole.log("loadhandler: " + iframe.getSrc());
-        int additional = 50;
         if(!iframe.getSrc().endsWith("empty.html"))
         {
           //VConsole.log("loadhandler: survived first check");
@@ -81,7 +81,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
             else if(doc.getBody().getScrollHeight() > 20)
             {
               // real html page
-              newHeight = doc.getBody().getScrollHeight() + additional;
+              newHeight = doc.getBody().getScrollHeight() + additionalHeight;
             }
             
             if(newHeight > -1)
@@ -130,6 +130,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     // Save the client side identifier (paintable id) for the widget
     paintableId = uidl.getId();
 
+    additionalHeight = uidl.getIntAttribute("additional_height");
 
     final Style style = iframe.getStyle();
 
