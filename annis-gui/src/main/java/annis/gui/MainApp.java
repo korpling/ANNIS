@@ -32,9 +32,14 @@ import annis.gui.visualizers.graph.DotGraphVisualizer;
 import annis.gui.visualizers.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.partitur.PartiturVisualizer;
 import annis.gui.visualizers.tree.TigerTreeVisualizer;
+import annis.security.AnnisSecurityManager;
+import annis.security.SimpleSecurityManager;
 import com.vaadin.Application;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.LoginForm;
+import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.TabSheet;
@@ -44,8 +49,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +66,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  * The Application's "main" class
  */
 @SuppressWarnings("serial")
-public class MainApp extends Application implements PluginSystem
+public class MainApp extends Application implements PluginSystem, LoginForm.LoginListener
 {
 
   private Window window;
@@ -72,23 +79,35 @@ public class MainApp extends Application implements PluginSystem
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
+  private AnnisSecurityManager securityManager;
+
+  private MenuItem miUserName;
+  private MenuItem miLoginLogut;
   
   @Override
   public void init()
   {
     initPlugins();
-    
+    initSecurityManager();
+
     setTheme("annis-theme");
-    
+
     window = new Window("Annis² Corpus Search");
     setMainWindow(window);
-    
+
     window.getContent().setSizeFull();
-    ((VerticalLayout)window.getContent()).setMargin(false);
+    ((VerticalLayout) window.getContent()).setMargin(false);
+
+    HorizontalLayout layoutMenus = new HorizontalLayout();
+    layoutMenus.setWidth("100%");
+    layoutMenus.setHeight("-1px");
+    window.addComponent(layoutMenus);
     
-    MenuBar menu = new MenuBar();
-    MenuItem helpMenuItem = menu.addItem("Help", null);
-    helpMenuItem.addItem("Tutorial", new MenuBar.Command() {
+    MenuBar menuMain = new MenuBar();    
+    menuMain.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    MenuItem miHelp = menuMain.addItem("Help", null);
+    miHelp.addItem("Tutorial", new MenuBar.Command()
+    {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
@@ -96,7 +115,8 @@ public class MainApp extends Application implements PluginSystem
         mainTab.setSelectedTab(tutorial);
       }
     });
-    helpMenuItem.addItem("About", new MenuBar.Command() {
+    miHelp.addItem("About", new MenuBar.Command()
+    {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
@@ -104,20 +124,25 @@ public class MainApp extends Application implements PluginSystem
         window.showNotification("The is a prototype to tests vaadins capabilities in regards to the need of ANNIS", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
-    helpMenuItem.addItem("Test", new MenuBar.Command() {
+    layoutMenus.addComponent(menuMain);
+    
+    MenuBar menuLogin = new MenuBar();
+    menuLogin.setSizeUndefined();
+    miUserName = menuLogin.addItem("not logged in", null);
+    miLoginLogut = menuLogin.addItem("Login", new MenuBar.Command() {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
-        Window w = new Window("Test", new TestPanel());
-        w.setModal(true);
-        window.addWindow(w);
+        showLoginWindow();
       }
     });
+    layoutMenus.addComponent(menuLogin);
     
-    window.addComponent(menu);
-    menu.setWidth(100f, Layout.UNITS_PERCENTAGE);
-    
+    layoutMenus.setComponentAlignment(menuMain, Alignment.MIDDLE_LEFT);
+    layoutMenus.setComponentAlignment(menuLogin, Alignment.MIDDLE_RIGHT);
+    layoutMenus.setExpandRatio(menuMain, 1.0f);
+
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();
     window.addComponent(hLayout);
@@ -127,22 +152,21 @@ public class MainApp extends Application implements PluginSystem
     control.setWidth(30f, Layout.UNITS_EM);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);
-    
+
     tutorial = new TutorialPanel();
-    
-    
+
+
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
-    
+
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
   }
-  
 
-  public void showQueryResult(String aql, Set<Long> corpora, int contextLeft, 
+  public void showQueryResult(String aql, Set<Long> corpora, int contextLeft,
     int contextRight, int pageSize)
-  {  
+  {
     // remove old result from view
     if(resultView != null)
     {
@@ -153,7 +177,7 @@ public class MainApp extends Application implements PluginSystem
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
   }
-  
+
   public void updateQueryCount(int count)
   {
     if(resultView != null && count >= 0)
@@ -161,15 +185,28 @@ public class MainApp extends Application implements PluginSystem
       resultView.setCount(count);
     }
   }
-  
+
+  private void initSecurityManager()
+  {
+    securityManager = new SimpleSecurityManager();
+    
+    Enumeration<?> parameterNames = getPropertyNames();
+    Properties properties = new Properties();
+    while(parameterNames.hasMoreElements())
+    {
+      String name = (String) parameterNames.nextElement();
+      properties.put(name, getProperty(name));
+    }
+  }
+
   private void initPlugins()
   {
     Logger log = Logger.getLogger(MainApp.class.getName());
-    
-    
+
+
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-    
+
     // TODO: package core plugins as extra project/jar and load them as jar
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
@@ -185,16 +222,6 @@ public class MainApp extends Application implements PluginSystem
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
-    
-    // TODO: classpath is very large and it takes too much time
-    /*
-    URI classpath = ClassURI.CLASSPATH("annis.**");
-    if(classpath != null)
-    {
-      pluginManager.addPluginsFrom(classpath);
-      log.info("added plugins from classpath");
-    }
-     */
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -211,7 +238,7 @@ public class MainApp extends Application implements PluginSystem
       pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
       log.log(Level.INFO, "added plugins from {0}", globalPlugins);
     }
-    
+
     StringBuilder listOfPlugins = new StringBuilder();
     listOfPlugins.append("loaded plugins:\n");
     PluginManagerUtil util = new PluginManagerUtil(pluginManager);
@@ -220,13 +247,34 @@ public class MainApp extends Application implements PluginSystem
       listOfPlugins.append(p.getClass().getName()).append("\n");
     }
     log.info(listOfPlugins.toString());
-    
+
     Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
     for(VisualizerPlugin vis : visualizers)
     {
       visualizerRegistry.put(vis.getShortName(), vis);
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
+  }
+  
+  private void showLoginWindow()
+  {
+    window.showNotification("Still working on that...");
+   
+    LoginForm login = new LoginForm();
+    
+    login.addListener(this);
+    
+    Window windowLogin = new Window("Login");
+    windowLogin.addComponent(login);
+    windowLogin.setModal(true);
+    window.addWindow(windowLogin);
+  }
+  
+  @Override
+  public void onLogin(LoginEvent event)
+  {
+    window.showNotification("user: " + event.getLoginParameter("username") 
+      + " password: " + event.getLoginParameter("password"));
   }
 
   @Override
@@ -236,7 +284,7 @@ public class MainApp extends Application implements PluginSystem
     {
       pluginManager.shutdown();
     }
-    
+
     super.close();
   }
 

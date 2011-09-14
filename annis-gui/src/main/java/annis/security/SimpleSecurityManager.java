@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -48,13 +49,14 @@ public class SimpleSecurityManager implements AnnisSecurityManager
 
   public final static String CONFIG_PATH = "config_path";
   private Properties properties;
-  
+
+  @Override
   public AnnisUser login(String userName, String password) throws NamingException, AuthenticationException
   {
     if(properties == null || !properties.containsKey(CONFIG_PATH))
     {
-      throw new NamingException("don't know where to search for the user configuration, " +
-        "properties not set");
+      throw new NamingException("don't know where to search for the user configuration, "
+        + "properties not set");
     }
 
     if(userName != null && !"".equals(userName) && password != null && !"".equals(password))
@@ -106,7 +108,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                       String groupCorporaAsString = groupProps.getProperty(g, "");
                       String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
 
-                      Map<String,Long> name2ID = getAllAvailableCorpora();
+                      Map<String, Long> name2ID = getAllAvailableCorpora();
 
                       for(String c : corporaOfGroup)
                       {
@@ -129,7 +131,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
 
                   // create user object
                   user.setCorpusIdList(new LinkedList<Long>(userCorpora));
-                 
+
                   // finally return the user
                   return user;
                 }
@@ -157,9 +159,9 @@ public class SimpleSecurityManager implements AnnisSecurityManager
     throw new AuthenticationException();
   }
 
-  private Map<String,Long> getAllAvailableCorpora()
+  private Map<String, Long> getAllAvailableCorpora()
   {
-    HashMap<String,Long> result = new HashMap<String, Long>();
+    HashMap<String, Long> result = new HashMap<String, Long>();
     try
     {
       String url = properties.getProperty("AnnisRemoteService.URL", "rmi://localhost:4711/AnnisService");
@@ -181,11 +183,13 @@ public class SimpleSecurityManager implements AnnisSecurityManager
     return result;
   }
 
+  @Override
   public void setProperties(Properties properties)
   {
     this.properties = properties;
   }
 
+  @Override
   public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException
   {
     File configDir = new File(properties.getProperty(CONFIG_PATH));
@@ -194,14 +198,14 @@ public class SimpleSecurityManager implements AnnisSecurityManager
       File usersDir = new File(configDir.getAbsolutePath() + "/users/");
       File fileOfUser = new File(usersDir.getAbsolutePath() + "/" + user.getUserName());
       if(fileOfUser.isFile())
-      {        
+      {
         try
         {
           user.store(new FileOutputStream(fileOfUser, false), "");
         }
         catch(IOException ex)
         {
-          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, 
+          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE,
             "", ex);
         }
       }
