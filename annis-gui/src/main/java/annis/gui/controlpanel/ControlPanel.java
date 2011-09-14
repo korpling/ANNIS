@@ -21,6 +21,8 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.MainApp;
 import annis.gui.Helper;
 import annis.service.AnnisService;
+import com.vaadin.terminal.PaintException;
+import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
@@ -90,6 +92,13 @@ public class ControlPanel extends Panel
     }
   }
 
+  @Override
+  public void paintContent(PaintTarget target) throws PaintException
+  {
+    super.paintContent(target);
+  }
+  
+  
   public void executeQuery()
   {
     if(app != null && corpusList != null && queryPanel != null)

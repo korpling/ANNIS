@@ -181,9 +181,10 @@ public class PagingComponent extends CustomComponent implements
 
   private void update(boolean informCallbacks)
   {
+    int myCount = count.get();
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
-    int myCount = count.get();
+    
     lblStatus.setValue("Displaying Results " + (getStartNumber() + 1) 
       + " - " + Math.min(getStartNumber() + pageSize, myCount) + " of " + myCount);
 
@@ -214,7 +215,8 @@ public class PagingComponent extends CustomComponent implements
 
   public int getMaxPage()
   {
-    return (1 + (count.get() / pageSize));
+    int mycount = Math.max(0, count.get()-1);
+    return (1 + (mycount  / pageSize));
   }
   
   public int getStartNumber()

@@ -16,6 +16,8 @@
 package annis.gui.tutorial;
 
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.PaintException;
+import com.vaadin.terminal.PaintTarget;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
@@ -54,6 +56,11 @@ public class TutorialPanel extends Panel
     
     super.attach();
   }
-  
+
+  @Override
+  public void paintContent(PaintTarget target) throws PaintException
+  {
+    super.paintContent(target);
+  }
   
 }

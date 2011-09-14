@@ -81,7 +81,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
+    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
     btEntry.addListener((Button.ClickListener) this);
     addComponent(btEntry);
   }

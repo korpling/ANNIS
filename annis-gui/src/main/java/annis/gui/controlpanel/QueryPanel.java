@@ -114,6 +114,8 @@ public class QueryPanel extends Panel implements TextChangeListener
     piCount.setEnabled(false);
     piCount.setVisible(false);
     piCount.setPollingInterval(500);
+    panelStatus.addComponent(piCount);
+    
     
     btShowResult = new Button("Show Result");
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
@@ -192,16 +194,7 @@ public class QueryPanel extends Panel implements TextChangeListener
   {
     if(piCount != null && btShowResult != null)
     {
-      if(enabled)
-      {
-        panelStatus.removeComponent(lblStatus);
-        panelStatus.addComponent(piCount);
-      }
-      else
-      {
-        panelStatus.removeComponent(piCount);
-        panelStatus.addComponent(lblStatus);
-      }
+      lblStatus.setVisible(!enabled);
       piCount.setVisible(enabled);
       piCount.setEnabled(enabled);
       

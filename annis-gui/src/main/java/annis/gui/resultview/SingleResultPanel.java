@@ -90,6 +90,8 @@ public class SingleResultPanel extends Panel
     
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
+    vLayout.setMargin(false);
+    vLayout.setSpacing(true);
     
     hLayout.setExpandRatio(vLayout, 1.0f);
   }

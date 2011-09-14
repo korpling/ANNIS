@@ -24,6 +24,8 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.terminal.PaintException;
+import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
@@ -48,7 +50,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private VerticalLayout layout;
-  private Panel scrollPanel;
+  private ScrollPanel scrollPanel;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
 
@@ -75,7 +77,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging.addCallback((PagingCallback) this);
 
 
-    scrollPanel = new Panel();
+    scrollPanel = new ScrollPanel();
     scrollPanel.setSizeFull();
     scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout = (VerticalLayout) scrollPanel.getContent();
@@ -142,7 +144,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
             }
             resultPanel = new ResultSetPanel(result, start, ps);
             
-            layout.replaceComponent(layout, resultPanel);
             layout.addComponent(resultPanel);
             resultPanel.setVisible(true);
             
@@ -177,6 +178,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
+  @Override
+  public void paintContent(PaintTarget target) throws PaintException
+  {
+    super.paintContent(target);
+  }
+  
   private class WorkerThread extends Thread
   {
 
@@ -185,5 +192,16 @@ public class ResultViewPanel extends Panel implements PagingCallback
     {
       super.run();
     }
+  }
+  
+  public class ScrollPanel extends Panel
+  {
+
+    @Override
+    public void paintContent(PaintTarget target) throws PaintException
+    {
+      super.paintContent(target);
+    }
+    
   }
 }
