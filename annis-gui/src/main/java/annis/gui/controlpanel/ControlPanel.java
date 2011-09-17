@@ -31,6 +31,7 @@ import com.vaadin.ui.Window;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,10 +102,20 @@ public class ControlPanel extends Panel
   
   public void executeQuery()
   {
-    if(app != null && corpusList != null && queryPanel != null)
+    if(app != null && app.getUser() == null)
     {
-
-      lastCorpusSelection = corpusList.getSelectedCorpora();
+      getWindow().showNotification("Please login first", 
+        Window.Notification.TYPE_WARNING_MESSAGE);
+    }    
+    else if(app != null && corpusList != null && queryPanel != null)
+    {
+      
+      Set<Long> rawCorpusSelection = corpusList.getSelectedCorpora();
+      
+      // filter corpus selection by logged in user
+      lastCorpusSelection = new TreeSet<Long>(rawCorpusSelection);
+      lastCorpusSelection.retainAll(app.getUser().getCorpusIdList());
+      
       lastQuery = queryPanel.getQuery();
       if(lastCorpusSelection.isEmpty())
       {

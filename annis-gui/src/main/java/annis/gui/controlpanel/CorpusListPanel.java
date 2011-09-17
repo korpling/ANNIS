@@ -15,14 +15,15 @@
  */
 package annis.gui.controlpanel;
 
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.gui.Helper;
+import annis.security.AnnisUser;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisCorpusSet;
+import com.vaadin.Application.UserChangeEvent;
+import com.vaadin.Application.UserChangeListener;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
@@ -38,10 +39,9 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  *
  * @author thomas
  */
-public class CorpusListPanel extends Panel
+public class CorpusListPanel extends Panel implements UserChangeListener
 {
   
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
@@ -102,23 +102,36 @@ public class CorpusListPanel extends Panel
   { 
     super.attach();
     
-    corpusContainer.addAll(getCorpusList()); 
+    getApplication().addListener((UserChangeListener) this);
     
     tblCorpora.setSortContainerPropertyId("name");
-    tblCorpora.sort();
-    
+    updateCorpusList();
   }
   
-  private List<AnnisCorpus> getCorpusList()
+  public void updateCorpusList()
   {
-    List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
+    corpusContainer.removeAllItems();
+    corpusContainer.addAll(getCorpusList((AnnisUser) getApplication().getUser()));
+    
+    tblCorpora.sort();
+  }
+  
+  private Set<AnnisCorpus> getCorpusList(AnnisUser user)
+  {
+    Set<AnnisCorpus> result = new TreeSet<AnnisCorpus>();
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
       if(service != null)
       {
         AnnisCorpusSet corpora = service.getCorpusSet();
-        result.addAll(corpora);
+        for(AnnisCorpus c : corpora)
+        {
+          if(user == null || user.getCorpusIdList().contains(c.getId()))
+          {
+            result.add(c);
+          }
+        }
       }
     }
     catch(RemoteException ex)
@@ -129,6 +142,12 @@ public class CorpusListPanel extends Panel
         Notification.TYPE_WARNING_MESSAGE);
     }
     return result;
+  }
+
+  @Override
+  public void applicationUserChanged(UserChangeEvent event)
+  {
+    updateCorpusList();
   }
   
   public class CorpusSorter extends DefaultItemSorter

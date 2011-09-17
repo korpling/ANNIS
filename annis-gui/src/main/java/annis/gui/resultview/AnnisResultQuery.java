@@ -16,13 +16,10 @@
 package annis.gui.resultview;
 
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisResultSetImpl;
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

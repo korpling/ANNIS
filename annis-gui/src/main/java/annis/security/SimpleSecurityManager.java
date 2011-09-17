@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
@@ -138,7 +139,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                   }
 
                   // create user object
-                  user.setCorpusIdList(new LinkedList<Long>(userCorpora));
+                  user.setCorpusIdList(userCorpora);
 
                   // finally return the user
                   return user;
@@ -165,9 +166,9 @@ public class SimpleSecurityManager implements AnnisSecurityManager
       {
         // add all corpora to fallback user
         AnnisUser user = new AnnisUser(FALLBACK_USER);
-        LinkedHashSet<Long> userCorpora = new LinkedHashSet<Long>();
+        TreeSet<Long> userCorpora = new TreeSet<Long>();
         userCorpora.addAll(getAllAvailableCorpora().values());
-        user.setCorpusIdList(null);
+        user.setCorpusIdList(userCorpora);
         return user;
       }
 

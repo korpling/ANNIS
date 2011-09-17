@@ -22,6 +22,7 @@ import annis.gui.PluginSystem;
 import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
+import annis.security.AnnisUser;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
@@ -100,8 +101,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
   @Override
   public void attach()
-  {
-
+  {    
     query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
       contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
     createPage(0, pageSize);

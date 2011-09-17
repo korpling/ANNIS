@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
@@ -95,6 +96,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
   @Override
   public void init()
   {
+    addListener((UserChangeListener) this);
+    
     initPlugins();
     initSecurityManager();
 
@@ -181,6 +184,7 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     hLayout.setExpandRatio(mainTab, 1.0f);
     
     updateUserInformation();
+    
   }
 
   public void showQueryResult(String aql, Set<Long> corpora, int contextLeft,
