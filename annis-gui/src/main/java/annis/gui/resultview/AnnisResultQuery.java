@@ -15,12 +15,17 @@
  */
 package annis.gui.resultview;
 
+import annis.security.AnnisUser;
+import annis.security.IllegalCorpusAccessException;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisResultSetImpl;
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,12 +35,12 @@ import java.util.logging.Logger;
  */
 public class AnnisResultQuery implements Serializable
 {
-  private List<Long> corpora;
+  private Set<Long> corpora;
   private String aql;
   private AnnisService service;
   private int contextLeft, contextRight;
   
-  public AnnisResultQuery(List<Long> corpora, String aql, int contextLeft, 
+  public AnnisResultQuery(Set<Long> corpora, String aql, int contextLeft, 
     int contextRight, AnnisService service)
   {
     this.corpora = corpora;
@@ -45,14 +50,27 @@ public class AnnisResultQuery implements Serializable
     this.contextRight = contextRight;
   }
 
-  public AnnisResultSet loadBeans(int startIndex, int count)
+  public AnnisResultSet loadBeans(int startIndex, int count, AnnisUser user) throws IllegalCorpusAccessException
   { 
+    // check corpus selection by logged in user
+    
+    Set<Long> filteredCorpora = new TreeSet<Long>(corpora);
+    if(user != null)
+    {
+      filteredCorpora.retainAll(user.getCorpusIdList());
+    }
+    
+    if(filteredCorpora.size() != corpora.size())
+    {
+      throw new IllegalCorpusAccessException("illegal corpus access");
+    }
+    
     AnnisResultSet result = new AnnisResultSetImpl();
     if(service != null)
     {
       try
       {
-        result = service.getResultSet(corpora, aql, count, startIndex, contextLeft, contextRight);
+        result = service.getResultSet(new LinkedList<Long>(filteredCorpora), aql, count, startIndex, contextLeft, contextRight);
       }
       catch(RemoteException ex)
       {

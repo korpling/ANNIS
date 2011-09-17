@@ -150,6 +150,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
         {
           // logout
           setUser(null);
+          window.showNotification("Logged out",
+           Window.Notification.TYPE_TRAY_NOTIFICATION);
         }
         else
         {
@@ -356,6 +358,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
       AnnisUser newUser = securityManager.login(event.getLoginParameter("username"),
         event.getLoginParameter("password"), true);
       setUser(newUser);
+      window.showNotification("Logged in as \"" + newUser.getUserName() + "\"", 
+        Window.Notification.TYPE_TRAY_NOTIFICATION);
     }
     catch(AuthenticationException ex)
     {

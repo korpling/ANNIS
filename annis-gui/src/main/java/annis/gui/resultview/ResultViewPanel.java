@@ -30,10 +30,7 @@ import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,7 +99,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {    
-    query = new AnnisResultQuery(new LinkedList<Long>(corpora), aql,
+    query = new AnnisResultQuery(corpora, aql,
       contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
     createPage(0, pageSize);
     
@@ -135,8 +132,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
         {
           try
           {
-            
-            AnnisResultSet result = query.loadBeans(start, limit);
+
+            AnnisUser user = null;
+            if(getApplication() != null)
+            {
+              user = (AnnisUser) getApplication().getUser();
+            }
+            AnnisResultSet result = query.loadBeans(start, limit, user);
             
             if(resultPanel != null)
             {
@@ -182,16 +184,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void paintContent(PaintTarget target) throws PaintException
   {
     super.paintContent(target);
-  }
-  
-  private class WorkerThread extends Thread
-  {
-
-    @Override
-    public void run()
-    {
-      super.run();
-    }
   }
   
   public class ScrollPanel extends Panel
