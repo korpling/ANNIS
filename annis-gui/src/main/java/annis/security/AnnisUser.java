@@ -96,4 +96,33 @@ public class AnnisUser extends Properties
   {
     setProperty(PASSWORD, password);
   }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if(obj == null)
+    {
+      return false;
+    }
+    if(getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final AnnisUser other = (AnnisUser) obj;
+    if((this.userName == null) ? (other.userName != null) : !this.userName.equals(other.userName))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 83 * hash + (this.userName != null ? this.userName.hashCode() : 0);
+    return hash;
+  }
+  
+  
 }

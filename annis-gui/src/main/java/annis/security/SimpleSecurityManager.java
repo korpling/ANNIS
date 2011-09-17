@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,22 +48,29 @@ import javax.naming.NamingException;
 public class SimpleSecurityManager implements AnnisSecurityManager
 {
 
-  public final static String CONFIG_PATH = "config_path";
+  public final static String CONFIG_PATH = "userconfig_path";
   private Properties properties;
-
+  
   @Override
-  public AnnisUser login(String userName, String password) throws NamingException, AuthenticationException
+  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled) throws NamingException, AuthenticationException
   {
-    if(properties == null || !properties.containsKey(CONFIG_PATH))
+    if(properties == null)
     {
       throw new NamingException("don't know where to search for the user configuration, "
         + "properties not set");
     }
+    else if(!demoFallbackEnabled && !properties.containsKey(CONFIG_PATH))
+    {
+      throw new NamingException("don't know where to search for the user configuration, "
+        + "key \"" + CONFIG_PATH + "\" not set and demo fallback not enabled");
+    }
 
     if(userName != null && !"".equals(userName) && password != null && !"".equals(password))
-    {
-      File configDir = new File(properties.getProperty(CONFIG_PATH));
-      if(configDir.isDirectory())
+    {      
+      File configDir = properties.getProperty(CONFIG_PATH) == null ? null 
+        : new File(properties.getProperty(CONFIG_PATH));
+            
+      if(configDir != null && configDir.isDirectory())
       {
         File usersDir = new File(configDir.getAbsolutePath() + "/users/");
         File groupsFile = new File(configDir.getAbsolutePath() + "/groups");
@@ -153,10 +161,19 @@ public class SimpleSecurityManager implements AnnisSecurityManager
         }
 
       }
+      else if(demoFallbackEnabled && FALLBACK_USER.equals(userName))
+      {
+        // add all corpora to fallback user
+        AnnisUser user = new AnnisUser(FALLBACK_USER);
+        LinkedHashSet<Long> userCorpora = new LinkedHashSet<Long>();
+        userCorpora.addAll(getAllAvailableCorpora().values());
+        user.setCorpusIdList(null);
+        return user;
+      }
 
     }
     // not authorized
-    throw new AuthenticationException();
+    throw new AuthenticationException("invalid user name or password");
   }
 
   private Map<String, Long> getAllAvailableCorpora()

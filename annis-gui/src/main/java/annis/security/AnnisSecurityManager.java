@@ -21,9 +21,25 @@ import java.util.Properties;
 import javax.naming.AuthenticationException;
 import javax.naming.NamingException;
 
-public interface AnnisSecurityManager {
+public interface AnnisSecurityManager
+{
 
-	public AnnisUser login(String userName, String password) throws NamingException, AuthenticationException;
-	public void setProperties(Properties properties);
-	public  void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException;
+  public final static String FALLBACK_USER = "demo";
+  
+  /**
+   * Login with username and password
+   * @param userName
+   * @param password
+   * @param demoFallbackEnabled If true login will not complain if no 
+   *                            configuration is set and instead allow all 
+   *                            corpora for the "demo" user.
+   * @return
+   * @throws NamingException
+   * @throws AuthenticationException 
+   */
+  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled) throws NamingException, AuthenticationException;
+
+  public void setProperties(Properties properties);
+
+  public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException;
 }

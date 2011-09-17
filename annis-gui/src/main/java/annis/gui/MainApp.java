@@ -33,8 +33,11 @@ import annis.gui.visualizers.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.partitur.PartiturVisualizer;
 import annis.gui.visualizers.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
+import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import com.vaadin.Application;
+import com.vaadin.Application.UserChangeListener;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
@@ -56,6 +59,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.AuthenticationException;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -66,9 +72,11 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  * The Application's "main" class
  */
 @SuppressWarnings("serial")
-public class MainApp extends Application implements PluginSystem, LoginForm.LoginListener
+public class MainApp extends Application implements PluginSystem, LoginForm.LoginListener,
+  UserChangeListener
 {
 
+  public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   private Window window;
   private ControlPanel control;
   private TutorialPanel tutorial;
@@ -80,10 +88,10 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private AnnisSecurityManager securityManager;
-
   private MenuItem miUserName;
   private MenuItem miLoginLogut;
-  
+  private Window windowLogin;
+
   @Override
   public void init()
   {
@@ -102,8 +110,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     layoutMenus.setWidth("100%");
     layoutMenus.setHeight("-1px");
     window.addComponent(layoutMenus);
-    
-    MenuBar menuMain = new MenuBar();    
+
+    MenuBar menuMain = new MenuBar();
     menuMain.setWidth(100f, Layout.UNITS_PERCENTAGE);
     MenuItem miHelp = menuMain.addItem("Help", null);
     miHelp.addItem("Tutorial", new MenuBar.Command()
@@ -125,20 +133,29 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
       }
     });
     layoutMenus.addComponent(menuMain);
-    
+
     MenuBar menuLogin = new MenuBar();
     menuLogin.setSizeUndefined();
     miUserName = menuLogin.addItem("not logged in", null);
-    miLoginLogut = menuLogin.addItem("Login", new MenuBar.Command() {
+    miLoginLogut = menuLogin.addItem("Login", new MenuBar.Command()
+    {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
-        showLoginWindow();
+        if(isLoggedIn())
+        {
+          // logout
+          setUser(null);
+        }
+        else
+        {
+          showLoginWindow();
+        }
       }
     });
     layoutMenus.addComponent(menuLogin);
-    
+
     layoutMenus.setComponentAlignment(menuMain, Alignment.MIDDLE_LEFT);
     layoutMenus.setComponentAlignment(menuLogin, Alignment.MIDDLE_RIGHT);
     layoutMenus.setExpandRatio(menuMain, 1.0f);
@@ -162,6 +179,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
 
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
+    
+    updateUserInformation();
   }
 
   public void showQueryResult(String aql, Set<Long> corpora, int contextLeft,
@@ -189,13 +208,63 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
   private void initSecurityManager()
   {
     securityManager = new SimpleSecurityManager();
-    
+
     Enumeration<?> parameterNames = getPropertyNames();
     Properties properties = new Properties();
     while(parameterNames.hasMoreElements())
     {
       String name = (String) parameterNames.nextElement();
       properties.put(name, getProperty(name));
+    }
+    securityManager.setProperties(properties);
+
+    setUser(null);
+  }
+
+  @Override
+  public void setUser(Object user)
+  {
+    if(user == null || !(user instanceof AnnisUser))
+    {
+      try
+      {
+        user = securityManager.login(AnnisSecurityManager.FALLBACK_USER,
+          AnnisSecurityManager.FALLBACK_USER, true);
+      }
+      catch(Exception ex)
+      {
+        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    super.setUser(user);
+
+    updateUserInformation();
+  }
+
+  @Override
+  public AnnisUser getUser()
+  {
+    Object u = super.getUser();
+    if(u == null)
+    {
+      return null;
+    }
+    else
+    {
+      return (AnnisUser) u;
+    }
+  }
+
+  public boolean isLoggedIn()
+  {
+    AnnisUser u = getUser();
+    if(u == null || AnnisSecurityManager.FALLBACK_USER.equals(u.getUserName()))
+    {
+      return false;
+    }
+    else
+    {
+      return true;
     }
   }
 
@@ -255,26 +324,71 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
   }
-  
+
   private void showLoginWindow()
   {
-    window.showNotification("Still working on that...");
-   
     LoginForm login = new LoginForm();
-    
+
     login.addListener(this);
-    
-    Window windowLogin = new Window("Login");
-    windowLogin.addComponent(login);
-    windowLogin.setModal(true);
+
+    if(windowLogin == null)
+    {
+      windowLogin = new Window("Login");
+      windowLogin.addComponent(login);
+      windowLogin.setModal(true);
+      windowLogin.setSizeUndefined();
+      login.setSizeUndefined();
+      ((VerticalLayout) windowLogin.getContent()).setSizeUndefined();
+    }
     window.addWindow(windowLogin);
+    windowLogin.center();
   }
-  
+
   @Override
   public void onLogin(LoginEvent event)
   {
-    window.showNotification("user: " + event.getLoginParameter("username") 
-      + " password: " + event.getLoginParameter("password"));
+    try
+    {
+      AnnisUser newUser = securityManager.login(event.getLoginParameter("username"),
+        event.getLoginParameter("password"), true);
+      setUser(newUser);
+    }
+    catch(AuthenticationException ex)
+    {
+      window.showNotification("Authentification error: " + ex.getMessage(),
+        Window.Notification.TYPE_ERROR_MESSAGE);
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+
+      window.showNotification("Unexpected exception: " + ex.getMessage(),
+        Window.Notification.TYPE_ERROR_MESSAGE);
+    }
+    finally
+    {
+      // hide login window
+      window.removeWindow(windowLogin);
+    }
+
+  }
+
+  private void updateUserInformation()
+  {
+    if(miLoginLogut == null || miLoginLogut == null || getUser() == null)
+    {
+      return;
+    }
+    if(isLoggedIn())
+    {      
+      miUserName.setText("logged in as \"" + getUser().getUserName() + "\"");
+      miLoginLogut.setText("Logout");
+    }
+    else
+    {      
+      miUserName.setText("not logged in");
+      miLoginLogut.setText("Login");
+    }
   }
 
   @Override
@@ -300,5 +414,10 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     return visualizerRegistry.get(shortName);
   }
 
-  
+  @Override
+  public void applicationUserChanged(UserChangeEvent event)
+  {
+    HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
+    session.setAttribute(USER_KEY, event.getNewUser());
+  }
 }
