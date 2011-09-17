@@ -14,10 +14,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 r9760"
-   sodipodi:docname="last.svg"
-   inkscape:export-filename="/home/thomas/projekte/job/korpling/annis/annis-gui/src/main/webapp/VAADIN/themes/annis-theme/last.png"
-   inkscape:export-xdpi="6.7733335"
-   inkscape:export-ydpi="6.7733335">
+   sodipodi:docname="right_arrow.svg"
+   inkscape:export-filename="/home/thomas/projekte/job/korpling/annis/annis-gui/src/main/webapp/VAADIN/themes/annis-theme/left_arrow.png"
+   inkscape:export-xdpi="5.0799999"
+   inkscape:export-ydpi="5.0799999">
   <defs
      id="defs4">
     <filter
@@ -159,7 +159,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="17.937657"
+     inkscape:cx="-104.91949"
      inkscape:cy="165.61354"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -195,8 +195,7 @@
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0"
        id="path3777"
-       d="M 435.88322,175.54977 143.43156,470.51432 435.88322,740.94804"
-       style="fill:none;stroke:#000000;stroke-width:100;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3863)"
-       transform="matrix(-0.31173604,0,0,0.31173604,539.28792,279.6791)" />
+       d="m 403.40741,334.40429 91.16772,91.95108 -91.16772,84.30394"
+       style="fill:none;stroke:#000000;stroke-width:31.17360306;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
   </g>
 </svg>
