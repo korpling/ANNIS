@@ -74,6 +74,7 @@ public class PagingComponent extends CustomComponent implements
     this.pageSize = pageSize;
     
     setWidth("100%");
+    setHeight("-1px");
 
     addStyleName("paging");
     
@@ -92,7 +93,8 @@ public class PagingComponent extends CustomComponent implements
     lblInfo = new Label();
     lblInfo.addStyleName("right-aligned-text");
     
-    layout.setSizeFull();
+    layout.setWidth("100%");
+    layout.setHeight("-1px");
     
     btFirst = new Button();
     btFirst.setIcon(FIRST);

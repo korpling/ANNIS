@@ -53,11 +53,13 @@ public class KWICPanel extends Panel
     
     this.addStyleName("kwic");
     setSizeFull();
+    setHeight("-1px");
     
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
+    layout.setHeight("-1px");
     
     containerAnnos = new BeanItemContainer<String>(String.class);
     
@@ -67,7 +69,7 @@ public class KWICPanel extends Panel
     tblToken.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
     tblToken.addStyleName(ChameleonTheme.TABLE_BORDERLESS);
     tblToken.setWidth("100%");
-    tblToken.setHeight("100%");
+    tblToken.setHeight("-1px");
     tblToken.setPageLength(0);
     
     List<AnnisNode> token = result.getGraph().getTokens();
