@@ -5,12 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -46,10 +41,9 @@ public class GridTreeVisualizer extends WriterVisualizer
     Long left;
     Long right;
     AnnisNode root;
+    String anno;
     int height;
-    int visits;
     long offset;
-    HashMap<Span, Span> nodes = new HashMap<Span, Span>();
 
     /**
      * left and right should be initiate with null, when root is not a token.
@@ -58,10 +52,16 @@ public class GridTreeVisualizer extends WriterVisualizer
      * @param r
      *          must be a sorted List of the result
      */
-    public Span(AnnisNode root, long offset)
+    public Span(AnnisNode root, long offset, int length, String anno)
     {
       this.root = root;
       this.offset = offset;
+      this.anno = anno;
+      left = (root.getLeftToken() < offset) ? offset : root.getLeftToken();
+      right = (root.getRightToken() > offset + length) ? offset + length : root
+          .getRightToken();
+
+      calculateHeight(root, 0);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class GridTreeVisualizer extends WriterVisualizer
      */
     public int compareTo(Span sp)
     {
-      if (this.height < sp.height)
+      if (this.height > sp.height)
         return 1;
       if (this.height == sp.height)
       {
@@ -88,6 +88,25 @@ public class GridTreeVisualizer extends WriterVisualizer
         }
       }
       return -1;
+    }
+
+    private void calculateHeight(AnnisNode current, int height)
+    {
+
+      if (current != null)
+      {
+        for (Edge incoming : current.getIncomingEdges())
+        {
+          AnnisNode tmp = incoming.getSource();
+
+          if (hasAnno(tmp, anno))
+            calculateHeight(tmp, height + 1);
+
+          calculateHeight(tmp, height);
+        }
+      }
+
+      this.height = Math.max(this.height, height);
     }
 
     @Override
@@ -116,7 +135,7 @@ public class GridTreeVisualizer extends WriterVisualizer
       sb.append(right + 1 - offset);
 
       sb.append("\" class=\"gridtree-result\">");
-      sb.append(getAnnoValue(this.root, anno));
+      sb.append(getAnnoValue(this.root, anno) + " " + height);
       sb.append("</td>");
     }
 
@@ -179,7 +198,6 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     List<AnnisNode> nodes = graph.getNodes();
     List<AnnisNode> result = graph.getTokens();
-    Set<Span> roots = new HashSet<Span>();
     StringBuilder sb = new StringBuilder();
     String anno = input.getMappings().getProperty(PROPERTY_KEY);
 
@@ -188,17 +206,14 @@ public class GridTreeVisualizer extends WriterVisualizer
     anno = input.getNamespace() + ":" + anno;
 
     for (AnnisNode n : nodes)
-      if (hasAnno(n, anno))
-        roots.add(new Span(n, result.get(0).getTokenIndex()));
-
-    for (Span n : roots)
     {
-      // catch the result
-      getTokens(n, roots);
-      spans.add(n);
+      if (hasAnno(n, anno))
+      {
+        Span tmp = new Span(n, result.get(0).getTokenIndex(), result.size(), anno);
+        spans.add(tmp);
+      }
     }
 
-    adaptTreeHeightToMax(roots);
     Collections.sort(spans);
 
     // print result
@@ -229,122 +244,26 @@ public class GridTreeVisualizer extends WriterVisualizer
   }
 
   /**
-   * Returns true when the node is annotated with the string. It is not
-   * sensitive to namespaces.
+   * Returns true when the node is annotated with the string.
    * 
    * @param n
    *          the node to check
    * @param annotation
-   *          String to check, without namespaces
+   *          String to check
    * @return
    */
   private boolean hasAnno(AnnisNode n, String annotation)
   {
+    if (n == null)
+      return false;
+
     for (Annotation x : n.getNodeAnnotations())
+    {
       if (x.getQualifiedName().equals(annotation))
         return true;
+    }
 
     return false;
-  }
-
-  /**
-   * Steps from the root recursive through all children nodes to find the
-   * tokens. This function is a straight forward DFS-Algorithm. It also
-   * calculate the max-depth with this functional pseudo-algorithm:<br/>
-   * 
-   * data Tree a = Node [Tree a] | Leaf a<br />
-   * 
-   * maxDepth :: Tree a -> Int <br />
-   * maxDepth (Leaf a) = 0 <br />
-   * maxDepth (Node ls) = maximum (map maxDepth ls) + 1
-   * 
-   * @param n
-   *          is the root
-   * @param roots
-   *          List of root nodes
-   * 
-   */
-  public void getTokens(Span n, Set<Span> roots)
-  {
-    getTokens(n, n.root, roots, 0);
-  }
-
-  private void getTokens(Span n, AnnisNode current, Set<Span> roots, int height)
-  {
-    Set<Edge> edges = current.getOutgoingEdges();
-
-    for (Edge e : edges)
-    {
-      if ("edge".equals(e.getName()))
-      {
-        AnnisNode x = e.getDestination();
-
-        for (Span r : roots)
-        {
-          if (r.root == x)
-          {
-            n.nodes.put(r, r);
-            r.visits++;
-            break;
-          }
-        }
-
-        if (x.isToken())
-        {
-
-          Long tokenIndex = x.getTokenIndex();
-
-          if (n.left == null)
-            n.left = tokenIndex;
-          else
-            n.left = Math.min(n.left, tokenIndex);
-
-          if (n.right == null)
-            n.right = tokenIndex;
-          else
-            n.right = Math.max(n.right, tokenIndex);
-
-          n.height = Math.max(n.height, height);
-
-        }
-
-        // recursive step
-        else
-        {
-          getTokens(n, x, roots, height + 1);
-        }
-      }
-    }
-  }
-
-  private void adaptTreeHeightToMax(Set<Span> roots)
-  {
-    int maxHeight = 0;
-    LinkedList<Span> trees = new LinkedList<Span>();
-
-    // find trees
-    for (Span s : roots)
-    {
-      if (maxHeight < s.height)
-        maxHeight = s.height;
-      if (s.visits == 0)
-        trees.add(s);
-    }
-
-    // sum offset to trees, which are lower than the highest tree
-    for (Span t : trees)
-      if (t.height < maxHeight)
-        sumHeight(t, maxHeight - t.height);
-
-  }
-
-  private void sumHeight(Span t, int distance)
-  {
-    t.height += distance;
-    for (Span s : t.nodes.values())
-    {
-      s.height = s.height + distance;
-    }
   }
 
   /**
