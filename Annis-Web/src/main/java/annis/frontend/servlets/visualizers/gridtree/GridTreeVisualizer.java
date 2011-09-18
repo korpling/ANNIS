@@ -26,6 +26,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
   // looking for the configuration in resolver_vis_map
   final private String PROPERTY_KEY = "node_key";
+  private VisualizerInput input;
 
   /**
    * This helper-class saves the span from a specific Node. The span is
@@ -60,7 +61,6 @@ public class GridTreeVisualizer extends WriterVisualizer
       left = (root.getLeftToken() < offset) ? offset : root.getLeftToken();
       right = (root.getRightToken() > offset + length) ? offset + length : root
           .getRightToken();
-
       calculateHeight(root, 0);
     }
 
@@ -134,7 +134,10 @@ public class GridTreeVisualizer extends WriterVisualizer
       sb.append("-");
       sb.append(right + 1 - offset);
 
-      sb.append("\" class=\"gridtree-result\">");
+      sb.append("\" class=\"gridtree-result\" ");
+      sb.append("style=\"color:"
+          + input.getMarkableExactMap().get(Long.toString(this.root.getId()))
+          + "\">");
       sb.append(getAnnoValue(this.root, anno) + " " + height);
       sb.append("</td>");
     }
@@ -157,6 +160,7 @@ public class GridTreeVisualizer extends WriterVisualizer
   public void writeOutput(VisualizerInput input, Writer writer)
   {
     ArrayList<Span> spans = new ArrayList<GridTreeVisualizer.Span>();
+    this.input = input;
 
     try
     {
@@ -209,7 +213,8 @@ public class GridTreeVisualizer extends WriterVisualizer
     {
       if (hasAnno(n, anno))
       {
-        Span tmp = new Span(n, result.get(0).getTokenIndex(), result.size(), anno);
+        Span tmp = new Span(n, result.get(0).getTokenIndex(), result.size(),
+            anno);
         spans.add(tmp);
       }
     }
