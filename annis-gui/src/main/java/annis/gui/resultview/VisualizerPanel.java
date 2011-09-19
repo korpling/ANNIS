@@ -67,10 +67,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.entry = entry;
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
-
+    
     this.setWidth("100%");
     this.setHeight("-1px");
-
+    
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     VerticalLayout layout = (VerticalLayout) getContent();

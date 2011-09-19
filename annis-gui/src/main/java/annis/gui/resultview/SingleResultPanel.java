@@ -71,7 +71,7 @@ public class SingleResultPanel extends Panel
     
     HorizontalLayout hLayout = new HorizontalLayout();
     setContent(hLayout);
-    
+        
     hLayout.setWidth("100%");
     hLayout.setHeight("-1px");
     hLayout.setMargin(true);
@@ -91,7 +91,7 @@ public class SingleResultPanel extends Panel
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
     vLayout.setMargin(false);
-    vLayout.setSpacing(true);
+    vLayout.setSpacing(false);
     
     hLayout.setExpandRatio(vLayout, 1.0f);
   }
