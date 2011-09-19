@@ -9,6 +9,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.user.client.Timer;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
@@ -26,6 +27,9 @@ public class VAutoHeightIFrame extends Widget implements Paintable
   ApplicationConnection gClient;
   private IFrameElement iframe;
   private int additionalHeight;
+  private Timer timer;
+  private int timerCalls;
+  private Document doc;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -54,43 +58,29 @@ public class VAutoHeightIFrame extends Widget implements Paintable
         if(!iframe.getSrc().endsWith("empty.html"))
         {
           //VConsole.log("loadhandler: survived first check");
-          Document doc = null;
+          doc = null;
           try
           {
             doc = iframe.getContentDocument();
-          }          
+          }
           catch(JavaScriptException ex)
           {
             VConsole.log("trying to access iframe source from different domain which is forbidden");
           }
-          
+
           if(doc != null)
           {
-            int newHeight = -1;
-            String contentType = doc.getDocumentElement().getPropertyString("contentType");
-            if(contentType != null && contentType.startsWith("image/"))
+            timer = new Timer()
             {
-              // image
-              NodeList<Element> imgList = doc.getElementsByTagName("img");
-              if(imgList.getLength() > 0)
+
+              @Override
+              public void run()
               {
-                ImageElement img = (ImageElement) imgList.getItem(0);
-                newHeight = img.getPropertyInt("naturalHeight");
+                checkIFrameLoaded();
               }
-            }
-            else if(doc.getBody().getScrollHeight() > 20)
-            {
-              // real html page
-              newHeight = doc.getBody().getScrollHeight() + additionalHeight;
-            }
-            
-            if(newHeight > -1)
-            {
-              
-              //VConsole.log("new height is " + newHeight + " (with additional " + additional + ")");
-              gClient.updateVariable(paintableId, "height", newHeight, true);
-            }
-            
+            };
+            timerCalls = 0;
+            timer.scheduleRepeating(500);
           }
 
         }
@@ -100,6 +90,52 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     iframe.setFrameBorder(0);
   }
 
+  private void checkIFrameLoaded()
+  {
+    int newHeight = -1;
+    
+    doc.getScrollLeft();
+    String contentType = getContentType(doc); //doc.getDocumentElement().getPropertyString("contentType");
+
+    if(contentType == null)
+    {
+      if(timer != null && timerCalls > 5)
+      {
+        timer.cancel();
+      }
+      timerCalls++;
+      return;
+    }
+    
+    if(timer != null)
+    {
+      timer.cancel();
+    }
+
+    if(contentType != null && contentType.startsWith("image/"))
+    {
+      // image
+      NodeList<Element> imgList = doc.getElementsByTagName("img");
+      if(imgList.getLength() > 0)
+      {
+        ImageElement img = (ImageElement) imgList.getItem(0);
+        newHeight = img.getPropertyInt("naturalHeight");
+      }
+    }
+    else if(doc.getBody().getScrollHeight() > 20)
+    {
+      // real html page
+      newHeight = doc.getBody().getScrollHeight() + additionalHeight;
+    }
+
+    if(newHeight > -1)
+    {
+
+      //VConsole.log("new height is " + newHeight + " (with additional " + additional + ")");
+      gClient.updateVariable(paintableId, "height", newHeight, true);
+    }
+  }
+
   /**
    * Called whenever an update is received from the server 
    */
@@ -107,7 +143,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
 
-    
+
     // This call should be made first. 
     // It handles sizes, captions, tooltips, etc. automatically.
     if(client.updateComponent(this, uidl, true))
@@ -116,7 +152,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
       // do not need to update anything.
       return;
     }
-    
+
     String url = uidl.getStringAttribute("url");
 
     if(iframe.getSrc() != null && url != null && iframe.getSrc().equals(url))
@@ -139,10 +175,15 @@ public class VAutoHeightIFrame extends Widget implements Paintable
 
     if(url != null)
     {
-      url =  client.translateVaadinUri(url);
-      
+      url = client.translateVaadinUri(url);
+
       //VConsole.log("iframe is updated with url " + url );
       iframe.setSrc(url);
     }
   }
+  
+  public final native String getContentType(Document doc) /*-{
+    return doc.contentType;
+  }-*/;
+  
 }
