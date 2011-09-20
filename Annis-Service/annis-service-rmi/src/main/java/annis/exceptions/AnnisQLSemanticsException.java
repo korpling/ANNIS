@@ -17,7 +17,7 @@ package annis.exceptions;
 
 
 public class AnnisQLSemanticsException extends AnnisException {
-	private static final long serialVersionUID = -7463138045135370338L;
+	
 
 	public AnnisQLSemanticsException() {
 		super();

@@ -21,7 +21,7 @@ import java.util.Vector;
 import annis.service.ifaces.AnnisContingencyTable;
 
 public class AnnisContingencyTableImpl implements AnnisContingencyTable {
-	private static final long serialVersionUID = -5454466033408083951L;
+	
 	private List<List<String>> values = new Vector<List<String>>();
 	
 	public int getColumnCount() {

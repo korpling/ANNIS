@@ -18,7 +18,7 @@ package annis.service.objects;
 import annis.service.ifaces.AnnisBinary;
 
 public class AnnisBinaryImpl implements AnnisBinary {
-	private static final long serialVersionUID = -4484371544441543151L;
+	
 
 	private byte[] bytes;
 	private long id;

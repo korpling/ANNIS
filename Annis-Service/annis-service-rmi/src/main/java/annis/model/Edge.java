@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class Edge implements Serializable {
 
 	// this class is sent to the front end
-	private static final long serialVersionUID = 3127054835526596882L;
+	
 
 	public enum EdgeType { 
 		COVERAGE			("c", "Coverage"),

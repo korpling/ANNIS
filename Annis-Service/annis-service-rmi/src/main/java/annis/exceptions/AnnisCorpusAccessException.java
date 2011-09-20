@@ -16,7 +16,7 @@
 package annis.exceptions;
 
 public class AnnisCorpusAccessException extends AnnisException {
-	private static final long serialVersionUID = 2360084114228587837L;
+	
 
 	public AnnisCorpusAccessException() {
 		super();

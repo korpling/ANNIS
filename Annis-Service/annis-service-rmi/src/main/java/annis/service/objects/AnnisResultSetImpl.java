@@ -28,7 +28,7 @@ import annis.service.ifaces.AnnisResultSet;
 public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisResultSet {
 
 	private static class AnnisResultSetComparator implements Comparator<AnnisResult>, Serializable {
-		private static final long serialVersionUID = 9079334885343355346L;
+		
 
 		public int compare(AnnisResult o1, AnnisResult o2) {
 			int order =  Long.signum(o1.getStartNodeId() - o2.getStartNodeId());
@@ -43,7 +43,7 @@ public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisRes
 		}
 	}
 
-	private static final long serialVersionUID = -4537960128275640204L;
+	
 
 	public AnnisResultSetImpl() {
 		super(new AnnisResultSetComparator());

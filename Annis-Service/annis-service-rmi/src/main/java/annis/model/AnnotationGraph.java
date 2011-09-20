@@ -33,7 +33,7 @@ public class AnnotationGraph implements Serializable
 {
 
 	// this class is sent to the front end
-	private static final long serialVersionUID = -1525612317405210436L;
+	
 
 	// metadata for searchresult
 	private String documentName;

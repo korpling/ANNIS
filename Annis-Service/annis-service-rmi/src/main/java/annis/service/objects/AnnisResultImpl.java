@@ -52,7 +52,7 @@ public class AnnisResultImpl implements AnnisResult
 {
 
 	// this class is sent to the frontend
-	private static final long serialVersionUID = 1648848837712346094L;
+	
 
 	// the wrapped graph object
 	private AnnotationGraph graph;

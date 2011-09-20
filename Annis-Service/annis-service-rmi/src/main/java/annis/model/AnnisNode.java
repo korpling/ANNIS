@@ -33,7 +33,7 @@ public class AnnisNode implements Serializable
 {
 
   // this class is send to the front end
-  private static final long serialVersionUID = 6376277416278198777L;
+  
   // node object in database
   private long id;
   private long corpus; // FIXME: Corpus object with annotations or move to

@@ -25,7 +25,7 @@ import annis.service.ifaces.AnnisToken;
 public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToken
 {
 
-  private static final long serialVersionUID = 7148692986572108260L;
+  
   private long id;
   private String text;
   private long left;

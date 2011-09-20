@@ -21,7 +21,7 @@ import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.JSONAble;
 
 public class AnnisCorpusImpl implements Serializable, JSONAble, AnnisCorpus {
-	private static final long serialVersionUID = 7622346856447696397L;
+	
 	
 	private long id;
 	private String name;
