@@ -49,6 +49,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -57,7 +58,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
@@ -74,7 +74,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem, LoginForm.LoginListener,
-  UserChangeListener
+  UserChangeListener, SecurityManagerHolder
 {
 
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
@@ -223,7 +223,6 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
       properties.put(name, getProperty(name));
     }
     securityManager.setProperties(properties);
-
     setUser(null);
   }
 
@@ -427,5 +426,14 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
   {
     HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
     session.setAttribute(USER_KEY, event.getNewUser());
+  }
+
+  @Override
+  public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException
+  {
+    if(securityManager != null)
+    {
+      securityManager.storeUserProperties(user);
+    }
   }
 }

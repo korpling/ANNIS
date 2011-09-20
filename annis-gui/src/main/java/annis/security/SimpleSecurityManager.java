@@ -27,9 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -44,7 +41,7 @@ import javax.naming.NamingException;
  * Every user is part of a group. Every group has certain access rights.
  * Ther is a "all-corpora" group.
  * 
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
 public class SimpleSecurityManager implements AnnisSecurityManager
 {

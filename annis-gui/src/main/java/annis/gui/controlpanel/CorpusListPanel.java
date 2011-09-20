@@ -25,11 +25,15 @@ import annis.service.ifaces.AnnisCorpusSet;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
@@ -40,8 +44,9 @@ import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,13 +54,20 @@ import java.util.logging.Logger;
  *
  * @author thomas
  */
-public class CorpusListPanel extends Panel implements UserChangeListener
+public class CorpusListPanel extends Panel implements UserChangeListener,
+  AbstractSelect.NewItemHandler, ValueChangeListener
 {
   
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
+  public static final String ALL_CORPORA = "All";
+  public static final String CORPUSSET_PREFIX = "corpusset_";
+  
   BeanContainer<Long, AnnisCorpus> corpusContainer;
   private Table tblCorpora;
   private ControlPanel controlPanel;
+  private ComboBox cbSelection;
+  private Map<String, Map<Long, AnnisCorpus>> corpusSets 
+    = new TreeMap<String, Map<Long, AnnisCorpus>>();
   
   public CorpusListPanel(ControlPanel controlPanel)
   {
@@ -65,6 +77,19 @@ public class CorpusListPanel extends Panel implements UserChangeListener
     
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
+    
+    cbSelection = new ComboBox();
+    cbSelection.setDescription("Choose corpus selection set");
+    cbSelection.setWidth("100%");
+    cbSelection.setHeight("-1px");
+    cbSelection.setInputPrompt("Add new corpus selection set");
+    cbSelection.setNullSelectionAllowed(false);
+    cbSelection.setNewItemsAllowed(true);
+    cbSelection.setNewItemHandler((AbstractSelect.NewItemHandler) this);
+    cbSelection.setImmediate(true);
+    cbSelection.addListener((ValueChangeListener) this);
+    
+    layout.addComponent(cbSelection);
     
     tblCorpora = new Table();
     addComponent(tblCorpora);
@@ -95,6 +120,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener
     tblCorpora.setColumnExpandRatio("tokenCount", 0.15f);
     tblCorpora.setColumnWidth("info", 18);
     
+    layout.setExpandRatio(tblCorpora, 1.0f);
+    
   }
   
   @Override
@@ -105,20 +132,82 @@ public class CorpusListPanel extends Panel implements UserChangeListener
     getApplication().addListener((UserChangeListener) this);
     
     tblCorpora.setSortContainerPropertyId("name");
+    updateCorpusSetList();
+  }  
+  
+  private void updateCorpusSetList()
+  {
+    corpusSets.clear();
+    
+    Map<Long, AnnisCorpus> allCorpora = getCorpusList((AnnisUser) getApplication().getUser());
+    corpusSets.put(ALL_CORPORA, allCorpora);
+    
+    AnnisUser user = (AnnisUser) getApplication().getUser();
+    for(String p : user.stringPropertyNames())
+    {
+      if(p.startsWith(CORPUSSET_PREFIX))
+      {
+        String setName = p.substring(CORPUSSET_PREFIX.length());
+        Map<Long, AnnisCorpus> corpora = new TreeMap<Long, AnnisCorpus>();
+        
+        String corpusString = user.getProperty(p);
+        if(!ALL_CORPORA.equals(setName) && corpusString != null)
+        {
+          String[] splitted = corpusString.split(",");
+          for(String s : splitted)
+          {
+            try
+            {
+              Long val = Long.parseLong(s);
+              AnnisCorpus c = allCorpora.get(val);
+              corpora.put(c.getId(), c);
+            }
+            catch(NumberFormatException ex)
+            {
+              Logger.getLogger(CorpusListPanel.class.getName())
+                .log(Level.WARNING, "invalid number in corpus set " + setName, ex);
+            }
+          }
+        }
+        corpusSets.put(setName, corpora);
+      }
+    }
+    
+    Object oldSelection = cbSelection.getValue();
+    cbSelection.removeAllItems();
+    for(String n : corpusSets.keySet())
+    {
+      cbSelection.addItem(n);
+    }
+    if(oldSelection != null && cbSelection.containsId(oldSelection))
+    {
+      cbSelection.select(oldSelection);
+    }
+    else
+    {
+      cbSelection.select(ALL_CORPORA);
+    }
+    
     updateCorpusList();
+    
   }
   
-  public void updateCorpusList()
-  {
+  private void updateCorpusList()
+  {    
     corpusContainer.removeAllItems();
-    corpusContainer.addAll(getCorpusList((AnnisUser) getApplication().getUser()));
+    String selectedCorpusSet = (String) cbSelection.getValue();
+    if(selectedCorpusSet == null)
+    {
+      selectedCorpusSet = ALL_CORPORA;
+    }
+    corpusContainer.addAll(corpusSets.get(selectedCorpusSet).values());
     
     tblCorpora.sort();
   }
   
-  private Set<AnnisCorpus> getCorpusList(AnnisUser user)
+  private Map<Long, AnnisCorpus> getCorpusList(AnnisUser user)
   {
-    Set<AnnisCorpus> result = new TreeSet<AnnisCorpus>();
+    Map<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
@@ -129,7 +218,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener
         {
           if(user == null || user.getCorpusIdList().contains(c.getId()))
           {
-            result.add(c);
+            result.put(c.getId(), c);
           }
         }
       }
@@ -146,6 +235,23 @@ public class CorpusListPanel extends Panel implements UserChangeListener
 
   @Override
   public void applicationUserChanged(UserChangeEvent event)
+  {
+    updateCorpusSetList();
+  }
+
+  @Override
+  public void addNewItem(String newItemCaption)
+  {
+    getWindow().showNotification("ups, new item");
+    if(!cbSelection.containsId(newItemCaption))
+    {
+      cbSelection.addItem(newItemCaption);
+      cbSelection.setValue(newItemCaption);
+    }
+  }
+
+  @Override
+  public void valueChange(ValueChangeEvent event)
   {
     updateCorpusList();
   }
@@ -175,6 +281,35 @@ public class CorpusListPanel extends Panel implements UserChangeListener
         return super.compareProperty(propertyId, sortDirection, item1, item2);
       }
     }
+  }
+  
+  
+  
+  protected void selectCorpora(Set<Long> corpora)
+  {
+    if(tblCorpora != null)
+    {
+      tblCorpora.setValue(null);
+      for(Long l : corpora)
+      {
+        tblCorpora.select(l);
+      }
+    }
+  }
+  
+  protected Set<Long> getSelectedCorpora()
+  {
+    HashSet<Long> result = new HashSet<Long>();
+    
+    for(Long id : corpusContainer.getItemIds())
+    {
+      if(tblCorpora.isSelected(id))
+      {
+        result.add(id);
+      }
+    }
+      
+    return result;
   }
   
   public class InfoGenerator implements Table.ColumnGenerator
@@ -222,32 +357,5 @@ public class CorpusListPanel extends Panel implements UserChangeListener
       
       return l;
     }
-  }
-  
-  protected void selectCorpora(Set<Long> corpora)
-  {
-    if(tblCorpora != null)
-    {
-      tblCorpora.setValue(null);
-      for(Long l : corpora)
-      {
-        tblCorpora.select(l);
-      }
-    }
-  }
-  
-  protected Set<Long> getSelectedCorpora()
-  {
-    HashSet<Long> result = new HashSet<Long>();
-    
-    for(Long id : corpusContainer.getItemIds())
-    {
-      if(tblCorpora.isSelected(id))
-      {
-        result.add(id);
-      }
-    }
-      
-    return result;
   }
 }

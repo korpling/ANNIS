@@ -10,6 +10,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
@@ -27,9 +28,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
   ApplicationConnection gClient;
   private IFrameElement iframe;
   private int additionalHeight;
-  private Timer timer;
-  private int timerCalls;
-  private Document doc;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -58,7 +56,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
         if(!iframe.getSrc().endsWith("empty.html"))
         {
           //VConsole.log("loadhandler: survived first check");
-          doc = null;
+          Document doc = null;
           try
           {
             doc = iframe.getContentDocument();
@@ -70,17 +68,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
 
           if(doc != null)
           {
-            timer = new Timer()
-            {
-
-              @Override
-              public void run()
-              {
-                checkIFrameLoaded();
-              }
-            };
-            timerCalls = 0;
-            timer.scheduleRepeating(500);
+            checkIFrameLoaded(doc);
           }
 
         }
@@ -90,27 +78,12 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     iframe.setFrameBorder(0);
   }
 
-  private void checkIFrameLoaded()
+  private void checkIFrameLoaded(Document doc)
   {
     int newHeight = -1;
     
     doc.getScrollLeft();
     String contentType = getContentType(doc); //doc.getDocumentElement().getPropertyString("contentType");
-
-    if(contentType == null)
-    {
-      if(timer != null && timerCalls > 5)
-      {
-        timer.cancel();
-      }
-      timerCalls++;
-      return;
-    }
-    
-    if(timer != null)
-    {
-      timer.cancel();
-    }
 
     if(contentType != null && contentType.startsWith("image/"))
     {
@@ -124,13 +97,12 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     }
     else if(doc.getBody().getScrollHeight() > 20)
     {
-      // real html page
+      // real html page or fallback if content type is unknown (e.g. in chrome)
       newHeight = doc.getBody().getScrollHeight() + additionalHeight;
     }
 
     if(newHeight > -1)
     {
-
       //VConsole.log("new height is " + newHeight + " (with additional " + additional + ")");
       gClient.updateVariable(paintableId, "height", newHeight, true);
     }
