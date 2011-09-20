@@ -74,7 +74,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem, LoginForm.LoginListener,
-  UserChangeListener, SecurityManagerHolder
+  UserChangeListener
 {
 
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
@@ -428,12 +428,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     session.setAttribute(USER_KEY, event.getNewUser());
   }
 
-  @Override
-  public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException
+  public AnnisSecurityManager getSecurityManager()
   {
-    if(securityManager != null)
-    {
-      securityManager.storeUserProperties(user);
-    }
+    return securityManager;
   }
 }
