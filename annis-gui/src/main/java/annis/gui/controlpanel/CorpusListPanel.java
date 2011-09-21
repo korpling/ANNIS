@@ -33,7 +33,6 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.event.Action;
-import com.vaadin.event.ActionManager;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
@@ -47,9 +46,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
-import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -57,8 +54,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.AuthenticationException;
-import javax.naming.NamingException;
 import org.apache.commons.lang.StringUtils;
 
 /**
