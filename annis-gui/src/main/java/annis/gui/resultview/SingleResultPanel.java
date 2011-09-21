@@ -86,7 +86,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
 
     hLayout.setWidth("100%");
     hLayout.setHeight("-1px");
-    hLayout.setMargin(true);
+    hLayout.setMargin(false);
     hLayout.setSpacing(true);
 
     VerticalLayout actionLayout = new VerticalLayout();

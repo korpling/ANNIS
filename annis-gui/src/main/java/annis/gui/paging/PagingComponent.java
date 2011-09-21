@@ -82,7 +82,7 @@ public class PagingComponent extends CustomComponent implements
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);
-    layout.setMargin(true);
+    layout.setMargin(false, true, false, true);
 
     Panel root = new Panel(layout);
     root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
