@@ -48,7 +48,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   
   public List<SingleResultPanel> resultPanelList;
   
-  public ResultSetPanel(AnnisResultSet resultSet, int start, PluginSystem ps)
+  public ResultSetPanel(AnnisResultSet resultSet, int start, PluginSystem ps, 
+    Set<String> visibleTokenAnnos)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
@@ -64,7 +65,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     int i=start; 
     for(AnnisResult r : resultSet)
     {
-      SingleResultPanel panel = new SingleResultPanel(r, i, this, ps);
+      SingleResultPanel panel = new SingleResultPanel(r, i, this, ps, visibleTokenAnnos);
       addComponent(panel);
       resultPanelList.add(panel);
       i++;
@@ -147,11 +148,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     return visArray;
   }
   
-  public void setTokenAnnosVisible(String anno, boolean visible)
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     for(SingleResultPanel p : resultPanelList)
     {
-      p.setTokenAnnosVisible(anno, visible);
+      p.setVisibleTokenAnnosVisible(annos);
     }
   }
   

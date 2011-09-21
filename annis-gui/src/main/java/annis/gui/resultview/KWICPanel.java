@@ -103,18 +103,13 @@ public class KWICPanel extends Panel
     addComponent(tblToken);
   }
   
-  public void setTokenAnnosVisible(String anno, boolean visible)
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(visible)
+    if(containerAnnos != null)
     {
-      if(!containerAnnos.containsId(anno))
-      {
-        containerAnnos.addItem(anno);
-      }
-    }
-    else
-    {
-      containerAnnos.removeItem(anno);
+      containerAnnos.removeAllItems();
+      containerAnnos.addItem("tok");
+      containerAnnos.addAll(annos);
     }
   }
   

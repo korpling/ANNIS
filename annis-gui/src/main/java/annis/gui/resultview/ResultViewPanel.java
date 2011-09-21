@@ -23,7 +23,6 @@ import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
-import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
@@ -33,8 +32,10 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window.Notification;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,11 +57,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
+  private TreeMap<String,Boolean> tokenAnnoVisible;
 
   public ResultViewPanel(String aql, Set<Long> corpora, 
     int contextLeft, int contextRight, int pageSize,
     PluginSystem ps)
   {
+    this.tokenAnnoVisible = new TreeMap<String, Boolean>();
     this.aql = aql;
     this.corpora = corpora;
     this.contextLeft = contextLeft;
@@ -154,7 +157,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
             {
               layout.removeComponent(resultPanel);
             }
-            resultPanel = new ResultSetPanel(result, start, ps);
+            resultPanel = new ResultSetPanel(result, start, ps, getVisibleTokenAnnos());
             
             layout.addComponent(resultPanel);
             resultPanel.setVisible(true);
@@ -189,11 +192,37 @@ public class ResultViewPanel extends Panel implements PagingCallback
       
     }
   }
+  
+  private Set<String> getVisibleTokenAnnos()
+  {
+    TreeSet<String> result = new TreeSet<String>();
+    
+    for(Entry<String,Boolean> e : tokenAnnoVisible.entrySet())
+    {
+      if(e.getValue().booleanValue() == true)
+      {
+        result.add(e.getKey());
+      }
+    }
+    
+    return result;
+  }
 
   private void updateTokenAnnos(AnnisResultSet resultSet)
   {
+    
+    // add new annotations
+    for(String s : resultSet.getTokenAnnotationLevelSet())
+    {
+      if(!tokenAnnoVisible.containsKey(s))
+      {
+        tokenAnnoVisible.put(s, Boolean.TRUE);
+      }
+    }
+    
     miTokAnnos.removeChildren();
-    for(final String a : resultSet.getTokenAnnotationLevelSet())
+    
+    for(String a : resultSet.getTokenAnnotationLevelSet())
     {
       MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
       {
@@ -203,17 +232,19 @@ public class ResultViewPanel extends Panel implements PagingCallback
           
           if(selectedItem.isChecked())
           {
-            resultPanel.setTokenAnnosVisible(a, true);
+            tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
           }
           else
           { 
-            resultPanel.setTokenAnnosVisible(a, false);
+            tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
           }
+          
+          resultPanel.setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
         }
       });
       
       miSingleTokAnno.setCheckable(true);
-      miSingleTokAnno.setChecked(true);
+      miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
       
     }
     

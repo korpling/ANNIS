@@ -49,7 +49,6 @@ public class SingleResultPanel extends Panel
   private Map<String,String> markedCoveredMap;
   private Map<String,String> markedExactMap;
   
-  private Set<String> tokenAnnos;
   private Set<String> nodeAnnos;
   private VerticalLayout vLayout;
   private ResolverProvider resolverProvider;
@@ -57,7 +56,8 @@ public class SingleResultPanel extends Panel
   private KWICPanel kwic;
     
   public SingleResultPanel(AnnisResult result, int resultNumber, 
-    ResolverProvider resolverProvider, PluginSystem ps)
+    ResolverProvider resolverProvider, PluginSystem ps, 
+    Set<String> visibleTokenAnnos)
   {
     this.ps = ps;
     this.result = result;
@@ -86,7 +86,7 @@ public class SingleResultPanel extends Panel
     hLayout.addComponent(vLayout);
     
     
-    kwic = new KWICPanel(result, tokenAnnos, markedAndCovered);
+    kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered);
     vLayout.addComponent(kwic);
     
     vLayout.setWidth("100%");
@@ -125,18 +125,17 @@ public class SingleResultPanel extends Panel
     super.attach();
   }
   
-  public void setTokenAnnosVisible(String anno, boolean visible)
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if(kwic != null)
     {
-      kwic.setTokenAnnosVisible(anno, visible);
+      kwic.setVisibleTokenAnnosVisible(annos);
     }
   }
   
   private void calculateHelperVariables()
   {
     nodeAnnos = new TreeSet<String>();
-    tokenAnnos = new TreeSet<String>();
     
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
@@ -151,15 +150,7 @@ public class SingleResultPanel extends Panel
         markedExactMap.put("" + n.getId(), 
           MatchedNodeColors.values()[color].name());
       }
-      // add to annotation overview      
-      for(Annotation a : n.getNodeAnnotations())
-      {
-        nodeAnnos.add(a.getQualifiedName());
-        if(n.isToken())
-        {
-          tokenAnnos.add(a.getQualifiedName());
-        }
-      }      
+      
     }
     
     markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
