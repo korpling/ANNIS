@@ -36,12 +36,17 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -103,6 +108,13 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     vLayout = new VerticalLayout();
     hLayout.addComponent(vLayout);
 
+    List<String> path = new LinkedList<String>(Arrays.asList(result.getGraph().getPath()));
+    Collections.reverse(path);
+    Label lblPath = new Label("Path: " + StringUtils.join(path , " > "));
+    lblPath.addStyleName("docPath");
+    lblPath.setWidth("100%");
+    lblPath.setHeight("-1px");
+    vLayout.addComponent(lblPath);
 
     kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered);
     vLayout.addComponent(kwic);

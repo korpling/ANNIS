@@ -60,6 +60,7 @@ public class KWICPanel extends Panel
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
     layout.setHeight("-1px");
+    layout.setMargin(false);
     
     containerAnnos = new BeanItemContainer<String>(String.class);
     
