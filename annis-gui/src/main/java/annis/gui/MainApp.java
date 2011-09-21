@@ -37,19 +37,22 @@ import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.LoginForm;
 import com.vaadin.ui.LoginForm.LoginEvent;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.BaseTheme;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -61,7 +64,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
@@ -89,8 +91,8 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private AnnisSecurityManager securityManager;
-  private MenuItem miUserName;
-  private MenuItem miLoginLogut;
+  private Label lblUserName;
+  private Button btLoginLogout;
   private Window windowLogin;
 
   @Override
@@ -109,42 +111,20 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     window.getContent().setSizeFull();
     ((VerticalLayout) window.getContent()).setMargin(false);
 
-    HorizontalLayout layoutMenus = new HorizontalLayout();
-    layoutMenus.setWidth("100%");
-    layoutMenus.setHeight("-1px");
-    window.addComponent(layoutMenus);
+    HorizontalLayout layoutToolbar = new HorizontalLayout();
+    layoutToolbar.setWidth("100%");
+    layoutToolbar.setHeight("-1px");
+    window.addComponent(layoutToolbar);
 
-    MenuBar menuMain = new MenuBar();
-    menuMain.setWidth(100f, Layout.UNITS_PERCENTAGE);
-    MenuItem miHelp = menuMain.addItem("Help", null);
-    miHelp.addItem("Tutorial", new MenuBar.Command()
-    {
-
-      @Override
-      public void menuSelected(MenuItem selectedItem)
-      {
-        mainTab.setSelectedTab(tutorial);
-      }
-    });
-    miHelp.addItem("About", new MenuBar.Command()
-    {
+    lblUserName = new Label("not logged in");
+    lblUserName.setWidth("100%");
+    lblUserName.setHeight("-1px");
+    lblUserName.addStyleName("right-aligned-text");
+    
+    btLoginLogout = new Button("Login", new Button.ClickListener() {
 
       @Override
-      public void menuSelected(MenuItem selectedItem)
-      {
-        window.showNotification("The is a prototype to tests vaadins capabilities in regards to the need of ANNIS", Window.Notification.TYPE_HUMANIZED_MESSAGE);
-      }
-    });
-    layoutMenus.addComponent(menuMain);
-
-    MenuBar menuLogin = new MenuBar();
-    menuLogin.setSizeUndefined();
-    miUserName = menuLogin.addItem("not logged in", null);
-    miLoginLogut = menuLogin.addItem("Login", new MenuBar.Command()
-    {
-
-      @Override
-      public void menuSelected(MenuItem selectedItem)
+      public void buttonClick(ClickEvent event)
       {
         if(isLoggedIn())
         {
@@ -159,16 +139,25 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
         }
       }
     });
-    layoutMenus.addComponent(menuLogin);
+    btLoginLogout.setSizeUndefined();
+    btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    
+    layoutToolbar.addComponent(lblUserName);
+    layoutToolbar.addComponent(btLoginLogout);
 
-    layoutMenus.setComponentAlignment(menuMain, Alignment.MIDDLE_LEFT);
-    layoutMenus.setComponentAlignment(menuLogin, Alignment.MIDDLE_RIGHT);
-    layoutMenus.setExpandRatio(menuMain, 1.0f);
-
+    layoutToolbar.setSpacing(true);
+    layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
+    layoutToolbar.setComponentAlignment(btLoginLogout, Alignment.MIDDLE_RIGHT);
+    layoutToolbar.setExpandRatio(lblUserName, 1.0f);
+    
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();
-    window.addComponent(hLayout);
-    ((VerticalLayout) window.getContent()).setExpandRatio(hLayout, 1.0f);
+    
+    Panel hPanel = new Panel(hLayout);
+    hPanel.setSizeFull();
+    
+    window.addComponent(hPanel);
+    ((VerticalLayout) window.getContent()).setExpandRatio(hPanel, 1.0f);
 
     control = new ControlPanel(this);
     control.setWidth(30f, Layout.UNITS_EM);
@@ -176,7 +165,6 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     hLayout.addComponent(control);
 
     tutorial = new TutorialPanel();
-
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
@@ -382,19 +370,19 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
 
   private void updateUserInformation()
   {
-    if(miLoginLogut == null || miLoginLogut == null || getUser() == null)
+    if(btLoginLogout == null || lblUserName == null || getUser() == null)
     {
       return;
     }
     if(isLoggedIn())
     {      
-      miUserName.setText("logged in as \"" + getUser().getUserName() + "\"");
-      miLoginLogut.setText("Logout");
+      lblUserName.setValue("logged in as \"" + getUser().getUserName() + "\"");
+      btLoginLogout.setCaption("Logout");
     }
     else
     {      
-      miUserName.setText("not logged in");
-      miLoginLogut.setText("Login");
+      lblUserName.setValue("not logged in");
+      btLoginLogout.setCaption("Login");
     }
   }
 
