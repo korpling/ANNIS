@@ -103,6 +103,21 @@ public class KWICPanel extends Panel
     addComponent(tblToken);
   }
   
+  public void setTokenAnnosVisible(String anno, boolean visible)
+  {
+    if(visible)
+    {
+      if(!containerAnnos.containsId(anno))
+      {
+        containerAnnos.addItem(anno);
+      }
+    }
+    else
+    {
+      containerAnnos.removeItem(anno);
+    }
+  }
+  
   public class TokenColumnGenerator implements Table.ColumnGenerator
   {
 

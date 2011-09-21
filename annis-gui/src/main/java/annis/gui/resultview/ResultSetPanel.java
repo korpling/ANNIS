@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,8 +46,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   
   public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
   
+  public List<SingleResultPanel> resultPanelList;
+  
   public ResultSetPanel(AnnisResultSet resultSet, int start, PluginSystem ps)
   {
+    resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
     
     setWidth("100%");
@@ -62,6 +66,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       SingleResultPanel panel = new SingleResultPanel(r, i, this, ps);
       addComponent(panel);
+      resultPanelList.add(panel);
       i++;
     }
   }
@@ -140,6 +145,14 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     });
     return visArray;
+  }
+  
+  public void setTokenAnnosVisible(String anno, boolean visible)
+  {
+    for(SingleResultPanel p : resultPanelList)
+    {
+      p.setTokenAnnosVisible(anno, visible);
+    }
   }
   
 }

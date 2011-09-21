@@ -54,6 +54,7 @@ public class SingleResultPanel extends Panel
   private VerticalLayout vLayout;
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
+  private KWICPanel kwic;
     
   public SingleResultPanel(AnnisResult result, int resultNumber, 
     ResolverProvider resolverProvider, PluginSystem ps)
@@ -85,7 +86,7 @@ public class SingleResultPanel extends Panel
     hLayout.addComponent(vLayout);
     
     
-    KWICPanel kwic = new KWICPanel(result, tokenAnnos, markedAndCovered);
+    kwic = new KWICPanel(result, tokenAnnos, markedAndCovered);
     vLayout.addComponent(kwic);
     
     vLayout.setWidth("100%");
@@ -124,7 +125,13 @@ public class SingleResultPanel extends Panel
     super.attach();
   }
   
-  
+  public void setTokenAnnosVisible(String anno, boolean visible)
+  {
+    if(kwic != null)
+    {
+      kwic.setTokenAnnosVisible(anno, visible);
+    }
+  }
   
   private void calculateHelperVariables()
   {

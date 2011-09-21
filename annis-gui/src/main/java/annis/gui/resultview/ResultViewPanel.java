@@ -23,13 +23,17 @@ import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
+import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +55,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ScrollPanel scrollPanel;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
+  private MenuItem miTokAnnos;
 
   public ResultViewPanel(String aql, Set<Long> corpora, 
     int contextLeft, int contextRight, int pageSize,
@@ -69,11 +74,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
 
+    MenuBar mbResult = new MenuBar();
+    mbResult.setWidth("100%");
+    miTokAnnos = mbResult.addItem("Token Annotations", null);
     
     paging = new PagingComponent(0, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
-
 
     scrollPanel = new ScrollPanel();
     scrollPanel.setSizeFull();
@@ -83,6 +90,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     layout.setWidth("100%");
     layout.setHeight("-1px");
 
+    mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
     mainLayout.addComponent(scrollPanel);
 
@@ -140,6 +148,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
             }
             AnnisResultSet result = query.loadBeans(start, limit, user);
             
+            updateTokenAnnos(result);
+            
             if(resultPanel != null)
             {
               layout.removeComponent(resultPanel);
@@ -180,6 +190,35 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
+  private void updateTokenAnnos(AnnisResultSet resultSet)
+  {
+    miTokAnnos.removeChildren();
+    for(final String a : resultSet.getTokenAnnotationLevelSet())
+    {
+      MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+      {
+        @Override
+        public void menuSelected(MenuItem selectedItem)
+        {
+          
+          if(selectedItem.isChecked())
+          {
+            resultPanel.setTokenAnnosVisible(a, true);
+          }
+          else
+          { 
+            resultPanel.setTokenAnnosVisible(a, false);
+          }
+        }
+      });
+      
+      miSingleTokAnno.setCheckable(true);
+      miSingleTokAnno.setChecked(true);
+      
+    }
+    
+  }
+  
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
