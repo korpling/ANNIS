@@ -51,7 +51,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -114,7 +113,12 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     HorizontalLayout layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
     layoutToolbar.setHeight("-1px");
-    window.addComponent(layoutToolbar);
+    
+    Panel panelToolbar = new Panel(layoutToolbar);
+    panelToolbar.setWidth("100%");
+    panelToolbar.setHeight("-1px");
+    window.addComponent(panelToolbar);
+    panelToolbar.addStyleName("toolbar");
 
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
@@ -155,6 +159,7 @@ public class MainApp extends Application implements PluginSystem, LoginForm.Logi
     
     Panel hPanel = new Panel(hLayout);
     hPanel.setSizeFull();
+    hPanel.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     window.addComponent(hPanel);
     ((VerticalLayout) window.getContent()).setExpandRatio(hPanel, 1.0f);

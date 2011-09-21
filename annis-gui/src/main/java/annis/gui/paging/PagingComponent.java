@@ -76,7 +76,7 @@ public class PagingComponent extends CustomComponent implements
     setWidth("100%");
     setHeight("-1px");
 
-    addStyleName("paging");
+    addStyleName("toolbar");
     
     callbacks = new HashSet<PagingCallback>();
 

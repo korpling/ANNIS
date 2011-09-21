@@ -21,6 +21,7 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.MainApp;
 import annis.gui.Helper;
 import annis.service.AnnisService;
+import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Accordion;
@@ -55,6 +56,7 @@ public class ControlPanel extends Panel
     super("Search Form");
     this.app = app;
 
+    setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
     VerticalLayout layout = (VerticalLayout) getContent();
