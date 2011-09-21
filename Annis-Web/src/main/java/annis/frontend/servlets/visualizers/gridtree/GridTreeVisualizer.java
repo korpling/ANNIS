@@ -1,3 +1,4 @@
+
 package annis.frontend.servlets.visualizers.gridtree;
 
 import annis.frontend.servlets.visualizers.VisualizerInput;
@@ -138,7 +139,7 @@ public class GridTreeVisualizer extends WriterVisualizer
       sb.append("style=\"color:"
           + input.getMarkableExactMap().get(Long.toString(this.root.getId()))
           + "\">");
-      sb.append(getAnnoValue(this.root, anno) + " " + height);
+      sb.append(getAnnoValue(this.root, anno));
       sb.append("</td>");
     }
 
