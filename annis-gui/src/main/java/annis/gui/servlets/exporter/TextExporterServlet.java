@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets.exporter;
+package annis.gui.servlets.exporter;
 
 import java.io.IOException;
 import javax.servlet.http.*;

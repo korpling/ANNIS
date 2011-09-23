@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets.exporter;
+package annis.gui.servlets.exporter;
 
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.frontend.servlets.SubmitQueryServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
@@ -45,23 +44,9 @@ public class WekaExporterServlet extends HttpServlet
 
     //this is a full result export
     List<Long> corpusIdList = new LinkedList<Long>();
-    String queryAnnisQL = request.getParameter(SubmitQueryServlet.PARAM_ANNIS_QL);
-    String corpusListAsString = request.getParameter(SubmitQueryServlet.PARAM_CORPUS_ID);
-    if(queryAnnisQL == null)
-    {
-      response.getWriter().println(
-        "missing parameter for the AQL query ("
-        + SubmitQueryServlet.PARAM_ANNIS_QL + ")");
-      return;
-    }
-    if(corpusListAsString == null)
-    {
-      response.getWriter().println(
-        "missing parameter for the corpus list ("
-        + SubmitQueryServlet.PARAM_CORPUS_ID + ")");
-      return;
-    }
-
+    String queryAnnisQL = checkAndGetMandatoryStringParam("query", request);
+    String corpusListAsString = checkAndGetMandatoryStringParam("corpora", request);
+    
     for(String corpusId : corpusListAsString.split(","))
     {
       try
@@ -98,6 +83,31 @@ public class WekaExporterServlet extends HttpServlet
     {
       // TODO Auto-generated catch block
       e.printStackTrace();
+    }
+  }
+  
+  private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
+  {
+    String result = request.getParameter(name);
+    if(result == null)
+    {
+      throw new NullPointerException("Parameter '" + name + "' must no be null.");
+    }
+    return result;
+  }
+
+  private int checkAndGetMandatoryIntParam(String name, HttpServletRequest request)
+  {
+    String asString = checkAndGetMandatoryStringParam(name, request);
+
+    try
+    {
+      return Integer.parseInt(asString);
+    }
+    catch(NumberFormatException ex)
+    {
+      throw new NumberFormatException("Could not cast the parameter '" + name
+        + "' to an integer (parameter value was '" + asString + "')");
     }
   }
 }

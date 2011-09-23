@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets.exporter;
+package annis.gui.servlets.exporter;
 
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.frontend.servlets.SubmitQueryServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
@@ -53,48 +52,22 @@ public class GeneralTextExporter extends HttpServlet
     /** The selected corpora */
     List<Long> corpusIdList = new LinkedList<Long>();
     /** The AQL query which should be executed */
-    String queryAnnisQL = request.getParameter(SubmitQueryServlet.PARAM_ANNIS_QL);
+    String queryAnnisQL = checkAndGetMandatoryStringParam("query", request);
 
     // the left an right context size
-    int contextLeft = 0;
-    int contextRight = 0;
-    try
-    {
-      String p = request.getParameter(SubmitQueryServlet.PARAM_CONTEXT_LEFT);
-      if (p != null)
-      {
-        contextLeft = Integer.parseInt(p);
-      }
-      p = request.getParameter(SubmitQueryServlet.PARAM_CONTEXT_RIGHT);
-      if (p != null)
-      {
-        contextRight = Integer.parseInt(p);
-      }
-    }
-    catch (NumberFormatException ex)
-    {
-      // ignore
-    }
-    // get a "real" list of corpora from the comma-delimited parameter
-    String corpusListAsString = request.getParameter(SubmitQueryServlet.PARAM_CORPUS_ID);
-    if (queryAnnisQL == null)
-    {
-      response.getWriter().println("missing parameter for the AQL query (" + SubmitQueryServlet.PARAM_ANNIS_QL + ")");
-      return;
-    }
-    if (corpusListAsString == null)
-    {
-      response.getWriter().println("missing parameter for the corpus list (" + SubmitQueryServlet.PARAM_CORPUS_ID + ")");
-      return;
-    }
+    int contextLeft = checkAndGetMandatoryIntParam("context_left", request);
+    int contextRight = checkAndGetMandatoryIntParam("context_right", request);
 
-    for (String corpusId : corpusListAsString.split(","))
+    // get a "real" list of corpora from the comma-delimited parameter
+    String corpusListAsString = checkAndGetMandatoryStringParam("corpora", request);
+
+    for(String corpusId : corpusListAsString.split(","))
     {
       try
       {
         corpusIdList.add(Long.parseLong(corpusId));
       }
-      catch (NumberFormatException ex)
+      catch(NumberFormatException ex)
       {
         // ignore
       }
@@ -110,12 +83,12 @@ public class GeneralTextExporter extends HttpServlet
       AnnisResultSet queryResult = null;
 
       LinkedList<String> keys = new LinkedList<String>();
-      
+
       if(request.getParameter("keys") == null)
       {
         // auto set
         keys.add("tok");
-        AnnisAttributeSet attributes = 
+        AnnisAttributeSet attributes =
           service.getAttributeSet(corpusIdList, false, false);
         for(AnnisAttribute a : attributes)
         {
@@ -143,7 +116,7 @@ public class GeneralTextExporter extends HttpServlet
         }
       }
       int offset = 0;
-      while (offset == 0 || (queryResult != null && queryResult.size() > 0))
+      while(offset == 0 || (queryResult != null && queryResult.size() > 0))
       {
 
         queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
@@ -160,44 +133,44 @@ public class GeneralTextExporter extends HttpServlet
       response.getWriter().println("finished");
 
     }
-    catch (AnnisServiceFactoryException e)
+    catch(AnnisServiceFactoryException e)
     {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisQLSemanticsException e)
+    catch(AnnisQLSemanticsException e)
     {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisQLSyntaxException e)
+    catch(AnnisQLSyntaxException e)
     {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    catch (AnnisCorpusAccessException e)
+    catch(AnnisCorpusAccessException e)
     {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, List<String> keys, Map<String,String[]> httpArgs, HttpServletResponse response,
+  public void convertText(AnnisResultSet queryResult, List<String> keys, Map<String, String[]> httpArgs, HttpServletResponse response,
     int offset) throws IOException
   {
     int counter = 0;
-    for (AnnisResult annisResult : queryResult)
+    for(AnnisResult annisResult : queryResult)
     {
       Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
       counter++;
-      response.getWriter().append((counter+offset) + ". ");
+      response.getWriter().append((counter + offset) + ". ");
       List<AnnisNode> tok = annisResult.getGraph().getTokens();
 
-      for (AnnisNode annisNode : tok)
+      for(AnnisNode annisNode : tok)
       {
         Long tokID = annisNode.getId();
-        if (matchedNodeIds.contains(tokID))
+        if(matchedNodeIds.contains(tokID))
         {
           response.getWriter().append("[");
           response.getWriter().append(annisNode.getSpannedText());
@@ -216,6 +189,31 @@ public class GeneralTextExporter extends HttpServlet
 
       }
       response.getWriter().append("\n");
+    }
+  }
+
+  private String checkAndGetMandatoryStringParam(String name, HttpServletRequest request)
+  {
+    String result = request.getParameter(name);
+    if(result == null)
+    {
+      throw new NullPointerException("Parameter '" + name + "' must no be null.");
+    }
+    return result;
+  }
+
+  private int checkAndGetMandatoryIntParam(String name, HttpServletRequest request)
+  {
+    String asString = checkAndGetMandatoryStringParam(name, request);
+
+    try
+    {
+      return Integer.parseInt(asString);
+    }
+    catch(NumberFormatException ex)
+    {
+      throw new NumberFormatException("Could not cast the parameter '" + name
+        + "' to an integer (parameter value was '" + asString + "')");
     }
   }
 }
