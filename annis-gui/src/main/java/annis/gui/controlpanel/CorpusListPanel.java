@@ -35,11 +35,13 @@ import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.event.Action;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -88,6 +90,14 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
 
+    HorizontalLayout selectionLayout = new HorizontalLayout();
+    selectionLayout.setWidth("100%");
+    selectionLayout.setHeight("-1px");
+    
+    Label lblVisible = new Label("Visible: ");
+    lblVisible.setSizeUndefined();  
+    selectionLayout.addComponent(lblVisible);
+    
     cbSelection = new ComboBox();
     cbSelection.setDescription("Choose corpus selection set");
     cbSelection.setWidth("100%");
@@ -99,8 +109,14 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     cbSelection.setImmediate(true);
     cbSelection.addListener((ValueChangeListener) this);
 
-    layout.addComponent(cbSelection);
-
+    selectionLayout.addComponent(cbSelection);
+    selectionLayout.setExpandRatio(cbSelection, 1.0f);
+    selectionLayout.setSpacing(true);
+    selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
+    selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
+    
+    layout.addComponent(selectionLayout);
+    
     tblCorpora = new Table();
     addComponent(tblCorpora);
 
