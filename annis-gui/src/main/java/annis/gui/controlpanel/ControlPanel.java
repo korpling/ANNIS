@@ -49,8 +49,10 @@ public class ControlPanel extends Panel
   private MainApp app;
   private Window window;
   private String lastQuery;
-  Set<Long> lastCorpusSelection;
+  private Set<Long> lastCorpusSelection;
 
+  private SearchOptionsPanel searchOptions;
+  
   public ControlPanel(MainApp app)
   {
     super("Search Form");
@@ -66,8 +68,11 @@ public class ControlPanel extends Panel
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
 
     corpusList = new CorpusListPanel(this);
+    
+    searchOptions = new SearchOptionsPanel();
+    
     accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(new SearchOptionsPanel(), "Search Options", null);
+    accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(), "Export", null);
 
     queryPanel = new QueryPanel(this);
@@ -136,7 +141,9 @@ public class ControlPanel extends Panel
       CountThread countThread = new CountThread();
       countThread.start();
 
-      app.showQueryResult(lastQuery, lastCorpusSelection, 5, 5, 10);
+      app.showQueryResult(lastQuery, lastCorpusSelection, 
+        searchOptions.getLeftContext(), searchOptions.getRightContext(), 
+        searchOptions.getResultsPerPage());
     }
   }
 

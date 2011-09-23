@@ -15,8 +15,9 @@
  */
 package annis.gui.controlpanel;
 
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
 
 /**
@@ -25,10 +26,106 @@ import com.vaadin.ui.Panel;
  */
 public class SearchOptionsPanel extends Panel
 {
+  private ComboBox cbLeftContext;
+  private ComboBox cbRightContext;
+  private ComboBox cbResultsPerPage;
 
+  // TODO: make this configurable
+  private static final String[] predefinedPageSizes = new String[] 
+  {
+    "1", "2", "5", "10", "15", "20", "25"
+  };
+  private static final String[] predefinedContexts = new String[] 
+  {
+    "0", "1", "2", "5", "10"
+  };
+  
   public SearchOptionsPanel()
   {
     setSizeFull();
+    
+    FormLayout layout = new FormLayout();
+    setContent(layout);
+    
+    cbLeftContext = new ComboBox("Left Context");
+    cbRightContext = new ComboBox("Right Context");
+    cbResultsPerPage = new ComboBox("Results Per Page");
+    
+    cbLeftContext.setNullSelectionAllowed(false);
+    cbRightContext.setNullSelectionAllowed(false);
+    cbResultsPerPage.setNullSelectionAllowed(false);
+    
+    cbLeftContext.setNewItemsAllowed(true);
+    cbRightContext.setNewItemsAllowed(true);
+    cbResultsPerPage.setNewItemsAllowed(true);
+    
+    cbLeftContext.addValidator(new IntegerValidator("must be a number"));
+    cbRightContext.addValidator(new IntegerValidator("must be a number"));
+    cbResultsPerPage.addValidator(new IntegerValidator("must be a number"));
+    
+    for(String s : predefinedContexts)
+    {
+      cbLeftContext.addItem(s);
+      cbRightContext.addItem(s);
+    }
+    
+    for(String s : predefinedPageSizes)
+    {
+      cbResultsPerPage.addItem(s);
+    }
+    
+    cbLeftContext.setValue("5");
+    cbRightContext.setValue("5");
+    cbResultsPerPage.setValue("10");
+    
+    layout.addComponent(cbLeftContext);
+    layout.addComponent(cbRightContext);
+    layout.addComponent(cbResultsPerPage);
+
   }
   
+  public int getLeftContext()
+  {
+    int result = 5;
+    try
+    {
+      result = Integer.parseInt((String) cbLeftContext.getValue());
+    }
+    catch(Exception ex)
+    {
+      
+    }
+    
+    return Math.max(0, result);
+  }
+  
+  public int getRightContext()
+  {
+    int result = 5;
+    try
+    {
+      result = Integer.parseInt((String) cbRightContext.getValue());
+    }
+    catch(Exception ex)
+    {
+      
+    }
+    
+    return Math.max(0, result);
+  }
+  
+  public int getResultsPerPage()
+  {
+    int result = 10;
+    try
+    {
+      result = Integer.parseInt((String) cbResultsPerPage.getValue());
+    }
+    catch(Exception ex)
+    {
+      
+    }
+    
+    return Math.max(0, result);
+  }
 }
