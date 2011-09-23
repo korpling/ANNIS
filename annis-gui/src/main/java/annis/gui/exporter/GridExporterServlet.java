@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets.exporter;
+package annis.gui.exporter;
 
 import java.io.IOException;
-import javax.servlet.http.*;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,18 +31,18 @@ public class GridExporterServlet extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, List<String> keys,
-    Map<String, String[]> httpArgs, HttpServletResponse response, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys, 
+    Map<String,String> args, Writer out, int offset) throws IOException
   {
 
 
     boolean showNumbers = true;
-    if (httpArgs.containsKey("numbers"))
+    if (args.containsKey("numbers"))
     {
-      String[] arg = httpArgs.get("numbers");
-      if (arg[0].equalsIgnoreCase("false")
-        || arg[0].equalsIgnoreCase("0")
-        || arg[0].equalsIgnoreCase("off"))
+      String arg = args.get("numbers");
+      if (arg.equalsIgnoreCase("false")
+        || arg.equalsIgnoreCase("0")
+        || arg.equalsIgnoreCase("off"))
       {
         showNumbers = false;
       }
@@ -55,7 +55,7 @@ public class GridExporterServlet extends GeneralTextExporter
         new HashMap<String, TreeMap<Long, Span>>();
 
       counter++;
-      response.getWriter().append((counter + offset) + ". ");
+      out.append((counter + offset) + ". ");
 
       long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
       for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
@@ -81,39 +81,39 @@ public class GridExporterServlet extends GeneralTextExporter
 
         if ("tok".equals(k))
         {
-          response.getWriter().append("\t " + k + "\t ");
+          out.append("\t " + k + "\t ");
           for (AnnisNode annisNode : annisResult.getGraph().getTokens())
           {
-            response.getWriter().append(annisNode.getSpannedText() + " ");
+            out.append(annisNode.getSpannedText() + " ");
           }
-          response.getWriter().append("\n");
+          out.append("\n");
         }
         else
         {
           if(annos.get(k) != null)
           {
-            response.getWriter().append("\t " + k + "\t ");
+            out.append("\t " + k + "\t ");
             for(Span s : annos.get(k).values())
             {
 
-              response.getWriter().append(s.getValue());
+              out.append(s.getValue());
 
               if (showNumbers)
               {
                 long leftIndex = Math.max(1, s.getStart() - tokenOffset);
                 long rightIndex = s.getEnd() - tokenOffset;
-                response.getWriter().append("[" + leftIndex
+                out.append("[" + leftIndex
                   + "-" + rightIndex + "]");
               }
-              response.getWriter().append(" ");
+              out.append(" ");
 
             }
-            response.getWriter().append("\n");
+            out.append("\n");
           }
         }
       }
 
-      response.getWriter().append("\n\n");
+      out.append("\n\n");
     }
   }
 
