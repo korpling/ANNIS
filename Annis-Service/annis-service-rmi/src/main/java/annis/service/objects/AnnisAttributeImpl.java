@@ -27,7 +27,7 @@ import annis.service.ifaces.AnnisAttribute;
 public class AnnisAttributeImpl implements AnnisAttribute, Serializable
 {
 
-  private static final long serialVersionUID = 4786862953057862936L;
+  
   private String name = "";
   private String edgeName = null;
   private Set<String> distinctValues = new HashSet<String>();

@@ -7,7 +7,9 @@ function checkIFrameLoaded(id)
     if(dom.src.match("empty.html$") !== "empty.html") // does not end with
     {
       var doc = dom.contentWindow.document;
-
+      
+      if(doc == undefined) return;
+      
       if(doc.contentType != null &&doc.contentType.match("^image/") == "image/")
       {
         if(doc.getElementsByTagName('img').length !== 0)

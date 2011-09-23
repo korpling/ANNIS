@@ -18,7 +18,7 @@ package annis.service;
 import annis.exceptions.AnnisException;
 
 public class AnnisServiceException extends AnnisException {
-	private static final long serialVersionUID = 1647809989551905657L;
+	
 
 	public AnnisServiceException() {
 		// TODO Auto-generated constructor stub

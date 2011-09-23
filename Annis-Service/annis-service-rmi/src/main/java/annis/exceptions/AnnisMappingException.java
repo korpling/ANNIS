@@ -17,7 +17,7 @@ package annis.exceptions;
 
 public class AnnisMappingException extends AnnisException {
 
-	private static final long serialVersionUID = -8349107194203746434L;
+	
 
 	public AnnisMappingException() {
 		super();

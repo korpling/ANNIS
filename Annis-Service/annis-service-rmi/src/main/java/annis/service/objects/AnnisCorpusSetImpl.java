@@ -23,7 +23,7 @@ import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisCorpusSet;
 
 public class AnnisCorpusSetImpl extends HashSet<AnnisCorpus> implements Serializable, AnnisCorpusSet {
-	private static final long serialVersionUID = 7014311983171387068L;
+	
 
 	public AnnisCorpusSetImpl() {
 		super();

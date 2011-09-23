@@ -22,7 +22,7 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
 
 public class AnnisAttributeSetImpl extends HashSet<AnnisAttribute> implements AnnisAttributeSet {
-	private static final long serialVersionUID = 4786862953057862936L;
+	
 
 	public AnnisAttributeSetImpl() {
 		super();

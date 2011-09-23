@@ -16,7 +16,7 @@
 package annis.exceptions;
 
 public class AnnisBinaryNotFoundException extends AnnisException {
-	private static final long serialVersionUID = -6440920661178781203L;
+	
 
 	public AnnisBinaryNotFoundException() {
 		super();

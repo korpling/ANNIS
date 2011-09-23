@@ -16,7 +16,7 @@
 package annis.exceptions;
 
 public class AnnisServiceFactoryException extends Exception {
-	private static final long serialVersionUID = -6440920661178781203L;
+	
 
 	public AnnisServiceFactoryException() {
 		super();

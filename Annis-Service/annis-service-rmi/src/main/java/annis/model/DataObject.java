@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 public class DataObject implements Serializable {
 
 	// this class is sent to the front end
-	private static final long serialVersionUID = -800334837282048108L;
+	
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(value=ElementType.FIELD)

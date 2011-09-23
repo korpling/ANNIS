@@ -26,7 +26,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 {
 
 	// this class is sent to the front end
-	private static final long serialVersionUID = -7594536903324312228L;
+	
 
 	private String namespace;
 	private String name;

@@ -41,14 +41,14 @@ limitations under the License.
 	</util:list>
 
   <!-- transforms a AQL query into its disjunctive normal form -->
-  <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" />
+  <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" scope="prototype" />
 
   <bean id="aqlClauseAnalysis" class="annis.ql.parser.ClauseAnalysis" scope="prototype">
     <property name="precedenceBound" value="${annis.precedence-restriction}"/>
   </bean>
 
   <bean id="aqlAnalysis" class="annis.ql.parser.QueryAnalysis">
-    <property name="dnfTransformer" ref="aqlDnfTransformer"/>
+    <lookup-method name="getDnfTransformer" bean="aqlDnfTransformer"/>
     <lookup-method name="getClauseAnalysis" bean="aqlClauseAnalysis"/>
   </bean>
 

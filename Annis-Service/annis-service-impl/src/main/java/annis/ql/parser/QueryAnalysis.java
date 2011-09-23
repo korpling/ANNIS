@@ -30,8 +30,8 @@ public class QueryAnalysis
 {
   private final Logger log = Logger.getLogger(QueryAnalysis.class);
 
-  private DnfTransformer dnfTransformer;
-  private ClauseAnalysis clauseAnalysis;
+  private DnfTransformer dummyDnfTransformer;
+  private ClauseAnalysis dummyClauseAnalysis;
 
   public QueryData analyzeQuery(Start statement, List<Long> corpusList)
   {
@@ -43,6 +43,7 @@ public class QueryAnalysis
 
 		// split statement into list of clauses
 
+    DnfTransformer dnfTransformer = getDnfTransformer();
     statement.apply(dnfTransformer);
     clauses = dnfTransformer.listClauses(statement);
 
@@ -55,15 +56,15 @@ public class QueryAnalysis
       clause.apply(nodeRelationNormalizer);
 
 			// get a fresh clause analyzer from Spring
-			ClauseAnalysis myClauseAnalysis = getClauseAnalysis();
-			clause.apply(myClauseAnalysis);
+			ClauseAnalysis clauseAnalysis = getClauseAnalysis();
+			clause.apply(clauseAnalysis);
 			
 			// save nodes and update column width
-			queryData.addAlternative(new LinkedList<AnnisNode>(myClauseAnalysis.getNodes()));
-			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), myClauseAnalysis.nodesCount()));
+			queryData.addAlternative(new LinkedList<AnnisNode>(clauseAnalysis.getNodes()));
+			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), clauseAnalysis.nodesCount()));
 			
 			// collect meta data
-			queryData.addMetaAnnotations(myClauseAnalysis.getMetaAnnotations());
+			queryData.addMetaAnnotations(clauseAnalysis.getMetaAnnotations());
 		}
 		log.debug("maximum column width is " + queryData.getMaxWidth());
 		
@@ -72,22 +73,22 @@ public class QueryAnalysis
 
   public DnfTransformer getDnfTransformer()
   {
-    return dnfTransformer;
+    return dummyDnfTransformer;
   }
 
   public void setDnfTransformer(DnfTransformer dnfTransformer)
   {
-    this.dnfTransformer = dnfTransformer;
+    this.dummyDnfTransformer = dnfTransformer;
   }
 
   public ClauseAnalysis getClauseAnalysis()
   {
-    return clauseAnalysis;
+    return dummyClauseAnalysis;
   }
 
   public void setClauseAnalysis(ClauseAnalysis clauseAnalysis)
   {
-    this.clauseAnalysis = clauseAnalysis;
+    this.dummyClauseAnalysis = clauseAnalysis;
   }
 
 
