@@ -50,9 +50,8 @@ public class ControlPanel extends Panel
   private Window window;
   private String lastQuery;
   private Set<Long> lastCorpusSelection;
-
   private SearchOptionsPanel searchOptions;
-  
+
   public ControlPanel(MainApp app)
   {
     super("Search Form");
@@ -68,15 +67,16 @@ public class ControlPanel extends Panel
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
 
     corpusList = new CorpusListPanel(this);
-    
+
     searchOptions = new SearchOptionsPanel();
-    
-    accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(), "Export", null);
 
     queryPanel = new QueryPanel(this);
     queryPanel.setHeight(18f, Layout.UNITS_EM);
+
+    accordion.addTab(corpusList, "Corpus List", null);
+    accordion.addTab(searchOptions, "Search Options", null);
+    accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
+
 
     addComponent(queryPanel);
     addComponent(accordion);
@@ -86,9 +86,9 @@ public class ControlPanel extends Panel
 
   @Override
   public void attach()
-  {    
+  {
     super.attach();
-    this.window = getWindow(); 
+    this.window = getWindow();
   }
 
   public void setQuery(String query, Set<Long> corpora)
@@ -105,24 +105,23 @@ public class ControlPanel extends Panel
   {
     super.paintContent(target);
   }
-  
-  
+
   public void executeQuery()
   {
     if(app != null && app.getUser() == null)
     {
-      getWindow().showNotification("Please login first", 
+      getWindow().showNotification("Please login first",
         Window.Notification.TYPE_WARNING_MESSAGE);
-    }    
+    }
     else if(app != null && corpusList != null && queryPanel != null)
     {
-      
+
       Set<Long> rawCorpusSelection = corpusList.getSelectedCorpora();
-      
+
       // filter corpus selection by logged in user
       lastCorpusSelection = new TreeSet<Long>(rawCorpusSelection);
       lastCorpusSelection.retainAll(app.getUser().getCorpusIdList());
-      
+
       lastQuery = queryPanel.getQuery();
       if(lastCorpusSelection.isEmpty())
       {
@@ -141,8 +140,8 @@ public class ControlPanel extends Panel
       CountThread countThread = new CountThread();
       countThread.start();
 
-      app.showQueryResult(lastQuery, lastCorpusSelection, 
-        searchOptions.getLeftContext(), searchOptions.getRightContext(), 
+      app.showQueryResult(lastQuery, lastCorpusSelection,
+        searchOptions.getLeftContext(), searchOptions.getRightContext(),
         searchOptions.getResultsPerPage());
     }
   }

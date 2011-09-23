@@ -31,11 +31,11 @@ public class SearchOptionsPanel extends Panel
   private ComboBox cbResultsPerPage;
 
   // TODO: make this configurable
-  private static final String[] predefinedPageSizes = new String[] 
+  public static final String[] PREDEFINED_PAGE_SIZES = new String[] 
   {
     "1", "2", "5", "10", "15", "20", "25"
   };
-  private static final String[] predefinedContexts = new String[] 
+  public static final String[] PREDEFINED_CONTEXTS = new String[] 
   {
     "0", "1", "2", "5", "10"
   };
@@ -63,13 +63,13 @@ public class SearchOptionsPanel extends Panel
     cbRightContext.addValidator(new IntegerValidator("must be a number"));
     cbResultsPerPage.addValidator(new IntegerValidator("must be a number"));
     
-    for(String s : predefinedContexts)
+    for(String s : PREDEFINED_CONTEXTS)
     {
       cbLeftContext.addItem(s);
       cbRightContext.addItem(s);
     }
     
-    for(String s : predefinedPageSizes)
+    for(String s : PREDEFINED_PAGE_SIZES)
     {
       cbResultsPerPage.addItem(s);
     }

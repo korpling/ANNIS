@@ -119,7 +119,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       {
         return new ByteArrayInputStream(byteStream.toByteArray());
       }
-    }, entry.getVisType() + rand.nextLong(), getApplication());
+    }, entry.getVisType() + "_" + Math.abs(rand.nextLong()), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
