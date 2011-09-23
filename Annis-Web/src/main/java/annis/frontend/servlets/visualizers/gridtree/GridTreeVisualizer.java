@@ -1,4 +1,3 @@
-
 package annis.frontend.servlets.visualizers.gridtree;
 
 import annis.frontend.servlets.visualizers.VisualizerInput;
@@ -60,8 +59,7 @@ public class GridTreeVisualizer extends WriterVisualizer
       this.offset = offset;
       this.anno = anno;
       left = (root.getLeftToken() < offset) ? offset : root.getLeftToken();
-      right = (root.getRightToken() > offset + length) ? offset + length : root
-          .getRightToken();
+      right = (root.getRightToken() > offset + length) ? offset + length : root.getRightToken();
       calculateHeight(root, 0);
     }
 
@@ -77,7 +75,9 @@ public class GridTreeVisualizer extends WriterVisualizer
     public int compareTo(Span sp)
     {
       if (this.height > sp.height)
+      {
         return 1;
+      }
       if (this.height == sp.height)
       {
         if (this.left > sp.right)
@@ -101,7 +101,9 @@ public class GridTreeVisualizer extends WriterVisualizer
           AnnisNode tmp = incoming.getSource();
 
           if (hasAnno(tmp, anno))
+          {
             calculateHeight(tmp, height + 1);
+          }
 
           calculateHeight(tmp, height);
         }
@@ -124,6 +126,9 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     public void colspan(StringBuilder sb, String anno)
     {
+
+      String annoValue = getAnnoValue(this.root, anno);
+
       sb.append("<td colspan=\"");
       sb.append(Math.abs(this.right - this.left) + 1);
 
@@ -131,22 +136,28 @@ public class GridTreeVisualizer extends WriterVisualizer
       sb.append("\" id=\"intervall:");
       sb.append(this.hashCode());
       sb.append(":");
+
       sb.append(left + 1 - offset);
       sb.append("-");
       sb.append(right + 1 - offset);
 
+      sb.append("\" title=\"");
+      sb.append(anno);
+      sb.append("=");
+      sb.append(annoValue);
+
       sb.append("\" class=\"gridtree-result\" ");
-      sb.append("style=\"color:"
-          + input.getMarkableExactMap().get(Long.toString(this.root.getId()))
-          + "\">");
-      sb.append(getAnnoValue(this.root, anno));
+      sb.append("style=\"color:").append(input.getMarkableExactMap().get(Long.toString(this.root.getId()))).append("\">");
+      sb.append(annoValue);
       sb.append("</td>");
     }
 
     public boolean isInIntervall(long l)
     {
       if (this.left <= l && l <= this.right)
+      {
         return true;
+      }
       return false;
     }
   }
@@ -165,27 +176,25 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     try
     {
-      writer
-          .append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 
       writer.append("<link href=\""
-          + input.getResourcePath("jquery.tooltip.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+              + input.getResourcePath("jquery.tooltip.css")
+              + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getResourcePath("partitur.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+              + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getResourcePath("gridtree.css")
-          + "\" rel=\"stylesheet\" type=\"text/css\" >");
+              + "\" rel=\"stylesheet\" type=\"text/css\" >");
 
       writer.append("<script type=\"text/javascript\" src=\""
-          + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
+              + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
       writer.append("<script type=\"text/javascript\" src=\""
-          + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
+              + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
 
       writer.append("<script type=\"text/javascript\" src=\""
-          + input.getResourcePath("gridtreeVisualizer.js") + "\"></script>");
+              + input.getResourcePath("gridtreeVisualizer.js") + "\"></script>");
       writer.append("<body>");
-      writer
-          .append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
+      writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
       writer.append(findAnnotation(input.getResult().getGraph(), input, spans));
       writer.append("</table>\n");
       writer.append("</body></html>");
@@ -193,12 +202,11 @@ public class GridTreeVisualizer extends WriterVisualizer
     } catch (IOException e)
     {
       // TODO Auto-generated catch block
-      e.printStackTrace();
     }
   }
 
   private String findAnnotation(AnnotationGraph graph, VisualizerInput input,
-      ArrayList<Span> spans)
+          ArrayList<Span> spans)
   {
 
     List<AnnisNode> nodes = graph.getNodes();
@@ -215,7 +223,7 @@ public class GridTreeVisualizer extends WriterVisualizer
       if (hasAnno(n, anno))
       {
         Span tmp = new Span(n, result.get(0).getTokenIndex(), result.size(),
-            anno);
+                anno);
         spans.add(tmp);
       }
     }
@@ -228,7 +236,9 @@ public class GridTreeVisualizer extends WriterVisualizer
     htmlTableRow(sb, result);
 
     return sb.toString();
-  };
+  }
+
+  ;
 
   /**
    * Returns the annotation of a {@link AnnisNode}
@@ -243,7 +253,9 @@ public class GridTreeVisualizer extends WriterVisualizer
     for (Annotation a : n.getNodeAnnotations())
     {
       if (a.getQualifiedName().equals(anno))
+      {
         return a.getValue();
+      }
     }
 
     return null;
@@ -261,12 +273,16 @@ public class GridTreeVisualizer extends WriterVisualizer
   private boolean hasAnno(AnnisNode n, String annotation)
   {
     if (n == null)
+    {
       return false;
+    }
 
     for (Annotation x : n.getNodeAnnotations())
     {
       if (x.getQualifiedName().equals(annotation))
+      {
         return true;
+      }
     }
 
     return false;
@@ -285,7 +301,7 @@ public class GridTreeVisualizer extends WriterVisualizer
    *          the anno, which matches to all Span-Objects
    */
   private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
-      ArrayList<Span> spans, String anno)
+          ArrayList<Span> spans, String anno)
   {
 
     int j = 0;
@@ -304,7 +320,9 @@ public class GridTreeVisualizer extends WriterVisualizer
       {
 
         if (j < spans.size()) // check if there is a span left
+        {
           tmp = spans.get(j);
+        }
 
         // shift the index
         long index = i + result.get(0).getTokenIndex();
@@ -340,7 +358,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     for (AnnisNode n : result)
     {
-      sb.append("<td>" + n.getSpannedText() + "</td>");
+      sb.append("<td>").append(n.getSpannedText()).append("</td>");
     }
 
     sb.append("</tr>\n");
