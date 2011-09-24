@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.partitur;
 
+import annis.gui.Helper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import annis.service.ifaces.AnnisToken;
@@ -392,38 +393,17 @@ public class PartiturVisualizer extends WriterVisualizer
 
   private boolean checkRTL(List<AnnisToken> tokenList)
   {
-    boolean result = false;
     Iterator<AnnisToken> itToken = tokenList.listIterator();
-    while (itToken.hasNext() && !result)
+    while (itToken.hasNext())
     {
       AnnisToken tok = itToken.next();
       String tokText = tok.getText();
-      for (int i = 0; i < tokText.length(); i++)
+      if(Helper.containsRTLText(tokText))
       {
-        char cc = tokText.charAt(i);
-        // hebrew extended and basic, arabic basic and extendend
-        if (cc >= 1425 && cc <= 1785)
-        {
-          result = true;
-        }
-        // alphabetic presentations forms (hebrwew) to arabic presentation forms A
-        else if (cc >= 64286 && cc <= 65019)
-        {
-          result = true;
-        }
-        // arabic presentation forms B
-        else if (cc >= 65136 && cc <= 65276)
-        {
-          result = true;
-        }
-
-        if (result)
-        {
-          break;
-        }
+        return true;
       }
     }
 
-    return result;
+    return false;
   }
 }

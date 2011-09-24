@@ -33,6 +33,10 @@
   text-align: right;
 }
 
+.rtl {
+  direction: rtl;
+}
+
 .v-label-docPath {
   text-align: left;
   font-weight: normal;

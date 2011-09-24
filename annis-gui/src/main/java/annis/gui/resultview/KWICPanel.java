@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -72,6 +73,10 @@ public class KWICPanel extends Panel
     tblToken.setWidth("100%");
     tblToken.setHeight("-1px");
     tblToken.setPageLength(0);
+    if(checkRTL(result.getGraph().getTokens()))
+    {
+      tblToken.addStyleName("rtl");
+    }
     
     List<AnnisNode> token = result.getGraph().getTokens();
     ArrayList<Object> visible = new ArrayList<Object>(10);
@@ -149,6 +154,20 @@ public class KWICPanel extends Panel
       }
       return l;
     }
+  }
+ 
+  private boolean checkRTL(List<AnnisNode> tokenList)
+  {
+    for(AnnisNode tok : tokenList)
+    {
+      String tokText = tok.getSpannedText();
+      if(Helper.containsRTLText(tokText))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
   
 }
