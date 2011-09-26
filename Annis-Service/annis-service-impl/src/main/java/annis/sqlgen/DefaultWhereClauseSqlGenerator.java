@@ -205,18 +205,20 @@ public class DefaultWhereClauseSqlGenerator
         sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post + " AND\n");
         sb.append("\t" + pre + " < " + pre2 + " AND " + pre2 + " < " + post
           + " AND toplevel_corpus IN(" 
-          + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,","))
+          + (corpusList == null || corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,","))
           + "))");
         conditions.add(sb.toString());
 
       }
       else if (join instanceof LeftDominance)
       {
-        addLeftRightDominance(node, target, conditions, true, (RankTableJoin) join);
+        addLeftRightDominance(node, target, conditions, true, (RankTableJoin) join,
+          corpusList);
       }
       else if (join instanceof RightDominance)
       {
-        addLeftRightDominance(node, target, conditions, false, (RankTableJoin) join);
+        addLeftRightDominance(node, target, conditions, false, (RankTableJoin) join,
+          corpusList);
       }
       else if (join instanceof Dominance)
       {
@@ -382,7 +384,8 @@ public class DefaultWhereClauseSqlGenerator
   }
   
   protected void addLeftRightDominance(AnnisNode node, AnnisNode target , 
-    List<String> conditions, boolean left, RankTableJoin rankTableJoin)
+    List<String> conditions, boolean left, RankTableJoin rankTableJoin,
+    List<Long> corpusList)
   {
     conditions.add(join("=", tables(target).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"), tables(target).aliasedColumn(RANK_TABLE, "parent")));
@@ -403,7 +406,8 @@ public class DefaultWhereClauseSqlGenerator
       in(tables(target).aliasedColumn(NODE_TABLE, tok),
         "SELECT " + agg + "(lrsub." + tok + ") FROM " + FACTS_TABLE + " as lrsub "
         + "WHERE parent=" + tables(node).aliasedColumn(RANK_TABLE, "pre")
-        + " AND corpus_ref=" + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref") 
+        + " AND corpus_ref=" + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref")
+        + " AND toplevel_corpus IN(" + (corpusList == null || corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,",")) + ")"
     ));
   }
   
