@@ -193,7 +193,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
       writer.append("<script type=\"text/javascript\" src=\""
               + input.getResourcePath("gridtreeVisualizer.js") + "\"></script>");
-      writer.append("<body>");
+      writer.append("</head>\n<body>");
       writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
       writer.append(findAnnotation(input.getResult().getGraph(), input, spans));
       writer.append("</table>\n");
