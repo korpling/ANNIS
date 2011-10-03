@@ -17,9 +17,9 @@ package annis.gui.controlpanel;
 
 import annis.gui.Helper;
 import annis.gui.exporter.Exporter;
-import annis.gui.exporter.GridExporterServlet;
-import annis.gui.exporter.TextExporterServlet;
-import annis.gui.exporter.WekaExporterServlet;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.WekaExporter;
 import annis.security.AnnisUser;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.data.validator.IntegerValidator;
@@ -53,9 +53,9 @@ public class ExportPanel extends Panel implements Button.ClickListener
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
-    new WekaExporterServlet(),
-    new TextExporterServlet(),
-    new GridExporterServlet()
+    new WekaExporter(),
+    new TextExporter(),
+    new GridExporter()
   };
   private ComboBox cbExporter;
   private ComboBox cbLeftContext;

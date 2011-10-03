@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TextExporterServlet extends GeneralTextExporter
+public class TextExporter extends GeneralTextExporter
 {
 
   @Override

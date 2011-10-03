@@ -28,7 +28,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class WekaExporterServlet implements Exporter
+public class WekaExporter implements Exporter
 {
 
   private static final long serialVersionUID = -8182635617256833563L;
@@ -55,25 +55,25 @@ public class WekaExporterServlet implements Exporter
     {
       out.append(service.getWeka(corpusIdList, queryAnnisQL));
     }
+
+
+
+
     catch(AnnisQLSemanticsException ex)
     {
-      Logger.getLogger(WekaExporterServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch(AnnisQLSyntaxException ex)
+      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
+    }    catch(AnnisQLSyntaxException ex)
     {
-      Logger.getLogger(WekaExporterServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch(AnnisCorpusAccessException ex)
+      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
+    }    catch(AnnisCorpusAccessException ex)
     {
-      Logger.getLogger(WekaExporterServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch(RemoteException ex)
+      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
+    }    catch(RemoteException ex)
     {
-      Logger.getLogger(WekaExporterServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch(IOException ex)
+      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
+    }    catch(IOException ex)
     {
-      Logger.getLogger(WekaExporterServlet.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 

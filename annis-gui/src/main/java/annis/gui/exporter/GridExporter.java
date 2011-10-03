@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GridExporterServlet extends GeneralTextExporter
+public class GridExporter extends GeneralTextExporter
 {
 
   @Override
