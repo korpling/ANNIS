@@ -15,14 +15,12 @@
  */
 package annis.gui;
 
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.controlpanel.CorpusListPanel;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
@@ -35,6 +33,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,15 +53,15 @@ public class CorpusBrowserPanel extends Panel
    * 
    */
   private static final long serialVersionUID = -1029743017413951838L;
-  private long corpusId;
+  private AnnisCorpus corpus;
   private Table tblNodeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
 
-  public CorpusBrowserPanel(final long corpusId,
+  public CorpusBrowserPanel(final AnnisCorpus corpus,
     final ControlPanel controlPanel)
   {
     super("Available annotations");
-    this.corpusId = corpusId;
+    this.corpus = corpus;
 
     setSizeFull();
 
@@ -110,11 +109,11 @@ public class CorpusBrowserPanel extends Panel
       public void valueChange(ValueChangeEvent event)
       {
         CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
-        HashSet<Long> corpus = new HashSet<Long>();
-        corpus.add(corpusId);
+        HashMap<Long,AnnisCorpus> corpusMap = new HashMap<Long,AnnisCorpus>();
+        corpusMap.put(corpus.getId(), corpus);
         if(controlPanel != null)
         {
-          controlPanel.setQuery(cbe.getExample(), corpus);
+          controlPanel.setQuery(cbe.getExample(), corpusMap);
         }
       }
     });
@@ -131,7 +130,7 @@ public class CorpusBrowserPanel extends Panel
     boolean stripNodeAnno = true;
     HashSet<String> nodeAnnoNames = new HashSet<String>();
 
-    List<AnnisAttribute> attributes = fetchAnnos(corpusId);
+    List<AnnisAttribute> attributes = fetchAnnos(corpus.getId());
     // check for ambigous names first
     for(AnnisAttribute a : attributes)
     {
@@ -156,7 +155,7 @@ public class CorpusBrowserPanel extends Panel
         CorpusBrowserEntry cbe = new CorpusBrowserEntry();
         cbe.setName(name);
         cbe.setExample(name + "=\"" + getFirst(a.getValueSet()) + "\"");
-        cbe.setCorpusId(corpusId);
+        cbe.setCorpus(corpus);
         containerNodeAnno.addBean(cbe);
       }
 

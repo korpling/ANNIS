@@ -21,6 +21,7 @@ import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
+import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -185,7 +186,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     }
   }
 
-  public void showQueryResult(String aql, Map<Long, String> corpora, int contextLeft,
+  public void showQueryResult(String aql, Map<Long, AnnisCorpus> corpora, int contextLeft,
     int contextRight, int pageSize)
   {
     // remove old result from view
@@ -281,5 +282,11 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     return securityManager;
   }
 
+  public ControlPanel getControl()
+  {
+    return control;
+  }
+
+  
   
 }

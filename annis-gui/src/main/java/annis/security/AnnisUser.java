@@ -15,9 +15,11 @@
  */
 package annis.security;
 
+import annis.service.ifaces.AnnisCorpus;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 public class AnnisUser extends Properties
 {
@@ -28,7 +30,7 @@ public class AnnisUser extends Properties
   public final static String PASSWORD = "password";
   
   
-  private Set<Long> corpusIdList;
+  private Map<Long,AnnisCorpus> corpusList;
   private String userName = "";
   
   public String getSurName()
@@ -44,29 +46,34 @@ public class AnnisUser extends Properties
   /** (Almost) empty constructor, use this to load a stored property file*/
   public AnnisUser(String userName)
   {
-    this.corpusIdList = new TreeSet<Long>();
+    this.corpusList = new TreeMap<Long,AnnisCorpus>();
     this.userName = userName;
   }
 
   /** legacy construct */
   public AnnisUser(String userName, String surName, String givenName)
   {
-    this.corpusIdList = new TreeSet<Long>();
+    this.corpusList = new TreeMap<Long,AnnisCorpus>();
     this.userName = userName;
     setSurName(surName);
     setGivenName(givenName);
   }
 
+  public Map<Long, AnnisCorpus> getCorpusList()
+  {
+    return corpusList;
+  }
+
+  public void setCorpusList(Map<Long, AnnisCorpus> corpusList)
+  {
+    this.corpusList = corpusList;
+  }
+
   public Set<Long> getCorpusIdList()
   {
-    return corpusIdList;
+    return corpusList.keySet();
   }
-
-  public void setCorpusIdList(Set<Long> corpusIdList)
-  {
-    this.corpusIdList = corpusIdList;
-  }
-
+  
   public String getUserName()
   {
     return userName;

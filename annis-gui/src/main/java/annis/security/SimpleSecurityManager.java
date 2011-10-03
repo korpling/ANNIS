@@ -26,10 +26,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeSet;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
@@ -99,13 +98,13 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                 {
 
                   String[] allGroups = groupNames.split("\\s*,\\s*");
-                  HashSet<Long> userCorpora = new HashSet<Long>();
+                  TreeMap<Long, AnnisCorpus> userCorpora = new TreeMap<Long, AnnisCorpus>();
                   for(String g : allGroups)
                   {
                     if("*".equals(g))
                     {
                       // superuser, has all available corpora
-                      userCorpora.addAll(getAllAvailableCorpora().values());
+                      userCorpora.putAll(getAllAvailableCorpora());
 
                       break;
                     }
@@ -114,16 +113,16 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                       String groupCorporaAsString = groupProps.getProperty(g, "");
                       String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
 
-                      Map<String, Long> name2ID = getAllAvailableCorpora();
+                      Map<String, AnnisCorpus> name2ID = calculateName2ID(getAllAvailableCorpora());
 
-                      for(String c : corporaOfGroup)
+                      for(String groupCorpusName : corporaOfGroup)
                       {
                         try
                         {
-                          Long cID = name2ID.get(c);
-                          if(cID != null)
+                          AnnisCorpus c = name2ID.get(groupCorpusName);
+                          if(c != null)
                           {
-                            userCorpora.add(cID);
+                            userCorpora.put(c.getId(), c);
                           }
                         }
                         catch(NumberFormatException ex)
@@ -136,7 +135,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                   }
 
                   // create user object
-                  user.setCorpusIdList(userCorpora);
+                  user.setCorpusList(userCorpora);
 
                   // finally return the user
                   return user;
@@ -163,9 +162,9 @@ public class SimpleSecurityManager implements AnnisSecurityManager
       {
         // add all corpora to fallback user
         AnnisUser user = new AnnisUser(FALLBACK_USER);
-        TreeSet<Long> userCorpora = new TreeSet<Long>();
-        userCorpora.addAll(getAllAvailableCorpora().values());
-        user.setCorpusIdList(userCorpora);
+        TreeMap<Long, AnnisCorpus> userCorpora = new TreeMap<Long, AnnisCorpus>();
+        userCorpora.putAll(getAllAvailableCorpora());
+        user.setCorpusList(userCorpora);
         return user;
       }
 
@@ -173,10 +172,20 @@ public class SimpleSecurityManager implements AnnisSecurityManager
     // not authorized
     throw new AuthenticationException("invalid user name or password");
   }
-
-  private Map<String, Long> getAllAvailableCorpora()
+  
+  private Map<String, AnnisCorpus> calculateName2ID(Map<Long, AnnisCorpus> corpusMap)
   {
-    HashMap<String, Long> result = new HashMap<String, Long>();
+    TreeMap<String,AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
+    for(AnnisCorpus c  : corpusMap.values())
+    {
+      result.put(c.getName(), c);
+    }
+    return result;
+  }
+
+  private Map<Long, AnnisCorpus> getAllAvailableCorpora()
+  {
+    HashMap<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
     try
     {
       String url = properties.getProperty("AnnisRemoteService.URL", "rmi://localhost:4711/AnnisService");
@@ -184,16 +193,11 @@ public class SimpleSecurityManager implements AnnisSecurityManager
       AnnisCorpusSet corpusSet = service.getCorpusSet();
       for(AnnisCorpus corpus : corpusSet)
       {
-        result.put(corpus.getName(), corpus.getId());
+        result.put(corpus.getId(), corpus);
       }
     }
     catch(Exception e)
     {
-      // fallback...
-      for(long i = 1; i <= 100; i++)
-      {
-        result.put("" + i, i);
-      }
     }
     return result;
   }

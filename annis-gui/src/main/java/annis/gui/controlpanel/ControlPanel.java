@@ -18,11 +18,11 @@ package annis.gui.controlpanel;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.MainApp;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
 import annis.service.AnnisService;
+import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -34,9 +34,7 @@ import com.vaadin.ui.Window;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +51,7 @@ public class ControlPanel extends Panel
   private SearchWindow searchWindow;
   private Window window;
   private String lastQuery;
-  private Map<Long,String> lastCorpusSelection;
+  private Map<Long,AnnisCorpus> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
 
   public ControlPanel(SearchWindow searchWindow)
@@ -95,7 +93,7 @@ public class ControlPanel extends Panel
     this.window = getWindow();
   }
 
-  public void setQuery(String query, Set<Long> corpora)
+  public void setQuery(String query, Map<Long,AnnisCorpus> corpora)
   {
     if(queryPanel != null && corpusList != null)
     {
@@ -120,10 +118,10 @@ public class ControlPanel extends Panel
     else if(getApplication() != null && corpusList != null && queryPanel != null)
     {
 
-      Map<Long,String> rawCorpusSelection = corpusList.getSelectedCorpora();
+      Map<Long,AnnisCorpus> rawCorpusSelection = corpusList.getSelectedCorpora();
 
       // filter corpus selection by logged in user
-      lastCorpusSelection = new TreeMap<Long, String>(rawCorpusSelection);
+      lastCorpusSelection = new TreeMap<Long, AnnisCorpus>(rawCorpusSelection);
       AnnisUser user = (AnnisUser) getApplication().getUser();
       if(user != null)
       {

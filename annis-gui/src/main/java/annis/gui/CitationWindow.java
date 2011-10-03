@@ -15,11 +15,17 @@
  */
 package annis.gui;
 
+import annis.gui.controlpanel.ControlPanel;
+import annis.security.AnnisUser;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.URIHandler;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,29 +56,44 @@ public class CitationWindow extends Window implements URIHandler
   @Override
   public DownloadStream handleURI(URL context, String relativeUri)
   {
+    SearchWindow w = (SearchWindow) getApplication().getWindow("Search");
+    if(w == null)
+    {
+      return null;
+    }
+    
+    AnnisUser user = (AnnisUser) getApplication().getUser();
+    if(user == null)
+    {
+      return null;
+    }
+    
+    ControlPanel controlPanel = w.getControl();
     Matcher m = citationPattern.matcher(relativeUri);
     if(m.matches())
     {
-//      // AQL
-//      String aql = "";
-//      if(m.group(1) != null)
-//      {
-//        formPanelSearch.getComponent('queryAnnisQL').setValue(Url.decode(params[1]));
-//      }
-//
-//      // CIDS
-//      if(params[2] != undefined)
-//      {
-//        var cids = params[2].split(',');
-//        var selection = new Array();
-//        for(i=0;i<cids.length;i++)
-//        {
-//          var index = store.findExact('name',cids[i]);
-//          selection[i] = store.getAt(index);
-//        }
-//        selectionModel.selectRecords(selection, false);
-//      }
-//
+      // AQL
+      String aql = "";
+      if(m.group(1) != null)
+      {
+        try
+        {
+          aql = URLDecoder.decode(m.group(1), "UTF-8");
+        }
+        catch(UnsupportedEncodingException ex)
+        {
+          Logger.getLogger(CitationWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+
+      // CIDS
+      
+      if(m.group(2) != null)
+      {
+        String[] cids = m.group(2).split(",");        
+      }
+      controlPanel.setQuery(aql, null);
+      
 //      // CLEFT
 //      if(params[4] != undefined)
 //      {

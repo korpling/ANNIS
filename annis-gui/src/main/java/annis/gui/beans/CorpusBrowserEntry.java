@@ -15,6 +15,8 @@
  */
 package annis.gui.beans;
 
+import annis.service.ifaces.AnnisCorpus;
+
 /**
  *
  * @author thomas
@@ -23,7 +25,7 @@ public class CorpusBrowserEntry
 {
   private String name;
   private String example;
-  private long corpusId;
+  private AnnisCorpus corpus;
 
   public String getExample()
   {
@@ -45,14 +47,14 @@ public class CorpusBrowserEntry
     this.name = name;
   }
 
-  public long getCorpusId()
+  public AnnisCorpus getCorpus()
   {
-    return corpusId;
+    return corpus;
   }
 
-  public void setCorpusId(long corpusId)
+  public void setCorpus(AnnisCorpus corpus)
   {
-    this.corpusId = corpusId;
+    this.corpus = corpus;
   }
 
   @Override
@@ -75,7 +77,7 @@ public class CorpusBrowserEntry
     {
       return false;
     }
-    if(this.corpusId != other.corpusId)
+    if(this.corpus != other.corpus)
     {
       return false;
     }
@@ -85,12 +87,14 @@ public class CorpusBrowserEntry
   @Override
   public int hashCode()
   {
-    int hash = 5;
-    hash = 89 * hash + (this.name != null ? this.name.hashCode() : 0);
-    hash = 89 * hash + (this.example != null ? this.example.hashCode() : 0);
-    hash = 89 * hash + (int) (this.corpusId ^ (this.corpusId >>> 32));
+    int hash = 7;
+    hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
+    hash = 67 * hash + (this.example != null ? this.example.hashCode() : 0);
+    hash = 67 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
     return hash;
   }
+
+  
   
   
 }

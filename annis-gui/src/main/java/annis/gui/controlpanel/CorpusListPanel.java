@@ -446,28 +446,28 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
   }
 
-  protected void selectCorpora(Set<Long> corpora)
+  protected void selectCorpora(Map<Long, AnnisCorpus> corpora)
   {
     if(tblCorpora != null)
     {
       tblCorpora.setValue(null);
-      for(Long l : corpora)
+      for(Long l : corpora.keySet())
       {
         tblCorpora.select(l);
       }
     }
   }
 
-  protected Map<Long, String> getSelectedCorpora()
+  protected Map<Long, AnnisCorpus> getSelectedCorpora()
   {
-    HashMap<Long, String> result = new HashMap<Long, String>();
+    HashMap<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
 
     for(Long id : corpusContainer.getItemIds())
     {
       if(tblCorpora.isSelected(id))
       {
         AnnisCorpus c = (AnnisCorpus) corpusContainer.getItem(id).getBean();
-        result.put(id, c.getName());
+        result.put(id, c);
       }
     }
 
@@ -495,7 +495,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
           MetaDataPanel meta = new MetaDataPanel(c.getId());
           if(controlPanel != null)
           {
-            CorpusBrowserPanel browse = new CorpusBrowserPanel(c.getId(), controlPanel);
+            CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controlPanel);
             HorizontalLayout layout = new HorizontalLayout();
             layout.addComponent(meta);
             layout.addComponent(browse);

@@ -23,6 +23,7 @@ import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
+import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
@@ -34,7 +35,6 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.util.LinkedList;
@@ -56,7 +56,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
-  private Map<Long,String> corpora;
+  private Map<Long,AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private VerticalLayout layout;
@@ -66,7 +66,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private MenuItem miTokAnnos;
   private TreeMap<String,Boolean> tokenAnnoVisible;
 
-  public ResultViewPanel(String aql, Map<Long, String> corpora,
+  public ResultViewPanel(String aql, Map<Long, AnnisCorpus> corpora,
     int contextLeft, int contextRight, int pageSize,
     PluginSystem ps)
   {
@@ -229,8 +229,14 @@ public class ResultViewPanel extends Panel implements PagingCallback
     Window w = new Window("Citation");
     VerticalLayout wLayout = (VerticalLayout) w.getContent();
     TextArea txtCitation = new TextArea();
+    
+    LinkedList<String> corpusNames = new LinkedList<String>();
+    for(AnnisCorpus c : corpora.values())
+    {
+      corpusNames.add(c.getName());
+    }    
     txtCitation.setValue(Helper.generateCitation(getApplication(), 
-      aql, new LinkedList<String>(corpora.values()), contextLeft, contextRight));
+      aql, corpusNames, contextLeft, contextRight));
     txtCitation.setReadOnly(true);
     txtCitation.setRows(5);
     txtCitation.setSizeFull();
