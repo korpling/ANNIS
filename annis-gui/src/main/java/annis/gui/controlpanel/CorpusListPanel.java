@@ -187,7 +187,10 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
             {
               Long val = Long.parseLong(s);
               AnnisCorpus c = allCorpora.get(val);
-              corpora.put(c.getId(), c);
+              if(c != null)
+              {
+                corpora.put(c.getId(), c);
+              }
             }
             catch(NumberFormatException ex)
             {
