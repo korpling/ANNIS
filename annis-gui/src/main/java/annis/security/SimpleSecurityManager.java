@@ -15,6 +15,7 @@
  */
 package annis.security;
 
+import annis.gui.Helper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
@@ -113,13 +114,14 @@ public class SimpleSecurityManager implements AnnisSecurityManager
                       String groupCorporaAsString = groupProps.getProperty(g, "");
                       String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
 
-                      Map<String, AnnisCorpus> name2ID = calculateName2ID(getAllAvailableCorpora());
+                      Map<String, AnnisCorpus> name2Corpus = 
+                        Helper.calculateName2Corpus(getAllAvailableCorpora());
 
                       for(String groupCorpusName : corporaOfGroup)
                       {
                         try
                         {
-                          AnnisCorpus c = name2ID.get(groupCorpusName);
+                          AnnisCorpus c = name2Corpus.get(groupCorpusName);
                           if(c != null)
                           {
                             userCorpora.put(c.getId(), c);
@@ -173,16 +175,6 @@ public class SimpleSecurityManager implements AnnisSecurityManager
     throw new AuthenticationException("invalid user name or password");
   }
   
-  private Map<String, AnnisCorpus> calculateName2ID(Map<Long, AnnisCorpus> corpusMap)
-  {
-    TreeMap<String,AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
-    for(AnnisCorpus c  : corpusMap.values())
-    {
-      result.put(c.getName(), c);
-    }
-    return result;
-  }
-
   private Map<Long, AnnisCorpus> getAllAvailableCorpora()
   {
     HashMap<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();

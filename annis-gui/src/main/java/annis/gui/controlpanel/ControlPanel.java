@@ -101,6 +101,14 @@ public class ControlPanel extends Panel
       corpusList.selectCorpora(corpora);
     }
   }
+  
+  public void setQuery(String query, Map<Long,AnnisCorpus> corpora, 
+    int contextLeft, int contextRight)
+  {
+    setQuery(query, corpora);
+    searchOptions.setLeftContext(contextLeft);
+    searchOptions.setRightContext(contextRight);
+  }
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException

@@ -18,17 +18,18 @@ package annis.gui;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
+import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -115,5 +116,15 @@ public class Helper
     }
 
     return sb.toString();
+  }
+  
+  public static Map<String, AnnisCorpus> calculateName2Corpus(Map<Long, AnnisCorpus> corpusMap)
+  {
+    TreeMap<String,AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
+    for(AnnisCorpus c  : corpusMap.values())
+    {
+      result.put(c.getName(), c);
+    }
+    return result;
   }
 }

@@ -50,6 +50,7 @@ import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -450,11 +451,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     if(tblCorpora != null)
     {
-      tblCorpora.setValue(null);
-      for(Long l : corpora.keySet())
-      {
-        tblCorpora.select(l);
-      }
+      tblCorpora.setValue(corpora.keySet());
     }
   }
 

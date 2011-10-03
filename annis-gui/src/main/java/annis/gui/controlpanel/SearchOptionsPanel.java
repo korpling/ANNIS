@@ -84,6 +84,11 @@ public class SearchOptionsPanel extends Panel
 
   }
   
+  public void setLeftContext(int context)
+  {
+    cbLeftContext.setValue("" + context);
+  }
+  
   public int getLeftContext()
   {
     int result = 5;
@@ -114,6 +119,11 @@ public class SearchOptionsPanel extends Panel
     return Math.max(0, result);
   }
   
+  public void setRightContext(int context)
+  {
+    cbRightContext.setValue("" + context);
+  }
+  
   public int getResultsPerPage()
   {
     int result = 10;
@@ -128,4 +138,6 @@ public class SearchOptionsPanel extends Panel
     
     return Math.max(0, result);
   }
+  
+  
 }

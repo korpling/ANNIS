@@ -26,10 +26,14 @@ import annis.security.AnnisUser;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
@@ -226,24 +230,36 @@ public class ResultViewPanel extends Panel implements PagingCallback
   
   private void showCitationURLWindow()
   {
-    Window w = new Window("Citation");
+    final Window w = new Window("Citation");
     VerticalLayout wLayout = (VerticalLayout) w.getContent();
-    TextArea txtCitation = new TextArea();
-    
+        
     LinkedList<String> corpusNames = new LinkedList<String>();
     for(AnnisCorpus c : corpora.values())
     {
       corpusNames.add(c.getName());
-    }    
-    txtCitation.setValue(Helper.generateCitation(getApplication(), 
-      aql, corpusNames, contextLeft, contextRight));
+    }
+    String url = Helper.generateCitation(getApplication(), 
+      aql, corpusNames, contextLeft, contextRight);
+    TextArea txtCitation = new TextArea();
+
+    txtCitation.setWidth("100%");
+    txtCitation.setHeight("-1px");
+    txtCitation.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
+    txtCitation.setValue(url);
+    txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
-    txtCitation.setRows(5);
-    txtCitation.setSizeFull();
     
     w.addComponent(txtCitation);
     
     Button btOk = new Button("OK");
+    btOk.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        getWindow().removeWindow(w);
+      }
+    });
     btOk.setSizeUndefined();
     
     w.addComponent(btOk);
@@ -251,7 +267,11 @@ public class ResultViewPanel extends Panel implements PagingCallback
     wLayout.setExpandRatio(txtCitation, 1.0f);
     wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
     
+    w.setWidth("400px");
+    w.setHeight("-1px");
+    
     getWindow().addWindow(w);
+    w.center();
   }
 
   private void updateTokenAnnos(AnnisResultSet resultSet)
