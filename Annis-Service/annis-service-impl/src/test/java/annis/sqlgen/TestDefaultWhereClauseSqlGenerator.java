@@ -381,7 +381,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_component42.type", "'d'"),
         join("=", "_rank23.pre", "_rank42.parent"),
 				"_component42.name IS NULL",
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref)"
+        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))"
 		);
 	}
 	
@@ -393,7 +393,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 				join("=", "_component42.type", "'d'"),
         join("=", "_rank23.pre", "_rank42.parent"),
 				"_component42.name IS NULL",
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref)"
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))"
 		);
 	}
 	

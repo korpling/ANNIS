@@ -4,10 +4,10 @@ function highlightedToken(element, lastRow, changeClass)
   element.addClass("hover");
   
   // fetch the intervall for highlight the tokens. the form is:
-  // id="interval:hashcode:n-m"
+  // id="interval:hashcode:n-m:namespace:anno=anno_value"
   var intervall = element.attr('id').split(':');
-  var left = intervall[intervall.length - 1].split('-')[0];
-  var right = intervall[intervall.length - 1].split('-')[1];
+  var left = intervall[2].split('-')[0];
+  var right = intervall[2].split('-')[1];
 
   $.each(lastRow, function(unusedIndex, td)
   {
@@ -26,7 +26,7 @@ $(document).ready(function()
     mouseover : function(e)
     {
       highlightedToken($(this), lastRow, function(element)
-      {
+      {        
         element.addClass("highlightedToken");
       });
     },
@@ -38,5 +38,7 @@ $(document).ready(function()
       });
     }
   });
+  
+  $("#gridtree-partitur *[colspan]").tooltip();
 
 });
