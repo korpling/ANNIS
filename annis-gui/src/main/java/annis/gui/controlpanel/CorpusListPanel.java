@@ -50,10 +50,8 @@ import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -142,9 +140,9 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
     tblCorpora.setNullSelectionAllowed(false);
-    tblCorpora.setColumnExpandRatio("name", 0.7f);
+    tblCorpora.setColumnExpandRatio("name", 0.6f);
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
-    tblCorpora.setColumnExpandRatio("tokenCount", 0.15f);
+    tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.setColumnWidth("info", 18);
     tblCorpora.addActionHandler((Action.Handler) this);
 

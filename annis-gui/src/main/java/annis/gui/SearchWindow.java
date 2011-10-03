@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.querybuilder.TigerQueryBuilder;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisSecurityManager;
@@ -23,9 +24,6 @@ import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.addon.chameleon.ChameleonTheme;
-import com.vaadin.event.FieldEvents.FocusEvent;
-import com.vaadin.event.FieldEvents.FocusListener;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -38,7 +36,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +45,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.naming.AuthenticationException;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -148,6 +144,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
+    mainTab.addTab(new TigerQueryBuilder(), "Query Builder", null);
+    
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
 
