@@ -21,7 +21,6 @@ import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,12 +46,15 @@ public class SimpleCanvas extends AbstractComponent
     target.startTag("clear");
     target.endTag("clear");
     
-    target.startTag("line");
-    target.addAttribute("from_x", 0);
-    target.addAttribute("from_y", 0);    
-    target.addAttribute("to_x", 10000);
-    target.addAttribute("to_y", 1000);
-    target.endTag("line");
+    for(Line2D l : lines)
+    {
+      target.startTag("line");
+      target.addAttribute("from_x", l.getX1());
+      target.addAttribute("from_y", l.getY1());    
+      target.addAttribute("to_x", l.getX2());
+      target.addAttribute("to_y", l.getY2());
+      target.endTag("line");
+    }
   }
 
   public List<Line2D> getLines()

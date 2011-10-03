@@ -25,13 +25,13 @@ import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 {
 
   private SimpleCanvas canvas;
-  private List<NodeWindow> nodes;
+  private List<DragAndDropWrapper> nodes;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
   private int number = 0;
@@ -51,7 +51,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   public TigerQueryBuilder()
   {
 
-    nodes = new ArrayList<NodeWindow>();
+    nodes = new ArrayList<DragAndDropWrapper>();
 
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeUndefined();
@@ -75,17 +75,16 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     area.addStyleName("no-horizontal-drag-hints");
     area.addStyleName("no-box-drag-hints");
 
-    handler = new AbsoluteDropHandler(area);
-
-    DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
-    areaPane.setDropHandler(handler);
-
     canvas = new SimpleCanvas();
     canvas.setWidth("2000px");
     canvas.setHeight("2000px");
 
-    area.addComponent(canvas, "top:0px;left:0px");
+    handler = new AbsoluteDropHandler(area, nodes, canvas);
 
+    DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
+    areaPane.setDropHandler(handler);
+
+    area.addComponent(canvas, "top:0px;left:0px");
     addComponent(areaPane);
   }
 
@@ -94,11 +93,14 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   {
 
     //final int number = nodes.size();
-    Button n = new Button("button " + number++);
+    NodeWindow n = new NodeWindow(number++);
     DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-
-    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.COMPONENT);
-    wrapper.setSizeUndefined();
+    nodes.add(wrapper);
+    
+    
+    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
+    wrapper.setWidth("140px");
+    wrapper.setHeight("140px");
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
   }
 
@@ -106,10 +108,15 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   {
 
     private AbsoluteLayout layout;
+    private List<DragAndDropWrapper> nodes;
+    private SimpleCanvas canvas;
 
-    public AbsoluteDropHandler(AbsoluteLayout layout)
+    public AbsoluteDropHandler(AbsoluteLayout layout, List<DragAndDropWrapper> nodes,
+      SimpleCanvas canvas)
     {
       this.layout = layout;
+      this.nodes = nodes;
+      this.canvas = canvas;
     }
 
     @Override
@@ -117,8 +124,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     {
       WrapperTransferable t = (WrapperTransferable) event.getTransferable();
       WrapperTargetDetails details = (WrapperTargetDetails) event.getTargetDetails();
-      Component c = t.getSourceComponent();
-
+      
       int xChange = details.getMouseEvent().getClientX()
         - t.getMouseDownEvent().getClientX();
       int yChange = details.getMouseEvent().getClientY()
@@ -130,7 +136,24 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       pos.setLeftValue(pos.getLeftValue() + xChange);
       pos.setTopValue(pos.getTopValue() + yChange);
 
-      layout.getWindow().showNotification("dropped");
+      // connect each with each
+      canvas.getLines().clear();
+          
+      for(int i = 0; i < nodes.size(); i++)
+      {
+        DragAndDropWrapper w1 = nodes.get(i);
+        ComponentPosition p1 = layout.getPosition(w1);
+        for(int j = i + 1; j < nodes.size(); j++)
+        {
+          DragAndDropWrapper w2 = nodes.get(j);
+          ComponentPosition p2 = layout.getPosition(w2);
+          canvas.getLines().add(new Line2D.Float(
+            p1.getLeftValue() + (w1.getWidth()/2), p1.getTopValue() + (w1.getHeight()/2), 
+            p2.getLeftValue() + (w2.getWidth()/2), p2.getTopValue() + (w2.getHeight()/2)));
+        }
+      }
+      canvas.requestRepaint();
+
     }
 
     @Override
