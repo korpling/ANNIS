@@ -24,6 +24,9 @@ import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -91,37 +94,37 @@ public class Helper
     }
     return false;
   }
-  
-  public static String generateCitation(Application app, String aql, List<String> corpora, 
+
+  public static String generateCitation(Application app, String aql, List<String> corpora,
     int contextLeft, int contextRight)
   {
     StringBuilder sb = new StringBuilder();
-     
+
+    sb.append(app.getURL().toString());
+    sb.append("Cite/AQL(");
+    sb.append(aql);
+    sb.append("),CIDS(");
+    sb.append(StringUtils.join(corpora, ","));
+    sb.append("),CLEFT(");
+    sb.append(contextLeft);
+    sb.append("),CRIGHT(");
+    sb.append(contextRight);
+    sb.append(")");
     try
     {
-      sb.append(app.getWindow("Cite").getURL());
-      sb.append("AQL(");    
-      sb.append(URLEncoder.encode(aql, "UTF-8"));
-      sb.append("),CIDS(");
-      sb.append(StringUtils.join(corpora, ","));
-      sb.append("),CLEFT(");
-      sb.append(contextLeft);
-      sb.append("),CRIGHT(");
-      sb.append(contextRight);
-      sb.append(")");
+      return new URI(sb.toString()).toASCIIString();
     }
-    catch(UnsupportedEncodingException ex)
+    catch(URISyntaxException ex)
     {
       Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
     }
-
     return sb.toString();
   }
-  
+
   public static Map<String, AnnisCorpus> calculateName2Corpus(Map<Long, AnnisCorpus> corpusMap)
   {
-    TreeMap<String,AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
-    for(AnnisCorpus c  : corpusMap.values())
+    TreeMap<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
+    for(AnnisCorpus c : corpusMap.values())
     {
       result.put(c.getName(), c);
     }

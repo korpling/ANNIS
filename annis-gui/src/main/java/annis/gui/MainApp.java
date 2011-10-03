@@ -33,8 +33,12 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -42,6 +46,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
@@ -54,37 +60,31 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener
+  UserChangeListener, HttpServletRequestListener
 {
 
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
+  public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private SearchWindow windowSearch;
-  
   private PluginManager pluginManager;
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
-  
-  private CitationWindow windowCitation;
 
   @Override
   public void init()
   {
     addListener((UserChangeListener) this);
-    
+
     initPlugins();
 
     setTheme("annis-theme");
 
     windowSearch = new SearchWindow((PluginSystem) this);
     setMainWindow(windowSearch);
-    
-    windowCitation = new CitationWindow();
-    addWindow(windowCitation);    
-    
-  }
 
+  }
 
   @Override
   public void setUser(Object user)
@@ -120,7 +120,6 @@ public class MainApp extends Application implements PluginSystem,
     }
   }
 
-  
   private void initPlugins()
   {
     Logger log = Logger.getLogger(MainApp.class.getName());
@@ -178,8 +177,6 @@ public class MainApp extends Application implements PluginSystem,
     }
   }
 
-  
-
   @Override
   public void close()
   {
@@ -214,5 +211,38 @@ public class MainApp extends Application implements PluginSystem,
   {
     return windowSearch.getSecurityManager();
   }
-  
+
+  @Override
+  public void onRequestStart(HttpServletRequest request, HttpServletResponse response)
+  {
+    String origURI = request.getRequestURI();
+    String parameters = origURI.replaceAll(".*?/Cite(/)?", "");
+    if(!"".equals(parameters) && !origURI.equals(parameters))
+    {
+      try
+      {
+        String decoded = URLDecoder.decode(parameters, "UTF-8");
+        windowSearch.evaluateCitation(decoded);
+        try
+        {
+          response.sendRedirect(windowSearch.getURL().toString());
+        }
+        catch(IOException ex)
+        {
+          Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+      catch(UnsupportedEncodingException ex)
+      {
+        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+
+    }
+  }
+
+  @Override
+  public void onRequestEnd(HttpServletRequest request, HttpServletResponse response)
+  {
+  }
 }
