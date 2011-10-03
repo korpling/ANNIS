@@ -27,11 +27,18 @@ import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -49,7 +56,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
-  private Set<Long> corpora;
+  private Map<Long,String> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private VerticalLayout layout;
@@ -59,7 +66,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private MenuItem miTokAnnos;
   private TreeMap<String,Boolean> tokenAnnoVisible;
 
-  public ResultViewPanel(String aql, Set<Long> corpora, 
+  public ResultViewPanel(String aql, Map<Long, String> corpora,
     int contextLeft, int contextRight, int pageSize,
     PluginSystem ps)
   {
@@ -80,6 +87,15 @@ public class ResultViewPanel extends Panel implements PagingCallback
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     miTokAnnos = mbResult.addItem("Token Annotations", null);
+    
+    mbResult.addItem("Show Citation URL", new MenuBar.Command() {
+
+      @Override
+      public void menuSelected(MenuItem selectedItem)
+      {
+        showCitationURLWindow();
+      }
+    });
     
     paging = new PagingComponent(0, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
@@ -110,7 +126,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {    
-    query = new AnnisResultQuery(corpora, aql,
+    query = new AnnisResultQuery(corpora.keySet(), aql,
       contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
     createPage(0, pageSize);
     
@@ -206,6 +222,30 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
     
     return result;
+  }
+  
+  private void showCitationURLWindow()
+  {
+    Window w = new Window("Citation");
+    VerticalLayout wLayout = (VerticalLayout) w.getContent();
+    TextArea txtCitation = new TextArea();
+    txtCitation.setValue(Helper.generateCitation(getApplication(), 
+      aql, new LinkedList<String>(corpora.values()), contextLeft, contextRight));
+    txtCitation.setReadOnly(true);
+    txtCitation.setRows(5);
+    txtCitation.setSizeFull();
+    
+    w.addComponent(txtCitation);
+    
+    Button btOk = new Button("OK");
+    btOk.setSizeUndefined();
+    
+    w.addComponent(btOk);
+    
+    wLayout.setExpandRatio(txtCitation, 1.0f);
+    wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
+    
+    getWindow().addWindow(w);
   }
 
   private void updateTokenAnnos(AnnisResultSet resultSet)

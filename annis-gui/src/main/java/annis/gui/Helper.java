@@ -22,8 +22,14 @@ import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -83,5 +89,31 @@ public class Helper
       }
     }
     return false;
+  }
+  
+  public static String generateCitation(Application app, String aql, List<String> corpora, 
+    int contextLeft, int contextRight)
+  {
+    StringBuilder sb = new StringBuilder();
+     
+    try
+    {
+      sb.append(app.getWindow("Cite").getURL());
+      sb.append("AQL(");    
+      sb.append(URLEncoder.encode(aql, "UTF-8"));
+      sb.append("),CIDS(");
+      sb.append(StringUtils.join(corpora, ","));
+      sb.append("),CLEFT(");
+      sb.append(contextLeft);
+      sb.append("),CRIGHT(");
+      sb.append(contextRight);
+      sb.append(")");
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    return sb.toString();
   }
 }

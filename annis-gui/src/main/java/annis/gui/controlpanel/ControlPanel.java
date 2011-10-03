@@ -20,6 +20,8 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.MainApp;
 import annis.gui.Helper;
+import annis.gui.SearchWindow;
+import annis.security.AnnisUser;
 import annis.service.AnnisService;
 import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
@@ -31,7 +33,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,16 +50,16 @@ public class ControlPanel extends Panel
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
-  private MainApp app;
+  private SearchWindow searchWindow;
   private Window window;
   private String lastQuery;
-  private Set<Long> lastCorpusSelection;
+  private Map<Long,String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
 
-  public ControlPanel(MainApp app)
+  public ControlPanel(SearchWindow searchWindow)
   {
     super("Search Form");
-    this.app = app;
+    this.searchWindow = searchWindow;
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
@@ -108,20 +112,23 @@ public class ControlPanel extends Panel
 
   public void executeQuery()
   {
-    if(app != null && app.getUser() == null)
+    if(getApplication() != null && getApplication().getUser() == null)
     {
       getWindow().showNotification("Please login first",
         Window.Notification.TYPE_WARNING_MESSAGE);
     }
-    else if(app != null && corpusList != null && queryPanel != null)
+    else if(getApplication() != null && corpusList != null && queryPanel != null)
     {
 
-      Set<Long> rawCorpusSelection = corpusList.getSelectedCorpora();
+      Map<Long,String> rawCorpusSelection = corpusList.getSelectedCorpora();
 
       // filter corpus selection by logged in user
-      lastCorpusSelection = new TreeSet<Long>(rawCorpusSelection);
-      lastCorpusSelection.retainAll(app.getUser().getCorpusIdList());
-
+      lastCorpusSelection = new TreeMap<Long, String>(rawCorpusSelection);
+      AnnisUser user = (AnnisUser) getApplication().getUser();
+      if(user != null)
+      {
+        lastCorpusSelection.keySet().retainAll(user.getCorpusIdList());
+      }
       lastQuery = queryPanel.getQuery();
       if(lastCorpusSelection.isEmpty())
       {
@@ -140,7 +147,7 @@ public class ControlPanel extends Panel
       CountThread countThread = new CountThread();
       countThread.start();
 
-      app.showQueryResult(lastQuery, lastCorpusSelection,
+      searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
         searchOptions.getLeftContext(), searchOptions.getRightContext(),
         searchOptions.getResultsPerPage());
     }
@@ -154,14 +161,14 @@ public class ControlPanel extends Panel
     @Override
     public void run()
     {
-      AnnisService service = Helper.getService(app, window);
+      AnnisService service = Helper.getService(getApplication(), window);
       if(service != null)
       {
         try
         {
 
           count = service.getCount(new LinkedList<Long>(
-            lastCorpusSelection), lastQuery);
+            lastCorpusSelection.keySet()), lastQuery);
 
         }
         catch(RemoteException ex)
@@ -198,7 +205,7 @@ public class ControlPanel extends Panel
       }
 
       queryPanel.setStatus("" + count + " matches");
-      app.updateQueryCount(count);
+      searchWindow.updateQueryCount(count);
 
       queryPanel.setCountIndicatorEnabled(false);
     }

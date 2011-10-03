@@ -21,7 +21,6 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.security.AnnisUser;
-import com.vaadin.addon.chameleon.ChameleonTheme;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.StreamResource;
@@ -144,7 +143,8 @@ public class ExportPanel extends Panel implements Button.ClickListener
 
         // check corpus access
         AnnisUser user = (AnnisUser) getApplication().getUser();
-        if(user == null || !user.getCorpusIdList().containsAll(corpusListPanel.getSelectedCorpora()))
+        if(user == null || !user.getCorpusIdList().containsAll(
+          corpusListPanel.getSelectedCorpora().keySet()))
         {
           getWindow().showNotification("Illegal corpus access",
             Notification.TYPE_ERROR_MESSAGE);
@@ -163,7 +163,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
             exporter.convertText(queryPanel.getQuery(),
               Integer.parseInt((String) cbLeftContext.getValue()),
               Integer.parseInt((String) cbRightContext.getValue()),
-              StringUtils.join(corpusListPanel.getSelectedCorpora().toArray()),
+              StringUtils.join(corpusListPanel.getSelectedCorpora().keySet().toArray()),
               null, (String) txtParameters.getValue(),
               Helper.getService(getApplication(), getWindow()), new OutputStreamWriter(out));
           }
