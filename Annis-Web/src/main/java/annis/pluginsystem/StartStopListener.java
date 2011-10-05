@@ -27,6 +27,7 @@ import annis.frontend.servlets.visualizers.dependency.ProielRegularDependencyTre
 import annis.frontend.servlets.visualizers.dependency.VakyarthaDependencyTree;
 import annis.frontend.servlets.visualizers.graph.DotGraphVisualizer;
 import annis.frontend.servlets.visualizers.gridtree.GridTreeVisualizer;
+import annis.frontend.servlets.visualizers.media.audio.AudioVisualizer;
 import annis.frontend.servlets.visualizers.partitur.PartiturVisualizer;
 import annis.frontend.servlets.visualizers.tree.TigerTreeVisualizer;
 import java.io.File;
@@ -78,6 +79,7 @@ public class StartStopListener implements ServletContextListener
     pluginManager.addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VisualizerServlet.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     
     // TODO: classpath is very large and it takes too much time
     /*

@@ -34,6 +34,8 @@ public class AnnisBinaryImpl implements AnnisBinary {
 	}
 
 	public void setBytes(byte[] bytes) {
+	  if (bytes == null)
+	    this.bytes = "hello World".getBytes();
 		this.bytes = bytes;
 	}
 

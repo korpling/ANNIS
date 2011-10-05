@@ -38,7 +38,10 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisBinaryImpl;
+import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -59,12 +62,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 {
 
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
-  /// old
+  // / old
   private SqlGenerator sqlGenerator;
   private ListCorpusSqlHelper listCorpusSqlHelper;
   private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
-  /// new
+  // / new
   private List<SqlSessionModifier> sqlSessionModifiers;
   private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
@@ -80,6 +83,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private DddQueryParser dddqueryParser;
   private de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis;
   private HashMap<Long, Properties> corpusConfiguration;
+  private ByteHelper byteHelper;
 
   public SpringAnnisDao()
   {
@@ -105,7 +109,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   @Override
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList)
   {
-    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.parse(dddquery);
+    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser
+        .parse(dddquery);
     return dddqueryAnalysis.analyzeQuery(statement, corpusList);
   }
 
@@ -120,13 +125,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList,
+      final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
 
-    return matrixExtractor.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
+    return matrixExtractor
+        .queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
   }
 
   @Override
@@ -141,9 +148,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
-  public String planGraph(QueryData aql, List<Long> corpusList,
-    long offset, long limit, int left, int right,
-    boolean analyze)
+  public String planGraph(QueryData aql, List<Long> corpusList, long offset,
+      long limit, int left, int right, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
 
@@ -151,24 +157,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
     int nodeCount = queryData.getMaxWidth();
     return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
-      offset, limit, left, right, analyze, corpusConfiguration);
+        offset, limit, left, right, analyze, corpusConfiguration);
   }
 
   @Override
   @Transactional
-  public List<AnnotationGraph> retrieveAnnotationGraph(
-    List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
+  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList,
+      QueryData aql, long offset, long limit, int left, int right)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
 
     // create the Annis graphs
-    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(),
-      corpusList, nodeCount, offset, limit, left, right, corpusConfiguration);
+    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(), corpusList,
+        nodeCount, offset, limit, left, right, corpusConfiguration);
   }
 
-  private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
+  private QueryData createDynamicMatchView(List<Long> corpusList,
+      QueryData queryData)
   {
 
     // execute session modifiers
@@ -194,28 +201,29 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<AnnisCorpus> listCorpora()
   {
     return (List<AnnisCorpus>) getJdbcTemplate().query(
-      listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
+        listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
-    boolean listValues, boolean onlyMostFrequentValues)
+      boolean listValues, boolean onlyMostFrequentValues)
   {
     return (List<AnnisAttribute>) getJdbcTemplate().query(
-      listAnnotationsSqlHelper.createSqlQuery(corpusList,
-      listValues, onlyMostFrequentValues), listAnnotationsSqlHelper);
+        listAnnotationsSqlHelper.createSqlQuery(corpusList, listValues,
+            onlyMostFrequentValues), listAnnotationsSqlHelper);
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
-    List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(getJdbcTemplate(), textId);
+    List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(
+        getJdbcTemplate(), textId);
     if (graphs.isEmpty())
     {
       return null;
@@ -228,26 +236,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(long corpusId)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
-    final List<Annotation> corpusAnnotations =
-      (List<Annotation>) getJdbcTemplate().query(sql, listCorpusAnnotationsSqlHelper);
+    final List<Annotation> corpusAnnotations = (List<Annotation>) getJdbcTemplate()
+        .query(sql, listCorpusAnnotationsSqlHelper);
     return corpusAnnotations;
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
-    final List<Long> result = getSimpleJdbcTemplate().query(sql, listCorpusByNameDaoHelper);
+    final List<Long> result = getSimpleJdbcTemplate().query(sql,
+        listCorpusByNameDaoHelper);
     return result;
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
   {
     try
@@ -257,8 +266,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       helper.fillPreparedStatement(request, stmt);
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;
-    }
-    catch (SQLException ex)
+    } catch (SQLException ex)
     {
       log.error("Could not get resolver entries from database", ex);
       return new LinkedList<ResolverEntry>();
@@ -273,63 +281,63 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     try
     {
       List<AnnisCorpus> corpora = listCorpora();
-      for(AnnisCorpus c : corpora)
+      for (AnnisCorpus c : corpora)
       {
         // put in empty default properties
         corpusConfiguration.put(c.getId(), new Properties());
 
         // parse from configuration folder
-        if(System.getProperty("annis.home") != null)
+        if (System.getProperty("annis.home") != null)
         {
-          File confFolder = new File(System.getProperty("annis.home") + "/conf/corpora");
-          if(confFolder.isDirectory())
+          File confFolder = new File(System.getProperty("annis.home")
+              + "/conf/corpora");
+          if (confFolder.isDirectory())
           {
 
             // try corpus ID first
-            File conf = new File(confFolder, "" + c.getId() + ".properties" );
-            if(!conf.isFile())
+            File conf = new File(confFolder, "" + c.getId() + ".properties");
+            if (!conf.isFile())
             {
               try
               {
                 // try hash of corpus name
-                conf = new File(confFolder, Utils.calculateSHAHash(c.getName()) + ".properties");
-                if(!conf.isFile())
+                conf = new File(confFolder, Utils.calculateSHAHash(c.getName())
+                    + ".properties");
+                if (!conf.isFile())
                 {
                   // try corpus name
                   conf = new File(confFolder, c.getName() + ".properties");
                 }
-              }
-              catch (NoSuchAlgorithmException ex)
+              } catch (NoSuchAlgorithmException ex)
               {
                 log.log(Level.WARN, null, ex);
-              }
-              catch (UnsupportedEncodingException ex)
+              } catch (UnsupportedEncodingException ex)
               {
                 log.log(Level.WARN, null, ex);
               }
             }
 
             // parse property file if found
-            if(conf.isFile())
+            if (conf.isFile())
             {
               Properties p = corpusConfiguration.get(c.getId());
               try
               {
                 p.load(new FileReader(conf));
 
-              }
-              catch (IOException ex)
+              } catch (IOException ex)
               {
-                log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
+                log.log(Level.WARN, "could not load corpus configuration file "
+                    + conf.getAbsolutePath(), ex);
               }
             }
           }
         }
       }
-    }
-    catch(org.springframework.jdbc.CannotGetJdbcConnectionException ex)
+    } catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex)
     {
-      log.log(Level.WARN, "No corpus configuration loaded due to missing database connection.");
+      log.log(Level.WARN,
+          "No corpus configuration loaded due to missing database connection.");
     }
   }
 
@@ -343,10 +351,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.aqlParser = aqlParser;
   }
 
-  
-
   // /// Getter / Setter
-  
 
   public SqlGenerator getSqlGenerator()
   {
@@ -364,11 +369,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   public void setPlanRowMapper(
-    ParameterizedSingleColumnRowMapper<String> planRowMapper)
+      ParameterizedSingleColumnRowMapper<String> planRowMapper)
   {
     this.planRowMapper = planRowMapper;
   }
-  
+
   public ListCorpusSqlHelper getListCorpusSqlHelper()
   {
     return listCorpusSqlHelper;
@@ -385,7 +390,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   public void setListAnnotationsSqlHelper(
-    ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper)
+      ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper)
   {
     this.listAnnotationsSqlHelper = listNodeAnnotationsSqlHelper;
   }
@@ -396,7 +401,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   public void setListCorpusAnnotationsSqlHelper(
-    ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper)
+      ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper)
   {
     this.listCorpusAnnotationsSqlHelper = listCorpusAnnotationsHelper;
   }
@@ -406,7 +411,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return sqlSessionModifiers;
   }
 
-  public void setSqlSessionModifiers(List<SqlSessionModifier> sqlSessionModifiers)
+  public void setSqlSessionModifiers(
+      List<SqlSessionModifier> sqlSessionModifiers)
   {
     this.sqlSessionModifiers = sqlSessionModifiers;
   }
@@ -437,7 +443,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   }
 
   public void setListCorpusByNameDaoHelper(
-    ListCorpusByNameDaoHelper listCorpusByNameDaoHelper)
+      ListCorpusByNameDaoHelper listCorpusByNameDaoHelper)
   {
     this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
   }
@@ -507,7 +513,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return dddqueryAnalysis;
   }
 
-  public void setDddqueryAnalysis(de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
+  public void setDddqueryAnalysis(
+      de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
   {
     this.dddqueryAnalysis = dddqueryAnalysis;
   }
@@ -522,4 +529,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.dddqueryParser = dddqueryParser;
   }
 
+  public AnnisBinary getBinary(long corpusId)
+  {
+    ByteHelper bh = new ByteHelper();
+    AnnisBinary ab = new AnnisBinaryImpl();
+    ab.setBytes(bh.getBytes(corpusId, getJdbcTemplate()));
+    ab.setFileName("test");
+    ab.setId(corpusId);
+    ab.setMimeType("ogg");
+    return ab;
+  }
 }

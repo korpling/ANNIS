@@ -115,7 +115,7 @@ public interface AnnisService extends Remote {
 	 * @param id
 	 * @return AnnisBinary
 	 */
-	public AnnisBinary getBinary(Long id) throws RemoteException, AnnisBinaryNotFoundException;
+	public AnnisBinary getBinary(long id) throws RemoteException;
 	
 	/**
 	 * 

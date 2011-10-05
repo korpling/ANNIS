@@ -142,20 +142,10 @@ public class AnnisServiceImpl implements AnnisService
     return true;
   }
 
-  // TODO: test getBinary
   @Override
-  public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException
+  public AnnisBinary getBinary(long id) throws RemoteException
   {
-    log.debug("Retrieving binary file with id = " + id);
-
-    try
-    {
-      return externalFileMgr.getBinary(id);
-    }
-    catch(Exception e)
-    {
-      throw new AnnisBinaryNotFoundException(e.getMessage());
-    }
+    return annisDao.getBinary(id);
   }
 
   @Override

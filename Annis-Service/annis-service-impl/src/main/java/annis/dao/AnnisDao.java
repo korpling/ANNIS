@@ -23,6 +23,7 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
 
 public interface AnnisDao
@@ -49,6 +50,8 @@ public interface AnnisDao
     boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
+  
+  public AnnisBinary getBinary(long corpusId);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 
