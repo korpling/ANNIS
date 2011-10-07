@@ -16,6 +16,9 @@ WHERE _rank.node_ref = roots.node_ref;
 
 DROP TABLE _tmp_real_roots;
 
+-- rank was changed, reanalyze it
+ANALYZE _rank;
+
 -- setup computation of level
 ALTER TABLE _rank ADD level integer;
 

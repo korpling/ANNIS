@@ -30,6 +30,8 @@ AS
 
 CREATE INDEX _idx_spannendtoken_id on spannendtoken(id);
 
+ANALYZE spannendtoken;
+
 UPDATE _node SET
 left_token = (SELECT left_token FROM spannendtoken AS s WHERE s.id = _node.id),
 right_token = (SELECT right_token FROM spannendtoken AS s WHERE s.id = _node.id)
