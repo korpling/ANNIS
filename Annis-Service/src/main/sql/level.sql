@@ -1,4 +1,4 @@
-set enable_mergejoin = false;
+--set enable_mergejoin = false;
 
 -- compute real roots
 -- actually, roots of components that are not actual roots should link parent to their parent node (even though it is in another component)
@@ -43,6 +43,8 @@ AS
 );
 CREATE INDEX _idx_tmplevels_pre on tmplevels(pre);
 
+ANALYZE tmplevels;
+
 UPDATE _rank SET
 level = (SELECT level FROM tmplevels AS l WHERE l.pre = _rank.pre)
 WHERE _rank.pre is not null;
@@ -53,4 +55,4 @@ DROP INDEX _idx_tmplevels_pre;
 
 DROP TABLE tmplevels;
 
-set enable_mergejoin = true;
+--set enable_mergejoin = true;

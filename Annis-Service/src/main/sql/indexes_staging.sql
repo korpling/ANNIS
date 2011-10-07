@@ -9,7 +9,6 @@ CREATE INDEX tmpidx_fk1_rank ON _rank USING HASH (node_ref);
 CREATE INDEX tmpidx_fk2_rank ON _rank USING HASH (component_ref);
 CREATE INDEX tmpidx_rank_pre ON _rank (pre);
 CREATE INDEX tmpidx_rank_parent ON _rank USING HASH (parent);
-CREATE INDEX tmpidx_rank_parent_btree ON _rank USING btree (parent);
 CREATE INDEX tmpidx_fk2_component_type ON _component ("type");
 CREATE INDEX tmpidx_fk_edge_annotation ON _edge_annotation USING HASH (rank_ref);
 
