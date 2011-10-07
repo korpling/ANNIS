@@ -1,7 +1,10 @@
 Version 2.3.0
 =============
 
-TODO
+bugfixes:
+
+* import: level for dominance edges might be not set (https://bugs.launchpad.net/bugs/870108)
+
 
 Version 2.2.0
 =============
