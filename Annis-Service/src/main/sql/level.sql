@@ -30,7 +30,7 @@ AS
     SELECT r.pre as pre, 0 as level
     FROM _rank as r
     WHERE
-      r.root is true
+      r.parent is null
 
     UNION ALL
 
