@@ -231,7 +231,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCorpus(String list)
   {
-    List<AnnisCorpus> allCorpora = null;
     corpusList = new LinkedList<Long>();
     String[] splits = StringUtils.split(list, " ");
     for(String split : splits)
@@ -243,18 +242,9 @@ public class AnnisRunner extends AnnisBaseRunner
       catch(NumberFormatException e)
       {
         // check if there is a corpus with this name
-        if(allCorpora == null)
-        {
-         allCorpora = annisDao.listCorpora();
-        }
-        for(AnnisCorpus c : allCorpora)
-        {
-          if(split.equals(c.getName()))
-          {
-            corpusList.add(c.getId());
-            break;
-          }
-        }
+        LinkedList<String> splitList = new LinkedList<String>();
+        splitList.add(split);
+        corpusList.addAll(annisDao.listCorpusByName(splitList));
       }
     }
 
