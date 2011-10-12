@@ -181,7 +181,8 @@ public class SpringAnnisAdministrationDao
   void createStagingArea(boolean useTemporary)
   {
     log.info("creating staging area");
-    MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary ? "TEMPORARY" : "");
+    MapSqlParameterSource args = makeArgs()
+      .addValue(":tmp", useTemporary ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area.sql", args);
   }
 
@@ -276,6 +277,12 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("left_token_right_token.sql");
   }
 
+  void computeRealRoot()
+  {
+    log.info("computing real root for rank");
+    executeSqlFromScript("root.sql");
+  }
+  
   void computeLevel()
   {
     log.info("computing values for rank.level");
