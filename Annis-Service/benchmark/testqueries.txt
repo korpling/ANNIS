@@ -1,0 +1,3 @@
+pcc2	tok
+pcc3	tok
+pcc2	node & node & #1 > #2
