@@ -19,6 +19,7 @@ ALTER TABLE _node ADD CONSTRAINT "_FK__node__corpus" FOREIGN KEY (corpus_ref) RE
 -- _component
 ALTER TABLE _component ADD CONSTRAINT "__PK_component" PRIMARY KEY (id);
 
+-- _rank
 ALTER TABLE _rank ADD CONSTRAINT "_PK__rank" PRIMARY KEY (pre);
 ALTER TABLE _rank ADD CONSTRAINT "_UNIQ__rank_pre" UNIQUE (pre);
 ALTER TABLE _rank ADD CONSTRAINT "_UNIQ__rank_post" UNIQUE (post);

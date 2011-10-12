@@ -85,6 +85,8 @@ public class CorpusAdministration {
 //			// finish transaction here to debug computation of left|right-token
 			//if (true) return;
 			administrationDao.computeLeftTokenRightToken();
+//      if (true) return;
+      administrationDao.computeRealRoot();
 			administrationDao.computeLevel();
 			administrationDao.computeCorpusStatistics();
       administrationDao.updateCorpusStatsId(corpusID);
