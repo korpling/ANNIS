@@ -75,7 +75,6 @@ public class AnnisRunner extends AnnisBaseRunner
     isDDDQueryMode = false;
   }
 
-
   // switch between AQL as input mode and DDDQuery
   public void doLanguage(String newLanguage)
   {
@@ -104,15 +103,15 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Map<String, List<String>> output = new HashMap<String, List<String>>();
 
-    if (fInput.exists())
+    if(fInput.exists())
     {
       try
       {
         String[] content = FileUtils.readFileToString(fInput).split("\n");
 
-        for (String query : content)
+        for(String query : content)
         {
-          if (query.trim().length() > 0)
+          if(query.trim().length() > 0)
           {
             Map<String, Set<String>> map = proposedIndexHelper(query.trim());
             for (Map.Entry<String, Set<String>> t : map.entrySet())
@@ -141,7 +140,7 @@ public class AnnisRunner extends AnnisBaseRunner
         }
 
       }
-      catch (IOException ex)
+      catch(IOException ex)
       {
         Logger.getLogger(AnnisRunner.class.getName()).log(Level.SEVERE, null, ex);
       }
@@ -207,7 +206,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doMatrix(String annisQuery)
   {
     List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
-    if (matches.isEmpty())
+    if(matches.isEmpty())
     {
       out.println("(empty");
     }
@@ -254,8 +253,24 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCorpus(String list)
   {
-    corpusList = dddQueryMapper.translateCorpusList(list);
-    if (corpusList.isEmpty())
+    corpusList = new LinkedList<Long>();
+    String[] splits = StringUtils.split(list, " ");
+    for(String split : splits)
+    {
+      try
+      {
+        corpusList.add(Long.parseLong(split));
+      }
+      catch(NumberFormatException e)
+      {
+        // check if there is a corpus with this name
+        LinkedList<String> splitList = new LinkedList<String>();
+        splitList.add(split);
+        corpusList.addAll(annisDao.listCorpusByName(splitList));
+      }
+    }
+
+    if(corpusList.isEmpty())
     {
       setPrompt("no corpus>");
     }
@@ -289,7 +304,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doText(String textID)
   {
     List<AnnotationGraph> result = new LinkedList<AnnotationGraph>();
-    AnnotationGraph graph =  annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
+    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
     result.add(graph);
     printAsTable(result, "nodes", "edges");
   }
@@ -329,7 +344,6 @@ public class AnnisRunner extends AnnisBaseRunner
     return dddQueryMapper.translate(annisQuery);
   }
 
-
   public Map<String, Set<String>> proposedIndexHelper(String aql)
   {
     Map<String, Set<String>> result = new HashMap<String, Set<String>>();
@@ -345,16 +359,16 @@ public class AnnisRunner extends AnnisBaseRunner
     // extract WHERE clause
 
     Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
-    if (mWhere.find())
+    if(mWhere.find())
     {
       String whereClause = sql.substring(mWhere.end());
       //out.println("WHERE clause:\n" + whereClause);
 
-      for (String table : result.keySet())
+      for(String table : result.keySet())
       {
         Set<String> attr = result.get(table);
         Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
-        while (mFacts.find())
+        while(mFacts.find())
         {
           attr.add(mFacts.group(1).trim());
         }
@@ -412,7 +426,7 @@ public class AnnisRunner extends AnnisBaseRunner
     this.annisParser = annisParser;
   }
 
-    public AnnisDao getAnnisDao()
+  public AnnisDao getAnnisDao()
   {
     return annisDao;
   }

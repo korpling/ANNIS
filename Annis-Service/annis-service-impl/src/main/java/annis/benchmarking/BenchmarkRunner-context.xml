@@ -27,10 +27,6 @@
 		</property>
 	</bean>
 
-	<!-- DddQueryMapper -->
-	<import
-		resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml" />
-
 	<!-- AnnisDao -->
 	<import resource="classpath:annis/dao/SpringAnnisDao-context.xml" />
 
@@ -60,7 +56,6 @@
 
 	<!-- The runner -->
 	<bean id="benchmarkRunner" class="annis.benchmarking.BenchmarkRunner">
-		<property name="dddQueryMapper" ref="dddQueryMapper" />
 		<property name="annisDao" ref="springAnnisDao" />
 		<property name="administrationDao" ref="administrationDao" />
 	</bean>
