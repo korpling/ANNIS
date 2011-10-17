@@ -31,9 +31,13 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -43,8 +47,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 {
 
   private SimpleCanvas canvas;
-  private List<DragAndDropWrapper> dropWrappers;
-  private List<NodeWindow> nodes;
+  private Map<NodeWindow,DragAndDropWrapper> nodes;
   private List<EdgeWindow> edges;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
@@ -55,8 +58,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   public TigerQueryBuilder()
   {
 
-    dropWrappers = new ArrayList<DragAndDropWrapper>();
-    nodes = new ArrayList<NodeWindow>();
+    nodes = new HashMap<NodeWindow, DragAndDropWrapper>();
     edges = new ArrayList<EdgeWindow>();
 
     VerticalLayout layout = (VerticalLayout) getContent();
@@ -89,6 +91,9 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
     areaPane.setDropHandler(handler);
+    areaPane.addStyleName("no-vertical-drag-hints");
+    areaPane.addStyleName("no-horizontal-drag-hints");
+    areaPane.addStyleName("no-box-drag-hints");
 
     area.addComponent(canvas, "top:0px;left:0px");
     addComponent(areaPane);
@@ -100,8 +105,8 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     for(EdgeWindow e : edges)
     {
-      DragAndDropWrapper w1 = dropWrappers.get(e.getSource().getNumber());
-      DragAndDropWrapper w2 = dropWrappers.get(e.getTarget().getNumber());
+      DragAndDropWrapper w1 = nodes.get(e.getSource());
+      DragAndDropWrapper w2 = nodes.get(e.getTarget());
 
       ComponentPosition p1 = area.getPosition(w1);
       ComponentPosition p2 = area.getPosition(w2);
@@ -142,7 +147,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   public void prepareAddingEdge(NodeWindow sourceNode)
   {
     preparedEdgeSource = sourceNode;
-    for(NodeWindow w : nodes)
+    for(NodeWindow w : nodes.keySet())
     {
       if(w != sourceNode)
       {
@@ -153,28 +158,51 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
   public void addEdge(NodeWindow target)
   {
-    for(NodeWindow w : nodes)
+    for(NodeWindow w : nodes.keySet())
     {
       w.setPrepareEdgeDock(false);
     }
 
     if(preparedEdgeSource != target)
-    {
-      EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
-      e.setWidth("70px");
-      e.setHeight("70px");
-      edges.add(e);
-      area.addComponent(e);
-      updateLinesAndEdgePositions();
+    {      
+      boolean valid = true;
+      for(EdgeWindow e : edges)
+      {
+        if(e.getSource() == preparedEdgeSource && e.getTarget() == target)
+        {
+          valid=false;
+          break;
+        }
+      }
+      if(valid)
+      {
+        EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
+        e.setWidth("70px");
+        e.setHeight("70px");
+        edges.add(e);
+        area.addComponent(e);
+        updateLinesAndEdgePositions();
+      }
+      else
+      {
+        getWindow().showNotification("There is already such an edge", 
+          Notification.TYPE_WARNING_MESSAGE);
+      }
     }
   }
+  
+  public void deleteEdge(EdgeWindow e)
+  {
+    area.removeComponent(e);
+    edges.remove(e);
+    updateLinesAndEdgePositions();
+  }
 
-  private NodeWindow addNode()
+  public void addNode()
   {
     NodeWindow n = new NodeWindow(number++, this);
     DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-    dropWrappers.add(wrapper);
-    nodes.add(n);
+    nodes.put(n, wrapper);
 
 
     wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
@@ -182,7 +210,25 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     wrapper.setHeight("140px");
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
 
-    return n;
+  }
+  
+  public void deleteNode(NodeWindow n)
+  {
+    LinkedList<EdgeWindow> edgesToRemove = new LinkedList<EdgeWindow>();
+    for(EdgeWindow e : edges)
+    {
+      if(e.getSource() == n || e.getTarget() == n)
+      {
+        edgesToRemove.add(e);
+        area.removeComponent(e);
+      }
+    }
+    
+    edges.removeAll(edgesToRemove);
+    
+    area.removeComponent(nodes.get(n));
+    nodes.remove(n);
+    updateLinesAndEdgePositions();
   }
 
   private static class AbsoluteDropHandler implements DropHandler

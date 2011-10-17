@@ -58,11 +58,12 @@ public class EdgeWindow extends Panel implements Button.ClickListener
         
     btClose = new Button("X");
     btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
     
-    Label lblNode = new Label("edge " + source.getNumber() + " -> " + target.getNumber());
+    Label lblNode = new Label("edge " + source.getID() + " -> " + target.getID());
     addComponent(lblNode);
 
     vLayout.setExpandRatio(lblNode, 1.0f);
@@ -74,7 +75,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
   {
     if(event.getButton() == btClose)
     {      
-      // TODO: delete this edge
+      parent.deleteEdge(this);
     }
   }
 

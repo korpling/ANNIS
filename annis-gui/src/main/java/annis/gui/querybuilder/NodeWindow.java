@@ -39,12 +39,12 @@ public class NodeWindow extends Panel implements Button.ClickListener
   
   private boolean prepareEdgeDock;
   
-  private int number;
+  private int id;
   
-  public NodeWindow(int number, TigerQueryBuilder parent)
+  public NodeWindow(int id, TigerQueryBuilder parent)
   {
     this.parent = parent;
-    this.number = number;
+    this.id = id;
     
     setWidth("99%");
     setHeight("99%");
@@ -73,11 +73,12 @@ public class NodeWindow extends Panel implements Button.ClickListener
     
     btClose = new Button("X");
     btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
     
-    Label lblNode = new Label("node " + number);
+    Label lblNode = new Label("node " + id);
     addComponent(lblNode);
 
     vLayout.setExpandRatio(lblNode, 1.0f);
@@ -119,12 +120,41 @@ public class NodeWindow extends Panel implements Button.ClickListener
         btEdge.setCaption("Cancel");
       }
     }
+    else if(event.getButton() == btClose)
+    {
+      parent.deleteNode(this);
+    }
   }
 
-  public int getNumber()
+  public int getID()
   {
-    return number;
+    return id;
   }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if(obj == null)
+    {
+      return false;
+    }
+    if(getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final NodeWindow other = (NodeWindow) obj;
+    return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 5;
+    hash = 41 * hash + this.id;
+    return hash;
+  }
+  
+  
   
   
 }
