@@ -53,6 +53,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   private AbsoluteDropHandler handler;
   private int number = 0;
   private Button btAddNode;
+  private Button btClearAll;
   private NodeWindow preparedEdgeSource = null;
 
   public TigerQueryBuilder()
@@ -70,6 +71,10 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     btAddNode = new Button("Add node", (Button.ClickListener) this);
     btAddNode.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btAddNode);
+    
+    btClearAll = new Button("Clear all", (Button.ClickListener) this);
+    btClearAll.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    toolbar.addComponent(btClearAll);
 
     toolbar.setWidth("100%");
     toolbar.setHeight("-1px");
@@ -177,6 +182,24 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     if(event.getButton() == btAddNode)
     {
       addNode();
+    }
+    else if(event.getButton() == btClearAll)
+    {
+      
+      for(EdgeWindow w : edges)
+      {
+        area.removeComponent(w);
+      }      
+      edges.clear();
+      
+      for(DragAndDropWrapper w : nodes.values())
+      {
+        area.removeComponent(w);
+      }
+      nodes.clear();
+      number = 0;
+      
+      updateLinesAndEdgePositions();
     }
 
   }
