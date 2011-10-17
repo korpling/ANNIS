@@ -91,12 +91,13 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
     areaPane.setDropHandler(handler);
-    areaPane.addStyleName("no-vertical-drag-hints");
-    areaPane.addStyleName("no-horizontal-drag-hints");
-    areaPane.addStyleName("no-box-drag-hints");
 
     area.addComponent(canvas, "top:0px;left:0px");
     addComponent(areaPane);
+    
+    addStyleName("no-vertical-drag-hints");
+    addStyleName("no-horizontal-drag-hints");
+    addStyleName("no-box-drag-hints");
   }
 
   public void updateLinesAndEdgePositions()
