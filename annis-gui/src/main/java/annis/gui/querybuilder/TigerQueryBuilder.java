@@ -45,11 +45,11 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   private SimpleCanvas canvas;
   private List<DragAndDropWrapper> dropWrappers;
   private List<NodeWindow> nodes;
+  private List<EdgeWindow> edges;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
   private int number = 0;
   private Button btAddNode;
-  
   private NodeWindow preparedEdgeSource = null;
 
   public TigerQueryBuilder()
@@ -57,6 +57,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     dropWrappers = new ArrayList<DragAndDropWrapper>();
     nodes = new ArrayList<NodeWindow>();
+    edges = new ArrayList<EdgeWindow>();
 
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeUndefined();
@@ -93,24 +94,37 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     addComponent(areaPane);
   }
 
-  public void updateLines()
+  public void updateLinesAndEdgePositions()
   {
-    // connect each with each
     canvas.getLines().clear();
 
-    for(int i = 0; i < dropWrappers.size(); i++)
+    for(EdgeWindow e : edges)
     {
-      DragAndDropWrapper w1 = dropWrappers.get(i);
+      DragAndDropWrapper w1 = dropWrappers.get(e.getSource().getNumber());
+      DragAndDropWrapper w2 = dropWrappers.get(e.getTarget().getNumber());
+
       ComponentPosition p1 = area.getPosition(w1);
-      for(int j = i + 1; j < dropWrappers.size(); j++)
-      {
-        DragAndDropWrapper w2 = dropWrappers.get(j);
-        ComponentPosition p2 = area.getPosition(w2);
-        canvas.getLines().add(new Line2D.Float(
-          p1.getLeftValue() + (w1.getWidth() / 2), p1.getTopValue() + (w1.getHeight() / 2),
-          p2.getLeftValue() + (w2.getWidth() / 2), p2.getTopValue() + (w2.getHeight() / 2)));
-      }
+      ComponentPosition p2 = area.getPosition(w2);
+
+      float x1 = p1.getLeftValue() + (w1.getWidth() / 2);
+      float y1 = p1.getTopValue() + (w1.getHeight() / 2);
+      float x2 = p2.getLeftValue() + (w2.getWidth() / 2);
+      float y2 = p2.getTopValue() + (w2.getHeight() / 2);
+      
+      // add line
+      canvas.getLines().add(new Line2D.Float(x1, y1, x2, y2));
+
+      // set position on half of the line for the edge window      
+      ComponentPosition posEdge = area.getPosition(e);
+      
+      float vectorLength = (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+      float xM = x1 + (vectorLength/2.0f)*((x2-x1)/vectorLength);
+      float yM = y1 + (vectorLength/2.0f)*((y2-y1) / vectorLength);
+      
+      posEdge.setLeftValue(xM-e.getWidth()/2.0f);
+      posEdge.setTopValue(yM-e.getHeight()/2.0f);
     }
+
     canvas.requestRepaint();
   }
 
@@ -124,7 +138,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     }
 
   }
-  
+
   public void prepareAddingEdge(NodeWindow sourceNode)
   {
     preparedEdgeSource = sourceNode;
@@ -136,15 +150,23 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       }
     }
   }
-  
+
   public void addEdge(NodeWindow target)
   {
     for(NodeWindow w : nodes)
     {
       w.setPrepareEdgeDock(false);
     }
-    
-    // TODO: add edge
+
+    if(preparedEdgeSource != target)
+    {
+      EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
+      e.setWidth("70px");
+      e.setHeight("70px");
+      edges.add(e);
+      area.addComponent(e);
+      updateLinesAndEdgePositions();
+    }
   }
 
   private NodeWindow addNode()
@@ -194,7 +216,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
       if(parent != null)
       {
-        parent.updateLines();
+        parent.updateLinesAndEdgePositions();
       }
 
     }

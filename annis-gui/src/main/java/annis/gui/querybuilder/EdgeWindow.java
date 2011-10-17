@@ -28,28 +28,24 @@ import com.vaadin.ui.themes.ChameleonTheme;
  *
  * @author thomas
  */
-public class NodeWindow extends Panel implements Button.ClickListener
+public class EdgeWindow extends Panel implements Button.ClickListener
 {
   private TigerQueryBuilder parent;
   
-  private Button btEdge;
-  private Button btAdd;
-  private Button btClear;
   private Button btClose;
+  private NodeWindow source;
+  private NodeWindow target;
   
-  private boolean prepareEdgeDock;
   
-  private int number;
-  
-  public NodeWindow(int number, TigerQueryBuilder parent)
+  public EdgeWindow(TigerQueryBuilder parent, NodeWindow source, NodeWindow target)
   {
     this.parent = parent;
-    this.number = number;
+    this.source = source;
+    this.target = target;
     
     setWidth("99%");
     setHeight("99%");
     
-    prepareEdgeDock = false;
     
     VerticalLayout vLayout = (VerticalLayout) getContent();
     vLayout.setMargin(false);
@@ -59,72 +55,39 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.setWidth("100%");
     toolbar.setHeight("-1px");
     addComponent(toolbar);
-    
-    btEdge = new Button("Edge");
-    btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
-    btEdge.addListener((Button.ClickListener) this);
-    toolbar.addComponent(btEdge);
-    btAdd = new Button("Add");
-    btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
-    toolbar.addComponent(btAdd);
-    btClear = new Button("Clear");
-    btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
-    toolbar.addComponent(btClear);
-    
+        
     btClose = new Button("X");
     btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
     
-    Label lblNode = new Label("node " + number);
+    Label lblNode = new Label("edge " + source.getNumber() + " -> " + target.getNumber());
     addComponent(lblNode);
 
     vLayout.setExpandRatio(lblNode, 1.0f);
     
   }
   
-  public void setPrepareEdgeDock(boolean prepare)
-  {
-    this.prepareEdgeDock = prepare;
-    
-    btClear.setVisible(!prepare);
-    btClose.setVisible(!prepare);
-    btAdd.setVisible(!prepare);
-    
-    if(prepare)
-    {
-      btEdge.setCaption("Dock");
-    }
-    else
-    {
-      btEdge.setCaption("Edge");
-    }
-  }
-
   @Override
   public void buttonClick(ClickEvent event)
   {
-    if(event.getButton() == btEdge)
+    if(event.getButton() == btClose)
     {      
-      if(prepareEdgeDock)
-      {
-        setPrepareEdgeDock(false);
-        parent.addEdge(this);
-      }
-      else
-      {
-        parent.prepareAddingEdge(this);
-        setPrepareEdgeDock(true);
-        btEdge.setCaption("Cancel");
-      }
+      // TODO: delete this edge
     }
   }
 
-  public int getNumber()
+  public NodeWindow getSource()
   {
-    return number;
+    return source;
   }
+
+  public NodeWindow getTarget()
+  {
+    return target;
+  }
+  
   
   
 }
