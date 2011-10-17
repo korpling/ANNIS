@@ -24,7 +24,7 @@ import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;

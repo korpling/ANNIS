@@ -15,7 +15,7 @@
  */
 package annis.gui.paging;
 
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.event.ShortcutAction.KeyCode;

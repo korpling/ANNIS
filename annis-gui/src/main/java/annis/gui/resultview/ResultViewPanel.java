@@ -25,7 +25,7 @@ import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisResultSet;
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Alignment;

@@ -23,7 +23,7 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.ifaces.AnnisCorpus;
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;

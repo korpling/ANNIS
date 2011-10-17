@@ -2,7 +2,7 @@
 @import "base.css";
 
 .control .v-panel-content {
-  background-color: #e9eafb;
+  background-color: #ecf0f6;
 }
 
 .v-table-cell-wrapper {
@@ -25,11 +25,11 @@
 }
 
 .toolbar .v-panel-content {
-  background-color: #e9eafb;
+  background-color: #ecf0f6;
 }
 
 .toolbar {
-  background-color: #e9eafb;
+  background-color: #ecf0f6;
 }
 
 .right-aligned-text {
@@ -45,7 +45,7 @@
   font-weight: normal;
   margin: 0 0 4px;
   padding: 2px 3px;
-  background-color: #EBF3FD;
+  background-color: #ecf0f6;
 }
 
 /* matched node colors by match index*/

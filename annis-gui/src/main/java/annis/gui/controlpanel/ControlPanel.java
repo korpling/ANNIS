@@ -23,7 +23,7 @@ import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisCorpus;
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Accordion;

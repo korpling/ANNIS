@@ -16,7 +16,7 @@
 package annis.gui.querybuilder;
 
 import annis.gui.widgets.SimpleCanvas;
-import com.vaadin.addon.chameleon.ChameleonTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptAll;
@@ -43,15 +43,20 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 {
 
   private SimpleCanvas canvas;
-  private List<DragAndDropWrapper> nodes;
+  private List<DragAndDropWrapper> dropWrappers;
+  private List<NodeWindow> nodes;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
   private int number = 0;
+  private Button btAddNode;
+  
+  private NodeWindow preparedEdgeSource = null;
 
   public TigerQueryBuilder()
   {
 
-    nodes = new ArrayList<DragAndDropWrapper>();
+    dropWrappers = new ArrayList<DragAndDropWrapper>();
+    nodes = new ArrayList<NodeWindow>();
 
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeUndefined();
@@ -59,7 +64,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
-    Button btAddNode = new Button("Add node", (Button.ClickListener) this);
+    btAddNode = new Button("Add node", (Button.ClickListener) this);
     btAddNode.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btAddNode);
 
@@ -79,7 +84,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     canvas.setWidth("2000px");
     canvas.setHeight("2000px");
 
-    handler = new AbsoluteDropHandler(area, nodes, canvas);
+    handler = new AbsoluteDropHandler(this, area);
 
     DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
     areaPane.setDropHandler(handler);
@@ -88,35 +93,86 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     addComponent(areaPane);
   }
 
+  public void updateLines()
+  {
+    // connect each with each
+    canvas.getLines().clear();
+
+    for(int i = 0; i < dropWrappers.size(); i++)
+    {
+      DragAndDropWrapper w1 = dropWrappers.get(i);
+      ComponentPosition p1 = area.getPosition(w1);
+      for(int j = i + 1; j < dropWrappers.size(); j++)
+      {
+        DragAndDropWrapper w2 = dropWrappers.get(j);
+        ComponentPosition p2 = area.getPosition(w2);
+        canvas.getLines().add(new Line2D.Float(
+          p1.getLeftValue() + (w1.getWidth() / 2), p1.getTopValue() + (w1.getHeight() / 2),
+          p2.getLeftValue() + (w2.getWidth() / 2), p2.getTopValue() + (w2.getHeight() / 2)));
+      }
+    }
+    canvas.requestRepaint();
+  }
+
   @Override
   public void buttonClick(ClickEvent event)
   {
 
-    //final int number = nodes.size();
-    NodeWindow n = new NodeWindow(number++);
+    if(event.getButton() == btAddNode)
+    {
+      addNode();
+    }
+
+  }
+  
+  public void prepareAddingEdge(NodeWindow sourceNode)
+  {
+    preparedEdgeSource = sourceNode;
+    for(NodeWindow w : nodes)
+    {
+      if(w != sourceNode)
+      {
+        w.setPrepareEdgeDock(true);
+      }
+    }
+  }
+  
+  public void addEdge(NodeWindow target)
+  {
+    for(NodeWindow w : nodes)
+    {
+      w.setPrepareEdgeDock(false);
+    }
+    
+    // TODO: add edge
+  }
+
+  private NodeWindow addNode()
+  {
+    NodeWindow n = new NodeWindow(number++, this);
     DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-    nodes.add(wrapper);
-    
-    
+    dropWrappers.add(wrapper);
+    nodes.add(n);
+
+
     wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
     wrapper.setWidth("140px");
     wrapper.setHeight("140px");
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
+
+    return n;
   }
 
   private static class AbsoluteDropHandler implements DropHandler
   {
 
     private AbsoluteLayout layout;
-    private List<DragAndDropWrapper> nodes;
-    private SimpleCanvas canvas;
+    private TigerQueryBuilder parent;
 
-    public AbsoluteDropHandler(AbsoluteLayout layout, List<DragAndDropWrapper> nodes,
-      SimpleCanvas canvas)
+    public AbsoluteDropHandler(TigerQueryBuilder parent, AbsoluteLayout layout)
     {
       this.layout = layout;
-      this.nodes = nodes;
-      this.canvas = canvas;
+      this.parent = parent;
     }
 
     @Override
@@ -124,7 +180,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     {
       WrapperTransferable t = (WrapperTransferable) event.getTransferable();
       WrapperTargetDetails details = (WrapperTargetDetails) event.getTargetDetails();
-      
+
       int xChange = details.getMouseEvent().getClientX()
         - t.getMouseDownEvent().getClientX();
       int yChange = details.getMouseEvent().getClientY()
@@ -136,23 +192,10 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       pos.setLeftValue(pos.getLeftValue() + xChange);
       pos.setTopValue(pos.getTopValue() + yChange);
 
-      // connect each with each
-      canvas.getLines().clear();
-          
-      for(int i = 0; i < nodes.size(); i++)
+      if(parent != null)
       {
-        DragAndDropWrapper w1 = nodes.get(i);
-        ComponentPosition p1 = layout.getPosition(w1);
-        for(int j = i + 1; j < nodes.size(); j++)
-        {
-          DragAndDropWrapper w2 = nodes.get(j);
-          ComponentPosition p2 = layout.getPosition(w2);
-          canvas.getLines().add(new Line2D.Float(
-            p1.getLeftValue() + (w1.getWidth()/2), p1.getTopValue() + (w1.getHeight()/2), 
-            p2.getLeftValue() + (w2.getWidth()/2), p2.getTopValue() + (w2.getHeight()/2)));
-        }
+        parent.updateLines();
       }
-      canvas.requestRepaint();
 
     }
 
