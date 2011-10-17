@@ -117,6 +117,9 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       float x2 = p2.getLeftValue() + (w2.getWidth() / 2);
       float y2 = p2.getTopValue() + (w2.getHeight() / 2);
       
+      float v_x = x2 - x1;
+      float v_y = y2 - y1;
+      
       // add line
       canvas.getLines().add(new Line2D.Float(x1, y1, x2, y2));
 
@@ -127,11 +130,44 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       float xM = x1 + (vectorLength/2.0f)*((x2-x1)/vectorLength);
       float yM = y1 + (vectorLength/2.0f)*((y2-y1) / vectorLength);
       
+      double normV_x = v_x / vectorLength;
+      double normV_y = v_y / vectorLength;
+      
+      double pos1_x = (2.1*vectorLength/3)*normV_x + x1;
+      double pos1_y = (2.1*vectorLength/3)*normV_y + y1;
+      double  origDir = Math.atan2(normV_y, normV_x);
+      
+      double pos2_x = ((1*vectorLength)/3)*normV_x + x1;
+      double pos2_y = ((1*vectorLength)/3)*normV_y + y1;
+      
+      canvas.getLines().addAll(createArrow(pos1_x, pos1_y, origDir, 20.0));
+      canvas.getLines().addAll(createArrow(pos2_x, pos2_y, origDir, 20.0));
+      
       posEdge.setLeftValue(xM-e.getWidth()/2.0f);
       posEdge.setTopValue(yM-e.getHeight()/2.0f);
     }
 
     canvas.requestRepaint();
+  }
+  
+  private List<Line2D> createArrow(double x, double y, double direction, double arrowLength)
+  {
+    LinkedList<Line2D> result = new LinkedList<Line2D>();
+    
+    
+    double dir1 = direction + Math.PI/8.0;
+    double dir2 = direction - Math.PI/8.0;
+    
+    double end1_x = x - arrowLength * Math.cos(dir1);
+    double end1_y = y - arrowLength * Math.sin(dir1);
+    
+    double end2_x = x - arrowLength * Math.cos(dir2);
+    double end2_y = y - arrowLength * Math.sin(dir2);
+    
+    result.add(new Line2D.Double(x, y, end1_x, end1_y));
+    result.add(new Line2D.Double(x, y, end2_x, end2_y));
+    
+    return result;
   }
 
   @Override
