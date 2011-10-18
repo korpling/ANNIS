@@ -56,7 +56,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
-    Pattern.compile("AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?");
+    Pattern.compile("AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
+      Pattern.MULTILINE | Pattern.DOTALL);
 
   
   private Label lblUserName;
@@ -221,6 +222,10 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         control.setQuery(aql, selectedCorpora);
       }
       
+    }
+    else
+    {
+      showNotification("Invalid citation", Notification.TYPE_WARNING_MESSAGE);
     }
   }
   

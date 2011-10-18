@@ -98,6 +98,9 @@ public class Helper
     StringBuilder sb = new StringBuilder();
 
     aql = aql.replaceAll("#", "%23");
+    aql = aql.replaceAll("&", "%26");
+    aql = aql.replaceAll(" ", "%20");
+    aql = aql.replaceAll("\n", "%0A");
     
     sb.append(app.getURL().toString());
     sb.append("Cite/AQL(");
