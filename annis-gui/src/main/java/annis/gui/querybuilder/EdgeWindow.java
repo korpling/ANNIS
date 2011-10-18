@@ -15,9 +15,13 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -30,21 +34,28 @@ import com.vaadin.ui.themes.ChameleonTheme;
  */
 public class EdgeWindow extends Panel implements Button.ClickListener
 {
+  
+  public static final String[] EDGE_OPERATORS = new String[]
+  {
+    ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
+    "_l_", "'_r_", "_o_", "_ol_", "_or_"
+  };
+    
   private TigerQueryBuilder parent;
   
+  private ComboBox cbOperator;
   private Button btClose;
   private NodeWindow source;
   private NodeWindow target;
   
   
-  public EdgeWindow(TigerQueryBuilder parent, NodeWindow source, NodeWindow target)
+  public EdgeWindow(final TigerQueryBuilder parent, NodeWindow source, NodeWindow target)
   {
     this.parent = parent;
     this.source = source;
     this.target = target;
     
-    setWidth("99%");
-    setHeight("99%");
+    setSizeFull();
     
     
     VerticalLayout vLayout = (VerticalLayout) getContent();
@@ -53,7 +64,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
     toolbar.setWidth("100%");
-    toolbar.setHeight("-1px");
+    toolbar.setHeight("20px");
     addComponent(toolbar);
         
     btClose = new Button("X");
@@ -63,10 +74,32 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
     
-    Label lblNode = new Label("edge " + source.getID() + " -> " + target.getID());
-    addComponent(lblNode);
+    cbOperator = new ComboBox();
+    cbOperator.setNewItemsAllowed(true);
+    cbOperator.setNewItemHandler(new SimpleNewItemHandler(cbOperator));
+    cbOperator.setImmediate(true);
+    addComponent(cbOperator);
+    for(String o : EDGE_OPERATORS)
+    {
+      cbOperator.addItem(o);
+    }
+    cbOperator.setValue(EDGE_OPERATORS[0]);
+    cbOperator.addListener(new ValueChangeListener() {
 
-    vLayout.setExpandRatio(lblNode, 1.0f);
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      {
+        if(parent != null)
+        {
+          parent.updateQuery();
+        }
+      }
+    });
+    
+    cbOperator.setWidth("100%");
+    cbOperator.setHeight("20px");
+    
+    vLayout.setExpandRatio(cbOperator, 1.0f);
     
   }
   
@@ -87,6 +120,11 @@ public class EdgeWindow extends Panel implements Button.ClickListener
   public NodeWindow getTarget()
   {
     return target;
+  }
+  
+  public String getOperator()
+  {
+    return (String) cbOperator.getValue();
   }
   
   

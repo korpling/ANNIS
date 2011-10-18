@@ -15,6 +15,8 @@
  */
 package annis.gui.querybuilder;
 
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.ui.AbstractField;
@@ -43,6 +45,11 @@ public class NodeWindow extends Panel implements Button.ClickListener
   public static final int HEIGHT=100;
   public static final int WIDTH=200;
 
+  public static final String[] NODE_OPERATORS = new String[] 
+  {
+    "=", "~", "!=", "!~"
+  };
+  
   private TigerQueryBuilder parent;
   private Button btEdge;
   private Button btAdd;
@@ -84,6 +91,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btAdd);
     btClear = new Button("Clear");
     btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClear.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClear);
 
     btClose = new Button("X");
@@ -135,11 +143,23 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else if(event.getButton() == btAdd)
     {
-      ConstraintLayout c = new ConstraintLayout();
+      ConstraintLayout c = new ConstraintLayout(parent);
       c.setWidth("100%");
       c.setHeight("-1px");
       constraints.add(c);
       addComponent(c);
+    }
+    else if(event.getButton() == btClear)
+    {
+      for(ConstraintLayout c : constraints)
+      {
+        removeComponent(c);
+      }
+      constraints.clear();
+      if(parent != null)
+      {
+        parent.updateQuery();
+      }
     }
   }
 
@@ -171,39 +191,57 @@ public class NodeWindow extends Panel implements Button.ClickListener
     return hash;
   }
 
-  public static class ConstraintLayout extends HorizontalLayout implements LayoutClickListener
+  public List<ConstraintLayout> getConstraints()
+  {
+    return constraints;
+  }
+  
+  
+
+  public static class ConstraintLayout extends HorizontalLayout 
+  implements LayoutClickListener, ValueChangeListener
   {
 
-    private ComboBox cbKey;
+    private TigerQueryBuilder parent;
+    private ComboBox cbName;
     private ComboBox cbOperator;
     private TextField txtValue;
 
-    public ConstraintLayout()
+    public ConstraintLayout(TigerQueryBuilder parent)
     {
+      this.parent = parent;
       
       setWidth("100%");
       
-      cbKey = new ComboBox();
-      cbKey.setNewItemsAllowed(true);
-      cbKey.setNewItemHandler(new DoNotAddNewItemHandler(cbKey));
-      cbKey.setImmediate(true);
+      cbName = new ComboBox();
+      cbName.setNewItemsAllowed(true);
+      cbName.setNewItemHandler(new SimpleNewItemHandler(cbName));
+      cbName.setImmediate(true);
+      cbName.addListener((ValueChangeListener) this);
       
       cbOperator = new ComboBox();
-      cbOperator.setNewItemsAllowed(true);
-      cbOperator.setNewItemHandler(new DoNotAddNewItemHandler(cbOperator));
+      cbOperator.setNewItemsAllowed(false);
       cbOperator.setImmediate(true);
-
+      for(String o : NODE_OPERATORS)
+      {
+        cbOperator.addItem(o);
+      }
+      cbOperator.setValue(NODE_OPERATORS[0]);
+      cbOperator.addListener((ValueChangeListener) this);
+      
       txtValue = new TextField();
-
-      cbOperator.setWidth("50px");
-      cbKey.setWidth("100%");
+      txtValue.setImmediate(true);
+      txtValue.addListener((ValueChangeListener) this);
+      
+      cbOperator.setWidth("3em");
+      cbName.setWidth("100%");
       txtValue.setWidth("100%");
 
-      addComponent(cbKey);
+      addComponent(cbName);
       addComponent(cbOperator);
       addComponent(txtValue);
 
-      setExpandRatio(cbKey, 1.0f);
+      setExpandRatio(cbName, 0.8f);
       setExpandRatio(txtValue, 1.0f);
       
       addListener((LayoutClickListener) this);
@@ -220,13 +258,59 @@ public class NodeWindow extends Panel implements Button.ClickListener
         f.focus();
       }
     }
+    
+    public String getOperator()
+    {
+      if(cbOperator.getValue() == null)
+      {
+        return "";
+      }
+      else
+      {
+        return (String) cbOperator.getValue();
+      }
+    }
+    
+    public String getName()
+    {
+      if(cbName.getValue() == null)
+      {
+        return "";
+      }
+      else
+      {
+        return (String) cbName.getValue();
+      }
+    }
+    
+    public String getValue()
+    {
+      if(txtValue.getValue() == null)
+      {
+        return "";
+      }
+      else
+      {
+        return (String) txtValue.getValue();
+      }
+    }
+
+    @Override
+    public void valueChange(ValueChangeEvent event)
+    {
+      if(parent != null)
+      {
+        parent.updateQuery();
+      }
+    }
+    
   }
-  public static class DoNotAddNewItemHandler  implements NewItemHandler  
+  public static class SimpleNewItemHandler  implements NewItemHandler  
   {
 
     private ComboBox comboBox;
 
-    public DoNotAddNewItemHandler(ComboBox comboBox)
+    public SimpleNewItemHandler(ComboBox comboBox)
     {
       this.comboBox = comboBox;
     }
@@ -244,5 +328,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       }
     }
   }
+  
+  
 
 }

@@ -98,7 +98,10 @@ public class ControlPanel extends Panel
     if(queryPanel != null && corpusList != null)
     {
       queryPanel.setQuery(query);
-      corpusList.selectCorpora(corpora);
+      if(corpora != null)
+      {
+        corpusList.selectCorpora(corpora);
+      }
     }
   }
   

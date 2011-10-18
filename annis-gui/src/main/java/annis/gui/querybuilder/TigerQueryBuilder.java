@@ -15,6 +15,7 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.controlpanel.ControlPanel;
 import annis.gui.widgets.SimpleCanvas;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.event.dd.DragAndDropEvent;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -48,7 +50,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 {
 
   private SimpleCanvas canvas;
-  private Map<NodeWindow,DragAndDropWrapper> nodes;
+  private Map<NodeWindow, DragAndDropWrapper> nodes;
   private List<EdgeWindow> edges;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
@@ -56,9 +58,11 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   private Button btAddNode;
   private Button btClearAll;
   private NodeWindow preparedEdgeSource = null;
+  private ControlPanel controlPanel;
 
-  public TigerQueryBuilder()
+  public TigerQueryBuilder(ControlPanel controlPanel)
   {
+    this.controlPanel = controlPanel;
 
     nodes = new HashMap<NodeWindow, DragAndDropWrapper>();
     edges = new ArrayList<EdgeWindow>();
@@ -72,7 +76,7 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     btAddNode = new Button("Add node", (Button.ClickListener) this);
     btAddNode.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btAddNode);
-    
+
     btClearAll = new Button("Clear all", (Button.ClickListener) this);
     btClearAll.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btClearAll);
@@ -100,10 +104,15 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     area.addComponent(canvas, "top:0px;left:0px");
     addComponent(areaPane);
-    
+
     addStyleName("no-vertical-drag-hints");
     addStyleName("no-horizontal-drag-hints");
     addStyleName("no-box-drag-hints");
+  }
+  
+  public void updateQuery()
+  {
+    controlPanel.setQuery(getAQLQuery(), null);
   }
 
   public void updateLinesAndEdgePositions()
@@ -122,57 +131,57 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       float y1 = p1.getTopValue() + (w1.getHeight() / 2);
       float x2 = p2.getLeftValue() + (w2.getWidth() / 2);
       float y2 = p2.getTopValue() + (w2.getHeight() / 2);
-      
+
       float v_x = x2 - x1;
       float v_y = y2 - y1;
-      
+
       // add line
       canvas.getLines().add(new Line2D.Float(x1, y1, x2, y2));
 
       // set position on half of the line for the edge window      
       ComponentPosition posEdge = area.getPosition(e);
-      
-      float vectorLength = (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
-      float xM = x1 + (vectorLength/2.0f)*((x2-x1)/vectorLength);
-      float yM = y1 + (vectorLength/2.0f)*((y2-y1) / vectorLength);
-      
+
+      float vectorLength = (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      float xM = x1 + (vectorLength / 2.0f) * ((x2 - x1) / vectorLength);
+      float yM = y1 + (vectorLength / 2.0f) * ((y2 - y1) / vectorLength);
+
       double normV_x = v_x / vectorLength;
       double normV_y = v_y / vectorLength;
-      
-      double pos1_x = (2.1*vectorLength/3)*normV_x + x1;
-      double pos1_y = (2.1*vectorLength/3)*normV_y + y1;
-      double  origDir = Math.atan2(normV_y, normV_x);
-      
-      double pos2_x = ((1*vectorLength)/3)*normV_x + x1;
-      double pos2_y = ((1*vectorLength)/3)*normV_y + y1;
-      
+
+      double pos1_x = (2.1 * vectorLength / 3) * normV_x + x1;
+      double pos1_y = (2.1 * vectorLength / 3) * normV_y + y1;
+      double origDir = Math.atan2(normV_y, normV_x);
+
+      double pos2_x = ((1 * vectorLength) / 3) * normV_x + x1;
+      double pos2_y = ((1 * vectorLength) / 3) * normV_y + y1;
+
       canvas.getLines().addAll(createArrow(pos1_x, pos1_y, origDir, 20.0));
       canvas.getLines().addAll(createArrow(pos2_x, pos2_y, origDir, 20.0));
-      
-      posEdge.setLeftValue(xM-e.getWidth()/2.0f);
-      posEdge.setTopValue(yM-e.getHeight()/2.0f);
+
+      posEdge.setLeftValue(xM - e.getWidth() / 2.0f);
+      posEdge.setTopValue(yM - e.getHeight() / 2.0f);
     }
 
     canvas.requestRepaint();
   }
-  
+
   private List<Line2D> createArrow(double x, double y, double direction, double arrowLength)
   {
     LinkedList<Line2D> result = new LinkedList<Line2D>();
-    
-    
-    double dir1 = direction + Math.PI/8.0;
-    double dir2 = direction - Math.PI/8.0;
-    
+
+
+    double dir1 = direction + Math.PI / 8.0;
+    double dir2 = direction - Math.PI / 8.0;
+
     double end1_x = x - arrowLength * Math.cos(dir1);
     double end1_y = y - arrowLength * Math.sin(dir1);
-    
+
     double end2_x = x - arrowLength * Math.cos(dir2);
     double end2_y = y - arrowLength * Math.sin(dir2);
-    
+
     result.add(new Line2D.Double(x, y, end1_x, end1_y));
     result.add(new Line2D.Double(x, y, end2_x, end2_y));
-    
+
     return result;
   }
 
@@ -186,21 +195,22 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     }
     else if(event.getButton() == btClearAll)
     {
-      
+
       for(EdgeWindow w : edges)
       {
         area.removeComponent(w);
-      }      
+      }
       edges.clear();
-      
+
       for(DragAndDropWrapper w : nodes.values())
       {
         area.removeComponent(w);
       }
       nodes.clear();
       number = 0;
-      
+
       updateLinesAndEdgePositions();
+      updateQuery();
     }
 
   }
@@ -225,13 +235,13 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     }
 
     if(preparedEdgeSource != target)
-    {      
+    {
       boolean valid = true;
       for(EdgeWindow e : edges)
       {
         if(e.getSource() == preparedEdgeSource && e.getTarget() == target)
         {
-          valid=false;
+          valid = false;
           break;
         }
       }
@@ -239,42 +249,45 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
       {
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
         e.setWidth("70px");
-        e.setHeight("70px");
+        e.setHeight("50px");
         edges.add(e);
         area.addComponent(e);
         updateLinesAndEdgePositions();
+        updateQuery();
       }
       else
       {
-        getWindow().showNotification("There is already such an edge", 
+        getWindow().showNotification("There is already such an edge",
           Notification.TYPE_WARNING_MESSAGE);
       }
     }
   }
-  
+
   public void deleteEdge(EdgeWindow e)
   {
     area.removeComponent(e);
     edges.remove(e);
     updateLinesAndEdgePositions();
+    updateQuery();
   }
 
   public void addNode()
   {
     final NodeWindow n = new NodeWindow(number++, this);
-    
+
     DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
     nodes.put(n, wrapper);
-  
+
 
     wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
     wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
     wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
-        
+
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
+    updateQuery();
 
   }
-  
+
   public void deleteNode(NodeWindow n)
   {
     LinkedList<EdgeWindow> edgesToRemove = new LinkedList<EdgeWindow>();
@@ -286,12 +299,13 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
         area.removeComponent(e);
       }
     }
-    
+
     edges.removeAll(edgesToRemove);
-    
+
     area.removeComponent(nodes.get(n));
     nodes.remove(n);
     updateLinesAndEdgePositions();
+    updateQuery();
   }
 
   private static class AbsoluteDropHandler implements DropHandler
@@ -311,6 +325,11 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     {
       WrapperTransferable t = (WrapperTransferable) event.getTransferable();
       WrapperTargetDetails details = (WrapperTargetDetails) event.getTargetDetails();
+
+      if(t == null || details == null)
+      {
+        return;
+      }
 
       int xChange = details.getMouseEvent().getClientX()
         - t.getMouseDownEvent().getClientX();
@@ -335,5 +354,80 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     {
       return AcceptAll.get();
     }
+  }
+
+  public String getAQLQuery()
+  {
+    StringBuilder query = new StringBuilder();
+    StringBuffer nodeIdentityOperations = new StringBuffer();
+    Map<NodeWindow, Integer> nodeComponentMap = new HashMap<NodeWindow, Integer>();
+
+
+    //creating node definitions
+    int componentCount = 0;
+    int nodeID = 1;
+    for(NodeWindow nodeWindow : nodes.keySet())
+    {
+      List<NodeWindow.ConstraintLayout> constraints = nodeWindow.getConstraints();
+
+      if(componentCount++ > 0)
+      {
+        query.append(" & ");
+      }
+
+      if(constraints.size() > 0)
+      {
+        int nodeComponentCount = 0;
+        for(NodeWindow.ConstraintLayout c : constraints)
+        {
+          if(nodeComponentCount++ > 0)
+          {
+            nodeIdentityOperations.append("\n& #")
+              .append(componentCount)
+              .append(" = #")
+              .append(componentCount + 1);
+            query.append(" & ");
+            componentCount++;
+          }
+          String operator = c.getOperator().replace("~", "=");
+          String quotes = c.getOperator().equals("=")
+            || c.getOperator().equals("!=") ? "\"" : "/";
+          String prefix = "";
+          if(!c.getName().trim().isEmpty() || c.getName().equals("word")
+            || c.getName().equals("text"))
+          {
+            prefix = c.getName() + operator;
+          }
+          else if(c.getName().trim().isEmpty() && operator.equals("!="))
+          {
+            prefix = "tok" + c.getName() + operator;
+          }
+          query.append(prefix).append(quotes).append(c.getValue()).append(quotes);
+        }
+      }
+      else
+      {
+        query.append("node");
+      }
+      nodeComponentMap.put(nodeWindow, componentCount);
+
+      nodeID++;
+    }
+    query.append(nodeIdentityOperations);
+
+    //appending node relations
+    for(EdgeWindow edgeWindow : edges)
+    {
+      query.append("\n& ");
+      query.append('#')
+        .append(nodeComponentMap.get(edgeWindow.getSource()))
+        .append(" ")
+        .append(edgeWindow.getOperator())
+        .append(" ")
+        .append("#")
+        .append(nodeComponentMap.get(edgeWindow.getTarget()));
+    }
+
+    return query.toString();
   }
 }

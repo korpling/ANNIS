@@ -144,7 +144,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    mainTab.addTab(new TigerQueryBuilder(), "Query Builder", null);
+    mainTab.addTab(new TigerQueryBuilder(control), "Query Builder", null);
     
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
