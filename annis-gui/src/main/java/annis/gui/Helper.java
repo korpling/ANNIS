@@ -23,11 +23,8 @@ import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -100,6 +97,8 @@ public class Helper
   {
     StringBuilder sb = new StringBuilder();
 
+    aql = aql.replaceAll("#", "%23");
+    
     sb.append(app.getURL().toString());
     sb.append("Cite/AQL(");
     sb.append(aql);
