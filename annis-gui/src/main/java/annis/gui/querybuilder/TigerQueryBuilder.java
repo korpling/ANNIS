@@ -29,6 +29,7 @@ import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
@@ -260,14 +261,16 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
   public void addNode()
   {
-    NodeWindow n = new NodeWindow(number++, this);
+    final NodeWindow n = new NodeWindow(number++, this);
+    
     DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
     nodes.put(n, wrapper);
-
+  
 
     wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
-    wrapper.setWidth("140px");
-    wrapper.setHeight("140px");
+    wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
+    wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
+        
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
 
   }
