@@ -112,6 +112,12 @@ public class ControlPanel extends Panel
     searchOptions.setLeftContext(contextLeft);
     searchOptions.setRightContext(contextRight);
   }
+  
+  
+  public Map<Long,AnnisCorpus> getSelectedCorpora()
+  {
+    return corpusList.getSelectedCorpora();
+  }
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException

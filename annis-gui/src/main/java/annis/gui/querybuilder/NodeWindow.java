@@ -21,19 +21,21 @@ import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect.NewItemHandler;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -44,11 +46,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
   
   public static final int HEIGHT=100;
   public static final int WIDTH=200;
-
+  
   public static final String[] NODE_OPERATORS = new String[] 
   {
     "=", "~", "!=", "!~"
   };
+  
+  private Set<String> annoNames;
   
   private TigerQueryBuilder parent;
   private Button btEdge;
@@ -64,7 +68,12 @@ public class NodeWindow extends Panel implements Button.ClickListener
   {
     this.parent = parent;
     this.id = id;
-
+    this.annoNames = new TreeSet<String>();
+    
+    for(String a :parent.getAvailableAnnotationNames())
+    {
+      annoNames.add(a.replaceFirst("^[^:]*:", ""));
+    }
     constraints = new ArrayList<ConstraintLayout>();
 
     setWidth("99%");
@@ -143,11 +152,15 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else if(event.getButton() == btAdd)
     {
-      ConstraintLayout c = new ConstraintLayout(parent);
+      ConstraintLayout c = new ConstraintLayout(parent, annoNames);
       c.setWidth("100%");
       c.setHeight("-1px");
       constraints.add(c);
       addComponent(c);
+      if(parent != null)
+      {
+        parent.updateQuery();
+      }
     }
     else if(event.getButton() == btClear)
     {
@@ -207,7 +220,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     private ComboBox cbOperator;
     private TextField txtValue;
 
-    public ConstraintLayout(TigerQueryBuilder parent)
+    public ConstraintLayout(TigerQueryBuilder parent, Set<String> annoNames)
     {
       this.parent = parent;
       
@@ -218,8 +231,15 @@ public class NodeWindow extends Panel implements Button.ClickListener
       cbName.setNewItemHandler(new SimpleNewItemHandler(cbName));
       cbName.setImmediate(true);
       cbName.setNullSelectionAllowed(true);
-      cbName.setNullSelectionItemId("");
+      cbName.setNullSelectionItemId("tok");
+      cbName.addItem("tok");
+      for(String n : annoNames)
+      {
+        cbName.addItem(n);
+      }
+      cbName.setValue("tok");
       cbName.addListener((ValueChangeListener) this);
+      
       
       cbOperator = new ComboBox();
       cbOperator.setNewItemsAllowed(false);
@@ -258,6 +278,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
       {
         AbstractField f = (AbstractField) c;
         f.focus();
+        if(event.isDoubleClick())
+        {
+          if(f instanceof AbstractTextField)
+          {
+            ((AbstractTextField) f).selectAll();
+          }
+        }
       }
     }
     
@@ -277,7 +304,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     {
       if(cbName.getValue() == null)
       {
-        return "";
+        return "tok";
       }
       else
       {

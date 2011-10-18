@@ -46,6 +46,7 @@ import java.util.logging.Logger;
  */
 public class QueryPanel extends Panel implements TextChangeListener
 {
+
   private TextField txtQuery;
   private Label lblStatus;
   private Button btShowResult;
@@ -56,90 +57,92 @@ public class QueryPanel extends Panel implements TextChangeListener
   private GridLayout mainLayout;
   private Panel panelStatus;
   private String lastPublicStatus;
-  
+
   public QueryPanel(ControlPanel controlPanel)
   {
     this.controlPanel = controlPanel;
     this.lastPublicStatus = "Ok";
-    
+
     setSizeFull();
-    
+
     mainLayout = new GridLayout(2, 3);
     setContent(mainLayout);
     mainLayout.setSizeFull();
     mainLayout.setSpacing(true);
     mainLayout.setMargin(true);
-    
-    mainLayout.addComponent(new Label("AnnisQL:"), 0, 0);    
+
+    mainLayout.addComponent(new Label("AnnisQL:"), 0, 0);
     mainLayout.addComponent(new Label("Status:"), 0, 2);
-    
+
     mainLayout.setRowExpandRatio(0, 1.0f);
     mainLayout.setColumnExpandRatio(0, 0.2f);
     mainLayout.setColumnExpandRatio(1, 0.8f);
-    
+
     txtQuery = new TextField();
     txtQuery.setSizeFull();
-    txtQuery.setTextChangeTimeout(1000);    
+    txtQuery.setTextChangeTimeout(1000);
     txtQuery.addListener((TextChangeListener) this);
-    
+
     mainLayout.addComponent(txtQuery, 1, 0);
-    
+
     panelStatus = new Panel();
     panelStatus.setWidth(100f, UNITS_PERCENTAGE);
     panelStatus.setHeight(3.5f, UNITS_EM);
     ((VerticalLayout) panelStatus.getContent()).setMargin(false);
     ((VerticalLayout) panelStatus.getContent()).setSpacing(false);
     ((VerticalLayout) panelStatus.getContent()).setSizeFull();
-    
+
     lblStatus = new Label();
     lblStatus.setContentMode(Label.CONTENT_TEXT);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
     lblStatus.setHeight("-1px");
-    
+
     panelStatus.addComponent(lblStatus);
-    
+
     mainLayout.addComponent(panelStatus, 1, 2);
-    
+
     setScrollable(true);
-    
-    
+
+
     Panel buttonPanel = new Panel();
     buttonPanelLayout = new HorizontalLayout();
     buttonPanel.setContent(buttonPanelLayout);
     buttonPanelLayout.setWidth(100f, UNITS_PERCENTAGE);
     mainLayout.addComponent(buttonPanel, 1, 1);
-    
+
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
     piCount.setPollingInterval(500);
     panelStatus.addComponent(piCount);
-    
-    
+
+
     btShowResult = new Button("Show Result");
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
     btShowResult.addListener(new ShowResultClickListener());
     btShowResult.setDescription("<b>Show Result</b><br />Ctrl+Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
-    
+
     buttonPanel.addComponent(btShowResult);
-    
+
     btHistory = new Button("History");
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
     buttonPanel.addComponent(btHistory);
-    
+
   }
-  
+
   public void setQuery(String query)
   {
     if(txtQuery != null)
     {
       txtQuery.setValue(query);
     }
+    
+    validateQuery(query);
   }
-  
+
   public String getQuery()
   {
     if(txtQuery != null)
@@ -152,11 +155,17 @@ public class QueryPanel extends Panel implements TextChangeListener
   @Override
   public void textChange(TextChangeEvent event)
   {
+    validateQuery(event.getText());
+  }
+
+  
+  private void validateQuery(String query)
+  {
     // validate query
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
-      if(service != null && service.isValidQuery(event.getText()))
+      if(service != null && service.isValidQuery(query))
       {
         lblStatus.setValue(lastPublicStatus);
       }
@@ -168,16 +177,16 @@ public class QueryPanel extends Panel implements TextChangeListener
     catch(AnnisQLSemanticsException ex)
     {
       lblStatus.setValue(ex.getMessage());
-    }  
+    }
     catch(RemoteException ex)
     {
       Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
         "Remote exception when communicating with service", ex);
-      getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(), 
+      getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
     }
   }
-  
+
   public class ShowResultClickListener implements Button.ClickListener
   {
 
@@ -188,9 +197,9 @@ public class QueryPanel extends Panel implements TextChangeListener
       {
         controlPanel.executeQuery();
       }
-    }    
+    }
   }
-  
+
   public void setCountIndicatorEnabled(boolean enabled)
   {
     if(piCount != null && btShowResult != null)
@@ -198,10 +207,10 @@ public class QueryPanel extends Panel implements TextChangeListener
       lblStatus.setVisible(!enabled);
       piCount.setVisible(enabled);
       piCount.setEnabled(enabled);
-      
+
     }
   }
-  
+
   protected void setStatus(String status)
   {
     if(lblStatus != null)

@@ -23,6 +23,8 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.ifaces.AnnisCorpus;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -69,6 +71,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   private ResultViewPanel resultView;
   private AnnisSecurityManager securityManager;
   private PluginSystem ps;
+  private TigerQueryBuilder queryBuilder;
   
   public SearchWindow(PluginSystem ps)
   {
@@ -145,11 +148,29 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    mainTab.addTab(new TigerQueryBuilder(control), "Query Builder", null);
+    queryBuilder = new TigerQueryBuilder(control);
+    mainTab.addTab(queryBuilder, "Query Builder", null);
     
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
 
+    addAction(new ShortcutListener("^Query builder") {
+
+      @Override
+      public void handleAction(Object sender, Object target)
+      {
+        mainTab.setSelectedTab(queryBuilder);
+      }
+    });
+    addAction(new ShortcutListener("Tutor^ial") {
+
+      @Override
+      public void handleAction(Object sender, Object target)
+      {
+        mainTab.setSelectedTab(tutorial);
+      }
+    });
+    
   }
 
   @Override
@@ -160,8 +181,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     initSecurityManager();    
     updateUserInformation();
     
-  }
-  
+  }  
 
   public void evaluateCitation(String relativeUri)
   {

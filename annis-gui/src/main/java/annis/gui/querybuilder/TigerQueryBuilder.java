@@ -15,8 +15,13 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.Helper;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.widgets.SimpleCanvas;
+import annis.service.AnnisService;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
@@ -35,12 +40,16 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -113,6 +122,39 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
   public void updateQuery()
   {
     controlPanel.setQuery(getAQLQuery(), null);
+  }
+  
+  public Set<String> getAvailableAnnotationNames()
+  {
+    Set<String> result = new TreeSet<String>();
+    
+    AnnisService service = Helper.getService(getApplication(), getWindow());
+    
+    // get current corpus selection
+    Map<Long,AnnisCorpus> corpusSelection = controlPanel.getSelectedCorpora();
+    
+    if(service != null)
+    {
+      try
+      {
+        AnnisAttributeSet atts = 
+          service.getAttributeSet(new LinkedList<Long>(corpusSelection.keySet()), false, true);
+        
+        for(AnnisAttribute a : atts)
+        {
+          if(a.getType() == AnnisAttribute.Type.node)
+          {
+            result.add(a.getName());
+          }
+        }
+        
+      }
+      catch(RemoteException ex)
+      {
+        Logger.getLogger(TigerQueryBuilder.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    return result;
   }
 
   public void updateLinesAndEdgePositions()
@@ -393,16 +435,26 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
           String quotes = c.getOperator().equals("=")
             || c.getOperator().equals("!=") ? "\"" : "/";
           String prefix = "";
-          if(!c.getName().trim().isEmpty() || c.getName().equals("word")
-            || c.getName().equals("text"))
+          if(c.getName().trim().isEmpty() || c.getName().trim().equals("tok"))
+          {
+            if(operator.equals("!="))
+            {
+              prefix = "tok" + c.getName() 
+                + operator;
+            }
+          }
+          else
           {
             prefix = c.getName() + operator;
           }
-          else if(c.getName().trim().isEmpty() && operator.equals("!="))
+          if("".equals(c.getValue()))
           {
-            prefix = "tok" + c.getName() + operator;
+            query.append(c.getName());
           }
-          query.append(prefix).append(quotes).append(c.getValue()).append(quotes);
+          else
+          {
+            query.append(prefix).append(quotes).append(c.getValue()).append(quotes);
+          }
         }
       }
       else
@@ -430,4 +482,5 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
 
     return query.toString();
   }
+  
 }
