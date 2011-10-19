@@ -505,7 +505,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
             window.setWidth(70, UNITS_EM);
             window.setHeight(40, UNITS_EM);
             window.setResizable(false);
-            window.setModal(true);
+            window.setModal(false);
 
             getWindow().addWindow(window);
             window.center();

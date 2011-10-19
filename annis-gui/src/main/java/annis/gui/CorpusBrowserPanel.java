@@ -23,6 +23,7 @@ import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
@@ -55,13 +56,17 @@ public class CorpusBrowserPanel extends Panel
   private AnnisCorpus corpus;
   private Table tblNodeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
+  private Table tblEdgeTypes;
+  private BeanItemContainer<CorpusBrowserEntry> containerEdgeType;
   private CitationLinkGenerator citationGenerator;
+  private ControlPanel controlPanel;
 
   public CorpusBrowserPanel(final AnnisCorpus corpus,
-    final ControlPanel controlPanel)
+    ControlPanel controlPanel)
   {
     super("Available annotations");
     this.corpus = corpus;
+    this.controlPanel = controlPanel;
 
     setSizeFull();
 
@@ -73,45 +78,20 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry.class);
     containerNodeAnno.setItemSorter(new ExampleSorter());
 
-    citationGenerator = new CitationLinkGenerator();
-    
-    tblNodeAnno = new Table();
-    tblNodeAnno.setSizeFull();
-    tblNodeAnno.setSelectable(true);
-    tblNodeAnno.setMultiSelect(false);
-    tblNodeAnno.setContainerDataSource(containerNodeAnno);
-    tblNodeAnno.addGeneratedColumn("genlink",citationGenerator);
-    tblNodeAnno.setVisibleColumns(new String[]
-      {
-        "name", "example",
-        "genlink"
-      });
-    tblNodeAnno.setColumnHeaders(new String[]
-      {
-        "Name",
-        "Example (click to use query)", "URL"
-      });
-    tblNodeAnno.setColumnExpandRatio("name", 0.5f);
-    tblNodeAnno.setColumnExpandRatio("example", 0.5f);
-    tblNodeAnno.setImmediate(true);
-    tblNodeAnno.addListener(new Table.ValueChangeListener()
-    {
+    containerEdgeType = new BeanItemContainer<CorpusBrowserEntry>(
+      CorpusBrowserEntry.class);
+    containerEdgeType.setItemSorter(new ExampleSorter());
 
-      @Override
-      public void valueChange(ValueChangeEvent event)
-      {
-        CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
-        HashMap<Long,AnnisCorpus> corpusMap = new HashMap<Long,AnnisCorpus>();
-        corpusMap.put(corpus.getId(), corpus);
-        if(controlPanel != null)
-        {
-          controlPanel.setQuery(cbe.getExample(), corpusMap);
-        }
-      }
-    });
+    citationGenerator = new CitationLinkGenerator();
+
+    tblNodeAnno = new ExampleTable(citationGenerator, containerNodeAnno);
+    tblNodeAnno.addListener(new ExampleListener());
+
+    tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
+    tblEdgeTypes.addListener(new ExampleListener());
 
     accordion.addTab(tblNodeAnno, "Node annotations", null);
-    accordion.addTab(new Label("test"), "Edge types", null);
+    accordion.addTab(tblEdgeTypes, "Edge types", null);
     accordion.addTab(new Label("test"), "Edge annotations", null);
   }
 
@@ -120,16 +100,21 @@ public class CorpusBrowserPanel extends Panel
   {
 
     citationGenerator.setMainWindow(getApplication().getMainWindow());
-    
+
     boolean stripNodeAnno = true;
+    boolean stripEdgeName = true;
     HashSet<String> nodeAnnoNames = new HashSet<String>();
+    HashSet<String> edgeNames = new HashSet<String>();
+    boolean hasDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getId());
-    // check for ambigous names first
+    
+    // do some preparations first
     for(AnnisAttribute a : attributes)
     {
       if(stripNodeAnno && a.getType() == AnnisAttribute.Type.node)
       {
+        // check for ambigous names
         String name = killNamespace(a.getName());
         if(nodeAnnoNames.contains(name))
         {
@@ -137,7 +122,32 @@ public class CorpusBrowserPanel extends Panel
         }
         nodeAnnoNames.add(name);
       }
+      
+      if(a.getType() == AnnisAttribute.Type.edge)
+      {
+        String name = killNamespace(a.getEdgeName());
+        if(edgeNames.contains(name))
+        {
+          stripEdgeName = false;
+        }
+        edgeNames.add(name);
+        
+        // check if we need to add the general dominance example edge
+        if(a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          hasDominance = true;
+        }
+      }
 
+    }
+    
+    if(hasDominance)
+    {
+      CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+      cbe.setName("(dominance)");
+      cbe.setCorpus(corpus);
+      cbe.setExample("node & node & #1 > #2");
+      containerEdgeType.addBean(cbe);
     }
 
     // secound round, fill the actual containers
@@ -152,11 +162,28 @@ public class CorpusBrowserPanel extends Panel
         cbe.setCorpus(corpus);
         containerNodeAnno.addBean(cbe);
       }
+      else if(a.getType() == AnnisAttribute.Type.edge)
+      {
+        CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+        String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.getEdgeName();
+        cbe.setName(name);
+        cbe.setCorpus(corpus);
+        if(a.getSubtype() == AnnisAttribute.SubType.p)
+        {
+          cbe.setExample("node & node & #1 ->" + killNamespace(name) + " #2");
+        }
+        else if(a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          cbe.setExample("node & node & #1 >" + killNamespace(name) + " #2");
+        }
+        containerEdgeType.addBean(cbe);
+      }
 
     }
 
     tblNodeAnno.setSortContainerPropertyId("name");
-    
+    tblEdgeTypes.setSortContainerPropertyId("name");
+
     super.attach();
   }
 
@@ -185,6 +212,47 @@ public class CorpusBrowserPanel extends Panel
         Notification.TYPE_WARNING_MESSAGE);
     }
     return result;
+  }
+
+  public class ExampleTable extends Table
+  {
+
+    public ExampleTable(CitationLinkGenerator citationGenerator, 
+      BeanItemContainer<CorpusBrowserEntry> container)
+    {
+      setContainerDataSource(container);
+      addGeneratedColumn("genlink", citationGenerator);
+      setSizeFull();
+      setSelectable(true);
+      setMultiSelect(false);
+      setVisibleColumns(new String[]
+        {
+          "name", "example", "genlink"
+        });
+      setColumnHeaders(new String[]
+        {
+          "Name", "Example (click to use query)", "URL"
+        });
+      setColumnExpandRatio("name", 0.5F);
+      setColumnExpandRatio("example", 0.5F);
+      setImmediate(true);
+    }
+  }
+
+  public class ExampleListener implements ValueChangeListener
+  {
+
+    @Override
+    public void valueChange(ValueChangeEvent event)
+    {
+      CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
+      HashMap<Long, AnnisCorpus> corpusMap = new HashMap<Long, AnnisCorpus>();
+      corpusMap.put(corpus.getId(), corpus);
+      if(controlPanel != null)
+      {
+        controlPanel.setQuery(cbe.getExample(), corpusMap);
+      }
+    }
   }
 
   public class ExampleSorter extends DefaultItemSorter
