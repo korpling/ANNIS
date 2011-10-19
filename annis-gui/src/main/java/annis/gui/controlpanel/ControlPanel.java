@@ -32,11 +32,16 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.collections15.set.ListOrderedSet;
 
 /**
  * 
@@ -53,12 +58,14 @@ public class ControlPanel extends Panel
   private String lastQuery;
   private Map<Long,AnnisCorpus> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
+  private ListOrderedSet<HistoryEntry> history;
 
   public ControlPanel(SearchWindow searchWindow)
   {
     super("Search Form");
     this.searchWindow = searchWindow;
-
+    this.history = new ListOrderedSet<HistoryEntry>();
+    
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
@@ -158,6 +165,19 @@ public class ControlPanel extends Panel
         return;
       }
 
+      HistoryEntry e = new HistoryEntry();
+      e.setQuery(lastQuery);
+      e.setCorpora(getSelectedCorpora());
+      
+      // remove it first in order to let it appear on the beginning of the list
+      if(history.contains(e))
+      {
+        history.remove(e);
+      }
+      
+      history.add(0, e);
+      queryPanel.updateShortHistory(history.asList());
+      
       queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
@@ -165,9 +185,16 @@ public class ControlPanel extends Panel
       searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
         searchOptions.getLeftContext(), searchOptions.getRightContext(),
         searchOptions.getResultsPerPage());
+      
+      
     }
   }
 
+  public Set<HistoryEntry> getHistory()
+  {
+    return history;
+  }
+  
   private class CountThread extends Thread
   {
 

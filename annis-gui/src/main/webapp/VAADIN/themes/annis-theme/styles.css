@@ -48,6 +48,13 @@
   background-color: #ecf0f6;
 }
 
+/* 
+Hack, split button should have the some appearance on focus as the other buttons 
+*/
+.v-splitbutton .v-button:focus .v-button-wrap {
+  background-position: left top !important;
+}
+
 /* matched node colors by match index*/
 .match_1 {
   color: rgb(255,0,0);

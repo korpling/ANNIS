@@ -17,10 +17,10 @@ package annis.gui.controlpanel;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.gui.Helper;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -30,27 +30,40 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
-import java.security.Provider.Service;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.vaadin.hene.splitbutton.SplitButton;
+import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
 
 /**
  *
  * @author thomas
  */
-public class QueryPanel extends Panel implements TextChangeListener
+public class QueryPanel extends Panel implements TextChangeListener,
+  ValueChangeListener
 {
+  
+  public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
   private TextField txtQuery;
   private Label lblStatus;
   private Button btShowResult;
-  private Button btHistory;
+  private SplitButton btHistory;
+  private ListSelect lstHistory;
   private ControlPanel controlPanel;
   private ProgressIndicator piCount;
   private HorizontalLayout buttonPanelLayout;
@@ -58,6 +71,7 @@ public class QueryPanel extends Panel implements TextChangeListener
   private Panel panelStatus;
   private String lastPublicStatus;
 
+  
   public QueryPanel(ControlPanel controlPanel)
   {
     this.controlPanel = controlPanel;
@@ -127,10 +141,47 @@ public class QueryPanel extends Panel implements TextChangeListener
 
     buttonPanel.addComponent(btShowResult);
 
-    btHistory = new Button("History");
+    lstHistory = new ListSelect();
+    lstHistory.setNullSelectionAllowed(false);
+    lstHistory.setValue(null);
+    lstHistory.addListener((ValueChangeListener) this);
+    lstHistory.setImmediate(true);
+    
+    btHistory = new SplitButton("History");
+    btHistory.addStyleName(SplitButton.STYLE_CHAMELEON);
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
+    btHistory.setComponent(lstHistory);
     buttonPanel.addComponent(btHistory);
+    
+    btHistory.addClickListener(new SplitButton.SplitButtonClickListener() {
 
+      @Override
+      public void splitButtonClick(SplitButtonClickEvent event)
+      {
+        getWindow().showNotification("History requested");
+      }
+    });
+
+  }
+  
+  public void updateShortHistory(List<HistoryEntry> history)
+  {
+    lstHistory.removeAllItems();
+    
+    int counter = 0;
+    
+    for(HistoryEntry e : history)
+    {
+      if(counter >= MAX_HISTORY_MENU_ITEMS)
+      {
+        break;
+      }
+      else
+      {
+        lstHistory.addItem(e);
+      }
+      counter++;
+    }
   }
 
   public void setQuery(String query)
@@ -184,6 +235,17 @@ public class QueryPanel extends Panel implements TextChangeListener
         "Remote exception when communicating with service", ex);
       getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
+    }
+  }
+
+  @Override
+  public void valueChange(ValueChangeEvent event)
+  {
+    btHistory.setPopupVisible(false);
+    HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
+    if(controlPanel != null & e != null)
+    {
+      controlPanel.setQuery(e.getQuery(), e.getCorpora());
     }
   }
 
