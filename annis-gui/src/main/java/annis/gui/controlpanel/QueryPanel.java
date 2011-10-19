@@ -15,9 +15,11 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.beans.HistoryEntry;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
+import annis.gui.HistoryPanel;
 import annis.service.AnnisService;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -35,11 +37,13 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -70,13 +74,15 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private GridLayout mainLayout;
   private Panel panelStatus;
   private String lastPublicStatus;
+  private List<HistoryEntry> history;
 
   
-  public QueryPanel(ControlPanel controlPanel)
+  public QueryPanel(final ControlPanel controlPanel)
   {
     this.controlPanel = controlPanel;
     this.lastPublicStatus = "Ok";
-
+    this.history = new LinkedList<HistoryEntry>();
+    
     setSizeFull();
 
     mainLayout = new GridLayout(2, 3);
@@ -158,7 +164,12 @@ public class QueryPanel extends Panel implements TextChangeListener,
       @Override
       public void splitButtonClick(SplitButtonClickEvent event)
       {
-        getWindow().showNotification("History requested");
+        Window w = new Window("History", new HistoryPanel(history, controlPanel));
+        w.setModal(false);
+        w.setWidth("400px");
+        w.setHeight("250px");
+        getWindow().addWindow(w);
+
       }
     });
 
@@ -166,6 +177,8 @@ public class QueryPanel extends Panel implements TextChangeListener,
   
   public void updateShortHistory(List<HistoryEntry> history)
   {
+    this.history = history;
+    
     lstHistory.removeAllItems();
     
     int counter = 0;

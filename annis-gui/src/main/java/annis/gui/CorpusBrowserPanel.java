@@ -85,6 +85,7 @@ public class CorpusBrowserPanel extends Panel
       public Component generateCell(Table source, Object itemId,
         Object columnId)
       {
+        // TODO: generate citation link
         return new Label("X");
       }
     });

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
+package annis.gui.beans;
 
 import annis.service.ifaces.AnnisCorpus;
 import java.util.HashMap;

@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.beans.HistoryEntry;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -170,12 +171,9 @@ public class ControlPanel extends Panel
       e.setCorpora(getSelectedCorpora());
       
       // remove it first in order to let it appear on the beginning of the list
-      if(history.contains(e))
-      {
-        history.remove(e);
-      }
-      
+      history.remove(e);      
       history.add(0, e);
+      
       queryPanel.updateShortHistory(history.asList());
       
       queryPanel.setCountIndicatorEnabled(true);
