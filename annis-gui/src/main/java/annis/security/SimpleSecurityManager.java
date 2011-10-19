@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -43,7 +44,8 @@ import javax.naming.NamingException;
  * 
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
-public class SimpleSecurityManager implements AnnisSecurityManager
+public class SimpleSecurityManager implements AnnisSecurityManager,
+  Serializable
 {
 
   public final static String CONFIG_PATH = "userconfig_path";

@@ -143,7 +143,6 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     tblCorpora.setColumnExpandRatio("name", 0.6f);
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
-    tblCorpora.setColumnWidth("info", 18);
     tblCorpora.addActionHandler((Action.Handler) this);
 
     layout.setExpandRatio(tblCorpora, 1.0f);
