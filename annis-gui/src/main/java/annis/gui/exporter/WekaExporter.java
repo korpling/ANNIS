@@ -28,7 +28,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class WekaExporter implements Exporter
+public class WekaExporter implements Exporter, Serializable
 {
 
   private static final long serialVersionUID = -8182635617256833563L;

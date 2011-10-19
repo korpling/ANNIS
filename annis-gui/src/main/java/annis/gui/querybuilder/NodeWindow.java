@@ -91,20 +91,20 @@ public class NodeWindow extends Panel implements Button.ClickListener
     addComponent(toolbar);
 
     btEdge = new Button("Edge");
-    btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btEdge.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btEdge.addListener((Button.ClickListener) this);
     toolbar.addComponent(btEdge);
     btAdd = new Button("Add");
-    btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btAdd.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btAdd.addListener((Button.ClickListener) this);
     toolbar.addComponent(btAdd);
     btClear = new Button("Clear");
-    btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClear);
 
     btClose = new Button("X");
-    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 

@@ -68,7 +68,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     addComponent(toolbar);
         
     btClose = new Button("X");
-    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     

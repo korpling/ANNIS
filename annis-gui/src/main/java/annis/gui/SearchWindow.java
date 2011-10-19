@@ -162,7 +162,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         mainTab.setSelectedTab(queryBuilder);
       }
     });
-    addAction(new ShortcutListener("Tutor^ial") {
+    addAction(new ShortcutListener("Tutor^eial") {
 
       @Override
       public void handleAction(Object sender, Object target)
