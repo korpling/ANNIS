@@ -40,17 +40,19 @@ public class KWICPanel extends Panel
 {
   private AnnisResult result;
   
-  private final String DUMMY_COLUMN = "dummyColumn"; 
+  private final String DUMMY_COLUMN = "dkoummyColumn"; 
   
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode,Long> markedAndCovered;
+  private long textID;
   
   public KWICPanel(AnnisResult result, Set<String> tokenAnnos, 
-    Map<AnnisNode,Long> markedAndCovered)
+    Map<AnnisNode,Long> markedAndCovered, long textID)
   {
     this.result = result;
     this.markedAndCovered = markedAndCovered;
+    this.textID = textID;
     
     this.addStyleName("kwic");
     setSizeFull();
@@ -82,11 +84,14 @@ public class KWICPanel extends Panel
     ArrayList<Object> visible = new ArrayList<Object>(10);
     for(AnnisNode t : token)
     {
-      // add a column for each token
-      tblToken.addGeneratedColumn(t, new TokenColumnGenerator());
-      tblToken.setColumnWidth(t, -1);
-      tblToken.setColumnExpandRatio(t, 0.0f);
-      visible.add(t);
+      if(t.getTextId() == textID)
+      {
+        // add a column for each token
+        tblToken.addGeneratedColumn(t, new TokenColumnGenerator());
+        tblToken.setColumnWidth(t, -1);
+        tblToken.setColumnExpandRatio(t, 0.0f);
+        visible.add(t);
+      }
     }
     
     tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator() {

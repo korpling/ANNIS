@@ -36,6 +36,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -60,10 +62,11 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
   private Map<AnnisNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
+  private Set<Long> containedTexts;
   private VerticalLayout vLayout;
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
-  private KWICPanel kwic;
+  private List<KWICPanel> kwicPanels;
   private Button btInfo;
 
   public SingleResultPanel(final AnnisResult result, int resultNumber,
@@ -115,10 +118,16 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
     vLayout.addComponent(lblPath);
-
-    kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered);
-    vLayout.addComponent(kwic);
-
+    
+    kwicPanels = new ArrayList<KWICPanel>();
+    for(long textId : containedTexts)
+    {
+      
+      KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
+        textId);
+      vLayout.addComponent(kwic);
+      kwicPanels.add(kwic);
+    }
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
     vLayout.setMargin(false);
@@ -157,9 +166,12 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(kwic != null)
+    if(kwicPanels != null)
     {
-      kwic.setVisibleTokenAnnosVisible(annos);
+      for(KWICPanel kwic : kwicPanels)
+      {
+        kwic.setVisibleTokenAnnosVisible(annos);
+      }
     }
   }
 
@@ -167,9 +179,12 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
   {
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
-
+    containedTexts = new TreeSet<Long>();
+    
     for(AnnisNode n : result.getGraph().getNodes())
     {
+      containedTexts.add(n.getTextId());
+      
       Long match = n.getMatchedNodeInQuery();
       if(match != null)
       {
