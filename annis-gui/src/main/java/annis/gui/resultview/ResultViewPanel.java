@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
 import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
@@ -28,17 +29,12 @@ import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -227,45 +223,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
   
   private void showCitationURLWindow()
   {
-    final Window w = new Window("Citation");
-    VerticalLayout wLayout = (VerticalLayout) w.getContent();
-        
-    LinkedList<String> corpusNames = new LinkedList<String>();
-    for(AnnisCorpus c : corpora.values())
-    {
-      corpusNames.add(c.getName());
-    }
-    String url = Helper.generateCitation(getApplication(), 
-      aql, corpusNames, contextLeft, contextRight);
-    TextArea txtCitation = new TextArea();
-
-    txtCitation.setWidth("100%");
-    txtCitation.setHeight("-1px");
-    txtCitation.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
-    txtCitation.setValue(url);
-    txtCitation.setWordwrap(true);
-    txtCitation.setReadOnly(true);
-    
-    w.addComponent(txtCitation);
-    
-    Button btOk = new Button("OK");
-    btOk.addListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        getWindow().removeWindow(w);
-      }
-    });
-    btOk.setSizeUndefined();
-    
-    w.addComponent(btOk);
-    
-    wLayout.setExpandRatio(txtCitation, 1.0f);
-    wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
-    
-    w.setWidth("400px");
-    w.setHeight("-1px");
+    final Window w = 
+      new CitationWindow(
+        getApplication(),
+        aql, corpora, contextLeft, contextRight);
     
     getWindow().addWindow(w);
     w.center();

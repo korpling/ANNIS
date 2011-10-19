@@ -19,7 +19,6 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -38,6 +37,7 @@ public class HistoryPanel extends Panel
   private Table tblHistory;
   private BeanItemContainer<HistoryEntry> containerHistory;
   private ControlPanel parent;
+  private CitationLinkGenerator citationGenerator;
 
   public HistoryPanel(List<HistoryEntry> history, ControlPanel parent)
   {
@@ -57,7 +57,7 @@ public class HistoryPanel extends Panel
     tblHistory.setMultiSelect(false);
     tblHistory.setContainerDataSource(containerHistory);
 
-    tblHistory.addGeneratedColumn("number", new Table.ColumnGenerator()
+    tblHistory.addGeneratedColumn("gennumber", new Table.ColumnGenerator()
     {
 
       @Override
@@ -66,18 +66,31 @@ public class HistoryPanel extends Panel
         return new Label("" + (containerHistory.indexOfId(itemId) + 1));
       }
     });
+    citationGenerator = new CitationLinkGenerator();
+    tblHistory.addGeneratedColumn("genlink", citationGenerator);
 
     tblHistory.setVisibleColumns(new String[]
       {
-        "number", "query"
+        "gennumber", "query", "genlink"
       });
-    tblHistory.setColumnHeader("number", "#");
+    tblHistory.setColumnHeader("gennumber", "#");
     tblHistory.setColumnHeader("query", "Query");
+    tblHistory.setColumnHeader("genlink", "URL");
     tblHistory.setColumnExpandRatio("query", 1.0f);
     tblHistory.setImmediate(true);
     tblHistory.addListener((ValueChangeListener) this);
 
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    citationGenerator.setMainWindow(getApplication().getMainWindow());
+  }
+  
+  
 
   @Override
   public void valueChange(ValueChangeEvent event)

@@ -80,7 +80,7 @@ public class MainApp extends Application implements PluginSystem,
     initPlugins();
 
     setTheme("annis-theme");
-
+    
     windowSearch = new SearchWindow((PluginSystem) this);
     setMainWindow(windowSearch);
 

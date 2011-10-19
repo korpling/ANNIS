@@ -26,7 +26,6 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -56,6 +55,7 @@ public class CorpusBrowserPanel extends Panel
   private AnnisCorpus corpus;
   private Table tblNodeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
+  private CitationLinkGenerator citationGenerator;
 
   public CorpusBrowserPanel(final AnnisCorpus corpus,
     final ControlPanel controlPanel)
@@ -73,22 +73,14 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry.class);
     containerNodeAnno.setItemSorter(new ExampleSorter());
 
+    citationGenerator = new CitationLinkGenerator();
+    
     tblNodeAnno = new Table();
     tblNodeAnno.setSizeFull();
     tblNodeAnno.setSelectable(true);
     tblNodeAnno.setMultiSelect(false);
     tblNodeAnno.setContainerDataSource(containerNodeAnno);
-    tblNodeAnno.addGeneratedColumn("genlink", new Table.ColumnGenerator()
-    {
-
-      @Override
-      public Component generateCell(Table source, Object itemId,
-        Object columnId)
-      {
-        // TODO: generate citation link
-        return new Label("X");
-      }
-    });
+    tblNodeAnno.addGeneratedColumn("genlink",citationGenerator);
     tblNodeAnno.setVisibleColumns(new String[]
       {
         "name", "example",
@@ -97,11 +89,10 @@ public class CorpusBrowserPanel extends Panel
     tblNodeAnno.setColumnHeaders(new String[]
       {
         "Name",
-        "Example (click to use query)", "Url"
+        "Example (click to use query)", "URL"
       });
     tblNodeAnno.setColumnExpandRatio("name", 0.5f);
     tblNodeAnno.setColumnExpandRatio("example", 0.5f);
-    tblNodeAnno.setColumnWidth("genlink", 18);
     tblNodeAnno.setImmediate(true);
     tblNodeAnno.addListener(new Table.ValueChangeListener()
     {
@@ -128,6 +119,8 @@ public class CorpusBrowserPanel extends Panel
   public void attach()
   {
 
+    citationGenerator.setMainWindow(getApplication().getMainWindow());
+    
     boolean stripNodeAnno = true;
     HashSet<String> nodeAnnoNames = new HashSet<String>();
 

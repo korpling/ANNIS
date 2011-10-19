@@ -16,12 +16,14 @@
 package annis.gui.beans;
 
 import annis.service.ifaces.AnnisCorpus;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author thomas
  */
-public class CorpusBrowserEntry
+public class CorpusBrowserEntry implements CitationProvider
 {
   private String name;
   private String example;
@@ -94,7 +96,30 @@ public class CorpusBrowserEntry
     return hash;
   }
 
-  
-  
+  @Override
+  public String getQuery()
+  {
+    return example;
+  }
+
+  @Override
+  public Map<Long, AnnisCorpus> getCorpora()
+  {
+    Map<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
+    result.put(corpus.getId(), corpus);
+    return result;
+  }
+
+  @Override
+  public int getLeftContext()
+  {
+    return 5;
+  }
+
+  @Override
+  public int getRightContext()
+  {
+    return 5;
+  }
   
 }

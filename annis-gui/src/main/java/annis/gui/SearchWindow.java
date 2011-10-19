@@ -23,7 +23,6 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.ifaces.AnnisCorpus;
-import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
@@ -77,6 +76,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   {
     super("Annis² Corpus Search");
     this.ps = ps;
+    setName("search");
     
     getContent().setSizeFull();
     ((VerticalLayout) getContent()).setMargin(false);

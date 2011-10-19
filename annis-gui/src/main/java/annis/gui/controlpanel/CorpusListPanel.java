@@ -183,18 +183,21 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
             String[] splitted = corpusString.split(",");
             for(String s : splitted)
             {
-              try
+              if(!"".equals(s))
               {
-                Long val = Long.parseLong(s);
-                AnnisCorpus c = allCorpora.get(val);
-                if(c != null)
+                try
                 {
-                  corpora.put(c.getId(), c);
+                  Long val = Long.parseLong(s);
+                  AnnisCorpus c = allCorpora.get(val);
+                  if(c != null)
+                  {
+                    corpora.put(c.getId(), c);
+                  }
                 }
-              }
-              catch(NumberFormatException ex)
-              {
-                Logger.getLogger(CorpusListPanel.class.getName()).log(Level.WARNING, "invalid number in corpus set " + setName, ex);
+                catch(NumberFormatException ex)
+                {
+                  Logger.getLogger(CorpusListPanel.class.getName()).log(Level.WARNING, "invalid number in corpus set " + setName, ex);
+                }
               }
             }
             corpusSets.put(setName, corpora);

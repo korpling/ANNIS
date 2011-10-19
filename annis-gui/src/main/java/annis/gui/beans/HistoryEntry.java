@@ -24,17 +24,18 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class HistoryEntry
+public class HistoryEntry implements CitationProvider
 {
-  
-  private Map<Long,AnnisCorpus> corpora;
+
+  private Map<Long, AnnisCorpus> corpora;
   private String query;
 
   public HistoryEntry()
   {
     corpora = new HashMap<Long, AnnisCorpus>();
   }
-  
+
+  @Override
   public Map<Long, AnnisCorpus> getCorpora()
   {
     return corpora;
@@ -45,6 +46,7 @@ public class HistoryEntry
     this.corpora = corpora;
   }
 
+  @Override
   public String getQuery()
   {
     return query;
@@ -53,6 +55,18 @@ public class HistoryEntry
   public void setQuery(String query)
   {
     this.query = query;
+  }
+
+  @Override
+  public int getLeftContext()
+  {
+    return 5;
+  }
+
+  @Override
+  public int getRightContext()
+  {
+    return 5;
   }
 
   @Override
@@ -92,6 +106,4 @@ public class HistoryEntry
     hash = 11 * hash + (this.query != null ? this.query.hashCode() : 0);
     return hash;
   }
-  
-  
 }
