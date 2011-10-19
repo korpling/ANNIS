@@ -27,7 +27,6 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window.Notification;
@@ -58,6 +57,8 @@ public class CorpusBrowserPanel extends Panel
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
   private Table tblEdgeTypes;
   private BeanItemContainer<CorpusBrowserEntry> containerEdgeType;
+  private Table tblEdgeAnno;
+  private BeanItemContainer<CorpusBrowserEntry> containerEdgeAnno;
   private CitationLinkGenerator citationGenerator;
   private ControlPanel controlPanel;
 
@@ -81,6 +82,10 @@ public class CorpusBrowserPanel extends Panel
     containerEdgeType = new BeanItemContainer<CorpusBrowserEntry>(
       CorpusBrowserEntry.class);
     containerEdgeType.setItemSorter(new ExampleSorter());
+    
+    containerEdgeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+      CorpusBrowserEntry.class);
+    containerEdgeAnno.setItemSorter(new ExampleSorter());
 
     citationGenerator = new CitationLinkGenerator();
 
@@ -89,10 +94,13 @@ public class CorpusBrowserPanel extends Panel
 
     tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
     tblEdgeTypes.addListener(new ExampleListener());
+    
+    tblEdgeAnno = new ExampleTable(citationGenerator, containerEdgeAnno);
+    tblEdgeAnno.addListener(new ExampleListener());
 
     accordion.addTab(tblNodeAnno, "Node annotations", null);
     accordion.addTab(tblEdgeTypes, "Edge types", null);
-    accordion.addTab(new Label("test"), "Edge annotations", null);
+    accordion.addTab(tblEdgeAnno, "Edge annotations", null);
   }
 
   @Override
@@ -103,8 +111,11 @@ public class CorpusBrowserPanel extends Panel
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
+    boolean stripEdgeAnno = true;
     HashSet<String> nodeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeNames = new HashSet<String>();
+    HashSet<String> edgeAnnoNames = new HashSet<String>();  
+    HashSet<String> edgeNames = new HashSet<String>();  
+    HashSet<String> fullEdgeNames = new HashSet<String>();
     boolean hasDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getId());
@@ -112,7 +123,7 @@ public class CorpusBrowserPanel extends Panel
     // do some preparations first
     for(AnnisAttribute a : attributes)
     {
-      if(stripNodeAnno && a.getType() == AnnisAttribute.Type.node)
+      if(a.getType() == AnnisAttribute.Type.node)
       {
         // check for ambigous names
         String name = killNamespace(a.getName());
@@ -121,24 +132,36 @@ public class CorpusBrowserPanel extends Panel
           stripNodeAnno = false;
         }
         nodeAnnoNames.add(name);
-      }
-      
-      if(a.getType() == AnnisAttribute.Type.edge)
+      }      
+      else if(a.getType() == AnnisAttribute.Type.edge)
       {
-        String name = killNamespace(a.getEdgeName());
-        if(edgeNames.contains(name))
-        {
-          stripEdgeName = false;
-        }
-        edgeNames.add(name);
+        fullEdgeNames.add(a.getEdgeName());
         
         // check if we need to add the general dominance example edge
         if(a.getSubtype() == AnnisAttribute.SubType.d)
         {
           hasDominance = true;
         }
+        
+        String annoName = killNamespace(a.getName());
+        if(edgeAnnoNames.contains(annoName))
+        {
+          stripEdgeAnno = false;
+        }
+        edgeAnnoNames.add(annoName);
+        
       }
-
+    }
+    
+    // check if collected edge names are unique
+    for(String edgeName : fullEdgeNames)
+    {
+      String name = killNamespace(edgeName);
+      if(edgeNames.contains(name))
+      {
+        stripEdgeName = false;
+      }
+      edgeNames.add(name);
     }
     
     if(hasDominance)
@@ -164,26 +187,49 @@ public class CorpusBrowserPanel extends Panel
       }
       else if(a.getType() == AnnisAttribute.Type.edge)
       {
-        CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+        // edge type entry (multiple entries will be removed automatically)
+        CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
         String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.getEdgeName();
-        cbe.setName(name);
-        cbe.setCorpus(corpus);
+        cbeEdgeType.setName(name);
+        cbeEdgeType.setCorpus(corpus);
         if(a.getSubtype() == AnnisAttribute.SubType.p)
         {
-          cbe.setExample("node & node & #1 ->" + killNamespace(name) + " #2");
+          cbeEdgeType.setExample("node & node & #1 ->" + killNamespace(name) + " #2");
         }
         else if(a.getSubtype() == AnnisAttribute.SubType.d)
         {
-          cbe.setExample("node & node & #1 >" + killNamespace(name) + " #2");
+          cbeEdgeType.setExample("node & node & #1 >" + killNamespace(name) + " #2");
         }
-        containerEdgeType.addBean(cbe);
+        containerEdgeType.addBean(cbeEdgeType);
+        
+        // the edge annotation entry
+        CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
+        String edgeAnno = stripEdgeAnno 
+          ? killNamespace(a.getName()) : a.getName();
+        cbeEdgeAnno.setName(edgeAnno);
+        cbeEdgeAnno.setCorpus(corpus);
+        if(a.getSubtype() == AnnisAttribute.SubType.p)
+        {
+          cbeEdgeAnno.setExample("node & node & #1 ->"
+            + killNamespace(a.getEdgeName()) + "["
+            + killNamespace(a.getName()) + "=\""
+            + getFirst(a.getValueSet())
+            + "\"] #2");
+        }
+        else if(a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          cbeEdgeAnno.setExample("node & node & #1 >[" 
+           + killNamespace(a.getName()) + "=\""
+           + getFirst(a.getValueSet()) + "\"] #2");
+        }
+        containerEdgeAnno.addBean(cbeEdgeAnno);
       }
-
     }
 
     tblNodeAnno.setSortContainerPropertyId("name");
     tblEdgeTypes.setSortContainerPropertyId("name");
-
+    tblEdgeAnno.setSortContainerPropertyId("name");
+      
     super.attach();
   }
 
@@ -233,8 +279,8 @@ public class CorpusBrowserPanel extends Panel
         {
           "Name", "Example (click to use query)", "URL"
         });
-      setColumnExpandRatio("name", 0.5F);
-      setColumnExpandRatio("example", 0.5F);
+      setColumnExpandRatio("name", 0.3f);
+      setColumnExpandRatio("example", 0.7f);
       setImmediate(true);
     }
   }

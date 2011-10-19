@@ -75,11 +75,7 @@ public class CorpusBrowserEntry implements CitationProvider
     {
       return false;
     }
-    if((this.example == null) ? (other.example != null) : !this.example.equals(other.example))
-    {
-      return false;
-    }
-    if(this.corpus != other.corpus)
+    if(this.corpus != other.corpus && (this.corpus == null || !this.corpus.equals(other.corpus)))
     {
       return false;
     }
@@ -89,13 +85,13 @@ public class CorpusBrowserEntry implements CitationProvider
   @Override
   public int hashCode()
   {
-    int hash = 7;
-    hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
-    hash = 67 * hash + (this.example != null ? this.example.hashCode() : 0);
-    hash = 67 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
+    int hash = 5;
+    hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
+    hash = 13 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
     return hash;
   }
 
+  
   @Override
   public String getQuery()
   {
