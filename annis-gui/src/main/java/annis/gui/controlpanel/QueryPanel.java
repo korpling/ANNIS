@@ -40,14 +40,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.vaadin.hene.splitbutton.SplitButton;
@@ -75,7 +69,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private Panel panelStatus;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
-
+  private Window historyWindow;
   
   public QueryPanel(final ControlPanel controlPanel)
   {
@@ -164,12 +158,23 @@ public class QueryPanel extends Panel implements TextChangeListener,
       @Override
       public void splitButtonClick(SplitButtonClickEvent event)
       {
-        Window w = new Window("History", new HistoryPanel(history, controlPanel));
-        w.setModal(false);
-        w.setWidth("400px");
-        w.setHeight("250px");
-        getWindow().addWindow(w);
-
+        if(historyWindow == null)
+        {
+          historyWindow = new Window("History");
+          historyWindow.setModal(false);
+          historyWindow.setWidth("400px");
+          historyWindow.setHeight("250px");
+        }
+        historyWindow.setContent(new HistoryPanel(history, controlPanel));
+        
+        if(getWindow().getChildWindows().contains(historyWindow))
+        {
+          historyWindow.bringToFront();
+        }
+        else
+        {          
+          getWindow().addWindow(historyWindow);
+        }
       }
     });
 
