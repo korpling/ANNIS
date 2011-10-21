@@ -107,7 +107,7 @@ public class MainApp extends Application implements PluginSystem,
     int result = -1;
     try
     {
-      result = Integer.parseInt(versionProperties.getProperty("revision", "-1"));
+      result = Integer.parseInt(versionProperties.getProperty("build_revision", "-1"));
     }
     catch(NumberFormatException ex)
     {
@@ -160,7 +160,7 @@ public class MainApp extends Application implements PluginSystem,
     try
     {
       DateFormat format = new SimpleDateFormat("YYYY-MM-dd_HH-mm-ss");
-      format.parse(versionProperties.getProperty("date"));
+      format.parse(versionProperties.getProperty("build_date"));
       
     }
     catch(Exception ex)
