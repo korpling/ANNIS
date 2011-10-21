@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="annis-gui">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="annis-service-rmi-2.3.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-service-rmi/annis-service-rmi">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="annis-gwt-2.3.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-gwt/annis-gwt">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="annis-gui"/>
+        <property name="java-output-path" value="/annis-gui/target/classes"/>
+    </wb-module>
+</project-modules>

@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Operators in ANNIS Quey Language</title>
+<link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div id="tutorialcontent">
+
+<h2>Complete List of Operators</h2>
+	The ANNIS Query Language (AQL) currently includes the following operators:<br>
+      <br>
+      <table border="1">
+	<tr><td height="20"><strong>Operator</strong></td>
+	<td><strong>Description</strong></td>
+	<td colspan="3"><strong>Illustration</strong></td>
+	<td><strong>Notes</strong></td>
+	</tr>
+	<tr><td height="38"><code>.</code></td><td>direct precedence</td><td colspan="3"><center>
+	  <strong>A B</strong>
+	  </center></td><td>For non-terminal nodes, precedence is determined by the right most and left most terminal children</td></tr>
+	<tr><td height="38"><code>.*</code></td><td>indirect precedence</td><td colspan="3"><center><strong>A</strong> <span class="style1">x y z</span> <strong>B</strong>
+	</center></td><td>For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance</td></tr>
+	<tr><td height="56"><code>&gt;</code></td><td>direct dominance</td><td colspan="3"><center>
+	  <strong>A</strong> <br>
+	  |<br>
+	  <strong>B</strong>
+	  </center></td>
+	<td>A specific edge type may be specifed, e.g.: <code>&gt;secedge</code> to find secondary edges. Edges labels are specified in brackets, e.g. <code>&gt;[func="OA"]</code> for an edge with the function 'object, accusative'</td>
+	</tr>
+	<tr>
+	  <td height="92"><code>&gt;*</code></td>
+	  <td>indirect dominance</td>
+	  <td colspan="3"><center>
+	    <strong>A</strong><br>
+    |<br>
+    ...  <br>
+	    |<br>
+	    <strong>B</strong>
+	    </center></td>
+	  <td>For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td>
+	</tr>
+	<tr><td height="38"><code>_=_</code></td><td>identical coverage</td><td colspan="3"><center><strong>A<br>B</strong></center></td>
+	<td>Applies when two annotation cover the exact same span of tokens </td>
+	</tr>
+	<tr>
+	  <td height="38"><code>_i_</code></td>
+	  <td>inclusion</td>
+	  <td colspan="3"><center>
+	    <strong>AAA<br>
+B	    </strong>
+	  </center></td>
+	  <td>Applies when one annotation covers a span identical to or larger than another </td>
+	</tr>
+	<tr>
+	  <td height="38"><code>_o_</code></td>
+	  <td>overlap</td>
+	  <td colspan="3"><center>
+	    <strong>AAA&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;BBB</strong><strong></strong>
+	  </center></td>
+	  <td>For overlap only on the left or right side, use <code>_ol_</code> and <code>_or_</code> respectively </td>
+	</tr>
+	<tr>
+	  <td height="38"><code>_l_</code></td>
+	  <td>left aligned</td>
+		  <td width="15">&nbsp;</td>
+	  <td colspan="2" valign="top">	      <div align="left"><strong>A</strong><strong>AA<br>
+             BB&nbsp;</strong>
+	        </div></td>
+	  <td>Both elements span an area beginning with the same token </td>
+	</tr>
+		<tr>
+		  <td height="38"><code>_r_</code></td>
+		  <td>right aligned</td>
+		  <td colspan="2" valign="top">	        <div align="right"><strong>AA<br>
+	          BBB
+		        </strong><strong></strong>
+		        </div></td>
+		  <td width="26">&nbsp;</td>
+		  <td>Both elements span an area ending with the same token </td>
+		</tr>
+<tr>
+	  <td height="38"><code>-&gt;LABEL</code></td>
+	  <td>labeled pointing relation</td>
+	  <td colspan="3"><center>
+<table cellpadding="0" cellspacing="0">
+<tr><td colspan="4" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>LABEL</tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-left: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-right: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td colspan="2" align="center">V</td><td style="border-right: solid windowtext 1.0pt">&nbsp;</td><td align="center">&nbsp;</td></tr>
+<tr><td colspan="2" align="center"><strong>A</strong></td><td colspan="2" align="center">&nbsp;<strong>B</strong></td>
+</table>
+	  </center></td><td>A labeled, directed relationship between two elements. Annotations can be specified with
+<tt>-&gt;LABEL[annotation="VALUE"]</tt>
+</td>
+	</tr>
+
+		<tr>
+		  <td height="38"><code>-&gt;LABEL *</code></td>
+		  <td>indirect pointing relation</td>
+		  <td colspan="3"><center>
+<table cellpadding="0" cellspacing="0">
+<tr><td colspan="6" align="center"><tt>LABEL&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;LABEL</td></tr>
+<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-left: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="padding: 0in 0in 0in 0in; border-right: solid windowtext 1.0pt; border-top: solid windowtext 1.0pt">&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td colspan="4" align="left">&nbsp;&nbsp;&nbsp;V</td><td style="border-right: solid windowtext 1.0pt">&nbsp;</td><td align="center">&nbsp;</td></tr>
+<tr><td colspan="3" align="center"><strong>A</strong></td><td colspan="3" align="center">&nbsp;<strong>B</strong></td>
+</table>
+
+		  </center></td><td>An indirect labeled relationship between two elements. The length of the chain may be specified with
+<tt>-&gt;LABEL n,m</tt> for relation chains of length n to m
+
+	</td>
+	</tr>
+	<tr>
+	  <td height="38"><code>&gt;@l</code></td>
+	  <td>left-most child</td>
+	  <td colspan="3"><center>
+	    <strong>A</strong> <br>
+/ | \<br>
+<strong>B </strong><span class="style1">x y</span>
+	  </center></td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	  <td height="38"><code>&gt;@r</code></td>
+	  <td>right-most child</td>
+	  <td colspan="3"><center>
+	    <strong>A<br>
+	    </strong>/ | \
+        <br>
+        <span class="style1">x y</span> <strong>B</strong>
+	  </center></td>
+	  <td>&nbsp;</td>
+	</tr>
+	<tr>
+	  <td>$</td>
+	  <td>Common parent node</td>
+	  <td colspan="3"><center>
+	    x<br>
+	      / \<br>
+	      <strong>A B</strong>
+	  </center></td>
+	  <td>&nbsp;</td>
+	  </tr>
+<tr><td>$*</td><td>Common ancestor node</td><td colspan="3"><center>
+  x<br>
+  |<br>
+  ...<br>
+  / \<br>
+  <strong>A B</strong>
+</center></td>
+<td>&nbsp;</td></tr>
+
+ <tr>
+  <td>
+  #x:arity=n
+  </td>
+  <td>
+  Arity
+  </td>
+  <td colspan="3" align="center">
+ x<br>
+   / | \<br>
+  <b> 1 … n</b>
+  </td>
+  <td>Specifies the amount of directly dominated children that the searched node has </td>
+ </tr>
+ <tr>
+  <td valign="center">
+  #x:tokenarity=n
+  </td>
+  <td valign="center">
+  Tokenarity
+  </td>
+  <td colspan="3" align="center" valign="center">
+   x<br>...<br> /  \<br>
+  <b>1 ... n</b>
+  </td>
+  <td>Specifies the length of the span of tokens covered by the node</td>
+ </tr>
+
+
+  <tr>
+   <td valign="center">
+   #x:root
+   </td>
+   <td valign="center">
+   Root
+   </td>
+   <td colspan="3" align="center" valign="center">
+    ___<br>x<br>...
+   </td>
+   <td>Specifies that the node is not dominated by any other node within its namespace</td>
+  </tr>
+
+
+	  </table>
+</div>
+
+</body>
+</html>

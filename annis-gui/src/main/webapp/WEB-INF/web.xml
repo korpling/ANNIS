@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <display-name>Annis corpus Search gui</display-name>
+  <context-param>
+    <description>Vaadin production mode</description>
+    <param-name>productionMode</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>MainApp</servlet-name>
+    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+    <init-param>
+      <param-name>application</param-name>
+      <param-value>annis.gui.MainApp</param-value>
+    </init-param>
+    <init-param>
+      <description>URL of the AnnisRMIServer</description>
+      <param-name>AnnisRemoteService.URL</param-name>
+      <param-value>rmi://localhost:4711/AnnisService</param-value>
+    </init-param>
+    <init-param>
+      <description>Path (or command) of the "dot" programm</description>
+      <param-name>DotPath</param-name>
+      <param-value>dot</param-value>
+    </init-param>
+    <init-param>
+      <description>Path for the file of the user configuration (SimpleSecurityManager)</description>
+      <param-name>userconfig_path</param-name>
+      <param-value>${annis.userConfig}</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        	Application widgetset
+      </description>
+      <param-name>widgetset</param-name>        	
+      <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MainApp</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ResourceServlet</servlet-name>
+    <servlet-class>annis.gui.servlets.ResourceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ResourceServlet</servlet-name>
+    <url-pattern>/Resource/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/tutorial/*</url-pattern>
+  </servlet-mapping>
+  
+    
+</web-app>

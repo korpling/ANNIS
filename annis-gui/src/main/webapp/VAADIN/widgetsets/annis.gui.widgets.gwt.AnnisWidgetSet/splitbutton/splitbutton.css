@@ -1,0 +1,122 @@
+/* Reindeer theme */
+
+.v-splitbutton {
+	height: 26px;
+	white-space: nowrap;
+}
+
+.v-splitbutton .v-button {
+	height: 25px;
+	vertical-align: top;
+}
+
+.v-splitbutton .v-button:focus .v-button-wrap {
+	background-position: left -26px;
+}
+
+.v-splitbutton .v-button .v-button-wrap,
+.v-splitbutton div.v-disabled.v-button .v-button-wrap {
+	background-position: left -130px;
+}
+
+.v-splitbutton .v-button:active .v-button-wrap,
+.v-splitbutton .v-button.v-pressed .v-button-wrap {
+	background-position: left -78px;
+}
+
+.v-splitbutton .v-popupbutton,
+.v-splitbutton div.v-disabled.v-popupbutton {
+	border-left: 1px solid #ababab;
+	border-right: none;
+	padding-left: 0;
+}
+
+.v-splitbutton .v-popupbutton:focus {
+	border-left-color: #7aa6d1;	
+}
+
+.v-splitbutton .v-popupbutton .v-button-wrap,
+.v-splitbutton div.v-disabled.v-popupbutton .v-button-wrap {
+	background-position: right -130px;
+	padding-left: 2px;
+	padding-right: 10px;
+}
+
+.v-splitbutton .v-popupbutton:focus .v-button-wrap {
+	background-position: right -26px;
+}
+
+.v-splitbutton .v-popupbutton:active, 
+.v-splitbutton .v-popupbutton.v-pressed {
+	border-left-color: #ababab;
+}
+
+.v-splitbutton .v-popupbutton:active .v-button-wrap,
+.v-splitbutton .v-popupbutton.v-pressed .v-button-wrap {
+	background-position: right -78px;
+}
+
+/* Chameleon theme */
+
+.v-splitbutton-chameleon {
+	height: auto;
+}
+
+.v-splitbutton-chameleon .v-button {
+	height: auto;
+}
+
+.v-splitbutton-chameleon .v-button,
+.v-splitbutton-chameleon .v-disabled.v-button:focus,
+.v-splitbutton-chameleon .v-disabled.v-button:active {
+	background-position: left bottom;	
+}
+
+.v-splitbutton-chameleon .v-button .v-button-wrap,
+.v-splitbutton-chameleon .v-disabled.v-button .v-button-wrap {
+	background-position: left 0;
+}
+
+.v-splitbutton-chameleon .v-disabled.v-popupbutton,
+.v-splitbutton-chameleon .v-popupbutton .v-button-wrap,
+.v-splitbutton-chameleon .v-disabled.v-popupbutton .v-button-wrap {
+	border-left: none;
+}
+
+.v-splitbutton-chameleon .v-button,
+.v-splitbutton-chameleon .v-disabled.v-button {
+	border-radius: 3px 0 0 3px;
+	-moz-border-radius: 3px 0 0 3px;
+	-webkit-border-radius: 3px 0 0 3px;
+}
+
+.v-splitbutton-chameleon .v-popupbutton,
+.v-splitbutton-chameleon .v-disabled.v-popupbutton {
+	border-right: 1px solid #8b8b8b;
+	border-radius: 0 3px 3px 0;
+	-moz-border-radius: 0 3px 3px 0;
+	-webkit-border-radius: 0 3px 3px 0;
+}
+
+.v-splitbutton-chameleon .v-popupbutton:focus {
+	border-left-color: #8b8b8b;	
+}	
+
+.v-splitbutton-chameleon .v-button .v-button-wrap {
+	border-radius: 2px 0 0 2px;
+	-moz-border-radius: 2px 0 0 2px;
+	-webkit-border-radius: 2px 0 0 2px;
+}
+
+.v-splitbutton-chameleon .v-popupbutton .v-button-wrap {
+	border-radius: 0 2px 2px 0;
+	-moz-border-radius: 0 2px 2px 0;
+	-webkit-border-radius: 0 2px 2px 0;
+}
+
+.v-splitbutton-chameleon .v-popupbutton:active .v-button-wrap,
+.v-splitbutton-chameleon .v-disabled.v-popupbutton .v-button-wrap,
+.v-ie7 .v-splitbutton-chameleon .v-pressed.v-popupbutton .v-button-wrap,
+.v-ie8 .v-splitbutton-chameleon .v-pressed.v-popupbutton .v-button-wrap {
+	padding: 3px 9px 0px 2px;
+}

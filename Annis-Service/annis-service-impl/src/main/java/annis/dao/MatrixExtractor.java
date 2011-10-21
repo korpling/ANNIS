@@ -172,33 +172,36 @@ public class MatrixExtractor implements ResultSetExtractor
       
       for(String line : arrayLines)
       {
-        String namespace = null;
-        String name = null;
-        String value = null;
-        
-        String[] split = line.split(":");
-        if(split.length > 2)
+        if(line != null)
         {
-          namespace = split[0];
-          name = split[1];
-          value = split[2];
-        }
-        else if(split.length > 1)
-        {
-          name = split[0];
-          value = split[1];
-        }
-        else
-        {
-          name = split[0];
-        }
-        
-        if(value != null)
-        {
-          value = new String(Base64.decodeBase64(value));
-        }
-        
-        result.add(new Annotation(namespace, name, value));
+          String namespace = null;
+          String name = null;
+          String value = null;
+
+          String[] split = line.split(":");
+          if(split.length > 2)
+          {
+            namespace = split[0];
+            name = split[1];
+            value = split[2];
+          }
+          else if(split.length > 1)
+          {
+            name = split[0];
+            value = split[1];
+          }
+          else
+          {
+            name = split[0];
+          }
+
+          if(value != null)
+          {
+            value = new String(Base64.decodeBase64(value));
+          }
+
+          result.add(new Annotation(namespace, name, value));
+        } // if line not null
       }
     }
     

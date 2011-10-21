@@ -21,22 +21,22 @@ package annis.service.ifaces;
  * @author k.huetter
  *
  */
-public interface AnnisCorpus extends JSONAble {
+public interface AnnisCorpus extends JSONAble, Comparable<AnnisCorpus>
+{
 
-	public abstract long getId();
+  public abstract long getId();
 
-	public abstract void setId(long id);
+  public abstract void setId(long id);
 
-	public abstract String getName();
+  public abstract String getName();
 
-	public abstract void setName(String name);
+  public abstract void setName(String name);
 
-	public abstract int getTextCount();
+  public abstract int getTextCount();
 
-	public abstract void setTextCount(int textCount);
+  public abstract void setTextCount(int textCount);
 
-	public abstract int getTokenCount();
+  public abstract int getTokenCount();
 
-	public abstract void setTokenCount(int tokenCount);
-
+  public abstract void setTokenCount(int tokenCount);
 }

@@ -1,0 +1,82 @@
+@import "../chameleon/styles.css";
+@import "base.css";
+
+.control .v-panel-content {
+  background-color: #ecf0f6;
+}
+
+.v-table-cell-wrapper {
+  white-space: normal;
+}
+
+.result-view .v-panel-content {
+  background-color: white;
+}
+.result-view .v-table-body {
+  background-color: white;
+}
+
+.kwic {
+  font-size: 11px;
+}
+
+.kwic-anno {
+  color: grey;
+}
+
+.toolbar .v-panel-content {
+  background-color: #ecf0f6;
+}
+
+.toolbar {
+  background-color: #ecf0f6;
+}
+
+.right-aligned-text {
+  text-align: right;
+}
+
+.rtl {
+  direction: rtl;
+}
+
+.v-label-docPath {
+  text-align: left;
+  font-weight: normal;
+  margin: 0 0 4px;
+  padding: 2px 3px;
+  background-color: #ecf0f6;
+}
+
+/* 
+Hack, split button should have the some appearance on focus as the other buttons 
+*/
+.v-splitbutton .v-button:focus .v-button-wrap {
+  background-position: left top !important;
+}
+
+/* matched node colors by match index*/
+.match_1 {
+  color: rgb(255,0,0);
+}
+.match_2 {
+  color: rgb(199,21,133);
+}
+.match_3 {
+  color: rgb(50, 205, 50);
+}
+.match_4 {
+  color: rgb(205,133,63);
+}
+.match_5 {
+  color: rgb(205,92,92);
+}
+.match_6 {
+  color: rgb(173,255,47);
+}
+.match_7 {
+  color: rgb(139,0,0);
+}
+.match_8 {
+  color: rgb(255,69,0);
+}
