@@ -26,7 +26,7 @@
     <init-param>
       <description>Path for the file of the user configuration (SimpleSecurityManager)</description>
       <param-name>userconfig_path</param-name>
-      <param-value>${annis.userConfig}</param-value>
+      <param-value>/etc/annis/user_config_trunk</param-value>
     </init-param>
     <init-param>
       <description>
