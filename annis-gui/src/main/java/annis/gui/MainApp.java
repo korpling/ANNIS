@@ -111,7 +111,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(NumberFormatException ex)
     {
-//      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
     }
     return result;
   }
@@ -137,9 +137,10 @@ public class MainApp extends Application implements PluginSystem,
       }
       if(date != null)
       {
-        result.append(added ? " " : "");
+        result.append(added ? ", built " : "");
         
-        result.append(date.toString());
+        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        result.append(d.format(date));
       }
       
       result.append(")");
@@ -159,13 +160,12 @@ public class MainApp extends Application implements PluginSystem,
     Date result = null;
     try
     {
-      DateFormat format = new SimpleDateFormat("YYYY-MM-dd_HH-mm-ss");
-      format.parse(versionProperties.getProperty("build_date"));
-      
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+      result = format.parse(versionProperties.getProperty("build_date"));      
     }
     catch(Exception ex)
     {
-//      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
     }
     return result;
   }
