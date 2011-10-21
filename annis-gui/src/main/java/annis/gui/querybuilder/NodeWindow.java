@@ -54,7 +54,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   
   private Set<String> annoNames;
   
-  private TigerQueryBuilder parent;
+  private TigerQueryBuilderCanvas parent;
   private Button btEdge;
   private Button btAdd;
   private Button btClear;
@@ -64,7 +64,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   private boolean prepareEdgeDock;
   private int id;
 
-  public NodeWindow(int id, TigerQueryBuilder parent)
+  public NodeWindow(int id, TigerQueryBuilderCanvas parent)
   {
     this.parent = parent;
     this.id = id;
@@ -215,12 +215,12 @@ public class NodeWindow extends Panel implements Button.ClickListener
   implements LayoutClickListener, ValueChangeListener
   {
 
-    private TigerQueryBuilder parent;
+    private TigerQueryBuilderCanvas parent;
     private ComboBox cbName;
     private ComboBox cbOperator;
     private TextField txtValue;
 
-    public ConstraintLayout(TigerQueryBuilder parent, Set<String> annoNames)
+    public ConstraintLayout(TigerQueryBuilderCanvas parent, Set<String> annoNames)
     {
       this.parent = parent;
       

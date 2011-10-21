@@ -41,7 +41,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     "_l_", "'_r_", "_o_", "_ol_", "_or_"
   };
     
-  private TigerQueryBuilder parent;
+  private TigerQueryBuilderCanvas parent;
   
   private ComboBox cbOperator;
   private Button btClose;
@@ -49,7 +49,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
   private NodeWindow target;
   
   
-  public EdgeWindow(final TigerQueryBuilder parent, NodeWindow source, NodeWindow target)
+  public EdgeWindow(final TigerQueryBuilderCanvas parent, NodeWindow source, NodeWindow target)
   {
     this.parent = parent;
     this.source = source;
