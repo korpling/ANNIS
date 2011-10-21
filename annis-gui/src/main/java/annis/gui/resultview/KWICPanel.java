@@ -94,7 +94,7 @@ public class KWICPanel extends Panel
         tblToken.setColumnExpandRatio(t, 0.0f);
         visible.add(t);
         
-        if(lastTokenIndex != null && lastTokenIndex != null 
+        if(lastTokenIndex != null && t.getTokenIndex() != null 
           && t.getTokenIndex().longValue() > (lastTokenIndex.longValue()+1))
         {
           // add "(...)"

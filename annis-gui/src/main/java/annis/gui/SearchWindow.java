@@ -200,7 +200,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       @Override
       public void handleParameters(Map<String, String[]> parameters)
       {
-        if(parameters.containsKey("citation"));
+        if(parameters.containsKey("citation"))
         {
           HttpSession session =
             ((WebApplicationContext) getApplication().getContext()).getHttpSession();
