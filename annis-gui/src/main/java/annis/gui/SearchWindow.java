@@ -42,8 +42,10 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -287,7 +289,13 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       {
         control.setQuery(aql, selectedCorpora);
       }
-
+      
+      // remove all currently openend sub-windows
+      Set<Window> all = new HashSet<Window>(getChildWindows());
+      for(Window w : all)
+      {
+        removeWindow(w);
+      }
     }
     else
     {
