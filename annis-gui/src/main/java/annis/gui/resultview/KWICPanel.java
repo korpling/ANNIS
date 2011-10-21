@@ -40,7 +40,7 @@ public class KWICPanel extends Panel
 {
   private AnnisResult result;
   
-  private final String DUMMY_COLUMN = "dkoummyColumn"; 
+  private final String DUMMY_COLUMN = "dummyColumn"; 
   
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;

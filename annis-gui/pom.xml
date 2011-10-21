@@ -26,6 +26,13 @@
   </properties>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -36,7 +43,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-
+            
      <!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
           be launched with the Maven goal jetty:run and stopped with jetty:stop -->
       <plugin>

@@ -37,6 +37,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.BaseTheme;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -91,6 +92,22 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     addComponent(panelToolbar);
     panelToolbar.addStyleName("toolbar");
 
+    Button btAboutAnnis = new Button("About Annis");
+    btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
+    btAboutAnnis.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        Window w = new Window("About Annis", new AboutPanel());
+        w.setModal(true);
+        w.setResizable(false);
+        addWindow(w);
+        w.center();
+      }
+    });
+    
+    
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
     lblUserName.setHeight("-1px");
@@ -118,11 +135,12 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     btLoginLogout.setSizeUndefined();
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
-
+    layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(lblUserName);
     layoutToolbar.addComponent(btLoginLogout);
 
     layoutToolbar.setSpacing(true);
+    layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
     layoutToolbar.setComponentAlignment(btLoginLogout, Alignment.MIDDLE_RIGHT);
     layoutToolbar.setExpandRatio(lblUserName, 1.0f);

@@ -33,17 +33,21 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -71,19 +75,100 @@ public class MainApp extends Application implements PluginSystem,
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
+  private Properties versionProperties;
 
   @Override
   public void init()
   {
+    
+    ClassResource res = new ClassResource("version.properties", this);
+    versionProperties = new Properties();
+    try
+    {
+      versionProperties.load(res.getStream().getStream());
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
     addListener((UserChangeListener) this);
 
     initPlugins();
 
     setTheme("annis-theme");
-    
+
     windowSearch = new SearchWindow((PluginSystem) this);
     setMainWindow(windowSearch);
 
+  }
+
+  public int getBuildRevision()
+  {
+    int result = -1;
+    try
+    {
+      result = Integer.parseInt(versionProperties.getProperty("revision", "-1"));
+    }
+    catch(NumberFormatException ex)
+    {
+//      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return result;
+  }
+
+  @Override
+  public String getVersion()
+  {
+    int rev = getBuildRevision();
+    Date date = getBuildDate();
+    StringBuilder result = new StringBuilder();
+
+    result.append(getVersionNumber());
+    if(rev >= 0 || date != null)
+    {
+      result.append(" (");
+      
+      boolean added = false;
+      if(rev >= 0)
+      {
+        result.append("rev. ");
+        result.append(rev);
+        added = true;
+      }
+      if(date != null)
+      {
+        result.append(added ? " " : "");
+        
+        result.append(date.toString());
+      }
+      
+      result.append(")");
+    }
+    
+    return result.toString();
+
+  }
+  
+  public String getVersionNumber()
+  {    
+    return versionProperties.getProperty("version", "UNKNOWNVERSION");
+  }
+  
+  public Date getBuildDate()
+  {
+    Date result = null;
+    try
+    {
+      DateFormat format = new SimpleDateFormat("YYYY-MM-dd_HH-mm-ss");
+      format.parse(versionProperties.getProperty("date"));
+      
+    }
+    catch(Exception ex)
+    {
+//      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return result;
   }
 
   @Override
