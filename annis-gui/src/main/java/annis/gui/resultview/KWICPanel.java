@@ -82,6 +82,8 @@ public class KWICPanel extends Panel
     
     List<AnnisNode> token = result.getGraph().getTokens();
     ArrayList<Object> visible = new ArrayList<Object>(10);
+    Long lastTokenIndex = null;
+    
     for(AnnisNode t : token)
     {
       if(t.getTextId() == textID)
@@ -91,6 +93,19 @@ public class KWICPanel extends Panel
         tblToken.setColumnWidth(t, -1);
         tblToken.setColumnExpandRatio(t, 0.0f);
         visible.add(t);
+        
+        if(lastTokenIndex != null && lastTokenIndex != null 
+          && t.getTokenIndex().longValue() > (lastTokenIndex.longValue()+1))
+        {
+          // add "(...)"
+          Long gapColumnID = t.getTokenIndex();
+          tblToken.addGeneratedColumn(gapColumnID, new GapColumnGenerator());
+          tblToken.setColumnWidth(gapColumnID, -1);
+          tblToken.setColumnExpandRatio(gapColumnID, 0.0f);
+          visible.add(gapColumnID);
+        
+        }
+        lastTokenIndex = t.getTokenIndex();
       }
     }
     
@@ -122,6 +137,27 @@ public class KWICPanel extends Panel
       containerAnnos.addItem("tok");
       containerAnnos.addAll(annos);
     }
+  }
+  
+  public class GapColumnGenerator implements Table.ColumnGenerator
+  {
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      Label l = new Label();
+      
+      if("tok".equals(itemId))
+      {
+        l.setValue("(...)");
+      }
+      else
+      {
+        l.setValue("");
+        l.addStyleName("kwic-anno");
+      }
+      return l;
+    }
+    
   }
   
   public class TokenColumnGenerator implements Table.ColumnGenerator
