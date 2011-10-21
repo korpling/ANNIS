@@ -95,32 +95,41 @@ public class Helper
   public static String generateCitation(Application app, String aql, List<String> corpora,
     int contextLeft, int contextRight)
   {
-    StringBuilder sb = new StringBuilder();
-
-    aql = aql.replaceAll("#", "%23");
-    aql = aql.replaceAll("&", "%26");
-    aql = aql.replaceAll(" ", "%20");
-    aql = aql.replaceAll("\n", "%0A");
-    
-    sb.append(app.getURL().toString());
-    sb.append("Cite/AQL(");
-    sb.append(aql);
-    sb.append("),CIDS(");
-    sb.append(StringUtils.join(corpora, ","));
-    sb.append("),CLEFT(");
-    sb.append(contextLeft);
-    sb.append("),CRIGHT(");
-    sb.append(contextRight);
-    sb.append(")");
     try
     {
-      return new URI(sb.toString()).toASCIIString();
+      StringBuilder sb = new StringBuilder();
+
+      URI appURI = app.getURL().toURI();
+      
+      sb.append(getContext(app));
+      sb.append("/Cite/AQL(");
+      sb.append(aql);
+      sb.append("),CIDS(");
+      sb.append(StringUtils.join(corpora, ","));
+      sb.append("),CLEFT(");
+      sb.append(contextLeft);
+      sb.append("),CRIGHT(");
+      sb.append(contextRight);
+      sb.append(")");
+      
+      try
+      {
+        return new URI(appURI.getScheme(), null, 
+          appURI.getHost(), appURI.getPort(),
+          sb.toString(), null, null)
+          .toASCIIString();
+      }
+      catch(URISyntaxException ex)
+      {
+        Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      return "ERROR";
     }
     catch(URISyntaxException ex)
     {
       Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
     }
-    return sb.toString();
+    return "ERROR";
   }
 
   public static Map<String, AnnisCorpus> calculateName2Corpus(Map<Long, AnnisCorpus> corpusMap)

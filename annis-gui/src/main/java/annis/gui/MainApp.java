@@ -80,7 +80,6 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void init()
   {
-    
     ClassResource res = new ClassResource("version.properties", this);
     versionProperties = new Properties();
     try
@@ -310,7 +309,7 @@ public class MainApp extends Application implements PluginSystem,
         windowSearch.evaluateCitation(decoded);
         try
         {
-          response.sendRedirect(windowSearch.getURL().toString());
+          response.sendRedirect(getURL().toString());
         }
         catch(IOException ex)
         {

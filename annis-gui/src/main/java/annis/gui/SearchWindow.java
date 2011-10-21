@@ -24,6 +24,8 @@ import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.ifaces.AnnisCorpus;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.terminal.ParameterHandler;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -47,6 +49,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.naming.AuthenticationException;
+import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -59,9 +63,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
     Pattern.compile("AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
-      Pattern.MULTILINE | Pattern.DOTALL);
-
-  
+    Pattern.MULTILINE | Pattern.DOTALL);
   private Label lblUserName;
   private Button btLoginLogout;
   private ControlPanel control;
@@ -72,13 +74,13 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   private AnnisSecurityManager securityManager;
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
-  
+
   public SearchWindow(PluginSystem ps)
   {
     super("Annis² Corpus Search");
     this.ps = ps;
     setName("search");
-    
+
     getContent().setSizeFull();
     ((VerticalLayout) getContent()).setMargin(false);
 
@@ -94,7 +96,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
 
     Button btAboutAnnis = new Button("About Annis");
     btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
-    btAboutAnnis.addListener(new Button.ClickListener() {
+    btAboutAnnis.addListener(new Button.ClickListener()
+    {
 
       @Override
       public void buttonClick(ClickEvent event)
@@ -106,8 +109,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         w.center();
       }
     });
-    
-    
+
+
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
     lblUserName.setHeight("-1px");
@@ -168,11 +171,12 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
 
     queryBuilder = new TigerQueryBuilder(control);
     mainTab.addTab(queryBuilder, "Query Builder", null);
-    
+
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
 
-    addAction(new ShortcutListener("^Query builder") {
+    addAction(new ShortcutListener("^Query builder")
+    {
 
       @Override
       public void handleAction(Object sender, Object target)
@@ -180,7 +184,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         mainTab.setSelectedTab(queryBuilder);
       }
     });
-    addAction(new ShortcutListener("Tutor^eial") {
+    addAction(new ShortcutListener("Tutor^eial")
+    {
 
       @Override
       public void handleAction(Object sender, Object target)
@@ -188,22 +193,45 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         mainTab.setSelectedTab(tutorial);
       }
     });
-    
+
+    addParameterHandler(new ParameterHandler()
+    {
+
+      @Override
+      public void handleParameters(Map<String, String[]> parameters)
+      {
+        if(parameters.containsKey("citation"));
+        {
+          HttpSession session =
+            ((WebApplicationContext) getApplication().getContext()).getHttpSession();
+          String citation = (String) session.getAttribute("citation");
+          if(citation != null)
+          {
+            citation = StringUtils.removeStart(citation, 
+               Helper.getContext(getApplication()) + "/Cite/");
+            evaluateCitation(citation);
+            session.removeAttribute("citation");
+          }
+
+        }
+      }
+    });
+
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    
-    initSecurityManager();    
+
+    initSecurityManager();
     updateUserInformation();
-    
-  }  
+
+  }
 
   public void evaluateCitation(String relativeUri)
   {
-    
+
     AnnisUser user = (AnnisUser) getApplication().getUser();
     if(user == null)
     {
@@ -250,7 +278,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
         }
         catch(NumberFormatException ex)
         {
-          Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE, 
+          Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE,
             "could not parse context value", ex);
         }
         control.setQuery(aql, selectedCorpora, cleft, cright);
@@ -259,14 +287,14 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       {
         control.setQuery(aql, selectedCorpora);
       }
-      
+
     }
     else
     {
       showNotification("Invalid citation", Notification.TYPE_WARNING_MESSAGE);
     }
   }
-  
+
   private void initSecurityManager()
   {
     securityManager = new SimpleSecurityManager();
@@ -401,8 +429,4 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   {
     return control;
   }
-
-
-  
-  
 }
