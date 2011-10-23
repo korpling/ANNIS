@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import com.vaadin.Application;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -32,8 +33,14 @@ import com.vaadin.ui.Window;
 public class AboutPanel extends Panel
 {
 
-  public AboutPanel()
+  private static ClassResource logo_res;
+  public AboutPanel(Application app)
   {
+    if(logo_res == null)
+    {
+      logo_res = new ClassResource(AboutPanel.class,
+      "annis-logo.jpg", app);
+    }
     setWidth("400px");
     setHeight("-1px");
   }
@@ -44,10 +51,9 @@ public class AboutPanel extends Panel
     super.attach();
 
     Embedded logo = new Embedded();
-    logo.setSource(new ClassResource(AboutPanel.class,
-      "annis-logo.jpg", getApplication()));
+    logo.setSource(logo_res);
     logo.setType(Embedded.TYPE_IMAGE);
-    
+        
     addComponent(logo);
     addComponent(new Label("Annis is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));

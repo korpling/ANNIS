@@ -76,7 +76,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   private AnnisSecurityManager securityManager;
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
-
+  
   public SearchWindow(PluginSystem ps)
   {
     super("Annis² Corpus Search");
@@ -104,7 +104,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About Annis", new AboutPanel());
+        Window w = new Window("About Annis", new AboutPanel(getApplication()));
         w.setModal(true);
         w.setResizable(false);
         addWindow(w);
@@ -209,8 +209,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
           String citation = (String) session.getAttribute("citation");
           if(citation != null)
           {
-            citation = StringUtils.removeStart(citation, 
-               Helper.getContext(getApplication()) + "/Cite/");
+            citation = StringUtils.removeStart(citation,
+              Helper.getContext(getApplication()) + "/Cite/");
             evaluateCitation(citation);
             session.removeAttribute("citation");
           }
@@ -289,7 +289,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       {
         control.setQuery(aql, selectedCorpora);
       }
-      
+
       // remove all currently openend sub-windows
       Set<Window> all = new HashSet<Window>(getChildWindows());
       for(Window w : all)
@@ -361,12 +361,12 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
 
   private void showLoginWindow()
   {
-    LoginForm login = new LoginForm();
-
-    login.addListener((LoginForm.LoginListener) this);
 
     if(windowLogin == null)
     {
+      LoginForm login = new LoginForm();
+      login.addListener((LoginForm.LoginListener) this);
+
       windowLogin = new Window("Login");
       windowLogin.addComponent(login);
       windowLogin.setModal(true);
