@@ -80,15 +80,31 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
           try
           {
             Properties groupProps = new Properties();
-            groupProps.load(new FileInputStream(groupsFile));
-
+            FileInputStream groupsStream = new FileInputStream(groupsFile);
+            try
+            {
+              groupProps.load(groupsStream);
+            }
+            finally
+            {
+              groupsStream.close();
+            }
+            
             File fileOfUser = new File(usersDir.getAbsolutePath() + "/" + userName);
             if(fileOfUser.isFile())
             {
               AnnisUser user = new AnnisUser(userName);
 
-              user.load(new FileInputStream(fileOfUser));
-
+              FileInputStream userStream = new FileInputStream(fileOfUser);
+              try
+              {
+                user.load(userStream);
+              }
+              finally
+              {
+                userStream.close();
+              }
+              
               // check password
               String passwordAsSHA = Crypto.calculateSHAHash(password);
 

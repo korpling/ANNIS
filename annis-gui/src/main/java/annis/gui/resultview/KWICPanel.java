@@ -41,7 +41,7 @@ public class KWICPanel extends Panel
 {
 
   private AnnisResult result;
-  private final String DUMMY_COLUMN = "dummyColumn";
+  private static final String DUMMY_COLUMN = "dummyColumn";
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
@@ -140,7 +140,7 @@ public class KWICPanel extends Panel
     }
   }
 
-  public class GapColumnGenerator implements Table.ColumnGenerator
+  public  static class GapColumnGenerator implements Table.ColumnGenerator
   {
 
     @Override

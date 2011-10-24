@@ -52,7 +52,7 @@ public class CorefVisualizer extends WriterVisualizer
   LinkedList<TComponenttype> Componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which Component
   private HashMap<Integer, Integer> colorlist;
 
-  class TComponenttype
+  static class TComponenttype
   {
 
     String Type;
@@ -65,7 +65,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
-  class TComponent
+  static class TComponent
   {
 
     List<Long> TokenList;
@@ -84,7 +84,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
-  class TReferent
+  static class TReferent
   {
 
     long Node;
@@ -798,21 +798,22 @@ public class CorefVisualizer extends WriterVisualizer
    */
   private String ListToString(List<Long> ll)
   {
-    String result = "";
+    StringBuilder result = new StringBuilder();
     int i = 1;
     for (Long l : ll)
     {
       if (i == 1)
       {
         i = 0;
-        result += "" + l;
+        result.append(l);
       }
       else
       {
-        result += "," + l;
+        result.append(",");
+        result.append(l);
       }
     }
-    return result;
+    return result.toString();
   }
 
   /**

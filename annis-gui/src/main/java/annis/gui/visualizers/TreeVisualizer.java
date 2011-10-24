@@ -182,7 +182,7 @@ public class TreeVisualizer extends WriterVisualizer
         }
         else
         { 
-          return new Integer(this.hashCode()).equals(o.hashCode());
+          return Integer.valueOf(this.hashCode()).equals(o.hashCode());
         }
       }
     }

@@ -128,14 +128,20 @@ public class ResourceServlet extends HttpServlet implements Plugin
           OutputStream bufferedOut = new BufferedOutputStream(outStream);
           InputStream resourceInStream = new BufferedInputStream(resource.openStream());
 
-          int v = -1;
-          while((v = resourceInStream.read()) != -1)
+          try
           {
-            bufferedOut.write(v);
+            int v = -1;
+            while((v = resourceInStream.read()) != -1)
+            {
+              bufferedOut.write(v);
+            }
           }
-          resourceInStream.close();
-          bufferedOut.flush();
-          outStream.flush();
+          finally
+          {
+            resourceInStream.close();
+            bufferedOut.flush();
+            outStream.flush();
+          }
         }
       }
     }

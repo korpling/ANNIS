@@ -153,7 +153,7 @@ public class PartiturParser implements Serializable
     return token;
   }
 
-  public class Token implements Serializable
+  public static class Token implements Serializable
   {
 
     private Map<String, Event> tier2Event;
@@ -207,7 +207,7 @@ public class PartiturParser implements Serializable
     }
   }
 
-  public class Event implements Serializable
+  public static class Event implements Serializable
   {
 
     private long id;
@@ -230,7 +230,7 @@ public class PartiturParser implements Serializable
     }
   }
 
-  public class ResultElement
+  public static class ResultElement
   {
 
     private String id;

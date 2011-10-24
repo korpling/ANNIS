@@ -280,7 +280,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     super.paintContent(target);
   }
   
-  public class ScrollPanel extends Panel
+  public static class ScrollPanel extends Panel
   {
 
     @Override
