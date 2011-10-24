@@ -158,18 +158,36 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
     tblCorpora.setSortContainerPropertyId("name");
     updateCorpusSetList();
+
   }
 
   private void updateCorpusSetList()
   {
     corpusSets.clear();
 
-    Map<Long, AnnisCorpus> allCorpora = getCorpusList((AnnisUser) getApplication().getUser());
+    
+    AnnisUser user = (AnnisUser) getApplication().getUser();
+    Map<Long, AnnisCorpus> allCorpora = getCorpusList(user);
     corpusSets.put(ALL_CORPORA, allCorpora);
 
-    AnnisUser user = (AnnisUser) getApplication().getUser();
     if(user != null)
     {
+      if(user.getUserName().equals(AnnisSecurityManager.FALLBACK_USER))
+      {
+        if(corpusSets.get(ALL_CORPORA).isEmpty())
+        {
+          getWindow().showNotification("No corpora found. Please login "
+            + "(use button at upper right corner) to see more corpora.",
+            Notification.TYPE_HUMANIZED_MESSAGE);
+        }
+        else
+        {
+          getWindow().showNotification(
+            "You can login (use button at upper right corner) to see more corpora",
+            Notification.TYPE_TRAY_NOTIFICATION);
+        }
+      }
+      
       for(String p : user.stringPropertyNames())
       {
         if(p.startsWith(CORPUSSET_PREFIX))

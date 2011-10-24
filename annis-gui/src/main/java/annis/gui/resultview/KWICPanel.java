@@ -28,6 +28,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,37 +39,36 @@ import java.util.Set;
  */
 public class KWICPanel extends Panel
 {
+
   private AnnisResult result;
-  
-  private final String DUMMY_COLUMN = "dummyColumn"; 
-  
+  private final String DUMMY_COLUMN = "dummyColumn";
   private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
-  private Map<AnnisNode,Long> markedAndCovered;
+  private Map<AnnisNode, Long> markedAndCovered;
   private long textID;
-  
-  public KWICPanel(AnnisResult result, Set<String> tokenAnnos, 
-    Map<AnnisNode,Long> markedAndCovered, long textID)
+
+  public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
+    Map<AnnisNode, Long> markedAndCovered, long textID)
   {
     this.result = result;
     this.markedAndCovered = markedAndCovered;
     this.textID = textID;
-    
+
     this.addStyleName("kwic");
     setSizeFull();
     setHeight("-1px");
-    
+
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
+
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
     layout.setHeight("-1px");
     layout.setMargin(false);
-    
+
     containerAnnos = new BeanItemContainer<String>(String.class);
-    
+
     containerAnnos.addItem("tok");
-    
+
     tblToken = new Table();
     tblToken.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
     tblToken.addStyleName(ChameleonTheme.TABLE_BORDERLESS);
@@ -79,23 +79,23 @@ public class KWICPanel extends Panel
     {
       tblToken.addStyleName("rtl");
     }
-    
+
     List<AnnisNode> token = result.getGraph().getTokens();
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
-    
+
     for(AnnisNode t : token)
     {
       if(t.getTextId() == textID)
       {
         // add a column for each token
-        tblToken.addGeneratedColumn(t, new TokenColumnGenerator());
+        tblToken.addGeneratedColumn(t, new TokenColumnGenerator(t));
         tblToken.setColumnWidth(t, -1);
         tblToken.setColumnExpandRatio(t, 0.0f);
         visible.add(t);
-        
-        if(lastTokenIndex != null && t.getTokenIndex() != null 
-          && t.getTokenIndex().longValue() > (lastTokenIndex.longValue()+1))
+
+        if(lastTokenIndex != null && t.getTokenIndex() != null
+          && t.getTokenIndex().longValue() > (lastTokenIndex.longValue() + 1))
         {
           // add "(...)"
           Long gapColumnID = t.getTokenIndex();
@@ -103,13 +103,14 @@ public class KWICPanel extends Panel
           tblToken.setColumnWidth(gapColumnID, -1);
           tblToken.setColumnExpandRatio(gapColumnID, 0.0f);
           visible.add(gapColumnID);
-        
+
         }
         lastTokenIndex = t.getTokenIndex();
       }
     }
-    
-    tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator() {
+
+    tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
+    {
 
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
@@ -122,13 +123,13 @@ public class KWICPanel extends Panel
     tblToken.setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
     visible.add(DUMMY_COLUMN);
     containerAnnos.addAll(tokenAnnos);
-    
+
     tblToken.setContainerDataSource(containerAnnos);
     tblToken.setVisibleColumns(visible.toArray());
-    
+
     addComponent(tblToken);
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if(containerAnnos != null)
@@ -138,14 +139,15 @@ public class KWICPanel extends Panel
       containerAnnos.addAll(annos);
     }
   }
-  
+
   public class GapColumnGenerator implements Table.ColumnGenerator
   {
+
     @Override
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       Label l = new Label();
-      
+
       if("tok".equals(itemId))
       {
         l.setValue("(...)");
@@ -157,46 +159,54 @@ public class KWICPanel extends Panel
       }
       return l;
     }
-    
   }
-  
+
   public class TokenColumnGenerator implements Table.ColumnGenerator
   {
+
+    private Map<String, Annotation> annotationsByQName;
+    private AnnisNode token;
+
+    public TokenColumnGenerator(AnnisNode token)
+    {
+      this.token = token;
+      annotationsByQName = new HashMap<String, Annotation>();
+      for(Annotation a : token.getNodeAnnotations())
+      {
+        annotationsByQName.put(a.getQualifiedName(), a);
+      }
+    }
 
     @Override
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
       Label l = new Label("");
       l.setSizeUndefined();
-      AnnisNode t = (AnnisNode) columnId;
-      
+
       if("tok".equals(itemId))
       {
-        l.setValue(t.getSpannedText());
-        if(markedAndCovered.containsKey(t))
+        l.setValue(token.getSpannedText());
+        if(markedAndCovered.containsKey(token))
         {
           // add color
-          l.addStyleName(MatchedNodeColors.colorClassByMatch(markedAndCovered.get(t)));
+          l.addStyleName(
+            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));
         }
       }
       else
       {
-        for(Annotation a : t.getNodeAnnotations())
+        Annotation a = annotationsByQName.get((String) itemId);
+        if(a != null)
         {
-          if(a.getQualifiedName().equals(itemId))
-          {
-            // this is the right annotation
-            l.setValue(a.getValue());
-            l.setDescription(a.getQualifiedName());
-            l.addStyleName("kwic-anno");
-            break;
-          }
+          l.setValue(a.getValue());
+          l.setDescription(a.getQualifiedName());
+          l.addStyleName("kwic-anno");
         }
       }
       return l;
     }
   }
- 
+
   private boolean checkRTL(List<AnnisNode> tokenList)
   {
     for(AnnisNode tok : tokenList)
@@ -210,5 +220,4 @@ public class KWICPanel extends Panel
 
     return false;
   }
-  
 }

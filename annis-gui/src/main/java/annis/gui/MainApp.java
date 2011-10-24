@@ -208,14 +208,7 @@ public class MainApp extends Application implements PluginSystem,
   public AnnisUser getUser()
   {
     Object u = super.getUser();
-    if(u == null)
-    {
-      return null;
-    }
-    else
-    {
-      return (AnnisUser) u;
-    }
+    return (AnnisUser) u;
   }
 
   private void initPlugins()

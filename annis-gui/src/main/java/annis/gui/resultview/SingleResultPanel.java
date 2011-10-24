@@ -157,7 +157,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
         Logger.getLogger(SingleResultPanel.class.getName()).log(Level.SEVERE,
           "could not get resolver entries", ex);
         getWindow().showNotification("could not get resolver entries: "
-          + ex.getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
+          , ex.getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
       }
     }
 

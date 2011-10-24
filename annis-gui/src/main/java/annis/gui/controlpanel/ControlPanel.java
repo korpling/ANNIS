@@ -221,25 +221,25 @@ public class ControlPanel extends Panel
         catch(AnnisQLSemanticsException ex)
         {
           window.showNotification(
-            "Sematic error: " + ex.getLocalizedMessage(),
+            ex.getLocalizedMessage(), "Sematic error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
         catch(AnnisQLSyntaxException ex)
         {
           window.showNotification(
-            "Syntax error: " + ex.getLocalizedMessage(),
+            ex.getLocalizedMessage(), "Syntax error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
         catch(AnnisCorpusAccessException ex)
         {
           window.showNotification(
-            "Corpus access error: " + ex.getLocalizedMessage(),
+            ex.getLocalizedMessage(),"Corpus access error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
         catch(Exception ex)
         {
           window.showNotification(
-            "unknown exception: " + ex.getLocalizedMessage(),
+            ex.getLocalizedMessage(), "unknown exception",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
       }

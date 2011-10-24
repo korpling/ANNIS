@@ -44,7 +44,8 @@ import org.apache.log4j.Logger;
  * <li>serialVersionUID</i>
  * </ul>
  */
-public class DataObject implements Serializable {
+public class DataObject implements Serializable 
+{
 
 	// this class is sent to the front end
 	

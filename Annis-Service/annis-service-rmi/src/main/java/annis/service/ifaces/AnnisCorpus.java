@@ -15,13 +15,15 @@
  */
 package annis.service.ifaces;
 
+import java.io.Serializable;
+
 /**
  * Represents a Corpus.
  * 
  * @author k.huetter
  *
  */
-public interface AnnisCorpus extends JSONAble, Comparable<AnnisCorpus>
+public interface AnnisCorpus extends JSONAble, Comparable<AnnisCorpus>, Serializable
 {
 
   public abstract long getId();
