@@ -44,10 +44,15 @@ public class TigerQueryBuilder extends Panel implements Button.ClickListener
     toolbar.addStyleName("toolbar");
     btAddNode = new Button("Add node", (Button.ClickListener) this);
     btAddNode.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAddNode.setDescription("<strong>Create Node</strong><br />"
+      + "Click here to add a new node specification window.<br />"
+      + "To move the node, click and hold left mouse button, then move the mouse.");
     toolbar.addComponent(btAddNode);
 
     btClearAll = new Button("Clear all", (Button.ClickListener) this);
     btClearAll.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClearAll.setDescription("<strong>Clear all</strong><br />"
+      + "Click here to delete all node specification windows and reset the query builder.");
     toolbar.addComponent(btClearAll);
 
 

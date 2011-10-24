@@ -136,7 +136,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     btShowResult = new Button("Show Result");
     btShowResult.setWidth(100f, UNITS_PERCENTAGE);
     btShowResult.addListener(new ShowResultClickListener());
-    btShowResult.setDescription("<b>Show Result</b><br />Ctrl+Enter");
+    btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
     buttonPanel.addComponent(btShowResult);
@@ -150,7 +150,10 @@ public class QueryPanel extends Panel implements TextChangeListener,
     btHistory = new SplitButton("History");
     btHistory.addStyleName(SplitButton.STYLE_CHAMELEON);
     btHistory.setWidth(100f, UNITS_PERCENTAGE);
-    btHistory.setComponent(lstHistory);
+    btHistory.setComponent(lstHistory);    
+    btHistory.setButtonDescription("<strong>Show History</strong><br />"
+      + "Either use the short overview (arrow down) or click on the button "
+      + "for the extended view.");
     buttonPanel.addComponent(btHistory);
     
     btHistory.addClickListener(new SplitButton.SplitButtonClickListener() {

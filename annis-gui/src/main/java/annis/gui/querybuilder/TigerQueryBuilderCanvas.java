@@ -33,7 +33,6 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
 import java.rmi.RemoteException;
@@ -276,7 +275,6 @@ public class TigerQueryBuilderCanvas extends Panel
 
     area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
     updateQuery();
-
   }
 
   public void deleteNode(NodeWindow n)
