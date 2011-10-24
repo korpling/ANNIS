@@ -47,7 +47,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   public static final int HEIGHT=100;
   public static final int WIDTH=200;
   
-  public static final String[] NODE_OPERATORS = new String[] 
+  protected static final String[] NODE_OPERATORS = new String[] 
   {
     "=", "~", "!=", "!~"
   };

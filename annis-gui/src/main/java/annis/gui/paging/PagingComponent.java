@@ -32,6 +32,8 @@ import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -315,7 +317,7 @@ public class PagingComponent extends CustomComponent implements
       }
       catch(Exception ex)
       {
-        // ignore
+        Logger.getLogger(PagingComponent.class.getName()).log(Level.FINE, null, ex);
       }
     }
   }

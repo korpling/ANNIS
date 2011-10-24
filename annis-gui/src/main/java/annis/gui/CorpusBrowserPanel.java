@@ -260,7 +260,7 @@ public class CorpusBrowserPanel extends Panel
     return result;
   }
 
-  public class ExampleTable extends Table
+  public static class ExampleTable extends Table
   {
 
     public ExampleTable(CitationLinkGenerator citationGenerator, 
@@ -301,7 +301,7 @@ public class CorpusBrowserPanel extends Panel
     }
   }
 
-  public class ExampleSorter extends DefaultItemSorter
+  public static class ExampleSorter extends DefaultItemSorter
   {
 
     @Override

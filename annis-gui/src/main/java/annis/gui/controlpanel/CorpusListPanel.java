@@ -420,7 +420,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
   }
 
-  public class CorpusSorter extends DefaultItemSorter
+  public static class CorpusSorter extends DefaultItemSorter
   {
 
     @Override
@@ -518,7 +518,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
   }
 
-  public class AddRemoveAction extends Action
+  public static class AddRemoveAction extends Action
   {
 
     private ActionType type;

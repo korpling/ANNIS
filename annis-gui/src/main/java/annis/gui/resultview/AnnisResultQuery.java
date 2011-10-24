@@ -23,7 +23,6 @@ import annis.service.objects.AnnisResultSetImpl;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -37,7 +36,7 @@ public class AnnisResultQuery implements Serializable
 {
   private Set<Long> corpora;
   private String aql;
-  private AnnisService service;
+  private transient AnnisService service;
   private int contextLeft, contextRight;
   
   public AnnisResultQuery(Set<Long> corpora, String aql, int contextLeft, 

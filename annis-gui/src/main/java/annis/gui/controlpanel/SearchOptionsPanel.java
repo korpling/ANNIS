@@ -31,11 +31,11 @@ public class SearchOptionsPanel extends Panel
   private ComboBox cbResultsPerPage;
 
   // TODO: make this configurable
-  public static final String[] PREDEFINED_PAGE_SIZES = new String[] 
+  protected  static final String[] PREDEFINED_PAGE_SIZES = new String[] 
   {
     "1", "2", "5", "10", "15", "20", "25"
   };
-  public static final String[] PREDEFINED_CONTEXTS = new String[] 
+  protected static final String[] PREDEFINED_CONTEXTS = new String[] 
   {
     "0", "1", "2", "5", "10"
   };

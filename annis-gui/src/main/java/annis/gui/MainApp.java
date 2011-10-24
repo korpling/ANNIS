@@ -38,6 +38,7 @@ import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DateFormat;
@@ -64,12 +65,12 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener, HttpServletRequestListener
+  UserChangeListener, HttpServletRequestListener, Serializable
 {
 
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
-  private SearchWindow windowSearch;
+  private transient SearchWindow windowSearch;
   private transient PluginManager pluginManager;
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
@@ -96,10 +97,23 @@ public class MainApp extends Application implements PluginSystem,
     initPlugins();
 
     setTheme("annis-theme");
+    
+    initWindow(); 
+  }
 
+  public void initWindow()
+  {
     windowSearch = new SearchWindow((PluginSystem) this);
     setMainWindow(windowSearch);
-
+  }
+  
+  public SearchWindow getWindowSearch()
+  {
+    if(windowSearch == null)
+    {
+      initWindow();
+    }
+    return windowSearch;
   }
 
   public int getBuildRevision()
@@ -127,7 +141,7 @@ public class MainApp extends Application implements PluginSystem,
     if(rev >= 0 || date != null)
     {
       result.append(" (");
-      
+
       boolean added = false;
       if(rev >= 0)
       {
@@ -138,30 +152,30 @@ public class MainApp extends Application implements PluginSystem,
       if(date != null)
       {
         result.append(added ? ", built " : "");
-        
+
         SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         result.append(d.format(date));
       }
-      
+
       result.append(")");
     }
-    
+
     return result.toString();
 
   }
-  
+
   public String getVersionNumber()
-  {    
+  {
     return versionProperties.getProperty("version", "UNKNOWNVERSION");
   }
-  
+
   public Date getBuildDate()
   {
     Date result = null;
     try
     {
       DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-      result = format.parse(versionProperties.getProperty("build_date"));      
+      result = format.parse(versionProperties.getProperty("build_date"));
     }
     catch(Exception ex)
     {
@@ -177,7 +191,7 @@ public class MainApp extends Application implements PluginSystem,
     {
       try
       {
-        user = windowSearch.getSecurityManager().login(AnnisSecurityManager.FALLBACK_USER,
+        user = getWindowSearch().getSecurityManager().login(AnnisSecurityManager.FALLBACK_USER,
           AnnisSecurityManager.FALLBACK_USER, true);
       }
       catch(Exception ex)
@@ -187,7 +201,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     super.setUser(user);
 
-    windowSearch.updateUserInformation();
+    getWindowSearch().updateUserInformation();
   }
 
   @Override
@@ -297,7 +311,7 @@ public class MainApp extends Application implements PluginSystem,
 
   public AnnisSecurityManager getSecurityManager()
   {
-    return windowSearch.getSecurityManager();
+    return getWindowSearch().getSecurityManager();
   }
 
   @Override
@@ -310,7 +324,7 @@ public class MainApp extends Application implements PluginSystem,
       try
       {
         String decoded = URLDecoder.decode(parameters, "UTF-8");
-        windowSearch.evaluateCitation(decoded);
+        getWindowSearch().evaluateCitation(decoded);
         try
         {
           response.sendRedirect(getURL().toString());

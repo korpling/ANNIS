@@ -118,7 +118,7 @@ public class GridExporter extends GeneralTextExporter
   }
 
 
-  private class Span
+  private static class Span
   {
 
     private long start;

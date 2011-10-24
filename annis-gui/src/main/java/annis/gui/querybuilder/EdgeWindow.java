@@ -23,7 +23,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -35,7 +34,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 public class EdgeWindow extends Panel implements Button.ClickListener
 {
   
-  public static final String[] EDGE_OPERATORS = new String[]
+  protected static final String[] EDGE_OPERATORS = new String[]
   {
     ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
     "_l_", "'_r_", "_o_", "_ol_", "_or_"
