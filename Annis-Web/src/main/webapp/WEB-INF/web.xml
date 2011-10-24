@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="AnnisFrontend" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <display-name>Annis</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+	
+	
+	<!-- Application Configuration -->
+  <context-param>
+    <description>URL of the AnnisRMIServer</description>
+    <param-name>AnnisRemoteService.URL</param-name>
+    <param-value>rmi://localhost:4711/AnnisService</param-value>
+  </context-param>
+  <context-param>
+    <description>Path (or command) of the "dot" programm</description>
+    <param-name>DotPath</param-name>
+    <param-value>dot</param-value>
+  </context-param>
+	<!-- END Application Configuration -->
+  <listener>
+    <listener-class>annis.pluginsystem.StartStopListener</listener-class>
+  </listener>
+    
+	<!-- USED -->
+  <servlet>
+    <servlet-name>WekaExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.WekaExporterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WekaExporterServlet</servlet-name>
+    <url-pattern>/secure/WekaExporter</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TextExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.TextExporterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TextExporterServlet</servlet-name>
+    <url-pattern>/secure/TextExporter</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>SimpleTextExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.GeneralTextExporter</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SimpleTextExporterServlet</servlet-name>
+    <url-pattern>/secure/SimpleTextExporter</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GridExporterServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.exporter.GridExporterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GridExporterServlet</servlet-name>
+    <url-pattern>/secure/GridExporter</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>SearchResultServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.SearchResultServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SearchResultServlet</servlet-name>
+    <url-pattern>/secure/SearchResult</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>SubmitQueryServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.SubmitQueryServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SubmitQueryServlet</servlet-name>
+    <url-pattern>/secure/SubmitQuery</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>QueryValidationServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.QueryValidationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryValidationServlet</servlet-name>
+    <url-pattern>/secure/ValidateQuery</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CorpusList</servlet-name>
+    <servlet-class>annis.frontend.servlets.CorpusList</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CorpusList</servlet-name>
+    <url-pattern>/secure/CorpusList/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>VisualizerServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.VisualizerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>VisualizerServlet</servlet-name>
+    <url-pattern>/secure/Visualizer</url-pattern>
+  </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>ResourceServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.ResourceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ResourceServlet</servlet-name>
+    <url-pattern>/secure/Resource/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>BinaryServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.BinaryServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BinaryServlet</servlet-name>
+    <url-pattern>/secure/Binary/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>AttributeListServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.AttributeListServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AttributeListServlet</servlet-name>
+    <url-pattern>/secure/AttributeList</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CitationServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.CitationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CitationServlet</servlet-name>
+    <url-pattern>/Cite/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>SessionInfoServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.SessionInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SessionInfoServlet</servlet-name>
+    <url-pattern>/secure/SessionInfo</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>MetaDataServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.MetaDataServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetaDataServlet</servlet-name>
+    <url-pattern>/secure/MetaData</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>LoginLogoutServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.LoginLogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginLogoutServlet</servlet-name>
+    <url-pattern>/LoginLogout</url-pattern>
+  </servlet-mapping>
+	<!-- END USED -->
+  
+  <!-- FILTER -->
+  <filter>
+    <filter-name>AuthenticationFilter</filter-name>
+    <filter-class>annis.frontend.filters.AuthenticationFilter</filter-class>
+
+    <init-param>
+      <param-name>managerClassName</param-name>
+      <param-value>${annis.securityManager}</param-value>
+    </init-param>
+      
+      <!--
+      <init-param>
+        <param-name>enableDemo</param-name>
+        <param-value>true</param-value>
+      </init-param>
+      -->
+      
+      <!-- only needed if simple authentification or demo is used -->
+    <init-param>
+      <param-name>config_path</param-name>
+      <param-value>${annis.userConfig}/</param-value>
+    </init-param>
+      
+      
+      <!-- only needed if LDAP used -->
+      <!--
+      <init-param>
+          <param-name>ldapURL</param-name>
+          <param-value>ldap://korpling.german.hu-berlin.de</param-value>
+        </init-param>
+        <init-param>
+          <param-name>userBaseDN</param-name>
+          <param-value>ou=users,dc=annis,dc=korpling,dc=german,dc=hu-berlin,dc=de</param-value>
+        </init-param>
+        <init-param>
+          <param-name>groupBaseDN</param-name>
+          <param-value>ou=groups,dc=annis,dc=korpling,dc=german,dc=hu-berlin,dc=de</param-value>
+        </init-param>
+        <init-param>
+          <param-name>corpusBaseDN</param-name>
+          <param-value>ou=corpora,dc=annis,dc=korpling,dc=german,dc=hu-berlin,dc=de</param-value>
+        </init-param>
+        -->
+  </filter>
+  <!--
+  <filter-mapping>
+    <filter-name>AuthenticationFilter</filter-name>
+    <url-pattern>/search.html</url-pattern>
+  </filter-mapping>
+  -->
+  <filter-mapping>
+    <filter-name>AuthenticationFilter</filter-name>
+    <url-pattern>/LoginLogout</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>AuthenticationFilter</filter-name>
+    <url-pattern>/secure/*</url-pattern>
+  </filter-mapping>
+</web-app>
