@@ -42,7 +42,8 @@ public class CitationWindow extends Window
     super("Citation");
     
     VerticalLayout wLayout = (VerticalLayout) getContent();
-        
+    wLayout.setSizeFull();
+    
     LinkedList<String> corpusNames = new LinkedList<String>();
     for(AnnisCorpus c : corpora.values())
     {
@@ -53,8 +54,9 @@ public class CitationWindow extends Window
     TextArea txtCitation = new TextArea();
 
     txtCitation.setWidth("100%");
-    txtCitation.setHeight("-1px");
+    txtCitation.setHeight("100%");
     txtCitation.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
+    txtCitation.addStyleName("citation");
     txtCitation.setValue(url);
     txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
@@ -71,7 +73,7 @@ public class CitationWindow extends Window
     wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
     
     setWidth("400px");
-    setHeight("-1px");
+    setHeight("200px");
     
   }
 

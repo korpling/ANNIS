@@ -48,6 +48,14 @@
   background-color: #ecf0f6;
 }
 
+textarea.citation {
+  background-color: white;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  font-family: monospace;
+}
+
 /* matched node colors by match index*/
 .match_1 {
   color: rgb(255,0,0);

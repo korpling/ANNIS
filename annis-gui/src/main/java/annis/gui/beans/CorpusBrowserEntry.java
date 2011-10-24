@@ -16,6 +16,7 @@
 package annis.gui.beans;
 
 import annis.service.ifaces.AnnisCorpus;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ import java.util.Map;
  *
  * @author thomas
  */
-public class CorpusBrowserEntry implements CitationProvider
+public class CorpusBrowserEntry implements CitationProvider, Serializable
 {
   private String name;
   private String example;

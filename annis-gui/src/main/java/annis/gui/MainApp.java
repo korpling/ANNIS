@@ -70,7 +70,7 @@ public class MainApp extends Application implements PluginSystem,
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private SearchWindow windowSearch;
-  private PluginManager pluginManager;
+  private transient PluginManager pluginManager;
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
@@ -111,7 +111,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(NumberFormatException ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
     }
     return result;
   }
@@ -165,7 +165,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(Exception ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
     }
     return result;
   }
@@ -275,6 +275,10 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public PluginManager getPluginManager()
   {
+    if(pluginManager == null)
+    {
+      initPlugins();
+    }
     return pluginManager;
   }
 
