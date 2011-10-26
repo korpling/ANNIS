@@ -62,7 +62,7 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     LinkedList<String> conditions = new LinkedList<String>();
 
     conditions.add("-- select documents by metadata and toplevel corpus");
-    if (documents != null)
+    if (documents != null && ! documents.isEmpty() )
     {
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
         documents));
