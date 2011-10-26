@@ -67,29 +67,6 @@ limitations under the License.
     <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
   </bean>
 
-  <!-- generates a SQL statement for a single clause -->
-  <bean id="findClauseSqlGenerator" class="annis.sqlgen.ClauseSqlGenerator">
-    <property name="selectClauseSqlGenerators">
-      <util:list>
-        <ref bean="findMatchesSelectClauseSqlGenerator"/>
-      </util:list>
-    </property>
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="tableJoinsInWhereClauseSqlGenerator"/>
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="tableJoinsInWhereClauseSqlGenerator" />
-        <ref bean="defaultWhereClauseSqlGenerator"/>
-        <ref bean="subcorpusConstraintWhereClause"/>
-        <ref bean="metaDataAndCorpusWhereClause" />
-        <ref bean="sampleWhereClause" />
-      </util:list>
-    </property>
-  </bean>
-	
   <util:map id="tableAliases">
     <entry key="node" value="facts"/>
     <entry key="node_annotation" value="facts"/>
@@ -138,6 +115,30 @@ limitations under the License.
       </util:map>
     </entry>
   </util:map>
+
+<!-- old
+	
+  <bean id="findClauseSqlGenerator" class="annis.sqlgen.ClauseSqlGenerator">
+    <property name="selectClauseSqlGenerators">
+      <util:list>
+        <ref bean="findMatchesSelectClauseSqlGenerator"/>
+      </util:list>
+    </property>
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="tableJoinsInWhereClauseSqlGenerator"/>
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="tableJoinsInWhereClauseSqlGenerator" />
+        <ref bean="defaultWhereClauseSqlGenerator"/>
+        <ref bean="subcorpusConstraintWhereClause"/>
+        <ref bean="metaDataAndCorpusWhereClause" />
+        <ref bean="sampleWhereClause" />
+      </util:list>
+    </property>
+  </bean>
 	
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy" scope="prototype">
     <property name="tableAliases" ref="tableAliases"/>
@@ -153,13 +154,76 @@ limitations under the License.
     <lookup-method name="createTableAccessStrategy" bean="defaultTableAccessStrategy"/>
   </bean>
 
-
-  <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy"/>
-
-	<!-- SqlGenerator: generates a SQL statement for a DDDquery -->
-  <bean id="findSqlGenerator" class="annis.sqlgen.SqlGenerator">
+  <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator">
     <qualifier value="find"/>
     <property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
   </bean>
+	
+-->
+
+  <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy"/>
+
+	
+  <!-- new -->
+	
+	<bean 
+		id="tableAccessStrategy" 
+		class="annis.sqlgen.TableAccessStrategy" 
+		scope="prototype">
+		
+		<property name="tableAliases" ref="tableAliases"/>
+		<property name="columnAliases" ref="columnAliases"/>
+	</bean>
+	
+	<bean 
+		id="tableAccessStrategyFactory" 
+		class="annis.sqlgen.TableAccessStrategyFactory">
+
+		<lookup-method name="createTableAccessStrategy" bean="tableAccessStrategy"/>
+	</bean>
+	
+	<bean 
+		id="findSqlGenerator" 
+		class="annis.sqlgen.FindSqlGenerator" 
+		parent="tableAccessStrategyFactory">
+		
+		<property name="selectClauseSqlGenerator" ref="findSqlGenerator"/>
+		
+		<property name="fromClauseSqlGenerators">
+			<util:list>
+				<ref bean="tableJoinsInWhereClauseSqlGenerator"/>
+			</util:list>
+		</property>
+		<property name="whereClauseSqlGenerators">
+			<util:list>
+				<ref bean="tableJoinsInWhereClauseSqlGenerator"/>
+				<ref bean="defaultWhereClauseSqlGenerator"/>
+				<ref bean="subcorpusConstraintWhereClause"/>
+				<ref bean="metaDataAndCorpusWhereClause"/>
+				<ref bean="sampleWhereClause"/>
+			</util:list>
+		</property>	
+	</bean>
+	
+	<bean 
+		id="countSqlGenerator" 
+		class="annis.sqlgen.CountSqlGenerator" 
+		parent="findSqlGenerator">
+		
+		<property name="selectClauseSqlGenerator" ref="countSqlGenerator"/>
+		
+		<property name="findSqlGenerator" ref="findSqlGenerator"/>
+		
+		<property name="fromClauseSqlGenerators">
+			<util:list>
+				<ref bean="countSqlGenerator"/>
+			</util:list>
+		</property>
+		
+		<property name="whereClauseSqlGenerators"><util:list/></property>
+	</bean>	
+	
+	
+	
 	
 </beans>

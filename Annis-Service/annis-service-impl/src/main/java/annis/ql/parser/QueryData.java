@@ -16,7 +16,9 @@
 package annis.ql.parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -28,13 +30,17 @@ public class QueryData implements Cloneable
 {
 	private List<List<AnnisNode>> alternatives;
 	private List<Long> corpusList;
+	private List<Long> documents;
 	private List<Annotation> metaData;
 	private int maxWidth;
+	private Set<Object> extensions;
 
 	public QueryData() {
 		alternatives = new ArrayList<List<AnnisNode>>();
 		corpusList = new ArrayList<Long>();
+		documents = new ArrayList<Long>();
 		metaData = new ArrayList<Annotation>();
+		extensions = new HashSet<Object>();
 	}
 
   @Override
@@ -74,6 +80,14 @@ public class QueryData implements Cloneable
       sb.append("\t").append(itMeta.next().toString());
       sb.append("\n");
     }
+    if (! extensions.isEmpty() ) {
+    	sb.append("EXTENSIONS\n");
+    }
+    for (Object extension : extensions) {
+		String toString = extension.toString();
+		if (! "".equals(toString) )
+			sb.append("\t" + toString + "\n");
+	}
 
     return sb.toString();
   }
@@ -111,6 +125,7 @@ public class QueryData implements Cloneable
 		return metaData.addAll(annotations);
 	}
 
+	// FIXME: warum diese spezielle clone-Funktion?
   @Override
   public QueryData clone()
   {
@@ -124,6 +139,20 @@ public class QueryData implements Cloneable
     }
   }
 
+public List<Long> getDocuments() {
+	return documents;
+}
 
+public void setDocuments(List<Long> documents) {
+	this.documents = documents;
+}
+
+public Set<Object> getExtensions() {
+	return extensions;
+}
+
+public boolean addExtension(Object extension) {
+	return extensions.add(extension);
+}
 
 }

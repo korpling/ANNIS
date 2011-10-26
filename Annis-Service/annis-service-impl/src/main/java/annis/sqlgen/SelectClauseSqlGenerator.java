@@ -18,9 +18,10 @@ package annis.sqlgen;
 import java.util.List;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
 
 public interface SelectClauseSqlGenerator {
 
-	String selectClause(List<AnnisNode> nodes, int maxWidth);
+	String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent);
 	
 }

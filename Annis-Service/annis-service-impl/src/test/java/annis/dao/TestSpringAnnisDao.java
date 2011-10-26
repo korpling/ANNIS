@@ -113,7 +113,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
     annisDao.setMetaDataFilter(metaDataFilter);
 
 		when(annisParser.parse(anyString())).thenReturn(STATEMENT);
-		when(sqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
+		when(sqlGenerator.toSql(any(QueryData.class))).thenReturn(SQL);
 		
 		simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
 	}

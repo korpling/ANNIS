@@ -22,6 +22,7 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import java.util.Set;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -55,7 +57,22 @@ public class DefaultWhereClauseSqlGenerator
   implements WhereClauseSqlGenerator
 {
 
-  @Override
+	@Override
+	public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent)
+	{
+		Set<String> conditions = new HashSet<String>();
+		List<Long> corpusList = queryData.getCorpusList();
+		List<Long> documents = queryData.getDocuments();
+				
+		for (AnnisNode node : alternative) {
+			conditions.addAll(whereConditions(node, corpusList, documents));
+		}
+		
+		return conditions;
+	}
+
+	// VR: inline
+	@Deprecated
   public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
   {
     List<String> conditions = new ArrayList<String>();
@@ -101,6 +118,7 @@ public class DefaultWhereClauseSqlGenerator
       }
       else if (join instanceof Inclusion)
       {
+    	  // FIMXE: optimizeInclusion
         joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
         joinOnNode(conditions, node, target, "<=", "left", "left");
         joinOnNode(conditions, node, target, ">=", "right", "right");
@@ -136,6 +154,7 @@ public class DefaultWhereClauseSqlGenerator
         // indirect
         if (min == 0 && max == 0)
         {
+        	// FIXME: optimize indirect precedence
           joinOnNode(conditions, node, target, "<", "right_token", "left_token");
 
         }
@@ -412,9 +431,9 @@ public class DefaultWhereClauseSqlGenerator
   }
   
 
-  @Override
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-  {
-    return null;
-  }
+//  @Override
+//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
+//  {
+//    return null;
+//  }
 }

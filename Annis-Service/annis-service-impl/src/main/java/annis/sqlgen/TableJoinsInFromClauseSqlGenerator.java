@@ -15,18 +15,36 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.BaseSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
 
 public class TableJoinsInFromClauseSqlGenerator 
 	extends BaseNodeSqlGenerator 
 	implements FromClauseSqlGenerator {
 
-	public String fromClause(AnnisNode node) {
+	
+	@Override
+	public String fromClause(QueryData queryData, List<AnnisNode> alternative,
+			String indent) {
+		List<String> tables = new ArrayList<String>();
+		for (AnnisNode node : alternative)
+			tables.add(fromClauseForNode(node));
+		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
+	}
+	
+	public String fromClauseForNode(AnnisNode node) {
 		StringBuffer sb = new StringBuffer();
 		
 		// every node uses the node table

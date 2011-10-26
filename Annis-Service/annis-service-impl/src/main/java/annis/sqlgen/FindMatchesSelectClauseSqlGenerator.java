@@ -25,11 +25,11 @@ import org.apache.commons.lang.Validate;
 
 import annis.model.AnnisNode;
 
+// FindSqlGenerator hat seinen eigenen SelectClauseGenerator
+@Deprecated
 public class FindMatchesSelectClauseSqlGenerator
-	extends BaseNodeSqlGenerator
-	implements SelectClauseSqlGenerator {
+	extends BaseNodeSqlGenerator {
 
-  @Override
 	public String selectClause(List<AnnisNode> nodes, int maxWidth) {
 		Validate.isTrue(nodes.size() <= maxWidth, "BUG: nodes.size() > maxWidth");
 		

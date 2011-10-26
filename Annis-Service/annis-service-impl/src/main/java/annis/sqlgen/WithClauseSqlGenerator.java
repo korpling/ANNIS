@@ -15,15 +15,8 @@
  */
 package annis.sqlgen;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
-
-import annis.ql.parser.QueryData;
-
-
-public interface SqlGenerator<T> extends ResultSetExtractor<T> {
-
-	String toSql(QueryData queryData);
-	
-	String toSql(QueryData queryData, int indentBy);
+// FIXME: Wird der WithClauseSqlGenerator noch benötigt
+// Korpus-Selektion mit WITH-Clause hat nicht funktioniert
+public interface WithClauseSqlGenerator {
 
 }

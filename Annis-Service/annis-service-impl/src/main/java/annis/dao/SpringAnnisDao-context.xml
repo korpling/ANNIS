@@ -92,8 +92,34 @@
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
 
+  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
+    <property name="scriptFile" value="modify_session.sql"/>
+    <property name="administrationDao">
+      <bean class="annis.administration.SpringAnnisAdministrationDao">
+        <property name="scriptPath" value="${annis.script-path}"/>
+        <property name="dataSource" ref="dataSource"/>
+      </bean>
+    </property>
+  </bean>
+	
+  <bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
+    <property name="timeout" value="${annis.timeout}"/>
+  </bean>
+
+  <util:list id="sqlSessionModifiers">
+    <ref bean="timeOutSqlSessionModifier"/>
+    <ref bean="sqlScriptSessionModifier"/>
+  </util:list>
+	
+	
+<!-- new -->
+
 	<!-- exported bean: AnnisDao -->
   <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
+
+	<property name="countSqlGenerator" ref="countSqlGenerator"/>
+
+    <!-- VR: before benchmark merge -->
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
 		<!--<property name="dataSource" ref="dataSource"/>-->
 
@@ -121,25 +147,36 @@
     <property name="metaDataFilter" ref="metaDataFilter" />
 
   </bean>
-	
-  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
-    <property name="scriptFile" value="modify_session.sql"/>
-    <property name="administrationDao">
-      <bean class="annis.administration.SpringAnnisAdministrationDao">
-        <property name="scriptPath" value="${annis.script-path}"/>
-        <property name="dataSource" ref="dataSource"/>
-      </bean>
-    </property>
-  </bean>
-	
-  <bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
-    <property name="timeout" value="${annis.timeout}"/>
+<!-- old
+
+  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
+    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
+
+    <property name="aqlParser" ref="annisParser"/>
+    <property name="sqlGenerator" ref="findSqlGenerator"/>
+    <property name="dddqueryParser" ref="dddQueryParser" />
+    <property name="dddqueryAnalysis" ref="queryAnalysis" />
+
+    <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
+    <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
+    <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
+    <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
+		
+    <property name="queryAnalysis" ref="aqlAnalysis"/>
+    <property name="findSqlGenerator" ref="findSqlGenerator"/>
+    <property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
+    <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
+    <property name="countExtractor" ref="countExtractor"/>
+    <property name="matrixExtractor" ref="matrixExtractor" />
+
+    <property name="graphExtractor" ref="graphExtractor" />
+    <property name="executorList" ref="executorList" />
+
+    <property name="metaDataFilter" ref="metaDataFilter" />
+
   </bean>
 
-  <util:list id="sqlSessionModifiers">
-    <ref bean="timeOutSqlSessionModifier"/>
-    <ref bean="sqlScriptSessionModifier"/>
-  </util:list>
-	
+-->
+
 
 </beans>

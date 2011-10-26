@@ -93,7 +93,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 			tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
 			tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
 			tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-			when(tableAccessStrategyFactory.createTableAccessStrategy(node)).thenReturn(tableAccessStrategy);
+			when(tableAccessStrategyFactory.tables(node)).thenReturn(tableAccessStrategy);
 		}
 
 		// simulate three annotations

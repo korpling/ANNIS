@@ -28,8 +28,6 @@ import annis.service.ifaces.AnnisCorpus;
 public interface AnnisDao
 {
 
-  int countMatches(List<Long> corpusList, QueryData aql);
-
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze);
 
   public String planGraph(QueryData aql, List<Long> corpusList,
@@ -54,5 +52,14 @@ public interface AnnisDao
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
+
+// new 
+
+  int count(QueryData queryData);
+
+// old 
+	@Deprecated
+  int countMatches(List<Long> corpusList, QueryData aql);
+
 
 }

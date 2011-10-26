@@ -15,15 +15,13 @@
  */
 package annis.sqlgen;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
+import java.util.List;
 
+import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
+public interface GroupByClauseSqlGenerator {
 
-public interface SqlGenerator<T> extends ResultSetExtractor<T> {
-
-	String toSql(QueryData queryData);
-	
-	String toSql(QueryData queryData, int indentBy);
+	String groupByAttributes(QueryData queryData, List<AnnisNode> alternative);
 
 }

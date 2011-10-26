@@ -23,8 +23,12 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
+
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -33,8 +37,23 @@ import java.util.List;
 public class SampleWhereClause extends BaseNodeSqlGenerator
   implements WhereClauseSqlGenerator
 {
-
-  @Override
+	
+	@Override
+	public Set<String> whereConditions(QueryData queryData,
+			List<AnnisNode> alternative, String indent) {
+		Set<String> conditions = new HashSet<String>();
+		List<Long> corpusList = queryData.getCorpusList();
+		List<Long> documents = queryData.getDocuments();
+		
+		for (AnnisNode node : alternative) {
+			conditions.addAll(whereConditions(node, corpusList, documents));
+		}
+		
+		return conditions;
+	}
+	
+	// VR: inline
+	@Deprecated
   public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
   {
     LinkedList<String> conditions = new LinkedList<String>();
@@ -78,10 +97,10 @@ public class SampleWhereClause extends BaseNodeSqlGenerator
     return conditions;
   }
 
-  @Override
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-  {
-    return null;
-  }
+//  @Override
+//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
+//  {
+//    return null;
+//  }
 
 }

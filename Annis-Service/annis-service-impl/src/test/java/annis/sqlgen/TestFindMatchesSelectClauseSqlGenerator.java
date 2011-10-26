@@ -52,7 +52,7 @@ public class TestFindMatchesSelectClauseSqlGenerator {
 		for (AnnisNode node : Arrays.asList(node23, node42)) {
 			TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(node);
 			tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
-			when(tableAccessStrategyFactory.createTableAccessStrategy(node)).thenReturn(tableAccessStrategy);
+			when(tableAccessStrategyFactory.tables(node)).thenReturn(tableAccessStrategy);
 		}
 		generator.setTableAccessStrategyFactory(tableAccessStrategyFactory);
 	}

@@ -29,9 +29,12 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.SqlGenerator;
+import annis.dao.GraphExtractor.AnnotateQueryData;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +54,7 @@ import org.apache.commons.lang.StringUtils;
 public class AnnisRunner extends AnnisBaseRunner
 {
 
-  private List<Long> corpusList;
+	// dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
@@ -62,7 +65,35 @@ public class AnnisRunner extends AnnisBaseRunner
   private int context;
   private int matchLimit;
   private boolean isDDDQueryMode;
+  private QueryAnalysis queryAnalysis;
 
+	// settings
+	private int limit;
+	private int offset;
+	private int left;
+	private int right;
+	private List<Long> corpusList;
+  
+	// benchmarking
+	private static class Benchmark {
+		private String functionCall;
+		private QueryData queryData;
+		private float avgTimeInMilliseconds;
+		private long bestTimeInMilliseconds;
+		private String sql;
+		private String plan;
+		private int runs;
+		private int errors;
+		
+		public Benchmark(String functionCall, QueryData queryData) {
+			super();
+			this.functionCall = functionCall;
+			this.queryData = queryData;
+		}
+		
+	}
+	private List<Benchmark> benchmarks;
+  
   public static void main(String[] args)
   {
     // get runner from Spring
@@ -72,6 +103,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public AnnisRunner()
   {
     corpusList = new LinkedList<Long>();
+	benchmarks = new ArrayList<Benchmark>();
     isDDDQueryMode = false;
   }
 
@@ -166,8 +198,10 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println(sql);
   }
@@ -176,8 +210,10 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
@@ -192,8 +228,10 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
@@ -217,9 +255,19 @@ public class AnnisRunner extends AnnisBaseRunner
     }
   }
 
+	private QueryData analyzeQuery(String annisQuery, String queryFunction) {
+		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+		queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
+		if (annisQuery != null)
+			benchmarks.add(new Benchmark(queryFunction + " " + annisQuery, queryData));
+		out.println("NOTICE: corpus = " + queryData.getCorpusList());
+		return queryData;
+	}
+	
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.countMatches(getCorpusList(), parse(annisQuery)));
+	  out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+    // out.println(annisDao.countMatches(getCorpusList(), parse(annisQuery)));
   }
 
   public void doPlanCount(String annisQuery)
@@ -353,8 +401,10 @@ public class AnnisRunner extends AnnisBaseRunner
 
     // sql query
     QueryData queryData = parse(aql);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     // extract WHERE clause
 
@@ -495,4 +545,12 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.matchLimit = matchLimit;
   }
+
+public QueryAnalysis getQueryAnalysis() {
+	return queryAnalysis;
+}
+
+public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
+	this.queryAnalysis = queryAnalysis;
+}
 }

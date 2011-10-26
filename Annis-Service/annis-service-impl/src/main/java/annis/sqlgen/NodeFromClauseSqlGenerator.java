@@ -19,6 +19,8 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
@@ -27,11 +29,23 @@ import org.apache.commons.lang.StringUtils;
  * Generates a from clause only containing the node and node_annotation tables.
  * @author thomas
  */
+// FIXME: Is this thing used anywhere
 public class NodeFromClauseSqlGenerator extends BaseNodeSqlGenerator
 	implements FromClauseSqlGenerator
 {
 
-  @Override
+	@Override
+		public String fromClause(QueryData queryData, List<AnnisNode> alternative,
+				String indent) {
+			List<String> fromClausesForNode = new ArrayList<String>();
+			for (AnnisNode node : alternative) {
+				fromClausesForNode.add(fromClause(node));
+			}
+			
+			String result = StringUtils.join(fromClausesForNode, "\n" + indent);
+			return result;			
+		}
+	
   public String fromClause(AnnisNode node)
   {
     List<String> tables = new ArrayList<String>();

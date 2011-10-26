@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.dao;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
+import java.util.ArrayList;
+import java.util.List;
 
-import annis.ql.parser.QueryData;
+// FIXME: change to interface
+// FIXME: change to Map<String, Node>
+// key should be the marker of the step in the DDDquery
+@SuppressWarnings("serial")
+public class Match extends ArrayList<Span> {
 
-
-public interface SqlGenerator<T> extends ResultSetExtractor<T> {
-
-	String toSql(QueryData queryData);
+	public Match() {
+		
+	}
 	
-	String toSql(QueryData queryData, int indentBy);
-
+	public Match(List<Span> nodes) {
+		addAll(nodes);
+	}
+	
 }

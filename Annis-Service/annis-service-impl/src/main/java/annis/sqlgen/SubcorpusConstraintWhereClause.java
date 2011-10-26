@@ -19,6 +19,7 @@ import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
@@ -31,6 +32,7 @@ import annis.sqlgen.model.SameSpan;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -40,13 +42,20 @@ public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
   implements WhereClauseSqlGenerator
 {
 
-  @Override
-  public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
+  public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent)
   {
-    return null;
+	  Set<String> conditions = new HashSet<String>();
+	  List<Long> corpusList = queryData.getCorpusList();
+	  List<Long> documents = queryData.getDocuments();
+	  
+	  conditions.addAll(commonWhereConditions(alternative, corpusList, documents));
+	  
+	  return conditions;
   }
 
-  @Override
+	
+	// VR: inline
+	@Deprecated
   public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
   {
     LinkedList<String> conditions = new LinkedList<String>();

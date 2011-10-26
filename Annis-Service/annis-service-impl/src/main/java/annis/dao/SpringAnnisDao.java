@@ -39,6 +39,8 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.CountSqlGenerator;
+import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -58,6 +60,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 {
 
+	// SQL generators for the different query functions
+	private FindSqlGenerator findSqlGenerator;
+	private CountSqlGenerator countSqlGenerator;
+//	private AnnotateSqlGenerator annotateSqlGenerator;
+//	private MatrixSqlGenerator matrixSqlGenerator;
+	
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
   /// old
   private SqlGenerator sqlGenerator;
@@ -66,7 +74,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
   /// new
   private List<SqlSessionModifier> sqlSessionModifiers;
-  private SqlGenerator findSqlGenerator;
+//  private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
   private MatrixExtractor matrixExtractor;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
@@ -91,6 +99,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     parseCorpusConfiguration();
   }
+  
+  public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator) {
+		// execute session modifiers if any
+		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
+		
+		// execute query and return result
+		return getJdbcTemplate().query(generator.toSql(queryData), generator);
+  }
 
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
@@ -110,12 +127,18 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
+  @Deprecated
   public int countMatches(final List<Long> corpusList, final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     return countExtractor.queryCount(getJdbcTemplate());
   }
+
+	public int count(QueryData queryData) {
+		return (Integer) executeQueryFunction(queryData, countSqlGenerator);
+	}
+  
 
   @Override
   @Transactional
@@ -406,12 +429,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.sqlSessionModifiers = sqlSessionModifiers;
   }
 
-  public SqlGenerator getFindSqlGenerator()
+  public FindSqlGenerator getFindSqlGenerator()
   {
     return findSqlGenerator;
   }
 
-  public void setFindSqlGenerator(SqlGenerator findSqlGenerator)
+  public void setFindSqlGenerator(FindSqlGenerator findSqlGenerator)
   {
     this.findSqlGenerator = findSqlGenerator;
   }
@@ -516,4 +539,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     this.dddqueryParser = dddqueryParser;
   }
+
+public CountSqlGenerator getCountSqlGenerator() {
+	return countSqlGenerator;
+}
+
+public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator) {
+	this.countSqlGenerator = countSqlGenerator;
+}
 }

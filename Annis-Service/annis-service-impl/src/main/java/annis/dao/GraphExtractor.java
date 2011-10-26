@@ -26,6 +26,7 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,6 +48,52 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 public class GraphExtractor implements ResultSetExtractor
 {
 
+	public static class AnnotateQueryData {
+		private int offset;
+		private int limit;
+		private int left;
+		private int right;
+
+		public AnnotateQueryData(int offset, int limit, int left, int right) {
+			super();
+			this.offset = offset;
+			this.limit = limit;
+			this.left = left;
+			this.right = right;
+		}
+
+		public int getOffset() {
+			return offset;
+		}
+		public int getLimit() {
+			return limit;
+		}
+		public int getLeft() {
+			return left;
+		}
+		public int getRight() {
+			return right;
+		}
+		
+		public boolean isPaged() {
+			return offset != 0 || limit != 0;
+		}
+		
+		@Override
+		public String toString() {
+			List<String> fields = new ArrayList<String>();
+			if (limit > 0)
+				fields.add("limit = " + limit);
+			if (offset > 0)
+				fields.add("offset = " + offset);
+			if (left > 0)
+				fields.add("left = " + left);
+			if (right > 0)
+				fields.add("right = " + right);
+			return StringUtils.join(fields, ", ");
+		}
+	}
+	
 	public enum IslandPolicies
 	{
 		context, none

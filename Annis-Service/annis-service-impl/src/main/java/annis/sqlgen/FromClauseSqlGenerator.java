@@ -15,10 +15,13 @@
  */
 package annis.sqlgen;
 
+import java.util.List;
+
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
 
 public interface FromClauseSqlGenerator {
 
-	String fromClause(AnnisNode node);
+	String fromClause(QueryData queryData, List<AnnisNode> alternative, String indent);
 	
 }
