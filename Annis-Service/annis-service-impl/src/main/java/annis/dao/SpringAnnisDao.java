@@ -15,19 +15,27 @@
  */
 package annis.dao;
 
-import annis.executors.DefaultQueryExecutor;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
+import annis.executors.DefaultQueryExecutor;
 import annis.executors.QueryExecutor;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -39,22 +47,15 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Properties;
-import org.apache.log4j.Level;
-import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
@@ -63,7 +64,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 	// SQL generators for the different query functions
 	private FindSqlGenerator findSqlGenerator;
 	private CountSqlGenerator countSqlGenerator;
-//	private AnnotateSqlGenerator annotateSqlGenerator;
+	private AnnotateSqlGenerator annotateSqlGenerator;
+	
 //	private MatrixSqlGenerator matrixSqlGenerator;
 	
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
@@ -80,7 +82,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
   private DefaultQueryExecutor defaultQueryExecutor;
-  private GraphExtractor graphExtractor;
+  private AnnotateSqlGenerator graphExtractor;
   private List<QueryExecutor> executorList;
   private MetaDataFilter metaDataFilter;
   private QueryAnalysis queryAnalysis;
@@ -99,8 +101,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
   {
     parseCorpusConfiguration();
   }
+
+  // query functions
   
   public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator) {
+	  
+	  // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
+	  // oder nur an annotate-Queries?
+	  
+	  queryData.setCorpusConfiguration(corpusConfiguration);
+	  
 		// execute session modifiers if any
 		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
 			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
@@ -109,6 +119,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 		return getJdbcTemplate().query(generator.toSql(queryData), generator);
   }
 
+	public int count(QueryData queryData) {
+		return executeQueryFunction(queryData, countSqlGenerator);
+	}
+  
+	public List<Match> find(QueryData queryData) {
+		return executeQueryFunction(queryData, findSqlGenerator);
+	}
+	
+	@Override
+	public List<AnnotationGraph> annotate(QueryData queryData) {
+		return executeQueryFunction(queryData, annotateSqlGenerator);
+	}
+	
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
   {
@@ -135,10 +158,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     return countExtractor.queryCount(getJdbcTemplate());
   }
 
-	public int count(QueryData queryData) {
-		return (Integer) executeQueryFunction(queryData, countSqlGenerator);
-	}
-  
 
   @Override
   @Transactional
@@ -480,12 +499,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     this.defaultQueryExecutor = defaultQueryExecutor;
   }
 
-  public GraphExtractor getGraphExtractor()
+  public AnnotateSqlGenerator getGraphExtractor()
   {
     return graphExtractor;
   }
 
-  public void setGraphExtractor(GraphExtractor graphExtractor)
+  public void setGraphExtractor(AnnotateSqlGenerator graphExtractor)
   {
     this.graphExtractor = graphExtractor;
   }
@@ -546,5 +565,13 @@ public CountSqlGenerator getCountSqlGenerator() {
 
 public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator) {
 	this.countSqlGenerator = countSqlGenerator;
+}
+
+public AnnotateSqlGenerator getAnnotateSqlGenerator() {
+	return annotateSqlGenerator;
+}
+
+public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator) {
+	this.annotateSqlGenerator = annotateSqlGenerator;
 }
 }

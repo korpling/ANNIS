@@ -58,6 +58,7 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -78,7 +79,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
   @Mock private MetaDataFilter metaDataFilter;
 	@Mock private SqlGenerator sqlGenerator;
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
-  @Mock private GraphExtractor graphExtractor;
+  @Mock private AnnotateSqlGenerator graphExtractor;
 	@Mock private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 	@Mock private JdbcTemplate jdbcTemplate;
 	private SimpleJdbcTemplate simpleJdbcTemplate;
@@ -183,7 +184,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	// return null if text was not found
 	@Test
 	public void retrieveAnnotationGraphNoText() {
-		when(jdbcTemplate.query(anyString(), any(GraphExtractor.class))).thenReturn(new ArrayList<AnnotationGraph>());
+		when(jdbcTemplate.query(anyString(), any(AnnotateSqlGenerator.class))).thenReturn(new ArrayList<AnnotationGraph>());
 		assertThat(annisDao.retrieveAnnotationGraph(0), is(nullValue()));
 	}
 	

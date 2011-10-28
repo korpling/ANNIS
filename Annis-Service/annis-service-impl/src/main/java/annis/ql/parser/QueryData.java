@@ -16,8 +16,10 @@
 package annis.ql.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import annis.model.AnnisNode;
@@ -34,6 +36,7 @@ public class QueryData implements Cloneable
 	private List<Annotation> metaData;
 	private int maxWidth;
 	private Set<Object> extensions;
+	  private HashMap<Long, Properties> corpusConfiguration;
 
 	public QueryData() {
 		alternatives = new ArrayList<List<AnnisNode>>();
@@ -153,6 +156,14 @@ public Set<Object> getExtensions() {
 
 public boolean addExtension(Object extension) {
 	return extensions.add(extension);
+}
+
+public HashMap<Long, Properties> getCorpusConfiguration() {
+	return corpusConfiguration;
+}
+
+public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
+	this.corpusConfiguration = corpusConfiguration;
 }
 
 }

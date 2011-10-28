@@ -44,11 +44,6 @@
     <property name="password" value="$dao{datasource.password}"/>
   </bean>
 
-  <bean id="graphExtractor" class="annis.dao.GraphExtractor">
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
-  </bean>
-
 
   <bean id="countExtractor" class="annis.dao.CountExtractor">
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
@@ -118,6 +113,7 @@
   <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
 
 	<property name="countSqlGenerator" ref="countSqlGenerator"/>
+	<property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
 
     <!-- VR: before benchmark merge -->
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
@@ -141,13 +137,17 @@
     <property name="countExtractor" ref="countExtractor"/>
     <property name="matrixExtractor" ref="matrixExtractor" />
 
-    <property name="graphExtractor" ref="graphExtractor" />
     <property name="executorList" ref="executorList" />
 
     <property name="metaDataFilter" ref="metaDataFilter" />
 
   </bean>
 <!-- old
+
+  <bean id="graphExtractor" class="annis.dao.GraphExtractor">
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
+  </bean>
 
   <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />

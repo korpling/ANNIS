@@ -202,7 +202,7 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	///// private helper
 	
 	private void assertFromClause(String expected) {
-		assertEquals(expected, tableJoinsInFromClauseSqlGenerator.fromClauseForNode(node23));
+		assertEquals(expected, tableJoinsInFromClauseSqlGenerator.fromClauseForNode(node23, false));
 	}
 
 }

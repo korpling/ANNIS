@@ -17,7 +17,7 @@ package annis;
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.dao.GraphExtractor;
+import annis.dao.Match;
 import annis.dao.MatrixExtractor;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
@@ -28,8 +28,9 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.SqlGenerator;
-import annis.dao.GraphExtractor.AnnotateQueryData;
+import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 
 import java.io.File;
@@ -217,7 +218,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    GraphExtractor ge = new GraphExtractor();
+    AnnotateSqlGenerator ge = new AnnotateSqlGenerator();
     ge.setMatchedNodesViewName("matched_nodes");
     out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
       new HashMap<Long, Properties>())
@@ -267,8 +268,13 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doCount(String annisQuery)
   {
 	  out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
-    // out.println(annisDao.countMatches(getCorpusList(), parse(annisQuery)));
   }
+  
+	public void doFind(String annisQuery) {
+		List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
+		printAsTable(matches);
+	}
+  
 
   public void doPlanCount(String annisQuery)
   {
@@ -292,10 +298,18 @@ public class AnnisRunner extends AnnisBaseRunner
       0, matchLimit, context, context, true));
   }
 
+  public void doAnnotate2(String annisQuery) {
+	    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
+	    	      parse(annisQuery), 0, matchLimit, context, context);
+	    printAsTable(graphs, "nodes", "edges");
+  }
+  
   public void doAnnotate(String annisQuery)
   {
-    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
-      parse(annisQuery), 0, matchLimit, context, context);
+		QueryData queryData = analyzeQuery(annisQuery, "annotate");
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
+		// FIXME: annotations graphen visualisieren
     printAsTable(graphs, "nodes", "edges");
   }
 

@@ -55,7 +55,9 @@ public interface AnnisDao
 
 // new 
 
-  int count(QueryData queryData);
+    int count(QueryData queryData);
+	List<Match> find(QueryData queryData);
+	List<AnnotationGraph> annotate(QueryData queryData);
 
 // old 
 	@Deprecated
