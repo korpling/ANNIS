@@ -15,24 +15,6 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
-import annis.dao.Match;
-import annis.dao.MatrixExtractor;
-import annis.dao.MetaDataFilter;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.ql.parser.QueryAnalysis;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryData;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisCorpus;
-import annis.service.objects.AnnisAttributeSetImpl;
-import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.SqlGenerator;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
-import de.deutschdiachrondigital.dddquery.DddQueryMapper;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,20 +30,45 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+
+import annis.dao.AnnisDao;
+import annis.dao.AnnotatedMatch;
+import annis.dao.Match;
+import annis.dao.MatrixExtractor;
+import annis.dao.MetaDataFilter;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.QueryData;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.SqlGenerator;
+import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
 {
 
+	// SQL generators for query functions
+	private SqlGenerator<List<Match>> findSqlGenerator;
+	private SqlGenerator<Integer> countSqlGenerator;
+	private SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator;
+	private SqlGenerator matrixSqlGenerator;
+	
 	// dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
   private QueryAnalysis aqlAnalysis;
-  private SqlGenerator findSqlGenerator;
   private MetaDataFilter metaDataFilter;
   private int context;
   private int matchLimit;
@@ -195,7 +202,8 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(annisParser.dumpTree(annisQuery));
   }
 
-  public void doSql(String annisQuery)
+  @Deprecated
+  public void doSqlOld(String annisQuery)
   {
     // sql query
     QueryData queryData = parse(annisQuery);
@@ -207,6 +215,44 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(sql);
   }
 
+	// FIXME: missing tests
+	public void doSql(String functionCall) {
+		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+		QueryData queryData = analyzeQuery(annisQuery, null);
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+
+		out.println(generator.toSql(queryData));
+	}
+  
+	private SqlGenerator<?> getGeneratorForQueryFunction(String functionCall) {
+		String[] split = functionCall.split(" ", 2);
+		
+		Validate.isTrue(split.length == 2, "bad call to plan");
+		String function = split[0];
+
+		SqlGenerator<?> generator = null;
+		if ("count".equals(function))
+			generator = countSqlGenerator;
+		if ("find".equals(function))
+			generator = findSqlGenerator;
+		if ("annotate".equals(function))
+			generator = annotateSqlGenerator;
+		if ("matrix".equals(function))
+			generator = matrixSqlGenerator;
+		Validate.notNull(generator, "don't now query function: " + function);
+		
+		return generator;
+	}
+
+	private String getAnnisQueryFromFunctionCall(String functionCall) {
+		String[] split = functionCall.split(" ", 2);
+		
+		Validate.isTrue(split.length == 2, "bad call to plan");
+		return split[1];
+	}
+
+  @Deprecated
   public void doSqlGraph(String annisQuery)
   {
     // sql query
@@ -258,6 +304,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
 	private QueryData analyzeQuery(String annisQuery, String queryFunction) {
 		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+		queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
 		queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
 		if (annisQuery != null)
 			benchmarks.add(new Benchmark(queryFunction + " " + annisQuery, queryData));
@@ -298,7 +345,8 @@ public class AnnisRunner extends AnnisBaseRunner
       0, matchLimit, context, context, true));
   }
 
-  public void doAnnotate2(String annisQuery) {
+  @Deprecated
+  public void doAnnotateOld(String annisQuery) {
 	    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
 	    	      parse(annisQuery), 0, matchLimit, context, context);
 	    printAsTable(graphs, "nodes", "edges");
@@ -510,16 +558,6 @@ public class AnnisRunner extends AnnisBaseRunner
     this.aqlAnalysis = aqlAnalysis;
   }
 
-  public SqlGenerator getFindSqlGenerator()
-  {
-    return findSqlGenerator;
-  }
-
-  public void setFindSqlGenerator(SqlGenerator findSqlGenerator)
-  {
-    this.findSqlGenerator = findSqlGenerator;
-  }
-
   public List<Long> getCorpusList()
   {
     return corpusList;
@@ -567,4 +605,30 @@ public QueryAnalysis getQueryAnalysis() {
 public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
 	this.queryAnalysis = queryAnalysis;
 }
+
+public SqlGenerator<Integer> getCountSqlGenerator() {
+	return countSqlGenerator;
+}
+
+public void setCountSqlGenerator(SqlGenerator<Integer> countSqlGenerator) {
+	this.countSqlGenerator = countSqlGenerator;
+}
+
+public SqlGenerator<List<AnnotationGraph>> getAnnotateSqlGenerator() {
+	return annotateSqlGenerator;
+}
+
+public void setAnnotateSqlGenerator(
+		SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator) {
+	this.annotateSqlGenerator = annotateSqlGenerator;
+}
+
+public SqlGenerator<List<Match>> getFindSqlGenerator() {
+	return findSqlGenerator;
+}
+
+public void setFindSqlGenerator(SqlGenerator<List<Match>> findSqlGenerator) {
+	this.findSqlGenerator = findSqlGenerator;
+}
+
 }

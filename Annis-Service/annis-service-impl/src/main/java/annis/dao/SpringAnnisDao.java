@@ -574,4 +574,12 @@ public AnnotateSqlGenerator getAnnotateSqlGenerator() {
 public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator) {
 	this.annotateSqlGenerator = annotateSqlGenerator;
 }
+
+public HashMap<Long, Properties> getCorpusConfiguration() {
+	return corpusConfiguration;
+}
+
+public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
+	this.corpusConfiguration = corpusConfiguration;
+}
 }

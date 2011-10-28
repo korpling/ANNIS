@@ -68,7 +68,7 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
         documents));
     }
 
-    if (corpusList != null)
+    if (corpusList != null && ! corpusList.isEmpty())
     {
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "toplevel_corpus"),
         corpusList));

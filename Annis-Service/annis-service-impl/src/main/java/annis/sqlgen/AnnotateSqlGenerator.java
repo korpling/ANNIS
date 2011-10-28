@@ -765,7 +765,7 @@ public class AnnotateSqlGenerator
 				String rangeMin = "solutions.min" + i;
 				String rangeMax = "solutions.max" + i;
 
-				sb2.append(overlapForOneRange(indent,
+				sb2.append(overlapForOneRange(indent + TABSTOP,
 						rangeMin, rangeMax, tables));
 				overlapForOneSpan.add(sb2.toString());
 			}
@@ -775,7 +775,6 @@ public class AnnotateSqlGenerator
 			indent(sb, indent + TABSTOP);
 			sb.append(")");
 		} else {
-			sb.append("(\n");
 			indent(sb, indent);
 			sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
 			sb.append(" IN (");
@@ -784,8 +783,8 @@ public class AnnotateSqlGenerator
 				solutionTexts.add("solutions.text" + i);
 			}
 			sb.append(StringUtils.join(solutionTexts, ", "));
-			sb.append(" AND\n");
-			indent(sb, indent);
+			sb.append(") AND\n");
+			indent(sb, indent + TABSTOP);
 			
 			StringBuilder minSb = new StringBuilder();
 			StringBuilder maxSb = new StringBuilder();
@@ -823,7 +822,7 @@ public class AnnotateSqlGenerator
 		StringBuffer sb = new StringBuffer();
 		
 		sb.append("(\n");
-		indent(sb, indent + TABSTOP + TABSTOP + TABSTOP);
+		indent(sb, indent + TABSTOP + TABSTOP);
 		if (optimizeOverlap) {
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
@@ -832,14 +831,14 @@ public class AnnotateSqlGenerator
 			sb.append(tables.aliasedColumn(
 					NODE_TABLE, "right_token") + " <= " + rangeMax);
 			sb.append(") OR\n");
-			indent(sb, indent + TABSTOP + TABSTOP + TABSTOP);
+			indent(sb, indent + TABSTOP + TABSTOP);
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
 					NODE_TABLE, "left_token") + " <= " + rangeMin);
 			sb.append(" AND ");
 			sb.append(rangeMin + " <= " + tables.aliasedColumn(NODE_TABLE, "right_token"));
 			sb.append(") OR\n");
-			indent(sb, indent + TABSTOP + TABSTOP + TABSTOP);
+			indent(sb, indent + TABSTOP + TABSTOP);
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
 					NODE_TABLE, "left_token") + " <= " + rangeMax);
@@ -854,7 +853,7 @@ public class AnnotateSqlGenerator
 					NODE_TABLE, "right_token") + " >= " + rangeMin);
 		}
 		sb.append("\n");
-		indent(sb, indent + TABSTOP + TABSTOP);
+		indent(sb, indent + TABSTOP);
 		sb.append(")");
 		
 		String overlapForOneRange = sb.toString();

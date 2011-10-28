@@ -50,16 +50,19 @@ limitations under the License.
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 
 	<bean id="annisRunner" class="annis.AnnisRunner">
-    <property name="annisDao" ref="springAnnisDao"/>
+		<property name="findSqlGenerator" ref="findSqlGenerator"/>
+		<property name="countSqlGenerator" ref="countSqlGenerator"/>
+		<property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+		
+		<!-- VR: before port -->
+	    <property name="annisDao" ref="springAnnisDao"/>
 		<property name="annisParser" ref="annisParser"/>
 		<property name="dddQueryMapper" ref="dddQueryMapper"/>
 		<property name="helloMessage" value="Annis Interactive Shell 2.2.0"/>
 		<property name="prompt" value="Annis"/>
-    <property name="aqlAnalysis" ref="aqlAnalysis" />
-    <property name="findSqlGenerator" ref="findSqlGenerator"/>
-    <property name="metaDataFilter" ref="metaDataFilter" />
-
-    <property name="matchLimit" value="10"/>
+	    <property name="aqlAnalysis" ref="aqlAnalysis" />
+	    <property name="metaDataFilter" ref="metaDataFilter" />
+	    <property name="matchLimit" value="10"/>
 	</bean>
 
 </beans>

@@ -15,7 +15,9 @@
  */
 package annis.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -58,6 +60,11 @@ public interface AnnisDao
     int count(QueryData queryData);
 	List<Match> find(QueryData queryData);
 	List<AnnotationGraph> annotate(QueryData queryData);
+
+	// needed in AnnisRunner
+	public HashMap<Long, Properties> getCorpusConfiguration();
+	public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration);
+
 
 // old 
 	@Deprecated
