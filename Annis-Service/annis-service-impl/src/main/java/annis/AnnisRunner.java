@@ -224,7 +224,24 @@ public class AnnisRunner extends AnnisBaseRunner
 
 		out.println(generator.toSql(queryData));
 	}
+	
+	public void doExplain(String functionCall, boolean analyze) {
+		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+		QueryData queryData = analyzeQuery(annisQuery, null);
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+
+		out.println(annisDao.explain(generator, queryData, analyze));
+	}
   
+	public void doPlan(String functionCall) {
+		doExplain(functionCall, false);
+	}
+	
+	public void doAnalyze(String functionCall) {
+		doExplain(functionCall, true);
+	}
+	
 	private SqlGenerator<?> getGeneratorForQueryFunction(String functionCall) {
 		String[] split = functionCall.split(" ", 2);
 		
@@ -323,22 +340,26 @@ public class AnnisRunner extends AnnisBaseRunner
 	}
   
 
+	@Deprecated
   public void doPlanCount(String annisQuery)
   {
     out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), false));
   }
 
+	@Deprecated
   public void doAnalyzeCount(String annisQuery)
   {
     out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), true));
   }
 
+	@Deprecated
   public void doPlanGraph(String annisQuery)
   {
     out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
       0, matchLimit, context, context, false));
   }
 
+	@Deprecated
   public void doAnalyzeGraph(String annisQuery)
   {
     out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),

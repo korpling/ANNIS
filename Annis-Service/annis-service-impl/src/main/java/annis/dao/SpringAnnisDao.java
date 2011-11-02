@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.Properties;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,8 +67,49 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 	private FindSqlGenerator findSqlGenerator;
 	private CountSqlGenerator countSqlGenerator;
 	private AnnotateSqlGenerator annotateSqlGenerator;
+	private SqlGenerator matrixSqlGenerator;
 	
 //	private MatrixSqlGenerator matrixSqlGenerator;
+	
+	// SqlGenerator that prepends EXPLAIN to a query
+	private final class ExplainSqlGenerator implements SqlGenerator<String> {
+		
+		private final boolean analyze;
+		private final SqlGenerator<?> generator;
+		
+		private ExplainSqlGenerator(SqlGenerator<?> generator, boolean analyze) {
+			this.generator = generator;
+			this.analyze = analyze;
+		}
+
+		@Override
+		public String toSql(QueryData queryData) {
+			StringBuffer sb = new StringBuffer();
+			sb.append("EXPLAIN ");
+			if (analyze)
+				sb.append("ANALYZE ");
+			sb.append(generator.toSql(queryData));
+			return sb.toString();
+		}
+
+		@Override
+		public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+			StringBuffer sb = new StringBuffer();
+			while (rs.next()) {
+				sb.append(rs.getString(1));
+				sb.append("\n");
+			}
+			return sb.toString();
+		}
+
+		@Override
+		public String toSql(QueryData queryData, int indentBy) {
+			// dont indent
+			return toSql(queryData);
+		}
+	}
+	
+	
 	
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
   /// old
@@ -119,17 +162,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 		return getJdbcTemplate().query(generator.toSql(queryData), generator);
   }
 
-	public int count(QueryData queryData) {
-		return executeQueryFunction(queryData, countSqlGenerator);
-	}
-  
 	public List<Match> find(QueryData queryData) {
 		return executeQueryFunction(queryData, findSqlGenerator);
 	}
 	
+	public int count(QueryData queryData) {
+		return executeQueryFunction(queryData, countSqlGenerator);
+	}
+  
 	@Override
 	public List<AnnotationGraph> annotate(QueryData queryData) {
 		return executeQueryFunction(queryData, annotateSqlGenerator);
+	}
+	
+	public List<AnnotatedMatch> matrix(QueryData queryData) {
+		return executeQueryFunction(queryData, matrixSqlGenerator);
+	}
+	
+	@Override
+	public String explain(SqlGenerator<?> generator, QueryData queryData, final boolean analyze) {
+		return executeQueryFunction(queryData, new ExplainSqlGenerator(generator, analyze));
 	}
 	
   @Override
@@ -161,6 +213,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
+  @Deprecated
   public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
@@ -172,6 +225,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
+  @Deprecated
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze)
   {
     Validate.notNull(corpusList, "corpusList=null passed as argument");
@@ -182,6 +236,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
+  @Deprecated
   public String planGraph(QueryData aql, List<Long> corpusList,
     long offset, long limit, int left, int right,
     boolean analyze)
@@ -197,6 +252,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   @Override
   @Transactional
+  @Deprecated
   public List<AnnotationGraph> retrieveAnnotationGraph(
     List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
   {
@@ -209,6 +265,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
       corpusList, nodeCount, offset, limit, left, right, corpusConfiguration);
   }
 
+  @Deprecated
   private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
   {
 

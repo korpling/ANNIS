@@ -44,11 +44,13 @@ public class MatrixExtractor implements ResultSetExtractor
   private String matchedNodesViewName;
 
   @Override
-  public Object extractData(ResultSet resultSet) throws SQLException, DataAccessException
+  public Object extractData(ResultSet resultSet) 
+		  throws SQLException, DataAccessException
   {
     List<AnnotatedMatch> matches = new ArrayList<AnnotatedMatch>();
 
-    Map<List<Long>, AnnotatedSpan[]> matchesByGroup = new HashMap<List<Long>, AnnotatedSpan[]>();
+    Map<List<Long>, AnnotatedSpan[]> matchesByGroup = 
+    		new HashMap<List<Long>, AnnotatedSpan[]>();
 
     while (resultSet.next())
     {
@@ -63,9 +65,11 @@ public class MatrixExtractor implements ResultSetExtractor
 
       // create key
       Array sqlKey = resultSet.getArray("key");
-      Validate.isTrue(!resultSet.wasNull(), "Match group identifier must not be null");
+      Validate.isTrue(!resultSet.wasNull(), 
+    		  "Match group identifier must not be null");
       Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-        "Key in database must be from the type \"bigint\" but was \"" + sqlKey.getBaseTypeName() + "\"");
+        "Key in database must be from the type \"bigint\" but was \"" + 
+      sqlKey.getBaseTypeName() + "\"");
 
       Long[] keyArray = (Long[]) sqlKey.getArray();
       int matchWidth = keyArray.length;
@@ -82,7 +86,8 @@ public class MatrixExtractor implements ResultSetExtractor
       {
         if(key.get(posInMatch) == id)
         {
-          matchesByGroup.get(key)[posInMatch] = new AnnotatedSpan(id, coveredText, annotations, metaData);
+          matchesByGroup.get(key)[posInMatch] = 
+        		  new AnnotatedSpan(id, coveredText, annotations, metaData);
         }
       }
     }
@@ -115,10 +120,13 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append("\t");
     sb.append(key);
     sb.append(",\nfacts.id AS id,\n");
-    sb.append("min(substr(text.text, facts.left+1,facts.right-facts.left)) AS span,\n");
-    sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace || ':', '') "
+    sb.append("min(substr(text.text, facts.left+1,facts.right-facts.left)) " +
+    		"AS span,\n");
+    sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace " +
+    		"|| ':', '') "
       + "|| facts.node_annotation_name || ':' "
-      + "|| encode(facts.node_annotation_value::bytea, 'base64')) AS annotations,\n");
+      + "|| encode(facts.node_annotation_value::bytea, 'base64')) " +
+      "AS annotations,\n");
     sb.append("array_agg(DISTINCT coalesce(ca.namespace || ':', '') "
       + "|| ca.name || ':' "
       + "|| encode(ca.value::bytea, 'base64')) AS metadata\n");
@@ -133,14 +141,16 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append("\t");
     sb.append(FACTS_TABLE);
     sb.append(" AS facts\n");
-    sb.append("\t LEFT OUTER JOIN corpus_annotation AS ca ON (ca.corpus_ref = facts.corpus_ref)\n");
+    sb.append("\t LEFT OUTER JOIN corpus_annotation AS ca " +
+    		"ON (ca.corpus_ref = facts.corpus_ref)\n");
 
     sb.append("WHERE\n");
 
     if (corpusList != null)
     {
       sb.append("facts.toplevel_corpus IN (");
-      sb.append(corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","));
+      sb.append(corpusList.isEmpty() 
+    		  ? "NULL" : StringUtils.join(corpusList, ","));
       sb.append(") AND\n");
     }
     sb.append("facts.text_ref = text.id AND \n");
@@ -157,7 +167,8 @@ public class MatrixExtractor implements ResultSetExtractor
     sb.append(")\n");
     sb.append("GROUP BY key, facts.id, span");
 
-    Logger.getLogger(MatrixExtractor.class).debug("generated SQL for matrix:\n" + sb.toString());
+    Logger.getLogger(MatrixExtractor.class)
+    	.debug("generated SQL for matrix:\n" + sb.toString());
 
     return sb.toString();
   }
@@ -208,9 +219,11 @@ public class MatrixExtractor implements ResultSetExtractor
     return result;
   }
 
-  public List<AnnotatedMatch> queryMatrix(JdbcTemplate jdbcTemplate, List<Long> corpusList, int maxWidth)
+  public List<AnnotatedMatch> queryMatrix(JdbcTemplate jdbcTemplate, 
+		  List<Long> corpusList, int maxWidth)
   {
-    return (List<AnnotatedMatch>) jdbcTemplate.query(getMatrixQuery(corpusList, maxWidth), this);
+    return (List<AnnotatedMatch>) 
+    		jdbcTemplate.query(getMatrixQuery(corpusList, maxWidth), this);
   }
 
   public String getMatchedNodesViewName()
