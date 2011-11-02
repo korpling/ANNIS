@@ -61,11 +61,15 @@ public interface AnnisDao
 	List<AnnotationGraph> annotate(QueryData queryData);
 	String explain(SqlGenerator<?> generator, QueryData queryData, final boolean analyze);
     List<AnnotatedMatch> matrix(QueryData queryData);
-
+    public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator);
 
 	// needed in AnnisRunner
 	public HashMap<Long, Properties> getCorpusConfiguration();
 	public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration);
+
+	///// configuration
+	void setTimeout(int milliseconds);
+	int getTimeout();
 
 
 // old 

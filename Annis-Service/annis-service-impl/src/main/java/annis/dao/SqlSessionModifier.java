@@ -15,12 +15,12 @@
  */
 package annis.dao;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.ql.parser.QueryData;
 
 public interface SqlSessionModifier {
 
-	void modifySqlSession(SimpleJdbcTemplate simpleJdbcTemplate, QueryData queryData);
+	void modifySqlSession(JdbcTemplate simpleJdbcTemplate, QueryData queryData);
 	
 }

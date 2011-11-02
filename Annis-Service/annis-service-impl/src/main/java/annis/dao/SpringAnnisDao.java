@@ -33,6 +33,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
 // FIXME: test and refactor timeout and transaction management
-public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
+public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, SqlSessionModifier
 {
 
 	// SQL generators for the different query functions
@@ -68,6 +69,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 	private CountSqlGenerator countSqlGenerator;
 	private AnnotateSqlGenerator annotateSqlGenerator;
 	private SqlGenerator matrixSqlGenerator;
+	
+	// configuration
+	private int timeout;
 	
 //	private MatrixSqlGenerator matrixSqlGenerator;
 	
@@ -147,39 +151,53 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
 
   // query functions
   
+  @Transactional
   public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator) {
 	  
-	  // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
+	JdbcTemplate jdbcTemplate = getJdbcTemplate();
+
+		// FIXME: muss corpusConfiguration an jeden Query angehangen werden?
 	  // oder nur an annotate-Queries?
 	  
 	  queryData.setCorpusConfiguration(corpusConfiguration);
 	  
 		// execute session modifiers if any
-		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
-			sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
+		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers) {
+			sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
+		}
 		
 		// execute query and return result
-		return getJdbcTemplate().query(generator.toSql(queryData), generator);
+		return jdbcTemplate.query(generator.toSql(queryData), generator);
   }
 
+	public void modifySqlSession(JdbcTemplate jdbcTemplate, QueryData queryData) {
+		if (timeout > 0)
+			jdbcTemplate.update("SET statement_timeout TO " + timeout);
+	}
+
+	  @Transactional(readOnly = true)
 	public List<Match> find(QueryData queryData) {
 		return executeQueryFunction(queryData, findSqlGenerator);
 	}
 	
+	  @Transactional(readOnly = true)
 	public int count(QueryData queryData) {
 		return executeQueryFunction(queryData, countSqlGenerator);
 	}
   
 	@Override
+	  @Transactional(readOnly = true)
 	public List<AnnotationGraph> annotate(QueryData queryData) {
 		return executeQueryFunction(queryData, annotateSqlGenerator);
 	}
 	
+	  @Transactional(readOnly = true)
 	public List<AnnotatedMatch> matrix(QueryData queryData) {
 		return executeQueryFunction(queryData, matrixSqlGenerator);
 	}
 	
 	@Override
+	  @Transactional(readOnly = true)
 	public String explain(SqlGenerator<?> generator, QueryData queryData, final boolean analyze) {
 		return executeQueryFunction(queryData, new ExplainSqlGenerator(generator, analyze));
 	}
@@ -272,7 +290,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao
     // execute session modifiers
     for(SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
     {
-      sqlSessionModifier.modifySqlSession(getSimpleJdbcTemplate(), queryData);
+      sqlSessionModifier.modifySqlSession(getJdbcTemplate(), queryData);
     }
 
     List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
@@ -639,4 +657,14 @@ public HashMap<Long, Properties> getCorpusConfiguration() {
 public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
 	this.corpusConfiguration = corpusConfiguration;
 }
+
+public int getTimeout() {
+	return timeout;
+}
+
+public void setTimeout(int timeout) {
+	this.timeout = timeout;
+}
+
+
 }

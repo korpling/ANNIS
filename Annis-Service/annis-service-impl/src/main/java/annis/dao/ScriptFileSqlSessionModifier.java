@@ -15,7 +15,7 @@
  */
 package annis.dao;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.administration.SpringAnnisAdministrationDao;
 import annis.ql.parser.QueryData;
@@ -29,7 +29,7 @@ public class ScriptFileSqlSessionModifier implements SqlSessionModifier {
 	private SpringAnnisAdministrationDao administrationDao;
 
 	// execute SQL from scriptFile
-	public void modifySqlSession(SimpleJdbcTemplate simpleJdbcTemplate,
+	public void modifySqlSession(JdbcTemplate jdbcTemplate,
 			QueryData queryData) {
 		administrationDao.executeSqlFromScript(scriptFile);
 	}

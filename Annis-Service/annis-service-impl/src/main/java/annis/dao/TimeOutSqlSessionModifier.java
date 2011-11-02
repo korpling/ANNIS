@@ -15,7 +15,7 @@
  */
 package annis.dao;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.ql.parser.QueryData;
 
@@ -23,9 +23,9 @@ public class TimeOutSqlSessionModifier implements SqlSessionModifier {
 
 	private int timeout;
 	
-	public void modifySqlSession(SimpleJdbcTemplate simpleJdbcTemplate, QueryData queryData) {
+	public void modifySqlSession(JdbcTemplate jdbcTemplate, QueryData queryData) {
 		if (timeout > 0)
-			simpleJdbcTemplate.update("SET statement_timeout TO " + timeout);
+			jdbcTemplate.update("SET statement_timeout TO " + timeout);
 	}
 
 	public int getTimeout() {
