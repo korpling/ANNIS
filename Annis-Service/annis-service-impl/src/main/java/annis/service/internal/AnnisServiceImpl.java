@@ -15,13 +15,12 @@
  */
 package annis.service.internal;
 
-import annis.WekaHelper;
-import annis.resolver.ResolverEntry;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.exceptions.AnnisBinaryNotFoundException;
@@ -31,6 +30,8 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.externalFiles.ExternalFileMgr;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
+import annis.ql.parser.QueryData;
+import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
@@ -43,6 +44,7 @@ import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSetImpl;
 import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
+import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -77,10 +79,16 @@ public class AnnisServiceImpl implements AnnisService
   }
 
 
+	private QueryData analyzeQuery(String annisQuery, List<Long> corpusList) {
+		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+		return queryData;
+	}
+
   @Override
   public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
   {
-    return annisDao.countMatches(corpusList, annisDao.parseAQL(annisQuery, corpusList));
+		QueryData queryData = analyzeQuery(annisQuery, corpusList);
+		return annisDao.count(queryData);
   }
 
   @Override
@@ -90,7 +98,9 @@ public class AnnisServiceImpl implements AnnisService
     contextLeft = Math.min(maxContext, contextLeft);
     contextRight = Math.min(maxContext, contextRight);
 
-    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseAQL(annisQuery, corpusList), offset, limit, contextLeft, contextRight);
+	QueryData queryData = analyzeQuery(annisQuery, corpusList);
+	queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft, contextRight));
+    List<AnnotationGraph> annotationGraphs = annisDao.annotate(queryData);
     AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
     for(AnnotationGraph annotationGraph : annotationGraphs)
     {
@@ -175,7 +185,8 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, annisDao.parseAQL(annisQL, corpusList));
+	  QueryData queryData = analyzeQuery(annisQL, corpusList) ;
+    List<AnnotatedMatch> matches = annisDao.matrix(queryData);
     if(matches.isEmpty())
     {
       return "(empty)";

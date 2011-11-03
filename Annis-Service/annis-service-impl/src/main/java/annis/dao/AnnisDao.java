@@ -31,13 +31,17 @@ import annis.sqlgen.SqlGenerator;
 public interface AnnisDao
 {
 
+	@Deprecated
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze);
 
+	@Deprecated
   public String planGraph(QueryData aql, List<Long> corpusList,
     long offset, long limit, int left, int right, boolean analyse);
 
+  @Deprecated
   public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right);
 
+  
   public AnnotationGraph retrieveAnnotationGraph(long textId);
 
   public List<AnnisCorpus> listCorpora();
@@ -52,6 +56,8 @@ public interface AnnisDao
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
+  
+  @Deprecated
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
 // new 

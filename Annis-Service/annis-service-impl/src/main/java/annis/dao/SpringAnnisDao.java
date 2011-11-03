@@ -331,7 +331,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   @Transactional(readOnly = true)
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
-    List<AnnotationGraph> graphs = graphExtractor.queryAnnotationGraph(getJdbcTemplate(), textId);
+    List<AnnotationGraph> graphs = annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
     if(graphs.isEmpty())
     {
       return null;
