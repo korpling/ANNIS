@@ -23,8 +23,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
 import annis.dao.Match;
@@ -33,18 +33,30 @@ import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public class FindSqlGenerator extends UnionBaseSqlGenerator<List<Match>> implements SelectClauseSqlGenerator {
+public class FindSqlGenerator extends UnionBaseSqlGenerator<List<Match>> 
+implements SelectClauseSqlGenerator {
 
 	@Override
 	public String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
+		int maxWidth = queryData.getMaxWidth();
+		Validate.isTrue(alternative.size() <= maxWidth, "BUG: nodes.size() > maxWidth");
+
+		boolean isDistinct = false;
 		List<String> ids = new ArrayList<String>();
 		int i = 0;
 		for (AnnisNode node : alternative) {
 			++i;
 			ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + 
 					" AS id" + i);
+			if (tables(node).usesRankTable()) {
+				isDistinct = true;
+			}
 		}
-		return "DISTINCT\n" + indent + TABSTOP + StringUtils.join(ids, ", ");
+		for (i = alternative.size(); i < maxWidth; ++i) {
+			ids.add("NULL");
+		}
+		return (isDistinct ? "DISTINCT" : "") + 
+				"\n" + indent + TABSTOP + StringUtils.join(ids, ", ");
 	}
 
 	@Override
