@@ -15,38 +15,8 @@
  */
 package annis.sqlgen;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static test.IsCollectionEmpty.empty;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
-import annis.ql.parser.QueryData;
-import de.deutschdiachrondigital.dddquery.node.Start;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(locations={"SqlGenerator-context.xml", 
@@ -54,6 +24,8 @@ import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 public class TestSqlGenerator {
 
 	// VR: functionality moved to BaseSqlGenerator and UnionBaseSqlGenerator
+	@Test public void dummyTest() { };
+	
 	
 //	// simple SqlGenerator instance with mocked dependencies
 //	private SqlGenerator sqlGenerator;

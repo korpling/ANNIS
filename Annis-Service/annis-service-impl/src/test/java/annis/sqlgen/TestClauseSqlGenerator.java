@@ -15,32 +15,14 @@
  */
 package annis.sqlgen;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.Test;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
 
 
 public class TestClauseSqlGenerator {
 
 	// VR: functionality moved to BaseSqlGenerator and UnionBaseSqlGenerator
+	@Test public void dummyTest() { };
 
 //	// class under test
 //	private ClauseSqlGenerator generator;
