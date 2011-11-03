@@ -15,10 +15,8 @@
  */
 package annis;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,10 +33,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import annis.exceptions.ParseException;
 import java.util.LinkedList;
 import java.util.List;
-import jline.ArgumentCompletor;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
-import org.apache.commons.lang.time.StopWatch;
+
 
 public abstract class AnnisBaseRunner
 {

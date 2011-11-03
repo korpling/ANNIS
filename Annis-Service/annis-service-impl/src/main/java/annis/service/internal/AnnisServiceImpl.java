@@ -49,173 +49,198 @@ import annis.service.objects.AnnisResultSetImpl;
 public class AnnisServiceImpl implements AnnisService
 {
 
-  private static final long serialVersionUID = 1970615866336637980L;
-  private Logger log = Logger.getLogger(this.getClass());
-  private AnnisDao annisDao;
-  private ExternalFileMgr externalFileMgr;
-  private WekaHelper wekaHelper;
+    private static final long serialVersionUID = 1970615866336637980L;
+    private Logger log = Logger.getLogger(this.getClass());
+    private AnnisDao annisDao;
+    private ExternalFileMgr externalFileMgr;
+    private WekaHelper wekaHelper;
+    private int maxContext = 10;
 
-  private int maxContext = 10;
-
-  /**
-   * Log the successful initialization of this bean.
-   *
-   * <p>
-   * XXX: This should be a private method annotated with <tt>@PostConstruct</tt>, but
-   * that doesn't seem to work.  As a work-around, the method is called
-   * by Spring as an init-method.
-   */
-  public void sayHello()
-  {
-    // log a message after successful startup
-    log.info("AnnisService loaded.");
-  }
-
-  @Override
-  public void ping() throws RemoteException
-  {
-  }
-
-
-  @Override
-  public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
-  {
-    return annisDao.countMatches(corpusList, annisDao.parseAQL(annisQuery, corpusList));
-  }
-
-  @Override
-  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
-    throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
-  {
-    contextLeft = Math.min(maxContext, contextLeft);
-    contextRight = Math.min(maxContext, contextRight);
-
-    List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(corpusList, annisDao.parseAQL(annisQuery, corpusList), offset, limit, contextLeft, contextRight);
-    AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
-    for(AnnotationGraph annotationGraph : annotationGraphs)
+    /**
+     * Log the successful initialization of this bean.
+     * 
+     * <p>
+     * XXX: This should be a private method annotated with <tt>@PostConstruct</tt>
+     * , but that doesn't seem to work. As a work-around, the method is called by
+     * Spring as an init-method.
+     */
+    public void sayHello()
     {
-      annisResultSet.add(new AnnisResultImpl(annotationGraph));
+        // log a message after successful startup
+        log.info("AnnisService loaded.");
     }
-    return annisResultSet;
-  }
 
-  @Override
-  public AnnisCorpusSet getCorpusSet() throws RemoteException
-  {
-    return new AnnisCorpusSetImpl(annisDao.listCorpora());
-  }
-
-  @Override
-  public AnnisAttributeSet getAttributeSet(List<Long> corpusList,
-    boolean fetchValues, boolean onlyMostFrequentValues) throws RemoteException
-  {
-    return new AnnisAttributeSetImpl(annisDao.listAnnotations(corpusList,
-      fetchValues, onlyMostFrequentValues));
-  }
-
-  @Override
-  public String getPaula(Long textId) throws RemoteException
-  {
-    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
-    if(graph != null)
+    @Override
+    public void ping() throws RemoteException
     {
-      return new AnnisResultImpl(graph).getPaula();
     }
-    throw new AnnisServiceException("no text found with id = " + textId);
-  }
 
-  @Override
-  public AnnisResult getAnnisResult(Long textId) throws RemoteException
-  {
-    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
-    if(graph != null)
+    @Override
+    public int getCount(List<Long> corpusList, String annisQuery)
+            throws RemoteException, AnnisQLSemanticsException
     {
-      return new AnnisResultImpl(graph);
+        return annisDao.countMatches(corpusList,
+                annisDao.parseAQL(annisQuery, corpusList));
     }
-    throw new AnnisServiceException("no text found with id = " + textId);
-  }
 
-  @Override
-  public boolean isValidQuery(String annisQuery) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException
-  {
-    annisDao.parseAQL(annisQuery, null);
-    return true;
-  }
-
-  @Override
-  public AnnisBinary getBinary(long id) throws RemoteException
-  {
-    return annisDao.getBinary(id);
-  }
-
-  @Override
-  public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException
-  {
-    return annisDao.listCorpusAnnotations(corpusId);
-  }
-
-  @Override
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
-    throws RemoteException
-  {
-    return annisDao.getResolverEntries(request);
-  }
-
-
-  @Override
-  public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
-  {
-    List<AnnotatedMatch> matches = annisDao.matrix(corpusList, annisDao.parseAQL(annisQL, corpusList));
-    if(matches.isEmpty())
+    @Override
+    public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery,
+            int limit, int offset, int contextLeft, int contextRight)
+            throws RemoteException, AnnisQLSemanticsException,
+            AnnisQLSyntaxException, AnnisCorpusAccessException
     {
-      return "(empty)";
+        contextLeft = Math.min(maxContext, contextLeft);
+        contextRight = Math.min(maxContext, contextRight);
+
+        List<AnnotationGraph> annotationGraphs = annisDao.retrieveAnnotationGraph(
+                corpusList, annisDao.parseAQL(annisQuery, corpusList), offset, limit,
+                contextLeft, contextRight);
+        AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
+        for (AnnotationGraph annotationGraph : annotationGraphs)
+        {
+            annisResultSet.add(new AnnisResultImpl(annotationGraph));
+        }
+        return annisResultSet;
     }
-    else
+
+    @Override
+    public AnnisCorpusSet getCorpusSet() throws RemoteException
     {
-      return wekaHelper.exportAsArff(matches);
+        return new AnnisCorpusSetImpl(annisDao.listCorpora());
     }
-  }
 
-  ///// Getter / Setter
-  public ExternalFileMgr getExternalFileMgr()
-  {
-    return externalFileMgr;
-  }
+    @Override
+    public AnnisAttributeSet getAttributeSet(List<Long> corpusList,
+            boolean fetchValues, boolean onlyMostFrequentValues)
+            throws RemoteException
+    {
+        return new AnnisAttributeSetImpl(annisDao.listAnnotations(corpusList,
+                fetchValues, onlyMostFrequentValues));
+    }
 
-  public void setExternalFileMgr(ExternalFileMgr externalFileMgr)
-  {
-    this.externalFileMgr = externalFileMgr;
-  }
+    @Override
+    public String getPaula(Long textId) throws RemoteException
+    {
+        AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
+        if (graph != null)
+        {
+            return new AnnisResultImpl(graph).getPaula();
+        }
+        throw new AnnisServiceException("no text found with id = " + textId);
+    }
 
-  public AnnisDao getAnnisDao()
-  {
-    return annisDao;
-  }
+    @Override
+    public AnnisResult getAnnisResult(Long textId) throws RemoteException
+    {
+        AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
+        if (graph != null)
+        {
+            return new AnnisResultImpl(graph);
+        }
+        throw new AnnisServiceException("no text found with id = " + textId);
+    }
 
-  public void setAnnisDao(AnnisDao annisDao)
-  {
-    this.annisDao = annisDao;
-  }
+    @Override
+    public boolean isValidQuery(String annisQuery) throws RemoteException,
+            AnnisQLSemanticsException, AnnisQLSyntaxException
+    {
+        annisDao.parseAQL(annisQuery, null);
+        return true;
+    }
 
-  public WekaHelper getWekaHelper()
-  {
-    return wekaHelper;
-  }
+    @Override
+    public AnnisBinary getBinary(long id, int offset, int length)
+            throws RemoteException
+    {
+        return annisDao.getBinary(id, offset, length);
+    }
 
-  public void setWekaHelper(WekaHelper wekaHelper)
-  {
-    this.wekaHelper = wekaHelper;
-  }
+    @Override
+    public List<Annotation> getMetadata(long corpusId) throws RemoteException,
+            AnnisServiceException
+    {
+        return annisDao.listCorpusAnnotations(corpusId);
+    }
 
-  public int getMaxContext()
-  {
-    return maxContext;
-  }
+    @Override
+    public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
+            throws RemoteException
+    {
+        return annisDao.getResolverEntries(request);
+    }
 
-  public void setMaxContext(int maxContext)
-  {
-    this.maxContext = maxContext;
-  }
+    @Override
+    public String getWeka(List<Long> corpusList, String annisQL)
+            throws RemoteException, AnnisQLSemanticsException,
+            AnnisQLSyntaxException, AnnisCorpusAccessException
+    {
+        List<AnnotatedMatch> matches = annisDao.matrix(corpusList,
+                annisDao.parseAQL(annisQL, corpusList));
+        if (matches.isEmpty())
+        {
+            return "(empty)";
+        } else
+        {
+            return wekaHelper.exportAsArff(matches);
+        }
+    }
 
-  
+    // /// Getter / Setter
+    public ExternalFileMgr getExternalFileMgr()
+    {
+        return externalFileMgr;
+    }
+
+    public void setExternalFileMgr(ExternalFileMgr externalFileMgr)
+    {
+        this.externalFileMgr = externalFileMgr;
+    }
+
+    public AnnisDao getAnnisDao()
+    {
+        return annisDao;
+    }
+
+    public void setAnnisDao(AnnisDao annisDao)
+    {
+        this.annisDao = annisDao;
+    }
+
+    public WekaHelper getWekaHelper()
+    {
+        return wekaHelper;
+    }
+
+    public void setWekaHelper(WekaHelper wekaHelper)
+    {
+        this.wekaHelper = wekaHelper;
+    }
+
+    public int getMaxContext()
+    {
+        return maxContext;
+    }
+
+    public void setMaxContext(int maxContext)
+    {
+        this.maxContext = maxContext;
+    }
+
+    @Override
+    public AnnisBinary getBinary(long id) throws AnnisBinaryNotFoundException
+    {
+        log.debug("Retrieving binary file with id = " + id);
+
+        try
+        {
+
+            return externalFileMgr.getBinary(id);
+
+        } catch (Exception e)
+        {
+
+            throw new AnnisBinaryNotFoundException(e.getMessage());
+
+        }
+    }
 }

@@ -33,29 +33,32 @@ public interface AnnisDao
 
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze);
 
-  public String planGraph(QueryData aql, List<Long> corpusList,
-    long offset, long limit, int left, int right, boolean analyse);
+  public String planGraph(QueryData aql, List<Long> corpusList, long offset,
+      long limit, int left, int right, boolean analyse);
 
-  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right);
+  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList,
+      QueryData aql, long offset, long limit, int left, int right);
 
   public AnnotationGraph retrieveAnnotationGraph(long textId);
 
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql);
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList,
+      final QueryData aql);
 
   public List<AnnisCorpus> listCorpora();
 
   public List<Long> listCorpusByName(List<String> corpusNames);
 
-  public List<AnnisAttribute> listAnnotations(List<Long> corpusList, 
-    boolean listValues, boolean onlyMostFrequentValues);
+  public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
+      boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
-  
-  public AnnisBinary getBinary(long corpusId);
+
+  public AnnisBinary getBinary(long corpusId, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
+
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
 }

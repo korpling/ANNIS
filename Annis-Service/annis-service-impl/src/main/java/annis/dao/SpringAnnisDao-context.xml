@@ -91,6 +91,8 @@
 		<!--<property name="dataSource" ref="dataSource"/>-->
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
+  
+  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" />
 
 	<!-- exported bean: AnnisDao -->
   <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
@@ -119,7 +121,8 @@
     <property name="executorList" ref="executorList" />
 
     <property name="metaDataFilter" ref="metaDataFilter" />
-
+    
+    <property name="byteHelper" ref="byteHelper" />
   </bean>
 	
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">

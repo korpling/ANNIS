@@ -17,50 +17,84 @@ package annis.service.objects;
 
 import annis.service.ifaces.AnnisBinary;
 
-public class AnnisBinaryImpl implements AnnisBinary {
-	private static final long serialVersionUID = -4484371544441543151L;
+public class AnnisBinaryImpl implements AnnisBinary
+{
 
-	private byte[] bytes;
-	private long id;
-	private String mimeType;
-	private String fileName;
-	
-	public byte[] getBytes() {
-		return this.bytes;
-	}
+  private static final long serialVersionUID = -4484371544441543151L;
+  private byte[] bytes;
+  private long id;
+  private String mimeType;
+  private String fileName;
+  private int length;
 
-	public long getId() {
-		return this.id;
-	}
+  @Override
+  public byte[] getBytes()
+  {
+    return this.bytes;
+  }
 
-	public void setBytes(byte[] bytes) {
-	  if (bytes == null)
-	    this.bytes = "hello World".getBytes();
-		this.bytes = bytes;
-	}
+  @Override
+  public long getId()
+  {
+    return this.id;
+  }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  @Override
+  public void setBytes(byte[] bytes)
+  {
+    if (bytes == null)
+    {
+      throw new RuntimeException("didn't get bytes");
+    }
+    this.bytes = bytes;
+  }
 
-	public String getJSON() {
-		return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '" + new String(this.bytes) + "'}";
-	}
+  @Override
+  public void setId(long id)
+  {
+    this.id = id;
+  }
 
-	public String getMimeType() {
-		return this.mimeType;
-	}
+  @Override
+  public String getJSON()
+  {
+    return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '"
+            + new String(this.bytes) + "'}";
+  }
 
-	public void setMimeType(String mimeType) {
-		this.mimeType = mimeType;
-	}
+  @Override
+  public String getMimeType()
+  {
+    return this.mimeType;
+  }
 
-	public String getFileName() {
-		return this.fileName;
-	}
+  @Override
+  public void setMimeType(String mimeType)
+  {
+    this.mimeType = mimeType;
+  }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+  @Override
+  public String getFileName()
+  {
+    return this.fileName;
+  }
 
+  @Override
+  public void setFileName(String fileName)
+  {
+    this.fileName = fileName;
+  }
+
+  @Override
+  public void setLength(int length)
+  {
+    this.length = length;
+  }
+
+  @Override
+  public int getLength()
+  {
+    return this.length;
+  }
 }

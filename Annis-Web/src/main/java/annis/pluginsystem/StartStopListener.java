@@ -67,7 +67,7 @@ public class StartStopListener implements ServletContextListener
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ExternalFileVisualizer.class).toURI());
+//    pluginManager.addPluginsFrom(new ClassURI(ExternalFileVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(OldPartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
