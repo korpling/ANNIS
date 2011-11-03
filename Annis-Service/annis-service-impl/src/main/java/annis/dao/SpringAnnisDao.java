@@ -56,6 +56,7 @@ import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
@@ -68,7 +69,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
 	private FindSqlGenerator findSqlGenerator;
 	private CountSqlGenerator countSqlGenerator;
 	private AnnotateSqlGenerator annotateSqlGenerator;
-	private SqlGenerator matrixSqlGenerator;
+	private MatrixSqlGenerator matrixSqlGenerator;
 	
 	// configuration
 	private int timeout;
@@ -125,7 +126,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
-  private MatrixExtractor matrixExtractor;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
   private DefaultQueryExecutor defaultQueryExecutor;
@@ -238,7 +238,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
 
     int nodeCount = queryData.getMaxWidth();
 
-    return matrixExtractor.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
+    return matrixSqlGenerator.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
   }
 
   @Override
@@ -604,16 +604,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     this.metaDataFilter = metaDataFilter;
   }
 
-  public MatrixExtractor getMatrixExtractor()
-  {
-    return matrixExtractor;
-  }
-
-  public void setMatrixExtractor(MatrixExtractor matrixExtractor)
-  {
-    this.matrixExtractor = matrixExtractor;
-  }
-
   public de.deutschdiachrondigital.dddquery.parser.QueryAnalysis getDddqueryAnalysis()
   {
     return dddqueryAnalysis;
@@ -664,6 +654,14 @@ public int getTimeout() {
 
 public void setTimeout(int timeout) {
 	this.timeout = timeout;
+}
+
+public MatrixSqlGenerator getMatrixSqlGenerator() {
+	return matrixSqlGenerator;
+}
+
+public void setMatrixSqlGenerator(MatrixSqlGenerator matrixSqlGenerator) {
+	this.matrixSqlGenerator = matrixSqlGenerator;
 }
 
 

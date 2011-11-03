@@ -87,6 +87,10 @@ public abstract class BaseSqlGenerator<T>
 		sb.append(indent);
 	}
 
+	protected void indent(StringBuilder sb, String indent) {
+		sb.append(indent);
+	}
+
 	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
 		sb.append("SELECT ");
 		sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative, indent));

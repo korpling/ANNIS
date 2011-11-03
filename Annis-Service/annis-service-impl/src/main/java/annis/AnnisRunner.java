@@ -40,7 +40,6 @@ import org.apache.commons.lang.Validate;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
-import annis.dao.MatrixExtractor;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -51,6 +50,7 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
@@ -63,7 +63,7 @@ public class AnnisRunner extends AnnisBaseRunner
 	private SqlGenerator<List<Match>> findSqlGenerator;
 	private SqlGenerator<Integer> countSqlGenerator;
 	private SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator;
-	private SqlGenerator matrixSqlGenerator;
+	private SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator;
 	
 	// dependencies
   private AnnisDao annisDao;
@@ -480,24 +480,10 @@ public class AnnisRunner extends AnnisBaseRunner
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    MatrixExtractor me = new MatrixExtractor();
+    MatrixSqlGenerator me = new MatrixSqlGenerator();
     me.setMatchedNodesViewName("matched_nodes");
     out.println(me.getMatrixQuery(corpusList, queryData.getMaxWidth())
       + ";");
-  }
-
-  public void doMatrix(String annisQuery)
-  {
-    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
-    if(matches.isEmpty())
-    {
-      out.println("(empty");
-    }
-    else
-    {
-      WekaHelper helper = new WekaHelper();
-      out.println(helper.exportAsArff(matches));
-    }
   }
 
 	private QueryData analyzeQuery(String annisQuery, String queryFunction) {
@@ -515,6 +501,21 @@ public class AnnisRunner extends AnnisBaseRunner
 	  out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
   }
   
+  public void doMatrix(String annisQuery)
+  {
+//	    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
+	    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery, "matrix"));
+    if(matches.isEmpty())
+    {
+      out.println("(empty");
+    }
+    else
+    {
+      WekaHelper helper = new WekaHelper();
+      out.println(helper.exportAsArff(matches));
+    }
+  }
+
 	public void doFind(String annisQuery) {
 		List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
 		printAsTable(matches);
@@ -831,6 +832,15 @@ public SqlGenerator<List<Match>> getFindSqlGenerator() {
 
 public void setFindSqlGenerator(SqlGenerator<List<Match>> findSqlGenerator) {
 	this.findSqlGenerator = findSqlGenerator;
+}
+
+public SqlGenerator<List<AnnotatedMatch>> getMatrixSqlGenerator() {
+	return matrixSqlGenerator;
+}
+
+public void setMatrixSqlGenerator(
+		SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator) {
+	this.matrixSqlGenerator = matrixSqlGenerator;
 }
 
 }

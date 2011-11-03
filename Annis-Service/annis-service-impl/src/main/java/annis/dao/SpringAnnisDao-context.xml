@@ -49,10 +49,6 @@
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
 
-  <bean id="matrixExtractor" class="annis.dao.MatrixExtractor">
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-  </bean>
-		
 	<!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper"/>
 	
@@ -108,6 +104,7 @@
 
 	<property name="countSqlGenerator" ref="countSqlGenerator"/>
 	<property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+	<property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
 
     <!-- VR: before benchmark merge -->
 	<property name="dataSource" ref="dataSource"/>
@@ -134,7 +131,6 @@
     
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
     <property name="countExtractor" ref="countExtractor"/>
-    <property name="matrixExtractor" ref="matrixExtractor" />
 
     <property name="executorList" ref="executorList" />
 

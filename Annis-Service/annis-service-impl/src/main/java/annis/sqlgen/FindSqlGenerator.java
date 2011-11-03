@@ -38,8 +38,12 @@ public class FindSqlGenerator extends UnionBaseSqlGenerator<List<Match>> impleme
 	@Override
 	public String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
 		List<String> ids = new ArrayList<String>();
-		for (AnnisNode node : alternative)
-			ids.add(tables(node).aliasedColumn(NODE_TABLE, "id"));
+		int i = 0;
+		for (AnnisNode node : alternative) {
+			++i;
+			ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + 
+					" AS id" + i);
+		}
 		return "DISTINCT\n" + indent + TABSTOP + StringUtils.join(ids, ", ");
 	}
 

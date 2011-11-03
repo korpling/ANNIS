@@ -28,6 +28,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -268,5 +269,32 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
 		verify(simpleJdbcTemplate).query(SQL, listCorpusByNameDaoHelper);
 	}
+	
+	@Test
+	public void sessionTimeout() {
+		// time out after 100 seconds
+		int timeout = 100;
+		annisDao.setTimeout(timeout);
+		
+		// call (query data not needed)
+		annisDao.modifySqlSession(jdbcTemplate, null);
+		
+		// verify correct session timeout
+		verify(jdbcTemplate).update("SET statement_timeout TO " + timeout);
+	}
+	
+	@Test
+	public void noTimeout() {
+		// 0 indicates no timeout
+		annisDao.setTimeout(0);
+		
+		// call
+		annisDao.modifySqlSession(jdbcTemplate, null);
+		
+		// verify that nothing has happened
+		verifyNoMoreInteractions(simpleJdbcTemplate);
+	}
+	
+
 	
 }

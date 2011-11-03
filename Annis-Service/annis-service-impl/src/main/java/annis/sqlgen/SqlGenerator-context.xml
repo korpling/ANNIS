@@ -172,6 +172,20 @@ limitations under the License.
 	
   <!-- new -->
 	
+	<bean
+		id="matrixSqlGenerator"
+		class="annis.sqlgen.MatrixSqlGenerator"
+		parent="findSqlGenerator">
+		
+		<property name="innerQuerySqlGenerator" ref="findSqlGenerator"/>
+		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator"/>
+
+		<property name="selectClauseSqlGenerator" ref="matrixSqlGenerator"/>
+		<property name="fromClauseSqlGenerators"><util:list><ref bean="matrixSqlGenerator"/></util:list></property>
+		<property name="whereClauseSqlGenerators"><util:list><ref bean="matrixSqlGenerator"/></util:list></property>
+		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator"/>
+	</bean>
+		
 	<bean 
 		id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
 		parent="findSqlGenerator">
