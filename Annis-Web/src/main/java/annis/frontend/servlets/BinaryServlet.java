@@ -66,7 +66,8 @@ public class BinaryServlet extends HttpServlet
       } else
       {
 
-        responseStatus200(service, out, response, corpusId, offset, length);
+        responseStatus200(service, out, response, corpusId, offset,
+                length);
       }
     } catch (AnnisServiceFactoryException e)
     {
@@ -113,7 +114,7 @@ public class BinaryServlet extends HttpServlet
     response.setContentType(binary.getMimeType());
     response.setContentLength(binary.getLength());
 
-    getByteWise(service, out, corpusId);
+//    getByteWise(service, out, corpusId);
   }
 
   /**

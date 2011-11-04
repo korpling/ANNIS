@@ -12,18 +12,14 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 {
 
-  private int offset;
-  private int length;
   private long corpusId;
 
   public String generateSql(long corpusId, int offset, int length)
   {
-    this.offset = offset;
-    this.length = length;
     this.corpusId = corpusId;
 
     return "SELECT (substring((SELECT file FROM media_files WHERE corpus_ref="
-            + corpusId + ") from " + offset + " for " + (offset + length) + ""
+            + corpusId + ") from " + offset + " for " + length + ""
             + ")), bytes, mime_type, title FROM media_files WHERE corpus_ref="
             + corpusId;
   }
@@ -33,55 +29,18 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
           DataAccessException
   {
     AnnisBinary ab = new AnnisBinaryImpl();
-    byte[] bytes = new byte[length];
 
     while (rs.next())
     {
       {
-
-//          rs.getBinaryStream("substring").read(bytes);  
-        ab.setBytes(rs.getBytes("substring"));  
+        ab.setBytes(rs.getBytes("substring"));
         ab.setFileName(rs.getString("title"));
         ab.setId(corpusId);
-        ab.setMimeType(rs.getString("mime_type")  );
-        ab.setLength(rs.getInt("bytes"));
-
-        Logger.getLogger(ByteHelper.class.getName()).log(Level.WARNING, rs.getBytes("substring").toString());
+        ab.setMimeType(rs.getString("mime_type"));
+        ab.setLength(rs.getInt("bytes"));        
       }
     }
 
     return ab;
-  }
-
-  /**
-   * @return the offset
-   */
-  public int getOffset()
-  {
-    return offset;
-  }
-
-  /**
-   * @param offset the offset to set
-   */
-  public void setOffset(int offset)
-  {
-    this.offset = offset;
-  }
-
-  /**
-   * @return the length
-   */
-  public int getLength()
-  {
-    return length;
-  }
-
-  /**
-   * @param length the length to set
-   */
-  public void setLength(int length)
-  {
-    this.length = length;
   }
 }
