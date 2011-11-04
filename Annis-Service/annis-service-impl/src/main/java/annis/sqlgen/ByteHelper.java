@@ -2,7 +2,6 @@ package annis.sqlgen;
 
 import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisBinaryImpl;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -12,6 +11,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 {
+
   private int offset;
   private int length;
   private long corpusId;
@@ -22,10 +22,10 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
     this.length = length;
     this.corpusId = corpusId;
 
-    return "SELECT (substring((SELECT file FROM media_files WHERE corpus_ref=" +
-            corpusId + ") from " + offset + " for " + (offset + length - 1) + ""
-            + ")), bytes, mime_type, title FROM media_files WHERE corpus_ref=" +
-            corpusId;
+    return "SELECT (substring((SELECT file FROM media_files WHERE corpus_ref="
+            + corpusId + ") from " + offset + " for " + (offset + length) + ""
+            + ")), bytes, mime_type, title FROM media_files WHERE corpus_ref="
+            + corpusId;
   }
 
   @Override
@@ -33,24 +33,21 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
           DataAccessException
   {
     AnnisBinary ab = new AnnisBinaryImpl();
-    byte[] bytes = new byte[length];    
+    byte[] bytes = new byte[length];
 
     while (rs.next())
     {
       {
-        try
-        {
-          rs.getBinaryStream("substring").read(bytes);  
-          ab.setBytes(bytes);
-          ab.setFileName(rs.getString("title"));
-          ab.setId(corpusId);
-          ab.setMimeType(rs.getString("mime_type"));
-          ab.setLength(rs.getInt("bytes"));
-        } catch (IOException ex)
-        {
-          Logger.getLogger(ByteHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      } 
+
+//          rs.getBinaryStream("substring").read(bytes);  
+        ab.setBytes(rs.getBytes("substring"));  
+        ab.setFileName(rs.getString("title"));
+        ab.setId(corpusId);
+        ab.setMimeType(rs.getString("mime_type")  );
+        ab.setLength(rs.getInt("bytes"));
+
+        Logger.getLogger(ByteHelper.class.getName()).log(Level.WARNING, rs.getBytes("substring").toString());
+      }
     }
 
     return ab;

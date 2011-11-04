@@ -84,18 +84,18 @@ public class BinaryServlet extends HttpServlet
     // Range: byte=x-y | Range: byte=0-
     String[] rangeTupel = range.split("-");
     offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
-    binary = service.getBinary(corpusId, offset + 1, length + 1); //index shifting
 
     if (rangeTupel.length > 1)
     {
       length = Integer.parseInt(rangeTupel[1]);
     }
 
+    binary = service.getBinary(corpusId, offset + 1, length + 1); //index shifting
     response.setHeader("Content-Range", "bytes " + offset + "-" + (offset
             + length) + "/" + binary.getLength());
     response.setContentType(binary.getMimeType());
     response.setStatus(206);
-    response.setContentLength(length+1);
+    response.setContentLength(binary.getBytes().length);
 
     out.write(binary.getBytes());
     out.flush();

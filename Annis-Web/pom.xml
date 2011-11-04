@@ -142,7 +142,7 @@
     <finalName>Annis-web</finalName>
   </build>
   <properties>
-    <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+    <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
   </properties>
   <description>The web frontend for the Annis Corpus Search</description>
 </project>
