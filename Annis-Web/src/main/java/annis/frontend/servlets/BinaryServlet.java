@@ -45,7 +45,7 @@ public class BinaryServlet extends HttpServlet
           throws ServletException, IOException
   {
     int offset = 0;
-    int length = 2047;
+    int length = 200000;
 
     Map<String, String[]> binaryParameter = request.getParameterMap();
     long corpusId = Long.parseLong(binaryParameter.get("id")[0]);
@@ -91,9 +91,19 @@ public class BinaryServlet extends HttpServlet
       length = Integer.parseInt(rangeTupel[1]);
     }
 
-    binary = service.getBinary(corpusId, offset + 1, length + 1); //index shifting
+    binary = service.getBinary(corpusId, offset + 1, 1); //index shifting
+
+    if (binary.getLength() < offset + length)
+    {
+      binary = service.getBinary(corpusId, offset + 1, binary.getLength() - offset);
+    } else
+    {
+      binary = service.getBinary(corpusId, offset + 1, length);
+    }
+
+
     response.setHeader("Content-Range", "bytes " + offset + "-" + (offset
-            + length) + "/" + binary.getLength());
+            + binary.getBytes().length - 1) + "/" + binary.getLength());
     response.setContentType(binary.getMimeType());
     response.setStatus(206);
     response.setContentLength(binary.getBytes().length);
@@ -112,9 +122,11 @@ public class BinaryServlet extends HttpServlet
     response.setStatus(200);
     response.setHeader("Accept-Ranges", "bytes");
     response.setContentType(binary.getMimeType());
+    response.setHeader("Content-Range", "bytes 0-" + (
+            binary.getBytes().length - 1) + "/" + binary.getLength());
     response.setContentLength(binary.getLength());
 
-//    getByteWise(service, out, corpusId);
+    getCompleteFile(service, out, corpusId, length);
   }
 
   /**
@@ -126,16 +138,21 @@ public class BinaryServlet extends HttpServlet
    * @param out
    * @param corpusId 
    */
-  private void getByteWise(AnnisService service, ServletOutputStream out, long corpusId) throws RemoteException, IOException
+  private void getCompleteFile(AnnisService service, ServletOutputStream out,
+          long corpusId, int length) throws RemoteException, IOException
   {
 
     AnnisBinary annisBinary = service.getBinary(corpusId, 1, 1);
-    int length = annisBinary.getLength();
-    for (int i = 1; i <= length; i++)
+
+    int i = 0;
+    while (i + length < annisBinary.getLength())
     {
-      out.write(service.getBinary(corpusId, i, 1).getBytes());
-      out.flush();
+      out.write(service.getBinary(corpusId, i + 1, length).getBytes());
+      i += length;
     }
+
+    out.write(service.getBinary(corpusId, i + 1, annisBinary.getLength() - i).getBytes());
+    out.flush();
 
   }
 }

@@ -4,8 +4,6 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisBinaryImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
