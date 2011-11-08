@@ -15,47 +15,15 @@
  */
 package annis.sqlgen;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
-import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public class SqlGenerator
-{
+public interface SqlGenerator<T> extends ResultSetExtractor<T> {
 
-	private Logger log = Logger.getLogger(this.getClass());
+	String toSql(QueryData queryData);
 	
-	// dependencies
-	private ClauseSqlGenerator clauseSqlGenerator;
-	
-	public String toSql(QueryData queryData, List<Long> corpusList, List<Long> documents) {
-		
-		// build SQL query
-		List<String> subQueries = new ArrayList<String>();
-		for (List<AnnisNode> alternative : queryData.getAlternatives()) {
-			String clauseSql = clauseSqlGenerator.toSql(alternative, 
-        queryData.getMaxWidth(), corpusList, documents);
-			subQueries.add(clauseSql);
-		}
-		String sql = StringUtils.join(subQueries, "\n\nUNION ");
-		log.debug("SQL:\n" + sql);
-
-		return sql;
-	}
-
-	///// Getter / Setter
-	
-	public ClauseSqlGenerator getClauseSqlGenerator() {
-		return clauseSqlGenerator;
-	}
-
-	public void setClauseSqlGenerator(ClauseSqlGenerator clauseSqlGenerator) {
-		this.clauseSqlGenerator = clauseSqlGenerator;
-	}
+	String toSql(QueryData queryData, int indentBy);
 
 }

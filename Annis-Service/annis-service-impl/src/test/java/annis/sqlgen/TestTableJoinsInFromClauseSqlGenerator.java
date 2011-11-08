@@ -63,7 +63,7 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 		
 		// setup table aliases
 		tableAccessStrategy = new TableAccessStrategy(node23);
-		when(tableAccessStrategyFactory.createTableAccessStrategy(any(AnnisNode.class))).thenReturn(tableAccessStrategy);
+		when(tableAccessStrategyFactory.tables(any(AnnisNode.class))).thenReturn(tableAccessStrategy);
 		tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
 		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
@@ -202,7 +202,7 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	///// private helper
 	
 	private void assertFromClause(String expected) {
-		assertEquals(expected, tableJoinsInFromClauseSqlGenerator.fromClause(node23));
+		assertEquals(expected, tableJoinsInFromClauseSqlGenerator.fromClauseForNode(node23, false));
 	}
 
 }

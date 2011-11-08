@@ -20,8 +20,13 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
+
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -32,7 +37,22 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
   implements WhereClauseSqlGenerator
 {
 
-  @Override
+	@Override
+	public Set<String> whereConditions(QueryData queryData,
+			List<AnnisNode> alternative, String indent) {
+		Set<String> conditions = new HashSet<String>();
+		List<Long> corpusList = queryData.getCorpusList();
+		List<Long> documents = queryData.getDocuments();
+		
+		for (AnnisNode node : alternative) {
+			conditions.addAll(whereConditions(node, corpusList, documents));
+		}
+		
+		return conditions;
+	}
+	
+	// VR: inline
+	@Deprecated
   public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
   {
     if (documents == null && corpusList == null)
@@ -42,13 +62,13 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     LinkedList<String> conditions = new LinkedList<String>();
 
     conditions.add("-- select documents by metadata and toplevel corpus");
-    if (documents != null)
+    if (documents != null && ! documents.isEmpty() )
     {
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
         documents));
     }
 
-    if (corpusList != null)
+    if (corpusList != null && ! corpusList.isEmpty())
     {
       conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "toplevel_corpus"),
         corpusList));
@@ -66,9 +86,9 @@ public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
     return conditions;
   }
 
-  @Override
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-  {
-    return null;
-  }
+//  @Override
+//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
+//  {
+//    return null;
+//  }
 }

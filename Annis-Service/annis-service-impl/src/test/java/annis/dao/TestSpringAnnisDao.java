@@ -28,6 +28,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -58,6 +59,7 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -66,7 +68,7 @@ import annis.ql.node.Start;
 import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"SpringAnnisDao-context.xml"})
+@ContextConfiguration(locations={"SpringAnnisDao-context.xml", "classpath:annis/sqlgen/SqlGenerator-context.xml"})
 public class TestSpringAnnisDao extends AnnisHomeTest {
 
 	// SpringAnnisDao instance that is managed by Spring
@@ -78,7 +80,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
   @Mock private MetaDataFilter metaDataFilter;
 	@Mock private SqlGenerator sqlGenerator;
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
-  @Mock private GraphExtractor graphExtractor;
+  @Mock private AnnotateSqlGenerator annotateSqlGenerator;
 	@Mock private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 	@Mock private JdbcTemplate jdbcTemplate;
 	private SimpleJdbcTemplate simpleJdbcTemplate;
@@ -103,7 +105,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao.setAqlParser(annisParser);
 		annisDao.setSqlGenerator(sqlGenerator);
     annisDao.setDefaultQueryExecutor(defaultQueryExecutor);
-    annisDao.setGraphExtractor(graphExtractor);
+    annisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
@@ -113,7 +115,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
     annisDao.setMetaDataFilter(metaDataFilter);
 
 		when(annisParser.parse(anyString())).thenReturn(STATEMENT);
-		when(sqlGenerator.toSql(any(QueryData.class), anyList(), anyList())).thenReturn(SQL);
+		when(sqlGenerator.toSql(any(QueryData.class))).thenReturn(SQL);
 		
 		simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
 	}
@@ -174,7 +176,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
 		final AnnotationGraph GRAPH = mock(AnnotationGraph.class);
 
-    when(graphExtractor.queryAnnotationGraph(any(JdbcTemplate.class), anyLong())).thenReturn(Arrays.asList(GRAPH));
+    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class), anyLong())).thenReturn(Arrays.asList(GRAPH));
 		
 		// call and test
 		assertThat(annisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
@@ -183,7 +185,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 	// return null if text was not found
 	@Test
 	public void retrieveAnnotationGraphNoText() {
-		when(jdbcTemplate.query(anyString(), any(GraphExtractor.class))).thenReturn(new ArrayList<AnnotationGraph>());
+		when(jdbcTemplate.query(anyString(), any(AnnotateSqlGenerator.class))).thenReturn(new ArrayList<AnnotationGraph>());
 		assertThat(annisDao.retrieveAnnotationGraph(0), is(nullValue()));
 	}
 	
@@ -194,7 +196,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// stub returned graph list with more than one entry
 		final List<AnnotationGraph> GRAPHS = mock(List.class);
 		when(GRAPHS.size()).thenReturn(2);
-    when(graphExtractor.queryAnnotationGraph(any(JdbcTemplate.class),
+    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
       anyLong())).thenReturn(GRAPHS);
 		annisDao.retrieveAnnotationGraph(0);
 	}
@@ -267,5 +269,32 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
 		verify(simpleJdbcTemplate).query(SQL, listCorpusByNameDaoHelper);
 	}
+	
+	@Test
+	public void sessionTimeout() {
+		// time out after 100 seconds
+		int timeout = 100;
+		annisDao.setTimeout(timeout);
+		
+		// call (query data not needed)
+		annisDao.modifySqlSession(jdbcTemplate, null);
+		
+		// verify correct session timeout
+		verify(jdbcTemplate).update("SET statement_timeout TO " + timeout);
+	}
+	
+	@Test
+	public void noTimeout() {
+		// 0 indicates no timeout
+		annisDao.setTimeout(0);
+		
+		// call
+		annisDao.modifySqlSession(jdbcTemplate, null);
+		
+		// verify that nothing has happened
+		verifyNoMoreInteractions(simpleJdbcTemplate);
+	}
+	
+
 	
 }

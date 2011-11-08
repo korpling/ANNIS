@@ -18,10 +18,12 @@ package annis.sqlgen;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
 
 import annis.model.AnnisNode;
+
 
 public class TableAccessStrategy {
 
@@ -31,7 +33,10 @@ public class TableAccessStrategy {
 	public final static String COMPONENT_TABLE = "component";
 	public final static String NODE_ANNOTATION_TABLE = "node_annotation";
 	public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
-  public final static String FACTS_TABLE = "facts";
+	public final static String FACTS_TABLE = "facts";
+  	public final static String CORPUS_TABLE = "corpus";
+  	public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";
+  	public final static String TEXT_TABLE = "text";
 
 	// the wrapped node
 	private AnnisNode node;
@@ -69,25 +74,32 @@ public class TableAccessStrategy {
 	}
 	
 	public String aliasedTable(String table, int count) {
-		// sanity checks
-		if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
-			throw new IllegalArgumentException("access to node annotation table out of range: " + count);
-		if (table.equals(EDGE_ANNOTATION_TABLE) && count > node.getEdgeAnnotations().size())
-			throw new IllegalArgumentException("access to edge annotation table out of range: " + count);
-		if (table.equals(NODE_TABLE) && count > 1)
-			throw new IllegalArgumentException("access to struct table out of range: " + count);
-		if (table.equals(RANK_TABLE) && count > 1)
-			throw new IllegalArgumentException("access to rank table out of range: " + count);
+		if (node != null) {
+			// sanity checks
+			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size() && 
+					(count > 1 || !node.requiresTable(NODE_ANNOTATION_TABLE)))
+				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
+			if (table.equals(EDGE_ANNOTATION_TABLE) && count > node.getEdgeAnnotations().size())
+				throw new IllegalArgumentException("access to edge annotation table out of range: " + count);
+			if (table.equals(NODE_TABLE) && count > 1)
+				throw new IllegalArgumentException("access to struct table out of range: " + count);
+			if (table.equals(RANK_TABLE) && count > 1)
+				throw new IllegalArgumentException("access to rank table out of range: " + count);
+			
+			// offset table count for edge annotations if node and edge annotations are the same table
+			if (table.equals(EDGE_ANNOTATION_TABLE) && isMaterialized(EDGE_ANNOTATION_TABLE, NODE_ANNOTATION_TABLE))
+				count = count + node.getNodeAnnotations().size() - 1;
+		}
 		
-		// offset table count for edge annotations if node and edge annotations are the same table
-		if (table.equals(EDGE_ANNOTATION_TABLE) && isMaterialized(EDGE_ANNOTATION_TABLE, NODE_ANNOTATION_TABLE))
-			count = count + node.getNodeAnnotations().size() - 1;
+		if (count == 0) {
+			count = 1;
+		}
 		
 		// compute table counts
 		Bag tables = computeSourceTables();
 
 		String aliasedName = tableName(table);
-		String aliasCount = String.valueOf(node.getId());
+		String aliasCount = node != null ? String.valueOf(node.getId()) : "";
 		String countSuffix = tables.getCount(aliasedName) > 1 ? "_" + count : "";
 
 		return aliasedName + aliasCount + countSuffix;
@@ -110,7 +122,18 @@ public class TableAccessStrategy {
 	protected Bag computeSourceTables() {
 		Bag tables = new HashBag();
 		
+		// hack to support table selections for ANNOTATE query
+		if (node == null) {
+			String[] tableNames = {NODE_TABLE, RANK_TABLE, COMPONENT_TABLE, NODE_ANNOTATION_TABLE, EDGE_ANNOTATION_TABLE};
+			for (String table : tableNames)
+				tables.add(table);
+			return tables;
+		}
+		
 		tables.add(tableName(NODE_ANNOTATION_TABLE), node.getNodeAnnotations().size());
+		if (node.getNodeAnnotations().isEmpty() && node.requiresTable(NODE_ANNOTATION_TABLE))
+			tables.add(tableName(NODE_ANNOTATION_TABLE));
+		
 		tables.add(tableName(EDGE_ANNOTATION_TABLE), node.getEdgeAnnotations().size());
 		
 		if ( tables.getCount(tableName(RANK_TABLE)) == 0 && usesRankTable() )
@@ -121,23 +144,26 @@ public class TableAccessStrategy {
 		if (tables.getCount(tableName(NODE_TABLE)) == 0)
 			tables.add(tableName(NODE_TABLE));
 		
+		if (node.requiresTable(TEXT_TABLE))
+			tables.add(tableName(TEXT_TABLE));
+
 		return tables;
 	}
-
+	
 	public boolean usesNodeAnnotationTable() {
-		return ! node.getNodeAnnotations().isEmpty();
+		return node == null || ! node.getNodeAnnotations().isEmpty();
 	}
 	
 	public boolean usesRankTable() {
-		return usesComponentTable() || node.isRoot() || node.getArity() != null;
+		return node == null || usesComponentTable() || node.isRoot() || node.getArity() != null;
 	}
 	
 	public boolean usesComponentTable() {
-		return node.isPartOfEdge() || usesEdgeAnnotationTable();
+		return node == null || node.isPartOfEdge() || usesEdgeAnnotationTable();
 	}
 	
 	public boolean usesEdgeAnnotationTable() {
-		return ! node.getEdgeAnnotations().isEmpty();
+		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
 	
 	public boolean isMaterialized(String table, String otherTable) {

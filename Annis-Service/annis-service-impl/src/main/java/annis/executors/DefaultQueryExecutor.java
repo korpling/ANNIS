@@ -41,6 +41,9 @@ public class DefaultQueryExecutor implements QueryExecutor
   public void createMatchView(JdbcTemplate jdbcTemplate, List<Long> corpusList, 
     List<Long> documents, QueryData queryData)
   {
+	  queryData.setCorpusList(corpusList);
+	  queryData.setDocuments(documents);
+	  
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
     matchSb.append("CREATE TEMPORARY VIEW \"");
@@ -48,7 +51,7 @@ public class DefaultQueryExecutor implements QueryExecutor
     matchSb.append("\" AS\n");
     matchSb.append("\t SELECT DISTINCT *\n");
     matchSb.append("\n\tFROM\n(\n");
-    matchSb.append(sqlGenerator.toSql(queryData, corpusList, documents));
+    matchSb.append(sqlGenerator.toSql(queryData));
     matchSb.append("\n) as matched_ids");
 
     jdbcTemplate.execute(matchSb.toString());

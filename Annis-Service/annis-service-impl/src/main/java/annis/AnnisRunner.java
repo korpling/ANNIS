@@ -15,23 +15,11 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
-import annis.dao.GraphExtractor;
-import annis.dao.MatrixExtractor;
-import annis.dao.MetaDataFilter;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.ql.parser.QueryAnalysis;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryData;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisCorpus;
-import annis.service.objects.AnnisAttributeSetImpl;
-import annis.sqlgen.SqlGenerator;
-import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,25 +32,79 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+
+import annis.dao.AnnisDao;
+import annis.dao.AnnotatedMatch;
+import annis.dao.Match;
+import annis.dao.MetaDataFilter;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.QueryData;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.MatrixSqlGenerator;
+import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.SqlGenerator;
+import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
 {
 
-  private List<Long> corpusList;
+	// SQL generators for query functions
+	private SqlGenerator<List<Match>> findSqlGenerator;
+	private SqlGenerator<Integer> countSqlGenerator;
+	private SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator;
+	private SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator;
+	
+	// dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
   private QueryAnalysis aqlAnalysis;
-  private SqlGenerator findSqlGenerator;
   private MetaDataFilter metaDataFilter;
   private int context;
   private int matchLimit;
   private boolean isDDDQueryMode;
+  private QueryAnalysis queryAnalysis;
 
+	// settings
+	private int limit;
+	private int offset;
+	private int left;
+	private int right;
+	private List<Long> corpusList;
+  
+	// benchmarking
+	private static class Benchmark {
+		private String functionCall;
+		private QueryData queryData;
+		private float avgTimeInMilliseconds;
+		private long bestTimeInMilliseconds;
+		private String sql;
+		private String plan;
+		private int runs;
+		private int errors;
+		
+		public Benchmark(String functionCall, QueryData queryData) {
+			super();
+			this.functionCall = functionCall;
+			this.queryData = queryData;
+		}
+		
+	}
+	private List<Benchmark> benchmarks;
+	private static final int SEQUENTIAL_RUNS = 5;
+  
   public static void main(String[] args)
   {
     // get runner from Spring
@@ -72,6 +114,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public AnnisRunner()
   {
     corpusList = new LinkedList<Long>();
+	benchmarks = new ArrayList<Benchmark>();
     isDDDQueryMode = false;
   }
 
@@ -162,26 +205,264 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(annisParser.dumpTree(annisQuery));
   }
 
-  public void doSql(String annisQuery)
+  @Deprecated
+  public void doSqlOld(String annisQuery)
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println(sql);
   }
 
+	// FIXME: missing tests
+	public void doSql(String functionCall) {
+		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+		QueryData queryData = analyzeQuery(annisQuery, null);
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+
+		out.println(generator.toSql(queryData));
+	}
+	
+	public void doExplain(String functionCall, boolean analyze) {
+		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+		QueryData queryData = analyzeQuery(annisQuery, null);
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+
+		out.println(annisDao.explain(generator, queryData, analyze));
+	}
+  
+	public void doPlan(String functionCall) {
+		doExplain(functionCall, false);
+	}
+	
+	public void doAnalyze(String functionCall) {
+		doExplain(functionCall, true);
+	}
+	
+	private SqlGenerator<?> getGeneratorForQueryFunction(String functionCall) {
+		String[] split = functionCall.split(" ", 2);
+		
+		Validate.isTrue(split.length == 2, "bad call to plan");
+		String function = split[0];
+
+		SqlGenerator<?> generator = null;
+		if ("count".equals(function))
+			generator = countSqlGenerator;
+		if ("find".equals(function))
+			generator = findSqlGenerator;
+		if ("annotate".equals(function))
+			generator = annotateSqlGenerator;
+		if ("matrix".equals(function))
+			generator = matrixSqlGenerator;
+		Validate.notNull(generator, "don't now query function: " + function);
+		
+		return generator;
+	}
+
+	private String getAnnisQueryFromFunctionCall(String functionCall) {
+		String[] split = functionCall.split(" ", 2);
+		
+		Validate.isTrue(split.length == 2, "bad call to plan");
+		return split[1];
+	}
+
+	public void doRecord(String dummy) {
+		out.println("recording new benchmark session");
+		benchmarks.clear();
+	}
+	
+	public void doBenchmark(String benchmarkCount) {
+		int count = Integer.parseInt(benchmarkCount);
+		out.println("---> executing " + benchmarks.size() + " queries " + count + " times");
+
+		List<Benchmark> session = new ArrayList<Benchmark>();
+		
+		// create sql + plan for each query and create count copies for each benchmark
+		for (Benchmark benchmark : benchmarks) {
+			SqlGenerator<?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
+			benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).toSql(benchmark.queryData);
+			out.println("---> SQL query for: " + benchmark.functionCall);
+			out.println(benchmark.sql);
+			try {
+				benchmark.plan = annisDao.explain(generator, benchmark.queryData, true);
+				out.println("---> query plan for: " + benchmark.functionCall);
+				out.println(benchmark.plan);
+			} catch (RuntimeException e) { // nested DataAccessException would be better
+				out.println("---> query plan failed for " + benchmark.functionCall);
+			}
+			benchmark.bestTimeInMilliseconds = Long.MAX_VALUE;
+			out.println("---> running query sequentially " + SEQUENTIAL_RUNS + " times");
+			String options = benchmarkOptions(benchmark.queryData);
+			for (int i = 0; i < SEQUENTIAL_RUNS; ++i) {
+				if (i > 0)
+					out.print(", ");
+				long start = new Date().getTime();
+				try {
+					annisDao.executeQueryFunction(benchmark.queryData, generator);
+				} catch (RuntimeException e) {
+					// don't care
+				}
+				long end = new Date().getTime();
+				long runtime = end - start;
+				benchmark.bestTimeInMilliseconds = Math.min(benchmark.bestTimeInMilliseconds, end - start);
+				out.print(runtime + " ms");
+			}
+			out.println();
+			out.println(benchmark.bestTimeInMilliseconds + " ms best time for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
+			session.addAll(Collections.nCopies(count, benchmark));
+		}
+		
+		// shuffle the benchmark queries
+		Collections.shuffle(session);
+		out.println();
+		out.println("---> running queries in random order");
+		
+		// execute the queries, record test times
+		for (Benchmark benchmark : session) {
+			if (benchmark.errors >= 3)
+				continue;
+			boolean error = false;
+			SqlGenerator<?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
+			long start = new Date().getTime();
+			try {
+				annisDao.executeQueryFunction(benchmark.queryData, generator);
+			} catch (RuntimeException e) {
+				error = true;
+			}
+			long end = new Date().getTime();
+			long runtime = end - start;
+			benchmark.avgTimeInMilliseconds += runtime;
+			++benchmark.runs;
+			if (error)
+				++benchmark.errors;
+			String options = benchmarkOptions(benchmark.queryData);
+			out.println(runtime + " ms for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options) + (error ? " ERROR" : ""));
+		}
+		
+		// compute average runtime for each query
+		out.println();
+		out.println("---> benchmark complete");
+		for (Benchmark benchmark : benchmarks) {
+			benchmark.avgTimeInMilliseconds = benchmark.avgTimeInMilliseconds / benchmark.runs;
+			String options = benchmarkOptions(benchmark.queryData);
+			out.println(benchmark.avgTimeInMilliseconds + " ms (avg for " + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", " + benchmark.errors + " errors)" : ")") + " for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
+		}
+
+		// compute average runtime for each query
+		out.println();
+		out.println("---> best times");
+		for (Benchmark benchmark : benchmarks) {
+			String options = benchmarkOptions(benchmark.queryData);
+			out.println(benchmark.bestTimeInMilliseconds + " ms (avg for " + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", " + benchmark.errors + " errors)" : ")") + " for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
+		}
+		out.println();
+	}
+	
+	public String benchmarkOptions(QueryData queryData) {
+		List<Long> corpusList = queryData.getCorpusList();
+		List<Annotation> metaData = queryData.getMetaData();
+		Set<Object> extensions = queryData.getExtensions();
+		List<String> fields = new ArrayList<String>();
+		if (! corpusList.isEmpty() )
+			fields.add("corpus = " + corpusList);
+		if (! metaData.isEmpty() )
+			fields.add("meta = " + metaData);
+		for (Object extension : extensions) {
+			String toString = extension.toString();
+			if (! "".equals(toString) )
+				fields.add(toString);
+		}
+		return StringUtils.join(fields, ", ");
+	}
+	
+	public void doSet(String callToSet) {
+		String[] split = callToSet.split(" ", 3);
+		Validate.isTrue(split.length > 0, "syntax error: set " + callToSet);
+		
+		String setting = split[0];
+		String value = null;
+		
+		boolean show = split.length == 1 && setting.startsWith("?");
+		if (show)
+			setting = setting.substring(1);
+		else {
+			Validate.isTrue(split.length == 3 && "TO".toLowerCase().equals(split[1]), "syntax error: set " + callToSet);
+			value = split[2];
+		}
+		
+		if ("limit".equals(setting)) {
+			if (show)
+				value = String.valueOf(limit);
+			else
+				limit = Integer.parseInt(value);
+		}
+		else if ("offset".equals(setting)) {
+			if (show)
+				value = String.valueOf(offset);
+			else
+				offset = Integer.parseInt(value);
+		} else if ("left".equals(setting)) {
+			if (show)
+				value = String.valueOf(left);
+			else
+				left = Integer.parseInt(value);
+		} else if ("right".equals(setting)) {
+			if (show)
+				value = String.valueOf(right);
+			else
+				right = Integer.parseInt(value);
+		} else if ("context".equals(setting)) {
+			if (show) {
+				if (left != right) 
+					value = "(left != right)";
+				else
+					value = String.valueOf(left);
+			} else {
+				left = Integer.parseInt(value);
+				right = left;
+			}
+		} else if ("timeout".equals(setting)) {
+			if (show)
+				value = String.valueOf(annisDao.getTimeout());
+			else
+				annisDao.setTimeout(Integer.parseInt(value));
+		} else if ("corpus-list".equals(setting)) {
+			corpusList.clear();
+			if ( ! "all".equals(value) ) {
+				String[] list = value.split(" ");
+				for (String corpus : list)
+					corpusList.add(Long.parseLong(corpus));
+			}
+		} else {
+			out.println("ERROR: unknown option: " + setting);
+		}
+
+		out.println(setting + ": " + value);
+	}
+	
+	public void doShow(String setting) {
+		doSet("?" + setting);
+	}
+	
+  @Deprecated
   public void doSqlGraph(String annisQuery)
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    GraphExtractor ge = new GraphExtractor();
+    AnnotateSqlGenerator ge = new AnnotateSqlGenerator();
     ge.setMatchedNodesViewName("matched_nodes");
     out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
       new HashMap<Long, Properties>())
@@ -192,20 +473,38 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     // sql query
     QueryData queryData = parse(annisQuery);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    MatrixExtractor me = new MatrixExtractor();
+    MatrixSqlGenerator me = new MatrixSqlGenerator();
     me.setMatchedNodesViewName("matched_nodes");
     out.println(me.getMatrixQuery(corpusList, queryData.getMaxWidth())
       + ";");
   }
 
+	private QueryData analyzeQuery(String annisQuery, String queryFunction) {
+		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+		queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
+		queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
+		if (annisQuery != null)
+			benchmarks.add(new Benchmark(queryFunction + " " + annisQuery, queryData));
+		out.println("NOTICE: corpus = " + queryData.getCorpusList());
+		return queryData;
+	}
+	
+  public void doCount(String annisQuery)
+  {
+	  out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+  }
+  
   public void doMatrix(String annisQuery)
   {
-    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
+//	    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
+	    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery, "matrix"));
     if(matches.isEmpty())
     {
       out.println("(empty");
@@ -217,38 +516,52 @@ public class AnnisRunner extends AnnisBaseRunner
     }
   }
 
-  public void doCount(String annisQuery)
-  {
-    out.println(annisDao.countMatches(getCorpusList(), parse(annisQuery)));
-  }
+	public void doFind(String annisQuery) {
+		List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
+		printAsTable(matches);
+	}
+  
 
+	@Deprecated
   public void doPlanCount(String annisQuery)
   {
     out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), false));
   }
 
+	@Deprecated
   public void doAnalyzeCount(String annisQuery)
   {
     out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), true));
   }
 
+	@Deprecated
   public void doPlanGraph(String annisQuery)
   {
     out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
       0, matchLimit, context, context, false));
   }
 
+	@Deprecated
   public void doAnalyzeGraph(String annisQuery)
   {
     out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
       0, matchLimit, context, context, true));
   }
 
+  @Deprecated
+  public void doAnnotateOld(String annisQuery) {
+	    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
+	    	      parse(annisQuery), 0, matchLimit, context, context);
+	    printAsTable(graphs, "nodes", "edges");
+  }
+  
   public void doAnnotate(String annisQuery)
   {
-    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
-      parse(annisQuery), 0, matchLimit, context, context);
-    printAsTable(graphs, "nodes", "edges");
+		QueryData queryData = analyzeQuery(annisQuery, "annotate");
+		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
+		// FIXME: annotations graphen visualisieren
+//    printAsTable(graphs, "nodes", "edges");
   }
 
   public void doCorpus(String list)
@@ -353,8 +666,10 @@ public class AnnisRunner extends AnnisBaseRunner
 
     // sql query
     QueryData queryData = parse(aql);
+    queryData.setCorpusList(corpusList);
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-    String sql = findSqlGenerator.toSql(queryData, corpusList, metaDataFilter.getDocumentsForMetadata(queryData));
+    String sql = findSqlGenerator.toSql(queryData);
 
     // extract WHERE clause
 
@@ -446,16 +761,6 @@ public class AnnisRunner extends AnnisBaseRunner
     this.aqlAnalysis = aqlAnalysis;
   }
 
-  public SqlGenerator getFindSqlGenerator()
-  {
-    return findSqlGenerator;
-  }
-
-  public void setFindSqlGenerator(SqlGenerator findSqlGenerator)
-  {
-    this.findSqlGenerator = findSqlGenerator;
-  }
-
   public List<Long> getCorpusList()
   {
     return corpusList;
@@ -495,4 +800,47 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.matchLimit = matchLimit;
   }
+
+public QueryAnalysis getQueryAnalysis() {
+	return queryAnalysis;
+}
+
+public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
+	this.queryAnalysis = queryAnalysis;
+}
+
+public SqlGenerator<Integer> getCountSqlGenerator() {
+	return countSqlGenerator;
+}
+
+public void setCountSqlGenerator(SqlGenerator<Integer> countSqlGenerator) {
+	this.countSqlGenerator = countSqlGenerator;
+}
+
+public SqlGenerator<List<AnnotationGraph>> getAnnotateSqlGenerator() {
+	return annotateSqlGenerator;
+}
+
+public void setAnnotateSqlGenerator(
+		SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator) {
+	this.annotateSqlGenerator = annotateSqlGenerator;
+}
+
+public SqlGenerator<List<Match>> getFindSqlGenerator() {
+	return findSqlGenerator;
+}
+
+public void setFindSqlGenerator(SqlGenerator<List<Match>> findSqlGenerator) {
+	this.findSqlGenerator = findSqlGenerator;
+}
+
+public SqlGenerator<List<AnnotatedMatch>> getMatrixSqlGenerator() {
+	return matrixSqlGenerator;
+}
+
+public void setMatrixSqlGenerator(
+		SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator) {
+	this.matrixSqlGenerator = matrixSqlGenerator;
+}
+
 }

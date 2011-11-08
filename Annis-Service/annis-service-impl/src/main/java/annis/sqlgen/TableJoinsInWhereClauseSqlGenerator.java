@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.BaseSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -22,18 +23,42 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
+import annis.ql.parser.QueryData;
 
 public class TableJoinsInWhereClauseSqlGenerator
 	extends BaseNodeSqlGenerator
 	implements WhereClauseSqlGenerator, FromClauseSqlGenerator {
 
-	public String fromClause(AnnisNode node) {
+	@Override
+	public String fromClause(QueryData queryData, List<AnnisNode> alternative,
+			String indent) {
+		List<String> tables = new ArrayList<String>();
+		for (AnnisNode node : alternative)
+			tables.add(fromClauseForNode(node, false));
+		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
+	}
+
+	@Override
+	public Set<String> whereConditions(QueryData queryData,
+			List<AnnisNode> alternative, String indent) {
+		Set<String> conditions = new HashSet<String>();
+		
+		for (AnnisNode node : alternative) {
+			conditions.addAll(whereConditionsForNode(node));
+		}
+		
+		return conditions;
+	}
+
+	public String fromClauseForNode(AnnisNode node, boolean leftJoin) {
 		List<String> tables = new ArrayList<String>();
 
 		// every node uses the node table
@@ -68,12 +93,11 @@ public class TableJoinsInWhereClauseSqlGenerator
 		return StringUtils.join(tables, ", ");
 	}
 
-  @Override
-  public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
+  public Set<String> whereConditionsForNode(AnnisNode node)
   {
 
-		List<String> conditions = new ArrayList<String>();
-    conditions.add("-- join the tables");
+		Set<String> conditions = new HashSet<String>();
+//    conditions.add("-- join the tables");
 
 		// join rank table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(RANK_TABLE, NODE_TABLE)) {
@@ -111,10 +135,10 @@ public class TableJoinsInWhereClauseSqlGenerator
 	}
 
 
-  @Override
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-  {
-    return null;
-  }
+//  @Override
+//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
+//  {
+//    return null;
+//  }
 
 }

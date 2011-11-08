@@ -18,6 +18,8 @@ package annis.ql.parser;
 import annis.model.AnnisNode;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -37,7 +39,7 @@ public class QueryAnalysis
   {
     QueryData queryData = new QueryData();
     
-    queryData.setCorpusList(corpusList);
+    queryData.setCorpusList(new ArrayList<Long>(corpusList));
 		
     List<PExpr> clauses = new LinkedList<PExpr>();
 

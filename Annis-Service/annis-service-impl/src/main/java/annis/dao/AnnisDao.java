@@ -15,7 +15,9 @@
  */
 package annis.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -24,22 +26,23 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.SqlGenerator;
 
 public interface AnnisDao
 {
 
-  int countMatches(List<Long> corpusList, QueryData aql);
-
+	@Deprecated
   public String planCount(QueryData aql, List<Long> corpusList, boolean analyze);
 
+	@Deprecated
   public String planGraph(QueryData aql, List<Long> corpusList,
     long offset, long limit, int left, int right, boolean analyse);
 
+  @Deprecated
   public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right);
 
+  
   public AnnotationGraph retrieveAnnotationGraph(long textId);
-
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql);
 
   public List<AnnisCorpus> listCorpora();
 
@@ -53,6 +56,32 @@ public interface AnnisDao
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
+  
+  @Deprecated
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
+
+// new 
+
+    int count(QueryData queryData);
+	List<Match> find(QueryData queryData);
+	List<AnnotationGraph> annotate(QueryData queryData);
+	String explain(SqlGenerator<?> generator, QueryData queryData, final boolean analyze);
+    List<AnnotatedMatch> matrix(QueryData queryData);
+    public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator);
+
+	// needed in AnnisRunner
+	public HashMap<Long, Properties> getCorpusConfiguration();
+	public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration);
+
+	///// configuration
+	void setTimeout(int milliseconds);
+	int getTimeout();
+
+
+// old 
+	@Deprecated int countMatches(List<Long> corpusList, QueryData aql);
+	@Deprecated public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql);
+
+
 
 }

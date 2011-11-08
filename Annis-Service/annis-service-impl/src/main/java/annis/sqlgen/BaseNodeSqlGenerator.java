@@ -29,7 +29,7 @@ public class BaseNodeSqlGenerator
   ///// Helpers
   protected TableAccessStrategy tables(AnnisNode node)
   {
-    return tableAccessStrategyFactory.createTableAccessStrategy(node);
+    return tableAccessStrategyFactory.tables(node);
   }
 
   protected String tableAliasDefinition(AnnisNode node, String table, int count)
