@@ -44,6 +44,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
 	// API for corpus administration
 	@Autowired private CorpusAdministration corpusAdministration;
+	private boolean keepStagingArea;
 	
 	public static void main(String[] args) {
 		// get Runner from Spring
@@ -175,7 +176,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		if (commandArgs.isEmpty())
 			throw new UsageException("Where can I find the corpus you want to import?");
 
-		corpusAdministration.importCorpora(true, commandArgs);
+		corpusAdministration.importCorpora(!keepStagingArea, commandArgs);
 	}
 
 	private void doDelete(List<String> commandArgs) {
@@ -305,6 +306,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
 	public void setCorpusAdministration(CorpusAdministration administration) {
 		this.corpusAdministration = administration;
+	}
+
+	public boolean isKeepStagingArea() {
+		return keepStagingArea;
+	}
+
+	public void setKeepStagingArea(boolean keepStagingArea) {
+		this.keepStagingArea = keepStagingArea;
 	}
 
 }

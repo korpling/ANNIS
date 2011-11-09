@@ -103,8 +103,10 @@ public class CorpusAdministration {
       // create the new facts table partition
       administrationDao.createFacts(corpusID);
 
+      
+      if ( temporaryStagingArea ) {
 			administrationDao.dropStagingArea();
-
+      }
       administrationDao.analyzeFacts(corpusID);
 
       log.info("Finished import from: " + path);
