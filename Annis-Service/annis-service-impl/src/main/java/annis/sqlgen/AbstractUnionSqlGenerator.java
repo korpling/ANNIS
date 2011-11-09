@@ -19,14 +19,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
-
-public abstract class UnionBaseSqlGenerator<T> extends AbstractSqlGenerator<T>
+/**
+ * Abstract base class for a SQL statement 
+ * which coalesces multiple alternatives using UNION.
+ * 
+ * Only the SELECT, FROM, WHERE and GROUP BY clauses are used for each
+ * alternative. The ORDER BY and LIMIT/OFFSET clauses are applied to the
+ * entire query.
+ * 
+ * It is the responsibility of the calling code to correctly set 
+ * {@link QueryData.maxWidth} and the responsibility of the
+ * {@link SelectClauseSqlGenrator} to pad the SELECT clause if necessary.
+ * 
+ * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
+ *
+ * @param <T> Type into which the JDBC result set is transformed.
+ */
+public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<T>
 {
 
 	// corpusList, documents

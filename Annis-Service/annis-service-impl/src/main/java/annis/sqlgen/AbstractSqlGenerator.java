@@ -36,9 +36,9 @@ import annis.ql.parser.QueryData;
  * The individual clauses are generated using helper classes which 
  * are specified by properties.
  * 
- * @author Viktor Rosenfeld
+ * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  *
- * @param <T> 
+ * @param <T> Type into which the JDBC result set is transformed.
  */
 public abstract class AbstractSqlGenerator<T>
 	extends TableAccessStrategyFactory 

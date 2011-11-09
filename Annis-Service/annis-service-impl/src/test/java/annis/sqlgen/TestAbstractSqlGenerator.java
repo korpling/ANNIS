@@ -23,14 +23,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static test.TestUtils.emptySetOf;
+import static test.TestUtils.newSet;
 import static test.TestUtils.uniqueString;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
@@ -274,22 +274,6 @@ public class TestAbstractSqlGenerator {
 		expected += 
 				limitOffset + "\n";
 		assertThat(sql, is(expected));
-	}
-
-	// create a set from a list of items
-	private <T> Set<T> newSet(T... items) {
-		Set<T> set = new HashSet<T>();
-		for (T item : items) {
-			set.add(item);
-		}
-		return set;
-	}
-	
-	
-	// create an empty set
-	private <T> Set<T> emptySetOf(Class<T> clazz) {
-		Set<T> set = new HashSet<T>();
-		return set;
 	}
 
 	// stub selectClauseSqlGenerator and fromClauseSqlGenerator for a minimal SQL statement

@@ -33,7 +33,7 @@ import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public class FindSqlGenerator extends UnionBaseSqlGenerator<List<Match>> 
+public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>> 
 implements SelectClauseSqlGenerator {
 
 	@Override

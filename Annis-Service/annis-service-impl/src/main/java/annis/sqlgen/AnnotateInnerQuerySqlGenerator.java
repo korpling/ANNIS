@@ -18,7 +18,7 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
 
 public class AnnotateInnerQuerySqlGenerator 
-	extends UnionBaseSqlGenerator<Object> 
+	extends AbstractUnionSqlGenerator<Object> 
 	implements SelectClauseSqlGenerator, OrderByClauseSqlGenerator, LimitOffsetClauseSqlGenerator {
 
 	// sort solutions

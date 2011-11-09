@@ -4,6 +4,8 @@ package test;
 
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.Description;
@@ -18,6 +20,32 @@ import org.hamcrest.TypeSafeMatcher;
  * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  */
 public class TestUtils {
+
+	/**
+	 * Create a set from a list of items.
+
+	 * @param items Items that should be added to the set.
+	 * @return A {@link HashSet} containing the specified items.
+	 */
+	public static <T> Set<T> newSet(T... items) {
+		Set<T> set = new HashSet<T>();
+		for (T item : items) {
+			set.add(item);
+		}
+		return set;
+	}
+	
+	
+	/**
+	 * Create an empty set.
+	 * 
+	 * @param clazz The type of class which should be contained in the set.
+	 * @return An empty typed set.
+	 */
+	public static <T> Set<T> emptySetOf(Class<T> clazz) {
+		Set<T> set = new HashSet<T>();
+		return set;
+	}
 
 	/**
 	 * Generates a random string consisting of 10 characters or numbers. 
