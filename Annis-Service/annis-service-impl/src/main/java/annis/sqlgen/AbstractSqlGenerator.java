@@ -28,8 +28,19 @@ import org.springframework.util.Assert;
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
-
-public abstract class BaseSqlGenerator<T>
+/**
+ * Abstract base class for a complete SQL statement.
+ * 
+ * A SQL statement consists of a mandatory SELECT and FROM clauses 
+ * and optional WHERE, GROUP BY, ORDER BY and LIMIT/OFFSET clauses. 
+ * The individual clauses are generated using helper classes which 
+ * are specified by properties.
+ * 
+ * @author Viktor Rosenfeld
+ *
+ * @param <T> 
+ */
+public abstract class AbstractSqlGenerator<T>
 	extends TableAccessStrategyFactory 
 	implements SqlGenerator<T> {
 
@@ -239,6 +250,5 @@ public abstract class BaseSqlGenerator<T>
 			LimitOffsetClauseSqlGenerator limitOffsetClauseSqlGenerator) {
 		this.limitOffsetClauseSqlGenerator = limitOffsetClauseSqlGenerator;
 	}
-
 
 }

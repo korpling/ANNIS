@@ -26,7 +26,7 @@ import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public abstract class UnionBaseSqlGenerator<T> extends BaseSqlGenerator<T>
+public abstract class UnionBaseSqlGenerator<T> extends AbstractSqlGenerator<T>
 {
 
 	// corpusList, documents
