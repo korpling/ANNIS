@@ -41,7 +41,9 @@
 	</bean>
 	
 	<!-- AnnisAdminRunner -->
-	<bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner"/>
+	<bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
+		<property name="keepStagingArea" value="${annis.import.keep-staging-area}"/>
+	</bean>
 	
 	<!-- Public API for corpus administration -->
 	<bean id="corpusAdministration" class="annis.administration.CorpusAdministration"/>
