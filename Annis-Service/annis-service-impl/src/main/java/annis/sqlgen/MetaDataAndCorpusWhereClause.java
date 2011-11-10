@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -33,7 +34,8 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
+public class MetaDataAndCorpusWhereClause 
+  extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator
 {
 

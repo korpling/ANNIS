@@ -15,50 +15,56 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.numberJoin;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class TestBaseNodeSqlGenerator {
+public class TestSqlConstraints {
 
-	private BaseNodeSqlGenerator generator;
-	
-	@Before
-	public void setup() {
-		generator = new BaseNodeSqlGenerator();
-	}
-	
-	// join two columns with a positive offset
+	/**
+	 * A positive offset is added to the right-hand side of a join.
+	 */
 	@Test
-	public void joinPlus() {
+	public void shouldAddPositiveOffsetToNumberJoinRhs() {
 		String expected = "lhs <op> rhs + 0";
-		String actual = generator.numberJoin("<op>", "lhs", "rhs", 0);
+		String actual = numberJoin("<op>", "lhs", "rhs", 0);
 		assertEquals(expected, actual);
 	}
 	
-	// join two columns with a negative offset
+	/**
+	 * A negative offset is subtracted from the right-hand side of a join.
+	 */
 	@Test
-	public void joinMinus() {
+	public void shouldSubstractNegativeOffsetFromNumberJoinRhs() {
 		String expected = "lhs <op> rhs - 1";
-		String actual = generator.numberJoin("<op>", "lhs", "rhs", -1);
+		String actual = numberJoin("<op>", "lhs", "rhs", -1);
 		assertEquals(expected, actual);
 	}
 	
-	// SQL string literals are enclosed in single quotes
+
+	/**
+	 * An SQL string is enclosed in single quotes (').
+	 */
 	@Test
-	public void sqlString() {
+	public void shouldUseSingleQuotesForSqlString() {
 		String string = "string";
-		assertThat(generator.sqlString(string), is("'" + string + "'"));
+		assertThat(sqlString(string), is("'" + string + "'"));
 	}
 	
-	// join two columns
+
+	/**
+	 * The left-hand side and right-hand side are joined by an 
+	 * arbitrary infix operation.
+	 */
 	@Test
-	public void join() {
+	public void shouldJoinLhsAndRhsWithOp() {
 		String expected = "lhs <op> rhs";
-		String actual = generator.join("<op>", "lhs", "rhs");
+		String actual = join("<op>", "lhs", "rhs");
 		assertEquals(expected, actual);
 	}
 	

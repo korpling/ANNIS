@@ -31,14 +31,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
+import annis.model.Annotation;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
@@ -67,9 +66,6 @@ public class TestDefaultWhereClauseSqlGenerator {
 	// object under test: the adapter to that node
 	private DefaultWhereClauseSqlGenerator generator;
 
-	// dependencies
-	@Mock private TableAccessStrategyFactory tableAccessStrategyFactory;
-	
 	// more constants for easier testing
 	private final static String NAME = "name";
 	
@@ -82,19 +78,17 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23 = new AnnisNode(23);
 		node42 = new AnnisNode(42);
 	
-		generator = new DefaultWhereClauseSqlGenerator();
-		generator.setTableAccessStrategyFactory(tableAccessStrategyFactory);
-
-		// add table aliases to make sure they are used for both nodes
-		for (AnnisNode node : Arrays.asList(node23, node42)) {
-			TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(node);
-			tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
-			tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
-			tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
-			tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
-			tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-			when(tableAccessStrategyFactory.tables(node)).thenReturn(tableAccessStrategy);
-		}
+		final TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
+		tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
+		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
+		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
+		tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
+		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
+		generator = new DefaultWhereClauseSqlGenerator() {
+			protected TableAccessStrategy createTableAccessStrategy() {
+				return tableAccessStrategy;
+			}
+		};
 
 		// simulate three annotations
 		when(annotations.size()).thenReturn(3);

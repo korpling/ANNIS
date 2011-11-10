@@ -15,27 +15,22 @@
  */
 package annis.sqlgen;
 
-import annis.model.AnnisNode.TextMatching;
-import org.apache.commons.lang.StringEscapeUtils;
+import annis.model.AnnisNode;
 
-/**
- *
- * @author thomas
- */
-public class SQLHelper
+public abstract class AbstractFromClauseGenerator 
+	extends TableAccessStrategyFactory 
+	implements FromClauseSqlGenerator
 {
 
-  public static String sqlString(String string)
-  {
-    return "'" + StringEscapeUtils.escapeSql(string) + "'";
-  }
+	  protected String tableAliasDefinition(AnnisNode node, String table, int count)
+	  {
+	    StringBuffer sb = new StringBuffer();
 
-  public static String sqlString(String string, TextMatching textMatching)
-  {
-    if (textMatching == TextMatching.REGEXP_EQUAL || textMatching == TextMatching.REGEXP_NOT_EQUAL)
-    {
-      string = "^" + string + "$";
-    }
-    return sqlString(string);
-  }
+	    sb.append(tables(node).tableName(table));
+	    sb.append(" AS ");
+	    sb.append(tables(node).aliasedTable(table, count));
+
+	    return sb.toString();
+	  }
+	
 }

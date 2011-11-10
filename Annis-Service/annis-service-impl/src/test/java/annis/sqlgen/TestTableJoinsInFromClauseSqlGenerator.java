@@ -21,7 +21,6 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -41,7 +40,6 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
 
 	// dependencies
-	@Mock TableAccessStrategyFactory tableAccessStrategyFactory;
 	private TableAccessStrategy tableAccessStrategy;
 	
 	// node that needs a from clause
@@ -54,8 +52,12 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	public void setup() {
 		// setup class and dependencies
 		initMocks(this);
-		tableJoinsInFromClauseSqlGenerator = new TableJoinsInFromClauseSqlGenerator();
-		tableJoinsInFromClauseSqlGenerator.setTableAccessStrategyFactory(tableAccessStrategyFactory);
+		tableJoinsInFromClauseSqlGenerator = new TableJoinsInFromClauseSqlGenerator() {
+			@Override
+			protected TableAccessStrategy createTableAccessStrategy() {
+				return tableAccessStrategy;
+			}
+		};
 		
 		// setup node
 		node23 = new AnnisNode(23L);
@@ -63,7 +65,6 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 		
 		// setup table aliases
 		tableAccessStrategy = new TableAccessStrategy(node23);
-		when(tableAccessStrategyFactory.tables(any(AnnisNode.class))).thenReturn(tableAccessStrategy);
 		tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
 		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");

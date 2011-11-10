@@ -16,6 +16,7 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -30,12 +31,11 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 
 public class TableJoinsInWhereClauseSqlGenerator
-	extends BaseNodeSqlGenerator
-	implements WhereClauseSqlGenerator, FromClauseSqlGenerator {
+	extends AbstractFromClauseGenerator
+	implements WhereClauseSqlGenerator {
 
 	@Override
 	public String fromClause(QueryData queryData, List<AnnisNode> alternative,
@@ -133,12 +133,5 @@ public class TableJoinsInWhereClauseSqlGenerator
 
 		return conditions;
 	}
-
-
-//  @Override
-//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-//  {
-//    return null;
-//  }
 
 }

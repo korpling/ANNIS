@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
@@ -38,7 +39,8 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
+public class SubcorpusConstraintWhereClause 
+  extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator
 {
 

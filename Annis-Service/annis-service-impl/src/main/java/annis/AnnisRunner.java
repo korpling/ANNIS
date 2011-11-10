@@ -560,6 +560,7 @@ public class AnnisRunner extends AnnisBaseRunner
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
 		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
+		out.println("Returned " + graphs.size() + " annotations graphs.");
 		// FIXME: annotations graphen visualisieren
 //    printAsTable(graphs, "nodes", "edges");
   }

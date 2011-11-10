@@ -15,21 +15,28 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.in;
+import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.numberJoin;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
+import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
@@ -49,11 +56,9 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import java.util.LinkedList;
-import org.apache.commons.lang.StringUtils;
 
 public class DefaultWhereClauseSqlGenerator
-  extends BaseNodeSqlGenerator
+  extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator
 {
 
@@ -178,14 +183,14 @@ public class DefaultWhereClauseSqlGenerator
 
   protected void addEdgeJoinConditions(AnnisNode node, List<String> conditions, List<Long> corpusList)
   {
-    for (Join join : node.getJoins())
+    for (Join nodeJoin : node.getJoins())
     {
-      AnnisNode target = join.getTarget();
+      AnnisNode target = nodeJoin.getTarget();
 
-      if (join instanceof Sibling)
+      if (nodeJoin instanceof Sibling)
       {
         conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
-        Sibling sibling = (Sibling) join;
+        Sibling sibling = (Sibling) nodeJoin;
         if (sibling.getName() != null)
         {
           conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(sibling.getName())));
@@ -197,10 +202,10 @@ public class DefaultWhereClauseSqlGenerator
         conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"), tables(target).aliasedColumn(RANK_TABLE, "parent")));
         joinOnNode(conditions, node, target, "<>", "id", "id");
       }
-      else if (join instanceof CommonAncestor)
+      else if (nodeJoin instanceof CommonAncestor)
       {
         conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
-        CommonAncestor commonAncestor = (CommonAncestor) join;
+        CommonAncestor commonAncestor = (CommonAncestor) nodeJoin;
         if (commonAncestor.getName() != null)
         {
           conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(commonAncestor.getName())));
@@ -229,24 +234,24 @@ public class DefaultWhereClauseSqlGenerator
         conditions.add(sb.toString());
 
       }
-      else if (join instanceof LeftDominance)
+      else if (nodeJoin instanceof LeftDominance)
       {
-        addLeftRightDominance(node, target, conditions, true, (RankTableJoin) join,
+        addLeftRightDominance(node, target, conditions, true, (RankTableJoin) nodeJoin,
           corpusList);
       }
-      else if (join instanceof RightDominance)
+      else if (nodeJoin instanceof RightDominance)
       {
-        addLeftRightDominance(node, target, conditions, false, (RankTableJoin) join,
+        addLeftRightDominance(node, target, conditions, false, (RankTableJoin) nodeJoin,
           corpusList);
       }
-      else if (join instanceof Dominance)
+      else if (nodeJoin instanceof Dominance)
       {
-        addSingleEdgeCondition(node, target, conditions, join, "d");
+        addSingleEdgeCondition(node, target, conditions, nodeJoin, "d");
 
       }
-      else if (join instanceof PointingRelation)
+      else if (nodeJoin instanceof PointingRelation)
       {
-        addSingleEdgeCondition(node, target, conditions, join, "p");
+        addSingleEdgeCondition(node, target, conditions, nodeJoin, "p");
 
       }
     }
@@ -430,10 +435,4 @@ public class DefaultWhereClauseSqlGenerator
     ));
   }
   
-
-//  @Override
-//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-//  {
-//    return null;
-//  }
 }

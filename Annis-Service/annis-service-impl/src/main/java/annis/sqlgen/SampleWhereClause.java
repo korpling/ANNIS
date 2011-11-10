@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.bitSelect;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
@@ -34,7 +35,8 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class SampleWhereClause extends BaseNodeSqlGenerator
+public class SampleWhereClause 
+  extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator
 {
 	
