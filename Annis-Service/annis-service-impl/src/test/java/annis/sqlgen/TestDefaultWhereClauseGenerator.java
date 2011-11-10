@@ -23,10 +23,12 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static test.IsCollectionSize.size;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +40,7 @@ import org.mockito.Mock;
 import annis.model.AnnisNode;
 import annis.model.AnnisNode.TextMatching;
 import annis.model.Annotation;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
@@ -57,14 +60,14 @@ import annis.sqlgen.model.Sibling;
  * FIXME: refactor tests, so they use the same condition constants everywhere
  * also, get rid of stupid helper functions like join (dup code)
  */
-public class TestDefaultWhereClauseSqlGenerator {
+public class TestDefaultWhereClauseGenerator {
 
 	// an example node
 	private AnnisNode node23;
 	private AnnisNode node42;
 
 	// object under test: the adapter to that node
-	private DefaultWhereClauseSqlGenerator generator;
+	private DefaultWhereClauseGenerator generator;
 
 	// more constants for easier testing
 	private final static String NAME = "name";
@@ -84,7 +87,7 @@ public class TestDefaultWhereClauseSqlGenerator {
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
 		tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
 		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-		generator = new DefaultWhereClauseSqlGenerator() {
+		generator = new DefaultWhereClauseGenerator() {
 			protected TableAccessStrategy createTableAccessStrategy() {
 				return tableAccessStrategy;
 			}
@@ -443,7 +446,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 	}
 
 	private void checkWhereCondition(AnnisNode node, String... expected) {
-		List<String> actual = generator.whereConditions(node, null, null);
+		List<AnnisNode> alternative = new ArrayList<AnnisNode>();
+		alternative.add(node);
+		QueryData queryData = mock(QueryData.class);
+		Set<String> actual = generator.whereConditions(queryData, alternative, "");
 		for (String item : expected)
 			assertThat(actual, hasItem(item));
 		assertThat(actual, is(size(expected.length)));
