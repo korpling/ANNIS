@@ -21,16 +21,11 @@ import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -57,110 +52,12 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 
-public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
-		implements WhereClauseSqlGenerator {
+public class DefaultWhereClauseGenerator 
+	extends AbstractWhereClauseGenerator
+	implements WhereClauseSqlGenerator 
+{
 
 	@Override
-	public Set<String> whereConditions(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
-		List<String> conditions = new ArrayList<String>();
-
-		for (AnnisNode node : alternative) {
-
-			// node constraints
-			if (node.getSpannedText() != null) {
-				addSpanConditions(conditions, queryData, node);
-			}
-			if (node.isToken()) {
-				addIsTokenConditions(conditions, queryData, node);
-			}
-			if (node.isRoot()) {
-				addIsRootConditions(conditions, queryData, node);
-			}
-			if (node.getNamespace() != null) {
-				addNodeNamespaceConditions(conditions, queryData, node);
-			}
-			if (node.getName() != null) {
-				addNodeNameCondition(conditions, queryData, node);
-			}
-			if (node.getArity() != null) {
-				addNodeArityConditions(conditions, queryData, node);
-			}
-			if (node.getTokenArity() != null) {
-				addTokenArityConditions(conditions, queryData, node);
-			}
-
-			// node joins
-			for (Join join : node.getJoins()) {
-				AnnisNode target = join.getTarget();
-				if (join instanceof SameSpan) {
-					addSameSpanConditions(conditions, node, target,
-							(SameSpan) join, queryData);
-				} else if (join instanceof Identical) {
-					addIdenticalConditions(conditions, node, target,
-							(Identical) join, queryData);
-				} else if (join instanceof LeftAlignment) {
-					addLeftAlignmentConditions(conditions, node, target,
-							(LeftAlignment) join, queryData);
-				} else if (join instanceof RightAlignment) {
-					addRightAlignmentConditions(conditions, node, target,
-							(RightAlignment) join, queryData);
-				} else if (join instanceof Inclusion) {
-					addInclusionConditions(conditions, node, target,
-							(Inclusion) join, queryData);
-				} else if (join instanceof Overlap) {
-					addOverlapConditions(conditions, node, target,
-							(Overlap) join, queryData);
-				} else if (join instanceof LeftOverlap) {
-					addLeftOverlapConditions(conditions, target, node,
-							(LeftOverlap) join, queryData);
-				} else if (join instanceof RightOverlap) {
-					addRightOverlapConditions(conditions, target, node,
-							(RightOverlap) join, queryData);
-				} else if (join instanceof Precedence) {
-					addPrecedenceConditions(conditions, node, target,
-							(Precedence) join, queryData);
-				} else if (join instanceof Sibling) {
-					addSiblingConditions(conditions, node, target,
-							(Sibling) join, queryData);
-				} else if (join instanceof CommonAncestor) {
-					addCommonAncestorConditions(conditions, node, target,
-							(CommonAncestor) join, queryData);
-				} else if (join instanceof LeftDominance) {
-					addLeftDominanceConditions(conditions, node, target,
-							(LeftDominance) join, queryData);
-				} else if (join instanceof RightDominance) {
-					addRightDominanceConditions(conditions, node, target,
-							(RightDominance) join, queryData);
-				} else if (join instanceof Dominance) {
-					addDominanceConditions(conditions, node, target,
-							(Dominance) join, queryData);
-				} else if (join instanceof PointingRelation) {
-					addPointingRelationConditions(conditions, node, target,
-							(PointingRelation) join, queryData);
-				}
-			}
-
-			// node annotations
-			int i = 0;
-			for (Annotation annotation : node.getNodeAnnotations()) {
-				++i;
-				addAnnotationConditions(conditions, node, i, annotation, NODE_ANNOTATION_TABLE,
-						"node_annotation_");
-			}
-
-			// edge annotations
-			int j = 0;
-			for (Annotation annotation : node.getEdgeAnnotations()) {
-				++j;
-				addAnnotationConditions(conditions, node, j, annotation, EDGE_ANNOTATION_TABLE,
-						"edge_annotation_");
-			}
-		}
-
-		return new HashSet<String>(conditions);
-	}
-
 	protected void addPointingRelationConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target,
 			PointingRelation join, QueryData queryData) {
@@ -168,12 +65,14 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 				"p");
 	}
 
+	@Override
 	protected void addDominanceConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Dominance join,
 			QueryData queryData) {
 		addSingleEdgeCondition(node, target, conditions, join, "d");
 	}
 
+	@Override
 	protected void addRightDominanceConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target,
 			RightDominance join, QueryData queryData) {
@@ -181,6 +80,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 				join, "max", "right_token");
 	}
 
+	@Override
 	protected void addLeftDominanceConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, LeftDominance join,
 			QueryData queryData) {
@@ -251,6 +151,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 				tables(target).aliasedColumn(NODE_TABLE, rightColumn), offset));
 	}
 
+	@Override
 	protected void addAnnotationConditions(List<String> conditions,
 			AnnisNode node, int index, Annotation annotation, String table,
 			String tableAlias) {
@@ -273,6 +174,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		}
 	}
 
+	@Override
 	protected void addPrecedenceConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Precedence join,
 			QueryData queryData) {
@@ -308,6 +210,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		}
 	}
 
+	@Override
 	protected void addRightOverlapConditions(List<String> conditions,
 			AnnisNode target, AnnisNode node, RightOverlap join,
 			QueryData queryData) {
@@ -317,6 +220,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, ">=", "left", "left");
 	}
 
+	@Override
 	protected void addLeftOverlapConditions(List<String> conditions,
 			AnnisNode target, AnnisNode node, LeftOverlap join,
 			QueryData queryData) {
@@ -326,6 +230,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, "<=", "right", "right");
 	}
 
+	@Override
 	protected void addOverlapConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Overlap join,
 			QueryData queryData) {
@@ -334,6 +239,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, target, node, "<=", "left", "right");
 	}
 
+	@Override
 	protected void addInclusionConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Inclusion join,
 			QueryData queryData) {
@@ -343,6 +249,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, ">=", "right", "right");
 	}
 
+	@Override
 	protected void addRightAlignmentConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target,
 			RightAlignment join, QueryData queryData) {
@@ -350,6 +257,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, "=", "right", "right");
 	}
 
+	@Override
 	protected void addLeftAlignmentConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, LeftAlignment join,
 			QueryData queryData) {
@@ -357,12 +265,14 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, "=", "left", "left");
 	}
 
+	@Override
 	protected void addIdenticalConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Identical join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "id", "id");
 	}
 
+	@Override
 	protected void addSameSpanConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, SameSpan join,
 			QueryData queryData) {
@@ -371,6 +281,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, "=", "right", "right");
 	}
 
+	@Override
 	protected void addCommonAncestorConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target,
 			CommonAncestor join, QueryData queryData) {
@@ -416,6 +327,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		conditions.add(sb.toString());
 	}
 
+	@Override
 	protected void addSiblingConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, Sibling join,
 			QueryData queryData) {
@@ -437,6 +349,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		joinOnNode(conditions, node, target, "<>", "id", "id");
 	}
 
+	@Override
 	protected void addSingleEdgeCondition(AnnisNode node, AnnisNode target,
 			List<String> conditions, Join join, final String edgeType) {
 		conditions.add(join("=",
@@ -490,6 +403,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		}
 	}
 
+	@Override
 	protected void addTokenArityConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		AnnisNode.Range tokenArity = node.getTokenArity();
@@ -506,6 +420,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		}
 	}
 
+	@Override
 	protected void addNodeArityConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		// fugly
@@ -535,6 +450,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 		}
 	}
 
+	@Override
 	protected void addNodeNameCondition(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		conditions.add(join("=",
@@ -542,6 +458,7 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 				sqlString(node.getName())));
 	}
 
+	@Override
 	protected void addNodeNamespaceConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		conditions.add(join("=",
@@ -549,18 +466,21 @@ public class DefaultWhereClauseGenerator extends TableAccessStrategyFactory
 				sqlString(node.getNamespace())));
 	}
 
+	@Override
 	protected void addIsRootConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root")
 				+ " IS TRUE");
 	}
 
+	@Override
 	protected void addIsTokenConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token")
 				+ " IS TRUE");
 	}
 
+	@Override
 	protected void addSpanConditions(List<String> conditions,
 			QueryData queryData, AnnisNode node) {
 		TextMatching textMatching = node.getSpanTextMatching();
