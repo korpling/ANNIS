@@ -646,7 +646,8 @@ public class AnnotateSqlGenerator
 		sb.append("] AS key,\n");
 		
 		List<String> fields = new ArrayList<String>();
-		addSelectClauseAttribute(fields, FACTS_TABLE, "fid");
+		// facts.fid is never evaluated in the result set
+		// addSelectClauseAttribute(fields, FACTS_TABLE, "fid");
 		addSelectClauseAttribute(fields, NODE_TABLE, "id");
 		addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
 		addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
@@ -676,7 +677,8 @@ public class AnnotateSqlGenerator
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
-		addSelectClauseAttribute(fields, FACTS_TABLE, "sample");
+		// facts.sample is never evaluated in the result set
+		// addSelectClauseAttribute(fields, FACTS_TABLE, "sample");
 		
 //		old order
 //		addSelectClauseAttribute(fields, NODE_TABLE, "id");

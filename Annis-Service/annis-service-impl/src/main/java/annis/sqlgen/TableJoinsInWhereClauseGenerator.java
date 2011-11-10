@@ -33,7 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
-public class TableJoinsInWhereClauseSqlGenerator
+public class TableJoinsInWhereClauseGenerator
 	extends AbstractFromClauseGenerator
 	implements WhereClauseSqlGenerator {
 
@@ -56,6 +56,10 @@ public class TableJoinsInWhereClauseSqlGenerator
 		}
 		
 		return conditions;
+	}
+	
+	public String fromClauseForNode(AnnisNode node) {
+		return fromClauseForNode(node, false);
 	}
 
 	public String fromClauseForNode(AnnisNode node, boolean leftJoin) {
@@ -97,7 +101,6 @@ public class TableJoinsInWhereClauseSqlGenerator
   {
 
 		Set<String> conditions = new HashSet<String>();
-//    conditions.add("-- join the tables");
 
 		// join rank table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(RANK_TABLE, NODE_TABLE)) {
@@ -124,12 +127,6 @@ public class TableJoinsInWhereClauseSqlGenerator
 				conditions.add(join("=", tables(node).aliasedColumn(EDGE_ANNOTATION_TABLE, "rank_ref", i), tables(node).aliasedColumn(RANK_TABLE, "pre")));
 			}
 		}
-
-    // don't output comment if there is not a single other constraint
-    if(conditions.size() == 1)
-    {
-      conditions.clear();
-    }
 
 		return conditions;
 	}

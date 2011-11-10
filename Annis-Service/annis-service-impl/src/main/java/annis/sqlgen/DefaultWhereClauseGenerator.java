@@ -153,23 +153,22 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addAnnotationConditions(List<String> conditions,
-			AnnisNode node, int index, Annotation annotation, String table,
-			String tableAlias) {
+			AnnisNode node, int index, Annotation annotation, String table) {
 		if (annotation.getNamespace() != null) {
 			conditions.add(join("=",
 					tables(node).aliasedColumn(table,
-							tableAlias + "namespace", index),
+							"namespace", index),
 					sqlString(annotation.getNamespace())));
 		}
 		conditions.add(join("=",
 				tables(node).aliasedColumn(table,
-						tableAlias + "name", index),
+						"name", index),
 				sqlString(annotation.getName())));
 		if (annotation.getValue() != null) {
 			TextMatching textMatching = annotation.getTextMatching();
 			conditions.add(join(textMatching.sqlOperator(), tables(node)
 					.aliasedColumn(table,
-							tableAlias + "value", index),
+							"value", index),
 					sqlString(annotation.getValue(), textMatching)));
 		}
 	}

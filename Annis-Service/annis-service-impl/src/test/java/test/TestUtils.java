@@ -12,6 +12,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Test;
 
 
 /**
@@ -21,6 +22,10 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class TestUtils {
 
+	
+	// FIXME: either rename the class or exclude it from maven testing
+	@Test public void dummyTest() { }
+	
 	/**
 	 * Create a set from a list of items.
 

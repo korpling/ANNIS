@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -38,8 +37,6 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
-import annis.executors.DefaultQueryExecutor;
-import annis.executors.QueryExecutor;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.node.Start;
@@ -128,9 +125,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   private CountExtractor countExtractor;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
-  private DefaultQueryExecutor defaultQueryExecutor;
   private AnnotateSqlGenerator graphExtractor;
-  private List<QueryExecutor> executorList;
   private MetaDataFilter metaDataFilter;
   private QueryAnalysis queryAnalysis;
   private AnnisParser aqlParser;
@@ -216,97 +211,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   {
     de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.parse(dddquery);
     return dddqueryAnalysis.analyzeQuery(statement, corpusList);
-  }
-
-  @Override
-  @Transactional
-  @Deprecated
-  public int countMatches(final List<Long> corpusList, final QueryData aql)
-  {
-    QueryData queryData = createDynamicMatchView(corpusList, aql);
-
-    return countExtractor.queryCount(getJdbcTemplate());
-  }
-
-
-  @Override
-  @Transactional
-  @Deprecated
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
-  {
-    QueryData queryData = createDynamicMatchView(corpusList, aql);
-
-    int nodeCount = queryData.getMaxWidth();
-
-    return matrixSqlGenerator.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
-  }
-
-  @Override
-  @Transactional
-  @Deprecated
-  public String planCount(QueryData aql, List<Long> corpusList, boolean analyze)
-  {
-    Validate.notNull(corpusList, "corpusList=null passed as argument");
-
-    createDynamicMatchView(corpusList, aql);
-    return countExtractor.explain(getJdbcTemplate(), analyze);
-  }
-
-  @Override
-  @Transactional
-  @Deprecated
-  public String planGraph(QueryData aql, List<Long> corpusList,
-    long offset, long limit, int left, int right,
-    boolean analyze)
-  {
-    Validate.notNull(corpusList, "corpusList=null passed as argument");
-
-    QueryData queryData = createDynamicMatchView(corpusList, aql);
-
-    int nodeCount = queryData.getMaxWidth();
-    return graphExtractor.explain(getJdbcTemplate(), corpusList, nodeCount,
-      offset, limit, left, right, analyze, corpusConfiguration);
-  }
-
-  @Override
-  @Transactional
-  @Deprecated
-  public List<AnnotationGraph> retrieveAnnotationGraph(
-    List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
-  {
-    QueryData queryData = createDynamicMatchView(corpusList, aql);
-
-    int nodeCount = queryData.getMaxWidth();
-
-    // create the Annis graphs
-    return graphExtractor.queryAnnotationGraph(getJdbcTemplate(),
-      corpusList, nodeCount, offset, limit, left, right, corpusConfiguration);
-  }
-
-  @Deprecated
-  private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
-  {
-
-    // execute session modifiers
-    for(SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
-    {
-      sqlSessionModifier.modifySqlSession(getJdbcTemplate(), queryData);
-    }
-
-    List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
-
-    // generate the view with the matched node IDs
-    for(QueryExecutor e : executorList)
-    {
-      if(e.checkIfApplicable(queryData))
-      {
-        e.createMatchView(getJdbcTemplate(), corpusList, documents, queryData);
-        // leave the loop
-        break;
-      }
-    }
-
-    return queryData;
   }
 
   @Override
@@ -564,16 +468,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     this.countExtractor = countExtractor;
   }
 
-  public DefaultQueryExecutor getDefaultQueryExecutor()
-  {
-    return defaultQueryExecutor;
-  }
-
-  public void setDefaultQueryExecutor(DefaultQueryExecutor defaultQueryExecutor)
-  {
-    this.defaultQueryExecutor = defaultQueryExecutor;
-  }
-
   public AnnotateSqlGenerator getGraphExtractor()
   {
     return graphExtractor;
@@ -582,16 +476,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   public void setGraphExtractor(AnnotateSqlGenerator graphExtractor)
   {
     this.graphExtractor = graphExtractor;
-  }
-
-  public List<QueryExecutor> getExecutorList()
-  {
-    return executorList;
-  }
-
-  public void setExecutorList(List<QueryExecutor> executorList)
-  {
-    this.executorList = executorList;
   }
 
   public MetaDataFilter getMetaDataFilter()

@@ -61,7 +61,7 @@ public class MatrixSqlGenerator
 
 	private SqlGenerator<?> innerQuerySqlGenerator;
 	private TableJoinsInFromClauseSqlGenerator 
-		tableJoinsInFromClauseSqlGenerator;
+		tableJoinsInFromClauseGenerator;
 
 	
   @Override
@@ -194,7 +194,7 @@ public class MatrixSqlGenerator
 		indent(sb, indent + TABSTOP);
 		// really ugly
 		sb.append(
-				tableJoinsInFromClauseSqlGenerator
+				tableJoinsInFromClauseGenerator
 				.fromClauseForNode(null, true));
 
 		sb.append("\n");
@@ -411,12 +411,12 @@ public void setInnerQuerySqlGenerator(
 	this.innerQuerySqlGenerator = innerQuerySqlGenerator;
 }
 
-public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseSqlGenerator() {
-	return tableJoinsInFromClauseSqlGenerator;
+public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator() {
+	return tableJoinsInFromClauseGenerator;
 }
 
-public void setTableJoinsInFromClauseSqlGenerator(
-		TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator) {
-	this.tableJoinsInFromClauseSqlGenerator = tableJoinsInFromClauseSqlGenerator;
+public void setTableJoinsInFromClauseGenerator(
+		TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator) {
+	this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
 }
 }

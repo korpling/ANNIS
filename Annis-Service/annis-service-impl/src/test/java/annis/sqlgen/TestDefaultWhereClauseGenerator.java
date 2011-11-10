@@ -87,6 +87,12 @@ public class TestDefaultWhereClauseGenerator {
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
 		tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
 		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "namespace", "node_annotation_namespace");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "name", "node_annotation_name");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "value", "node_annotation_value");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "namespace", "edge_annotation_namespace");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "name", "edge_annotation_name");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "value", "edge_annotation_value");
 		generator = new DefaultWhereClauseGenerator() {
 			protected TableAccessStrategy createTableAccessStrategy() {
 				return tableAccessStrategy;

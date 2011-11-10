@@ -113,16 +113,14 @@ public abstract class AbstractWhereClauseGenerator extends TableAccessStrategyFa
 			int i = 0;
 			for (Annotation annotation : node.getNodeAnnotations()) {
 				++i;
-				addAnnotationConditions(conditions, node, i, annotation, NODE_ANNOTATION_TABLE,
-						"node_annotation_");
+				addAnnotationConditions(conditions, node, i, annotation, NODE_ANNOTATION_TABLE);
 			}
 	
 			// edge annotations
 			int j = 0;
 			for (Annotation annotation : node.getEdgeAnnotations()) {
 				++j;
-				addAnnotationConditions(conditions, node, j, annotation, EDGE_ANNOTATION_TABLE,
-						"edge_annotation_");
+				addAnnotationConditions(conditions, node, j, annotation, EDGE_ANNOTATION_TABLE);
 			}
 		}
 	
@@ -187,7 +185,7 @@ public abstract class AbstractWhereClauseGenerator extends TableAccessStrategyFa
 			AnnisNode node, AnnisNode target, Precedence join, QueryData queryData);
 
 	protected abstract void addAnnotationConditions(List<String> conditions,
-			AnnisNode node, int index, Annotation annotation, String table, String tableAlias);
+			AnnisNode node, int index, Annotation annotation, String table);
 
 	protected abstract void addLeftDominanceConditions(List<String> conditions,
 			AnnisNode node, AnnisNode target, LeftDominance join, QueryData queryData);
