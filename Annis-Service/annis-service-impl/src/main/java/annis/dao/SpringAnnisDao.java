@@ -62,60 +62,67 @@ import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 
 // FIXME: test and refactor timeout and transaction management
-public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, SqlSessionModifier
+public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
+  SqlSessionModifier
 {
 
-	// SQL generators for the different query functions
-	private FindSqlGenerator findSqlGenerator;
-	private CountSqlGenerator countSqlGenerator;
-	private AnnotateSqlGenerator annotateSqlGenerator;
-	private MatrixSqlGenerator matrixSqlGenerator;
-	
-	// configuration
-	private int timeout;
-	
+  // SQL generators for the different query functions
+  private FindSqlGenerator findSqlGenerator;
+  private CountSqlGenerator countSqlGenerator;
+  private AnnotateSqlGenerator annotateSqlGenerator;
+  private MatrixSqlGenerator matrixSqlGenerator;
+  // configuration
+  private int timeout;
+
 //	private MatrixSqlGenerator matrixSqlGenerator;
-	
-	// SqlGenerator that prepends EXPLAIN to a query
-	private final class ExplainSqlGenerator implements SqlGenerator<String> {
-		
-		private final boolean analyze;
-		private final SqlGenerator<?> generator;
-		
-		private ExplainSqlGenerator(SqlGenerator<?> generator, boolean analyze) {
-			this.generator = generator;
-			this.analyze = analyze;
-		}
+  // SqlGenerator that prepends EXPLAIN to a query
+  private final class ExplainSqlGenerator implements
+    SqlGenerator<QueryData, String>
+  {
 
-		@Override
-		public String toSql(QueryData queryData) {
-			StringBuffer sb = new StringBuffer();
-			sb.append("EXPLAIN ");
-			if (analyze)
-				sb.append("ANALYZE ");
-			sb.append(generator.toSql(queryData));
-			return sb.toString();
-		}
+    private final boolean analyze;
+    private final SqlGenerator<QueryData, ?> generator;
 
-		@Override
-		public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-			StringBuffer sb = new StringBuffer();
-			while (rs.next()) {
-				sb.append(rs.getString(1));
-				sb.append("\n");
-			}
-			return sb.toString();
-		}
+    private ExplainSqlGenerator(SqlGenerator<QueryData, ?> generator,
+      boolean analyze)
+    {
+      this.generator = generator;
+      this.analyze = analyze;
+    }
 
-		@Override
-		public String toSql(QueryData queryData, int indentBy) {
-			// dont indent
-			return toSql(queryData);
-		}
-	}
-	
-	
-	
+    @Override
+    public String toSql(QueryData queryData)
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.append("EXPLAIN ");
+      if (analyze)
+      {
+        sb.append("ANALYZE ");
+      }
+      sb.append(generator.toSql(queryData));
+      return sb.toString();
+    }
+
+    @Override
+    public String extractData(ResultSet rs) throws SQLException,
+      DataAccessException
+    {
+      StringBuilder sb = new StringBuilder();
+      while (rs.next())
+      {
+        sb.append(rs.getString(1));
+        sb.append("\n");
+      }
+      return sb.toString();
+    }
+
+    @Override
+    public String toSql(QueryData queryData, int indentBy)
+    {
+      // dont indent
+      return toSql(queryData);
+    }
+  }
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
   /// old
   private SqlGenerator sqlGenerator;
@@ -150,58 +157,75 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   }
 
   // query functions
-  
   @Transactional
-  public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<T> generator) {
-	  
-	JdbcTemplate jdbcTemplate = getJdbcTemplate();
+  @Override
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGenerator<QueryData, T> generator)
+  {
 
-		// FIXME: muss corpusConfiguration an jeden Query angehangen werden?
-	  // oder nur an annotate-Queries?
-	  
-	  queryData.setCorpusConfiguration(corpusConfiguration);
-	  
-		// execute session modifiers if any
-		for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers) {
-			sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
-		}
-		
-		// execute query and return result
-		return jdbcTemplate.query(generator.toSql(queryData), generator);
+    JdbcTemplate jdbcTemplate = getJdbcTemplate();
+
+    // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
+    // oder nur an annotate-Queries?
+
+    queryData.setCorpusConfiguration(corpusConfiguration);
+
+    // execute session modifiers if any
+    for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+    {
+      sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
+    }
+
+    // execute query and return result
+    return jdbcTemplate.query(generator.toSql(queryData), generator);
   }
 
-	public void modifySqlSession(JdbcTemplate jdbcTemplate, QueryData queryData) {
-		if (timeout > 0)
-			jdbcTemplate.update("SET statement_timeout TO " + timeout);
-	}
+  @Override
+  public void modifySqlSession(JdbcTemplate jdbcTemplate, QueryData queryData)
+  {
+    if (timeout > 0)
+    {
+      jdbcTemplate.update("SET statement_timeout TO " + timeout);
+    }
+  }
 
-	  @Transactional(readOnly = true)
-	public List<Match> find(QueryData queryData) {
-		return executeQueryFunction(queryData, findSqlGenerator);
-	}
-	
-	  @Transactional(readOnly = true)
-	public int count(QueryData queryData) {
-		return executeQueryFunction(queryData, countSqlGenerator);
-	}
-  
-	@Override
-	  @Transactional(readOnly = true)
-	public List<AnnotationGraph> annotate(QueryData queryData) {
-		return executeQueryFunction(queryData, annotateSqlGenerator);
-	}
-	
-	  @Transactional(readOnly = true)
-	public List<AnnotatedMatch> matrix(QueryData queryData) {
-		return executeQueryFunction(queryData, matrixSqlGenerator);
-	}
-	
-	@Override
-	  @Transactional(readOnly = true)
-	public String explain(SqlGenerator<?> generator, QueryData queryData, final boolean analyze) {
-		return executeQueryFunction(queryData, new ExplainSqlGenerator(generator, analyze));
-	}
-	
+  @Transactional(readOnly = true)
+  @Override
+  public List<Match> find(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, findSqlGenerator);
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public int count(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, countSqlGenerator);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<AnnotationGraph> annotate(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, annotateSqlGenerator);
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public List<AnnotatedMatch> matrix(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, matrixSqlGenerator);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
+    final boolean analyze)
+  {
+    return executeQueryFunction(queryData, new ExplainSqlGenerator(generator,
+      analyze));
+  }
+
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
   {
@@ -214,7 +238,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   @Override
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList)
   {
-    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.parse(dddquery);
+    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.
+      parse(dddquery);
     return dddqueryAnalysis.analyzeQuery(statement, corpusList);
   }
 
@@ -228,17 +253,18 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     return countExtractor.queryCount(getJdbcTemplate());
   }
 
-
   @Override
   @Transactional
   @Deprecated
-  public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql)
+  public List<AnnotatedMatch> matrix(final List<Long> corpusList,
+    final QueryData aql)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
     int nodeCount = queryData.getMaxWidth();
 
-    return matrixSqlGenerator.queryMatrix(getJdbcTemplate(), corpusList, nodeCount);
+    return matrixSqlGenerator.queryMatrix(getJdbcTemplate(), corpusList,
+      nodeCount);
   }
 
   @Override
@@ -272,7 +298,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   @Transactional
   @Deprecated
   public List<AnnotationGraph> retrieveAnnotationGraph(
-    List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right)
+    List<Long> corpusList, QueryData aql, long offset, long limit, int left,
+    int right)
   {
     QueryData queryData = createDynamicMatchView(corpusList, aql);
 
@@ -284,11 +311,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   }
 
   @Deprecated
-  private QueryData createDynamicMatchView(List<Long> corpusList, QueryData queryData)
+  private QueryData createDynamicMatchView(List<Long> corpusList,
+    QueryData queryData)
   {
 
     // execute session modifiers
-    for(SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
+    for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)
     {
       sqlSessionModifier.modifySqlSession(getJdbcTemplate(), queryData);
     }
@@ -296,9 +324,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     List<Long> documents = metaDataFilter.getDocumentsForMetadata(queryData);
 
     // generate the view with the matched node IDs
-    for(QueryExecutor e : executorList)
+    for (QueryExecutor e : executorList)
     {
-      if(e.checkIfApplicable(queryData))
+      if (e.checkIfApplicable(queryData))
       {
         e.createMatchView(getJdbcTemplate(), corpusList, documents, queryData);
         // leave the loop
@@ -331,12 +359,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   @Transactional(readOnly = true)
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
-    List<AnnotationGraph> graphs = annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
-    if(graphs.isEmpty())
+    List<AnnotationGraph> graphs =
+      annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
+    if (graphs.isEmpty())
     {
       return null;
     }
-    if(graphs.size() > 1)
+    if (graphs.size() > 1)
     {
       throw new IllegalStateException("Expected only one annotation graph");
     }
@@ -349,7 +378,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
     final List<Annotation> corpusAnnotations =
-      (List<Annotation>) getJdbcTemplate().query(sql, listCorpusAnnotationsSqlHelper);
+      (List<Annotation>) getJdbcTemplate().query(sql,
+      listCorpusAnnotationsSqlHelper);
     return corpusAnnotations;
   }
 
@@ -358,7 +388,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
-    final List<Long> result = getSimpleJdbcTemplate().query(sql, listCorpusByNameDaoHelper);
+    final List<Long> result = getSimpleJdbcTemplate().query(sql,
+      listCorpusByNameDaoHelper);
     return result;
   }
 
@@ -374,7 +405,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;
     }
-    catch(SQLException ex)
+    catch (SQLException ex)
     {
       log.error("Could not get resolver entries from database", ex);
       return new LinkedList<ResolverEntry>();
@@ -389,44 +420,46 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     try
     {
       List<AnnisCorpus> corpora = listCorpora();
-      for(AnnisCorpus c : corpora)
+      for (AnnisCorpus c : corpora)
       {
         // put in empty default properties
         corpusConfiguration.put(c.getId(), new Properties());
 
         // parse from configuration folder
-        if(System.getProperty("annis.home") != null)
+        if (System.getProperty("annis.home") != null)
         {
-          File confFolder = new File(System.getProperty("annis.home") + "/conf/corpora");
-          if(confFolder.isDirectory())
+          File confFolder = new File(System.getProperty("annis.home")
+            + "/conf/corpora");
+          if (confFolder.isDirectory())
           {
 
             // try corpus ID first
             File conf = new File(confFolder, "" + c.getId() + ".properties");
-            if(!conf.isFile())
+            if (!conf.isFile())
             {
               try
               {
                 // try hash of corpus name
-                conf = new File(confFolder, Utils.calculateSHAHash(c.getName()) + ".properties");
-                if(!conf.isFile())
+                conf = new File(confFolder, Utils.calculateSHAHash(c.getName())
+                  + ".properties");
+                if (!conf.isFile())
                 {
                   // try corpus name
                   conf = new File(confFolder, c.getName() + ".properties");
                 }
               }
-              catch(NoSuchAlgorithmException ex)
+              catch (NoSuchAlgorithmException ex)
               {
                 log.log(Level.WARN, null, ex);
               }
-              catch(UnsupportedEncodingException ex)
+              catch (UnsupportedEncodingException ex)
               {
                 log.log(Level.WARN, null, ex);
               }
             }
 
             // parse property file if found
-            if(conf.isFile())
+            if (conf.isFile())
             {
               Properties p = corpusConfiguration.get(c.getId());
               try
@@ -434,18 +467,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
                 p.load(new FileReader(conf));
 
               }
-              catch(IOException ex)
+              catch (IOException ex)
               {
-                log.log(Level.WARN, "could not load corpus configuration file " + conf.getAbsolutePath(), ex);
+                log.log(Level.WARN, "could not load corpus configuration file "
+                  + conf.getAbsolutePath(), ex);
               }
             }
           }
         }
       }
     }
-    catch(org.springframework.jdbc.CannotGetJdbcConnectionException ex)
+    catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex)
     {
-      log.log(Level.WARN, "No corpus configuration loaded due to missing database connection.");
+      log.log(Level.WARN,
+        "No corpus configuration loaded due to missing database connection.");
     }
   }
 
@@ -518,7 +553,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     return sqlSessionModifiers;
   }
 
-  public void setSqlSessionModifiers(List<SqlSessionModifier> sqlSessionModifiers)
+  public void setSqlSessionModifiers(
+    List<SqlSessionModifier> sqlSessionModifiers)
   {
     this.sqlSessionModifiers = sqlSessionModifiers;
   }
@@ -609,7 +645,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     return dddqueryAnalysis;
   }
 
-  public void setDddqueryAnalysis(de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
+  public void setDddqueryAnalysis(
+    de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
   {
     this.dddqueryAnalysis = dddqueryAnalysis;
   }
@@ -624,45 +661,58 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao, Sq
     this.dddqueryParser = dddqueryParser;
   }
 
-public CountSqlGenerator getCountSqlGenerator() {
-	return countSqlGenerator;
-}
+  public CountSqlGenerator getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
 
-public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator) {
-	this.countSqlGenerator = countSqlGenerator;
-}
+  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
+  }
 
-public AnnotateSqlGenerator getAnnotateSqlGenerator() {
-	return annotateSqlGenerator;
-}
+  public AnnotateSqlGenerator getAnnotateSqlGenerator()
+  {
+    return annotateSqlGenerator;
+  }
 
-public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator) {
-	this.annotateSqlGenerator = annotateSqlGenerator;
-}
+  public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator)
+  {
+    this.annotateSqlGenerator = annotateSqlGenerator;
+  }
 
-public HashMap<Long, Properties> getCorpusConfiguration() {
-	return corpusConfiguration;
-}
+  @Override
+  public HashMap<Long, Properties> getCorpusConfiguration()
+  {
+    return corpusConfiguration;
+  }
 
-public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
-	this.corpusConfiguration = corpusConfiguration;
-}
+  @Override
+  public void setCorpusConfiguration(
+    HashMap<Long, Properties> corpusConfiguration)
+  {
+    this.corpusConfiguration = corpusConfiguration;
+  }
 
-public int getTimeout() {
-	return timeout;
-}
+  @Override
+  public int getTimeout()
+  {
+    return timeout;
+  }
 
-public void setTimeout(int timeout) {
-	this.timeout = timeout;
-}
+  @Override
+  public void setTimeout(int timeout)
+  {
+    this.timeout = timeout;
+  }
 
-public MatrixSqlGenerator getMatrixSqlGenerator() {
-	return matrixSqlGenerator;
-}
+  public MatrixSqlGenerator getMatrixSqlGenerator()
+  {
+    return matrixSqlGenerator;
+  }
 
-public void setMatrixSqlGenerator(MatrixSqlGenerator matrixSqlGenerator) {
-	this.matrixSqlGenerator = matrixSqlGenerator;
-}
-
-
+  public void setMatrixSqlGenerator(MatrixSqlGenerator matrixSqlGenerator)
+  {
+    this.matrixSqlGenerator = matrixSqlGenerator;
+  }
 }
