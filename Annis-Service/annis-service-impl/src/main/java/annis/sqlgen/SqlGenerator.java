@@ -20,10 +20,10 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import annis.ql.parser.QueryData;
 
 
-public interface SqlGenerator<T> extends ResultSetExtractor<T> {
+public interface SqlGenerator<QueryType, ResultType> extends ResultSetExtractor<ResultType> {
 
-	String toSql(QueryData queryData);
+	String toSql(QueryType queryData);
 	
-	String toSql(QueryData queryData, int indentBy);
+	String toSql(QueryType queryData, int indentBy);
 
 }

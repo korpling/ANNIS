@@ -19,14 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public abstract class UnionBaseSqlGenerator<T> extends BaseSqlGenerator<T>
+public abstract class UnionBaseSqlGenerator<T> extends QueryDataSqlGenerator<T>
 {
 
 	// corpusList, documents
