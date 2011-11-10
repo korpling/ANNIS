@@ -211,9 +211,7 @@ limitations under the License.
 		
 	</bean>
    
-   	<bean
-		id="sAnnotateSqlGenerator" class="annis.sqlgen.SAnnotateSqlGenerator"
-		parent="tableAccessStrategyFactory">
+   	<bean id="sAnnotateSqlGenerator" class="annis.sqlgen.SAnnotateSqlGenerator">
 		
       <!--
 		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}"/>

@@ -51,7 +51,7 @@ import annis.ql.parser.QueryData;
  * @author thomas
  */
 public class MatrixSqlGenerator 
-	extends QueryDataSqlGenerator<List<AnnotatedMatch>>
+	extends BaseSqlGenerator<List<AnnotatedMatch>>
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>,
 	WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>
 {

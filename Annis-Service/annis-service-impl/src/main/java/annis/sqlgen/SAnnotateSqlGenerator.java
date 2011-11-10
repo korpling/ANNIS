@@ -52,7 +52,7 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SAnnotateSqlGenerator extends BaseSqlGenerator<List<Match>, SaltProject>
+public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProject>
 {
 
   private TableAccessStrategy factsTas;
@@ -124,9 +124,27 @@ public class SAnnotateSqlGenerator extends BaseSqlGenerator<List<Match>, SaltPro
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
+    if(true)
+    {
+      throw new NotImplementedException();
+    }
+    
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 
-    SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+    final SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+
+    corpusGraph.setSName("annis_result");
+
+    project.getSCorpusGraphs().add(corpusGraph);
+
+    // for each match
+//    
+//      SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
+//      matchCorpus.setSName("match");
+//      corpusGraph.addSNode(matchCorpus);
+//      SCorpusGraph subcorpusGraph = retrieveAnnotationGraph(match, left,
+//        right);
+    
     SDocumentGraph graph = SaltFactory.eINSTANCE.createSDocumentGraph();
 
     // fn: edge pre order value -> edge
