@@ -18,10 +18,9 @@ package annis.sqlgen;
 import java.util.List;
 
 import annis.model.AnnisNode;
-import annis.ql.parser.QueryData;
 
-public interface LimitOffsetClauseSqlGenerator {
+public interface LimitOffsetClauseSqlGenerator<T> {
 
-	String limitOffsetClause(QueryData queryData, List<AnnisNode> alternative, String indent);
+	String limitOffsetClause(T queryData, List<AnnisNode> alternative, String indent);
 
 }

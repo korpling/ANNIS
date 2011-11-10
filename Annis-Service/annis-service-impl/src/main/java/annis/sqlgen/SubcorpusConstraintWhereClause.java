@@ -39,7 +39,7 @@ import java.util.Set;
  * @author thomas
  */
 public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
-  implements WhereClauseSqlGenerator
+  implements WhereClauseSqlGenerator<QueryData>
 {
 
   public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent)

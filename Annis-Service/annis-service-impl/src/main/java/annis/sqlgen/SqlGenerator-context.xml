@@ -210,6 +210,23 @@ limitations under the License.
 		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator"/>
 		
 	</bean>
+   
+   	<bean id="sAnnotateSqlGenerator" class="annis.sqlgen.SAnnotateSqlGenerator">
+		
+      <!--
+		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}"/>
+		
+		<property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}"/>
+	
+		<property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator"/>
+		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator"/>
+
+		<property name="selectClauseSqlGenerator" ref="annotateSqlGenerator"/>
+		<property name="fromClauseSqlGenerators"><util:list><ref bean="annotateSqlGenerator"/></util:list></property>
+		<property name="whereClauseSqlGenerators"><util:list><ref bean="annotateSqlGenerator"/></util:list></property>
+		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator"/>
+		-->
+	</bean>
 	
 	<bean 
 		id="tableAccessStrategy" 

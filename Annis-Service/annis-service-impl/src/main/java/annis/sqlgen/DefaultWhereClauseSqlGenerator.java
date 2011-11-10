@@ -54,7 +54,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class DefaultWhereClauseSqlGenerator
   extends BaseNodeSqlGenerator
-  implements WhereClauseSqlGenerator
+  implements WhereClauseSqlGenerator<QueryData>
 {
 
 	@Override

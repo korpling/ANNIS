@@ -35,7 +35,7 @@ import java.util.Set;
  * @author thomas
  */
 public class SampleWhereClause extends BaseNodeSqlGenerator
-  implements WhereClauseSqlGenerator
+  implements WhereClauseSqlGenerator<QueryData>
 {
 	
 	@Override

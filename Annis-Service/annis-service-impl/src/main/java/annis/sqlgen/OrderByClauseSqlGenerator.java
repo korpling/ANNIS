@@ -18,10 +18,9 @@ package annis.sqlgen;
 import java.util.List;
 
 import annis.model.AnnisNode;
-import annis.ql.parser.QueryData;
 
-public interface OrderByClauseSqlGenerator {
+public interface OrderByClauseSqlGenerator<T> {
 
-	String orderByClause(QueryData queryData, List<AnnisNode> alternative, String indent);
+	String orderByClause(T queryData, List<AnnisNode> alternative, String indent);
 
 }
