@@ -45,7 +45,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
 
   
 
-  protected String createSqlForAlternative(QueryData queryData,
+  protected String createSqlForAlternative(QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
     StringBuffer sb = new StringBuffer();
@@ -76,7 +76,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
     sb.append(indent);
   }
 
-  private void appendSelectClause(StringBuffer sb, QueryData queryData,
+  private void appendSelectClause(StringBuffer sb, QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
     sb.append("SELECT ");
@@ -85,7 +85,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
     sb.append("\n");
   }
 
-  private void appendFromClause(StringBuffer sb, QueryData queryData,
+  private void appendFromClause(StringBuffer sb, QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
     indent(sb, indent);
@@ -101,7 +101,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
     sb.append("\n");
   }
 
-  private void appendWhereClause(StringBuffer sb, QueryData queryData,
+  private void appendWhereClause(StringBuffer sb, QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
 
@@ -155,7 +155,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
     sb.append("\n");
   }
 
-  private void appendGroupByClause(StringBuffer sb, QueryData queryData,
+  private void appendGroupByClause(StringBuffer sb, QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
     if (groupByClauseSqlGenerator != null)
@@ -168,7 +168,7 @@ public abstract class BaseSqlGenerator<QueryType, ResultType>
     }
   }
 
-  protected void appendOrderByClause(StringBuffer sb, QueryData queryData,
+  protected void appendOrderByClause(StringBuffer sb, QueryType queryData,
     List<AnnisNode> alternative, String indent)
   {
     if (orderByClauseSqlGenerator != null)

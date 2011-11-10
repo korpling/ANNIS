@@ -59,8 +59,8 @@ import annis.ql.parser.QueryData;
  */
 public class AnnotateSqlGenerator 
 	extends QueryDataSqlGenerator<List<AnnotationGraph>> 
-	implements SelectClauseSqlGenerator, FromClauseSqlGenerator, 
-	WhereClauseSqlGenerator, OrderByClauseSqlGenerator
+	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>, 
+	WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {
 	
 	private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;

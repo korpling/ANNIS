@@ -27,7 +27,7 @@ import annis.ql.parser.QueryData;
 
 
 public class CountSqlGenerator extends QueryDataSqlGenerator<Integer>
-	implements SelectClauseSqlGenerator, FromClauseSqlGenerator {
+	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
 
 	@SuppressWarnings("rawtypes")
 	private SqlGenerator findSqlGenerator;

@@ -18,10 +18,9 @@ package annis.sqlgen;
 import java.util.List;
 
 import annis.model.AnnisNode;
-import annis.ql.parser.QueryData;
 
-public interface GroupByClauseSqlGenerator {
+public interface GroupByClauseSqlGenerator<T> {
 
-	String groupByAttributes(QueryData queryData, List<AnnisNode> alternative);
+	String groupByAttributes(T queryData, List<AnnisNode> alternative);
 
 }

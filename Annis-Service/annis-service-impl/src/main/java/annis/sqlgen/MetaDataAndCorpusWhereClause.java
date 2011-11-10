@@ -34,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
  * @author thomas
  */
 public class MetaDataAndCorpusWhereClause extends BaseNodeSqlGenerator
-  implements WhereClauseSqlGenerator
+  implements WhereClauseSqlGenerator<QueryData>
 {
 
 	@Override
