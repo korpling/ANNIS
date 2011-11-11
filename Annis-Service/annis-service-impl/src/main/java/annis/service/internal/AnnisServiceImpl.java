@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import annis.WekaHelper;
 import annis.resolver.ResolverEntry;
+import annis.service.ifaces.AnnisBinaryMetaData;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -243,4 +244,10 @@ public class AnnisServiceImpl implements AnnisService
 
         }
     }
+
+  @Override
+  public AnnisBinaryMetaData getBinaryMeta(long id)
+  {
+    return annisDao.getBinary(id, 1, 1);    
+  }
 }

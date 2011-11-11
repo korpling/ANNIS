@@ -17,27 +17,15 @@ package annis.service.objects;
 
 import annis.service.ifaces.AnnisBinary;
 
-public class AnnisBinaryImpl implements AnnisBinary
+public class AnnisBinaryImpl extends AnnisBinaryMetaDataImpl implements AnnisBinary
 {
-
-  private static final long serialVersionUID = -4484371544441543151L;
-  private byte[] bytes;
-  private long id;
-  private String mimeType;
-  private String fileName;
-  private int length;
 
   @Override
   public byte[] getBytes()
   {
     return this.bytes;
   }
-
-  @Override
-  public long getId()
-  {
-    return this.id;
-  }
+  
 
   @Override
   public void setBytes(byte[] bytes)
@@ -60,13 +48,7 @@ public class AnnisBinaryImpl implements AnnisBinary
   {
     return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '"
             + new String(this.bytes) + "'}";
-  }
-
-  @Override
-  public String getMimeType()
-  {
-    return this.mimeType;
-  }
+  }  
 
   @Override
   public void setMimeType(String mimeType)

@@ -28,6 +28,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
+import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
@@ -119,6 +120,16 @@ public interface AnnisService extends Remote
    * @return AnnisBinary
    */
   public AnnisBinary getBinary(long id, int offset, int length) throws RemoteException;
+
+  /**
+   * Get the Metadata of an Annis Binary object identified by its id. This 
+   * function calls getBinary(long id, 1, 1), so this function does not work, 
+   * if the specs of getBinary(long id, int offset,int length) changed.
+   * 
+   * @param id
+   * @return AnnisBinaryMetaData
+   */
+  public AnnisBinaryMetaData getBinaryMeta(long id) throws RemoteException;
 
   /**
    * @deprecated for External-File Servlet

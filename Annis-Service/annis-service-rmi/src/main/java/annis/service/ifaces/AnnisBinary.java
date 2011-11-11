@@ -23,37 +23,22 @@ import java.io.Serializable;
  * 
  * 
  * 
- * @author k.huetter
+ * @author k.huetter, b. weissenfels
  * 
  * 
  */
-
-public interface AnnisBinary extends Serializable, JSONAble
-
+public interface AnnisBinary extends AnnisBinaryMetaData, Serializable, JSONAble
 {
 
-  public byte[] getBytes();
-
   public void setBytes(byte[] bytes);
-
-  /**
-   * 
-   * @return the length of the File as bytes
-   */
-  public int getLength();
+  
+  public byte[] getBytes();
 
   public void setLength(int length);
 
-  public long getId();
-
   public void setId(long id);
-
-  public String getMimeType();
 
   public void setMimeType(String mimeType);
 
-  public String getFileName();
-
   public void setFileName(String fileName);
-
 }
