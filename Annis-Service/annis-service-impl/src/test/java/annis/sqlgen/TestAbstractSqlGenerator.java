@@ -48,11 +48,11 @@ public class TestAbstractSqlGenerator {
 
 	// class under test and dependencies
 	@InjectMocks private AbstractSqlGenerator<?> generator;
-	@Mock private SelectClauseSqlGenerator selectClauseSqlGenerator;
-	@Mock private FromClauseSqlGenerator fromClauseSqlGenerator;
-	@Spy private List<FromClauseSqlGenerator> fromClauseSqlGenerators = new ArrayList<FromClauseSqlGenerator>();
-	@Mock private WhereClauseSqlGenerator whereClauseSqlGenerator;
-	@Spy private List<WhereClauseSqlGenerator> whereClauseSqlGenerators = new ArrayList<WhereClauseSqlGenerator>();
+	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
+	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
+	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<FromClauseSqlGenerator<QueryData>>();
+	@Mock private WhereClauseSqlGenerator<QueryData> whereClauseSqlGenerator;
+	@Spy private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators = new ArrayList<WhereClauseSqlGenerator<QueryData>>();
 	
 	// test data
 	private QueryData queryData = new QueryData();
