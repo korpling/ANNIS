@@ -48,13 +48,14 @@ public class TableAccessStrategy {
 	private Map<String, Map<String, String>> columnAliases;
 	
 	public TableAccessStrategy() {
+		this.tableAliases = new HashMap<String, String>();
+		this.columnAliases = new HashMap<String, Map<String,String>>();
 		
 	}
 	
 	public TableAccessStrategy(AnnisNode node) {
+		this();
 		this.node = node;
-		this.tableAliases = new HashMap<String, String>();
-		this.columnAliases = new HashMap<String, Map<String,String>>();
 	}
 
 	///// table and column aliases

@@ -19,14 +19,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import org.springframework.dao.DataAccessException;
 
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
 
 
-public class CountSqlGenerator extends BaseSqlGenerator<Integer>
+public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
 
 	@SuppressWarnings("rawtypes")

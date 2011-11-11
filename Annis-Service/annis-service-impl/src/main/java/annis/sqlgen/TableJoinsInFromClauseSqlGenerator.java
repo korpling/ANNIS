@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.BaseSqlGenerator.TABSTOP;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -34,8 +34,7 @@ import annis.ql.parser.QueryData;
 
 
 public class TableJoinsInFromClauseSqlGenerator 
-	extends BaseNodeSqlGenerator 
-	implements FromClauseSqlGenerator<QueryData> {
+	extends AbstractFromClauseGenerator  {
 	
 	@Override
 	public String fromClause(QueryData queryData, List<AnnisNode> alternative, String indent) {

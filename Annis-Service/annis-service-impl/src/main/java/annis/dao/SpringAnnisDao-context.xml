@@ -16,8 +16,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 	">
 
-  <import resource="classpath:annis/executors/Executors-context.xml" />
-
 	<!-- Enable bean autowiring -->
   <context:annotation-config/>
 	
@@ -114,7 +112,6 @@
     <property name="dddqueryParser" ref="dddQueryParser" />
     <property name="dddqueryAnalysis" ref="queryAnalysis" />
 
-    <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
@@ -131,8 +128,6 @@
     
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
     <property name="countExtractor" ref="countExtractor"/>
-
-    <property name="executorList" ref="executorList" />
 
     <property name="metaDataFilter" ref="metaDataFilter" />
 

@@ -104,7 +104,6 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao = new SpringAnnisDao();
 		annisDao.setAqlParser(annisParser);
 		annisDao.setSqlGenerator(sqlGenerator);
-    annisDao.setDefaultQueryExecutor(defaultQueryExecutor);
     annisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
@@ -138,35 +137,9 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		assertThat(springAnnisDao.getFindSqlGenerator(), is(not(nullValue())));
 		assertThat(springAnnisDao.getSqlSessionModifiers(), is(not(nullValue())));
 		assertThat(springAnnisDao.getListCorpusByNameDaoHelper(), is(not(nullValue())));
-    assertThat(springAnnisDao.getExecutorList(), is(not(nullValue())));
     assertThat(springAnnisDao.getMetaDataFilter(), is(not(nullValue())));
 	}
 	
-	
-	@Ignore
-	public void planCount() {
-		String EXPLAIN_SQL = "EXPLAIN SQL";
-		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");
-		String PLAN = "PLAN 1\nPLAN 2";
-		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
-		
-		String test = annisDao.planCount(annisDao.parseDDDQuery(DDDQUERY, CORPUS_LIST), CORPUS_LIST, false);
-		assertThat(test, is(PLAN));
-		
-		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
-	}
-	
-	@Ignore
-	public void planCountAnalyze() {
-		String EXPLAIN_SQL = "EXPLAIN ANALYZE SQL";
-		List<String> PLAN_ROWS = Arrays.asList("PLAN 1", "PLAN 2");
-		String PLAN = "PLAN 1\nPLAN 2";
-		when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(PLAN_ROWS);
-		
-		assertThat(annisDao.planCount(annisDao.parseDDDQuery(DDDQUERY, CORPUS_LIST), CORPUS_LIST, true), is(PLAN));
-
-		verify(jdbcTemplate).query(EXPLAIN_SQL, planRowMapper);
-	}
 	
 	// retrieve annotation graph for a complete text
 	@Test

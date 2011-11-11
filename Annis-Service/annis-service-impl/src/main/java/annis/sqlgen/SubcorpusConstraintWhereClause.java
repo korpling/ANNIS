@@ -15,8 +15,13 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import annis.model.AnnisNode;
 import annis.ql.parser.QueryData;
@@ -29,16 +34,13 @@ import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  *
  * @author thomas
  */
-public class SubcorpusConstraintWhereClause extends BaseNodeSqlGenerator
+public class SubcorpusConstraintWhereClause 
+  extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator<QueryData>
 {
 

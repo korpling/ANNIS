@@ -23,22 +23,24 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static test.IsCollectionSize.size;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.model.AnnisNode.TextMatching;
+import annis.model.Annotation;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
@@ -58,18 +60,15 @@ import annis.sqlgen.model.Sibling;
  * FIXME: refactor tests, so they use the same condition constants everywhere
  * also, get rid of stupid helper functions like join (dup code)
  */
-public class TestDefaultWhereClauseSqlGenerator {
+public class TestDefaultWhereClauseGenerator {
 
 	// an example node
 	private AnnisNode node23;
 	private AnnisNode node42;
 
 	// object under test: the adapter to that node
-	private DefaultWhereClauseSqlGenerator generator;
+	private DefaultWhereClauseGenerator generator;
 
-	// dependencies
-	@Mock private TableAccessStrategyFactory tableAccessStrategyFactory;
-	
 	// more constants for easier testing
 	private final static String NAME = "name";
 	
@@ -82,19 +81,23 @@ public class TestDefaultWhereClauseSqlGenerator {
 		node23 = new AnnisNode(23);
 		node42 = new AnnisNode(42);
 	
-		generator = new DefaultWhereClauseSqlGenerator();
-		generator.setTableAccessStrategyFactory(tableAccessStrategyFactory);
-
-		// add table aliases to make sure they are used for both nodes
-		for (AnnisNode node : Arrays.asList(node23, node42)) {
-			TableAccessStrategy tableAccessStrategy = new TableAccessStrategy(node);
-			tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
-			tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
-			tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
-			tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
-			tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-			when(tableAccessStrategyFactory.tables(node)).thenReturn(tableAccessStrategy);
-		}
+		final TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
+		tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
+		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
+		tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
+		tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
+		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "namespace", "node_annotation_namespace");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "name", "node_annotation_name");
+		tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "value", "node_annotation_value");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "namespace", "edge_annotation_namespace");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "name", "edge_annotation_name");
+		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "value", "edge_annotation_value");
+		generator = new DefaultWhereClauseGenerator() {
+			protected TableAccessStrategy createTableAccessStrategy() {
+				return tableAccessStrategy;
+			}
+		};
 
 		// simulate three annotations
 		when(annotations.size()).thenReturn(3);
@@ -449,7 +452,10 @@ public class TestDefaultWhereClauseSqlGenerator {
 	}
 
 	private void checkWhereCondition(AnnisNode node, String... expected) {
-		List<String> actual = generator.whereConditions(node, null, null);
+		List<AnnisNode> alternative = new ArrayList<AnnisNode>();
+		alternative.add(node);
+		QueryData queryData = mock(QueryData.class);
+		Set<String> actual = generator.whereConditions(queryData, alternative, "");
 		for (String item : expected)
 			assertThat(actual, hasItem(item));
 		assertThat(actual, is(size(expected.length)));

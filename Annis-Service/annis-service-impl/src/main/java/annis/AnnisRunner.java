@@ -16,7 +16,9 @@
 package annis;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,14 +30,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
@@ -50,8 +51,8 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 
@@ -59,12 +60,15 @@ import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 public class AnnisRunner extends AnnisBaseRunner
 {
 
+	// logging
+	private Logger log = Logger.getLogger(this.getClass());
+
 	// SQL generators for query functions
 	private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
 	private SqlGenerator<QueryData, Integer> countSqlGenerator;
 	private SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator;
 	private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
-	
+
 	// dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -83,8 +87,16 @@ public class AnnisRunner extends AnnisBaseRunner
 	private int left;
 	private int right;
 	private List<Long> corpusList;
+	private boolean clearCaches;
   
-	// benchmarking
+	  public enum OS
+	  {
+
+	    linux,
+	    other
+	  }
+
+	  // benchmarking
 	private static class Benchmark {
 		private String functionCall;
 		private QueryData queryData;
@@ -185,7 +197,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       catch(IOException ex)
       {
-        Logger.getLogger(AnnisRunner.class.getName()).log(Level.SEVERE, null, ex);
+        log.warn("Problem reading queries.txt", ex);
       }
 
     }
@@ -281,7 +293,16 @@ public class AnnisRunner extends AnnisBaseRunner
 		int count = Integer.parseInt(benchmarkCount);
 		out.println("---> executing " + benchmarks.size() + " queries " + count + " times");
 
-		List<Benchmark> session = new ArrayList<Benchmark>();
+		OS currentOS = OS.other;
+		try {
+			currentOS = OS.valueOf(System.getProperty("os.name").toLowerCase());
+		} catch (IllegalArgumentException ex) {
+		}
+		if (clearCaches) {
+			resetCaches(currentOS);
+		}
+
+        List<Benchmark> session = new ArrayList<Benchmark>();
 		
 		// create sql + plan for each query and create count copies for each benchmark
 		for (Benchmark benchmark : benchmarks) {
@@ -381,6 +402,53 @@ public class AnnisRunner extends AnnisBaseRunner
 		return StringUtils.join(fields, ", ");
 	}
 	
+	  private void resetCaches(OS currentOS)
+	  {
+	    switch(currentOS)
+	    {
+	      case linux:
+	        try
+	        {
+	          log.info("resetting caches");
+	          log.debug("syncing");
+	          Runtime.getRuntime().exec("sync").waitFor();
+	          File dropCaches = new File("/proc/sys/vm/drop_caches");
+	          if(dropCaches.canWrite())
+	          {
+	            log.debug("clearing file system cache");
+	            Writer w = new FileWriter(dropCaches);
+	            w.write("3");
+	            w.close();
+	          }
+	          else
+	          {
+	            log.warn("Cannot clear file system cache of the operating system");
+	          }
+	          
+	          File postgresScript = new File("/etc/init.d/postgresql");
+	          if(postgresScript.exists() && postgresScript.isFile())
+	          {
+	            log.debug("restarting postgresql");
+	            Runtime.getRuntime().exec(postgresScript.getAbsolutePath() + " restart")
+	              .waitFor();
+	          }
+	          else
+	          {
+	            log.warn("Cannot restart postgresql");
+	          }
+	          
+	        }
+	        catch(Exception ex)
+	        {
+	          log.error( null, ex);
+	        }
+
+	        break;
+	      default:
+	        log.warn("Cannot reset cache on this operating system");
+	    }
+	  }
+
 	public void doSet(String callToSet) {
 		String[] split = callToSet.split(" ", 3);
 		Validate.isTrue(split.length > 0, "syntax error: set " + callToSet);
@@ -432,6 +500,12 @@ public class AnnisRunner extends AnnisBaseRunner
 				value = String.valueOf(annisDao.getTimeout());
 			else
 				annisDao.setTimeout(Integer.parseInt(value));
+		} else if ("clear-caches".equals(setting)) {
+			if (show) {
+				value = String.valueOf(clearCaches);
+			} else {
+				clearCaches = Boolean.parseBoolean(value);
+			}
 		} else if ("corpus-list".equals(setting)) {
 			corpusList.clear();
 			if ( ! "all".equals(value) ) {
@@ -522,44 +596,12 @@ public class AnnisRunner extends AnnisBaseRunner
 	}
   
 
-	@Deprecated
-  public void doPlanCount(String annisQuery)
-  {
-    out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), false));
-  }
-
-	@Deprecated
-  public void doAnalyzeCount(String annisQuery)
-  {
-    out.println(annisDao.planCount(parse(annisQuery), getCorpusList(), true));
-  }
-
-	@Deprecated
-  public void doPlanGraph(String annisQuery)
-  {
-    out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
-      0, matchLimit, context, context, false));
-  }
-
-	@Deprecated
-  public void doAnalyzeGraph(String annisQuery)
-  {
-    out.println(annisDao.planGraph(parse(annisQuery), getCorpusList(),
-      0, matchLimit, context, context, true));
-  }
-
-  @Deprecated
-  public void doAnnotateOld(String annisQuery) {
-	    List<AnnotationGraph> graphs = annisDao.retrieveAnnotationGraph(getCorpusList(),
-	    	      parse(annisQuery), 0, matchLimit, context, context);
-	    printAsTable(graphs, "nodes", "edges");
-  }
-  
   public void doAnnotate(String annisQuery)
   {
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
 		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
+		out.println("Returned " + graphs.size() + " annotations graphs.");
 		// FIXME: annotations graphen visualisieren
 //    printAsTable(graphs, "nodes", "edges");
   }

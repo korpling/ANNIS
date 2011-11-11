@@ -15,7 +15,8 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.BaseSqlGenerator.TABSTOP;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -30,12 +31,12 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 
-public class TableJoinsInWhereClauseSqlGenerator
-	extends BaseNodeSqlGenerator
-	implements WhereClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
+public class TableJoinsInWhereClauseGenerator
+	extends AbstractFromClauseGenerator
+	implements WhereClauseSqlGenerator<QueryData>
+{
 
 	@Override
 	public String fromClause(QueryData queryData, List<AnnisNode> alternative,
@@ -56,6 +57,10 @@ public class TableJoinsInWhereClauseSqlGenerator
 		}
 		
 		return conditions;
+	}
+	
+	public String fromClauseForNode(AnnisNode node) {
+		return fromClauseForNode(node, false);
 	}
 
 	public String fromClauseForNode(AnnisNode node, boolean leftJoin) {
@@ -97,7 +102,6 @@ public class TableJoinsInWhereClauseSqlGenerator
   {
 
 		Set<String> conditions = new HashSet<String>();
-//    conditions.add("-- join the tables");
 
 		// join rank table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(RANK_TABLE, NODE_TABLE)) {
@@ -125,20 +129,7 @@ public class TableJoinsInWhereClauseSqlGenerator
 			}
 		}
 
-    // don't output comment if there is not a single other constraint
-    if(conditions.size() == 1)
-    {
-      conditions.clear();
-    }
-
 		return conditions;
 	}
-
-
-//  @Override
-//  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
-//  {
-//    return null;
-//  }
 
 }
