@@ -7,7 +7,6 @@ package annis.sqlgen;
 import static annis.sqlgen.TableAccessStrategy.*;
 
 import annis.dao.Match;
-import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;

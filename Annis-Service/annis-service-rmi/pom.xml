@@ -11,6 +11,15 @@
   <artifactId>annis-service-rmi</artifactId>
 
   <name>annis-service-rmi</name>
+  
+  <repositories>
+    <repository>
+      <id>saltnpepper</id>
+      <name>SaltNPepper</name>
+      <url>http://korpling.german.hu-berlin.de/~annis/maven2/saltnpepper/</url>
+    </repository>
+  </repositories>
+  
   <build>
     <plugins>
       <plugin>

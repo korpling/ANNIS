@@ -31,17 +31,6 @@ import annis.sqlgen.SqlGenerator;
 public interface AnnisDao
 {
 
-	@Deprecated
-  public String planCount(QueryData aql, List<Long> corpusList, boolean analyze);
-
-	@Deprecated
-  public String planGraph(QueryData aql, List<Long> corpusList,
-    long offset, long limit, int left, int right, boolean analyse);
-
-  @Deprecated
-  public List<AnnotationGraph> retrieveAnnotationGraph(List<Long> corpusList, QueryData aql, long offset, long limit, int left, int right);
-
-  
   public AnnotationGraph retrieveAnnotationGraph(long textId);
 
   public List<AnnisCorpus> listCorpora();
@@ -76,12 +65,5 @@ public interface AnnisDao
 	///// configuration
 	void setTimeout(int milliseconds);
 	int getTimeout();
-
-
-// old 
-	@Deprecated int countMatches(List<Long> corpusList, QueryData aql);
-	@Deprecated public List<AnnotatedMatch> matrix(final List<Long> corpusList, final QueryData aql);
-
-
 
 }

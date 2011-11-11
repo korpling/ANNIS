@@ -32,38 +32,26 @@ limitations under the License.
     </property>
   </bean>
 
-	<!-- SELECT clause generator -->
-  <bean id="findMatchesSelectClauseSqlGenerator" class="annis.sqlgen.FindMatchesSelectClauseSqlGenerator">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
-	
 	<!-- FROM clause generator -->
-  <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
+  <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator"
+    parent="tableAccessStrategyFactory"/>
 
-  <bean id="tableJoinsInWhereClauseSqlGenerator" class="annis.sqlgen.TableJoinsInWhereClauseSqlGenerator">
-		<property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-	</bean>
+  <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
+    parent="tableAccessStrategyFactory"/>
 	
 	<!-- WHERE clause generator -->
-  <bean id="defaultWhereClauseSqlGenerator" class="annis.sqlgen.DefaultWhereClauseSqlGenerator">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
+  <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
+    parent="tableAccessStrategyFactory"/>
 
-  <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
+  <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
+	parent="tableAccessStrategyFactory"/>
 
-  <bean id="sampleWhereClause" class="annis.sqlgen.SampleWhereClause">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
+  <bean id="sampleWhereClause" class="annis.sqlgen.SampleWhereClause" parent="tableAccessStrategyFactory"/>
 	
-  <bean id="metaDataAndCorpusWhereClause" class="annis.sqlgen.MetaDataAndCorpusWhereClause">
-    <property name="tableAccessStrategyFactory" ref="tableAccessStrategyFactory"/>
-  </bean>
+  <bean id="metaDataAndCorpusWhereClauseGenerator" class="annis.sqlgen.MetaDataAndCorpusWhereClauseGenerator" 
+  	parent="tableAccessStrategyFactory"/>
 
-  <util:map id="tableAliases">
+  <util:map id="factsTableAliases">
     <entry key="node" value="facts"/>
     <entry key="node_annotation" value="facts"/>
     <entry key="rank" value="facts"/>
@@ -71,7 +59,7 @@ limitations under the License.
     <entry key="edge_annotation" value="facts"/>
   </util:map>
 	
-  <util:map id="columnAliases">
+  <util:map id="factsColumnAliases">
   	<entry key="node">
   		<util:map>
   			<entry key="name" value="node_name"/>
@@ -117,52 +105,28 @@ limitations under the License.
       </util:map>
     </entry>
   </util:map>
-
-<!-- old
+  
+  <util:map id="emptyTableAliases" />
 	
-  <bean id="findClauseSqlGenerator" class="annis.sqlgen.ClauseSqlGenerator">
-    <property name="selectClauseSqlGenerators">
-      <util:list>
-        <ref bean="findMatchesSelectClauseSqlGenerator"/>
-      </util:list>
-    </property>
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="tableJoinsInWhereClauseSqlGenerator"/>
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="tableJoinsInWhereClauseSqlGenerator" />
-        <ref bean="defaultWhereClauseSqlGenerator"/>
-        <ref bean="subcorpusConstraintWhereClause"/>
-        <ref bean="metaDataAndCorpusWhereClause" />
-        <ref bean="sampleWhereClause" />
-      </util:list>
-    </property>
-  </bean>
+  <util:map id="emptyColumnAliases" />
+  
+	<bean 
+		id="tableAccessStrategy" 
+		class="annis.sqlgen.TableAccessStrategy" 
+		scope="prototype">
+		
+		<property name="tableAliases" ref="factsTableAliases"/>
+		<property name="columnAliases" ref="factsColumnAliases"/>
+		
+	</bean>
 	
-  <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy" scope="prototype">
-    <property name="tableAliases" ref="tableAliases"/>
-    <property name="columnAliases" ref="columnAliases"/>
-  </bean>
+	<bean 
+		id="tableAccessStrategyFactory" 
+		class="annis.sqlgen.TableAccessStrategyFactory">
 
-  <bean id="defaultTableAccessStrategy" class="annis.sqlgen.DefaultTableAccessStrategy">
-    <property name="tableAliases" ref="tableAliases"/>
-    <property name="columnAliases" ref="columnAliases"/>
-  </bean>
-
-  <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory" >
-    <lookup-method name="createTableAccessStrategy" bean="defaultTableAccessStrategy"/>
-  </bean>
-
-  <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator">
-    <qualifier value="find"/>
-    <property name="clauseSqlGenerator" ref="findClauseSqlGenerator"/>
-  </bean>
+		<lookup-method name="createTableAccessStrategy" bean="tableAccessStrategy"/>
+	</bean>
 	
--->
-
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy"/>
 
 	
@@ -174,7 +138,7 @@ limitations under the License.
 		parent="findSqlGenerator">
 		
 		<property name="innerQuerySqlGenerator" ref="findSqlGenerator"/>
-		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator"/>
+		<property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator"/>
 
 		<property name="selectClauseSqlGenerator" ref="matrixSqlGenerator"/>
 		<property name="fromClauseSqlGenerators"><util:list><ref bean="matrixSqlGenerator"/></util:list></property>
@@ -229,22 +193,6 @@ limitations under the License.
 	</bean>
 	
 	<bean 
-		id="tableAccessStrategy" 
-		class="annis.sqlgen.TableAccessStrategy" 
-		scope="prototype">
-		
-		<property name="tableAliases" ref="tableAliases"/>
-		<property name="columnAliases" ref="columnAliases"/>
-	</bean>
-	
-	<bean 
-		id="tableAccessStrategyFactory" 
-		class="annis.sqlgen.TableAccessStrategyFactory">
-
-		<lookup-method name="createTableAccessStrategy" bean="tableAccessStrategy"/>
-	</bean>
-	
-	<bean 
 		id="findSqlGenerator" 
 		class="annis.sqlgen.FindSqlGenerator" 
 		parent="tableAccessStrategyFactory">
@@ -253,15 +201,15 @@ limitations under the License.
 		
 		<property name="fromClauseSqlGenerators">
 			<util:list>
-				<ref bean="tableJoinsInWhereClauseSqlGenerator"/>
+				<ref bean="tableJoinsInWhereClauseGenerator"/>
 			</util:list>
 		</property>
 		<property name="whereClauseSqlGenerators">
 			<util:list>
-				<ref bean="tableJoinsInWhereClauseSqlGenerator"/>
-				<ref bean="defaultWhereClauseSqlGenerator"/>
+				<ref bean="tableJoinsInWhereClauseGenerator"/>
+				<ref bean="defaultWhereClauseGenerator"/>
 				<ref bean="subcorpusConstraintWhereClause"/>
-				<ref bean="metaDataAndCorpusWhereClause"/>
+				<ref bean="metaDataAndCorpusWhereClauseGenerator"/>
 				<ref bean="sampleWhereClause"/>
 			</util:list>
 		</property>	
