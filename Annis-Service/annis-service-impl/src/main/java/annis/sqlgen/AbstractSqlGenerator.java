@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
@@ -42,16 +41,16 @@ import annis.ql.parser.QueryData;
  */
 public abstract class AbstractSqlGenerator<T>
 	extends TableAccessStrategyFactory 
-	implements SqlGenerator<T> {
+	implements SqlGenerator<QueryData, T> {
 
 	// generators for different SQL statement clauses
 	private WithClauseSqlGenerator withClauseSqlGenerator;
-	private SelectClauseSqlGenerator selectClauseSqlGenerator;
-	private List<FromClauseSqlGenerator> fromClauseSqlGenerators;
-	private List<WhereClauseSqlGenerator> whereClauseSqlGenerators;
-	private GroupByClauseSqlGenerator groupByClauseSqlGenerator;
-	private OrderByClauseSqlGenerator orderByClauseSqlGenerator;
-	private LimitOffsetClauseSqlGenerator limitOffsetClauseSqlGenerator;
+	private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
+	private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators;
+	private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators;
+	private GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator;
+	private OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator;
+	private LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator;
 
 	// controls indentation
 	public final static String TABSTOP = "  ";
@@ -112,7 +111,7 @@ public abstract class AbstractSqlGenerator<T>
 		indent(sb, indent);
 		sb.append("FROM");
 		List<String> fromTables = new ArrayList<String>();
-		for (FromClauseSqlGenerator generator : fromClauseSqlGenerators) {
+		for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators) {
 			fromTables.add(generator.fromClause(queryData, alternative, indent));
 		}
 		sb.append("\n");
@@ -125,7 +124,7 @@ public abstract class AbstractSqlGenerator<T>
 
 		// treat each condition as mutable string to remove last AND
 		List<StringBuffer> conditions = new ArrayList<StringBuffer>();
-		for (WhereClauseSqlGenerator generator : whereClauseSqlGenerators) {
+		for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators) {
 			Set<String> whereConditions = generator.whereConditions(queryData, alternative, indent);
 			for (String constraint : whereConditions)
 				conditions.add(new StringBuffer(constraint));
@@ -188,30 +187,30 @@ public abstract class AbstractSqlGenerator<T>
 
 	///// Getter / Setter
 
-	public List<FromClauseSqlGenerator> getFromClauseSqlGenerators() {
+	public List<FromClauseSqlGenerator<QueryData>> getFromClauseSqlGenerators() {
 		return fromClauseSqlGenerators;
 	}
 
 	public void setFromClauseSqlGenerators(
-			List<FromClauseSqlGenerator> fromClauseSqlGenerators) {
+			List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators) {
 		this.fromClauseSqlGenerators = fromClauseSqlGenerators;
 	}
 
-	public List<WhereClauseSqlGenerator> getWhereClauseSqlGenerators() {
+	public List<WhereClauseSqlGenerator<QueryData>> getWhereClauseSqlGenerators() {
 		return whereClauseSqlGenerators;
 	}
 
 	public void setWhereClauseSqlGenerators(
-			List<WhereClauseSqlGenerator> whereClauseSqlGenerators) {
+			List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators) {
 		this.whereClauseSqlGenerators = whereClauseSqlGenerators;
 	}
 
-	public GroupByClauseSqlGenerator getGroupByClauseSqlGenerator() {
+	public GroupByClauseSqlGenerator<QueryData> getGroupByClauseSqlGenerator() {
 		return groupByClauseSqlGenerator;
 	}
 
 	public void setGroupByClauseSqlGenerator(
-			GroupByClauseSqlGenerator groupByClauseSqlGenerator) {
+			GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator) {
 		this.groupByClauseSqlGenerator = groupByClauseSqlGenerator;
 	}
 
@@ -224,30 +223,30 @@ public abstract class AbstractSqlGenerator<T>
 		this.withClauseSqlGenerator = withClauseSqlGenerator;
 	}
 
-	public SelectClauseSqlGenerator getSelectClauseSqlGenerator() {
+	public SelectClauseSqlGenerator<QueryData> getSelectClauseSqlGenerator() {
 		return selectClauseSqlGenerator;
 	}
 
 	public void setSelectClauseSqlGenerator(
-			SelectClauseSqlGenerator selectClauseSqlGenerator) {
+			SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator) {
 		this.selectClauseSqlGenerator = selectClauseSqlGenerator;
 	}
 
-	public OrderByClauseSqlGenerator getOrderByClauseSqlGenerator() {
+	public OrderByClauseSqlGenerator<QueryData> getOrderByClauseSqlGenerator() {
 		return orderByClauseSqlGenerator;
 	}
 
 	public void setOrderByClauseSqlGenerator(
-			OrderByClauseSqlGenerator orderByClauseSqlGenerator) {
+			OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator) {
 		this.orderByClauseSqlGenerator = orderByClauseSqlGenerator;
 	}
 
-	public LimitOffsetClauseSqlGenerator getLimitOffsetClauseSqlGenerator() {
+	public LimitOffsetClauseSqlGenerator<QueryData> getLimitOffsetClauseSqlGenerator() {
 		return limitOffsetClauseSqlGenerator;
 	}
 
 	public void setLimitOffsetClauseSqlGenerator(
-			LimitOffsetClauseSqlGenerator limitOffsetClauseSqlGenerator) {
+			LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator) {
 		this.limitOffsetClauseSqlGenerator = limitOffsetClauseSqlGenerator;
 	}
 

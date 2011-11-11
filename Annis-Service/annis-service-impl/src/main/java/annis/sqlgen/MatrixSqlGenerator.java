@@ -52,14 +52,14 @@ import annis.ql.parser.QueryData;
  */
 public class MatrixSqlGenerator 
 	extends AbstractSqlGenerator<List<AnnotatedMatch>>
-	implements SelectClauseSqlGenerator, FromClauseSqlGenerator,
-	WhereClauseSqlGenerator, GroupByClauseSqlGenerator
+	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>,
+	WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>
 {
 
 	@Deprecated
   private String matchedNodesViewName;
 
-	private SqlGenerator<?> innerQuerySqlGenerator;
+	private SqlGenerator<QueryData,?> innerQuerySqlGenerator;
 	private TableJoinsInFromClauseSqlGenerator 
 		tableJoinsInFromClauseGenerator;
 
@@ -402,12 +402,12 @@ public class MatrixSqlGenerator
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-public SqlGenerator<?> getInnerQuerySqlGenerator() {
+public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator() {
 	return innerQuerySqlGenerator;
 }
 
 public void setInnerQuerySqlGenerator(
-		SqlGenerator<?> innerQuerySqlGenerator) {
+		SqlGenerator<QueryData, ?> innerQuerySqlGenerator) {
 	this.innerQuerySqlGenerator = innerQuerySqlGenerator;
 }
 

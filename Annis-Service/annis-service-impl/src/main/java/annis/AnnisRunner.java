@@ -63,12 +63,12 @@ public class AnnisRunner extends AnnisBaseRunner
 	// logging
 	private Logger log = Logger.getLogger(this.getClass());
 
-	  // SQL generators for query functions
-	private SqlGenerator<List<Match>> findSqlGenerator;
-	private SqlGenerator<Integer> countSqlGenerator;
-	private SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator;
-	private SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator;
-	
+	// SQL generators for query functions
+	private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
+	private SqlGenerator<QueryData, Integer> countSqlGenerator;
+	private SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator;
+	private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
+
 	// dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -232,7 +232,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
 	// FIXME: missing tests
 	public void doSql(String functionCall) {
-		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(functionCall);
 		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
 		QueryData queryData = analyzeQuery(annisQuery, null);
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
@@ -241,7 +241,7 @@ public class AnnisRunner extends AnnisBaseRunner
 	}
 	
 	public void doExplain(String functionCall, boolean analyze) {
-		SqlGenerator<?> generator = getGeneratorForQueryFunction(functionCall);
+		SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(functionCall);
 		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
 		QueryData queryData = analyzeQuery(annisQuery, null);
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
@@ -257,13 +257,13 @@ public class AnnisRunner extends AnnisBaseRunner
 		doExplain(functionCall, true);
 	}
 	
-	private SqlGenerator<?> getGeneratorForQueryFunction(String functionCall) {
+	private SqlGenerator<QueryData,?> getGeneratorForQueryFunction(String functionCall) {
 		String[] split = functionCall.split(" ", 2);
 		
 		Validate.isTrue(split.length == 2, "bad call to plan");
 		String function = split[0];
 
-		SqlGenerator<?> generator = null;
+		SqlGenerator<QueryData,?> generator = null;
 		if ("count".equals(function))
 			generator = countSqlGenerator;
 		if ("find".equals(function))
@@ -306,7 +306,7 @@ public class AnnisRunner extends AnnisBaseRunner
 		
 		// create sql + plan for each query and create count copies for each benchmark
 		for (Benchmark benchmark : benchmarks) {
-			SqlGenerator<?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
+			SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
 			benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).toSql(benchmark.queryData);
 			out.println("---> SQL query for: " + benchmark.functionCall);
 			out.println(benchmark.sql);
@@ -349,7 +349,7 @@ public class AnnisRunner extends AnnisBaseRunner
 			if (benchmark.errors >= 3)
 				continue;
 			boolean error = false;
-			SqlGenerator<?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
+			SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
 			long start = new Date().getTime();
 			try {
 				annisDao.executeQueryFunction(benchmark.queryData, generator);
@@ -851,37 +851,37 @@ public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
 	this.queryAnalysis = queryAnalysis;
 }
 
-public SqlGenerator<Integer> getCountSqlGenerator() {
+public SqlGenerator<QueryData, Integer> getCountSqlGenerator() {
 	return countSqlGenerator;
 }
 
-public void setCountSqlGenerator(SqlGenerator<Integer> countSqlGenerator) {
+public void setCountSqlGenerator(SqlGenerator<QueryData, Integer> countSqlGenerator) {
 	this.countSqlGenerator = countSqlGenerator;
 }
 
-public SqlGenerator<List<AnnotationGraph>> getAnnotateSqlGenerator() {
+public SqlGenerator<QueryData, List<AnnotationGraph>> getAnnotateSqlGenerator() {
 	return annotateSqlGenerator;
 }
 
 public void setAnnotateSqlGenerator(
-		SqlGenerator<List<AnnotationGraph>> annotateSqlGenerator) {
+		SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator) {
 	this.annotateSqlGenerator = annotateSqlGenerator;
 }
 
-public SqlGenerator<List<Match>> getFindSqlGenerator() {
+public SqlGenerator<QueryData, List<Match>> getFindSqlGenerator() {
 	return findSqlGenerator;
 }
 
-public void setFindSqlGenerator(SqlGenerator<List<Match>> findSqlGenerator) {
+public void setFindSqlGenerator(SqlGenerator<QueryData, List<Match>> findSqlGenerator) {
 	this.findSqlGenerator = findSqlGenerator;
 }
 
-public SqlGenerator<List<AnnotatedMatch>> getMatrixSqlGenerator() {
+public SqlGenerator<QueryData, List<AnnotatedMatch>> getMatrixSqlGenerator() {
 	return matrixSqlGenerator;
 }
 
 public void setMatrixSqlGenerator(
-		SqlGenerator<List<AnnotatedMatch>> matrixSqlGenerator) {
+		SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator) {
 	this.matrixSqlGenerator = matrixSqlGenerator;
 }
 

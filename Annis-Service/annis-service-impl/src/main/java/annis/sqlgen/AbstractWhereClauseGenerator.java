@@ -28,7 +28,10 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 
-public abstract class AbstractWhereClauseGenerator extends TableAccessStrategyFactory {
+public abstract class AbstractWhereClauseGenerator 
+	extends TableAccessStrategyFactory 
+	implements WhereClauseSqlGenerator<QueryData>
+{
 
 	public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent) {
 		List<String> conditions = new ArrayList<String>();

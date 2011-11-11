@@ -16,10 +16,11 @@
 package annis.sqlgen;
 
 import annis.model.AnnisNode;
+import annis.ql.parser.QueryData;
 
 public abstract class AbstractFromClauseGenerator 
 	extends TableAccessStrategyFactory 
-	implements FromClauseSqlGenerator
+	implements FromClauseSqlGenerator<QueryData>
 {
 
 	  protected String tableAliasDefinition(AnnisNode node, String table, int count)

@@ -35,9 +35,8 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class SampleWhereClause 
-  extends TableAccessStrategyFactory
-  implements WhereClauseSqlGenerator
+public class SampleWhereClause extends TableAccessStrategyFactory
+  implements WhereClauseSqlGenerator<QueryData>
 {
 	
 	@Override

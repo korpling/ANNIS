@@ -35,7 +35,8 @@ import annis.ql.parser.QueryData;
 
 public class TableJoinsInWhereClauseGenerator
 	extends AbstractFromClauseGenerator
-	implements WhereClauseSqlGenerator {
+	implements WhereClauseSqlGenerator<QueryData>
+{
 
 	@Override
 	public String fromClause(QueryData queryData, List<AnnisNode> alternative,

@@ -34,7 +34,7 @@ import annis.ql.parser.QueryData;
 
 
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>> 
-implements SelectClauseSqlGenerator {
+implements SelectClauseSqlGenerator<QueryData> {
 
 	@Override
 	public String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent) {

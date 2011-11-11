@@ -54,7 +54,6 @@ import annis.sqlgen.model.Sibling;
 
 public class DefaultWhereClauseGenerator 
 	extends AbstractWhereClauseGenerator
-	implements WhereClauseSqlGenerator 
 {
 
 	@Override

@@ -31,7 +31,7 @@ import annis.ql.parser.QueryData;
  */
 public class MetaDataAndCorpusWhereClauseGenerator 
   extends TableAccessStrategyFactory
-  implements WhereClauseSqlGenerator
+  implements WhereClauseSqlGenerator<QueryData>
 {
 
 	@Override
