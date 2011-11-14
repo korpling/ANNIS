@@ -2,9 +2,7 @@ package annis.frontend.servlets.visualizers.media.audio;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 import annis.frontend.servlets.visualizers.VisualizerInput;
 import annis.frontend.servlets.visualizers.WriterVisualizer;
 
