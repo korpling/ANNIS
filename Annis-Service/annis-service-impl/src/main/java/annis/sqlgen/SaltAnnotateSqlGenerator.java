@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -63,11 +64,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-//    if (true)
-//    {
-//      throw new NotImplementedException();
-//    }
-
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 
     final SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
@@ -76,15 +72,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     project.getSCorpusGraphs().add(corpusGraph);
 
-    // for each match
-//    
-//      SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
-//      matchCorpus.setSName("match");
-//      corpusGraph.addSNode(matchCorpus);
-//      SCorpusGraph subcorpusGraph = retrieveAnnotationGraph(match, left,
-//        right);
-
-    SDocumentGraph graph = SaltFactory.eINSTANCE.createSDocumentGraph();
+    SDocumentGraph graph = null;
 
     // fn: edge pre order value -> edge
     Map<Long, SNode> nodeByPre = new HashMap<Long, SNode>();
@@ -97,24 +85,70 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     nodeByPre.clear();
 
     // set the matched keys
-    SDocument document = SaltFactory.eINSTANCE.createSDocument();
-    document.setSDocumentGraph(graph);
+    SDocument document = null;
 
-    int rowNum = 0;
+    List<Long> lastKey = new LinkedList<Long>();
+
     while (resultSet.next())
     {
-      if (rowNum == 0)
+      Array sqlKey = resultSet.getArray("key");
+      Validate.isTrue(!resultSet.wasNull(),
+        "Match group identifier must not be null");
+      Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+        "Key in database must be from the type \"bigint\" but was \""
+        + sqlKey.getBaseTypeName() + "\"");
+
+      Long[] keyArray = (Long[]) sqlKey.getArray();
+      List<Long> key = Arrays.asList(keyArray);
+
+      if (!lastKey.equals(key))
       {
 
-        Array sqlKey = resultSet.getArray("key");
-        Validate.isTrue(!resultSet.wasNull(),
-          "Match group identifier must not be null");
-        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-          "Key in database must be from the type \"bigint\" but was \""
-          + sqlKey.getBaseTypeName() + "\"");
+        // create the text for the last graph
+        if (graph != null)
+        {
+          STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
+          graph.addSNode(textDataSource);
 
-        Long[] keyArray = (Long[]) sqlKey.getArray();
-        List<Long> key = Arrays.asList(keyArray);
+          StringBuilder sbText = new StringBuilder();
+          Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
+            iterator();
+          while (itToken.hasNext())
+          {
+            Map.Entry<Long, String> e = itToken.next();
+            SToken tok = tokenByIndex.get(e.getKey());
+
+            STextualRelation textRel = SaltFactory.eINSTANCE.
+              createSTextualRelation();
+            textRel.setSSource(tok);
+            textRel.setSTarget(textDataSource);
+            textRel.setSStart(sbText.length());
+            textRel.setSEnd(sbText.length() + e.getValue().length());
+
+            textRel.setSTextualDS(textDataSource);
+            graph.addSRelation(textRel);
+
+            sbText.append(e.getValue());
+            if (itToken.hasNext())
+            {
+              sbText.append(" ");
+            }
+          }
+
+          textDataSource.setSText(sbText.toString());
+                  
+        }
+
+        lastKey = key;
+        
+        // new match, reset everything        
+        nodeByPre.clear();
+        tokenTexts.clear();
+        tokenByIndex.clear();
+        
+        graph = SaltFactory.eINSTANCE.createSDocumentGraph();
+        document = SaltFactory.eINSTANCE.createSDocument();
+        document.setSDocumentGraph(graph);
 
         ArrayList<String> path =
           new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
@@ -154,37 +188,9 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         nodeByPre.put(pre, node);
         createRelation(resultSet, graph, nodeByPre, node);
       }
+    } // end while new result row
 
-      rowNum++;
-    }
 
-    STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
-    graph.addSNode(textDataSource);
-
-    StringBuilder sbText = new StringBuilder();
-    Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().iterator();
-    while (itToken.hasNext())
-    {
-      Map.Entry<Long, String> e = itToken.next();
-      SToken tok = tokenByIndex.get(e.getKey());
-
-      STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
-      textRel.setSSource(tok);
-      textRel.setSTarget(textDataSource);
-      textRel.setSStart(sbText.length());
-      textRel.setSEnd(sbText.length() + e.getValue().length());
-
-      textRel.setSTextualDS(textDataSource);
-      graph.addSRelation(textRel);
-
-      sbText.append(e.getValue());
-      if (itToken.hasNext())
-      {
-        sbText.append(" ");
-      }
-    }
-
-    textDataSource.setSText(sbText.toString());
 
     return project;
   }

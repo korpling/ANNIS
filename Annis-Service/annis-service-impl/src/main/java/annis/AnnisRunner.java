@@ -51,13 +51,11 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.AOMAnnotateSqlGenerator;
-import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
 import org.eclipse.emf.common.util.URI;
 
 // TODO: test AnnisRunner
@@ -153,7 +151,10 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doDebug(String ignore)
   {
     doCorpus("0");
-    doAnnotate("tok");
+    doSet("limit to 10");
+    doSet("left to 5");
+    doSet("right to 5");
+    doAnnotate("\"der\" & tok & #1 . #2");
   }
 
   public void doProposedIndex(String ignore)
@@ -605,7 +606,7 @@ public class AnnisRunner extends AnnisBaseRunner
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
 		SaltProject result = annisDao.annotateSalt(queryData);
-      URI uri = URI.createFileURI("/tmp");
+      URI uri = URI.createFileURI("/tmp/annissalt");
       result.saveSaltProject_DOT(uri);
 
       //		out.println("Returned " + graphs.size() + " annotations graphs.");
