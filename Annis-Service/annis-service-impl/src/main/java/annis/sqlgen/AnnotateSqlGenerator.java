@@ -752,27 +752,33 @@ public class AnnotateSqlGenerator
 		IslandPolicies islandsPolicy = 
 				getMostRestrictivePolicy(corpusList, corpusProperties);
 		if (islandsPolicy == IslandPolicies.context) {
-			indent(sb, indent + TABSTOP);
+			indent(sb, indent);
 			sb.append("(\n");
+			indent(sb, indent + TABSTOP + TABSTOP);
 			List<String> overlapForOneSpan = new ArrayList<String>();
 			for (int i = 1; i <= alternative.size(); ++i) {
 				
 				StringBuffer sb2 = new StringBuffer();
 
-				indent(sb2, indent + TABSTOP + TABSTOP);
+				sb2.append("(\n");
+				indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
+				
 				sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref") 
 						+ " = solutions.text" + i + " AND\n");
-				indent(sb2, indent + TABSTOP + TABSTOP);
+				indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
 
 				String rangeMin = "solutions.min" + i;
 				String rangeMax = "solutions.max" + i;
 
-				sb2.append(overlapForOneRange(indent + TABSTOP,
+				sb2.append(overlapForOneRange(indent + TABSTOP + TABSTOP,
 						rangeMin, rangeMax, tables));
+				sb2.append("\n");
+				indent(sb2, indent + TABSTOP + TABSTOP);
+				sb2.append(")");
 				overlapForOneSpan.add(sb2.toString());
 			}
 			sb.append(StringUtils.join(overlapForOneSpan, 
-					"\n" + indent + TABSTOP + ") OR (\n" + indent));
+					" OR "));
 			sb.append("\n");
 			indent(sb, indent + TABSTOP);
 			sb.append(")");
