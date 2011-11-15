@@ -36,7 +36,6 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import annis.model.AnnisNode;
 import annis.model.AnnotationGraph;
-import annis.model.Edge;
 import annis.ql.parser.QueryData;
 
 /**
@@ -181,18 +180,6 @@ public abstract class AnnotateSqlGenerator<T>
 								offset, nodeCount, corpusProperties),
 				planRowMapper);
 		return StringUtils.join(plan, "\n");
-	}
-
-	@Deprecated
-	public List<AnnotationGraph> queryAnnotationGraph(
-			JdbcTemplate jdbcTemplate, List<Long> corpusList, 
-			int nodeCount,
-			long offset, long limit, int left, int right,
-			Map<Long, Properties> corpusProperties)
-	{
-		return (List<AnnotationGraph>) jdbcTemplate.query(
-				getContextQuery(corpusList, left, right, limit, 
-						offset, nodeCount, corpusProperties), this);
 	}
 
 	@Deprecated
@@ -407,27 +394,6 @@ public abstract class AnnotateSqlGenerator<T>
 		return sql;
 	}
 
-	protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre,
-			Map<Long, AnnisNode> nodeById)
-	{
-		// pull source node from parent edge
-		AnnisNode source = edge.getSource();
-		if (source == null)
-		{
-			return;
-		}
-		long pre = source.getId();
-		Edge parentEdge = edgeByPre.get(pre);
-		AnnisNode parent = parentEdge != null 
-				? parentEdge.getDestination() : null;
-		// log.debug("looking for node with rank.pre = 
-		// " + pre + "; found: " + parent);
-		edge.setSource(parent);
-
-		// pull destination node from mapping function
-		long destinationId = edge.getDestination().getId();
-		edge.setDestination(nodeById.get(destinationId));
-	}
 
 	public String getMatchedNodesViewName()
 	{

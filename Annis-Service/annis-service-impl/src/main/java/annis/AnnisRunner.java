@@ -56,6 +56,9 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
+import org.eclipse.emf.common.util.URI;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -149,8 +152,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    QueryData qdAQL = annisDao.parseAQL("node & node & node & #1 > #2 & #1 > #3", null);
-    System.out.println(qdAQL);
+    doCorpus("0");
+    doAnnotate("tok");
   }
 
   public void doProposedIndex(String ignore)
@@ -601,8 +604,11 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
-		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
-		out.println("Returned " + graphs.size() + " annotations graphs.");
+		SaltProject result = annisDao.annotateSalt(queryData);
+      URI uri = URI.createFileURI("/tmp");
+      result.saveSaltProject_DOT(uri);
+
+      //		out.println("Returned " + graphs.size() + " annotations graphs.");
 		// FIXME: annotations graphen visualisieren
 //    printAsTable(graphs, "nodes", "edges");
   }

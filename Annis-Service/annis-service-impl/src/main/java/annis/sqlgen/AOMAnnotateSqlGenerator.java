@@ -205,6 +205,28 @@ public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
     return graphs;
   }
 
+  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre,
+    Map<Long, AnnisNode> nodeById)
+  {
+    // pull source node from parent edge
+    AnnisNode source = edge.getSource();
+    if (source == null)
+    {
+      return;
+    }
+    long pre = source.getId();
+    Edge parentEdge = edgeByPre.get(pre);
+    AnnisNode parent = parentEdge != null
+      ? parentEdge.getDestination() : null;
+    // log.debug("looking for node with rank.pre = 
+    // " + pre + "; found: " + parent);
+    edge.setSource(parent);
+
+    // pull destination node from mapping function
+    long destinationId = edge.getDestination().getId();
+    edge.setDestination(nodeById.get(destinationId));
+  }
+
   public AnnisNodeRowMapper getAnnisNodeRowMapper()
   {
     return annisNodeRowMapper;
@@ -220,10 +242,8 @@ public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
     return edgeAnnotationRowMapper;
   }
 
-
   public AnnotationRowMapper getNodeAnnotationRowMapper()
   {
     return nodeAnnotationRowMapper;
   }
-
 }

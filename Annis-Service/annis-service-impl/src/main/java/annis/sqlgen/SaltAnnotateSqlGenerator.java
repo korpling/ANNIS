@@ -63,10 +63,10 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    if (true)
-    {
-      throw new NotImplementedException();
-    }
+//    if (true)
+//    {
+//      throw new NotImplementedException();
+//    }
 
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 

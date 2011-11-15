@@ -102,6 +102,7 @@
 
 	<property name="countSqlGenerator" ref="countSqlGenerator"/>
 	<property name="aomAnnotateSqlGenerator" ref="aomAnnotateSqlGenerator"/>
+   <property name="saltAnnotateSqlGenerator" ref="saltAnnotateSqlGenerator"/>
 	<property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
 
     <!-- VR: before benchmark merge -->

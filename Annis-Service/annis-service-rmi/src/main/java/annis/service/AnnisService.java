@@ -30,7 +30,6 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
-import java.util.Set;
 
 public interface AnnisService extends Remote {
 	
