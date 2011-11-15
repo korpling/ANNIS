@@ -93,11 +93,11 @@ public class AnnotateInnerQuerySqlGenerator
   {
     AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     if (annotateQueryData.isPaged())
     {
-      sb.append("LIMIT " + annotateQueryData.getLimit());
-      sb.append(" OFFSET " + annotateQueryData.getOffset());
+      sb.append("LIMIT ").append(annotateQueryData.getLimit());
+      sb.append(" OFFSET ").append(annotateQueryData.getOffset());
     }
     return sb.toString();
   }

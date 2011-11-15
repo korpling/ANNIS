@@ -36,7 +36,7 @@ public class QueryData implements Cloneable
 	private List<Annotation> metaData;
 	private int maxWidth;
 	private Set<Object> extensions;
-	  private HashMap<Long, Properties> corpusConfiguration;
+   private HashMap<Long, Properties> corpusConfiguration;
 
 	public QueryData() {
 		alternatives = new ArrayList<List<AnnisNode>>();

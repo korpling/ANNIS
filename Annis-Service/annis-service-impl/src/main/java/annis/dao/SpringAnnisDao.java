@@ -47,6 +47,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.AOMAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
@@ -66,7 +67,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
   private CountSqlGenerator countSqlGenerator;
-  private AnnotateSqlGenerator annotateSqlGenerator;
+  private AOMAnnotateSqlGenerator aomAnnotateSqlGenerator;
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
   private int timeout;
@@ -202,7 +203,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<AnnotationGraph> annotate(QueryData queryData)
   {
-    return executeQueryFunction(queryData, annotateSqlGenerator);
+    return executeQueryFunction(queryData, aomAnnotateSqlGenerator);
   }
 
   @Transactional(readOnly = true)
@@ -261,7 +262,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
     List<AnnotationGraph> graphs =
-      annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
+      aomAnnotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
     if (graphs.isEmpty())
     {
       return null;
@@ -552,16 +553,17 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public AnnotateSqlGenerator getAnnotateSqlGenerator()
+  public AOMAnnotateSqlGenerator getAomAnnotateSqlGenerator()
   {
-    return annotateSqlGenerator;
+    return aomAnnotateSqlGenerator;
   }
 
-  public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator)
+  public void setAomAnnotateSqlGenerator(AOMAnnotateSqlGenerator aomAnnotateSqlGenerator)
   {
-    this.annotateSqlGenerator = annotateSqlGenerator;
+    this.aomAnnotateSqlGenerator = aomAnnotateSqlGenerator;
   }
 
+ 
   @Override
   public HashMap<Long, Properties> getCorpusConfiguration()
   {

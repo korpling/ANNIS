@@ -22,43 +22,31 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
-import annis.dao.AnnisNodeRowMapper;
-import annis.dao.AnnotationRowMapper;
-import annis.dao.DocumentNameMapRow;
-import annis.dao.EdgeRowMapper;
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.ql.parser.QueryData;
 
 /**
  * 
+ * @param <T> Type into which the JDBC result set is transformed
+ * 
  * @author thomas
  */
-public class AnnotateSqlGenerator 
-	extends AbstractSqlGenerator<List<AnnotationGraph>> 
+public abstract class AnnotateSqlGenerator<T>
+	extends AbstractSqlGenerator<T> 
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>, 
 	WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {
@@ -123,13 +111,7 @@ public class AnnotateSqlGenerator
 		context, none
 	}
 
-	private static final Logger log = 
-			Logger.getLogger(AnnotateSqlGenerator.class);
 	private String matchedNodesViewName;
-	private AnnotationRowMapper nodeAnnotationRowMapper;
-	private AnnotationRowMapper edgeAnnotationRowMapper;
-	private EdgeRowMapper edgeRowMapper;
-	private AnnisNodeRowMapper annisNodeRowMapper;
 	private String defaultIslandsPolicy;
 
 	public AnnotateSqlGenerator()
@@ -178,17 +160,7 @@ public class AnnotateSqlGenerator
 	    factsTas = new TableAccessStrategy(null);
 		factsTas.setColumnAliases(columnAliases);
 
-		edgeRowMapper = new EdgeRowMapper();
-		edgeRowMapper.setTableAccessStrategy(factsTas);
 
-		annisNodeRowMapper = new AnnisNodeRowMapper();
-		annisNodeRowMapper.setTableAccessStrategy(factsTas);
-
-		nodeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.NODE_ANNOTATION_TABLE);
-		nodeAnnotationRowMapper.setTableAccessStrategy(factsTas);
-
-		edgeAnnotationRowMapper = new AnnotationRowMapper(TableAccessStrategy.EDGE_ANNOTATION_TABLE);
-		edgeAnnotationRowMapper.setTableAccessStrategy(factsTas);
 	}
 
 	@Deprecated
@@ -435,157 +407,6 @@ public class AnnotateSqlGenerator
 		return sql;
 	}
 
-	@Override
-	public List<AnnotationGraph> extractData(ResultSet resultSet)
-			throws SQLException, DataAccessException
-	{
-		// function result
-		List<AnnotationGraph> graphs = 
-				new LinkedList<AnnotationGraph>();
-
-		// fn: match group -> annotation graph
-
-		Map<List<Long>, AnnotationGraph> graphByMatchGroup = 
-				new HashMap<List<Long>, AnnotationGraph>();
-
-		// fn: node id -> node
-		Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
-
-		// fn: edge pre order value -> edge
-		Map<Long, Edge> edgeByPre = new HashMap<Long, Edge>();
-
-		int rowNum = 0;
-		while (resultSet.next())
-		{
-			// process result by match group
-			// match group is identified by the ids of the matched 
-			// nodes
-			Array sqlKey = resultSet.getArray("key");
-			Validate.isTrue(!resultSet.wasNull(),
-					"Match group identifier must not be null");
-			Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-					"Key in database must be from the type \"bigint\" but was \""
-							+ sqlKey.getBaseTypeName() + "\"");
-
-			Long[] keyArray = (Long[]) sqlKey.getArray();
-			List<Long> key = Arrays.asList(keyArray);
-			// for (Long bd : keyArray)
-			// {
-			// key.add(bd == null ? null : bd.longValue());
-			// }
-
-			if (!graphByMatchGroup.containsKey(key))
-			{
-				log.debug("starting annotation graph for match: " 
-						+ key);
-				AnnotationGraph graph = new AnnotationGraph();
-				graphs.add(graph);
-				graphByMatchGroup.put(key, graph);
-
-				// clear mapping functions for this graph
-				// assumes that the result set is sorted by key, pre
-				nodeById.clear();
-				edgeByPre.clear();
-
-				// set the matched keys
-				for (Long l : key)
-				{
-					if (l != null)
-					{
-						graph.addMatchedNodeId(l);
-					}
-				}
-			}
-
-			AnnotationGraph graph = graphByMatchGroup.get(key);
-
-			graph.setDocumentName(new DocumentNameMapRow().mapRow(
-					resultSet, rowNum));
-			
-			Array path = resultSet.getArray("path");
-			graph.setPath((String []) path.getArray());
-
-			// get node data
-			AnnisNode node = annisNodeRowMapper.mapRow(resultSet, 
-					rowNum);
-
-			// add node to graph if it is new, else get known copy
-			long id = node.getId();
-			if (!nodeById.containsKey(id))
-			{
-				log.debug("new node: " + id);
-				nodeById.put(id, node);
-				graph.addNode(node);
-			} else
-			{
-				node = nodeById.get(id);
-			}
-
-			// we now have the id of the node and the general key, 
-			// so we can
-			// add the matched node index to the graph (if matched)
-			long matchIndex = 1;
-			// node.setMatchedNodeInQuery(null);
-			for (Long l : key)
-			{
-				if (l != null)
-				{
-					if (id == l)
-					{
-						node.setMatchedNodeInQuery(matchIndex);
-						break;
-					}
-					matchIndex++;
-				}
-			}
-
-			// get edge data
-			Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
-
-			// add edge to graph if it is new, else get known copy
-			long pre = edge.getPre();
-			if (!edgeByPre.containsKey(pre))
-			{
-				// fix source references in edge
-				edge.setDestination(node);
-				fixNodes(edge, edgeByPre, nodeById);
-
-				// add edge to src and dst nodes
-				node.addIncomingEdge(edge);
-				AnnisNode source = edge.getSource();
-				if (source != null)
-				{
-					source.addOutgoingEdge(edge);
-				}
-
-				log.debug("new edge: " + edge);
-				edgeByPre.put(pre, edge);
-				graph.addEdge(edge);
-			} else
-			{
-				edge = edgeByPre.get(pre);
-			}
-
-			// add annotation data
-			Annotation nodeAnnotation = 
-					nodeAnnotationRowMapper.mapRow(resultSet, rowNum);
-			if (nodeAnnotation != null)
-			{
-				node.addNodeAnnotation(nodeAnnotation);
-			}
-			Annotation edgeAnnotation = 
-					edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
-			if (edgeAnnotation != null)
-			{
-				edge.addAnnotation(edgeAnnotation);
-			}
-
-			rowNum++;
-		}
-
-		return graphs;
-	}
-
 	protected void fixNodes(Edge edge, Map<Long, Edge> edgeByPre,
 			Map<Long, AnnisNode> nodeById)
 	{
@@ -633,10 +454,10 @@ public class AnnotateSqlGenerator
 	@Override
 	public String selectClause(QueryData queryData, 
 			List<AnnisNode> alternative, String indent) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		
 		sb.append("DISTINCT\n");
-		sb.append(indent + TABSTOP + "ARRAY[");
+		sb.append(indent).append(TABSTOP + "ARRAY[");
 		
 		// solutions key
 		List<String> ids = new ArrayList<String>();
@@ -677,46 +498,13 @@ public class AnnotateSqlGenerator
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
 		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
-		// facts.sample is never evaluated in the result set
-		// addSelectClauseAttribute(fields, FACTS_TABLE, "sample");
 		
-//		old order
-//		addSelectClauseAttribute(fields, NODE_TABLE, "id");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "namespace");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "name");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "left");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "right");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "span");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
-//		addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
-//
-//		addSelectClauseAttribute(fields, RANK_TABLE, "pre");
-//		addSelectClauseAttribute(fields, RANK_TABLE, "post");
-//		addSelectClauseAttribute(fields, RANK_TABLE, "parent");
-//		addSelectClauseAttribute(fields, RANK_TABLE, "level");
-//
-//		addSelectClauseAttribute(fields, COMPONENT_TABLE, "id");
-//		addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
-//		addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-//		addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
-//
-//		addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "namespace");
-//		addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "name");
-//		addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "value");
-//
-//		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
-//		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
-//		addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
-
-		sb.append(indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-		sb.append(",\n" + indent + TABSTOP);
+		sb.append(",\n").append(indent).append(TABSTOP);
 
 		// corpus.path_name
-		sb.append("corpus.path_name AS path,\n" + indent + TABSTOP);
+		sb.append("corpus.path_name AS path,\n").append(indent).append(TABSTOP);
 		sb.append("corpus.path_name[1] AS document_name");
 		
 		return sb.toString();
@@ -760,8 +548,8 @@ public class AnnotateSqlGenerator
 				StringBuffer sb2 = new StringBuffer();
 
 				indent(sb2, indent + TABSTOP + TABSTOP);
-				sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref") 
-						+ " = solutions.text" + i + " AND\n");
+				sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")).
+          append(" = solutions.text").append(i).append(" AND\n");
 				indent(sb2, indent + TABSTOP + TABSTOP);
 
 				String rangeMin = "solutions.min" + i;
@@ -828,31 +616,31 @@ public class AnnotateSqlGenerator
 		if (optimizeOverlap) {
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "left_token") + " >= " + rangeMin);
+               NODE_TABLE, "left_token")).append(" >= ").append(rangeMin);
 			sb.append(" AND ");
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "right_token") + " <= " + rangeMax);
+               NODE_TABLE, "right_token")).append(" <= ").append(rangeMax);
 			sb.append(") OR\n");
 			indent(sb, indent + TABSTOP + TABSTOP);
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "left_token") + " <= " + rangeMin);
+               NODE_TABLE, "left_token")).append(" <= ").append(rangeMin);
 			sb.append(" AND ");
-			sb.append(rangeMin + " <= " + tables.aliasedColumn(NODE_TABLE, "right_token"));
+			sb.append(rangeMin).append(" <= ").append(tables.aliasedColumn(NODE_TABLE, "right_token"));
 			sb.append(") OR\n");
 			indent(sb, indent + TABSTOP + TABSTOP);
 			sb.append("(");
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "left_token") + " <= " + rangeMax);
+               NODE_TABLE, "left_token")).append(" <= ").append(rangeMax);
 			sb.append(" AND ");
-			sb.append(rangeMax + " <= " + tables.aliasedColumn(NODE_TABLE, "right_token"));
+			sb.append(rangeMax).append(" <= ").append(tables.aliasedColumn(NODE_TABLE, "right_token"));
 			sb.append(")");
 		} else {
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "left_token") + " <= " + rangeMax);
+               NODE_TABLE, "left_token")).append(" <= ").append(rangeMax);
 			sb.append(" AND ");
 			sb.append(tables.aliasedColumn(
-					NODE_TABLE, "right_token") + " >= " + rangeMin);
+               NODE_TABLE, "right_token")).append(" >= ").append(rangeMin);
 		}
 		sb.append("\n");
 		indent(sb, indent + TABSTOP);
@@ -920,5 +708,12 @@ public class AnnotateSqlGenerator
 	public void setOptimizeOverlap(boolean optimizeOverlap) {
 		this.optimizeOverlap = optimizeOverlap;
 	}
+
+  public TableAccessStrategy getFactsTas()
+  {
+    return factsTas;
+  }
+   
+   
 
 }

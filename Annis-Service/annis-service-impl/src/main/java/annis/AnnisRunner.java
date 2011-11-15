@@ -50,6 +50,7 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AOMAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
@@ -536,7 +537,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    AnnotateSqlGenerator ge = new AnnotateSqlGenerator();
+    AOMAnnotateSqlGenerator ge = new AOMAnnotateSqlGenerator();
     ge.setMatchedNodesViewName("matched_nodes");
     out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
       new HashMap<Long, Properties>())

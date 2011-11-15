@@ -60,6 +60,7 @@ public abstract class AbstractSqlGenerator<T>
 		return toSql(queryData, 0);
 	}
 	
+  @Override
 	public String toSql(QueryData queryData, int indentBy) {
 		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 		
@@ -86,7 +87,7 @@ public abstract class AbstractSqlGenerator<T>
 	}
 
 	protected String computeIndent(int indentBy) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < indentBy; ++i) {
 			sb.append(TABSTOP);
 		}
