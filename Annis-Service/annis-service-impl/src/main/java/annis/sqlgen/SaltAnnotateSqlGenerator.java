@@ -107,45 +107,16 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         // create the text for the last graph
         if (graph != null)
         {
-          STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
-          graph.addSNode(textDataSource);
-
-          StringBuilder sbText = new StringBuilder();
-          Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
-            iterator();
-          while (itToken.hasNext())
-          {
-            Map.Entry<Long, String> e = itToken.next();
-            SToken tok = tokenByIndex.get(e.getKey());
-
-            STextualRelation textRel = SaltFactory.eINSTANCE.
-              createSTextualRelation();
-            textRel.setSSource(tok);
-            textRel.setSTarget(textDataSource);
-            textRel.setSStart(sbText.length());
-            textRel.setSEnd(sbText.length() + e.getValue().length());
-
-            textRel.setSTextualDS(textDataSource);
-            graph.addSRelation(textRel);
-
-            sbText.append(e.getValue());
-            if (itToken.hasNext())
-            {
-              sbText.append(" ");
-            }
-          }
-
-          textDataSource.setSText(sbText.toString());
-                  
+          createPrimaryText(graph, tokenTexts, tokenByIndex);
         }
 
         lastKey = key;
-        
+
         // new match, reset everything        
         nodeByPre.clear();
         tokenTexts.clear();
         tokenByIndex.clear();
-        
+
         graph = SaltFactory.eINSTANCE.createSDocumentGraph();
         document = SaltFactory.eINSTANCE.createSDocument();
         document.setSDocumentGraph(graph);
@@ -190,9 +161,46 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       }
     } // end while new result row
 
-
-
+    // the last match needs a primary text, too
+    if(graph != null)
+    {
+      createPrimaryText(graph, tokenTexts, tokenByIndex);
+    }
+    
     return project;
+  }
+
+  private void createPrimaryText(SDocumentGraph graph,
+    TreeMap<Long, String> tokenTexts, TreeMap<Long, SToken> tokenByIndex)
+  {
+    STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
+    graph.addSNode(textDataSource);
+
+    StringBuilder sbText = new StringBuilder();
+    Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
+      iterator();
+    while (itToken.hasNext())
+    {
+      Map.Entry<Long, String> e = itToken.next();
+      SToken tok = tokenByIndex.get(e.getKey());
+
+      STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
+      textRel.setSSource(tok);
+      textRel.setSTarget(textDataSource);
+      textRel.setSStart(sbText.length());
+      textRel.setSEnd(sbText.length() + e.getValue().length());
+
+      textRel.setSTextualDS(textDataSource);
+      graph.addSRelation(textRel);
+
+      sbText.append(e.getValue());
+      if (itToken.hasNext())
+      {
+        sbText.append(" ");
+      }
+    }
+
+    textDataSource.setSText(sbText.toString());
   }
 
   private SNode createOrFindNewNode(ResultSet resultSet,

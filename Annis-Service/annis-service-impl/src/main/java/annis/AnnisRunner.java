@@ -154,7 +154,7 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("limit to 10");
     doSet("left to 5");
     doSet("right to 5");
-    doAnnotate("\"der\" & tok & #1 . #2");
+    doAnnotate("tok & tok & #1 . #2");
   }
 
   public void doProposedIndex(String ignore)
