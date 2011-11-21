@@ -132,6 +132,7 @@
     <property name="countExtractor" ref="countExtractor"/>
 
     <property name="metaDataFilter" ref="metaDataFilter" />
+    <property name="byteHelper" ref="byteHelper" />
 
   </bean>
 <!-- old

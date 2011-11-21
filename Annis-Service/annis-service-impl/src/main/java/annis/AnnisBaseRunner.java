@@ -35,10 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
-<<<<<<< TREE
-=======
-
->>>>>>> MERGE-SOURCE
 
 public abstract class AnnisBaseRunner
 {

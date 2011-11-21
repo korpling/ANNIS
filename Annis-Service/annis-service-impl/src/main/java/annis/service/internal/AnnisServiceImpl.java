@@ -15,8 +15,6 @@
  */
 package annis.service.internal;
 
-import annis.WekaHelper;
-import annis.resolver.ResolverEntry;
 import annis.service.ifaces.AnnisBinaryMetaData;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -155,8 +153,7 @@ public class AnnisServiceImpl implements AnnisService
     return true;
   }
 
-  // TODO: test getBinary
-  @Override
+ 
   public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException
   {
     log.debug("Retrieving binary file with id = " + id);
@@ -252,5 +249,12 @@ public class AnnisServiceImpl implements AnnisService
   public AnnisBinaryMetaData getBinaryMeta(long id)
   {
     return annisDao.getBinary(id, 1, 1);    
+  }
+
+  @Override
+  public AnnisBinary getBinary(long id) throws RemoteException,
+    AnnisBinaryNotFoundException
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 }
