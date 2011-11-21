@@ -125,12 +125,17 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           "path").getArray()));
         Collections.reverse(path);
 
-        SCorpus rootCorpus = SaltFactory.eINSTANCE.createSCorpus();
-        rootCorpus.setSName(path.get(0));
-        corpusGraph.addSNode(rootCorpus);
+        SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
+        matchCorpus.setSName("match_" + StringUtils.join(keyArray, "_"));
+        corpusGraph.addSNode(matchCorpus);
+        
+        SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();        
+        toplevelCorpus.setSName(path.get(0));
+        corpusGraph.addSSubCorpus(matchCorpus, toplevelCorpus);
+        
         Validate.isTrue(path.size() >= 2,
           "Corpus path must be have at least two members (toplevel and document)");
-        SCorpus corpus = rootCorpus;
+        SCorpus corpus = toplevelCorpus;
 
         for (int i = 1; i < path.size() - 1; i++)
         {
