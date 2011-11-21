@@ -150,7 +150,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("0");
+    doCorpus("3");
     doSet("limit to 10");
     doSet("left to 5");
     doSet("right to 5");

@@ -119,7 +119,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
         graph = SaltFactory.eINSTANCE.createSDocumentGraph();
         document = SaltFactory.eINSTANCE.createSDocument();
-        document.setSDocumentGraph(graph);
 
         ArrayList<String> path =
           new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
@@ -139,11 +138,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           subcorpus.setSName(path.get(i));
           corpusGraph.addSSubCorpus(corpus, subcorpus);
           corpus = subcorpus;
-        }
-        document.setSDocumentGraph(graph);
+        }        
         document.setSName(path.get(path.size() - 1));
         corpusGraph.addSDocument(corpus, document);
 
+        document.setSDocumentGraph(graph);
+        
         SFeature feature = SaltFactory.eINSTANCE.createSFeature();
         feature.setSName(AnnisConstants.MATCHED_IDS);
         feature.setSValue(key);
@@ -282,7 +282,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       throw new NotImplementedException("no node creation possible for class: "
         + clazz.getName());
     }
-
     copyNodeProperties(oldNode, node, oldNode.getSGraph(), null);
 
     return node;
@@ -308,7 +307,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     }
 
     graph.addNode(to);
-
+   
     if (from != null)
     {
       for (SAnnotation anno : from.getSAnnotations())
