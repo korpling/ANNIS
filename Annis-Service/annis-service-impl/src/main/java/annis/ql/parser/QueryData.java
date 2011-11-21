@@ -25,6 +25,7 @@ import java.util.Set;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -152,6 +153,21 @@ public void setDocuments(List<Long> documents) {
 
 public Set<Object> getExtensions() {
 	return extensions;
+}
+
+public<T> List<T> getExtensions(Class<T> clazz)
+{
+  List<T> result = new LinkedList<T>();
+  
+  for(Object o : extensions)
+  {
+    if(clazz.isInstance(o))
+    {
+      result.add((T) o);
+    }
+  }
+  
+  return result;
 }
 
 public boolean addExtension(Object extension) {

@@ -152,6 +152,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doCorpus("3");
     doSet("limit to 10");
+    doSet("offset to 10");
     doSet("left to 5");
     doSet("right to 5");
     doAnnotate("tok & tok & #1 . #2");
