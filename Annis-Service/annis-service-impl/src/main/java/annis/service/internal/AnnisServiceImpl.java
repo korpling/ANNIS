@@ -15,6 +15,9 @@
  */
 package annis.service.internal;
 
+import annis.WekaHelper;
+import annis.resolver.ResolverEntry;
+import annis.service.ifaces.AnnisBinaryMetaData;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -237,5 +240,17 @@ public class AnnisServiceImpl implements AnnisService
   {
     this.maxContext = maxContext;
   }
-  
+
+  @Override
+  public AnnisBinary getBinary(long id, int offset, int length)
+    throws RemoteException
+  {
+    return annisDao.getBinary(id, offset, length);
+  }
+
+  @Override
+  public AnnisBinaryMetaData getBinaryMeta(long id)
+  {
+    return annisDao.getBinary(id, 1, 1);    
+  }
 }

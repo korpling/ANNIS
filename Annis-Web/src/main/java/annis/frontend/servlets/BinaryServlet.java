@@ -15,60 +15,129 @@
  */
 package annis.frontend.servlets;
 
-
-import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisBinary;
+import annis.service.ifaces.AnnisBinaryMetaData;
+import java.rmi.RemoteException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.*;
 
 import java.io.IOException;
+import java.util.Map;
 
-public class BinaryServlet extends HttpServlet {
+/**
+ * This Servlet provides binary-files with a stream of partial-content. The
+ * first GET-request is answered with the status-code 206 Partial Content.
+ * 
+ * @author benjamin
+ * 
+ */
+public class BinaryServlet extends HttpServlet
+{
 
-	private static final long serialVersionUID = -8182635617256833563L;
+  private static final long serialVersionUID = -8182635617256833563L;
+  private int slice = 200000; // max portion which is transfered over rmi
+  private long corpusId;
 
-	@SuppressWarnings("unchecked")
-	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
-		String binaryParameter = request.getRequestURI().replaceFirst("/.+/.+/", "");
-		String[] split = binaryParameter.split("_");
-		
-		if(split.length < 1)
-			throw new RuntimeException("Parameter 'id' must no be null.");
-		
-		String binaryId = split[0];
-		
-    int foundMp3 = binaryId.lastIndexOf(".mp3");
-    if(foundMp3 > -1)
+  @SuppressWarnings("deprecation")
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException
+  {
+
+    // get Parameter from url, actually it' s only the corpusId
+    Map<String, String[]> binaryParameter = request.getParameterMap();
+    corpusId = Long.parseLong(binaryParameter.get("id")[0]);
+    ServletOutputStream out = response.getOutputStream();
+
+    try
     {
-      binaryId = binaryId.substring(0, foundMp3);
+
+      String range = request.getHeader("Range");
+      AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().
+              getInitParameter("AnnisRemoteService.URL"));
+
+      if (range != null)
+      {
+        responseStatus206(service, out, response, range);
+      } else
+      {
+
+        responseStatus200(service, out, response);
+      }
+    } catch (AnnisServiceFactoryException e)
+    {
+      throw new RuntimeException(e.getMessage());
     }
-    
-		ServletOutputStream out = response.getOutputStream();
 
-		//TODO: maybe we should implement Caching
-    
-		try {
-			AnnisService service = AnnisServiceFactory.getClient(this.getServletContext().getInitParameter("AnnisRemoteService.URL"));
-			AnnisBinary binary = service.getBinary(Long.parseLong(binaryId));
+    out.flush();
+    out.close();
+  }
 
-      String mimeType = binary.getMimeType();
+  private void responseStatus206(AnnisService service, ServletOutputStream out,
+          HttpServletResponse response, String range) throws RemoteException, IOException
+  {
+    AnnisBinaryMetaData bm = service.getBinaryMeta(corpusId);
+    AnnisBinary binary;
+
+    // Range: byte=x-y | Range: byte=0-
+    String[] rangeTupel = range.split("-");
+    int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
+
+    if (rangeTupel.length > 1)
+    {
+      slice = Integer.parseInt(rangeTupel[1]);
+    } else
+    {
+      slice = bm.getLength();
+    }
 
 
+    binary = service.getBinary(corpusId, offset + 1, slice - offset);
 
-			response.setContentType(binary.getMimeType());
-			response.setContentLength(binary.getBytes().length);
-			out.write(binary.getBytes());
-			out.flush();
-		} catch (AnnisServiceFactoryException e) {
-			throw new RuntimeException(e.getMessage());
-		} catch (NumberFormatException e) {
-			throw new RuntimeException("Parameter 'id' must be numeric");
-		} catch (AnnisBinaryNotFoundException e) {
-			throw new RuntimeException("Binary with id '" + binaryId + "' does not exist.");
-		}
-	}
+    response.setHeader("Content-Range", "bytes " + offset + "-"
+            + (bm.getLength() - 1) + "/" + bm.getLength());
+    response.setContentType(bm.getMimeType());
+    response.setStatus(206);
+    response.setContentLength(binary.getBytes().length);
+
+    out.write(binary.getBytes());
+  }
+
+  private void responseStatus200(AnnisService service, ServletOutputStream out,
+          HttpServletResponse response) throws RemoteException, IOException
+  {
+    AnnisBinaryMetaData binaryMeta = service.getBinaryMeta(corpusId);
+
+    response.setStatus(200);
+    response.setHeader("Accept-Ranges", "bytes");
+    response.setContentType(binaryMeta.getMimeType());
+    response.setHeader("Content-Range", "bytes 0-" + (binaryMeta.getLength() - 1)
+            + "/" + binaryMeta.getLength());
+    response.setContentLength(binaryMeta.getLength());
+
+    getCompleteFile(service, out);
+  }
+
+  /**
+   * This function get the whole binary-file and put it to responds.out
+   * there must exist at least one byte
+   * 
+   * 
+   * @param service
+   * @param out
+   * @param corpusId 
+   */
+  private void getCompleteFile(AnnisService service, ServletOutputStream out)
+          throws RemoteException, IOException
+  {
+
+    AnnisBinaryMetaData annisBinary = service.getBinaryMeta(corpusId);
+    slice = annisBinary.getLength();
+
+    out.write(service.getBinary(corpusId, 1, annisBinary.getLength() - 1).getBytes());
+  }
 }

@@ -25,11 +25,13 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 
 public interface AnnisDao
 {
+
 
   public AnnotationGraph retrieveAnnotationGraph(long textId);
 
@@ -37,10 +39,12 @@ public interface AnnisDao
 
   public List<Long> listCorpusByName(List<String> corpusNames);
 
-  public List<AnnisAttribute> listAnnotations(List<Long> corpusList, 
-    boolean listValues, boolean onlyMostFrequentValues);
+  public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
+      boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
+
+  public AnnisBinary getBinary(long corpusId, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 

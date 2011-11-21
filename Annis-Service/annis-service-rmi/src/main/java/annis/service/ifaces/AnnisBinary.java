@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.ifaces;
-
-import java.io.Serializable;
-
-/**
- * This is the actual container for a single search result.
- * 
- * @author k.huetter
- *
- */
-public interface AnnisBinary extends Serializable, JSONAble 
-{
-
-	public byte[] getBytes();
-	public void setBytes(byte[] bytes);
-	
-	public long getId();
-	public void setId(long id);
-	
-	public String getMimeType();
-	public void setMimeType(String mimeType);
-	
-	public String getFileName();
-	public void setFileName(String fileName);
-	
+package annis.service.ifaces;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * This is the actual container for a single search result.
+ * 
+ * 
+ * 
+ * @author k.huetter, b. weissenfels
+ * 
+ * 
+ */
+public interface AnnisBinary extends AnnisBinaryMetaData, Serializable, JSONAble
+{
+
+  public void setBytes(byte[] bytes);
+  
+  public byte[] getBytes();
+
+  public void setLength(int length);
+
+  public void setId(long id);
+
+  public void setMimeType(String mimeType);
+
+  public void setFileName(String fileName);
 }

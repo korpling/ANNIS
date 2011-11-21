@@ -80,6 +80,8 @@
 		<!--<property name="dataSource" ref="dataSource"/>-->
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
+  
+  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" />
 
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
     <property name="scriptFile" value="modify_session.sql"/>
