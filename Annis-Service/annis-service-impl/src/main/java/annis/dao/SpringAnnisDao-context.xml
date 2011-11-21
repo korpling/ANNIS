@@ -80,6 +80,8 @@
 		<!--<property name="dataSource" ref="dataSource"/>-->
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
+  
+  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" />
 
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
     <property name="scriptFile" value="modify_session.sql"/>
@@ -130,6 +132,7 @@
     <property name="countExtractor" ref="countExtractor"/>
 
     <property name="metaDataFilter" ref="metaDataFilter" />
+    <property name="byteHelper" ref="byteHelper" />
 
   </bean>
 <!-- old

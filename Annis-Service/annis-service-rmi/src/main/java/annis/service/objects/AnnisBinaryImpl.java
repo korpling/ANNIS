@@ -17,48 +17,66 @@ package annis.service.objects;
 
 import annis.service.ifaces.AnnisBinary;
 
-public class AnnisBinaryImpl implements AnnisBinary {
-	
+public class AnnisBinaryImpl extends AnnisBinaryMetaDataImpl implements AnnisBinary
+{
 
-	private byte[] bytes;
-	private long id;
-	private String mimeType;
-	private String fileName;
-	
-	public byte[] getBytes() {
-		return this.bytes;
-	}
+  @Override
+  public byte[] getBytes()
+  {
+    return this.bytes;
+  }
+  
 
-	public long getId() {
-		return this.id;
-	}
+  @Override
+  public void setBytes(byte[] bytes)
+  {
+    if (bytes == null)
+    {
+      throw new RuntimeException("didn't get bytes");
+    }
+    this.bytes = bytes;
+  }
 
-	public void setBytes(byte[] bytes) {
-		this.bytes = bytes;
-	}
+  @Override
+  public void setId(long id)
+  {
+    this.id = id;
+  }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  @Override
+  public String getJSON()
+  {
+    return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '"
+            + new String(this.bytes) + "'}";
+  }  
 
-	public String getJSON() {
-		return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '" + new String(this.bytes) + "'}";
-	}
+  @Override
+  public void setMimeType(String mimeType)
+  {
+    this.mimeType = mimeType;
+  }
 
-	public String getMimeType() {
-		return this.mimeType;
-	}
+  @Override
+  public String getFileName()
+  {
+    return this.fileName;
+  }
 
-	public void setMimeType(String mimeType) {
-		this.mimeType = mimeType;
-	}
+  @Override
+  public void setFileName(String fileName)
+  {
+    this.fileName = fileName;
+  }
 
-	public String getFileName() {
-		return this.fileName;
-	}
+  @Override
+  public void setLength(int length)
+  {
+    this.length = length;
+  }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
+  @Override
+  public int getLength()
+  {
+    return this.length;
+  }
 }
