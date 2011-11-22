@@ -17,8 +17,8 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnnotationSearchExpr;

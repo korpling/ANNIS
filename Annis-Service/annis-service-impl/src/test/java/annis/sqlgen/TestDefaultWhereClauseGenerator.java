@@ -37,9 +37,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.model.AnnisNode;
-import annis.model.AnnisNode.TextMatching;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.AnnisNode.TextMatching;
+import annis.querymodel.Annotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;

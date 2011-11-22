@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.model.AnnisNode;
-import annis.model.AnnisNode.TextMatching;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.AnnisNode.TextMatching;
+import annis.querymodel.Annotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;

@@ -26,8 +26,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.model.Annotation;
-import annis.model.AnnisNode.TextMatching;
+import annis.querymodel.Annotation;
+import annis.querymodel.AnnisNode.TextMatching;
 
 public class TestSubQueryCorpusSelectionStrategy {
 

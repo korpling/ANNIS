@@ -39,8 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
 
 public class TestTableAccessStrategy {
 

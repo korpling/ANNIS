@@ -15,7 +15,7 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 
 // FIXME: same as Dominance, abstract range information and refactor generation code in ClauseAnalysis
 public class PointingRelation extends RankTableJoin {

@@ -17,8 +17,7 @@ package annis.sqlgen;
 
 
 
-import annis.model.AnnisNode;
-import org.apache.log4j.Logger;
+import annis.querymodel.AnnisNode;
 
 
 public class DefaultTableAccessStrategy extends TableAccessStrategy

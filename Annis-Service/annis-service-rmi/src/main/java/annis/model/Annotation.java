@@ -20,144 +20,121 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import annis.model.AnnisNode.TextMatching;
-
 public class Annotation implements Comparable<Annotation>, Serializable
 {
 
-	// this class is sent to the front end
-	
+  // this class is sent to the front end
+  private String namespace;
+  private String name;
+  private String value;
+  private String type;
+  private String corpusName;
 
-	private String namespace;
-	private String name;
-	private String value;
-	private String type;
-	private String corpusName;
-	private TextMatching textMatching;
+  public Annotation(String namespace, String name)
+  {
+    this(namespace, name, null);
+  }
 
-	public Annotation(String namespace, String name)
-	{
-		this(namespace, name, null, null);
-	}
+  public Annotation(String namespace, String name, String value)
+  {
+    this.namespace = namespace;
+    this.name = name;
+    this.value = value;
+  }
 
-	public Annotation(String namespace, String name, String value)
-	{
-		this(namespace, name, value, TextMatching.EXACT_EQUAL);
-	}
+  public Annotation(String namespace, String name, String value, String type,
+    String corpusName)
+  {
+    this(namespace, name, value);
+    this.type = type;
+    this.corpusName = corpusName;
+  }
 
-	public Annotation(String namespace, String name, String value,
-			TextMatching textMatching)
-	{
-		this.namespace = namespace;
-		this.name = name;
-		this.value = value;
-		this.textMatching = textMatching;
-	}
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(AnnisNode.qName(namespace, name));
+    if (value != null)
+    {
+      sb.append("=");
+      sb.append(value);
+    }
+    return sb.toString();
+  }
 
-	public Annotation(String namespace, String name, String value, String type,
-			String corpusName)
-	{
-		this(namespace, name, value);
-		this.type = type;
-		this.corpusName = corpusName;
-	}
+  @Override
+  public int compareTo(Annotation o)
+  {
+    String name1 = getQualifiedName();
+    String name2 = o.getQualifiedName();
+    return name1.compareTo(name2);
+  }
 
-	@Override
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append(AnnisNode.qName(namespace, name));
-		if (value != null)
-		{
-			sb.append(" ");
-			sb.append(textMatching);
-			sb.append(" ");
-			sb.append(value);
-		}
-		return sb.toString();
-	}
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null || !(obj instanceof Annotation))
+    {
+      return false;
+    }
 
-	public int compareTo(Annotation o)
-	{
-		String name1 = getQualifiedName();
-		String name2 = o.getQualifiedName();
-		return name1.compareTo(name2);
-	}
+    Annotation other = (Annotation) obj;
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj == null || !(obj instanceof Annotation))
-			return false;
+    return new EqualsBuilder().append(this.namespace, other.namespace).append(
+      this.name, other.name).append(this.value, other.value).isEquals();
+  }
 
-		Annotation other = (Annotation) obj;
+  @Override
+  public int hashCode()
+  {
+    return new HashCodeBuilder().append(namespace).append(name).append(value).
+      toHashCode();
+  }
 
-		return new EqualsBuilder().append(this.namespace, other.namespace)
-				.append(this.name, other.name).append(this.value, other.value)
-				.append(this.textMatching, other.textMatching).isEquals();
-	}
+  // /// Getter / Setter
+  public String getValue()
+  {
+    return value;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return new HashCodeBuilder().append(namespace).append(name)
-				.append(value).append(textMatching).toHashCode();
-	}
+  public void setValue(String value)
+  {
+    this.value = value;
+  }
 
-	// /// Getter / Setter
+  public String getNamespace()
+  {
+    return namespace;
+  }
 
-	public String getValue()
-	{
-		return value;
-	}
+  public void setNamespace(String namespace)
+  {
+    this.namespace = namespace;
+  }
 
-	public void setValue(String value)
-	{
-		this.value = value;
-	}
+  public String getName()
+  {
+    return name;
+  }
 
-	public TextMatching getTextMatching()
-	{
-		return textMatching;
-	}
+  public void setName(String name)
+  {
+    this.name = name;
+  }
 
-	public void setTextMatching(TextMatching textMatching)
-	{
-		this.textMatching = textMatching;
-	}
+  public String getQualifiedName()
+  {
+    return AnnisNode.qName(namespace, name);
+  }
 
-	public String getNamespace()
-	{
-		return namespace;
-	}
+  public String getType()
+  {
+    return type;
+  }
 
-	public void setNamespace(String namespace)
-	{
-		this.namespace = namespace;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public String getQualifiedName()
-	{
-		return AnnisNode.qName(namespace, name);
-	}
-
-	public String getType()
-	{
-		return type;
-	}
-
-	public String getCorpusName()
-	{
-		return corpusName;
-	}
+  public String getCorpusName()
+  {
+    return corpusName;
+  }
 }

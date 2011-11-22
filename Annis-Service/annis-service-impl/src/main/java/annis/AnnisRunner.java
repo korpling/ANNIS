@@ -42,7 +42,7 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.dao.MetaDataFilter;
-import annis.model.Annotation;
+import annis.querymodel.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -661,7 +661,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
+    List<annis.model.Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
     printAsTable(corpusAnnotations, "namespace", "name", "value");
   }
 

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.model.Annotation;
+import annis.querymodel.Annotation;
 
 public class SubQueryCorpusSelectionStrategy {
 

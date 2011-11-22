@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;

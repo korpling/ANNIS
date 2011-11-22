@@ -15,7 +15,7 @@
  */
 package annis.ql.parser;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
 

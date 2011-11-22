@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.dao.DataAccessException;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.parser.QueryData;
 
 

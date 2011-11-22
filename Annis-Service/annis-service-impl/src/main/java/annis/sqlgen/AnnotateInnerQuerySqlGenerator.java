@@ -12,7 +12,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataAccessException;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 

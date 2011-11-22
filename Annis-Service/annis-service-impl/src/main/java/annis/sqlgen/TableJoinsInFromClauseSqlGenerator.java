@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.parser.QueryData;
 
 

@@ -13,16 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.model;
+package annis.querymodel;
 
+import annis.querymodel.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import annis.sqlgen.model.RankTableJoin;
 
 public class TestAnnisNode {
 	
@@ -72,7 +76,21 @@ public class TestAnnisNode {
 		// test for null values
 		assertThat(node.getSpannedText(), is(nullValue()));
 	}
-
+	
+	@Test
+	public void addRelationRankTable() {
+		// sanity check
+		assertThat(node.isPartOfEdge(), is(false));
+		
+		// add a join that uses the rank table
+		AnnisNode target = mock(AnnisNode.class);
+		RankTableJoin rankTableJoin = new RankTableJoin(target, "foo", 0, 0) { };
+		node.addJoin(rankTableJoin);
+		
+		// assert both node and target know about the edge
+		assertThat(node.isPartOfEdge(), is(true));
+		verify(target).setPartOfEdge(true);
+	}
 
 	@Test
 	public void setTokenIndexToken() {

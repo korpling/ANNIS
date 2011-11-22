@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnisNode.TextMatching;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
+import annis.querymodel.AnnisNode.TextMatching;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;

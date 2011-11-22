@@ -28,7 +28,7 @@ import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
 import annis.dao.Match;
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.ql.parser.QueryData;
 
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>

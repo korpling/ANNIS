@@ -63,9 +63,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnisNode.TextMatching;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
+import annis.querymodel.AnnisNode.TextMatching;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;

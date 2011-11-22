@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 import java.util.List;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 
 public interface GroupByClauseSqlGenerator<T> {
 

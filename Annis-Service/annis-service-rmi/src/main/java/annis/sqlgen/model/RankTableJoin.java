@@ -15,7 +15,7 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 
 public abstract class RankTableJoin extends RangedJoin {
 

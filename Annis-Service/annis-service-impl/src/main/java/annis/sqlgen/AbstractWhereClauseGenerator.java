@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;

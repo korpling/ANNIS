@@ -15,7 +15,7 @@
  */
 package annis.dao;
 
-import annis.model.Annotation;
+import annis.querymodel.Annotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.SubQueryCorpusSelectionStrategy;
 import java.util.List;

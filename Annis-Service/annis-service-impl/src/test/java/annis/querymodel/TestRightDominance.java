@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.model;
+package annis.querymodel;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -21,13 +21,13 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import annis.sqlgen.model.Dominance;
-import annis.sqlgen.model.Sibling;
+import annis.sqlgen.model.RightDominance;
 
-public class TestSibling {
+public class TestRightDominance {
 
 	@Test
 	public void instanceOfDominance() {
-		assertThat(new Sibling(new AnnisNode(1)), instanceOf(Dominance.class));
+		assertThat(new RightDominance(new AnnisNode(1)), instanceOf(Dominance.class));
 	}
 	
 }

@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.querymodel.AnnisNode;
+import annis.querymodel.Annotation;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;

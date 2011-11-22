@@ -20,7 +20,7 @@ import java.util.Collection;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import annis.model.AnnisNode.TextMatching;
+import annis.querymodel.AnnisNode.TextMatching;
 
 /**
  * TODO: write documentation for BaseSqlClauseGenerator, fix name

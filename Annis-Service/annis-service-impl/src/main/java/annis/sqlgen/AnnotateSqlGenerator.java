@@ -34,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
-import annis.model.AnnisNode;
+import annis.querymodel.AnnisNode;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import org.apache.commons.lang.Validate;

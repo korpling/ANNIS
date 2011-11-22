@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import annis.model.AnnisNode;
-import annis.model.AnnisNode.TextMatching;
 
 public class AnnisNodeRowMapper extends AbstractModelRowMapper<AnnisNode> {
 	
@@ -38,7 +37,7 @@ public class AnnisNodeRowMapper extends AbstractModelRowMapper<AnnisNode> {
 		annisNode.setTokenIndex(longValue(resultSet, "token_index"));
 		if (resultSet.wasNull())
 			annisNode.setTokenIndex(null);
-		annisNode.setSpannedText(stringValue(resultSet, "span"), TextMatching.EXACT_EQUAL);
+		annisNode.setSpannedText(stringValue(resultSet, "span"));
 		annisNode.setLeftToken(longValue(resultSet, "left_token"));
 		annisNode.setRightToken(longValue(resultSet, "right_token"));
 		
