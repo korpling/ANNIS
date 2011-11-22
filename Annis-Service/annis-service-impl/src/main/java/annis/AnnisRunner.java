@@ -42,7 +42,7 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.dao.MetaDataFilter;
-import annis.querymodel.QueryAnnotation;
+import annis.model.QueryAnnotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;

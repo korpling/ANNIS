@@ -22,7 +22,7 @@ import java.util.Map;
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 
 
 public class TableAccessStrategy {

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.querymodel;
+package annis.model;
 
-import annis.querymodel.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -28,7 +27,7 @@ import org.junit.Test;
 
 import annis.sqlgen.model.RankTableJoin;
 
-public class TestAnnisNode {
+public class TestQueryNode {
 	
 	// object under test
 	private QueryNode node;

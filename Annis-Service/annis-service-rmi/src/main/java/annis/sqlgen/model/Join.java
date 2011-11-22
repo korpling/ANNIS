@@ -15,8 +15,8 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.QueryNode;
-import annis.querymodel.DataObject;
+import annis.model.QueryNode;
+import annis.model.DataObject;
 
 @SuppressWarnings("serial")
 public abstract class Join extends DataObject {

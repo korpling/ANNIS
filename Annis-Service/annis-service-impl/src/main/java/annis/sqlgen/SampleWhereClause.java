@@ -23,7 +23,7 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 import java.util.HashSet;

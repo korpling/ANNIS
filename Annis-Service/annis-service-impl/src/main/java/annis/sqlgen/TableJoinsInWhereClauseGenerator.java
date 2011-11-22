@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TableJoinsInWhereClauseGenerator

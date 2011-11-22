@@ -15,7 +15,7 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 
 @SuppressWarnings("serial")
 public class Sibling extends Dominance {

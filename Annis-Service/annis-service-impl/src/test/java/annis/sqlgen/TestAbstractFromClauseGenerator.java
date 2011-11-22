@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Spy;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TestAbstractFromClauseGenerator {

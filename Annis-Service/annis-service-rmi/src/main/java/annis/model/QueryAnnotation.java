@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.querymodel;
+package annis.model;
 
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import annis.querymodel.QueryNode.TextMatching;
+import annis.model.QueryNode.TextMatching;
 
 public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializable
 {

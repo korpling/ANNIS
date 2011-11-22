@@ -38,7 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.dao.DataAccessException;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TestAbstractUnionSqlGenerator {

@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public abstract class AbstractFromClauseGenerator 

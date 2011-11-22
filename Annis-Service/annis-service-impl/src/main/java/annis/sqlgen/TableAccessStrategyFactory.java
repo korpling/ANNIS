@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 
 public class TableAccessStrategyFactory {
 

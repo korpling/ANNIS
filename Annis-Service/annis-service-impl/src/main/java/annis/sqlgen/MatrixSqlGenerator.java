@@ -42,8 +42,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
-import annis.querymodel.QueryNode;
-import annis.querymodel.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 
 /**

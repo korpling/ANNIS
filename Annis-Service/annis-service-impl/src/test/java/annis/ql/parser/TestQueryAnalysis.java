@@ -40,8 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.querymodel.QueryNode;
-import annis.querymodel.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
 import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
 import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
 import de.deutschdiachrondigital.dddquery.node.APathExpr;

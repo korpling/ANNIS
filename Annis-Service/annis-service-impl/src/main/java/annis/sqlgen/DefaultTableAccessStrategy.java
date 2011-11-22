@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 
 
 public class DefaultTableAccessStrategy extends TableAccessStrategy

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 

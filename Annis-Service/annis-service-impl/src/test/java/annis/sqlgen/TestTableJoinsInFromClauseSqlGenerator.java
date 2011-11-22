@@ -31,8 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.querymodel.QueryNode;
-import annis.querymodel.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
 
 public class TestTableJoinsInFromClauseSqlGenerator {
 

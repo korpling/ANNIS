@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
-import annis.querymodel.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
