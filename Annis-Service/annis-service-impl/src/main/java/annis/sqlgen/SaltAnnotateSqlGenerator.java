@@ -66,11 +66,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   {
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 
-    final SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
-
-    corpusGraph.setSName("annis_result");
-
-    project.getSCorpusGraphs().add(corpusGraph);
+    SCorpusGraph corpusGraph = null;
 
     SDocumentGraph graph = null;
 
@@ -90,7 +86,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     List<Long> lastKey = new LinkedList<Long>();
 
     int match_index = 0;
-    
+
     while (resultSet.next())
     {
       Array sqlKey = resultSet.getArray("key");
@@ -105,7 +101,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       if (!lastKey.equals(key))
       {
-        
 
         // create the text for the last graph
         if (graph != null)
@@ -120,6 +115,17 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         tokenTexts.clear();
         tokenByIndex.clear();
 
+
+        Integer matchstart = resultSet.getInt("matchstart");
+        corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+        corpusGraph.setSName("match_" + (match_index + matchstart));
+        
+        SFeature feature = SaltFactory.eINSTANCE.createSFeature();
+        feature.setSName(AnnisConstants.MATCHED_IDS);
+        feature.setSValue(key);
+        corpusGraph.addSFeature(feature);
+        project.getSCorpusGraphs().add(corpusGraph);
+        
         graph = SaltFactory.eINSTANCE.createSDocumentGraph();
         document = SaltFactory.eINSTANCE.createSDocument();
 
@@ -128,16 +134,10 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           "path").getArray()));
         Collections.reverse(path);
 
-        Integer matchstart = resultSet.getInt("matchstart");
-        
-        SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
-        matchCorpus.setSName("match_" + (match_index + matchstart));
-        corpusGraph.addSNode(matchCorpus);
-        
-        SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();        
+        SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
         toplevelCorpus.setSName(path.get(0));
-        corpusGraph.addSSubCorpus(matchCorpus, toplevelCorpus);
-        
+        corpusGraph.addSNode(toplevelCorpus);
+
         Validate.isTrue(path.size() >= 2,
           "Corpus path must be have at least two members (toplevel and document)");
         SCorpus corpus = toplevelCorpus;
@@ -148,17 +148,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           subcorpus.setSName(path.get(i));
           corpusGraph.addSSubCorpus(corpus, subcorpus);
           corpus = subcorpus;
-        }        
+        }
         document.setSName(path.get(path.size() - 1));
         corpusGraph.addSDocument(corpus, document);
 
         document.setSDocumentGraph(graph);
-        
-        SFeature feature = SaltFactory.eINSTANCE.createSFeature();
-        feature.setSName(AnnisConstants.MATCHED_IDS);
-        feature.setSValue(key);
-        graph.addSFeature(feature);
-        
+
         match_index++;
       } // end if new key
 
@@ -174,11 +169,11 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     } // end while new result row
 
     // the last match needs a primary text, too
-    if(graph != null)
+    if (graph != null)
     {
       createPrimaryText(graph, tokenTexts, tokenByIndex);
     }
-    
+
     return project;
   }
 
@@ -319,7 +314,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     }
 
     graph.addNode(to);
-   
+
     if (from != null)
     {
       for (SAnnotation anno : from.getSAnnotations())
