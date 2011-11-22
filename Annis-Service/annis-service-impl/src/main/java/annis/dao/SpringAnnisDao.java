@@ -46,6 +46,7 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisResultSet;
 import annis.sqlgen.AOMAnnotateSqlGenerator;
@@ -53,6 +54,7 @@ import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
+import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.MatrixSqlGenerator;
@@ -126,12 +128,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
   }
   private static Logger log = Logger.getLogger(SpringAnnisDao.class);
-  /// old
+  // / old
   private SqlGenerator sqlGenerator;
   private ListCorpusSqlHelper listCorpusSqlHelper;
   private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
-  /// new
+  // / new
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
   private CountExtractor countExtractor;
@@ -144,6 +146,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private DddQueryParser dddqueryParser;
   private de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis;
   private HashMap<Long, Properties> corpusConfiguration;
+  private ByteHelper byteHelper;
 
   public SpringAnnisDao()
   {
@@ -265,8 +268,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     boolean listValues, boolean onlyMostFrequentValues)
   {
     return (List<AnnisAttribute>) getJdbcTemplate().query(
-      listAnnotationsSqlHelper.createSqlQuery(corpusList,
-      listValues, onlyMostFrequentValues), listAnnotationsSqlHelper);
+      listAnnotationsSqlHelper.createSqlQuery(corpusList, listValues,
+      onlyMostFrequentValues), listAnnotationsSqlHelper);
   }
 
   @Override
@@ -621,5 +624,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.saltAnnotateSqlGenerator = saltAnnotateSqlGenerator;
   }
   
-  
+  public ByteHelper getByteHelper()
+  {
+    return byteHelper;
+  }
+
+  public void setByteHelper(ByteHelper byteHelper)
+  {
+    this.byteHelper = byteHelper;
+  }
+
+  @Override
+  public AnnisBinary getBinary(long corpusId, int offset, int length)
+  {
+    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(corpusId,
+      offset, length), byteHelper);
+  }
 }
