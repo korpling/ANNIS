@@ -15,7 +15,7 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 /**
  *
@@ -24,7 +24,7 @@ import annis.querymodel.AnnisNode;
 public class Identical extends Join
 {
 
-  public Identical(AnnisNode target)
+  public Identical(QueryNode target)
   {
     super(target);
   }

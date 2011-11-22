@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 
 public class DefaultTableAccessStrategy extends TableAccessStrategy
@@ -27,7 +27,7 @@ public class DefaultTableAccessStrategy extends TableAccessStrategy
 		super();
 	}
 	
-	public DefaultTableAccessStrategy(AnnisNode node) {
+	public DefaultTableAccessStrategy(QueryNode node) {
 		super(node);
 	}
 	

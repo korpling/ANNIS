@@ -26,19 +26,19 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.querymodel.Annotation;
-import annis.querymodel.AnnisNode.TextMatching;
+import annis.querymodel.QueryAnnotation;
+import annis.querymodel.QueryNode.TextMatching;
 
 public class TestSubQueryCorpusSelectionStrategy {
 
 	private List<Long> corpusList;
-	private List<Annotation> metaData;
+	private List<QueryAnnotation> metaData;
 	private SubQueryCorpusSelectionStrategy strategy;
 	
 	@Before
 	public void setup() {
 		corpusList = new ArrayList<Long>();
-		metaData = new ArrayList<Annotation>();
+		metaData = new ArrayList<QueryAnnotation>();
 		strategy = new SubQueryCorpusSelectionStrategy();
 	}
 
@@ -55,7 +55,7 @@ public class TestSubQueryCorpusSelectionStrategy {
 	
 	@Test
 	public void hasCorpusSelectionMetaData() {
-		metaData = Arrays.asList(new Annotation("NAMESPACE", "NAME"));
+		metaData = Arrays.asList(new QueryAnnotation("NAMESPACE", "NAME"));
 		assertThat(strategy.hasCorpusSelection(corpusList, metaData), is(true));
 	}
 	
@@ -106,9 +106,9 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation3.value ~ 'value3' " +
 			"AND corpus_annotation3.corpus_ref = c1.id";
 		
-		Annotation annotation1 = new Annotation("namespace1", "name1");
-		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
-		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
+		QueryAnnotation annotation1 = new QueryAnnotation("namespace1", "name1");
+		QueryAnnotation annotation2 = new QueryAnnotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
+		QueryAnnotation annotation3 = new QueryAnnotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
 		
 		metaData = Arrays.asList(annotation1, annotation2, annotation3);
 		assertEquals(expected, strategy.buildSubQuery(corpusList, metaData));
@@ -134,9 +134,9 @@ public class TestSubQueryCorpusSelectionStrategy {
 			"AND corpus_annotation3.value ~ 'value3' " +
 			"AND corpus_annotation3.corpus_ref = c1.id";
 		
-		Annotation annotation1 = new Annotation("namespace1", "name1");
-		Annotation annotation2 = new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
-		Annotation annotation3 = new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
+		QueryAnnotation annotation1 = new QueryAnnotation("namespace1", "name1");
+		QueryAnnotation annotation2 = new QueryAnnotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL);
+		QueryAnnotation annotation3 = new QueryAnnotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL);
 		
 		corpusList = Arrays.asList(23L, 42L, 69L);
 		metaData = Arrays.asList(annotation1, annotation2, annotation3);

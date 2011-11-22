@@ -17,10 +17,10 @@ package annis.sqlgen;
 
 import java.util.List;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public interface OrderByClauseSqlGenerator<T> {
 
-	String orderByClause(T queryData, List<AnnisNode> alternative, String indent);
+	String orderByClause(T queryData, List<QueryNode> alternative, String indent);
 
 }

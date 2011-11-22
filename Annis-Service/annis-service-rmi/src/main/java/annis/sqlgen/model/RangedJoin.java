@@ -15,14 +15,14 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public abstract class RangedJoin extends Join {
 
 	protected int minDistance;
 	protected int maxDistance;
 
-	public RangedJoin(AnnisNode target, int minDistance, int maxDistance) {
+	public RangedJoin(QueryNode target, int minDistance, int maxDistance) {
 		super(target);
 		this.minDistance = minDistance;
 		this.maxDistance = maxDistance;		

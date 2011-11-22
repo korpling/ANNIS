@@ -15,11 +15,11 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public class Inclusion extends Join {
 
-	public Inclusion(AnnisNode target) {
+	public Inclusion(QueryNode target) {
 		super(target);
 	}
 	

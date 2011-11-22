@@ -20,9 +20,9 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import annis.querymodel.AnnisNode.TextMatching;
+import annis.querymodel.QueryNode.TextMatching;
 
-public class Annotation implements Comparable<Annotation>, Serializable
+public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializable
 {
 
 	// this class is sent to the front end
@@ -35,17 +35,17 @@ public class Annotation implements Comparable<Annotation>, Serializable
 	private String corpusName;
 	private TextMatching textMatching;
 
-	public Annotation(String namespace, String name)
+	public QueryAnnotation(String namespace, String name)
 	{
 		this(namespace, name, null, null);
 	}
 
-	public Annotation(String namespace, String name, String value)
+	public QueryAnnotation(String namespace, String name, String value)
 	{
 		this(namespace, name, value, TextMatching.EXACT_EQUAL);
 	}
 
-	public Annotation(String namespace, String name, String value,
+	public QueryAnnotation(String namespace, String name, String value,
 			TextMatching textMatching)
 	{
 		this.namespace = namespace;
@@ -54,7 +54,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 		this.textMatching = textMatching;
 	}
 
-	public Annotation(String namespace, String name, String value, String type,
+	public QueryAnnotation(String namespace, String name, String value, String type,
 			String corpusName)
 	{
 		this(namespace, name, value);
@@ -66,7 +66,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append(AnnisNode.qName(namespace, name));
+		sb.append(QueryNode.qName(namespace, name));
 		if (value != null)
 		{
 			sb.append(" ");
@@ -77,7 +77,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 		return sb.toString();
 	}
 
-	public int compareTo(Annotation o)
+	public int compareTo(QueryAnnotation o)
 	{
 		String name1 = getQualifiedName();
 		String name2 = o.getQualifiedName();
@@ -87,10 +87,10 @@ public class Annotation implements Comparable<Annotation>, Serializable
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == null || !(obj instanceof Annotation))
+		if (obj == null || !(obj instanceof QueryAnnotation))
 			return false;
 
-		Annotation other = (Annotation) obj;
+		QueryAnnotation other = (QueryAnnotation) obj;
 
 		return new EqualsBuilder().append(this.namespace, other.namespace)
 				.append(this.name, other.name).append(this.value, other.value)
@@ -148,7 +148,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 
 	public String getQualifiedName()
 	{
-		return AnnisNode.qName(namespace, name);
+		return QueryNode.qName(namespace, name);
 	}
 
 	public String getType()

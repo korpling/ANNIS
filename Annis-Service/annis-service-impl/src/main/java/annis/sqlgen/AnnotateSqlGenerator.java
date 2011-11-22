@@ -34,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import org.apache.commons.lang.Validate;
@@ -442,7 +442,7 @@ public abstract class AnnotateSqlGenerator<T>
 // new
   @Override
   public String selectClause(QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     StringBuilder sb = new StringBuilder();
 
@@ -517,7 +517,7 @@ public abstract class AnnotateSqlGenerator<T>
 
   @Override
   public Set<String> whereConditions(QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     TableAccessStrategy tables = tables(null);
 
@@ -670,14 +670,14 @@ public abstract class AnnotateSqlGenerator<T>
 
   @Override
   public String orderByClause(QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     return "key, " + tables(null).aliasedColumn(RANK_TABLE, "pre");
   }
 
   @Override
   public String fromClause(QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     StringBuffer sb = new StringBuffer();
 

@@ -24,7 +24,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
@@ -65,7 +65,7 @@ public abstract class AbstractSqlGenerator<T>
 		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 		
 		// push alternative down
-		List<AnnisNode> alternative = queryData.getAlternatives().get(0);
+		List<QueryNode> alternative = queryData.getAlternatives().get(0);
 
 		String indent = computeIndent(indentBy);
 		StringBuffer sb = new StringBuffer();
@@ -77,7 +77,7 @@ public abstract class AbstractSqlGenerator<T>
 	}
 
 	protected String createSqlForAlternative(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
 		appendSelectClause(sb, queryData, alternative, indent);
 		appendFromClause(sb, queryData, alternative, indent);
@@ -102,13 +102,13 @@ public abstract class AbstractSqlGenerator<T>
 		sb.append(indent);
 	}
 
-	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		sb.append("SELECT ");
 		sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative, indent));
 		sb.append("\n");
 	}
 
-	private void appendFromClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	private void appendFromClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		indent(sb, indent);
 		sb.append("FROM");
 		List<String> fromTables = new ArrayList<String>();
@@ -121,7 +121,7 @@ public abstract class AbstractSqlGenerator<T>
 		sb.append("\n");
 	}
 
-	private void appendWhereClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	private void appendWhereClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 
 		// treat each condition as mutable string to remove last AND
 		List<StringBuffer> conditions = new ArrayList<StringBuffer>();
@@ -160,7 +160,7 @@ public abstract class AbstractSqlGenerator<T>
 		sb.append("\n");
 	}
 
-	private void appendGroupByClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	private void appendGroupByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (groupByClauseSqlGenerator != null) {
 			indent(sb, indent);
 			sb.append("GROUP BY ");
@@ -169,7 +169,7 @@ public abstract class AbstractSqlGenerator<T>
 		}
 	}
 
-	protected void appendOrderByClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	protected void appendOrderByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (orderByClauseSqlGenerator != null) {
 			indent(sb, indent);
 			sb.append("ORDER BY ");
@@ -178,7 +178,7 @@ public abstract class AbstractSqlGenerator<T>
 		}
 	}
 
-	protected void appendLimitOffsetClause(StringBuffer sb, QueryData queryData, List<AnnisNode> alternative, String indent) {
+	protected void appendLimitOffsetClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (limitOffsetClauseSqlGenerator != null) {
 			indent(sb, indent);
 			sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData, alternative, indent));

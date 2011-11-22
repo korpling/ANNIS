@@ -42,7 +42,7 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.dao.MetaDataFilter;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryAnnotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -393,7 +393,7 @@ public class AnnisRunner extends AnnisBaseRunner
 	
 	public String benchmarkOptions(QueryData queryData) {
 		List<Long> corpusList = queryData.getCorpusList();
-		List<Annotation> metaData = queryData.getMetaData();
+		List<QueryAnnotation> metaData = queryData.getMetaData();
 		Set<Object> extensions = queryData.getExtensions();
 		List<String> fields = new ArrayList<String>();
 		if (! corpusList.isEmpty() )

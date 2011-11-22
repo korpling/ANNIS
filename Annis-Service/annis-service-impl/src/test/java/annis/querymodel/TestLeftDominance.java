@@ -27,7 +27,7 @@ public class TestLeftDominance {
 
 	@Test
 	public void instanceOfDominance() {
-		assertThat(new LeftDominance(new AnnisNode(1)), instanceOf(Dominance.class));
+		assertThat(new LeftDominance(new QueryNode(1)), instanceOf(Dominance.class));
 	}
 	
 }

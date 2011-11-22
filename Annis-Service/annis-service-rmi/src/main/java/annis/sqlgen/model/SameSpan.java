@@ -15,11 +15,11 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public class SameSpan extends Join {
 
-	public SameSpan(AnnisNode target) {
+	public SameSpan(QueryNode target) {
 		super(target);
 	}
 	

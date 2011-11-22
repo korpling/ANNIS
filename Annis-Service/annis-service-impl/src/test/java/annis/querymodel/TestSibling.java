@@ -27,7 +27,7 @@ public class TestSibling {
 
 	@Test
 	public void instanceOfDominance() {
-		assertThat(new Sibling(new AnnisNode(1)), instanceOf(Dominance.class));
+		assertThat(new Sibling(new QueryNode(1)), instanceOf(Dominance.class));
 	}
 	
 }

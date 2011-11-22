@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.AnnisNode.TextMatching;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryNode.TextMatching;
+import annis.querymodel.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
@@ -58,7 +58,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addPointingRelationConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target,
+			QueryNode node, QueryNode target,
 			PointingRelation join, QueryData queryData) {
 		addSingleEdgeCondition(node, target, conditions, join,
 				"p");
@@ -66,14 +66,14 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addDominanceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Dominance join,
+			QueryNode node, QueryNode target, Dominance join,
 			QueryData queryData) {
 		addSingleEdgeCondition(node, target, conditions, join, "d");
 	}
 
 	@Override
 	protected void addRightDominanceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target,
+			QueryNode node, QueryNode target,
 			RightDominance join, QueryData queryData) {
 		addLeftOrRightDominance(conditions, node, target, queryData,
 				join, "max", "right_token");
@@ -81,14 +81,14 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addLeftDominanceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, LeftDominance join,
+			QueryNode node, QueryNode target, LeftDominance join,
 			QueryData queryData) {
 		addLeftOrRightDominance(conditions, node, target, queryData,
 				join, "min", "left_token");
 	}
 
-	void addLeftOrRightDominance(List<String> conditions, AnnisNode node,
-			AnnisNode target, QueryData queryData, RankTableJoin join,
+	void addLeftOrRightDominance(List<String> conditions, QueryNode node,
+			QueryNode target, QueryData queryData, RankTableJoin join,
 			String aggregationFunction, String tokenBoarder) {
 		List<Long> corpusList = queryData.getCorpusList();
 		conditions.add(join("=",
@@ -125,15 +125,15 @@ public class DefaultWhereClauseGenerator
 								: StringUtils.join(corpusList, ",")) + ")"));
 	}
 
-	void joinOnNode(List<String> conditions, AnnisNode node, AnnisNode target,
+	void joinOnNode(List<String> conditions, QueryNode node, QueryNode target,
 			String operator, String leftColumn, String rightColumn) {
 		conditions.add(join(operator,
 				tables(node).aliasedColumn(NODE_TABLE, leftColumn),
 				tables(target).aliasedColumn(NODE_TABLE, rightColumn)));
 	}
 
-	void betweenJoinOnNode(List<String> conditions, AnnisNode node,
-			AnnisNode target, String leftColumn, String rightColumn, int min,
+	void betweenJoinOnNode(List<String> conditions, QueryNode node,
+			QueryNode target, String leftColumn, String rightColumn, int min,
 			int max) {
 		conditions
 				.add(between(
@@ -142,8 +142,8 @@ public class DefaultWhereClauseGenerator
 						min, max));
 	}
 
-	void numberJoinOnNode(List<String> conditions, AnnisNode node,
-			AnnisNode target, String operator, String leftColumn,
+	void numberJoinOnNode(List<String> conditions, QueryNode node,
+			QueryNode target, String operator, String leftColumn,
 			String rightColumn, int offset) {
 		conditions.add(numberJoin(operator,
 				tables(node).aliasedColumn(NODE_TABLE, leftColumn),
@@ -152,7 +152,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addAnnotationConditions(List<String> conditions,
-			AnnisNode node, int index, Annotation annotation, String table) {
+			QueryNode node, int index, QueryAnnotation annotation, String table) {
 		if (annotation.getNamespace() != null) {
 			conditions.add(join("=",
 					tables(node).aliasedColumn(table,
@@ -174,7 +174,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addPrecedenceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Precedence join,
+			QueryNode node, QueryNode target, Precedence join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 
@@ -210,7 +210,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addRightOverlapConditions(List<String> conditions,
-			AnnisNode target, AnnisNode node, RightOverlap join,
+			QueryNode target, QueryNode node, RightOverlap join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, ">=", "right", "right");
@@ -220,7 +220,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addLeftOverlapConditions(List<String> conditions,
-			AnnisNode target, AnnisNode node, LeftOverlap join,
+			QueryNode target, QueryNode node, LeftOverlap join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, "<=", "left", "left");
@@ -230,7 +230,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addOverlapConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Overlap join,
+			QueryNode node, QueryNode target, Overlap join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, "<=", "left", "right");
@@ -239,7 +239,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addInclusionConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Inclusion join,
+			QueryNode node, QueryNode target, Inclusion join,
 			QueryData queryData) {
 		// FIMXE: optimizeInclusion
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
@@ -249,7 +249,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addRightAlignmentConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target,
+			QueryNode node, QueryNode target,
 			RightAlignment join, QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, "=", "right", "right");
@@ -257,7 +257,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addLeftAlignmentConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, LeftAlignment join,
+			QueryNode node, QueryNode target, LeftAlignment join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, "=", "left", "left");
@@ -265,14 +265,14 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addIdenticalConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Identical join,
+			QueryNode node, QueryNode target, Identical join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "id", "id");
 	}
 
 	@Override
 	protected void addSameSpanConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, SameSpan join,
+			QueryNode node, QueryNode target, SameSpan join,
 			QueryData queryData) {
 		joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 		joinOnNode(conditions, node, target, "=", "left", "left");
@@ -281,7 +281,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addCommonAncestorConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target,
+			QueryNode node, QueryNode target,
 			CommonAncestor join, QueryData queryData) {
 		List<Long> corpusList = queryData.getCorpusList();
 		conditions.add(join("=",
@@ -327,7 +327,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addSiblingConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Sibling join,
+			QueryNode node, QueryNode target, Sibling join,
 			QueryData queryData) {
 		conditions.add(join("=",
 				tables(node).aliasedColumn(COMPONENT_TABLE, "type"),
@@ -348,7 +348,7 @@ public class DefaultWhereClauseGenerator
 	}
 
 	@Override
-	protected void addSingleEdgeCondition(AnnisNode node, AnnisNode target,
+	protected void addSingleEdgeCondition(QueryNode node, QueryNode target,
 			List<String> conditions, Join join, final String edgeType) {
 		conditions.add(join("=",
 				tables(target).aliasedColumn(COMPONENT_TABLE, "type"),
@@ -403,8 +403,8 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addTokenArityConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
-		AnnisNode.Range tokenArity = node.getTokenArity();
+			QueryData queryData, QueryNode node) {
+		QueryNode.Range tokenArity = node.getTokenArity();
 		if (tokenArity.getMin() == tokenArity.getMax()) {
 			conditions.add(numberJoin("=",
 					tables(node).aliasedColumn(NODE_TABLE, "left_token"),
@@ -420,7 +420,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addNodeArityConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		// fugly
 		List<Long> corpusList = queryData.getCorpusList();
 		TableAccessStrategy tas = tables(null);
@@ -438,7 +438,7 @@ public class DefaultWhereClauseGenerator
 				+ " AND toplevel_corpus IN("
 				+ (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList,
 						",")) + ")" + ")");
-		AnnisNode.Range arity = node.getArity();
+		QueryNode.Range arity = node.getArity();
 		if (arity.getMin() == arity.getMax()) {
 			conditions.add(join("=", sb.toString(),
 					String.valueOf(arity.getMin())));
@@ -450,7 +450,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addNodeNameCondition(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		conditions.add(join("=",
 				tables(node).aliasedColumn(NODE_TABLE, "name"),
 				sqlString(node.getName())));
@@ -458,7 +458,7 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addNodeNamespaceConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		conditions.add(join("=",
 				tables(node).aliasedColumn(NODE_TABLE, "namespace"),
 				sqlString(node.getNamespace())));
@@ -466,21 +466,21 @@ public class DefaultWhereClauseGenerator
 
 	@Override
 	protected void addIsRootConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root")
 				+ " IS TRUE");
 	}
 
 	@Override
 	protected void addIsTokenConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token")
 				+ " IS TRUE");
 	}
 
 	@Override
 	protected void addSpanConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node) {
+			QueryData queryData, QueryNode node) {
 		TextMatching textMatching = node.getSpanTextMatching();
 		conditions.add(join(textMatching.sqlOperator(), tables(node)
 				.aliasedColumn(NODE_TABLE, "span"),

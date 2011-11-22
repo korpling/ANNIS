@@ -15,31 +15,31 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public class Dominance extends RankTableJoin {
 
-	public Dominance(AnnisNode target) {
+	public Dominance(QueryNode target) {
 		this(target, null);
 	}
 	
-	public Dominance(AnnisNode target, String name) {
+	public Dominance(QueryNode target, String name) {
 		this(target, name, 0, 0);
 	}
 	
-	public Dominance(AnnisNode target, int distance) {
+	public Dominance(QueryNode target, int distance) {
 		this(target, null, distance);
 	}
 	
-	public Dominance(AnnisNode target, String name, int distance) {
+	public Dominance(QueryNode target, String name, int distance) {
 		this(target, name, distance, distance);
 	}
 	
-	public Dominance(AnnisNode target, int minDistance, int maxDistance) {
+	public Dominance(QueryNode target, int minDistance, int maxDistance) {
 		this(target, null, minDistance, maxDistance);
 	}
 	
-	public Dominance(AnnisNode target, String name, int minDistance, int maxDistance) {
+	public Dominance(QueryNode target, String name, int minDistance, int maxDistance) {
 		super(target, name, minDistance, maxDistance);
 	}
 	

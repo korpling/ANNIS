@@ -20,11 +20,11 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryAnnotation;
 
 public class SubQueryCorpusSelectionStrategy {
 
-	public String buildSubQuery(List<Long> corpusList, List<Annotation> metaData) {
+	public String buildSubQuery(List<Long> corpusList, List<QueryAnnotation> metaData) {
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("SELECT DISTINCT c1.id FROM corpus AS c1");
@@ -52,7 +52,7 @@ public class SubQueryCorpusSelectionStrategy {
 		}
 		
 		for (int i = 1; i <= metaData.size(); ++i) {
-			Annotation annotation = metaData.get(i - 1);
+			QueryAnnotation annotation = metaData.get(i - 1);
 			if (annotation.getNamespace() != null)
 				conditions.add("corpus_annotation" + i + ".namespace = '" + annotation.getNamespace() + "'");
 			conditions.add("corpus_annotation" + i + ".name = '" + annotation.getName() + "'");
@@ -66,7 +66,7 @@ public class SubQueryCorpusSelectionStrategy {
 		return sb.toString();
 	}
 
-	public boolean hasCorpusSelection(List<Long> corpusList, List<Annotation> metaData) {
+	public boolean hasCorpusSelection(List<Long> corpusList, List<QueryAnnotation> metaData) {
 		return ! (corpusList.isEmpty() && metaData.isEmpty() );
 	}
 

@@ -17,10 +17,10 @@ package annis.sqlgen;
 
 import java.util.List;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public interface GroupByClauseSqlGenerator<T> {
 
-	String groupByAttributes(T queryData, List<AnnisNode> alternative);
+	String groupByAttributes(T queryData, List<QueryNode> alternative);
 
 }

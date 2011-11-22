@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TableJoinsInWhereClauseGenerator
@@ -39,31 +39,31 @@ public class TableJoinsInWhereClauseGenerator
 {
 
 	@Override
-	public String fromClause(QueryData queryData, List<AnnisNode> alternative,
+	public String fromClause(QueryData queryData, List<QueryNode> alternative,
 			String indent) {
 		List<String> tables = new ArrayList<String>();
-		for (AnnisNode node : alternative)
+		for (QueryNode node : alternative)
 			tables.add(fromClauseForNode(node, false));
 		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
 	}
 
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		Set<String> conditions = new HashSet<String>();
 		
-		for (AnnisNode node : alternative) {
+		for (QueryNode node : alternative) {
 			conditions.addAll(whereConditionsForNode(node));
 		}
 		
 		return conditions;
 	}
 	
-	public String fromClauseForNode(AnnisNode node) {
+	public String fromClauseForNode(QueryNode node) {
 		return fromClauseForNode(node, false);
 	}
 
-	public String fromClauseForNode(AnnisNode node, boolean leftJoin) {
+	public String fromClauseForNode(QueryNode node, boolean leftJoin) {
 		List<String> tables = new ArrayList<String>();
 
 		// every node uses the node table
@@ -98,7 +98,7 @@ public class TableJoinsInWhereClauseGenerator
 		return StringUtils.join(tables, ", ");
 	}
 
-  public Set<String> whereConditionsForNode(AnnisNode node)
+  public Set<String> whereConditionsForNode(QueryNode node)
   {
 
 		Set<String> conditions = new HashSet<String>();

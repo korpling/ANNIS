@@ -12,7 +12,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataAccessException;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
@@ -35,7 +35,7 @@ public class AnnotateInnerQuerySqlGenerator
   }
 
   @Override
-  public String selectClause(QueryData queryData, List<AnnisNode> alternative,
+  public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
     AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
@@ -43,7 +43,7 @@ public class AnnotateInnerQuerySqlGenerator
     List<String> fields = new ArrayList<String>();
     for (int i = 1; i <= alternative.size(); ++i)
     {
-      AnnisNode node = alternative.get(i - 1);
+      QueryNode node = alternative.get(i - 1);
       TableAccessStrategy tables = tables(node);
 
       fields.add("\n" + indent + TABSTOP
@@ -60,7 +60,7 @@ public class AnnotateInnerQuerySqlGenerator
 
   @Override
   protected void appendOrderByClause(StringBuffer sb, QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     // only use ORDER BY clause if result has to be sorted
     if (!sortSolutions)
@@ -76,7 +76,7 @@ public class AnnotateInnerQuerySqlGenerator
   }
 
   @Override
-  public String orderByClause(QueryData queryData, List<AnnisNode> alternative,
+  public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
     List<String> ids = new ArrayList<String>();
@@ -89,7 +89,7 @@ public class AnnotateInnerQuerySqlGenerator
 
   @Override
   public String limitOffsetClause(QueryData queryData,
-    List<AnnisNode> alternative, String indent)
+    List<QueryNode> alternative, String indent)
   {
     AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
 

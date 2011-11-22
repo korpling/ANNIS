@@ -30,7 +30,7 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 
 @SuppressWarnings("serial")
-public class AnnisNode implements Serializable
+public class QueryNode implements Serializable
 {
 
   // this class is send to the front end
@@ -45,7 +45,7 @@ public class AnnisNode implements Serializable
   private Long tokenIndex;
   private long leftToken;
   private long rightToken;
-  private Set<Annotation> nodeAnnotations;
+  private Set<QueryAnnotation> nodeAnnotations;
   // node position in annotation graph
   private String name;
   private String namespace;
@@ -56,7 +56,7 @@ public class AnnisNode implements Serializable
   private TextMatching spanTextMatching;
   private List<Join> joins;
   private String variable;
-  private Set<Annotation> edgeAnnotations;
+  private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
   private Range tokenArity;
   // for sql generation
@@ -137,21 +137,21 @@ public class AnnisNode implements Serializable
     }
   };
 
-  public AnnisNode()
+  public QueryNode()
   {
-    nodeAnnotations = new TreeSet<Annotation>();
-    edgeAnnotations = new TreeSet<Annotation>();
+    nodeAnnotations = new TreeSet<QueryAnnotation>();
+    edgeAnnotations = new TreeSet<QueryAnnotation>();
     joins = new ArrayList<Join>();
     requiredTables = new HashSet<String>();
   }
 
-  public AnnisNode(long id)
+  public QueryNode(long id)
   {
     this();
     this.id = id;
   }
 
-  public AnnisNode(long id, long corpusRef, long textRef, long left,
+  public QueryNode(long id, long corpusRef, long textRef, long left,
     long right, String namespace, String name, long tokenIndex,
     String span, long leftToken, long rightToken)
   {
@@ -271,12 +271,12 @@ public class AnnisNode implements Serializable
     return sb.toString();
   }
 
-  public boolean addEdgeAnnotation(Annotation annotation)
+  public boolean addEdgeAnnotation(QueryAnnotation annotation)
   {
     return edgeAnnotations.add(annotation);
   }
 
-  public boolean addNodeAnnotation(Annotation annotation)
+  public boolean addNodeAnnotation(QueryAnnotation annotation)
   {
     return nodeAnnotations.add(annotation);
   }
@@ -289,7 +289,7 @@ public class AnnisNode implements Serializable
     {
       this.setPartOfEdge(true);
 
-      AnnisNode target = join.getTarget();
+      QueryNode target = join.getTarget();
       target.setPartOfEdge(true);
     }
 
@@ -317,7 +317,7 @@ public class AnnisNode implements Serializable
     {
       return false;
     }
-    final AnnisNode other = (AnnisNode) obj;
+    final QueryNode other = (QueryNode) obj;
     if (this.id != other.id)
     {
       return false;
@@ -450,12 +450,12 @@ public class AnnisNode implements Serializable
   }
 
   // /// Getter / Setter
-  public Set<Annotation> getEdgeAnnotations()
+  public Set<QueryAnnotation> getEdgeAnnotations()
   {
     return edgeAnnotations;
   }
 
-  public void setEdgeAnnotations(Set<Annotation> edgeAnnotations)
+  public void setEdgeAnnotations(Set<QueryAnnotation> edgeAnnotations)
   {
     this.edgeAnnotations = edgeAnnotations;
   }
@@ -510,12 +510,12 @@ public class AnnisNode implements Serializable
     return spanTextMatching;
   }
 
-  public Set<Annotation> getNodeAnnotations()
+  public Set<QueryAnnotation> getNodeAnnotations()
   {
     return nodeAnnotations;
   }
 
-  public void setNodeAnnotations(Set<Annotation> nodeAnnotations)
+  public void setNodeAnnotations(Set<QueryAnnotation> nodeAnnotations)
   {
     this.nodeAnnotations = nodeAnnotations;
   }

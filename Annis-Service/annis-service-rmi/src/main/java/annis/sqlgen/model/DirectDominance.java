@@ -15,12 +15,12 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 @Deprecated
 public class DirectDominance extends Join {
 
-	public DirectDominance(AnnisNode target) {
+	public DirectDominance(QueryNode target) {
 		super(target);
 	}
 	

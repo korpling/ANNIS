@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -44,7 +44,7 @@ public class SubcorpusConstraintWhereClause
   implements WhereClauseSqlGenerator<QueryData>
 {
 
-  public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent)
+  public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
 	  Set<String> conditions = new HashSet<String>();
 	  List<Long> corpusList = queryData.getCorpusList();
@@ -58,13 +58,13 @@ public class SubcorpusConstraintWhereClause
 	
 	// VR: inline
 	@Deprecated
-  public List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList, List<Long> documents)
+  public List<String> commonWhereConditions(List<QueryNode> nodes, List<Long> corpusList, List<Long> documents)
   {
     LinkedList<String> conditions = new LinkedList<String>();
 
     conditions.add("-- annotations can always only be inside a subcorpus/document");
 
-    AnnisNode[] copyNodes = nodes.toArray(new AnnisNode[0]);
+    QueryNode[] copyNodes = nodes.toArray(new QueryNode[0]);
 
     HashSet<IdPair> hasAlreadyTextref = calculateTextRefRelations(copyNodes);
 
@@ -85,7 +85,7 @@ public class SubcorpusConstraintWhereClause
   }
 
   // TODO: find a way to store this information already in DefaultWhereClauseGeneration
-  private HashSet<IdPair> calculateTextRefRelations(AnnisNode[] copyNodes)
+  private HashSet<IdPair> calculateTextRefRelations(QueryNode[] copyNodes)
   {
     HashSet<IdPair> hasAlreadyTextref = new HashSet<IdPair>();
 

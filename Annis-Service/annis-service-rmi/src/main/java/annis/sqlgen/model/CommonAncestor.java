@@ -15,15 +15,15 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public class CommonAncestor extends Dominance {
 
-	public CommonAncestor(AnnisNode target) {
+	public CommonAncestor(QueryNode target) {
 		super(target);
 	}
 
-	public CommonAncestor(AnnisNode target, String name) {
+	public CommonAncestor(QueryNode target, String name) {
 		super(target, name);
 	}
 	

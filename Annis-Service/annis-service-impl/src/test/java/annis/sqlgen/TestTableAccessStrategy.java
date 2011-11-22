@@ -39,8 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
 
 public class TestTableAccessStrategy {
 
@@ -48,8 +48,8 @@ public class TestTableAccessStrategy {
 	
 	private TableAccessStrategy tableAccessStrategy;
 	
-	@Mock private AnnisNode node23;
-	@Mock private Set<Annotation> annotations;
+	@Mock private QueryNode node23;
+	@Mock private Set<QueryAnnotation> annotations;
 //	// TODO: refactor into ViewConstrainedTableAccessStrategy
 //	@Mock private CorpusSelectionStrategy corpusSelectionStrategy;
 
@@ -268,12 +268,12 @@ public class TestTableAccessStrategy {
 	@Test
 	public void aliasedTableNodeAndEdgeAnnotationsSameTable() {
 		final int NODE_ANNOTATION_COUNT = 2;
-		Set<Annotation> nodeAnnotations = mock(Set.class);
+		Set<QueryAnnotation> nodeAnnotations = mock(Set.class);
 		when(nodeAnnotations.size()).thenReturn(NODE_ANNOTATION_COUNT);
 		when(node23.getNodeAnnotations()).thenReturn(nodeAnnotations);
 		
 		final int EDGE_ANNOTATION_COUNT = 3;
-		Set<Annotation> edgeAnnotations = mock(Set.class);
+		Set<QueryAnnotation> edgeAnnotations = mock(Set.class);
 		when(edgeAnnotations.size()).thenReturn(EDGE_ANNOTATION_COUNT);
 		when(node23.getEdgeAnnotations()).thenReturn(edgeAnnotations);
 

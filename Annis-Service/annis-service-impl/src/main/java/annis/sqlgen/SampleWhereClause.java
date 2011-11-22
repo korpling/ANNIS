@@ -23,7 +23,7 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 import java.util.HashSet;
@@ -41,12 +41,12 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		Set<String> conditions = new HashSet<String>();
 		List<Long> corpusList = queryData.getCorpusList();
 		List<Long> documents = queryData.getDocuments();
 		
-		for (AnnisNode node : alternative) {
+		for (QueryNode node : alternative) {
 			conditions.addAll(whereConditions(node, corpusList, documents));
 		}
 		
@@ -55,7 +55,7 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	
 	// VR: inline
 	@Deprecated
-  public List<String> whereConditions(AnnisNode node, List<Long> corpusList, List<Long> documents)
+  public List<String> whereConditions(QueryNode node, List<Long> corpusList, List<Long> documents)
   {
     LinkedList<String> conditions = new LinkedList<String>();
 

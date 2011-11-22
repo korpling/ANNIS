@@ -28,7 +28,7 @@ import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
 import annis.dao.Match;
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
@@ -36,7 +36,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 {
 
   @Override
-  public String selectClause(QueryData queryData, List<AnnisNode> alternative,
+  public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
     int maxWidth = queryData.getMaxWidth();
@@ -46,7 +46,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     boolean isDistinct = false;
     List<String> ids = new ArrayList<String>();
     int i = 0;
-    for (AnnisNode node : alternative)
+    for (QueryNode node : alternative)
     {
       ++i;
       ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + " AS id" + i);

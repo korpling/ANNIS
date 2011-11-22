@@ -40,8 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
 import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
 import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
 import de.deutschdiachrondigital.dddquery.node.APathExpr;
@@ -89,17 +89,17 @@ public class TestQueryAnalysis {
 		when(clauseAnalysis.nodesCount()).thenReturn(columnWidth);
 		
 		// nodes for each clause
-		AnnisNode node1 = mock(AnnisNode.class);
-		AnnisNode node2 = mock(AnnisNode.class);
-		List<AnnisNode> nodes1 = Arrays.asList(node1);
-		List<AnnisNode> nodes2 = Arrays.asList(node2);
+		QueryNode node1 = mock(QueryNode.class);
+		QueryNode node2 = mock(QueryNode.class);
+		List<QueryNode> nodes1 = Arrays.asList(node1);
+		List<QueryNode> nodes2 = Arrays.asList(node2);
 		when(clauseAnalysis.getNodes()).thenReturn(nodes1, nodes2);
 		
 		// meta annotations
-		Annotation annotation1 = mock(Annotation.class);
-		Annotation annotation2 = mock(Annotation.class);
-		List<Annotation> annotations1 = Arrays.asList(annotation1);
-		List<Annotation> annotations2 = Arrays.asList(annotation2);
+		QueryAnnotation annotation1 = mock(QueryAnnotation.class);
+		QueryAnnotation annotation2 = mock(QueryAnnotation.class);
+		List<QueryAnnotation> annotations1 = Arrays.asList(annotation1);
+		List<QueryAnnotation> annotations2 = Arrays.asList(annotation2);
 		when(clauseAnalysis.getMetaAnnotations()).thenReturn(annotations1, annotations2);
 		
 		// finally the corpus list on which this query should be evaluated

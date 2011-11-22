@@ -15,23 +15,23 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.querymodel.DataObject;
 
 @SuppressWarnings("serial")
 public abstract class Join extends DataObject {
 
-	protected AnnisNode target;
+	protected QueryNode target;
 
-	public Join(AnnisNode target) {
+	public Join(QueryNode target) {
 		this.target = target;
 	}
 
-	public AnnisNode getTarget() {
+	public QueryNode getTarget() {
 		return target;
 	}
 
-	public void setTarget(AnnisNode target) {
+	public void setTarget(QueryNode target) {
 		this.target = target;
 	}
 	

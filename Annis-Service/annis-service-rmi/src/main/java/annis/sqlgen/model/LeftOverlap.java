@@ -15,11 +15,11 @@
  */
 package annis.sqlgen.model;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 
 public class LeftOverlap extends Join {
 
-	public LeftOverlap(AnnisNode target) {
+	public LeftOverlap(QueryNode target) {
 		super(target);
 	}
 	

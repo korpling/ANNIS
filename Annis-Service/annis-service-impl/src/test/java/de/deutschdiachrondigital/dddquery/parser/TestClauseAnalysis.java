@@ -63,9 +63,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
-import annis.querymodel.AnnisNode.TextMatching;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
+import annis.querymodel.QueryNode.TextMatching;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
@@ -121,7 +121,7 @@ public class TestClauseAnalysis {
 	@Test
 	public void caseAStepElementNodeTest() {
 		setTarget();
-		AnnisNode oldTarget = target();
+		QueryNode oldTarget = target();
 		clauseAnalysis.caseAStep(newStep(newParentAxis(), newElementNodeTest()));
 		assertThat(context(), is(sameInstance(oldTarget)));
 		assertThat(target(), is(not(nullValue())));
@@ -130,8 +130,8 @@ public class TestClauseAnalysis {
 	/// .../attribute::attribute()
 	@Test
 	public void caseAStepAttributeNodeTest() {
-		AnnisNode oldContext = setContext();
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldContext = setContext();
+		QueryNode oldTarget = setTarget();
 		clauseAnalysis.caseAStep(newStep(null, newAttributeNodeTest()));
 		assertThat(context(), is(sameInstance(oldContext)));
 		assertThat(target(), is(sameInstance(oldTarget)));
@@ -166,14 +166,14 @@ public class TestClauseAnalysis {
 	public void caseAExactEdgeAnnotation() {
 		setTarget();
 		clauseAnalysis.caseAExactEdgeAnnotation(newExactEdgeAnnotation(NAMESPACE, NAME, VALUE));
-		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.EXACT_EQUAL));
+		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, QueryNode.TextMatching.EXACT_EQUAL));
 	}
 	
 	@Test
 	public void caseARegexpEdgeAnnotation() {
 		setTarget();
 		clauseAnalysis.caseARegexpEdgeAnnotation(newRegexpEdgeAnnotation(NAMESPACE, NAME, VALUE));
-		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, AnnisNode.TextMatching.REGEXP_EQUAL));
+		assertThat(target(), hasEdgeAnnotation(NAMESPACE, NAME, VALUE, QueryNode.TextMatching.REGEXP_EQUAL));
 	}
 	
 	@Test
@@ -340,7 +340,7 @@ public class TestClauseAnalysis {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAComparisonExpr1() {
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldTarget = setTarget();
 		testCompare(EQ, newRegexpLiteralExpr("regexp"), newPathExpr(newRelativePathType()));
 		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP_EQUAL), is(oldTarget)));
 	}
@@ -349,7 +349,7 @@ public class TestClauseAnalysis {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAComparsionExpr2() {
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldTarget = setTarget();
 		testCompare(EQ, newPathExpr(newRelativePathType()), newRegexpLiteralExpr("regexp"));
 		assertThat(target(), allOf(spans("regexp", TextMatching.REGEXP_EQUAL), is(oldTarget)));
 	}
@@ -358,7 +358,7 @@ public class TestClauseAnalysis {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAComparisonExpr3() {
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldTarget = setTarget();
 		testCompare(EQ, newPathExpr(newRelativePathType()), newStringLiteralExpr("string"));
 		assertThat(target(), allOf(spans("string", TextMatching.EXACT_EQUAL), is(oldTarget)));
 	}
@@ -367,7 +367,7 @@ public class TestClauseAnalysis {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAComparisonExpr4() {
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldTarget = setTarget();
 		testCompare(EQ, 
 				newPathExpr(newRelativePathType(), newStep(newAttributeAxis(), newAttributeNodeTest(NAMESPACE, NAME))), 
 				newStringLiteralExpr("string"));
@@ -379,7 +379,7 @@ public class TestClauseAnalysis {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void caseAComparisonExpr5() {
-		AnnisNode oldTarget = setTarget();
+		QueryNode oldTarget = setTarget();
 		testCompare(EQ, 
 				newRegexpLiteralExpr("regexp"),
 				newPathExpr(newRelativePathType(), newStep(newAttributeAxis(), newAttributeNodeTest(NAMESPACE, NAME))));
@@ -580,9 +580,9 @@ public class TestClauseAnalysis {
 		final int COUNT = 3;
 		
 		// simulated COUNT generated nodes in analysis 
-		List<AnnisNode> nodes = new ArrayList<AnnisNode>();
+		List<QueryNode> nodes = new ArrayList<QueryNode>();
 		for (int i = 1; i <= COUNT; ++i) 
-			nodes.add(new AnnisNode(i));
+			nodes.add(new QueryNode(i));
 		clauseAnalysis.setNodes(nodes);
 		
 		assertThat(clauseAnalysis.nodesCount(), is(COUNT));
@@ -602,7 +602,7 @@ public class TestClauseAnalysis {
 	// meta::namespace:name="value"
 	@Test
 	public void metaAnnotation() {
-		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.EXACT_EQUAL);
+		QueryAnnotation expected = new QueryAnnotation(NAMESPACE, NAME, VALUE, TextMatching.EXACT_EQUAL);
 
 		Start start = newStart(newPathExpr(newStep(newChildAxis(), newMetaNodeTest(NAMESPACE, NAME, newQuotedText(VALUE)))));
 		clauseAnalysis.caseStart(start);
@@ -614,7 +614,7 @@ public class TestClauseAnalysis {
 	// meta::namespace:name=/value/
 	@Test
 	public void metaAnnotationRegexp() {
-		Annotation expected = new Annotation(NAMESPACE, NAME, VALUE, TextMatching.REGEXP_EQUAL);
+		QueryAnnotation expected = new QueryAnnotation(NAMESPACE, NAME, VALUE, TextMatching.REGEXP_EQUAL);
 
 		Start start = newStart(newPathExpr(newStep(newChildAxis(), newMetaNodeTest(NAMESPACE, NAME, newRegexpQuotedText(VALUE)))));
 		clauseAnalysis.caseStart(start);
@@ -625,25 +625,25 @@ public class TestClauseAnalysis {
 	
 	///// Helper
 	
-	private AnnisNode setTarget() {
-		clauseAnalysis.setTarget(new AnnisNode(1));
+	private QueryNode setTarget() {
+		clauseAnalysis.setTarget(new QueryNode(1));
 		return target();
 	}
 	
-	private AnnisNode setContext() {
-		clauseAnalysis.setContext(new AnnisNode(0));
+	private QueryNode setContext() {
+		clauseAnalysis.setContext(new QueryNode(0));
 		return context();
 	}
 
-	private AnnisNode context() {
+	private QueryNode context() {
 		return clauseAnalysis.getContext();
 	}
 	
-	private AnnisNode target() {
+	private QueryNode target() {
 		return clauseAnalysis.getTarget();
 	}
 
-	private List<AnnisNode> nodes() {
+	private List<QueryNode> nodes() {
 		return clauseAnalysis.getNodes();
 	}
 	
@@ -653,11 +653,11 @@ public class TestClauseAnalysis {
 
 	///// Matcher
 	
-	private Matcher<AnnisNode> spans(final String pattern, final TextMatching textMatching) {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> spans(final String pattern, final TextMatching textMatching) {
+		return new TypeSafeMatcher<QueryNode>() {
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return 
 					pattern.equals(node.getSpannedText()) &&
 					node.getSpanTextMatching() == textMatching;
@@ -674,11 +674,11 @@ public class TestClauseAnalysis {
 		};
 	}
 
-	private Matcher<AnnisNode> isNamed(final String namespace, final String name) {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> isNamed(final String namespace, final String name) {
+		return new TypeSafeMatcher<QueryNode>() {
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				if (namespace != null)
 					return namespace.equals(node.getNamespace()) && name.equals(node.getNamespace()); 
 				else
@@ -687,17 +687,17 @@ public class TestClauseAnalysis {
 
 			public void describeTo(Description description) {
 				description.appendText("node named: ");
-				description.appendText(AnnisNode.qName(namespace, name));
+				description.appendText(QueryNode.qName(namespace, name));
 			}
 			
 		};
 	}
 
-	private Matcher<AnnisNode> isMarked(final String marker) {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> isMarked(final String marker) {
+		return new TypeSafeMatcher<QueryNode>() {
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return marker.equals(node.getMarker());
 			}
 
@@ -709,18 +709,18 @@ public class TestClauseAnalysis {
 		};
 	}
 	
-	private Matcher<AnnisNode> hasAnnotation(String namespace, String name) {
+	private Matcher<QueryNode> hasAnnotation(String namespace, String name) {
 		return hasAnnotation(namespace, name, null, null);
 	}
 
-	private Matcher<AnnisNode> hasAnnotation(final String namespace, final String name, 
-			final String value, final AnnisNode.TextMatching textMatching) {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> hasAnnotation(final String namespace, final String name, 
+			final String value, final QueryNode.TextMatching textMatching) {
+		return new TypeSafeMatcher<QueryNode>() {
 			
-			Annotation annotation = new Annotation(namespace, name, value, textMatching);
+			QueryAnnotation annotation = new QueryAnnotation(namespace, name, value, textMatching);
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return node.getNodeAnnotations().contains(annotation);
 			}
 
@@ -732,18 +732,18 @@ public class TestClauseAnalysis {
 		};
 	}
 
-	private Matcher<AnnisNode> hasEdgeAnnotation(String namespace, String name) {
+	private Matcher<QueryNode> hasEdgeAnnotation(String namespace, String name) {
 		return hasEdgeAnnotation(namespace, name, null, null);
 	}
 
-	private Matcher<AnnisNode> hasEdgeAnnotation(final String namespace, final String name, 
-			final String value, final AnnisNode.TextMatching textMatching) {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> hasEdgeAnnotation(final String namespace, final String name, 
+			final String value, final QueryNode.TextMatching textMatching) {
+		return new TypeSafeMatcher<QueryNode>() {
 			
-			Annotation annotation = new Annotation(namespace, name, value, textMatching);
+			QueryAnnotation annotation = new QueryAnnotation(namespace, name, value, textMatching);
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return node.getEdgeAnnotations().contains(annotation);
 			}
 
@@ -755,11 +755,11 @@ public class TestClauseAnalysis {
 		};
 	}
 
-	private Matcher<AnnisNode> isRoot() {
-		return new TypeSafeMatcher<AnnisNode>() {
+	private Matcher<QueryNode> isRoot() {
+		return new TypeSafeMatcher<QueryNode>() {
 			
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return node.isRoot();
 			}
 
@@ -770,12 +770,12 @@ public class TestClauseAnalysis {
 		};
 	}
 	
-	private Matcher<AnnisNode> hasJoin(final Join expected) {
+	private Matcher<QueryNode> hasJoin(final Join expected) {
 		
-		return new TypeSafeMatcher<AnnisNode>() {
+		return new TypeSafeMatcher<QueryNode>() {
 
 			@Override
-			public boolean matchesSafely(AnnisNode node) {
+			public boolean matchesSafely(QueryNode node) {
 				return node.getJoins().contains(expected);
 			}
 

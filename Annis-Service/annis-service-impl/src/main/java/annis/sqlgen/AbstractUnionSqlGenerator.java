@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
@@ -52,7 +52,7 @@ public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<
 		
 		indent(sb, indent);
 		List<String> alternatives = new ArrayList<String>();
-		for (List<AnnisNode> alternative : queryData.getAlternatives()) {
+		for (List<QueryNode> alternative : queryData.getAlternatives()) {
 			alternatives.add(createSqlForAlternative(queryData, alternative, indent));
 		}
 		sb.append(StringUtils.join(alternatives, "\n" + indent + "UNION "));

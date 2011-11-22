@@ -31,8 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
 
 public class TestTableJoinsInFromClauseSqlGenerator {
 
@@ -43,10 +43,10 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	private TableAccessStrategy tableAccessStrategy;
 	
 	// node that needs a from clause
-	private AnnisNode node23;
+	private QueryNode node23;
 	
 	// dummy annotations
-	@Mock Set<Annotation> annotations;
+	@Mock Set<QueryAnnotation> annotations;
 	
 	@Before
 	public void setup() {
@@ -60,7 +60,7 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 		};
 		
 		// setup node
-		node23 = new AnnisNode(23L);
+		node23 = new QueryNode(23L);
 		when(annotations.size()).thenReturn(3);
 		
 		// setup table aliases
@@ -177,11 +177,11 @@ public class TestTableJoinsInFromClauseSqlGenerator {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void fromClauseTablesAliasedToNode() {
-		Set<Annotation> annotations1 = mock(Set.class);
+		Set<QueryAnnotation> annotations1 = mock(Set.class);
 		when(annotations1.size()).thenReturn(2);
 		node23.setNodeAnnotations(annotations1);
 
-		Set<Annotation> annotations2 = mock(Set.class);
+		Set<QueryAnnotation> annotations2 = mock(Set.class);
 		when(annotations2.size()).thenReturn(3);
 		node23.setEdgeAnnotations(annotations2);
 

@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
@@ -33,10 +33,10 @@ public abstract class AbstractWhereClauseGenerator
 	implements WhereClauseSqlGenerator<QueryData>
 {
 
-	public Set<String> whereConditions(QueryData queryData, List<AnnisNode> alternative, String indent) {
+	public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent) {
 		List<String> conditions = new ArrayList<String>();
 	
-		for (AnnisNode node : alternative) {
+		for (QueryNode node : alternative) {
 	
 			// node constraints
 			if (node.getSpannedText() != null) {
@@ -63,7 +63,7 @@ public abstract class AbstractWhereClauseGenerator
 	
 			// node joins
 			for (Join join : node.getJoins()) {
-				AnnisNode target = join.getTarget();
+				QueryNode target = join.getTarget();
 				if (join instanceof SameSpan) {
 					addSameSpanConditions(conditions, node, target,
 							(SameSpan) join, queryData);
@@ -114,14 +114,14 @@ public abstract class AbstractWhereClauseGenerator
 	
 			// node annotations
 			int i = 0;
-			for (Annotation annotation : node.getNodeAnnotations()) {
+			for (QueryAnnotation annotation : node.getNodeAnnotations()) {
 				++i;
 				addAnnotationConditions(conditions, node, i, annotation, NODE_ANNOTATION_TABLE);
 			}
 	
 			// edge annotations
 			int j = 0;
-			for (Annotation annotation : node.getEdgeAnnotations()) {
+			for (QueryAnnotation annotation : node.getEdgeAnnotations()) {
 				++j;
 				addAnnotationConditions(conditions, node, j, annotation, EDGE_ANNOTATION_TABLE);
 			}
@@ -131,75 +131,75 @@ public abstract class AbstractWhereClauseGenerator
 	}
 
 	protected abstract void addSpanConditions(List<String> conditions, QueryData queryData,
-			AnnisNode node);
+			QueryNode node);
 
 	protected abstract void addIsTokenConditions(List<String> conditions, QueryData queryData,
-			AnnisNode node);
+			QueryNode node);
 
 	protected abstract void addIsRootConditions(List<String> conditions, QueryData queryData,
-			AnnisNode node);
+			QueryNode node);
 
 	protected abstract void addNodeNamespaceConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node);
+			QueryData queryData, QueryNode node);
 
 	protected abstract void addNodeNameCondition(List<String> conditions, QueryData queryData,
-			AnnisNode node);
+			QueryNode node);
 
 	protected abstract void addNodeArityConditions(List<String> conditions, QueryData queryData,
-			AnnisNode node);
+			QueryNode node);
 
 	protected abstract void addTokenArityConditions(List<String> conditions,
-			QueryData queryData, AnnisNode node);
+			QueryData queryData, QueryNode node);
 
-	protected abstract void addSingleEdgeCondition(AnnisNode node, AnnisNode target,
+	protected abstract void addSingleEdgeCondition(QueryNode node, QueryNode target,
 			List<String> conditions, Join join, final String edgeType);
 
-	protected abstract void addSiblingConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, Sibling join, QueryData queryData);
+	protected abstract void addSiblingConditions(List<String> conditions, QueryNode node,
+			QueryNode target, Sibling join, QueryData queryData);
 
 	protected abstract void addCommonAncestorConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, CommonAncestor join, QueryData queryData);
+			QueryNode node, QueryNode target, CommonAncestor join, QueryData queryData);
 
-	protected abstract void addSameSpanConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, SameSpan join, QueryData queryData);
+	protected abstract void addSameSpanConditions(List<String> conditions, QueryNode node,
+			QueryNode target, SameSpan join, QueryData queryData);
 
-	protected abstract void addIdenticalConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, Identical join, QueryData queryData);
+	protected abstract void addIdenticalConditions(List<String> conditions, QueryNode node,
+			QueryNode target, Identical join, QueryData queryData);
 
 	protected abstract void addLeftAlignmentConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, LeftAlignment join, QueryData queryData);
+			QueryNode node, QueryNode target, LeftAlignment join, QueryData queryData);
 
 	protected abstract void addRightAlignmentConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, RightAlignment join, QueryData queryData);
+			QueryNode node, QueryNode target, RightAlignment join, QueryData queryData);
 
-	protected abstract void addInclusionConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, Inclusion join, QueryData queryData);
+	protected abstract void addInclusionConditions(List<String> conditions, QueryNode node,
+			QueryNode target, Inclusion join, QueryData queryData);
 
-	protected abstract void addOverlapConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, Overlap join, QueryData queryData);
+	protected abstract void addOverlapConditions(List<String> conditions, QueryNode node,
+			QueryNode target, Overlap join, QueryData queryData);
 
 	protected abstract void addLeftOverlapConditions(List<String> conditions,
-			AnnisNode target, AnnisNode node, LeftOverlap join, QueryData queryData);
+			QueryNode target, QueryNode node, LeftOverlap join, QueryData queryData);
 
 	protected abstract void addRightOverlapConditions(List<String> conditions,
-			AnnisNode target, AnnisNode node, RightOverlap join, QueryData queryData);
+			QueryNode target, QueryNode node, RightOverlap join, QueryData queryData);
 
 	protected abstract void addPrecedenceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, Precedence join, QueryData queryData);
+			QueryNode node, QueryNode target, Precedence join, QueryData queryData);
 
 	protected abstract void addAnnotationConditions(List<String> conditions,
-			AnnisNode node, int index, Annotation annotation, String table);
+			QueryNode node, int index, QueryAnnotation annotation, String table);
 
 	protected abstract void addLeftDominanceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, LeftDominance join, QueryData queryData);
+			QueryNode node, QueryNode target, LeftDominance join, QueryData queryData);
 
 	protected abstract void addRightDominanceConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, RightDominance join, QueryData queryData);
+			QueryNode node, QueryNode target, RightDominance join, QueryData queryData);
 
-	protected abstract void addDominanceConditions(List<String> conditions, AnnisNode node,
-			AnnisNode target, Dominance join, QueryData queryData);
+	protected abstract void addDominanceConditions(List<String> conditions, QueryNode node,
+			QueryNode target, Dominance join, QueryData queryData);
 
 	protected abstract void addPointingRelationConditions(List<String> conditions,
-			AnnisNode node, AnnisNode target, PointingRelation join, QueryData queryData);
+			QueryNode node, QueryNode target, PointingRelation join, QueryData queryData);
 
 }

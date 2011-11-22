@@ -38,7 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.dao.DataAccessException;
 
-import annis.querymodel.AnnisNode;
+import annis.querymodel.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TestAbstractUnionSqlGenerator {
@@ -55,9 +55,9 @@ public class TestAbstractUnionSqlGenerator {
 	
 	// test data
 	private QueryData queryData = new QueryData();
-	private AnnisNode annisNode = new AnnisNode();
-	private List<AnnisNode> alternative = new ArrayList<AnnisNode>();
-	private List<List<AnnisNode>> alternatives = new ArrayList<List<AnnisNode>>();
+	private QueryNode annisNode = new QueryNode();
+	private List<QueryNode> alternative = new ArrayList<QueryNode>();
+	private List<List<QueryNode>> alternatives = new ArrayList<List<QueryNode>>();
 	
 	@Before
 	public void setup() {
@@ -165,9 +165,9 @@ public class TestAbstractUnionSqlGenerator {
 			.willReturn(newSet(whereCondition));
 		given(groupByClauseSqlGenerator.groupByAttributes(eq(queryData), eq(alternative)))
 		.willReturn(groupBy);
-		given(orderByClauseSqlGenerator.orderByClause(eq(queryData), anyListOf(AnnisNode.class), anyString()))
+		given(orderByClauseSqlGenerator.orderByClause(eq(queryData), anyListOf(QueryNode.class), anyString()))
 			.willReturn(orderBy);
-		given(limitOffsetClauseSqlGenerator.limitOffsetClause(eq(queryData), anyListOf(AnnisNode.class), anyString()))
+		given(limitOffsetClauseSqlGenerator.limitOffsetClause(eq(queryData), anyListOf(QueryNode.class), anyString()))
 			.willReturn(limitOffset);
 	}
 	

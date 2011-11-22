@@ -35,14 +35,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.querymodel.AnnisNode;
-import annis.querymodel.Annotation;
+import annis.querymodel.QueryNode;
+import annis.querymodel.QueryAnnotation;
 
 
 public class TestTableJoinsInWhereClauseGenerator {
 
 	// an example node
-	private AnnisNode node23;
+	private QueryNode node23;
 
 	// object under test
 	private TableJoinsInWhereClauseGenerator generator;
@@ -52,15 +52,15 @@ public class TestTableJoinsInWhereClauseGenerator {
 	private TableAccessStrategy tableAccessStrategy;
 	
 	// a few distinct annotations
-	private static final Annotation annotation1 = new Annotation("namespace", "name1");
-	private static final Annotation annotation2 = new Annotation("namespace", "name2");
-	private static final Annotation annotation3 = new Annotation("namespace", "name3");
-	private Set<Annotation> annotations;
+	private static final QueryAnnotation annotation1 = new QueryAnnotation("namespace", "name1");
+	private static final QueryAnnotation annotation2 = new QueryAnnotation("namespace", "name2");
+	private static final QueryAnnotation annotation3 = new QueryAnnotation("namespace", "name3");
+	private Set<QueryAnnotation> annotations;
 	
 	@Before
 	public void setup() {
 		initMocks(this);
-		node23 = new AnnisNode(23);
+		node23 = new QueryNode(23);
 	
 		generator = new TableJoinsInWhereClauseGenerator() {
 			@Override
@@ -76,7 +76,7 @@ public class TestTableJoinsInWhereClauseGenerator {
 		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
 		tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
 		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-		when(tableAccessStrategyFactory.tables(any(AnnisNode.class))).thenReturn(tableAccessStrategy);
+		when(tableAccessStrategyFactory.tables(any(QueryNode.class))).thenReturn(tableAccessStrategy);
 		
 		annotations = annotationSet(annotation1, annotation2, annotation3); 
 
@@ -187,10 +187,10 @@ public class TestTableJoinsInWhereClauseGenerator {
 	// use one node table for each annotation and nothing else if all tables are aliased to node
 	@Test
 	public void fromClauseAllTablesAliasedToNode() {
-		Set<Annotation> annotations1 = annotationSet(annotation1, annotation2);
+		Set<QueryAnnotation> annotations1 = annotationSet(annotation1, annotation2);
 		node23.setNodeAnnotations(annotations1);
 
-		Set<Annotation> annotations2 = annotationSet(annotation1, annotation2, annotation3);
+		Set<QueryAnnotation> annotations2 = annotationSet(annotation1, annotation2, annotation3);
 		node23.setEdgeAnnotations(annotations2);
 
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_node");
@@ -209,8 +209,8 @@ public class TestTableJoinsInWhereClauseGenerator {
 		);
 	}
 	
-	private TreeSet<Annotation> annotationSet(Annotation... annotations) {
-		return new TreeSet<Annotation>(Arrays.asList(annotations));
+	private TreeSet<QueryAnnotation> annotationSet(QueryAnnotation... annotations) {
+		return new TreeSet<QueryAnnotation>(Arrays.asList(annotations));
 	}
 
 	///// Helper
