@@ -43,7 +43,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import annis.model.QueryNode;
-import annis.model.QueryAnnotation;
+import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 
 /**
@@ -81,8 +81,8 @@ public class MatrixSqlGenerator
       Array arrayAnnotation = resultSet.getArray("annotations");
       Array arrayMeta = resultSet.getArray("metadata");
       
-      List<annis.model.Annotation> annotations =  extractAnnotations(arrayAnnotation);
-      List<annis.model.Annotation> metaData = extractAnnotations(arrayMeta);
+      List<Annotation> annotations =  extractAnnotations(arrayAnnotation);
+      List<Annotation> metaData = extractAnnotations(arrayMeta);
 
       // create key
       Array sqlKey = resultSet.getArray("key");
@@ -339,9 +339,9 @@ public class MatrixSqlGenerator
     return sb.toString();
   }
   
-  private List<annis.model.Annotation> extractAnnotations(Array array) throws SQLException
+  private List<Annotation> extractAnnotations(Array array) throws SQLException
   {
-    List<annis.model.Annotation> result = new ArrayList<annis.model.Annotation>();
+    List<Annotation> result = new ArrayList<Annotation>();
     
     if(array != null)
     {
