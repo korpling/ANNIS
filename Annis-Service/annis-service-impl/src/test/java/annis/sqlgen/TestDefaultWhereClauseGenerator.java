@@ -37,9 +37,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import annis.model.AnnisNode;
-import annis.model.AnnisNode.TextMatching;
-import annis.model.Annotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode.TextMatching;
+import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -63,8 +63,8 @@ import annis.sqlgen.model.Sibling;
 public class TestDefaultWhereClauseGenerator {
 
 	// an example node
-	private AnnisNode node23;
-	private AnnisNode node42;
+	private QueryNode node23;
+	private QueryNode node42;
 
 	// object under test: the adapter to that node
 	private DefaultWhereClauseGenerator generator;
@@ -73,13 +73,13 @@ public class TestDefaultWhereClauseGenerator {
 	private final static String NAME = "name";
 	
 	// dummy annotation set
-	@Mock Set<Annotation> annotations;
+	@Mock Set<QueryAnnotation> annotations;
 	
 	@Before
 	public void setup() {
 		initMocks(this);
-		node23 = new AnnisNode(23);
-		node42 = new AnnisNode(42);
+		node23 = new QueryNode(23);
+		node42 = new QueryNode(42);
 	
 		final TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
 		tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
@@ -141,9 +141,9 @@ public class TestDefaultWhereClauseGenerator {
 	// WHERE condition for node annotation
 	@Test
 	public void whereClauseForNodeAnnotation() {
-		node23.addNodeAnnotation(new Annotation("namespace1", "name1"));
-		node23.addNodeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
-		node23.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
+		node23.addNodeAnnotation(new QueryAnnotation("namespace1", "name1"));
+		node23.addNodeAnnotation(new QueryAnnotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
+		node23.addNodeAnnotation(new QueryAnnotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 				join("=", "_annotation23_1.node_annotation_namespace", "'namespace1'"),
 				join("=", "_annotation23_1.node_annotation_name", "'name1'"),
@@ -159,9 +159,9 @@ public class TestDefaultWhereClauseGenerator {
 	// WHERE condition for node annotation
 	@Test
 	public void whereClauseForNodeEdgeAnnotation() {
-		node23.addEdgeAnnotation(new Annotation("namespace1", "name1"));
-		node23.addEdgeAnnotation(new Annotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
-		node23.addEdgeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
+		node23.addEdgeAnnotation(new QueryAnnotation("namespace1", "name1"));
+		node23.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2", "value2", TextMatching.EXACT_EQUAL));
+		node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 				join("=", "_rank_annotation23_1.edge_annotation_namespace", "'namespace1'"),
 				join("=", "_rank_annotation23_1.edge_annotation_name", "'name1'"),
@@ -324,7 +324,7 @@ public class TestDefaultWhereClauseGenerator {
 	@Test
 	public void whereClauseDirectDominanceNamedAndAnnotated() {
 		node23.addJoin(new Dominance(node42, NAME, 1));
-		node42.addNodeAnnotation(new Annotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
+		node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3", "value3", TextMatching.REGEXP_EQUAL));
 		checkWhereCondition(
 				join("=", "_component42.type", "'d'"),
 				join("=", "_component42.name", "'" + NAME + "'"),
@@ -451,8 +451,8 @@ public class TestDefaultWhereClauseGenerator {
 		checkWhereCondition(node23, expected);
 	}
 
-	private void checkWhereCondition(AnnisNode node, String... expected) {
-		List<AnnisNode> alternative = new ArrayList<AnnisNode>();
+	private void checkWhereCondition(QueryNode node, String... expected) {
+		List<QueryNode> alternative = new ArrayList<QueryNode>();
 		alternative.add(node);
 		QueryData queryData = mock(QueryData.class);
 		Set<String> actual = generator.whereConditions(queryData, alternative, "");

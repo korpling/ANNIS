@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 
@@ -37,14 +37,14 @@ public class TableJoinsInFromClauseSqlGenerator
 	extends AbstractFromClauseGenerator  {
 	
 	@Override
-	public String fromClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
+	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
 		List<String> tables = new ArrayList<String>();
-		for (AnnisNode node : alternative)
+		for (QueryNode node : alternative)
 			tables.add(fromClauseForNode(node, false));
 		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
 	}
 	
-	public String fromClauseForNode(AnnisNode node, boolean leftJoin) {
+	public String fromClauseForNode(QueryNode node, boolean leftJoin) {
 		StringBuffer sb = new StringBuffer();
 		
 		// every node uses the node table
@@ -98,19 +98,19 @@ public class TableJoinsInFromClauseSqlGenerator
 		return sb.toString(); 
 	}
 
-	protected String joinDefinition(AnnisNode node, String table, String column, String joinedTable, String joinedColumn) {
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn) {
 		return joinDefinition(node, table, column, joinedTable, joinedColumn, false);
 	}
 
-	protected String joinDefinition(AnnisNode node, String table, String column, String joinedTable, String joinedColumn, boolean leftJoin) {
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn, boolean leftJoin) {
 		return joinDefinition(node, table, column, joinedTable, joinedColumn, 1, leftJoin);
 	}
 
-	protected String joinDefinition(AnnisNode node, String table, String column, String joinedTable, String joinedColumn, int count) {
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn, int count) {
 		return joinDefinition(node, table, column, joinedTable, joinedColumn, count, false);
 	}
 
-	protected String joinDefinition(AnnisNode node, String table, String column, String joinedTable, String joinedColumn, int count, boolean leftJoin) {
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn, int count, boolean leftJoin) {
 		StringBuffer sb = new StringBuffer();
 		if (leftJoin) {
 			sb.append("LEFT OUTER ");

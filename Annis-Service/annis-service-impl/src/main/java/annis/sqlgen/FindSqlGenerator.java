@@ -28,65 +28,87 @@ import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
 import annis.dao.Match;
-import annis.dao.Span;
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
+public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
+  implements SelectClauseSqlGenerator<QueryData>
+{
 
-public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>> 
-implements SelectClauseSqlGenerator<QueryData> {
+  @Override
+  public String selectClause(QueryData queryData, List<QueryNode> alternative,
+    String indent)
+  {
+    int maxWidth = queryData.getMaxWidth();
+    Validate.isTrue(alternative.size() <= maxWidth,
+      "BUG: nodes.size() > maxWidth");
 
-	@Override
-	public String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
-		int maxWidth = queryData.getMaxWidth();
-		Validate.isTrue(alternative.size() <= maxWidth, "BUG: nodes.size() > maxWidth");
+    boolean isDistinct = false;
+    List<String> ids = new ArrayList<String>();
+    int i = 0;
+    for (QueryNode node : alternative)
+    {
+      ++i;
+      ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      if (tables(node).usesRankTable())
+      {
+        isDistinct = true;
+      }
+    }
+    for (i = alternative.size(); i < maxWidth; ++i)
+    {
+      ids.add("NULL");
+    }
+    
+    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE, "toplevel_corpus"));
+    
+    return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
+      + StringUtils.join(ids, ", ");
+  }
 
-		boolean isDistinct = false;
-		List<String> ids = new ArrayList<String>();
-		int i = 0;
-		for (AnnisNode node : alternative) {
-			++i;
-			ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + 
-					" AS id" + i);
-			if (tables(node).usesRankTable()) {
-				isDistinct = true;
-			}
-		}
-		for (i = alternative.size(); i < maxWidth; ++i) {
-			ids.add("NULL");
-		}
-		return (isDistinct ? "DISTINCT" : "") + 
-				"\n" + indent + TABSTOP + StringUtils.join(ids, ", ");
-	}
+  @Override
+  public List<Match> extractData(ResultSet rs) throws SQLException,
+    DataAccessException
+  {
+    List<Match> matches = new ArrayList<Match>();
+    int rowNum = 0;
+    while (rs.next())
+    {
+      matches.add(mapRow(rs, ++rowNum));
+    }
+    return matches;
+  }
 
-	@Override
-	public List<Match> extractData(ResultSet rs) throws SQLException, DataAccessException {
-		List<Match> matches = new ArrayList<Match>();
-		int rowNum = 0;
-		while (rs.next())
-			matches.add(mapRow(rs, ++rowNum));
-		return matches;			
-	}
-	
-	public Match mapRow(ResultSet rs, int rowNum) throws SQLException {
-		Match match = new Match();
+  public Match mapRow(ResultSet rs, int rowNum) throws SQLException
+  {
+    Match match = new Match();
 
-		// get size of solution
-		ResultSetMetaData metaData = rs.getMetaData();
-		int columnCount = metaData.getColumnCount();
-		
-		// one match per column
-		for (int column = 1; column <= columnCount; ++column) {
-			int id = rs.getInt((column));
+    // get size of solution
+    ResultSetMetaData metaData = rs.getMetaData();
+    int columnCount = metaData.getColumnCount();
 
-			// no more matches in this row if an id was NULL
-			if (rs.wasNull())
-				break;
+    // one match per column
+    for (int column = 1; column <= columnCount; ++column)
+    {
+      long id = rs.getLong((column));
+      
+      if(metaData.getColumnName(column).startsWith("id"))
+      {
+        match.add(id);
+      }
+      else if(metaData.getColumnName(column).startsWith("toplevel_corpus"))
+      {
+        match.setToplevelCorpusId(id);
+      }
 
-			match.add(new Span(id));
-		}
-		
-		return match;
-	}
+      // no more matches in this row if an id was NULL
+      if (rs.wasNull())
+      {
+        break;
+      }
 
+    }
+
+    return match;
+  }
 }

@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.dao.DataAccessException;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 
@@ -56,9 +56,9 @@ public class TestAbstractSqlGenerator {
 	
 	// test data
 	private QueryData queryData = new QueryData();
-	private AnnisNode annisNode = new AnnisNode();
-	private List<AnnisNode> alternative = new ArrayList<AnnisNode>();
-	private List<List<AnnisNode>> alternatives = new ArrayList<List<AnnisNode>>();
+	private QueryNode annisNode = new QueryNode();
+	private List<QueryNode> alternative = new ArrayList<QueryNode>();
+	private List<List<QueryNode>> alternatives = new ArrayList<List<QueryNode>>();
 	
 	@Before
 	public void setup() {
@@ -278,7 +278,7 @@ public class TestAbstractSqlGenerator {
 
 	// stub selectClauseSqlGenerator and fromClauseSqlGenerator for a minimal SQL statement
 	private void setupSelectAndFromClause(String selectClause, String fromClause) {
-		given(selectClauseSqlGenerator.selectClause(eq(queryData), anyListOf(AnnisNode.class), anyString()))
+		given(selectClauseSqlGenerator.selectClause(eq(queryData), anyListOf(QueryNode.class), anyString()))
 			.willReturn(selectClause);
 		given(fromClauseSqlGenerator.fromClause(eq(queryData), eq(alternative), anyString()))
 			.willReturn(fromClause);

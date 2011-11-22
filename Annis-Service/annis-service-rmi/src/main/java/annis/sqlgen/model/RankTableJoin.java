@@ -15,13 +15,13 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public abstract class RankTableJoin extends RangedJoin {
 
 	protected String name;
 
-	public RankTableJoin(AnnisNode target, String name, int minDistance, int maxDistance) {
+	public RankTableJoin(QueryNode target, String name, int minDistance, int maxDistance) {
 		super(target, minDistance, maxDistance);
 		this.name = name;
 	}

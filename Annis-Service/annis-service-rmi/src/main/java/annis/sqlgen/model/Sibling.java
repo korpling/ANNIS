@@ -15,16 +15,16 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 @SuppressWarnings("serial")
 public class Sibling extends Dominance {
 
-	public Sibling(AnnisNode target) {
+	public Sibling(QueryNode target) {
 		super(target);
 	}
 	
-	public Sibling(AnnisNode target, String name) {
+	public Sibling(QueryNode target, String name) {
 		super(target, name);
 	}
 	

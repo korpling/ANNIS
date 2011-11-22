@@ -15,7 +15,7 @@
  */
 package annis.dao;
 
-import annis.model.Annotation;
+import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.SubQueryCorpusSelectionStrategy;
 import java.util.List;
@@ -44,7 +44,7 @@ public class MetaDataFilter extends SimpleJdbcDaoSupport
 
     if (!corpusList.isEmpty())
     {     
-      List<Annotation> metaData = queryData.getMetaData();
+      List<QueryAnnotation> metaData = queryData.getMetaData();
       if (!metaData.isEmpty())
       {
         String documentsWithMetaDataSql = subQueryCorpusSelectionStrategy.buildSubQuery(corpusList, metaData);

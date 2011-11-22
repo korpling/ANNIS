@@ -15,20 +15,20 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 // FIXME: same as Dominance, abstract range information and refactor generation code in ClauseAnalysis
 public class PointingRelation extends RankTableJoin {
 
-	public PointingRelation(AnnisNode target, String name) {
+	public PointingRelation(QueryNode target, String name) {
 		this(target, name, 0, 0);
 	}
 	
-	public PointingRelation(AnnisNode target, String name, int distance) {
+	public PointingRelation(QueryNode target, String name, int distance) {
 		this(target, name, distance, distance);
 	}
 	
-	public PointingRelation(AnnisNode target, String name, int minDistance, int maxDistance) {
+	public PointingRelation(QueryNode target, String name, int minDistance, int maxDistance) {
 		super(target, name, minDistance, maxDistance);
 	}
 	

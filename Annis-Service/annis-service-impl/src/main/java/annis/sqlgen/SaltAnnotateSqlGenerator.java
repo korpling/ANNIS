@@ -6,7 +6,6 @@ package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.*;
 
-import annis.dao.Match;
 import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -39,10 +38,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -52,83 +53,17 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProject>
+public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 {
 
-  private TableAccessStrategy factsTas;
-
-  public SAnnotateSqlGenerator()
+  public SaltAnnotateSqlGenerator()
   {
-
-    // FIXME: totally ugly, but the query has fixed column names 
-    // (and needs its own column aliasing)
-    // TableAccessStrategyFactory wants a corpus selection 
-    // strategy
-    // solution: build AnnisNodes with API and refactor 
-    // SqlGenerator to accept GROUP BY nodes
-    Map<String, String> nodeColumns = new HashMap<String, String>();
-    nodeColumns.put("namespace", "node_namespace");
-    nodeColumns.put("name", "node_name");
-
-    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("node_ref", "id");
-    nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
-    nodeAnnotationColumns.put("name", "node_annotation_name");
-    nodeAnnotationColumns.put("value", "node_annotation_value");
-
-    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("rank_ref", "pre");
-    edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
-    edgeAnnotationColumns.put("name", "edge_annotation_name");
-    edgeAnnotationColumns.put("value", "edge_annotation_value");
-
-    Map<String, String> edgeColumns = new HashMap<String, String>();
-    edgeColumns.put("node_ref", "id");
-
-    Map<String, String> componentColumns = new HashMap<String, String>();
-    componentColumns.put("id", "component_id");
-    componentColumns.put("name", "edge_name");
-    componentColumns.put("namespace", "edge_namespace");
-    componentColumns.put("type", "edge_type");
-
-    edgeColumns.put("name", "edge_name");
-    edgeColumns.put("namespace", "edge_namespace");
-
-    Map<String, Map<String, String>> columnAliases =
-      new HashMap<String, Map<String, String>>();
-    columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
-    columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE,
-      nodeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE,
-      edgeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
-    columnAliases.put(COMPONENT_TABLE, componentColumns);
-
-    factsTas = new TableAccessStrategy(null);
-    factsTas.setColumnAliases(columnAliases);
-  }
-
-  @Override
-  public String toSql(List<Match> queryData)
-  {
-    throw new NotImplementedException();
-  }
-
-  @Override
-  public String toSql(List<Match> queryData, int indentBy)
-  {
-    throw new NotImplementedException();
   }
 
   @Override
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    if(true)
-    {
-      throw new NotImplementedException();
-    }
-    
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 
     final SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
@@ -137,15 +72,7 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
 
     project.getSCorpusGraphs().add(corpusGraph);
 
-    // for each match
-//    
-//      SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
-//      matchCorpus.setSName("match");
-//      corpusGraph.addSNode(matchCorpus);
-//      SCorpusGraph subcorpusGraph = retrieveAnnotationGraph(match, left,
-//        right);
-    
-    SDocumentGraph graph = SaltFactory.eINSTANCE.createSDocumentGraph();
+    SDocumentGraph graph = null;
 
     // fn: edge pre order value -> edge
     Map<Long, SNode> nodeByPre = new HashMap<Long, SNode>();
@@ -158,36 +85,62 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
     nodeByPre.clear();
 
     // set the matched keys
-    SDocument document = SaltFactory.eINSTANCE.createSDocument();
-    document.setSDocumentGraph(graph);
+    SDocument document = null;
 
-    int rowNum = 0;
+    List<Long> lastKey = new LinkedList<Long>();
+
+    int match_index = 0;
+    
     while (resultSet.next())
     {
-      if (rowNum == 0)
+      Array sqlKey = resultSet.getArray("key");
+      Validate.isTrue(!resultSet.wasNull(),
+        "Match group identifier must not be null");
+      Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+        "Key in database must be from the type \"bigint\" but was \""
+        + sqlKey.getBaseTypeName() + "\"");
+
+      Long[] keyArray = (Long[]) sqlKey.getArray();
+      List<Long> key = Arrays.asList(keyArray);
+
+      if (!lastKey.equals(key))
       {
+        
 
-        Array sqlKey = resultSet.getArray("key");
-        Validate.isTrue(!resultSet.wasNull(),
-          "Match group identifier must not be null");
-        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-          "Key in database must be from the type \"bigint\" but was \""
-          + sqlKey.getBaseTypeName() + "\"");
+        // create the text for the last graph
+        if (graph != null)
+        {
+          createPrimaryText(graph, tokenTexts, tokenByIndex);
+        }
 
-        Long[] keyArray = (Long[]) sqlKey.getArray();
-        List<Long> key = Arrays.asList(keyArray);
+        lastKey = key;
+
+        // new match, reset everything        
+        nodeByPre.clear();
+        tokenTexts.clear();
+        tokenByIndex.clear();
+
+        graph = SaltFactory.eINSTANCE.createSDocumentGraph();
+        document = SaltFactory.eINSTANCE.createSDocument();
 
         ArrayList<String> path =
           new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
           "path").getArray()));
         Collections.reverse(path);
 
-        SCorpus rootCorpus = SaltFactory.eINSTANCE.createSCorpus();
-        rootCorpus.setSName(path.get(0));
-        corpusGraph.addSNode(rootCorpus);
+        Integer matchstart = resultSet.getInt("matchstart");
+        
+        SCorpus matchCorpus = SaltFactory.eINSTANCE.createSCorpus();
+        matchCorpus.setSName("match_" + (match_index + matchstart));
+        corpusGraph.addSNode(matchCorpus);
+        
+        SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();        
+        toplevelCorpus.setSName(path.get(0));
+        corpusGraph.addSSubCorpus(matchCorpus, toplevelCorpus);
+        
         Validate.isTrue(path.size() >= 2,
           "Corpus path must be have at least two members (toplevel and document)");
-        SCorpus corpus = rootCorpus;
+        SCorpus corpus = toplevelCorpus;
 
         for (int i = 1; i < path.size() - 1; i++)
         {
@@ -195,16 +148,19 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
           subcorpus.setSName(path.get(i));
           corpusGraph.addSSubCorpus(corpus, subcorpus);
           corpus = subcorpus;
-        }
-        document.setSDocumentGraph(graph);
+        }        
         document.setSName(path.get(path.size() - 1));
         corpusGraph.addSDocument(corpus, document);
 
+        document.setSDocumentGraph(graph);
+        
         SFeature feature = SaltFactory.eINSTANCE.createSFeature();
         feature.setSName(AnnisConstants.MATCHED_IDS);
         feature.setSValue(key);
         graph.addSFeature(feature);
-      }
+        
+        match_index++;
+      } // end if new key
 
       // get node data
       SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
@@ -215,15 +171,26 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
         nodeByPre.put(pre, node);
         createRelation(resultSet, graph, nodeByPre, node);
       }
+    } // end while new result row
 
-      rowNum++;
+    // the last match needs a primary text, too
+    if(graph != null)
+    {
+      createPrimaryText(graph, tokenTexts, tokenByIndex);
     }
+    
+    return project;
+  }
 
+  private void createPrimaryText(SDocumentGraph graph,
+    TreeMap<Long, String> tokenTexts, TreeMap<Long, SToken> tokenByIndex)
+  {
     STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
     graph.addSNode(textDataSource);
 
     StringBuilder sbText = new StringBuilder();
-    Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().iterator();
+    Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
+      iterator();
     while (itToken.hasNext())
     {
       Map.Entry<Long, String> e = itToken.next();
@@ -246,8 +213,6 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
     }
 
     textDataSource.setSText(sbText.toString());
-
-    return project;
   }
 
   private SNode createOrFindNewNode(ResultSet resultSet,
@@ -329,7 +294,6 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
       throw new NotImplementedException("no node creation possible for class: "
         + clazz.getName());
     }
-
     copyNodeProperties(oldNode, node, oldNode.getSGraph(), null);
 
     return node;
@@ -355,7 +319,7 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
     }
 
     graph.addNode(to);
-
+   
     if (from != null)
     {
       for (SAnnotation anno : from.getSAnnotations())
@@ -486,15 +450,26 @@ public class SAnnotateSqlGenerator implements SqlGenerator<List<Match>, SaltProj
     return rel;
   }
 
+  protected void newline(StringBuilder sb, int indentBy)
+  {
+    sb.append("\n");
+    indent(sb, indentBy);
+  }
+
+  protected void indent(StringBuilder sb, int indentBy)
+  {
+    sb.append(StringUtils.repeat(AbstractSqlGenerator.TABSTOP, indentBy));
+  }
+
   protected long longValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getLong(factsTas.columnName(table, column));
+    return resultSet.getLong(getFactsTas().columnName(table, column));
   }
 
   protected String stringValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getString(factsTas.columnName(table, column));
+    return resultSet.getString(getFactsTas().columnName(table, column));
   }
 }

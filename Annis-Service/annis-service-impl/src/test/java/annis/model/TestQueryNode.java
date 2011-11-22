@@ -19,30 +19,33 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import annis.sqlgen.model.RankTableJoin;
 
-public class TestAnnisNode {
+public class TestQueryNode {
 	
 	// object under test
-	private AnnisNode node;
+	private QueryNode node;
 	
 
 	@Before
 	public void setup() {
-		node = new AnnisNode(0);
+		node = new QueryNode(0);
 	}
 	
 	@Test
 	public void qNameFullyQualified() {
-		assertThat(AnnisNode.qName("namespace", "name"), is("namespace:name"));
+		assertThat(QueryNode.qName("namespace", "name"), is("namespace:name"));
 	}
 	
 	@Test
 	public void qNameNoNamespace() {
-		assertThat(AnnisNode.qName(null, "name"), is("name"));
+		assertThat(QueryNode.qName(null, "name"), is("name"));
 	}
 	
 	@Test
@@ -72,18 +75,32 @@ public class TestAnnisNode {
 		// test for null values
 		assertThat(node.getSpannedText(), is(nullValue()));
 	}
-
+	
+	@Test
+	public void addRelationRankTable() {
+		// sanity check
+		assertThat(node.isPartOfEdge(), is(false));
+		
+		// add a join that uses the rank table
+		QueryNode target = mock(QueryNode.class);
+		RankTableJoin rankTableJoin = new RankTableJoin(target, "foo", 0, 0) { };
+		node.addJoin(rankTableJoin);
+		
+		// assert both node and target know about the edge
+		assertThat(node.isPartOfEdge(), is(true));
+		verify(target).setPartOfEdge(true);
+	}
 
 	@Test
 	public void setTokenIndexToken() {
-		AnnisNode node = new AnnisNode(1);
+		QueryNode node = new QueryNode(1);
 		node.setTokenIndex(1L);
 		assertThat(node.isToken(), is(true));
 	}
 	
 	@Test
 	public void setTokenIndexNull() {
-		AnnisNode node = new AnnisNode(1);
+		QueryNode node = new QueryNode(1);
 		node.setTokenIndex(null);
 		assertThat(node.isToken(), is(false));
 	}

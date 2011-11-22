@@ -28,6 +28,7 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
 public interface AnnisDao
 {
@@ -58,6 +59,7 @@ public interface AnnisDao
     int count(QueryData queryData);
 	List<Match> find(QueryData queryData);
 	List<AnnotationGraph> annotate(QueryData queryData);
+   SaltProject annotateSalt(QueryData queryData);
 	String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData, final boolean analyze);
     List<AnnotatedMatch> matrix(QueryData queryData);
     public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<QueryData, T> generator);

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 
@@ -32,7 +32,7 @@ public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	private SqlGenerator findSqlGenerator;
 	
 	@Override
-	public String selectClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
+	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {
 		return "\n" + indent + TABSTOP + "count(*)";
 	}
 
@@ -45,7 +45,7 @@ public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	}
 
 	@Override
-	public String fromClause(QueryData queryData, List<AnnisNode> alternative, String indent) {
+	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
 		
 		indent(sb, indent);

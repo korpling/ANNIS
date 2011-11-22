@@ -15,6 +15,7 @@
  */
 package annis.model;
 
+import annis.model.QueryNode;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -27,7 +28,7 @@ public class TestRightDominance {
 
 	@Test
 	public void instanceOfDominance() {
-		assertThat(new RightDominance(new AnnisNode(1)), instanceOf(Dominance.class));
+		assertThat(new RightDominance(new QueryNode(1)), instanceOf(Dominance.class));
 	}
 	
 }

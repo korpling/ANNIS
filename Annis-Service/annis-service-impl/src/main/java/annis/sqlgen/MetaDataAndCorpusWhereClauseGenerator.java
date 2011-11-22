@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
@@ -36,7 +36,7 @@ public class MetaDataAndCorpusWhereClauseGenerator
 
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		Set<String> conditions = new HashSet<String>();
 		List<Long> corpusList = queryData.getCorpusList();
 		List<Long> documents = queryData.getDocuments();
@@ -46,7 +46,7 @@ public class MetaDataAndCorpusWhereClauseGenerator
 	      return new HashSet<String>();
 	    }
 
-	    for (AnnisNode node : alternative) {
+	    for (QueryNode node : alternative) {
 			// FIXME: where condition comment should be optional 
 			// conditions.add("-- select documents by metadata and toplevel corpus");
 			if (documents != null && ! documents.isEmpty() )

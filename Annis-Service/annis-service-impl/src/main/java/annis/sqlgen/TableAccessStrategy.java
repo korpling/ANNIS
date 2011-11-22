@@ -22,7 +22,7 @@ import java.util.Map;
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 
 public class TableAccessStrategy {
@@ -39,7 +39,7 @@ public class TableAccessStrategy {
   	public final static String TEXT_TABLE = "text";
 
 	// the wrapped node
-	private AnnisNode node;
+	private QueryNode node;
 	
 	// table aliases
 	private Map<String, String> tableAliases;
@@ -53,7 +53,7 @@ public class TableAccessStrategy {
 		
 	}
 	
-	public TableAccessStrategy(AnnisNode node) {
+	public TableAccessStrategy(QueryNode node) {
 		this();
 		this.node = node;
 	}
@@ -187,11 +187,11 @@ public class TableAccessStrategy {
 	
 	///// Getter / Setter
 	
-	public AnnisNode getNode() {
+	public QueryNode getNode() {
 		return node;
 	}
 
-	public void setNode(AnnisNode node) {
+	public void setNode(QueryNode node) {
 		this.node = node;
 	}
 

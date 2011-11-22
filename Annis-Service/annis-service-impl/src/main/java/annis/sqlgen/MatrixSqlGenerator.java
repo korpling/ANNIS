@@ -42,7 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 
@@ -124,7 +124,7 @@ public class MatrixSqlGenerator
 
   @Override
 	public String selectClause(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 
 	  	StringBuilder sb = new StringBuilder();
 	  	sb.append("\n");
@@ -180,7 +180,7 @@ public class MatrixSqlGenerator
   
 	@Override
 	public String fromClause(QueryData queryData, 
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
 		
 		indent(sb, indent);
@@ -217,7 +217,7 @@ public class MatrixSqlGenerator
 
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
-			List<AnnisNode> alternative, String indent) {
+			List<QueryNode> alternative, String indent) {
 		
 		Set<String> conditions = new HashSet<String>();
 		StringBuilder sb = new StringBuilder();
@@ -262,7 +262,7 @@ public class MatrixSqlGenerator
 	
 	@Override
 	public String groupByAttributes(QueryData queryData,
-			List<AnnisNode> alternative) {
+			List<QueryNode> alternative) {
 		return "key, " + tables(null).aliasedColumn(NODE_TABLE, "id") + ", span";
 	}
 	
@@ -377,7 +377,7 @@ public class MatrixSqlGenerator
             value = new String(Base64.decodeBase64(value));
           }
 
-          result.add(new Annotation(namespace, name, value));
+          result.add(new annis.model.Annotation(namespace, name, value));
         } // if line not null
       }
     }

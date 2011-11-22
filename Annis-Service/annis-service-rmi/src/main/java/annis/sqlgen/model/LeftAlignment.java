@@ -15,11 +15,11 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public class LeftAlignment extends Join {
 
-	public LeftAlignment(AnnisNode target) {
+	public LeftAlignment(QueryNode target) {
 		super(target);
 	}
 	

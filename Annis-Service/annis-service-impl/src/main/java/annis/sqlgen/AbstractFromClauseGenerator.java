@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public abstract class AbstractFromClauseGenerator 
@@ -23,9 +23,9 @@ public abstract class AbstractFromClauseGenerator
 	implements FromClauseSqlGenerator<QueryData>
 {
 
-	  protected String tableAliasDefinition(AnnisNode node, String table, int count)
+	  protected String tableAliasDefinition(QueryNode node, String table, int count)
 	  {
-	    StringBuffer sb = new StringBuffer();
+	    StringBuilder sb = new StringBuilder();
 
 	    sb.append(tables(node).tableName(table));
 	    sb.append(" AS ");

@@ -17,10 +17,10 @@ package annis.sqlgen;
 
 import java.util.List;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public interface SelectClauseSqlGenerator<T> {
 
-	String selectClause(T queryData, List<AnnisNode> alternative, String indent);
+	String selectClause(T queryData, List<QueryNode> alternative, String indent);
 	
 }

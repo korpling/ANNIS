@@ -43,6 +43,7 @@ import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
+import annis.model.QueryAnnotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -50,11 +51,13 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
-import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.AOMAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.eclipse.emf.common.util.URI;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -148,8 +151,12 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    QueryData qdAQL = annisDao.parseAQL("node & node & node & #1 > #2 & #1 > #3", null);
-    System.out.println(qdAQL);
+    doCorpus("3");
+    doSet("limit to 10");
+    doSet("offset to 10");
+    doSet("left to 5");
+    doSet("right to 5");
+    doAnnotate("tok & tok & #1 . #2");
   }
 
   public void doProposedIndex(String ignore)
@@ -387,7 +394,7 @@ public class AnnisRunner extends AnnisBaseRunner
 	
 	public String benchmarkOptions(QueryData queryData) {
 		List<Long> corpusList = queryData.getCorpusList();
-		List<Annotation> metaData = queryData.getMetaData();
+		List<QueryAnnotation> metaData = queryData.getMetaData();
 		Set<Object> extensions = queryData.getExtensions();
 		List<String> fields = new ArrayList<String>();
 		if (! corpusList.isEmpty() )
@@ -536,7 +543,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
 
-    AnnotateSqlGenerator ge = new AnnotateSqlGenerator();
+    AOMAnnotateSqlGenerator ge = new AOMAnnotateSqlGenerator();
     ge.setMatchedNodesViewName("matched_nodes");
     out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
       new HashMap<Long, Properties>())
@@ -600,8 +607,11 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
-		List<AnnotationGraph> graphs = annisDao.annotate(queryData);
-		out.println("Returned " + graphs.size() + " annotations graphs.");
+		SaltProject result = annisDao.annotateSalt(queryData);
+      URI uri = URI.createFileURI("/tmp/annissalt");
+      result.saveSaltProject_DOT(uri);
+
+      //		out.println("Returned " + graphs.size() + " annotations graphs.");
 		// FIXME: annotations graphen visualisieren
 //    printAsTable(graphs, "nodes", "edges");
   }

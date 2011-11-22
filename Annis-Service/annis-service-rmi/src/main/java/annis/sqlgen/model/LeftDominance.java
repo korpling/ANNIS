@@ -15,17 +15,17 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 
 @SuppressWarnings("serial")
 public class LeftDominance extends Dominance {
 
-	public LeftDominance(AnnisNode target) {
+	public LeftDominance(QueryNode target) {
 		super(target);
 	}
 	
-	public LeftDominance(AnnisNode target, String name) {
+	public LeftDominance(QueryNode target, String name) {
 		super(target, name, 1);
 	}
 	

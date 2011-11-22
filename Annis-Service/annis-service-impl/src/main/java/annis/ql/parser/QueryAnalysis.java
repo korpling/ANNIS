@@ -15,7 +15,7 @@
  */
 package annis.ql.parser;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
 
@@ -62,7 +62,7 @@ public class QueryAnalysis
 			clause.apply(clauseAnalysis);
 			
 			// save nodes and update column width
-			queryData.addAlternative(new LinkedList<AnnisNode>(clauseAnalysis.getNodes()));
+			queryData.addAlternative(new LinkedList<QueryNode>(clauseAnalysis.getNodes()));
 			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), clauseAnalysis.nodesCount()));
 			
 			// collect meta data

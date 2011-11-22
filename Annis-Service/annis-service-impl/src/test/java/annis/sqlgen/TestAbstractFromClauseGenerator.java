@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Spy;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class TestAbstractFromClauseGenerator {
@@ -47,7 +47,7 @@ public class TestAbstractFromClauseGenerator {
 		generator = new AbstractFromClauseGenerator() {
 			
 			@Override
-			public String fromClause(QueryData queryData, List<AnnisNode> alternative,
+			public String fromClause(QueryData queryData, List<QueryNode> alternative,
 					String indent) {
 				throw new NotImplementedException("This AbstractFromClauseGenerator is only used for testing purposes");
 			}
@@ -66,7 +66,7 @@ public class TestAbstractFromClauseGenerator {
 	public void shouldCreateTableAliasWithoutCount() {
 		// given
 		long id = uniqueLong();
-		AnnisNode node = new AnnisNode(id);
+		QueryNode node = new QueryNode(id);
 		String table = uniqueString();
 		String tableAlias = uniqueString();
 		int count = 1;
@@ -85,7 +85,7 @@ public class TestAbstractFromClauseGenerator {
 	public void shouldCreateTableAliasWithCount() {
 		// given
 		long id = uniqueLong();
-		AnnisNode node = new AnnisNode(id);
+		QueryNode node = new QueryNode(id);
 		String table = uniqueString();
 		String tableAlias = uniqueString();
 		int count = uniqueInt();

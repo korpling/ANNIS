@@ -48,6 +48,8 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
+import annis.service.ifaces.AnnisResultSet;
+import annis.sqlgen.AOMAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
@@ -56,9 +58,11 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.MatrixSqlGenerator;
+import annis.sqlgen.SaltAnnotateSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
@@ -68,7 +72,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
   private CountSqlGenerator countSqlGenerator;
-  private AnnotateSqlGenerator annotateSqlGenerator;
+  private AOMAnnotateSqlGenerator aomAnnotateSqlGenerator;
+  private SaltAnnotateSqlGenerator saltAnnotateSqlGenerator;
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
   private int timeout;
@@ -205,7 +210,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<AnnotationGraph> annotate(QueryData queryData)
   {
-    return executeQueryFunction(queryData, annotateSqlGenerator);
+    return executeQueryFunction(queryData, aomAnnotateSqlGenerator);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public SaltProject annotateSalt(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, saltAnnotateSqlGenerator);
   }
 
   @Transactional(readOnly = true)
@@ -265,7 +277,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnotationGraph retrieveAnnotationGraph(long textId)
   {
     List<AnnotationGraph> graphs =
-      annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
+      aomAnnotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
     if (graphs.isEmpty())
     {
       return null;
@@ -556,14 +568,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public AnnotateSqlGenerator getAnnotateSqlGenerator()
+  public AOMAnnotateSqlGenerator getAomAnnotateSqlGenerator()
   {
-    return annotateSqlGenerator;
+    return aomAnnotateSqlGenerator;
   }
 
-  public void setAnnotateSqlGenerator(AnnotateSqlGenerator annotateSqlGenerator)
+  public void setAomAnnotateSqlGenerator(
+    AOMAnnotateSqlGenerator aomAnnotateSqlGenerator)
   {
-    this.annotateSqlGenerator = annotateSqlGenerator;
+    this.aomAnnotateSqlGenerator = aomAnnotateSqlGenerator;
   }
 
   @Override
@@ -601,6 +614,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.matrixSqlGenerator = matrixSqlGenerator;
   }
 
+  public SaltAnnotateSqlGenerator getSaltAnnotateSqlGenerator()
+  {
+    return saltAnnotateSqlGenerator;
+  }
+
+  public void setSaltAnnotateSqlGenerator(SaltAnnotateSqlGenerator saltAnnotateSqlGenerator)
+  {
+    this.saltAnnotateSqlGenerator = saltAnnotateSqlGenerator;
+  }
+  
   public ByteHelper getByteHelper()
   {
     return byteHelper;

@@ -17,8 +17,8 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnnotationSearchExpr;
@@ -102,17 +102,17 @@ import org.apache.commons.lang.Validate;
 public class ClauseAnalysis extends DepthFirstAdapter
 {
 
-  private Map<String, AnnisNode> nodes;
+  private Map<String, QueryNode> nodes;
   private int aliasCount;
-  private List<Annotation> metaAnnotations;
+  private List<QueryAnnotation> metaAnnotations;
   private int precedenceBound;
 
   public ClauseAnalysis()
   {
-    this(0, new ArrayList<Annotation>(), new LinkedHashMap<String, AnnisNode>(), 0);
+    this(0, new ArrayList<QueryAnnotation>(), new LinkedHashMap<String, QueryNode>(), 0);
   }
 
-  public ClauseAnalysis(int aliasCount, List<Annotation> metaAnnotations, Map<String, AnnisNode> nodes, int precedenceBound)
+  public ClauseAnalysis(int aliasCount, List<QueryAnnotation> metaAnnotations, Map<String, QueryNode> nodes, int precedenceBound)
   {
     this.aliasCount = aliasCount;
     this.metaAnnotations = metaAnnotations;
@@ -163,7 +163,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseARootLingOp(ARootLingOp node)
   {
-    AnnisNode nleft = lhs(node);
+    QueryNode nleft = lhs(node);
     Validate.notNull(nleft, errorLHS("root"));
     nleft.setRoot(true);
   }
@@ -171,7 +171,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseAArityLingOp(AArityLingOp node)
   {
-    AnnisNode nleft = lhs(node);
+    QueryNode nleft = lhs(node);
     Validate.notNull(nleft, errorLHS("arity"));
     nleft.setArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
   }
@@ -179,7 +179,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseATokenArityLingOp(ATokenArityLingOp node)
   {
-    AnnisNode nleft = lhs(node);
+    QueryNode nleft = lhs(node);
     Validate.notNull(nleft, errorLHS("token-arity"));
     nleft.setTokenArity(annisRangeFromARangeSpec((ARangeSpec) node.getRangeSpec()));
   }
@@ -241,8 +241,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseADirectPrecedenceSpec(ADirectPrecedenceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
@@ -254,8 +254,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseAIndirectPrecedenceSpec(AIndirectPrecedenceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
@@ -274,8 +274,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseARangePrecedenceSpec(ARangePrecedenceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
@@ -307,8 +307,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseADirectDominanceSpec(ADirectDominanceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
@@ -337,8 +337,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     if (node.getEdgeSpec() != null)
     {
-      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
-      for (Annotation a : annotations)
+      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for (QueryAnnotation a : annotations)
       {
         right.addEdgeAnnotation(a);
       }
@@ -349,8 +349,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseAIndirectDominanceSpec(AIndirectDominanceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
@@ -362,8 +362,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseARangeDominanceSpec(ARangeDominanceSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Dominance.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Dominance.class.getSimpleName()));
@@ -397,8 +397,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseADirectSiblingSpec(ADirectSiblingSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(Sibling.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Sibling.class.getSimpleName()));
@@ -407,8 +407,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     if (node.getEdgeSpec() != null)
     {
-      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
-      for (Annotation a : annotations)
+      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for (QueryAnnotation a : annotations)
       {
         left.addEdgeAnnotation(a);
         right.addEdgeAnnotation(a);
@@ -420,8 +420,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseAIndirectSiblingSpec(AIndirectSiblingSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(CommonAncestor.class.getSimpleName()));
     Validate.notNull(right, errorRHS(CommonAncestor.class.getSimpleName()));
@@ -438,8 +438,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseADirectPointingRelationSpec(ADirectPointingRelationSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(PointingRelation.class.getSimpleName()));
     Validate.notNull(right, errorRHS(PointingRelation.class.getSimpleName()));
@@ -450,8 +450,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     if (node.getEdgeSpec() != null)
     {
-      LinkedList<Annotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
-      for (Annotation a : annotations)
+      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation((AEdgeSpec) node.getEdgeSpec());
+      for (QueryAnnotation a : annotations)
       {
         right.addEdgeAnnotation(a);
       }
@@ -462,8 +462,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseARangePointingRelationSpec(ARangePointingRelationSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(PointingRelation.class.getSimpleName()));
     Validate.notNull(right, errorRHS(PointingRelation.class.getSimpleName()));
@@ -495,8 +495,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseAIndirectPointingRelationSpec(AIndirectPointingRelationSpec node)
   {
     PLingOp parent = (PLingOp) node.parent();
-    AnnisNode left = lhs(parent);
-    AnnisNode right = rhs(parent);
+    QueryNode left = lhs(parent);
+    QueryNode right = rhs(parent);
 
     Validate.notNull(left, errorLHS(PointingRelation.class.getSimpleName()));
     Validate.notNull(right, errorRHS(PointingRelation.class.getSimpleName()));
@@ -511,11 +511,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
   public void caseAMetaConstraintExpr(AMetaConstraintExpr node)
   {
     String annoText = textFromAnnoValue(node.getValue());
-    AnnisNode.TextMatching annoTextMatching = textMatchingFromAnnoValue(node.getValue());
+    QueryNode.TextMatching annoTextMatching = textMatchingFromAnnoValue(node.getValue());
     token(node.getName());
 
-    Annotation annotation = 
-      new Annotation(token(node.getNamespace()), token(node.getName()), annoText, annoTextMatching);
+    QueryAnnotation annotation = 
+      new QueryAnnotation(token(node.getNamespace()), token(node.getName()), annoText, annoTextMatching);
     metaAnnotations.add(annotation);
   }
 
@@ -532,13 +532,13 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseAAnnotationSearchExpr(AAnnotationSearchExpr node)
   {
-    AnnisNode target = newNode();
+    QueryNode target = newNode();
 
-    Annotation anno = new Annotation(token(node.getAnnoNamespace()), token(node.getAnnoType()));
+    QueryAnnotation anno = new QueryAnnotation(token(node.getAnnoNamespace()), token(node.getAnnoType()));
 
     if (node.getAnnoValue() != null)
     {
-      AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
+      QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
       String text = textFromAnnoValue(node.getAnnoValue());
 
       anno.setValue(text);
@@ -552,7 +552,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseATextSearchExpr(ATextSearchExpr node)
   {
-    AnnisNode context = newNode();
+    QueryNode context = newNode();
 
     if (node.getTextSpec() == null)
     {
@@ -561,12 +561,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
     else if (node.getTextSpec() instanceof AWildTextSpec)
     {
       context.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
-        AnnisNode.TextMatching.EXACT_EQUAL);
+        QueryNode.TextMatching.EXACT_EQUAL);
     }
     else if (node.getTextSpec() instanceof ARegexpTextSpec)
     {
       context.setSpannedText(((ARegexpTextSpec) node.getTextSpec()).getRegexp().getText(),
-        AnnisNode.TextMatching.REGEXP_EQUAL);
+        QueryNode.TextMatching.REGEXP_EQUAL);
     }
 
   }
@@ -574,17 +574,17 @@ public class ClauseAnalysis extends DepthFirstAdapter
   @Override
   public void caseATextSearchNotEqualExpr(ATextSearchNotEqualExpr node)
   {
-    AnnisNode target = newNode();
+    QueryNode target = newNode();
 
     if (node.getTextSpec() instanceof AWildTextSpec)
     {
       target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
-        AnnisNode.TextMatching.EXACT_NOT_EQUAL);
+        QueryNode.TextMatching.EXACT_NOT_EQUAL);
     }
     else if (node.getTextSpec() instanceof ARegexpTextSpec)
     {
       target.setSpannedText(((ARegexpTextSpec) node.getTextSpec()).getRegexp().getText(),
-        AnnisNode.TextMatching.REGEXP_NOT_EQUAL);
+        QueryNode.TextMatching.REGEXP_NOT_EQUAL);
     }
 
   }
@@ -597,9 +597,9 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   // </editor-fold>
   // <editor-fold desc="Complex helper" >
-  private AnnisNode newNode()
+  private QueryNode newNode()
   {
-    AnnisNode n = new AnnisNode(++aliasCount);
+    QueryNode n = new QueryNode(++aliasCount);
     n.setVariable("n" + n.getId());
     n.setMarker(n.getVariable());
     nodes.put(n.getVariable(), n);
@@ -614,18 +614,18 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return nested;
   }
 
-  private AnnisNode.Range annisRangeFromARangeSpec(ARangeSpec spec)
+  private QueryNode.Range annisRangeFromARangeSpec(ARangeSpec spec)
   {
     String min = spec.getMin().getText();
     String max = spec.getMax() != null ? spec.getMax().getText() : null;
 
     if (max == null)
     {
-      return new AnnisNode.Range(Integer.parseInt(min), Integer.parseInt(min));
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
     }
     else
     {
-      return new AnnisNode.Range(Integer.parseInt(min), Integer.parseInt(max));
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
     }
   }
 
@@ -640,14 +640,14 @@ public class ClauseAnalysis extends DepthFirstAdapter
    */
   private void join(PLingOp node, Class<? extends Join> type)
   {
-    AnnisNode left = lhs(node);
-    AnnisNode right = rhs(node);
+    QueryNode left = lhs(node);
+    QueryNode right = rhs(node);
 
     Validate.notNull(left, errorLHS(type.getSimpleName()));
     Validate.notNull(right, errorRHS(type.getSimpleName()));
     try
     {
-      Constructor<? extends Join> c = type.getConstructor(AnnisNode.class);
+      Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
       Join newJoin = c.newInstance(right);
       left.addJoin(newJoin);
     }
@@ -657,22 +657,22 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
   }
 
-  private LinkedList<Annotation> fromEdgeAnnotation(AEdgeSpec spec)
+  private LinkedList<QueryAnnotation> fromEdgeAnnotation(AEdgeSpec spec)
   {
-    LinkedList<Annotation> result = new LinkedList<Annotation>();
+    LinkedList<QueryAnnotation> result = new LinkedList<QueryAnnotation>();
     for (PEdgeAnnotation pAnno : spec.getEdgeAnnotation())
     {
       AEdgeAnnotation anno = (AEdgeAnnotation) pAnno;
       if (anno.getValue() != null)
       {
         String text = textFromAnnoValue(anno.getValue());
-        AnnisNode.TextMatching textMatching = textMatchingFromAnnoValue(anno.getValue());
-        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType()),
+        QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(anno.getValue());
+        result.add(new QueryAnnotation(token(anno.getNamespace()), token(anno.getType()),
           text, textMatching));
       }
       else
       {
-        result.add(new Annotation(token(anno.getNamespace()), token(anno.getType())));
+        result.add(new QueryAnnotation(token(anno.getNamespace()), token(anno.getType())));
       }
     }
     return result;
@@ -715,20 +715,20 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return token(text);
   }
 
-  private AnnisNode.TextMatching textMatchingFromAnnoValue(PAnnoValue value)
+  private QueryNode.TextMatching textMatchingFromAnnoValue(PAnnoValue value)
   {
-    AnnisNode.TextMatching textMatching = null;
+    QueryNode.TextMatching textMatching = null;
 
     if (value instanceof AUnequalAnnoValue)
     {
       AUnequalAnnoValue val = (AUnequalAnnoValue) value;
       if (val.getTextSpec() instanceof AWildTextSpec)
       {
-        textMatching = AnnisNode.TextMatching.EXACT_NOT_EQUAL;
+        textMatching = QueryNode.TextMatching.EXACT_NOT_EQUAL;
       }
       else if (val.getTextSpec() instanceof ARegexpTextSpec)
       {
-        textMatching = AnnisNode.TextMatching.REGEXP_NOT_EQUAL;
+        textMatching = QueryNode.TextMatching.REGEXP_NOT_EQUAL;
       }
     }
     else if (value instanceof AEqualAnnoValue)
@@ -736,11 +736,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
       AEqualAnnoValue val = (AEqualAnnoValue) value;
       if (val.getTextSpec() instanceof AWildTextSpec)
       {
-        textMatching = AnnisNode.TextMatching.EXACT_EQUAL;
+        textMatching = QueryNode.TextMatching.EXACT_EQUAL;
       }
       else if (val.getTextSpec() instanceof ARegexpTextSpec)
       {
-        textMatching = AnnisNode.TextMatching.REGEXP_EQUAL;
+        textMatching = QueryNode.TextMatching.REGEXP_EQUAL;
       }
     }
 
@@ -758,7 +758,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return token != null ? token.getText() : null;
   }
 
-  private AnnisNode lhs(PLingOp node)
+  private QueryNode lhs(PLingOp node)
   {
     String tok = lhsStr(node);
     if (tok == null)
@@ -768,7 +768,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     return nodes.get("n" + tok);
   }
 
-  private AnnisNode rhs(PLingOp node)
+  private QueryNode rhs(PLingOp node)
   {
     String tok = rhsStr(node);
     if (tok == null)
@@ -801,12 +801,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   // </editor-fold>
   // <editor-fold desc="Getter and Setter">
-  public List<Annotation> getMetaAnnotations()
+  public List<QueryAnnotation> getMetaAnnotations()
   {
     return metaAnnotations;
   }
 
-  public Collection<AnnisNode> getNodes()
+  public Collection<QueryNode> getNodes()
   {
     return nodes.values();
   }

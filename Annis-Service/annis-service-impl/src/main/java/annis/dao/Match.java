@@ -17,19 +17,46 @@ package annis.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Properties;
 
-// FIXME: change to interface
-// FIXME: change to Map<String, Node>
-// key should be the marker of the step in the DDDquery
+
 @SuppressWarnings("serial")
-public class Match extends ArrayList<Span> {
+public class Match extends ArrayList<Long>
+{
+  
+  private long toplevelCorpusId;
+  private HashMap<Long, Properties> corpusConfiguration;
+  
+  public Match()
+  {
+    corpusConfiguration = new HashMap<Long, Properties>();
+  }
 
-	public Match() {
-		
-	}
-	
-	public Match(List<Span> nodes) {
-		addAll(nodes);
-	}
-	
+  public Match(List<Long> nodes)
+  {
+    corpusConfiguration = new HashMap<Long, Properties>();
+    addAll(nodes);
+  }
+
+  public long getToplevelCorpusId()
+  {
+    return toplevelCorpusId;
+  }
+
+  public void setToplevelCorpusId(long toplevelCorpusId)
+  {
+    this.toplevelCorpusId = toplevelCorpusId;
+  }
+
+  public HashMap<Long, Properties> getCorpusConfiguration()
+  {
+    return corpusConfiguration;
+  }
+
+  public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration)
+  {
+    this.corpusConfiguration = corpusConfiguration;
+  }
+  
 }

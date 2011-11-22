@@ -17,10 +17,10 @@ package annis.sqlgen;
 
 import java.util.List;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public interface LimitOffsetClauseSqlGenerator<T> {
 
-	String limitOffsetClause(T queryData, List<AnnisNode> alternative, String indent);
+	String limitOffsetClause(T queryData, List<QueryNode> alternative, String indent);
 
 }

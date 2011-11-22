@@ -18,11 +18,11 @@ package annis.sqlgen;
 import java.util.List;
 import java.util.Set;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public interface WhereClauseSqlGenerator<T> {
 
-	Set<String> whereConditions(T queryData, List<AnnisNode> alternative, String indent);
+	Set<String> whereConditions(T queryData, List<QueryNode> alternative, String indent);
 
 //  List<String> commonWhereConditions(List<AnnisNode> nodes, List<Long> corpusList,List<Long> documents);
 

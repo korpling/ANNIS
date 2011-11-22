@@ -17,11 +17,11 @@ package annis.sqlgen;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public class TableAccessStrategyFactory {
 
-	public TableAccessStrategy tables(AnnisNode node) {
+	public TableAccessStrategy tables(QueryNode node) {
 		TableAccessStrategy tableAccessStrategy = createTableAccessStrategy();
 		tableAccessStrategy.setNode(node);
 		return tableAccessStrategy;

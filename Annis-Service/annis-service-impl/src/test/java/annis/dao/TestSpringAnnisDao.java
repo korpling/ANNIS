@@ -65,6 +65,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
+import annis.sqlgen.AOMAnnotateSqlGenerator;
 import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -80,7 +81,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
   @Mock private MetaDataFilter metaDataFilter;
 	@Mock private SqlGenerator sqlGenerator;
   @Mock private DefaultQueryExecutor defaultQueryExecutor;
-  @Mock private AnnotateSqlGenerator annotateSqlGenerator;
+  @Mock private AOMAnnotateSqlGenerator aomAnnotateSqlGenerator;
 	@Mock private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 	@Mock private JdbcTemplate jdbcTemplate;
 	private SimpleJdbcTemplate simpleJdbcTemplate;
@@ -104,7 +105,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		annisDao = new SpringAnnisDao();
 		annisDao.setAqlParser(annisParser);
 		annisDao.setSqlGenerator(sqlGenerator);
-    annisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
+    annisDao.setAomAnnotateSqlGenerator(aomAnnotateSqlGenerator);
 		annisDao.setPlanRowMapper(planRowMapper);
 		annisDao.setJdbcTemplate(jdbcTemplate);
 		annisDao.setListCorpusSqlHelper(listCorpusHelper);
@@ -149,7 +150,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
 		final AnnotationGraph GRAPH = mock(AnnotationGraph.class);
 
-    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class), anyLong())).thenReturn(Arrays.asList(GRAPH));
+    when(aomAnnotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class), anyLong())).thenReturn(Arrays.asList(GRAPH));
 		
 		// call and test
 		assertThat(annisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
@@ -169,7 +170,7 @@ public class TestSpringAnnisDao extends AnnisHomeTest {
 		// stub returned graph list with more than one entry
 		final List<AnnotationGraph> GRAPHS = mock(List.class);
 		when(GRAPHS.size()).thenReturn(2);
-    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
+    when(aomAnnotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
       anyLong())).thenReturn(GRAPHS);
 		annisDao.retrieveAnnotationGraph(0);
 	}

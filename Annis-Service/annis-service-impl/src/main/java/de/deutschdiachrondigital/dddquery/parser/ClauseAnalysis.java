@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnisNode.TextMatching;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode.TextMatching;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Inclusion;
@@ -85,25 +85,25 @@ public class ClauseAnalysis extends DepthFirstAdapter
 {
 
 //	private Logger log = Logger.getLogger(this.getClass());
-  private List<AnnisNode> nodes;
-  private Map<String, AnnisNode> boundNodes;
+  private List<QueryNode> nodes;
+  private Map<String, QueryNode> boundNodes;
   private int aliasCount;
-  private AnnisNode context;
-  private AnnisNode target;
+  private QueryNode context;
+  private QueryNode target;
   private boolean firstStep;
   private boolean topLevel;
   private Expression.Type textValue;
-  private Annotation annotation;
+  private QueryAnnotation annotation;
   boolean inSibling = false;
-  private List<Annotation> metaAnnotations;
+  private List<QueryAnnotation> metaAnnotations;
   private int precedenceBound;
 
   public ClauseAnalysis()
   {
-    this(null, 0, new HashMap<String, AnnisNode>(), 0, new ArrayList<Annotation>());
+    this(null, 0, new HashMap<String, QueryNode>(), 0, new ArrayList<QueryAnnotation>());
   }
 
-  public ClauseAnalysis(AnnisNode target, int aliasCount, Map<String, AnnisNode> boundNodes, int precedenceBound, List<Annotation> metaAnnotations)
+  public ClauseAnalysis(QueryNode target, int aliasCount, Map<String, QueryNode> boundNodes, int precedenceBound, List<QueryAnnotation> metaAnnotations)
   {
     this.target = target;
     this.aliasCount = aliasCount;
@@ -113,7 +113,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     firstStep = true;
     topLevel = true;
-    nodes = new ArrayList<AnnisNode>();
+    nodes = new ArrayList<QueryNode>();
   }
 
   ///// Analysis interface
@@ -262,10 +262,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     String namespace = token(node.getNamespace());
     String name = token(node.getType());
-    target.addEdgeAnnotation(new Annotation(namespace, name));
+    target.addEdgeAnnotation(new QueryAnnotation(namespace, name));
     if (inSibling)
     {
-      context.addEdgeAnnotation(new Annotation(namespace, name));
+      context.addEdgeAnnotation(new QueryAnnotation(namespace, name));
     }
     inSibling = false;
   }
@@ -279,11 +279,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     boolean isNegated = node.getOp() != null && node.getOp() instanceof ANeComparison;
 
-    target.addEdgeAnnotation(new Annotation(namespace, name, value,
+    target.addEdgeAnnotation(new QueryAnnotation(namespace, name, value,
       isNegated ? TextMatching.EXACT_NOT_EQUAL : TextMatching.EXACT_EQUAL));
     if (inSibling)
     {
-      context.addEdgeAnnotation(new Annotation(namespace, name, value,
+      context.addEdgeAnnotation(new QueryAnnotation(namespace, name, value,
          isNegated ? TextMatching.EXACT_NOT_EQUAL : TextMatching.EXACT_EQUAL));
     }
     inSibling = false;
@@ -298,11 +298,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     boolean isNegated = node.getOp() != null && node.getOp() instanceof ANeComparison;
 
-    target.addEdgeAnnotation(new Annotation(namespace, name, value,
+    target.addEdgeAnnotation(new QueryAnnotation(namespace, name, value,
       isNegated ? TextMatching.REGEXP_NOT_EQUAL : TextMatching.REGEXP_EQUAL));
     if (inSibling)
     {
-      context.addEdgeAnnotation(new Annotation(namespace, name, value,
+      context.addEdgeAnnotation(new QueryAnnotation(namespace, name, value,
         isNegated ? TextMatching.REGEXP_NOT_EQUAL : TextMatching.REGEXP_EQUAL));
     }
     inSibling = false;
@@ -322,7 +322,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     String namespace = token(node.getNamespace());
     String name = token(node.getName());
     textValue = Type.ATTRIBUTE;
-    annotation = new Annotation(namespace, name);
+    annotation = new QueryAnnotation(namespace, name);
   }
 
   @Override
@@ -557,7 +557,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   }
 
   // FIXME: test
-  private AnnisNode.Range convertArgListToRange(LinkedList<PExpr> args, String function)
+  private QueryNode.Range convertArgListToRange(LinkedList<PExpr> args, String function)
   {
     int min = 0;
     int max = 0;
@@ -590,13 +590,13 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       throw new IllegalArgumentException(function + " requires a number as argument");
     }
-    return new AnnisNode.Range(min, max);
+    return new QueryNode.Range(min, max);
   }
 
   @Override
   public void inAMetaNodeTest(AMetaNodeTest node)
   {
-    annotation = new Annotation(token(node.getNamespace()), token(node.getName()));
+    annotation = new QueryAnnotation(token(node.getNamespace()), token(node.getName()));
   }
 
   @Override
@@ -621,9 +621,9 @@ public class ClauseAnalysis extends DepthFirstAdapter
   }
 
   ///// Private Helper
-  private AnnisNode newNode()
+  private QueryNode newNode()
   {
-    AnnisNode node = new AnnisNode(++aliasCount);
+    QueryNode node = new QueryNode(++aliasCount);
     nodes.add(node);
     return node;
   }
@@ -735,11 +735,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
           switch (getType())
           {
             case SPAN:
-              AnnisNode target = nested.target;
+              QueryNode target = nested.target;
               target.setSpannedText(rhs.toSql(), textMatching);
               break;
             case ATTRIBUTE:
-              Annotation annotation = nested.annotation;
+              QueryAnnotation annotation = nested.annotation;
               annotation.setValue(rhs.toSql());
               annotation.setTextMatching(textMatching);
               break;
@@ -785,22 +785,22 @@ public class ClauseAnalysis extends DepthFirstAdapter
     this.topLevel = topLevel;
   }
 
-  public AnnisNode getContext()
+  public QueryNode getContext()
   {
     return context;
   }
 
-  public void setContext(AnnisNode context)
+  public void setContext(QueryNode context)
   {
     this.context = context;
   }
 
-  public AnnisNode getTarget()
+  public QueryNode getTarget()
   {
     return target;
   }
 
-  public void setTarget(AnnisNode target)
+  public void setTarget(QueryNode target)
   {
     this.target = target;
   }
@@ -815,12 +815,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
     this.textValue = textValue;
   }
 
-  public List<AnnisNode> getNodes()
+  public List<QueryNode> getNodes()
   {
     return nodes;
   }
 
-  public void setNodes(List<AnnisNode> nodes)
+  public void setNodes(List<QueryNode> nodes)
   {
     this.nodes = nodes;
   }
@@ -845,12 +845,12 @@ public class ClauseAnalysis extends DepthFirstAdapter
     this.precedenceBound = precedenceBound;
   }
 
-  public List<Annotation> getMetaAnnotations()
+  public List<QueryAnnotation> getMetaAnnotations()
   {
     return metaAnnotations;
   }
 
-  public void setMetaAnnotations(List<Annotation> metaAnnotations)
+  public void setMetaAnnotations(List<QueryAnnotation> metaAnnotations)
   {
     this.metaAnnotations = metaAnnotations;
   }

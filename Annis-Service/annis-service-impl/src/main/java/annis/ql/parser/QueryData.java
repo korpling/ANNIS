@@ -22,27 +22,28 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
+import annis.model.QueryNode;
+import annis.model.QueryAnnotation;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class QueryData implements Cloneable
 {
-	private List<List<AnnisNode>> alternatives;
+	private List<List<QueryNode>> alternatives;
 	private List<Long> corpusList;
 	private List<Long> documents;
-	private List<Annotation> metaData;
+	private List<QueryAnnotation> metaData;
 	private int maxWidth;
 	private Set<Object> extensions;
-	  private HashMap<Long, Properties> corpusConfiguration;
+   private HashMap<Long, Properties> corpusConfiguration;
 
 	public QueryData() {
-		alternatives = new ArrayList<List<AnnisNode>>();
+		alternatives = new ArrayList<List<QueryNode>>();
 		corpusList = new ArrayList<Long>();
 		documents = new ArrayList<Long>();
-		metaData = new ArrayList<Annotation>();
+		metaData = new ArrayList<QueryAnnotation>();
 		extensions = new HashSet<Object>();
 	}
 
@@ -50,11 +51,11 @@ public class QueryData implements Cloneable
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    Iterator<List<AnnisNode>> itOr = getAlternatives().iterator();
+    Iterator<List<QueryNode>> itOr = getAlternatives().iterator();
     while(itOr.hasNext())
     {
-      List<AnnisNode> nextNodes = itOr.next();
-      Iterator<AnnisNode> itAnd = nextNodes.iterator();
+      List<QueryNode> nextNodes = itOr.next();
+      Iterator<QueryNode> itAnd = nextNodes.iterator();
       while(itAnd.hasNext())
       {
         sb.append("\t").append(itAnd.next());
@@ -72,7 +73,7 @@ public class QueryData implements Cloneable
         sb.append("\n");
       }
     }
-    Iterator<Annotation> itMeta = getMetaData().iterator();
+    Iterator<QueryAnnotation> itMeta = getMetaData().iterator();
     if(itMeta.hasNext())
     {
       sb.append("META");
@@ -95,10 +96,10 @@ public class QueryData implements Cloneable
     return sb.toString();
   }
 
-	public List<List<AnnisNode>> getAlternatives() {
+	public List<List<QueryNode>> getAlternatives() {
 		return alternatives;
 	}
-	public void setAlternatives(List<List<AnnisNode>> alternatives) {
+	public void setAlternatives(List<List<QueryNode>> alternatives) {
 		this.alternatives = alternatives;
 	}
 	public List<Long> getCorpusList() {
@@ -107,10 +108,10 @@ public class QueryData implements Cloneable
 	public void setCorpusList(List<Long> corpusList) {
 		this.corpusList = corpusList;
 	}
-	public List<Annotation> getMetaData() {
+	public List<QueryAnnotation> getMetaData() {
 		return metaData;
 	}
-	public void setMetaData(List<Annotation> metaData) {
+	public void setMetaData(List<QueryAnnotation> metaData) {
 		this.metaData = metaData;
 	}
 	public int getMaxWidth() {
@@ -120,11 +121,11 @@ public class QueryData implements Cloneable
 		this.maxWidth = maxWidth;
 	}
 
-	public boolean addAlternative(List<AnnisNode> nodes) {
+	public boolean addAlternative(List<QueryNode> nodes) {
 		return alternatives.add(nodes);
 	}
 
-	public boolean addMetaAnnotations(List<Annotation> annotations) {
+	public boolean addMetaAnnotations(List<QueryAnnotation> annotations) {
 		return metaData.addAll(annotations);
 	}
 
@@ -152,6 +153,21 @@ public void setDocuments(List<Long> documents) {
 
 public Set<Object> getExtensions() {
 	return extensions;
+}
+
+public<T> List<T> getExtensions(Class<T> clazz)
+{
+  List<T> result = new LinkedList<T>();
+  
+  for(Object o : extensions)
+  {
+    if(clazz.isInstance(o))
+    {
+      result.add((T) o);
+    }
+  }
+  
+  return result;
 }
 
 public boolean addExtension(Object extension) {

@@ -15,19 +15,19 @@
  */
 package annis.sqlgen.model;
 
-import annis.model.AnnisNode;
+import annis.model.QueryNode;
 
 public class Precedence extends RangedJoin {
 
-	public Precedence(AnnisNode target) {
+	public Precedence(QueryNode target) {
 		this(target, 0, 0);
 	}
 
-	public Precedence(AnnisNode target, int distance) {
+	public Precedence(QueryNode target, int distance) {
 		this(target, distance, distance);
 	}
 	
-	public Precedence(AnnisNode target, int minDistance, int maxDistance) {
+	public Precedence(QueryNode target, int minDistance, int maxDistance) {
 		super(target, minDistance, maxDistance);
 	}
 
