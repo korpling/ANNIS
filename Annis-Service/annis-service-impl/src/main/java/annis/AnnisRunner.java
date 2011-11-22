@@ -100,7 +100,7 @@ public class AnnisRunner extends AnnisBaseRunner
 	private static class Benchmark {
 		private String functionCall;
 		private QueryData queryData;
-		private float avgTimeInMilliseconds;
+		private long avgTimeInMilliseconds;
 		private long bestTimeInMilliseconds;
 		private String sql;
 		private String plan;
@@ -370,7 +370,7 @@ public class AnnisRunner extends AnnisBaseRunner
 		out.println();
 		out.println("---> benchmark complete");
 		for (Benchmark benchmark : benchmarks) {
-			benchmark.avgTimeInMilliseconds = benchmark.avgTimeInMilliseconds / benchmark.runs;
+			benchmark.avgTimeInMilliseconds = Math.round(benchmark.avgTimeInMilliseconds / benchmark.runs);
 			String options = benchmarkOptions(benchmark.queryData);
 			out.println(benchmark.avgTimeInMilliseconds + " ms (avg for " + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", " + benchmark.errors + " errors)" : ")") + " for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
 		}
