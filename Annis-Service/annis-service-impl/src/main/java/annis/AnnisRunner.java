@@ -55,6 +55,7 @@ import annis.sqlgen.AOMAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
+import annis.utils.LegacyGraphConverter;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import org.eclipse.emf.common.util.URI;
@@ -608,8 +609,12 @@ public class AnnisRunner extends AnnisBaseRunner
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
 		SaltProject result = annisDao.annotateSalt(queryData);
+      
+ ///       List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
+      
       URI uri = URI.createFileURI("/tmp/annissalt");
       result.saveSaltProject_DOT(uri);
+      
 
       //		out.println("Returned " + graphs.size() + " annotations graphs.");
 		// FIXME: annotations graphen visualisieren

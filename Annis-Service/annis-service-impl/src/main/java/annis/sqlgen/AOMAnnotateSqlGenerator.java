@@ -159,7 +159,7 @@ public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
 
       // get edge data
       Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
-
+      
       // add edge to graph if it is new, else get known copy
       long pre = edge.getPre();
       if (!edgeByPre.containsKey(pre))
