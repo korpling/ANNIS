@@ -112,7 +112,7 @@ public class LegacyGraphConverter
       aEdge.setDestination(allNodes.get(rel.getTarget()));
 
       aEdge.setEdgeType(EdgeType.UNKNOWN);
-      aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.NAMESPACE + ":"
+      aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.NAMESPACE + "::"
         + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC());
 
       // TODO: use layer for namespace

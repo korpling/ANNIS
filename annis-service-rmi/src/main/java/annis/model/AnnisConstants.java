@@ -13,6 +13,5 @@ public class AnnisConstants
   public static final String NAMESPACE = "annis";
   public static final String FEAT_MATCHEDIDS = "matchedids";
   public static final String PROC_INTERNALID = "internalid";
-  public static final String PRE = "pre";
   
 }
