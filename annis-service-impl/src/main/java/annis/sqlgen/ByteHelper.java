@@ -18,7 +18,11 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
   {
     this.corpusName = corpusName;
 
-    return "SELECT substring((SELECT file FROM media_files WHERE corpus.id = corpus_ref) from " + offset + " for " + length + "), bytes, title, mime_type FROM media_files, corpus WHERE corpus.name = '" + corpusName + "' AND corpus.id = corpus_ref";
+    return "SELECT substring((SELECT file FROM media_files "
+      + "WHERE corpus.id = corpus_ref) from " + offset + " for " + length + "),"
+      + " bytes, title, mime_type FROM media_files, corpus "
+      + "WHERE corpus.name = '" + corpusName + "' AND corpus.id = corpus_ref";
+    
   }
 
   @Override
