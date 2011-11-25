@@ -79,7 +79,16 @@ public class CSVResultSetProvider
       }
     });
 
-    when(rs.wasNull()).thenReturn(wasNull);
+    when(rs.wasNull()).thenAnswer(new Answer<Boolean>()
+    {
+
+      @Override
+      public Boolean answer(InvocationOnMock invocation) throws Throwable
+      {
+        return wasNull;
+      }
+      
+    });
 
     // getter with column position as argument
     when(rs.getString(anyInt())).thenAnswer(new Answer<String>()
@@ -147,7 +156,7 @@ public class CSVResultSetProvider
       }
     });
 
-    when(rs.getLong(anyInt())).thenAnswer(new Answer<Long>()
+    when(rs.getLong(anyString())).thenAnswer(new Answer<Long>()
     {
 
       @Override
@@ -158,7 +167,7 @@ public class CSVResultSetProvider
       }
     });
 
-    when(rs.getInt(anyInt())).thenAnswer(new Answer<Integer>()
+    when(rs.getInt(anyString())).thenAnswer(new Answer<Integer>()
     {
 
       @Override
@@ -169,7 +178,7 @@ public class CSVResultSetProvider
       }
     });
 
-    when(rs.getBoolean(anyInt())).thenAnswer(new Answer<Boolean>()
+    when(rs.getBoolean(anyString())).thenAnswer(new Answer<Boolean>()
     {
 
       @Override
