@@ -46,7 +46,9 @@ public interface AnnisService extends Remote
    * @throws AnnisQLSyntaxException
    * @throws AnnisCorpusAccessException
    */
-  public int getCount(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException;
+  public int getCount(List<Long> corpusList, String annisQL) throws
+    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
+    AnnisCorpusAccessException;
 
   /**
    * 
@@ -69,7 +71,10 @@ public interface AnnisService extends Remote
    * @throws AnnisQLSyntaxException
    * @throws AnnisCorpusAccessException
    */
-  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL, int limit, int offset, int contextLeft, int contextRight) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException;
+  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL,
+    int limit, int offset, int contextLeft, int contextRight) throws
+    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
+    AnnisCorpusAccessException;
 
   /**
    * Get result in WEKA format
@@ -81,7 +86,9 @@ public interface AnnisService extends Remote
    * @throws AnnisQLSyntaxException
    * @throws AnnisCorpusAccessException
    */
-  public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException;
+  public String getWeka(List<Long> corpusList, String annisQL) throws
+    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
+    AnnisCorpusAccessException;
 
   /**
    * 
@@ -92,7 +99,8 @@ public interface AnnisService extends Remote
    * @throws RemoteException
    */
   public AnnisAttributeSet getAttributeSet(
-          List<Long> corpusList, boolean fetchValues, boolean onlyMostFrequent) throws RemoteException;
+    List<Long> corpusList, boolean fetchValues, boolean onlyMostFrequent) throws
+    RemoteException;
 
   /**
    * 
@@ -119,7 +127,8 @@ public interface AnnisService extends Remote
    * @param length how many bytes we take
    * @return AnnisBinary
    */
-  public AnnisBinary getBinary(long id, int offset, int length) throws RemoteException;
+  public AnnisBinary getBinary(String corpusName, int offset, int length) throws
+    RemoteException;
 
   /**
    * Get the Metadata of an Annis Binary object identified by its id. This 
@@ -129,7 +138,8 @@ public interface AnnisService extends Remote
    * @param id
    * @return AnnisBinaryMetaData
    */
-  public AnnisBinaryMetaData getBinaryMeta(long id) throws RemoteException;
+  public AnnisBinaryMetaData getBinaryMeta(String corpusName) throws
+    RemoteException;
 
   /**
    * @deprecated for External-File Servlet
@@ -138,7 +148,8 @@ public interface AnnisService extends Remote
    * @return
    * @throws RemoteException 
    */
-  public AnnisBinary getBinary(long id) throws RemoteException, AnnisBinaryNotFoundException;
+  public AnnisBinary getBinary(long id) throws RemoteException,
+    AnnisBinaryNotFoundException;
 
   /**
    * 
@@ -151,10 +162,12 @@ public interface AnnisService extends Remote
   /**
    * Return true if this is a valid query or throw exception when invalid
    */
-  public boolean isValidQuery(String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException;
+  public boolean isValidQuery(String annisQL) throws RemoteException,
+    AnnisQLSemanticsException, AnnisQLSyntaxException;
 
-  public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException;
+  public List<Annotation> getMetadata(long corpusId) throws RemoteException,
+    AnnisServiceException;
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
-          throws RemoteException;
+    throws RemoteException;
 }

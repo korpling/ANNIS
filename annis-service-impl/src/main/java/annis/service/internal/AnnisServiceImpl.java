@@ -239,16 +239,16 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public AnnisBinary getBinary(long id, int offset, int length)
+  public AnnisBinary getBinary(String corpusName, int offset, int length)
     throws RemoteException
   {
-    return annisDao.getBinary(id, offset, length);
+    return annisDao.getBinary(corpusName, offset, length);
   }
 
   @Override
-  public AnnisBinaryMetaData getBinaryMeta(long id)
+  public AnnisBinaryMetaData getBinaryMeta(String corpusName)
   {
-    return annisDao.getBinary(id, 1, 1);    
+    return annisDao.getBinary(corpusName, 1, 1);    
   }
 
   @Override

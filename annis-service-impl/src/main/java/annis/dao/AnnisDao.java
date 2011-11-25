@@ -45,7 +45,7 @@ public interface AnnisDao
 
   public List<Annotation> listCorpusAnnotations(long id);
 
-  public AnnisBinary getBinary(long corpusId, int offset, int length);
+  public AnnisBinary getBinary(String corpusName, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 

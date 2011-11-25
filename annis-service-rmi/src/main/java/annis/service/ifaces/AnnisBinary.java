@@ -36,7 +36,7 @@ public interface AnnisBinary extends AnnisBinaryMetaData, Serializable, JSONAble
 
   public void setLength(int length);
 
-  public void setId(long id);
+  public void setCorpusName(String corpusName);
 
   public void setMimeType(String mimeType);
 
