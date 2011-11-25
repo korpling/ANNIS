@@ -255,7 +255,9 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       node.addSProcessingAnnotation(procInternalID);
 
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
-      SLayer layer = graph.getSLayer(namespace);
+      EList<SLayer> layerList = graph.getSLayerByName(namespace);
+      SLayer layer = (layerList != null && layerList.size() > 0)
+        ? layerList.get(0) : null;
       if (layer == null)
       {
         layer = SaltFactory.eINSTANCE.createSLayer();
@@ -380,7 +382,9 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       return null;
     }
 
-    SLayer layer = graph.getSLayer(edgeNamespace);
+    EList<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
+    SLayer layer = (layerList != null && layerList.size() > 0) ? 
+      layerList.get(0) : null;
     if (layer == null)
     {
       layer = SaltFactory.eINSTANCE.createSLayer();
@@ -406,7 +410,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
             boolean noType = existingRel.getSTypes() == null || existingRel.
               getSTypes().size() == 0;
-            if (((noType && edgeName == null) || (!noType && existingRel.getSTypes().
+            if (((noType && edgeName == null) || (!noType && existingRel.
+              getSTypes().
               contains(edgeName)))
               && existingRel.getSLayers().contains(layer))
             {
