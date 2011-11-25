@@ -26,7 +26,8 @@
   </licenses>
 
   <modules>
-    <module>Annis-Service</module>
+    <module>annis-service-rmi</module>    
+    <module>annis-service-impl</module>
     <module>Annis-Web</module>
     <module>Annis-Kickstarter</module>
     <module>annis-gui</module>
