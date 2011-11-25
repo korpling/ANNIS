@@ -17,6 +17,7 @@ package annis.utils;
 
 import annis.model.AnnisConstants;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
@@ -28,6 +29,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
@@ -73,8 +75,8 @@ public class LegacyGraphConverter
       }
     }
 
-    throw new NotImplementedException();
-    // return result;
+    //throw new NotImplementedException();
+    return result;
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
@@ -96,8 +98,13 @@ public class LegacyGraphConverter
       {
         long internalID = procAnno.getSValueSNUMERIC();
         AnnisNode aNode = new AnnisNode(internalID);
-
-        // TODO: add annotations
+        
+        for (SAnnotation sAnno : sNode.getSAnnotations())
+        {
+          aNode.addNodeAnnotation(new Annotation(sAnno.getSNS(),
+            sAnno.getSName(),
+            sAnno.getSValueSTEXT()));
+        }
         // TODO: what else to add to node?
 
         annoGraph.addNode(aNode);
@@ -117,8 +124,7 @@ public class LegacyGraphConverter
 
       aEdge.setNamespace(rel.getSLayers().get(0).getSName());
       aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
-        ? rel.getSTypes().get(0) : null
-      );
+        ? rel.getSTypes().get(0) : null);
 
       if (rel instanceof SDominanceRelation)
       {
@@ -133,7 +139,11 @@ public class LegacyGraphConverter
         aEdge.setEdgeType(EdgeType.COVERAGE);
       }
 
-      // TODO: add annotations
+      for (SAnnotation sAnno : rel.getSAnnotations())
+      {
+        aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
+          sAnno.getSValueSTEXT()));
+      }
     }
 
     return annoGraph;
