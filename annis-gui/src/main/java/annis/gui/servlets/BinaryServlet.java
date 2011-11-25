@@ -35,6 +35,7 @@ import java.util.Map;
  * TODO: handle more than one byte-range
  * TODO: split rmi-requests
  * TODO: wrote tests
+ * TODO: 
  * 
  * @author benjamin
  * 
@@ -44,9 +45,8 @@ public class BinaryServlet extends HttpServlet
 
   private static final long serialVersionUID = -8182635617256833563L;
   private int slice = 200000; // max portion which is transfered over rmi
-  private long corpusId;
+  private String corpusName;
 
-  @SuppressWarnings("deprecation")
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException
@@ -54,8 +54,8 @@ public class BinaryServlet extends HttpServlet
 
     // get Parameter from url, actually it' s only the corpusId
     Map<String, String[]> binaryParameter = request.getParameterMap();
-    corpusId = Long.parseLong(binaryParameter.get("id")[0]);
-    ServletOutputStream out = response.getOutputStream();
+    corpusName = binaryParameter.get("name")[0];
+    ServletOutputStream out = response.getOutputStream();   
 
     try
     {
@@ -84,7 +84,7 @@ public class BinaryServlet extends HttpServlet
   private void responseStatus206(AnnisService service, ServletOutputStream out,
           HttpServletResponse response, String range) throws RemoteException, IOException
   {
-    AnnisBinaryMetaData bm = service.getBinaryMeta(corpusId);
+    AnnisBinaryMetaData bm = service.getBinaryMeta(corpusName);
     AnnisBinary binary;
 
     // Range: byte=x-y | Range: byte=0-
@@ -100,7 +100,7 @@ public class BinaryServlet extends HttpServlet
     }
 
 
-    binary = service.getBinary(corpusId, offset + 1, slice - offset);
+    binary = service.getBinary(corpusName, offset + 1, slice - offset);
 
     response.setHeader("Content-Range", "bytes " + offset + "-"
             + (bm.getLength() - 1) + "/" + bm.getLength());
@@ -114,7 +114,7 @@ public class BinaryServlet extends HttpServlet
   private void responseStatus200(AnnisService service, ServletOutputStream out,
           HttpServletResponse response) throws RemoteException, IOException
   {
-    AnnisBinaryMetaData binaryMeta = service.getBinaryMeta(corpusId);
+    AnnisBinaryMetaData binaryMeta = service.getBinaryMeta(corpusName);
 
     response.setStatus(200);
     response.setHeader("Accept-Ranges", "bytes");
@@ -139,9 +139,9 @@ public class BinaryServlet extends HttpServlet
           throws RemoteException, IOException
   {
 
-    AnnisBinaryMetaData annisBinary = service.getBinaryMeta(corpusId);
+    AnnisBinaryMetaData annisBinary = service.getBinaryMeta(corpusName);
     slice = annisBinary.getLength();
 
-    out.write(service.getBinary(corpusId, 1, annisBinary.getLength() - 1).getBytes());
+    out.write(service.getBinary(corpusName, 1, annisBinary.getLength() - 1).getBytes());
   }
 }

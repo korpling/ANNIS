@@ -11,15 +11,15 @@ public class AnnisBinaryMetaDataImpl implements AnnisBinaryMetaData
 
   protected static final long serialVersionUID = -4484371544441543151L;
   protected byte[] bytes;
-  protected long id;
+  protected String corpusName;
   protected String mimeType;
   protected String fileName;
   protected int length;
 
   @Override
-  public long getId()
+  public String getCorpusName()
   {
-    return this.id;
+    return this.corpusName;
   }
 
   @Override

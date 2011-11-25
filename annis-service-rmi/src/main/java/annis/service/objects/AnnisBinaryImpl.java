@@ -38,15 +38,15 @@ public class AnnisBinaryImpl extends AnnisBinaryMetaDataImpl implements AnnisBin
   }
 
   @Override
-  public void setId(long id)
+  public void setCorpusName(String corpusName)
   {
-    this.id = id;
+    this.corpusName = corpusName;
   }
 
   @Override
   public String getJSON()
   {
-    return "{id: " + this.id + ", mimeType: '" + this.mimeType + ", bytes: '"
+    return "{corpusName: " + this.corpusName + ", mimeType: '" + this.mimeType + ", bytes: '"
             + new String(this.bytes) + "'}";
   }  
 
