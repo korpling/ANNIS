@@ -19,48 +19,83 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
-public class Utils {
-
-	public static String min(List<Long> runtimeList) {
-		long min = Long.MAX_VALUE;
-		for (long value : runtimeList)
-			min = Math.min(min, value);
-		return String.valueOf(min);
-	}
-
-	public static String max(List<Long> runtimeList) {
-		long max = Long.MIN_VALUE;
-		for (long value : runtimeList)
-			max = Math.max(max, value);
-		return String.valueOf(max);
-	}
-	
-	public static String avg(List<Long> runtimeList) {
-		if (runtimeList.isEmpty())
-			return "";
-		
-		long sum = 0;
-		for (long value : runtimeList)
-			sum += value;
-		return String.valueOf(sum / runtimeList.size());
-	}
+public class Utils
+{
+  
+  public static String min(List<Long> runtimeList)
+  {
+    long min = Long.MAX_VALUE;
+    for (long value : runtimeList)
+    {
+      min = Math.min(min, value);
+    }
+    return String.valueOf(min);
+  }
+  
+  public static String max(List<Long> runtimeList)
+  {
+    long max = Long.MIN_VALUE;
+    for (long value : runtimeList)
+    {
+      max = Math.max(max, value);
+    }
+    return String.valueOf(max);
+  }
+  
+  public static String avg(List<Long> runtimeList)
+  {
+    if (runtimeList.isEmpty())
+    {
+      return "";
+    }
+    
+    long sum = 0;
+    for (long value : runtimeList)
+    {
+      sum += value;
+    }
+    return String.valueOf(sum / runtimeList.size());
+  }
+  
+  public static Long[] split2Long(String text, char seperator)
+  {
+    String[] str = StringUtils.split(text, seperator);
+    Long[] lng = new Long[str.length];
+    
+    for (int i = 0; i < lng.length; i++)
+    {
+      try
+      {
+        lng[i] = Long.parseLong(str[i]);
+      }
+      catch (NumberFormatException ex)
+      {
+        Logger.getLogger(Utils.class.getName()).log(Level.SEVERE,
+          "Could not parse long value, assuming \"0\" as default", ex);
+      }
+    }
+    
+    return lng;
+  }
 
   /** Hashes a string using SHA-256. */
-  public static String calculateSHAHash(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException
+  public static String calculateSHAHash(String s) throws
+    NoSuchAlgorithmException, UnsupportedEncodingException
   {
     MessageDigest md = MessageDigest.getInstance("SHA-256");
     md.update(s.getBytes("UTF-8"));
     byte[] digest = md.digest();
-
+    
     String hashVal = "";
-    for(byte b : digest)
+    for (byte b : digest)
     {
       hashVal += String.format("%02x", b);
     }
-
+    
     return hashVal;
   }
-
-
 }

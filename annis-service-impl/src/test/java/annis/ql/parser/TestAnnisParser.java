@@ -22,8 +22,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static test.CustomMatcher.hasInstance;
-import static test.IsCollectionEmpty.empty;
+import static annis.test.CustomMatcher.hasInstance;
+import static annis.test.IsCollectionEmpty.empty;
 
 import java.io.IOException;
 import java.util.Arrays;

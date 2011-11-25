@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import test.TestHelper;
-
 import annis.AnnisHomeTest;
 import annis.externalFiles.ExternalFileMgrImpl;
 import annis.service.AnnisService;

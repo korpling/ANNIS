@@ -23,9 +23,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static test.TestUtils.emptySetOf;
-import static test.TestUtils.newSet;
-import static test.TestUtils.uniqueString;
+import static annis.test.TestUtils.emptySetOf;
+import static annis.test.TestUtils.newSet;
+import static annis.test.TestUtils.uniqueString;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

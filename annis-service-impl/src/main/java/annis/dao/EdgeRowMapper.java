@@ -32,12 +32,9 @@ public class EdgeRowMapper extends AbstractModelRowMapper<Edge> {
 		Edge edge = new Edge();
 		
 		edge.setPre(longValue(resultSet, "pre"));
-		edge.setPost(longValue(resultSet, "post"));
-		edge.setComponent(longValue(resultSet, "component_id"));
 		edge.setEdgeType(EdgeType.parseEdgeType(stringValue(resultSet, "edge_type")));
 		edge.setNamespace(stringValue(resultSet, "namespace"));
 		edge.setName(stringValue(resultSet, "name"));
-		edge.setLevel(longValue(resultSet, "level"));
 		edge.setDestination(new AnnisNode(longValue(resultSet, "node_ref")));
 		
 		// create nodes for src with rank value (parent) as id.

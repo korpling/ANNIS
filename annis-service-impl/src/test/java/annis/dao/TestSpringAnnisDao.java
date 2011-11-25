@@ -50,7 +50,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import test.TestHelper;
+import annis.test.TestHelper;
 import annis.AnnisHomeTest;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;

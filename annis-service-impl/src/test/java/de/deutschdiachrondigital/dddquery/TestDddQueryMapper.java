@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static test.IsCollectionEmpty.empty;
+import static annis.test.IsCollectionEmpty.empty;
 
 import java.util.Arrays;
 import java.util.List;

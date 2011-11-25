@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static test.TestHelper.springFiles;
+import static annis.test.TestHelper.springFiles;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -31,9 +31,9 @@ import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import test.SpringQueryExamples;
-import test.SpringSyntaxTreeExamples;
-import test.SyntaxTreeExample;
+import annis.test.SpringQueryExamples;
+import annis.test.SpringSyntaxTreeExamples;
+import annis.test.SyntaxTreeExample;
 import annis.exceptions.AnnisException;
 import annis.ql.node.Start;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test;
+package annis.test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,24 +29,24 @@ import org.springframework.aop.target.SingletonTargetSource;
 public class TestHelper {
 
 	// return the path that corresponds to the package of a class
-	public static String packagePath(Class<?> clazz) {
+	private static String packagePath(Class<?> clazz) {
 		String packageDeclaration = clazz.getPackage().toString();
 		String path = packageDeclaration.replaceFirst("package ", "").replaceAll("\\.", "/") + "/";
 		return path;
 	}
 	
 	// return the path that corresponds to the package of a class instance
-	public static String packagePath(Object instance) {
+	private static String packagePath(Object instance) {
 		return packagePath(instance.getClass());
 	}
 	
 	// return the qualified Spring context XML file name
-	public static String springFile(Class<?> clazz, String contextFile) {
+	private static String springFile(Class<?> clazz, String contextFile) {
 		return packagePath(clazz) + contextFile;
 	}
 	
 	// return the qualified Spring context XML file name
-	public static String springFile(Object instance, String contextFile) {
+	private static String springFile(Object instance, String contextFile) {
 		return springFile(instance.getClass(), contextFile);
 	}
 	
@@ -69,12 +69,12 @@ public class TestHelper {
 	
 	@Test
 	public void testPackagePath() {
-		assertThat(packagePath(this), is("test/"));
+		assertThat(packagePath(this), is("annis/test/"));
 	}
 
 	@Test
 	public void testSpringFile() {
-		assertThat(springFile(this, "context.xml"), is("test/context.xml"));
+		assertThat(springFile(this, "context.xml"), is("annis/test/context.xml"));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -85,8 +85,8 @@ public class TestHelper {
 	@Test
 	public void testSpringFiles() {
 		String[] expected = {
-				"test/context1.xml",
-				"test/context2.xml"
+				"annis/test/context1.xml",
+				"annis/test/context2.xml"
 		};
 		assertThat(springFiles(this, "context1.xml", "context2.xml"), is(expected));
 	}
