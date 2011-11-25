@@ -69,12 +69,12 @@ public class TestHelper {
 	
 	@Test
 	public void testPackagePath() {
-		assertThat(packagePath(this), is("test/"));
+		assertThat(packagePath(this), is("annis/test/"));
 	}
 
 	@Test
 	public void testSpringFile() {
-		assertThat(springFile(this, "context.xml"), is("test/context.xml"));
+		assertThat(springFile(this, "context.xml"), is("annis/test/context.xml"));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -85,8 +85,8 @@ public class TestHelper {
 	@Test
 	public void testSpringFiles() {
 		String[] expected = {
-				"test/context1.xml",
-				"test/context2.xml"
+				"annis/test/context1.xml",
+				"annis/test/context2.xml"
 		};
 		assertThat(springFiles(this, "context1.xml", "context2.xml"), is(expected));
 	}
