@@ -1,4 +1,4 @@
 target
-Annis-Service/annis-service-impl/src/main/distribution/log/annis.log
-Annis-Service/annis-service-impl/src/main/distribution/log/error.log
+annis-service-impl/src/main/distribution/log/annis.log
+annis-service-impl/src/main/distribution/log/error.log
 catalog.xml
