@@ -128,8 +128,10 @@ public class CSVResultSetProvider
       @Override
       public Array answer(InvocationOnMock invocation) throws Throwable
       {
-        return new DummySQLLongArray(getLongArrayValue((Integer) invocation.
-          getArguments()[0]));
+        return new DummySQLArray(getArrayValue(
+          (Integer) invocation.getArguments()[0], Types.VARCHAR), Types.VARCHAR,
+          "VARCHAR");
+
       }
     });
 
@@ -184,8 +186,19 @@ public class CSVResultSetProvider
       @Override
       public Array answer(InvocationOnMock invocation) throws Throwable
       {
-        return new DummySQLLongArray(getLongArrayValue(getColumnByName(
-          (String) invocation.getArguments()[0])));
+        // HACK: we don't know how to get the type, use our knowledge
+        if ("key".equalsIgnoreCase((String) invocation.getArguments()[0]))
+        {
+          return new DummySQLArray(getArrayValue(getColumnByName(
+            (String) invocation.getArguments()[0]), Types.BIGINT), Types.BIGINT,
+            "BIGINT");
+        }
+        else
+        {
+          return new DummySQLArray(getArrayValue(getColumnByName(
+            (String) invocation.getArguments()[0]), Types.VARCHAR),
+            Types.VARCHAR, "VARCHAR");
+        }
       }
     });
 
@@ -271,27 +284,36 @@ public class CSVResultSetProvider
     return false;
   }
 
-  public Long[] getLongArrayValue(int column)
+  public Object[] getArrayValue(int column, int sqlType)
   {
     String str = getStringValue(column);
     if (StringUtils.startsWith(str, "{") && StringUtils.endsWith(str, "}"))
     {
       String stripped = str.substring(1, str.length() - 1);
       String[] split = stripped.split(",");
-      Long[] result = new Long[split.length];
-      for (int i = 0; i < result.length; i++)
+
+      if (sqlType == Types.BIGINT)
       {
-        try
+        Long[] result = new Long[split.length];
+        for (int i = 0; i < result.length; i++)
         {
-          result[i] = Long.parseLong(split[i]);
+          try
+          {
+            result[i] = Long.parseLong(split[i]);
+          }
+          catch (NumberFormatException ex)
+          {
+            Logger.getLogger(CSVResultSetProvider.class.getName()).log(
+              Level.SEVERE, null, ex);
+          }
         }
-        catch (NumberFormatException ex)
-        {
-          Logger.getLogger(CSVResultSetProvider.class.getName()).log(
-            Level.SEVERE, null, ex);
-        }
+        return result;
       }
-      return result;
+      else
+      {
+        // just return the string if requested so
+        return split;
+      }
     }
 
     return null;
@@ -302,26 +324,30 @@ public class CSVResultSetProvider
     return rs;
   }
 
-  public static class DummySQLLongArray implements Array
+  public static class DummySQLArray implements Array
   {
 
-    private Long[] base;
+    private Object[] base;
+    private int sqlType;
+    private String sqlTypeName;
 
-    public DummySQLLongArray(Long[] base)
+    public DummySQLArray(Object[] base, int sqlType, String sqlTypeName)
     {
       this.base = base;
+      this.sqlType = sqlType;
+      this.sqlTypeName = sqlTypeName;
     }
 
     @Override
     public String getBaseTypeName() throws SQLException
     {
-      return "BIGINT";
+      return sqlTypeName;
     }
 
     @Override
     public int getBaseType() throws SQLException
     {
-      return Types.BIGINT;
+      return sqlType;
     }
 
     @Override
