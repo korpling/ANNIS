@@ -115,7 +115,10 @@ public class LegacyGraphConverter
       aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.NAMESPACE + "::"
         + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC());
 
-      // TODO: use layer for namespace
+      aEdge.setNamespace(rel.getSLayers().get(0).getSName());
+      aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
+        ? rel.getSTypes().get(0) : null
+      );
 
       if (rel instanceof SDominanceRelation)
       {
