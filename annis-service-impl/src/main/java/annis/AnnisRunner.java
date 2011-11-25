@@ -610,7 +610,7 @@ public class AnnisRunner extends AnnisBaseRunner
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
 		SaltProject result = annisDao.annotateSalt(queryData);
       
- ///       List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
+      List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
       
       URI uri = URI.createFileURI("/tmp/annissalt");
       result.saveSaltProject_DOT(uri);

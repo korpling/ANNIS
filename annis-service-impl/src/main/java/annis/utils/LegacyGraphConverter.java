@@ -30,6 +30,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,11 +50,11 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class LegacyGraphConverter
 {
-  
+
   public static List<AnnotationGraph> convertToAOM(SaltProject p)
   {
     List<AnnotationGraph> result = new ArrayList<AnnotationGraph>();
-    
+
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       Long[] matchedIDs = new Long[0];
@@ -67,51 +68,55 @@ public class LegacyGraphConverter
       {
         SDocument doc = corpusGraph.getSDocuments().get(0);
         SDocumentGraph docGraph = doc.getSDocumentGraph();
-        
+
         result.add(convertToAnnotationGraph(docGraph, matchedIDs));
       }
     }
-    
+
     throw new NotImplementedException();
     // return result;
   }
-  
+
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
     Long[] matchedIDs)
   {
     Set<Long> matchSet = new HashSet<Long>(Arrays.asList(matchedIDs));
     AnnotationGraph annoGraph = new AnnotationGraph();
-    
+
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
-    
+
     Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();
-    
+
     for (SNode sNode : docGraph.getSNodes())
     {
-      long internalID = sNode.getSProcessingAnnotation(AnnisConstants.NAMESPACE
-        + "::"
-        + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC();
-      AnnisNode aNode = new AnnisNode(internalID);
+      SProcessingAnnotation procAnno =
+        sNode.getSProcessingAnnotation(AnnisConstants.NAMESPACE + "::"
+        + AnnisConstants.PROC_INTERNALID);
+      if (procAnno != null)
+      {
+        long internalID = procAnno.getSValueSNUMERIC();
+        AnnisNode aNode = new AnnisNode(internalID);
 
-      // TODO: add annotations
-      // TODO: what else to add to node?
-      
-      annoGraph.addNode(aNode);
-      allNodes.put(sNode, aNode);
+        // TODO: add annotations
+        // TODO: what else to add to node?
+
+        annoGraph.addNode(aNode);
+        allNodes.put(sNode, aNode);
+      }
     }
-    
+
     for (SRelation rel : docGraph.getSDominanceRelations())
     {
       Edge aEdge = new Edge();
       aEdge.setSource(allNodes.get(rel.getSource()));
       aEdge.setDestination(allNodes.get(rel.getTarget()));
-      
+
       aEdge.setEdgeType(EdgeType.UNKNOWN);
       aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.NAMESPACE + ":"
         + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC());
-      
+
       // TODO: use layer for namespace
-      
+
       if (rel instanceof SDominanceRelation)
       {
         aEdge.setEdgeType(EdgeType.DOMINANCE);
@@ -127,10 +132,10 @@ public class LegacyGraphConverter
 
       // TODO: add annotations
     }
-    
+
     return annoGraph;
   }
-  
+
   public static String convertToPaulaInline(SCorpusGraph g)
   {
     throw new NotImplementedException();

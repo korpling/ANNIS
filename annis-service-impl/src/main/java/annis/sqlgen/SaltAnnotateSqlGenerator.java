@@ -351,6 +351,10 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       {
         to.addSFeature(feat);
       }
+      for (SProcessingAnnotation proc : from.getSProcessingAnnotations())
+      {
+        to.addSProcessingAnnotation(proc);
+      }
       for (SMetaAnnotation meta : from.getSMetaAnnotations())
       {
         to.addSMetaAnnotation(meta);
