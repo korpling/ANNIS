@@ -51,7 +51,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
-import static test.IsCollectionSize.size;
+import static annis.test.IsCollectionSize.size;
 
 import java.util.ArrayList;
 import java.util.List;

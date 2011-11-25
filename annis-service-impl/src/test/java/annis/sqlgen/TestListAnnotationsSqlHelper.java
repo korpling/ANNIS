@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static test.IsCollectionSize.size;
+import static annis.test.IsCollectionSize.size;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -19,9 +19,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static test.TestUtils.uniqueInt;
-import static test.TestUtils.uniqueLong;
-import static test.TestUtils.uniqueString;
+import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueLong;
+import static annis.test.TestUtils.uniqueString;
 
 import java.util.HashMap;
 import java.util.List;
