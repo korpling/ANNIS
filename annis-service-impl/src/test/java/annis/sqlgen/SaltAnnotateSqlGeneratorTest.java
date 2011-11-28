@@ -23,6 +23,10 @@ import au.com.bytecode.opencsv.CSVReader;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNamedElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -334,6 +338,39 @@ public class SaltAnnotateSqlGeneratorTest
     assertEquals("sSpan167", e.get(6).getSSource().getSName());
     assertEquals("tok_156", e.get(6).getSTarget().getSName());
 
+  }
+
+  @Test
+  public void testRelationType()
+  {
+    SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
+      getSDocumentGraph();
+
+    for (SRelation r : g.getSRelations())
+    {
+      if(!(r instanceof STextualRelation))
+      {
+        assertEquals(1, r.getSLayers().size());
+        String layerName = r.getSLayers().get(0).getSName();
+
+        if ("exmaralda".equals(layerName) || "urml".equals(layerName) || "mmax".
+          equals(layerName))
+        {
+          assertTrue("instance of SSpanningRelation",
+            r instanceof SSpanningRelation);
+        }
+        else if ("dep".equals(layerName))
+        {
+          assertTrue("instance of SPointingRelation",
+            r instanceof SPointingRelation);
+        }
+        else if ("tiger".equals(layerName))
+        {
+          assertTrue("instance of SDominanceRelation",
+            r instanceof SDominanceRelation);
+        }
+      }
+    }
   }
 
   public static class NameComparator implements Comparator<SNamedElement>
