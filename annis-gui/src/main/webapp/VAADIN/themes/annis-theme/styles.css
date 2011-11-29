@@ -90,6 +90,7 @@ textarea.citation {
  - http://dev.vaadin.com/ticket/7713
 */
 .v-ff7 .v-button-wrap { overflow: visible; }
+.v-ff8 .v-button-wrap { overflow: visible; }
 
 /* 
  split button should have the some appearance on focus as the other buttons 
