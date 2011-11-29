@@ -49,8 +49,6 @@ public class SaltAnnotateSqlGeneratorTest
 {
 
   CSVResultSetProvider resultSetProvider;
-  private CSVReader sample;
-  private String[] currentLine;
   private SaltProject project;
 
   public SaltAnnotateSqlGeneratorTest()

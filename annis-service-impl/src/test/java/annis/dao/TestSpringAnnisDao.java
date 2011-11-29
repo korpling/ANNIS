@@ -51,7 +51,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.test.TestHelper;
-import annis.AnnisHomeTest;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
@@ -70,7 +69,7 @@ import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"SpringAnnisDao-context.xml", "classpath:annis/sqlgen/SqlGenerator-context.xml"})
-public class TestSpringAnnisDao extends AnnisHomeTest {
+public class TestSpringAnnisDao {
 
 	// SpringAnnisDao instance that is managed by Spring
 	@Autowired private AnnisDao springManagedAnnisDao;

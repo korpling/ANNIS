@@ -15,7 +15,6 @@
  */
 package annis.model;
 
-import annis.model.DataObject;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertFalse;
@@ -28,10 +27,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.AnnisHomeTest;
-
 @SuppressWarnings({ "unused", "serial" })
-public class TestDataObject extends AnnisHomeTest {
+public class TestDataObject {
 
 	static class A extends DataObject {
 
