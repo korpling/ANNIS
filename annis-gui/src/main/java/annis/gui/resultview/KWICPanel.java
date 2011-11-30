@@ -75,7 +75,7 @@ public class KWICPanel extends Panel
     tblToken.setWidth("100%");
     tblToken.setHeight("-1px");
     tblToken.setPageLength(0);
-    if(checkRTL(result.getGraph().getTokens()))
+    if (checkRTL(result.getGraph().getTokens()))
     {
       tblToken.addStyleName("rtl");
     }
@@ -84,9 +84,9 @@ public class KWICPanel extends Panel
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
-    for(AnnisNode t : token)
+    for (AnnisNode t : token)
     {
-      if(t.getTextId() == textID)
+      if (t.getTextId() == textID)
       {
         // add a column for each token
         tblToken.addGeneratedColumn(t, new TokenColumnGenerator(t));
@@ -94,7 +94,7 @@ public class KWICPanel extends Panel
         tblToken.setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 
-        if(lastTokenIndex != null && t.getTokenIndex() != null
+        if (lastTokenIndex != null && t.getTokenIndex() != null
           && t.getTokenIndex().longValue() > (lastTokenIndex.longValue() + 1))
         {
           // add "(...)"
@@ -132,7 +132,7 @@ public class KWICPanel extends Panel
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(containerAnnos != null)
+    if (containerAnnos != null)
     {
       containerAnnos.removeAllItems();
       containerAnnos.addItem("tok");
@@ -140,15 +140,21 @@ public class KWICPanel extends Panel
     }
   }
 
-  public  static class GapColumnGenerator implements Table.ColumnGenerator
+  public interface KWICComponentGenerator extends Table.ColumnGenerator
+  {
+
+    public Component generateCell(String layer);
+  }
+
+  public static class GapColumnGenerator implements KWICComponentGenerator
   {
 
     @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    public Component generateCell(String layer)
     {
       Label l = new Label();
 
-      if("tok".equals(itemId))
+      if ("tok".equals(layer))
       {
         l.setValue("(...)");
       }
@@ -159,9 +165,15 @@ public class KWICPanel extends Panel
       }
       return l;
     }
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      return generateCell((String) itemId);
+    }
   }
 
-  public class TokenColumnGenerator implements Table.ColumnGenerator
+  public class TokenColumnGenerator implements KWICComponentGenerator
   {
 
     private Map<String, Annotation> annotationsByQName;
@@ -171,22 +183,22 @@ public class KWICPanel extends Panel
     {
       this.token = token;
       annotationsByQName = new HashMap<String, Annotation>();
-      for(Annotation a : token.getNodeAnnotations())
+      for (Annotation a : token.getNodeAnnotations())
       {
         annotationsByQName.put(a.getQualifiedName(), a);
       }
     }
 
     @Override
-    public Component generateCell(Table source, Object itemId, Object columnId)
+    public Component generateCell(String layer)
     {
       Label l = new Label("");
       l.setSizeUndefined();
 
-      if("tok".equals(itemId))
+      if ("tok".equals(layer))
       {
         l.setValue(token.getSpannedText());
-        if(markedAndCovered.containsKey(token))
+        if (markedAndCovered.containsKey(token))
         {
           // add color
           l.addStyleName(
@@ -195,8 +207,8 @@ public class KWICPanel extends Panel
       }
       else
       {
-        Annotation a = annotationsByQName.get((String) itemId);
-        if(a != null)
+        Annotation a = annotationsByQName.get(layer);
+        if (a != null)
         {
           l.setValue(a.getValue());
           l.setDescription(a.getQualifiedName());
@@ -205,14 +217,20 @@ public class KWICPanel extends Panel
       }
       return l;
     }
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      return generateCell((String) itemId);
+    }
   }
 
   private boolean checkRTL(List<AnnisNode> tokenList)
   {
-    for(AnnisNode tok : tokenList)
+    for (AnnisNode tok : tokenList)
     {
       String tokText = tok.getSpannedText();
-      if(Helper.containsRTLText(tokText))
+      if (Helper.containsRTLText(tokText))
       {
         return true;
       }
