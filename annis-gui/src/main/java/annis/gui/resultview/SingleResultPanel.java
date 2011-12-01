@@ -24,17 +24,14 @@ import annis.model.AnnotationGraph;
 import annis.resolver.ResolverEntry;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
@@ -57,7 +54,8 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class SingleResultPanel extends GridLayout implements Button.ClickListener
+public class SingleResultPanel extends VerticalLayout implements
+  Button.ClickListener
 {
 
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
@@ -72,17 +70,16 @@ public class SingleResultPanel extends GridLayout implements Button.ClickListene
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
   private int resultNumber;
-  
+
   public SingleResultPanel(final AnnisResult result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos)
   {
-    super(2,3);
     this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
-    
+
     calculateHelperVariables();
 
     setWidth("100%");
@@ -94,15 +91,35 @@ public class SingleResultPanel extends GridLayout implements Button.ClickListene
     setMargin(false);
     setSpacing(false);
 
+    HorizontalLayout infoBar = new HorizontalLayout();
+    infoBar.addStyleName("docPath");
+    infoBar.setWidth("100%");
+    infoBar.setHeight("-1px");
+
+    addComponent(infoBar);
+
+    Label lblNumber = new Label("" + (resultNumber + 1));
+    infoBar.addComponent(lblNumber);
+    lblNumber.setSizeUndefined();
+
+    btInfo = new Button();
+    btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btInfo.setIcon(ICON_RESOURCE);
+    btInfo.addListener((Button.ClickListener) this);
+    infoBar.addComponent(btInfo);
 
     List<String> path = new LinkedList<String>(Arrays.asList(result.getGraph().
       getPath()));
     Collections.reverse(path);
+
+
+
     Label lblPath = new Label("Path: " + StringUtils.join(path, " > "));
-    lblPath.addStyleName("docPath");
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
-    addComponent(lblPath, 1, 0);
+    infoBar.addComponent(lblPath);
+    infoBar.setExpandRatio(lblPath, 1.0f);
+    infoBar.setSpacing(true);
 
     kwicPanels = new ArrayList<KWICPanel>();
     for (long textId : containedTexts)
@@ -110,11 +127,10 @@ public class SingleResultPanel extends GridLayout implements Button.ClickListene
 
       KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
         textId);
-      addComponent(kwic, 1, 1);
+      addComponent(kwic);
       kwicPanels.add(kwic);
     }
-    
-    setColumnExpandRatio(1, 1.0f);
+
   }
 
   @Override
@@ -128,35 +144,10 @@ public class SingleResultPanel extends GridLayout implements Button.ClickListene
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
 
-        int rows = 2 + entries.length;
-        setRows(rows);
-        
-        CssLayout actionLayout = new CssLayout()
-        {
-
-          @Override
-          protected String getCss(Component c)
-          {
-            return "text-align: center;";
-          }
-          
-        };
-        addComponent(actionLayout, 0, 0, 0, rows-1);
-        Label lblNumber = new Label("" + (resultNumber + 1));
-        actionLayout.addComponent(lblNumber);
-        lblNumber.setSizeUndefined();
-
-        btInfo = new Button();
-        btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
-        btInfo.setIcon(ICON_RESOURCE);
-        btInfo.addListener((Button.ClickListener) this);
-        actionLayout.addComponent(btInfo);
-
-        int row=2;
         for (ResolverEntry e : entries)
         {
           addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap), 1, row++);
+            markedCoveredMap));
         }
       }
       catch (RemoteException ex)
