@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.frontend.servlets;
+package annis.gui.servlets;
 
 import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;

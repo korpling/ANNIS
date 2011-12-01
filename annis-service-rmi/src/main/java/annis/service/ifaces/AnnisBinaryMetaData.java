@@ -26,7 +26,7 @@ public interface AnnisBinaryMetaData extends Serializable
 
   public int getLength();
 
-  public long getId();
+  public String getCorpusName();
 
   public String getMimeType();
 

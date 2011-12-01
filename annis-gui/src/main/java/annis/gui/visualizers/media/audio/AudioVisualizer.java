@@ -1,10 +1,10 @@
-package annis.frontend.servlets.visualizers.media.audio;
+package annis.gui.visualizers.media.audio;
 
+import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.WriterVisualizer;
 import java.io.IOException;
 import java.io.Writer;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import annis.frontend.servlets.visualizers.VisualizerInput;
-import annis.frontend.servlets.visualizers.WriterVisualizer;
 
 @PluginImplementation
 public class AudioVisualizer extends WriterVisualizer
@@ -15,7 +15,7 @@ public class AudioVisualizer extends WriterVisualizer
   {
     try
     {
-      String binaryServletPath = input.getContextPath() + "/secure/Binary?name="
+      String binaryServletPath = input.getContextPath() + "/Binary?name="
         + input.getResult().getDocumentName();
       writer.append(
         "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");

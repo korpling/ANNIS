@@ -264,7 +264,8 @@ public class ExternalFileMgrImpl implements ExternalFileMgr
 		    }
 			fis.close();
 			aBin.setBytes(bytes);
-			aBin.setId(extFile.getID());
+         // there is no Id anymore in AnnisBinary
+         // aBin.set(extFile.getID());
 			aBin.setFileName(extFile.getFileName());
 			aBin.setMimeType(extFile.getMime());
 			

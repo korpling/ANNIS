@@ -40,12 +40,16 @@
   direction: rtl;
 }
 
-.v-label-docPath {
+.docPath {
   text-align: left;
+  vertical-align: middle;
   font-weight: normal;
   margin: 0 0 4px;
   padding: 2px 3px;
   background-color: #ecf0f6;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px 0px 0px 0px;
 }
 
 textarea.citation {
@@ -89,7 +93,9 @@ textarea.citation {
  - https://vaadin.com/de/forum/-/message_boards/view_message/778075
  - http://dev.vaadin.com/ticket/7713
 */
+
 .v-ff7 .v-button-wrap { overflow: visible; }
+.v-ff8 .v-button-wrap { overflow: visible; }
 
 /* 
  split button should have the some appearance on focus as the other buttons 

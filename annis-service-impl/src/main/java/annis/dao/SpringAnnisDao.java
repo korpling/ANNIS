@@ -634,9 +634,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public AnnisBinary getBinary(long corpusId, int offset, int length)
+  public AnnisBinary getBinary(String corpusName, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(corpusId,
+    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(corpusName,
       offset, length), byteHelper);
   }
 }

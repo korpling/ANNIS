@@ -57,7 +57,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private VerticalLayout layout;
-  private ScrollPanel scrollPanel;
+  private Panel scrollPanel;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
@@ -98,7 +98,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
 
-    scrollPanel = new ScrollPanel();
+    scrollPanel = new Panel();
     scrollPanel.setSizeFull();
     scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout = (VerticalLayout) scrollPanel.getContent();
@@ -278,16 +278,5 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void paintContent(PaintTarget target) throws PaintException
   {
     super.paintContent(target);
-  }
-  
-  public static class ScrollPanel extends Panel
-  {
-
-    @Override
-    public void paintContent(PaintTarget target) throws PaintException
-    {
-      super.paintContent(target);
-    }
-    
   }
 }

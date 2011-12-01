@@ -26,12 +26,12 @@ import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
@@ -54,20 +54,22 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class SingleResultPanel extends Panel implements Button.ClickListener
+public class SingleResultPanel extends VerticalLayout implements
+  Button.ClickListener
 {
 
-  private static final ThemeResource ICON_RESOURCE = new ThemeResource("info.gif");
+  private static final ThemeResource ICON_RESOURCE = new ThemeResource(
+    "info.gif");
   private AnnisResult result;
   private Map<AnnisNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
   private Set<Long> containedTexts;
-  private VerticalLayout vLayout;
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
+  private int resultNumber;
 
   public SingleResultPanel(final AnnisResult result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -76,88 +78,84 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
+    this.resultNumber = resultNumber;
 
     calculateHelperVariables();
 
     setWidth("100%");
     setHeight("-1px");
 
-    setScrollable(true);
 
-    HorizontalLayout hLayout = new HorizontalLayout();
-    setContent(hLayout);
+    setWidth("100%");
+    setHeight("-1px");
+    setMargin(false);
+    setSpacing(false);
 
-    hLayout.setWidth("100%");
-    hLayout.setHeight("-1px");
-    hLayout.setMargin(false);
-    hLayout.setSpacing(true);
+    HorizontalLayout infoBar = new HorizontalLayout();
+    infoBar.addStyleName("docPath");
+    infoBar.setWidth("100%");
+    infoBar.setHeight("-1px");
 
-    VerticalLayout actionLayout = new VerticalLayout();
-    actionLayout.setSizeUndefined();
-    hLayout.addComponent(actionLayout);
+    addComponent(infoBar);
+
     Label lblNumber = new Label("" + (resultNumber + 1));
-    actionLayout.addComponent(lblNumber);
+    infoBar.addComponent(lblNumber);
     lblNumber.setSizeUndefined();
 
     btInfo = new Button();
     btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addListener((Button.ClickListener) this);
-    actionLayout.addComponent(btInfo);
+    infoBar.addComponent(btInfo);
 
-    actionLayout.setComponentAlignment(lblNumber, Alignment.TOP_CENTER);
-    actionLayout.setComponentAlignment(btInfo, Alignment.TOP_CENTER);
-    
-    vLayout = new VerticalLayout();
-    hLayout.addComponent(vLayout);
-
-    List<String> path = new LinkedList<String>(Arrays.asList(result.getGraph().getPath()));
+    List<String> path = new LinkedList<String>(Arrays.asList(result.getGraph().
+      getPath()));
     Collections.reverse(path);
-    Label lblPath = new Label("Path: " + StringUtils.join(path , " > "));
-    lblPath.addStyleName("docPath");
+
+
+
+    Label lblPath = new Label("Path: " + StringUtils.join(path, " > "));
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
-    vLayout.addComponent(lblPath);
-    
+    infoBar.addComponent(lblPath);
+    infoBar.setExpandRatio(lblPath, 1.0f);
+    infoBar.setSpacing(true);
+
     kwicPanels = new ArrayList<KWICPanel>();
-    for(long textId : containedTexts)
+    for (long textId : containedTexts)
     {
-      
+
       KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
         textId);
-      vLayout.addComponent(kwic);
+      addComponent(kwic);
       kwicPanels.add(kwic);
     }
-    vLayout.setWidth("100%");
-    vLayout.setHeight("-1px");
-    vLayout.setMargin(false);
-    vLayout.setSpacing(false);
 
-    hLayout.setExpandRatio(vLayout, 1.0f);
   }
 
   @Override
   public void attach()
   {
     AnnisService service = Helper.getService(getApplication(), getWindow());
-    if(service != null && resolverProvider != null)
+    if (service != null && resolverProvider != null)
     {
       try
       {
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
-        for(ResolverEntry e : entries)
+
+        for (ResolverEntry e : entries)
         {
-          vLayout.addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
+          addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
             markedCoveredMap));
         }
       }
-      catch(RemoteException ex)
+      catch (RemoteException ex)
       {
         Logger.getLogger(SingleResultPanel.class.getName()).log(Level.SEVERE,
           "could not get resolver entries", ex);
-        getWindow().showNotification("could not get resolver entries: "
-          , ex.getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
+        getWindow().showNotification("could not get resolver entries: ", ex.
+          getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
       }
     }
 
@@ -166,9 +164,9 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(kwicPanels != null)
+    if (kwicPanels != null)
     {
-      for(KWICPanel kwic : kwicPanels)
+      for (KWICPanel kwic : kwicPanels)
       {
         kwic.setVisibleTokenAnnosVisible(annos);
       }
@@ -180,13 +178,13 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
     containedTexts = new TreeSet<Long>();
-    
-    for(AnnisNode n : result.getGraph().getNodes())
+
+    for (AnnisNode n : result.getGraph().getNodes())
     {
       containedTexts.add(n.getTextId());
-      
+
       Long match = n.getMatchedNodeInQuery();
-      if(match != null)
+      if (match != null)
       {
         int color = Math.max(0, Math.min((int) match.longValue() - 1,
           MatchedNodeColors.values().length - 1));
@@ -198,24 +196,26 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
 
     markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
 
-    for(Entry<AnnisNode, Long> markedEntry : markedAndCovered.entrySet())
+    for (Entry<AnnisNode, Long> markedEntry : markedAndCovered.entrySet())
     {
-      int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue() - 1,
+      int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
+        - 1,
         MatchedNodeColors.values().length - 1));
       markedCoveredMap.put("" + markedEntry.getKey().getId(),
         MatchedNodeColors.values()[color].name());
     }
   }
 
-  private Map<AnnisNode, Long> calculateMarkedAndCoveredIDs(AnnotationGraph graph)
+  private Map<AnnisNode, Long> calculateMarkedAndCoveredIDs(
+    AnnotationGraph graph)
   {
     Set<Long> matchedNodes = graph.getMatchedNodeIds();
     Map<AnnisNode, Long> matchedAndCovered = new HashMap<AnnisNode, Long>();
 
     // add all covered nodes
-    for(AnnisNode n : graph.getNodes())
+    for (AnnisNode n : graph.getNodes())
     {
-      if(matchedNodes.contains(n.getId()) && n.getMatchedNodeInQuery() != null)
+      if (matchedNodes.contains(n.getId()) && n.getMatchedNodeInQuery() != null)
       {
         Long matchPosition = n.getMatchedNodeInQuery();
         matchedAndCovered.put(n, matchPosition);
@@ -223,12 +223,13 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
         long left = n.getLeftToken();
         long right = n.getRightToken();
 
-        for(long i = left; i <= right; i++)
+        for (long i = left; i <= right; i++)
         {
           AnnisNode tok = graph.getToken(i);
           Long oldTokenPosition = matchedAndCovered.get(tok);
-          if(oldTokenPosition == null
-            || (!matchedNodes.contains(tok.getId()) && matchPosition.compareTo(oldTokenPosition) >= 0))
+          if (oldTokenPosition == null
+            || (!matchedNodes.contains(tok.getId()) && matchPosition.compareTo(
+            oldTokenPosition) >= 0))
           {
             matchedAndCovered.put(tok, matchPosition);
           }
@@ -242,21 +243,22 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
-    if(event.getButton() == btInfo)
+    if (event.getButton() == btInfo)
     {
       AnnotationGraph graph = result.getGraph();
-      
-      long textId = graph.getNodes().size() > 0 ? graph.getNodes().get(0).getTextId()
+
+      long textId = graph.getNodes().size() > 0 ? graph.getNodes().get(0).
+        getTextId()
         : -1;
-      
+
       Window infoWindow = new Window("Info for " + graph.getDocumentName());
-      
+
       infoWindow.setModal(false);
       MetaDataPanel meta = new MetaDataPanel(textId);
       infoWindow.setContent(meta);
       infoWindow.setWidth("400px");
       infoWindow.setHeight("400px");
-      
+
       getWindow().addWindow(infoWindow);
     }
   }
