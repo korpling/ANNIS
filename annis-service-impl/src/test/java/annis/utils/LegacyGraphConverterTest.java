@@ -73,6 +73,7 @@ public class LegacyGraphConverterTest
    * Test of convertToAOM method, of class LegacyGraphConverter.
    */
   @Test
+  @Ignore
   public void testConvertToAOM() throws SQLException
   {
 
@@ -122,11 +123,11 @@ public class LegacyGraphConverterTest
           return Long.compare(arg0.getId(), arg1.getId());
         }
       });
-      
+
       Iterator<AnnisNode> itNodeExpected = nodeListExpected.iterator();
       Iterator<AnnisNode> itNodeResult = nodeListResult.iterator();
-      
-      while(itNodeExpected.hasNext() && itNodeResult.hasNext())
+
+      while (itNodeExpected.hasNext() && itNodeResult.hasNext())
       {
         checkAnnisNodeEqual(itNodeExpected.next(), itNodeResult.next());
       }
@@ -141,12 +142,61 @@ public class LegacyGraphConverterTest
     checkAnnotationSetEqual(n1.getNodeAnnotations(), n2.getNodeAnnotations());
     checkAnnotationSetEqual(n1.getEdgeAnnotations(), n2.getEdgeAnnotations());
 
+    assertEquals(n1.getCorpus(), n2.getCorpus());
+    assertEquals(n1.getId(), n2.getId());
+    assertEquals(n1.getLeft(), n2.getLeft());    
+    assertEquals(n1.getLeftToken(), n2.getLeftToken());
+    assertEquals(n1.getMatchedNodeInQuery(), n2.getMatchedNodeInQuery());
+    assertEquals(n1.getName(), n2.getName());
+    assertEquals(n1.getNamespace(), n2.getNamespace());
+    assertEquals(n1.getRight(), n2.getRight());
+    assertEquals(n1.getRightToken(), n2.getRightToken());
+    assertEquals(n1.getSpannedText(), n2.getSpannedText());
+    assertEquals(n1.getTextId(), n2.getTextId());
+    assertEquals(n1.getTokenIndex(), n2.getTokenIndex());
+
+    Set<Edge> out1 = n1.getOutgoingEdges();
+    Set<Edge> out2 = n2.getOutgoingEdges();
+
+    assertEquals(out1.size(), out2.size());
+    for (Edge e1 : out1)
+    {
+      assertTrue(out2.contains(e1));
+      for (Edge e2 : out2)
+      {
+        if (e1.getPre() == e2.getPre())
+        {
+          checkAnnisEdgeEqual(e1, e2);
+          break;
+        }
+      }
+    }
+
+    Set<Edge> in1 = n1.getIncomingEdges();
+    Set<Edge> in2 = n2.getIncomingEdges();
+
+    assertEquals(in1.size(), in2.size());
+    for (Edge e1 : in1)
+    {
+      assertTrue(in2.contains(e1));
+      for (Edge e2 : in2)
+      {
+        if (e1.getPre() == e2.getPre())
+        {
+          checkAnnisEdgeEqual(e1, e2);
+          break;
+        }
+      }
+    }
+
   }
 
-  private void checkAnnisEdgeEqual(Edge n1, Edge n2)
+  private void checkAnnisEdgeEqual(Edge e1, Edge e2)
   {
-    checkAnnotationSetEqual(n1.getAnnotations(), n2.getAnnotations());
+    checkAnnotationSetEqual(e1.getAnnotations(), e1.getAnnotations());
 
+    assertEquals(e1.getSource().getId(), e2.getSource().getId());
+    assertEquals(e1.getDestination().getId(), e2.getDestination().getId());
   }
 
   private void checkAnnotationSetEqual(Set<Annotation> annos1,
