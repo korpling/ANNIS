@@ -244,7 +244,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         node = struct;
       }
 
-      copyNodeProperties(null, node, graph, id);
+      moveNodeProperties(null, node, graph, id);
 
       SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
         createSProcessingAnnotation();
@@ -265,7 +265,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         graph.addSLayer(layer);
       }
       node.getSLayers().add(layer);
-
     }
 
     String nodeAnnoValue =
@@ -315,12 +314,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       throw new NotImplementedException("no node creation possible for class: "
         + clazz.getName());
     }
-    copyNodeProperties(oldNode, node, oldNode.getSGraph(), null);
+    moveNodeProperties(oldNode, node, oldNode.getSGraph(), null);
 
     return node;
   }
 
-  private void copyNodeProperties(SStructuredNode from, SStructuredNode to,
+  private void moveNodeProperties(SStructuredNode from, SStructuredNode to,
     SGraph graph, String fallbackName)
   {
 
@@ -335,6 +334,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       {
         to.getSLayers().add(l);
       }
+      from.getSLayers().clear();
 
       Validate.isTrue(graph.removeNode(from));
     }

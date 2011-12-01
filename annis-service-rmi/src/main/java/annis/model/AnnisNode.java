@@ -53,8 +53,6 @@ public class AnnisNode implements Serializable
   private boolean root;
   private boolean token;
   private Set<Annotation> edgeAnnotations;
-  private Range arity;
-  private Range tokenArity;
   private Long matchedNodeInQuery;
 
 
@@ -301,16 +299,6 @@ public class AnnisNode implements Serializable
     {
       return false;
     }
-    if ((this.arity == null) ? (other.arity != null) : !this.arity.equals(
-      other.arity))
-    {
-      return false;
-    }
-    if ((this.tokenArity == null) ? (other.tokenArity != null)
-      : !this.tokenArity.equals(other.tokenArity))
-    {
-      return false;
-    }
 
     return true;
   }
@@ -503,26 +491,6 @@ public class AnnisNode implements Serializable
   public void setGraph(AnnotationGraph graph)
   {
     this.graph = graph;
-  }
-
-  public Range getArity()
-  {
-    return arity;
-  }
-
-  public void setArity(Range arity)
-  {
-    this.arity = arity;
-  }
-
-  public Range getTokenArity()
-  {
-    return tokenArity;
-  }
-
-  public void setTokenArity(Range tokenArity)
-  {
-    this.tokenArity = tokenArity;
   }
 
   public Long getMatchedNodeInQuery()
