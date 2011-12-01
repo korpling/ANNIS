@@ -23,6 +23,7 @@ import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -37,12 +38,11 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class KWICPanel extends Panel
+public class KWICPanel extends Table
 {
 
   private AnnisResult result;
   private static final String DUMMY_COLUMN = "dummyColumn";
-  private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
   private long textID;
@@ -60,48 +60,42 @@ public class KWICPanel extends Panel
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setSizeFull();
-    layout.setHeight("-1px");
-    layout.setMargin(false);
-
     containerAnnos = new BeanItemContainer<String>(String.class);
 
     containerAnnos.addItem("tok");
 
-    tblToken = new Table();
-    tblToken.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
-    tblToken.addStyleName(ChameleonTheme.TABLE_BORDERLESS);
-    tblToken.setWidth("100%");
-    tblToken.setHeight("-1px");
-    tblToken.setPageLength(0);
-    if(checkRTL(result.getGraph().getTokens()))
+    setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+    addStyleName(ChameleonTheme.TABLE_BORDERLESS);
+    setWidth("100%");
+    setHeight("-1px");
+    setPageLength(0);
+    if (checkRTL(result.getGraph().getTokens()))
     {
-      tblToken.addStyleName("rtl");
+      addStyleName("rtl");
     }
 
     List<AnnisNode> token = result.getGraph().getTokens();
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
-    for(AnnisNode t : token)
+    for (AnnisNode t : token)
     {
-      if(t.getTextId() == textID)
+      if (t.getTextId() == textID)
       {
         // add a column for each token
-        tblToken.addGeneratedColumn(t, new TokenColumnGenerator(t));
-        tblToken.setColumnWidth(t, -1);
-        tblToken.setColumnExpandRatio(t, 0.0f);
+        addGeneratedColumn(t, new TokenColumnGenerator(t));
+        setColumnWidth(t, -1);
+        setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 
-        if(lastTokenIndex != null && t.getTokenIndex() != null
+        if (lastTokenIndex != null && t.getTokenIndex() != null
           && t.getTokenIndex().longValue() > (lastTokenIndex.longValue() + 1))
         {
           // add "(...)"
           Long gapColumnID = t.getTokenIndex();
-          tblToken.addGeneratedColumn(gapColumnID, new GapColumnGenerator());
-          tblToken.setColumnWidth(gapColumnID, -1);
-          tblToken.setColumnExpandRatio(gapColumnID, 0.0f);
+          addGeneratedColumn(gapColumnID, new GapColumnGenerator());
+          setColumnWidth(gapColumnID, -1);
+          setColumnExpandRatio(gapColumnID, 0.0f);
           visible.add(gapColumnID);
 
         }
@@ -109,7 +103,7 @@ public class KWICPanel extends Panel
       }
     }
 
-    tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
+    addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
     {
 
       @Override
@@ -119,20 +113,20 @@ public class KWICPanel extends Panel
         return lbl;
       }
     });
-    tblToken.setColumnWidth(DUMMY_COLUMN, 0);
-    tblToken.setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
+    setColumnWidth(DUMMY_COLUMN, 0);
+    setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
     visible.add(DUMMY_COLUMN);
     containerAnnos.addAll(tokenAnnos);
 
-    tblToken.setContainerDataSource(containerAnnos);
-    tblToken.setVisibleColumns(visible.toArray());
-
-    addComponent(tblToken);
+    setContainerDataSource(containerAnnos);
+    setVisibleColumns(visible.toArray());
+    
   }
+  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(containerAnnos != null)
+    if (containerAnnos != null)
     {
       containerAnnos.removeAllItems();
       containerAnnos.addItem("tok");
@@ -140,15 +134,21 @@ public class KWICPanel extends Panel
     }
   }
 
-  public  static class GapColumnGenerator implements Table.ColumnGenerator
+  public interface KWICComponentGenerator extends Table.ColumnGenerator
+  {
+
+    public Object generateCell(String layer);
+  }
+
+  public static class GapColumnGenerator implements KWICComponentGenerator
   {
 
     @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    public Object generateCell(String layer)
     {
       Label l = new Label();
 
-      if("tok".equals(itemId))
+      if ("tok".equals(layer))
       {
         l.setValue("(...)");
       }
@@ -159,9 +159,15 @@ public class KWICPanel extends Panel
       }
       return l;
     }
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      return generateCell((String) itemId);
+    }
   }
 
-  public class TokenColumnGenerator implements Table.ColumnGenerator
+  public class TokenColumnGenerator implements KWICComponentGenerator
   {
 
     private Map<String, Annotation> annotationsByQName;
@@ -171,22 +177,22 @@ public class KWICPanel extends Panel
     {
       this.token = token;
       annotationsByQName = new HashMap<String, Annotation>();
-      for(Annotation a : token.getNodeAnnotations())
+      for (Annotation a : token.getNodeAnnotations())
       {
         annotationsByQName.put(a.getQualifiedName(), a);
       }
     }
 
     @Override
-    public Component generateCell(Table source, Object itemId, Object columnId)
+    public Object generateCell(String layer)
     {
       Label l = new Label("");
       l.setSizeUndefined();
 
-      if("tok".equals(itemId))
+      if ("tok".equals(layer))
       {
         l.setValue(token.getSpannedText());
-        if(markedAndCovered.containsKey(token))
+        if (markedAndCovered.containsKey(token))
         {
           // add color
           l.addStyleName(
@@ -195,8 +201,8 @@ public class KWICPanel extends Panel
       }
       else
       {
-        Annotation a = annotationsByQName.get((String) itemId);
-        if(a != null)
+        Annotation a = annotationsByQName.get(layer);
+        if (a != null)
         {
           l.setValue(a.getValue());
           l.setDescription(a.getQualifiedName());
@@ -205,14 +211,20 @@ public class KWICPanel extends Panel
       }
       return l;
     }
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      return generateCell((String) itemId);
+    }
   }
 
   private boolean checkRTL(List<AnnisNode> tokenList)
   {
-    for(AnnisNode tok : tokenList)
+    for (AnnisNode tok : tokenList)
     {
       String tokText = tok.getSpannedText();
-      if(Helper.containsRTLText(tokText))
+      if (Helper.containsRTLText(tokText))
       {
         return true;
       }

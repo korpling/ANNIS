@@ -40,12 +40,16 @@
   direction: rtl;
 }
 
-.v-label-docPath {
+.docPath {
   text-align: left;
+  vertical-align: middle;
   font-weight: normal;
   margin: 0 0 4px;
   padding: 2px 3px;
   background-color: #ecf0f6;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px 0px 0px 0px;
 }
 
 textarea.citation {
