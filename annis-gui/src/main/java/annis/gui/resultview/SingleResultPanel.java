@@ -57,7 +57,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class SingleResultPanel extends Panel implements Button.ClickListener
+public class SingleResultPanel extends GridLayout implements Button.ClickListener
 {
 
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
@@ -71,13 +71,13 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
   private PluginSystem ps;
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
-  private GridLayout gridLayout;
   private int resultNumber;
   
   public SingleResultPanel(final AnnisResult result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos)
   {
+    super(2,3);
     this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
@@ -88,15 +88,11 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     setWidth("100%");
     setHeight("-1px");
 
-    setScrollable(true);
 
-    gridLayout = new GridLayout(2, 3);
-    setContent(gridLayout);
-
-    gridLayout.setWidth("100%");
-    gridLayout.setHeight("-1px");
-    gridLayout.setMargin(false);
-    gridLayout.setSpacing(false);
+    setWidth("100%");
+    setHeight("-1px");
+    setMargin(false);
+    setSpacing(false);
 
 
     List<String> path = new LinkedList<String>(Arrays.asList(result.getGraph().
@@ -106,7 +102,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
     lblPath.addStyleName("docPath");
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
-    gridLayout.addComponent(lblPath, 1, 0);
+    addComponent(lblPath, 1, 0);
 
     kwicPanels = new ArrayList<KWICPanel>();
     for (long textId : containedTexts)
@@ -114,11 +110,11 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
 
       KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
         textId);
-      gridLayout.addComponent(kwic, 1, 1);
+      addComponent(kwic, 1, 1);
       kwicPanels.add(kwic);
     }
     
-    gridLayout.setColumnExpandRatio(1, 1.0f);
+    setColumnExpandRatio(1, 1.0f);
   }
 
   @Override
@@ -133,7 +129,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
           resolverProvider.getResolverEntries(result, service);
 
         int rows = 2 + entries.length;
-        gridLayout.setRows(rows);
+        setRows(rows);
         
         CssLayout actionLayout = new CssLayout()
         {
@@ -145,7 +141,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
           }
           
         };
-        gridLayout.addComponent(actionLayout, 0, 0, 0, rows-1);
+        addComponent(actionLayout, 0, 0, 0, rows-1);
         Label lblNumber = new Label("" + (resultNumber + 1));
         actionLayout.addComponent(lblNumber);
         lblNumber.setSizeUndefined();
@@ -159,7 +155,7 @@ public class SingleResultPanel extends Panel implements Button.ClickListener
         int row=2;
         for (ResolverEntry e : entries)
         {
-          gridLayout.addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
+          addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
             markedCoveredMap), 1, row++);
         }
       }

@@ -23,6 +23,7 @@ import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -37,12 +38,11 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class KWICPanel extends Panel
+public class KWICPanel extends Table
 {
 
   private AnnisResult result;
   private static final String DUMMY_COLUMN = "dummyColumn";
-  private Table tblToken;
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
   private long textID;
@@ -60,24 +60,18 @@ public class KWICPanel extends Panel
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setSizeFull();
-    layout.setHeight("-1px");
-    layout.setMargin(false);
-
     containerAnnos = new BeanItemContainer<String>(String.class);
 
     containerAnnos.addItem("tok");
 
-    tblToken = new Table();
-    tblToken.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
-    tblToken.addStyleName(ChameleonTheme.TABLE_BORDERLESS);
-    tblToken.setWidth("100%");
-    tblToken.setHeight("-1px");
-    tblToken.setPageLength(0);
+    setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+    addStyleName(ChameleonTheme.TABLE_BORDERLESS);
+    setWidth("100%");
+    setHeight("-1px");
+    setPageLength(0);
     if (checkRTL(result.getGraph().getTokens()))
     {
-      tblToken.addStyleName("rtl");
+      addStyleName("rtl");
     }
 
     List<AnnisNode> token = result.getGraph().getTokens();
@@ -89,9 +83,9 @@ public class KWICPanel extends Panel
       if (t.getTextId() == textID)
       {
         // add a column for each token
-        tblToken.addGeneratedColumn(t, new TokenColumnGenerator(t));
-        tblToken.setColumnWidth(t, -1);
-        tblToken.setColumnExpandRatio(t, 0.0f);
+        addGeneratedColumn(t, new TokenColumnGenerator(t));
+        setColumnWidth(t, -1);
+        setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 
         if (lastTokenIndex != null && t.getTokenIndex() != null
@@ -99,9 +93,9 @@ public class KWICPanel extends Panel
         {
           // add "(...)"
           Long gapColumnID = t.getTokenIndex();
-          tblToken.addGeneratedColumn(gapColumnID, new GapColumnGenerator());
-          tblToken.setColumnWidth(gapColumnID, -1);
-          tblToken.setColumnExpandRatio(gapColumnID, 0.0f);
+          addGeneratedColumn(gapColumnID, new GapColumnGenerator());
+          setColumnWidth(gapColumnID, -1);
+          setColumnExpandRatio(gapColumnID, 0.0f);
           visible.add(gapColumnID);
 
         }
@@ -109,7 +103,7 @@ public class KWICPanel extends Panel
       }
     }
 
-    tblToken.addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
+    addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
     {
 
       @Override
@@ -119,16 +113,16 @@ public class KWICPanel extends Panel
         return lbl;
       }
     });
-    tblToken.setColumnWidth(DUMMY_COLUMN, 0);
-    tblToken.setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
+    setColumnWidth(DUMMY_COLUMN, 0);
+    setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
     visible.add(DUMMY_COLUMN);
     containerAnnos.addAll(tokenAnnos);
 
-    tblToken.setContainerDataSource(containerAnnos);
-    tblToken.setVisibleColumns(visible.toArray());
-
-    addComponent(tblToken);
+    setContainerDataSource(containerAnnos);
+    setVisibleColumns(visible.toArray());
+    
   }
+  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -143,14 +137,14 @@ public class KWICPanel extends Panel
   public interface KWICComponentGenerator extends Table.ColumnGenerator
   {
 
-    public Component generateCell(String layer);
+    public Object generateCell(String layer);
   }
 
   public static class GapColumnGenerator implements KWICComponentGenerator
   {
 
     @Override
-    public Component generateCell(String layer)
+    public Object generateCell(String layer)
     {
       Label l = new Label();
 
@@ -190,7 +184,7 @@ public class KWICPanel extends Panel
     }
 
     @Override
-    public Component generateCell(String layer)
+    public Object generateCell(String layer)
     {
       Label l = new Label("");
       l.setSizeUndefined();
