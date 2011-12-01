@@ -111,7 +111,7 @@ public class LegacyGraphConverterTest
         @Override
         public int compare(AnnisNode arg0, AnnisNode arg1)
         {
-          return Long.compare(arg0.getId(), arg1.getId());
+          return Long.valueOf(arg0.getId()).compareTo(Long.valueOf(arg1.getId()));
         }
       });
       Collections.sort(nodeListResult, new Comparator<AnnisNode>()
@@ -120,7 +120,7 @@ public class LegacyGraphConverterTest
         @Override
         public int compare(AnnisNode arg0, AnnisNode arg1)
         {
-          return Long.compare(arg0.getId(), arg1.getId());
+          return Long.valueOf(arg0.getId()).compareTo(Long.valueOf(arg1.getId()));
         }
       });
 
