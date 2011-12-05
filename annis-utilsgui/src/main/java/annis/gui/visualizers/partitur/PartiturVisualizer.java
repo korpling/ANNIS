@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.partitur;
 
-import annis.gui.Helper;
+import annis.CommonHelper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import annis.service.ifaces.AnnisToken;
@@ -398,7 +398,7 @@ public class PartiturVisualizer extends WriterVisualizer
     {
       AnnisToken tok = itToken.next();
       String tokText = tok.getText();
-      if(Helper.containsRTLText(tokText))
+      if(CommonHelper.containsRTLText(tokText))
       {
         return true;
       }

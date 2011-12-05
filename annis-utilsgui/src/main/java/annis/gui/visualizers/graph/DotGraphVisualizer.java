@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.graph;
 
-import annis.gui.MatchedNodeColors;
+import annis.MatchedNodeColors;
 import annis.gui.visualizers.AbstractDotVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;

@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
@@ -224,7 +225,7 @@ public class KWICPanel extends Table
     for (AnnisNode tok : tokenList)
     {
       String tokText = tok.getSpannedText();
-      if (Helper.containsRTLText(tokText))
+      if (CommonHelper.containsRTLText(tokText))
       {
         return true;
       }

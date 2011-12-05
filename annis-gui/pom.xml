@@ -168,11 +168,6 @@
       <url>http://maven.vaadin.com/vaadin-addons</url>
     </repository>
 
-    <repository>
-      <id>korpling</id>
-      <url>http://korpling.german.hu-berlin.de/maven2/</url>
-    </repository>
-
   </repositories>
 
     <!-- <pluginRepositories> <pluginRepository> <id>codehaus-snapshots</id> <url>http://nexus.codehaus.org/snapshots</url> 
@@ -205,6 +200,13 @@
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-rmi</artifactId>
+      <version>2.3.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>de.hu-berlin.german.korpling.annis</groupId>
+      <artifactId>annis-utilsgui</artifactId>
       <version>2.3.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
@@ -257,27 +259,7 @@
       <version>3.2.1</version>
       <scope>compile</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-graph-impl</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-io</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-visualization</artifactId>
-      <version>2.0</version>
-    </dependency>
+   
 
         <!-- <dependency> <groupId>com.google.gwt</groupId> <artifactId>gwt-user</artifactId> 
             <version>${gwt.version}</version> <scope>provided</scope> </dependency> <dependency> 

@@ -24,6 +24,20 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
+  
+  <repositories>
+    <repository>
+      <id>korpling</id>
+      <url>http://korpling.german.hu-berlin.de/maven2/</url>
+    </repository>
+    
+    <repository>
+      <id>saltnpepper</id>
+      <name>SaltNPepper</name>
+      <url>http://korpling.german.hu-berlin.de/~annis/maven2/saltnpepper/</url>
+    </repository>
+  
+  </repositories>
 
   <modules>
     <module>annis-service-rmi</module>    
@@ -31,6 +45,7 @@
     <module>Annis-Web</module>
     <module>Annis-Kickstarter</module>
     <module>annis-gui</module>
+    <module>annis-utilsgui</module>
   </modules>
 
 </project>

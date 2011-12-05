@@ -12,13 +12,6 @@
   <name>Annis-Web</name>
 
   <packaging>war</packaging>
-
-  <repositories>
-    <repository>
-      <id>korpling</id>
-      <url>http://korpling.german.hu-berlin.de/maven2/</url>
-    </repository>
-  </repositories>
   
   <properties>
     <annis.webcontext>/Annis-web</annis.webcontext>
@@ -68,6 +61,13 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>de.hu-berlin.german.korpling.annis</groupId>
+      <artifactId>annis-service-rmi</artifactId>
+      <version>2.3.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-rmi</artifactId>

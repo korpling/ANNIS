@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.tree;
 
-import annis.gui.MatchedNodeColors;
+import annis.MatchedNodeColors;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
