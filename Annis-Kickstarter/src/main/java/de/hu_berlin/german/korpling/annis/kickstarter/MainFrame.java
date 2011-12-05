@@ -19,14 +19,22 @@ import annis.administration.CorpusAdministration;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.SystemTray;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -102,6 +110,28 @@ public class MainFrame extends javax.swing.JFrame
   /** Creates new form MainFrame */
   public MainFrame()
   {
+    Integer[] sizes = new Integer[]
+    {
+      14, 16, 32, 48, 64, 128, 192
+    };
+    List<Image> allImages = new LinkedList<Image>();
+
+    for (int s : sizes)
+    {
+      try
+      {
+        BufferedImage imgIcon = ImageIO.read(MainFrame.class.getResource(
+          "logo/annis_" + s + ".png"));
+        allImages.add(imgIcon);
+      }
+      catch (IOException ex)
+      {
+        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    this.setIconImages(allImages);
+            
+    
     // init corpusAdministration
     System.setProperty("annis.home", ".");
     ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
