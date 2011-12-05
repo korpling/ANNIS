@@ -48,6 +48,10 @@
     <servlet-name>BinaryServlet</servlet-name>
     <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>ExternalFileServlet</servlet-name>
+    <servlet-class>annis.gui.servlets.ExternalFileServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
     <servlet-name>MainApp</servlet-name>
@@ -68,6 +72,10 @@
   <servlet-mapping>
     <servlet-name>BinaryServlet</servlet-name>
     <url-pattern>/Binary/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ExternalFileServlet</servlet-name>
+    <url-pattern>/Externalfile/*</url-pattern>
   </servlet-mapping>
   
 
