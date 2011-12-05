@@ -1,5 +1,6 @@
-package annis.gui.visualizers.media.audio;
+package annis.gui.visualizers.media.video;
 
+import annis.gui.visualizers.media.audio.*;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import java.io.IOException;
@@ -7,7 +8,7 @@ import java.io.Writer;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class AudioVisualizer extends WriterVisualizer
+public class VideoVisualizer extends WriterVisualizer
 {
 
   @Override
@@ -27,12 +28,12 @@ public class AudioVisualizer extends WriterVisualizer
       writer.append("\"></script>");
       writer.append("</head>");
       writer.append("<body>");
-      writer.append("<audio controls preload=none style=\"padding-top:70px\">");
+      writer.append("<video controls preload=none style=\"padding-top:70px\">");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);
       writer.append("\" type=\"audio/ogg\">");
       writer.append("[Browser zu antik]");
-      writer.append("</audio>");
+      writer.append("</video>");
       writer.append("</body></html>");
     }
     catch (IOException e)
@@ -45,6 +46,6 @@ public class AudioVisualizer extends WriterVisualizer
   @Override
   public String getShortName()
   {
-    return "audio";
+    return "video";
   }
 }
