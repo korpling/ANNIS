@@ -21,15 +21,14 @@ import javax.servlet.http.*;
 import annis.cache.Cache;
 import annis.cache.CacheException;
 import annis.exceptions.AnnisServiceFactoryException;
-import annis.frontend.servlets.visualizers.VisualizerInput;
-import annis.frontend.servlets.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisResult;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;

@@ -18,7 +18,7 @@ package annis.frontend.servlets;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
-import annis.frontend.servlets.visualizers.ResourcePlugin;
+import annis.gui.visualizers.ResourcePlugin;
 
 import java.io.*;
 import java.net.URL;
