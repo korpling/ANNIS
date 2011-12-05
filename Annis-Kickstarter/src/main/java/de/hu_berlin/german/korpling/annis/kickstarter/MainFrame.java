@@ -55,7 +55,7 @@ public class MainFrame extends javax.swing.JFrame
         setProgress(2);
         startJetty();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         return ex.getLocalizedMessage();
       }
@@ -70,26 +70,31 @@ public class MainFrame extends javax.swing.JFrame
         wasStarted = true;
         pbStart.setIndeterminate(false);
         pbStart.setValue(100);
-        if("".equals(this.get()))
+        if ("".equals(this.get()))
         {
           lblStatusService.setText("Annis started");
-          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
+          lblStatusService.setIcon(
+            new javax.swing.ImageIcon(
+            getClass().getResource(
+            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           btLaunch.setEnabled(true);
           btLaunch.setForeground(Color.blue);
         }
         else
         {
           lblStatusService.setText("Annis start failed: " + this.get());
-          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
+          lblStatusService.setIcon(
+            new javax.swing.ImageIcon(
+            getClass().getResource(
+            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         new ExceptionDialog(ex).setVisible(true);
       }
     }
   }
-  
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, String> serviceWorker;
   private boolean wasStarted = false;
@@ -99,14 +104,16 @@ public class MainFrame extends javax.swing.JFrame
   {
     // init corpusAdministration
     System.setProperty("annis.home", ".");
-    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("annis/administration/AnnisAdminRunner-context.xml");
-    this.corpusAdministration = (CorpusAdministration) ctx.getBean("corpusAdministration");
+    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
+      "annis/administration/AnnisAdminRunner-context.xml");
+    this.corpusAdministration = (CorpusAdministration) ctx.getBean(
+      "corpusAdministration");
 
     try
     {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
@@ -120,17 +127,20 @@ public class MainFrame extends javax.swing.JFrame
 
       public void propertyChange(PropertyChangeEvent evt)
       {
-        if(serviceWorker.getProgress() == 1)
+        if (serviceWorker.getProgress() == 1)
         {
           pbStart.setIndeterminate(true);
           lblStatusService.setText("Starting Annis...");
-          lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
+          lblStatusService.setIcon(
+            new javax.swing.ImageIcon(
+            getClass().getResource(
+            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
         }
       }
     });
 
 
-    if(isInitialized())
+    if (isInitialized())
     {
       btImport.setEnabled(true);
       btList.setEnabled(true);
@@ -277,7 +287,7 @@ public class MainFrame extends javax.swing.JFrame
       InitDialog dlg = new InitDialog(this, true, corpusAdministration);
       dlg.setVisible(true);
 
-      if(!wasStarted && isInitialized())
+      if (!wasStarted && isInitialized())
       {
         btImport.setEnabled(true);
         btList.setEnabled(true);
@@ -312,7 +322,7 @@ public class MainFrame extends javax.swing.JFrame
 
         Desktop.getDesktop().browse(new URI("http://localhost:8080/Annis-web"));
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         new ExceptionDialog(this, ex).setVisible(true);
       }
@@ -351,13 +361,12 @@ public class MainFrame extends javax.swing.JFrame
   private void startJetty() throws Exception
   {
     Server jetty = new Server(8080);
-    
     // add context for our bundled webapp
     WebAppContext context = new WebAppContext("./webapp/", "/Annis-web");
-    Map<String, String> initParams = new HashMap<String, String>();
-    initParams.put("managerClassName", "annis.security.TestSecurityManager");
-    context.setInitParams(initParams);
-    String webxmlOverrride = System.getProperty("annis.home") + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
+    context.setInitParameter("managerClassName",
+      "annis.security.TestSecurityManager");
+    String webxmlOverrride = System.getProperty("annis.home")
+      + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
     context.setOverrideDescriptor(webxmlOverrride);
 
     jetty.setHandler(context);
@@ -374,7 +383,7 @@ public class MainFrame extends javax.swing.JFrame
     {
       corpusAdministration.listCorpusStats();
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return false;
     }
