@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Regular Expressions in ANNIS2 - Search and Visualization in Multilevel Linguistic Corpora</title>
+<link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div id="tutorialcontent">
+<h2>Searching using Regular Expressions</h2>
+<p>
+When searching for word forms and annotation values, it is possible to employ wildcards as placeholders for a variety of characters, using Regular Expression syntax (see <a href="http://www.regular-expressions.info/" target="new_w">here</a> for detailed information). To search for wildcards use slashes instead of quotation marks to surround your search term. For example, you can use the <strong>period (<tt>.</tt>)</strong> to replace any single character:
+</p>
+<tt>tok=/de./</tt>
+<p>
+This finds word forms such as "der", "dem", "den" etc. It is also possible to make characters optional by following them with a <strong>question mark (<tt>?</tt>)</strong>. The following example finds cases of "das" and "dass", since the second "s" is optional:
+</p>
+<tt>tok=/dass?/</tt>
+<p>
+It is also possible to specify an arbitrary number of repetitions, with an <strong>asterisk (<tt>*</tt>)</strong> signifying zero or more occurrences and a <strong>plus (<tt>+</tt>)</strong> signifying at least one occurrence. For example, the first query below finds "da", "das", and "dass" (since the asterisk means zero or more times the preceding "s"), while the second finds "das" and "dass", since at least one "s" must be found:
+</p>
+<tt>tok=/das*/</tt><br><br>
+<tt>tok=/das+/</tt>
+<p>
+It is possible to combine these operators with the period operator to mean any number of occurrences of an arbitrary character. For example, the query below searches for pos (part-of-speech) annotations that begin with "VA", corresponding to all forms of auxiliary verbs. The string "VA" means that the result must begin with "VA", the period stands for any character, and the asterisk means that 'any character' can be repeated zero or more time, as above. 
+</p>
+<tt>pos=/VA.*/</tt>
+<p>
+This finds both finite verbs ("VAFIN") and non-finite ones ("VAINF"). It is also possible to search for explicit alternatives by either specifying characters in <strong>square brackets</strong> or longer strings in <strong>round brackets separated by pipe signs</strong>. The first example below finds either "dem" or "der" (i.e. "de" followed by either "m" or "r") while the second example finds lemma annotations that are either "sein" or "werden".
+</p>
+<tt>tok=/de[mr]/</tt><br><br>
+<tt>lemma=/(sein|werden)/</tt>
+<p>
+Finally, negative searches can be used as usual with the exclamation point, and regular expressions can generally be used also in edge annotations. For example, if we search for trees (see also <a href="trees.html">Searching for Trees</a>) where a node dominates another node with edges not containing an object, we can use a wildcard to rule out all edges labels beginning with "O" for object:
+</p>
+<tt>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2</tt><br><br>
+
+</div>
+
+</body>
+</html>
