@@ -15,13 +15,11 @@
  */
 package annis.utils;
 
-import annis.model.AnnisConstants;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
-import com.sun.xml.internal.ws.message.saaj.SAAJMessage;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -32,7 +30,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -48,7 +45,6 @@ import java.util.Set;
 import static annis.model.AnnisConstants.*;
 import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -95,7 +91,7 @@ public class LegacyGraphConverter
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
     Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();
-    
+
     for (SNode sNode : docGraph.getSNodes())
     {
       SProcessingAnnotation procInternalID =
@@ -121,7 +117,7 @@ public class LegacyGraphConverter
           textualRelation).get(0);
         aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
           substring(seq.getSStart(), seq.getSEnd()));
-        
+
         aNode.setCorpus(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
           + PROC_CORPUSREF).getSValueSNUMERIC());
         aNode.setLeft(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
@@ -141,37 +137,46 @@ public class LegacyGraphConverter
       }
     }
 
-    for (SRelation rel : docGraph.getSDominanceRelations())
+    for (SRelation rel : docGraph.getSRelations())
     {
-      Edge aEdge = new Edge();
-      aEdge.setSource(allNodes.get(rel.getSource()));
-      aEdge.setDestination(allNodes.get(rel.getTarget()));
-
-      aEdge.setEdgeType(EdgeType.UNKNOWN);
-      aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.ANNIS_NS + "::"
-        + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC());
-
-      aEdge.setNamespace(rel.getSLayers().get(0).getSName());
-      aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
-        ? rel.getSTypes().get(0) : null);
-
-      if (rel instanceof SDominanceRelation)
+      SProcessingAnnotation procPre = rel.getSProcessingAnnotation(ANNIS_NS + "::"
+        + PROC_INTERNALID);
+      
+      if(procPre != null)
       {
-        aEdge.setEdgeType(EdgeType.DOMINANCE);
-      }
-      else if (rel instanceof SPointingRelation)
-      {
-        aEdge.setEdgeType(EdgeType.POINTING_RELATION);
-      }
-      else if (rel instanceof SSpanningRelation)
-      {
-        aEdge.setEdgeType(EdgeType.COVERAGE);
-      }
+        Edge aEdge = new Edge();
+        aEdge.setSource(allNodes.get(rel.getSource()));
+        aEdge.setDestination(allNodes.get(rel.getTarget()));
 
-      for (SAnnotation sAnno : rel.getSAnnotations())
-      {
-        aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
-          sAnno.getSValueSTEXT()));
+        aEdge.setEdgeType(EdgeType.UNKNOWN);
+        aEdge.setPre(procPre.getSValueSNUMERIC());
+
+        aEdge.setNamespace(rel.getSLayers().get(0).getSName());
+        aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
+          ? rel.getSTypes().get(0) : null);
+
+        if (rel instanceof SDominanceRelation)
+        {
+          aEdge.setEdgeType(EdgeType.DOMINANCE);
+        }
+        else if (rel instanceof SPointingRelation)
+        {
+          aEdge.setEdgeType(EdgeType.POINTING_RELATION);
+        }
+        else if (rel instanceof SSpanningRelation)
+        {
+          aEdge.setEdgeType(EdgeType.COVERAGE);
+        }
+
+        for (SAnnotation sAnno : rel.getSAnnotations())
+        {
+          aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
+            sAnno.getSValueSTEXT()));
+        }
+
+        annoGraph.addEdge(aEdge);
+        aEdge.getDestination().addIncomingEdge(aEdge);
+        aEdge.getSource().addOutgoingEdge(aEdge);
       }
     }
 

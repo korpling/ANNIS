@@ -487,8 +487,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
         SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
           createSProcessingAnnotation();
-        procInternalID.setSNS(AnnisConstants.ANNIS_NS);
-        procInternalID.setSName(AnnisConstants.PROC_INTERNALID);
+        procInternalID.setSNS(ANNIS_NS);
+        procInternalID.setSName(PROC_INTERNALID);
         procInternalID.setSValue(Long.valueOf(pre));
         rel.addSProcessingAnnotation(procInternalID);
 
