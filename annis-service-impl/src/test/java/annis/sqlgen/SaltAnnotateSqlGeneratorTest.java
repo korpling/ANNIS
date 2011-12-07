@@ -19,7 +19,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import annis.test.CSVResultSetProvider;
 import java.sql.SQLException;
 import static org.mockito.MockitoAnnotations.initMocks;
-import au.com.bytecode.opencsv.CSVReader;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;

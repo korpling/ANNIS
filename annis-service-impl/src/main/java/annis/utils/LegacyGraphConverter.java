@@ -21,14 +21,18 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
+import com.sun.xml.internal.ws.message.saaj.SAAJMessage;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -41,7 +45,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import static annis.model.AnnisConstants.*;
 import org.apache.commons.lang.NotImplementedException;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -60,8 +67,8 @@ public class LegacyGraphConverter
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       Long[] matchedIDs = new Long[0];
-      SFeature featMatchedIDs = corpusGraph.getSFeature("annis",
-        AnnisConstants.FEAT_MATCHEDIDS);
+      SFeature featMatchedIDs = corpusGraph.getSFeature(ANNIS_NS,
+        FEAT_MATCHEDIDS);
       if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
       {
         matchedIDs = Utils.split2Long(featMatchedIDs.getSValueSTEXT(), ',');
@@ -88,23 +95,45 @@ public class LegacyGraphConverter
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
     Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();
-
+    
     for (SNode sNode : docGraph.getSNodes())
     {
-      SProcessingAnnotation procAnno =
-        sNode.getSProcessingAnnotation(AnnisConstants.NAMESPACE + "::"
-        + AnnisConstants.PROC_INTERNALID);
-      if (procAnno != null)
+      SProcessingAnnotation procInternalID =
+        sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+        + PROC_INTERNALID);
+      if (procInternalID != null)
       {
-        long internalID = procAnno.getSValueSNUMERIC();
+        long internalID = procInternalID.getSValueSNUMERIC();
         AnnisNode aNode = new AnnisNode(internalID);
-        
+
         for (SAnnotation sAnno : sNode.getSAnnotations())
         {
           aNode.addNodeAnnotation(new Annotation(sAnno.getSNS(),
             sAnno.getSName(),
             sAnno.getSValueSTEXT()));
         }
+        aNode.setName(sNode.getSName());
+        aNode.setNamespace(sNode.getSLayers().get(0).getSName());
+
+        BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+        textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+        SDataSourceSequence seq = docGraph.getOverlappedDSSequences(sNode,
+          textualRelation).get(0);
+        aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
+          substring(seq.getSStart(), seq.getSEnd()));
+        
+        aNode.setCorpus(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_CORPUSREF).getSValueSNUMERIC());
+        aNode.setLeft(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_LEFT).getSValueSNUMERIC());
+        aNode.setLeftToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_LEFTTOKEN).getSValueSNUMERIC());
+        aNode.setRight(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_RIGHT).getSValueSNUMERIC());
+        aNode.setRightToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_RIGHTTOKEN).getSValueSNUMERIC());
+        aNode.setTokenIndex(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+          + PROC_TOKENINDEX).getSValueSNUMERIC());
         // TODO: what else to add to node?
 
         annoGraph.addNode(aNode);
@@ -119,7 +148,7 @@ public class LegacyGraphConverter
       aEdge.setDestination(allNodes.get(rel.getTarget()));
 
       aEdge.setEdgeType(EdgeType.UNKNOWN);
-      aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.NAMESPACE + "::"
+      aEdge.setPre(rel.getSProcessingAnnotation(AnnisConstants.ANNIS_NS + "::"
         + AnnisConstants.PROC_INTERNALID).getSValueSNUMERIC());
 
       aEdge.setNamespace(rel.getSLayers().get(0).getSName());

@@ -50,6 +50,7 @@ import org.apache.commons.lang.Validate;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
+import static annis.model.AnnisConstants.*;
 
 /**
  *
@@ -123,8 +124,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         corpusGraph.setSName("match_" + (match_index + matchstart));
 
         SFeature feature = SaltFactory.eINSTANCE.createSFeature();
-        feature.setSNS(AnnisConstants.NAMESPACE);
-        feature.setSName(AnnisConstants.FEAT_MATCHEDIDS);
+        feature.setSNS(ANNIS_NS);
+        feature.setSName(FEAT_MATCHEDIDS);
         feature.setSValue(StringUtils.join(keyArray, ","));
         corpusGraph.addSFeature(feature);
         project.getSCorpusGraphs().add(corpusGraph);
@@ -246,13 +247,13 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       moveNodeProperties(null, node, graph, id);
 
-      SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
-        createSProcessingAnnotation();
-      procInternalID.setSNS(AnnisConstants.NAMESPACE);
-      procInternalID.setSName(AnnisConstants.PROC_INTERNALID);
-      procInternalID.setSValue(Long.valueOf(internalID));
-
-      node.addSProcessingAnnotation(procInternalID);
+      addLongSProcessing(node, PROC_INTERNALID, internalID);
+      addLongSProcessing(node, resultSet, PROC_CORPUSREF, "node", "corpus_ref");
+      addLongSProcessing(node, resultSet, PROC_LEFT, "node", "left");
+      addLongSProcessing(node, resultSet, PROC_LEFTTOKEN, "node", "left_token");
+      addLongSProcessing(node, resultSet, PROC_RIGHT, "node", "right");
+      addLongSProcessing(node, resultSet, PROC_RIGHTTOKEN, "node", "right_token");
+      addLongSProcessing(node, resultSet, PROC_TOKENINDEX, "node", "token_index");
 
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
       EList<SLayer> layerList = graph.getSLayerByName(namespace);
@@ -289,6 +290,23 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     // TODO: what more do we have to do?
     return node;
+  }
+
+  private void addLongSProcessing(SNode node, String name,
+    long value) throws SQLException
+  {
+    SProcessingAnnotation proc = SaltFactory.eINSTANCE.
+      createSProcessingAnnotation();
+    proc.setSNS(ANNIS_NS);
+    proc.setSName(name);
+    proc.setSValue(value);
+    node.addSProcessingAnnotation(proc);
+  }
+
+  private void addLongSProcessing(SNode node, ResultSet resultSet, String name,
+    String table, String tupleName) throws SQLException
+  {
+    addLongSProcessing(node, name, longValue(resultSet, table, tupleName));
   }
 
   private SStructuredNode recreateNode(Class<? extends SStructuredNode> clazz,
@@ -387,8 +405,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     }
 
     EList<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
-    SLayer layer = (layerList != null && layerList.size() > 0) ? 
-      layerList.get(0) : null;
+    SLayer layer = (layerList != null && layerList.size() > 0)
+      ? layerList.get(0) : null;
     if (layer == null)
     {
       layer = SaltFactory.eINSTANCE.createSLayer();
@@ -469,7 +487,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
         SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
           createSProcessingAnnotation();
-        procInternalID.setSNS(AnnisConstants.NAMESPACE);
+        procInternalID.setSNS(AnnisConstants.ANNIS_NS);
         procInternalID.setSName(AnnisConstants.PROC_INTERNALID);
         procInternalID.setSValue(Long.valueOf(pre));
         rel.addSProcessingAnnotation(procInternalID);
