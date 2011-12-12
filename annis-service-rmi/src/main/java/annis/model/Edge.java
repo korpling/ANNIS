@@ -96,11 +96,11 @@ public class Edge implements Serializable
   @Override
   public String toString()
   {
-    Long src = source != null ? source.getId() : null;
-    long dst = destination.getId();
-    String type = edgeType != null ? edgeType.toString() : null;
-    String name = getQualifiedName();
-    return src + "->" + dst + " " + name + " " + type;
+    String src = source != null ? "" + source.getId() : "(no source)";
+    String dst = "" + destination.getId();
+    String type = edgeType != null ? edgeType.toString() : "(no type)";
+    String qname = getQualifiedName() != null ? getQualifiedName() : "(no name)";
+    return src + "->" + dst + " " + qname + " " + type;
   }
 
   public String getQualifiedName()
@@ -111,25 +111,58 @@ public class Edge implements Serializable
   @Override
   public boolean equals(Object obj)
   {
-    if (obj == null || !(obj instanceof Edge))
+    if (obj == null)
     {
       return false;
     }
-
-    Edge other = (Edge) obj;
-
-    return new EqualsBuilder().append(this.source, other.source).append(
-      this.destination, other.destination).append(this.pre, other.pre).append(
-      this.edgeType, other.edgeType).append(this.name, other.name).append(
-      this.namespace, other.namespace).isEquals();
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final Edge other = (Edge) obj;
+    if (this.source != other.source &&
+      (this.source == null || !this.source.equals(other.source)))
+    {
+      return false;
+    }
+    if (this.destination != other.destination &&
+      (this.destination == null || !this.destination.equals(other.destination)))
+    {
+      return false;
+    }
+    if (this.pre != other.pre)
+    {
+      return false;
+    }
+    if (this.edgeType != other.edgeType)
+    {
+      return false;
+    }
+    if ((this.namespace == null) ? (other.namespace != null)
+      : !this.namespace.equals(other.namespace))
+    {
+      return false;
+    }
+    if ((this.name == null) ? (other.name != null)
+      : !this.name.equals(other.name))
+    {
+      return false;
+    }
+    return true;
   }
 
   @Override
   public int hashCode()
   {
-    return new HashCodeBuilder().append(source).append(destination).append(pre).
-      append(edgeType).append(getQualifiedName()).
-      append(annotations).toHashCode();
+    int hash = 3;
+    hash = 67 * hash + (this.source != null ? this.source.hashCode() : 0);
+    hash =
+      67 * hash + (this.destination != null ? this.destination.hashCode() : 0);
+    hash = 67 * hash + (int) (this.pre ^ (this.pre >>> 32));
+    hash = 67 * hash + (this.edgeType != null ? this.edgeType.hashCode() : 0);
+    hash = 67 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+    hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
+    return hash;
   }
 
   ///// Getters / Setters

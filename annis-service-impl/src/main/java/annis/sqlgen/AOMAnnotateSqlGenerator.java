@@ -18,13 +18,16 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -159,7 +162,7 @@ public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
 
       // get edge data
       Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
-      
+
       // add edge to graph if it is new, else get known copy
       long pre = edge.getPre();
       if (!edgeByPre.containsKey(pre))
@@ -198,8 +201,22 @@ public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
       {
         edge.addAnnotation(edgeAnnotation);
       }
-
       rowNum++;
+    }
+    
+    // remove edges from the graph with a source node inside the match
+    for(AnnotationGraph graph : graphByMatchGroup.values())
+    {
+      ListIterator<Edge> itEdge = graph.getEdges().listIterator();
+      while(itEdge.hasNext())
+      {
+        Edge edge = itEdge.next();
+        if(edge.getSource() == null)
+        {
+          edge.getDestination().getIncomingEdges().remove(edge);
+          itEdge.remove();
+        }
+      }
     }
 
     return graphs;
