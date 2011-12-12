@@ -30,6 +30,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -115,8 +116,19 @@ public class LegacyGraphConverter
         textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
         SDataSourceSequence seq = docGraph.getOverlappedDSSequences(sNode,
           textualRelation).get(0);
-        aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
-          substring(seq.getSStart(), seq.getSEnd()));
+        if (sNode instanceof SToken)
+        {
+          aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
+            substring(seq.getSStart(), seq.getSEnd()));
+          aNode.setToken(true);
+          aNode.setTokenIndex(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
+            + PROC_TOKENINDEX).getSValueSNUMERIC());
+        }
+        else
+        {
+          aNode.setToken(false);
+          aNode.setTokenIndex(null);
+        }
 
         aNode.setCorpus(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
           + PROC_CORPUSREF).getSValueSNUMERIC());
@@ -128,8 +140,6 @@ public class LegacyGraphConverter
           + PROC_RIGHT).getSValueSNUMERIC());
         aNode.setRightToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
           + PROC_RIGHTTOKEN).getSValueSNUMERIC());
-        aNode.setTokenIndex(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_TOKENINDEX).getSValueSNUMERIC());
         // TODO: what else to add to node?
 
         annoGraph.addNode(aNode);
@@ -139,10 +149,11 @@ public class LegacyGraphConverter
 
     for (SRelation rel : docGraph.getSRelations())
     {
-      SProcessingAnnotation procPre = rel.getSProcessingAnnotation(ANNIS_NS + "::"
+      SProcessingAnnotation procPre = rel.getSProcessingAnnotation(ANNIS_NS
+        + "::"
         + PROC_INTERNALID);
-      
-      if(procPre != null)
+
+      if (procPre != null)
       {
         Edge aEdge = new Edge();
         aEdge.setSource(allNodes.get(rel.getSource()));
