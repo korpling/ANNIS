@@ -25,6 +25,8 @@ import javax.servlet.http.*;
 
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class AuthenticationFilter implements Filter
 {
@@ -35,7 +37,9 @@ public final class AuthenticationFilter implements Filter
   public static final String KEY_USER = "user";
   public static final String KEY_LOGIN_ALREADY_TRIED = "loginAlreadyTried";
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response,
+    FilterChain chain) throws IOException, ServletException
   {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -43,18 +47,18 @@ public final class AuthenticationFilter implements Filter
     HttpSession session = httpRequest.getSession();
 
     //store security manger in session
-    if(session.getAttribute(KEY_SECURITY_MANAGER) == null)
+    if (session.getAttribute(KEY_SECURITY_MANAGER) == null)
     {
       session.setAttribute(KEY_SECURITY_MANAGER, this.manager);
     }
 
     // check if logged in
-    if(session.getAttribute(KEY_USER) != null)
+    if (session.getAttribute(KEY_USER) != null)
     {
       chain.doFilter(request, response);
     }
     // allow access to LoginLogout servlet without login
-    else if("/LoginLogout".equals(httpRequest.getServletPath()))
+    else if ("/LoginLogout".equals(httpRequest.getServletPath()))
     {
       chain.doFilter(request, response);
     }
@@ -62,7 +66,7 @@ public final class AuthenticationFilter implements Filter
     else
     {
       String demoEnabled = props.getProperty("enableDemo", "false");
-      if(!request.isSecure() && "true".equalsIgnoreCase(demoEnabled))
+      if (!request.isSecure() && "true".equalsIgnoreCase(demoEnabled))
       {
         // show demo account
         AnnisUser demoUser;
@@ -73,16 +77,17 @@ public final class AuthenticationFilter implements Filter
           session.setAttribute(KEY_USER, demoUser);
           chain.doFilter(request, response);
         }
-        catch(NamingException ex)
+        catch (NamingException ex)
         {
           try
           {
-            httpResponse.sendError(403, "{success: false, " +
-              "errors: { reason: 'No demo account available' }}");
+            httpResponse.sendError(403, "{success: false, "
+              + "errors: { reason: 'No demo account available' }}");
           }
-          catch(IOException e1)
+          catch (IOException e1)
           {
-            e1.printStackTrace();
+            Logger.getLogger(AuthenticationFilter.class.getName()).log(
+              Level.SEVERE, null, e1);
           }
         }
       }
@@ -90,29 +95,34 @@ public final class AuthenticationFilter implements Filter
       {
         try
         {
-          httpResponse.sendError(403, "{success: false, errors: { reason: 'Not logged in and no demo account available' }}");
+          httpResponse.sendError(403,
+            "{success: false, errors: { reason: 'Not logged in and no demo account available' }}");
         }
-        catch(IOException e1)
+        catch (IOException e1)
         {
-          e1.printStackTrace();
+          Logger.getLogger(AuthenticationFilter.class.getName()).log(
+            Level.SEVERE, null, e1);
         }
       }
     }
   }
 
+  @Override
   public void destroy()
   {
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public void init(FilterConfig filterConfig)
   {
     try
     {
-      this.manager = (AnnisSecurityManager) Class.forName(filterConfig.getInitParameter("managerClassName")).newInstance();
+      this.manager = (AnnisSecurityManager) Class.forName(filterConfig.
+        getInitParameter("managerClassName")).newInstance();
       Enumeration<String> parameterNames = filterConfig.getInitParameterNames();
       Properties properties = new Properties();
-      while(parameterNames.hasMoreElements())
+      while (parameterNames.hasMoreElements())
       {
         String name = parameterNames.nextElement();
         properties.put(name, filterConfig.getInitParameter(name));
@@ -120,29 +130,27 @@ public final class AuthenticationFilter implements Filter
 
       // copy annis-service url from context
       properties.put("AnnisRemoteService.URL",
-        filterConfig.getServletContext().getInitParameter("AnnisRemoteService.URL"));
+        filterConfig.getServletContext().getInitParameter(
+        "AnnisRemoteService.URL"));
 
       this.props = properties;
 
       this.manager.setProperties(properties);
     }
-    catch(InstantiationException e)
+    catch (InstantiationException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      Logger.getLogger(AuthenticationFilter.class.getName()).log(
+        Level.SEVERE, null, e);
     }
-    catch(IllegalAccessException e)
+    catch (IllegalAccessException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      Logger.getLogger(AuthenticationFilter.class.getName()).log(
+        Level.SEVERE, null, e);
     }
-    catch(ClassNotFoundException e)
+    catch (ClassNotFoundException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      Logger.getLogger(AuthenticationFilter.class.getName()).log(
+        Level.SEVERE, null, e);
     }
   }
-
 }
-
-
