@@ -140,7 +140,15 @@ public class LegacyGraphConverter
           + PROC_RIGHT).getSValueSNUMERIC());
         aNode.setRightToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
           + PROC_RIGHTTOKEN).getSValueSNUMERIC());
-        // TODO: what else to add to node?
+        if (matchSet.contains(internalID))
+        {
+          aNode.setMatchedNodeInQuery((long) Arrays.binarySearch(matchedIDs,
+            internalID)+1);
+        }
+        else
+        {
+          aNode.setMatchedNodeInQuery(null);
+        }
 
         annoGraph.addNode(aNode);
         allNodes.put(sNode, aNode);
