@@ -68,30 +68,6 @@ public class Helper
     return context.getHttpSession().getServletContext().getContextPath();
   }
 
-  public static boolean containsRTLText(String str)
-  {
-    for(int i = 0; i < str.length(); i++)
-    {
-      char cc = str.charAt(i);
-      // hebrew extended and basic, arabic basic and extendend
-      if(cc >= 1425 && cc <= 1785)
-      {
-        return true;
-      }
-      // alphabetic presentations forms (hebrwew) to arabic presentation forms A
-      else if(cc >= 64286 && cc <= 65019)
-      {
-        return true;
-      }
-      // arabic presentation forms B
-      else if(cc >= 65136 && cc <= 65276)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static String generateCitation(Application app, String aql, List<String> corpora,
     int contextLeft, int contextRight)
   {

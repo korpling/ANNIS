@@ -46,6 +46,7 @@ import annis.service.objects.AnnisCorpusSetImpl;
 import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import java.util.LinkedList;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -149,7 +150,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public boolean isValidQuery(String annisQuery) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException
   {
-    annisDao.parseAQL(annisQuery, null);
+    annisDao.parseAQL(annisQuery, new LinkedList<Long>());
     return true;
   }
 

@@ -26,13 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.AnnisHomeTest;
 import annis.externalFiles.ExternalFileMgrImpl;
 import annis.service.AnnisService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"AnnisServiceRunner-context.xml"})
-public class TestAnnisServiceImpl extends AnnisHomeTest {
+public class TestAnnisServiceImpl {
 
 	@Autowired private AnnisService springManagedAnnisServiceImpl;
 	

@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class ResultSetPanel extends Panel implements ResolverProvider
+public class ResultSetPanel extends VerticalLayout implements ResolverProvider
 {
   private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   
@@ -58,9 +58,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     setHeight("-1px");
     
     addStyleName("result-view");
-    
-    ((VerticalLayout) getContent()).setWidth("100%");
-    ((VerticalLayout) getContent()).setHeight("-1px");
     
     int i=start; 
     for(AnnisResult r : resultSet)
