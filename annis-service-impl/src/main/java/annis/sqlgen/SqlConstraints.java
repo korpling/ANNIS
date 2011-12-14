@@ -30,6 +30,8 @@ import annis.model.QueryNode.TextMatching;
 public class SqlConstraints
 {
 
+  private static boolean disableBetweenPredicate = false;
+  
   public static String join(String op, String lhs, String rhs)
   {
     return lhs + " " + op + " " + rhs;
@@ -55,14 +57,16 @@ public class SqlConstraints
 
   public static String between(String lhs, String rhs, int min, int max)
   {
+    String betweenPredicate = disableBetweenPredicate ? "BETWEEN" : "BETWEEN SYMMETRIC";
     String minPlus = min >= 0 ? " + " : " - ";
     String maxPlus = max >= 0 ? " + " : " - ";
-    return lhs + " BETWEEN SYMMETRIC " + rhs + minPlus + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus + String.valueOf(Math.abs(max));
+    return lhs + " " + betweenPredicate +  " " + rhs + minPlus + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus + String.valueOf(Math.abs(max));
   }
 
   public static String between(String lhs, int min, int max)
   {
-    return lhs + " BETWEEN SYMMETRIC " + min + " AND " + max;
+    String betweenPredicate = disableBetweenPredicate ? "BETWEEN" : "BETWEEN SYMMETRIC";
+    return lhs + " " + betweenPredicate + " " + min + " AND " + max;
   }
 
   public static String in(String lhs, String rhs)
@@ -94,6 +98,16 @@ public class SqlConstraints
 	  string = "^" + string + "$";
 	}
 	return sqlString(string);
+  }
+
+  public static boolean isDisableBetweenPredicate()
+  {
+    return disableBetweenPredicate;
+  }
+
+  public static void setDisableBetweenPredicate(boolean disableBetweenPredicate)
+  {
+    SqlConstraints.disableBetweenPredicate = disableBetweenPredicate;
   }
 
 }

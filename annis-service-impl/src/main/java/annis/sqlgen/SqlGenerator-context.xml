@@ -31,6 +31,14 @@ limitations under the License.
       </list>
     </property>
   </bean>
+  
+  
+  <!-- Configure BETWEEN SYMMETRIC workaround for MonetDB -->
+  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+   <property name="targetClass"><value>annis.sqlgen.SqlConstraints</value></property>
+   <property name="targetMethod"><value>setDisableBetweenPredicate</value></property>
+   <property name="arguments"><value>${annis.disable-between-symmetric}</value></property>
+ </bean>
 
 	<!-- FROM clause generator -->
   <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator"

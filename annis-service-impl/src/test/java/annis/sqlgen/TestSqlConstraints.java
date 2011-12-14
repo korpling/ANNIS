@@ -15,9 +15,11 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import static annis.test.TestUtils.uniqueInt;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -26,6 +28,74 @@ import org.junit.Test;
 
 public class TestSqlConstraints {
 
+  /**
+   * Use BETWEEN SYMMETRIC for between predicates.
+   */
+  @Test
+  public void shouldUseBetweenSymmetric()
+  {
+    // given
+    SqlConstraints.setDisableBetweenPredicate(false);
+    int min = uniqueInt();
+    int max = uniqueInt();
+    // when
+    String actual = between("lhs", min, max);
+    // then
+    String expected = "lhs BETWEEN SYMMETRIC " + min + " AND " + max;
+    assertEquals(expected, actual);
+  }
+  
+  /**
+   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested.
+   */
+  @Test
+  public void shouldNotUseBetweenSymmetric()
+  {
+    // given
+    SqlConstraints.setDisableBetweenPredicate(true);
+    int min = uniqueInt();
+    int max = uniqueInt();
+    // when
+    String actual = between("lhs", min, max);
+    // then
+    String expected = "lhs BETWEEN " + min + " AND " + max;
+    assertEquals(expected, actual);
+  }
+  
+  /**
+   * Use BETWEEN SYMMETRIC for between predicates (explicit RHS version)
+   */
+  @Test
+  public void shouldUseBetweenSymmetricRhs()
+  {
+    // given
+    SqlConstraints.setDisableBetweenPredicate(false);
+    int min = uniqueInt();
+    int max = uniqueInt();
+    // when
+    String actual = between("lhs", "rhs", min, max);
+    // then
+    String expected = "lhs BETWEEN SYMMETRIC rhs + " + min + " AND rhs + " + max;
+    assertEquals(expected, actual);
+  }
+  
+  /**
+   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested (explicit RHS version).
+   */
+  @Test
+  public void shouldNotUseBetweenSymmetricRhs()
+  {
+    // given
+    SqlConstraints.setDisableBetweenPredicate(true);
+    int min = uniqueInt();
+    int max = uniqueInt();
+    // when
+    String actual = between("lhs", "rhs", min, max);
+    // then
+    String expected = "lhs BETWEEN rhs + " + min + " AND rhs + " + max;
+    assertEquals(expected, actual);
+  }
+  
 	/**
 	 * A positive offset is added to the right-hand side of a join.
 	 */
