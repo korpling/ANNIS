@@ -20,16 +20,15 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import static annis.test.IsCollectionSize.size;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static annis.test.IsCollectionSize.size;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +36,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
-import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -102,6 +101,19 @@ public class TestDefaultWhereClauseGenerator {
 		// simulate three annotations
 		when(annotations.size()).thenReturn(3);
 	}
+	
+	@Test
+  public void shouldOptimizizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
+  {
+    // given
+	  generator.setOptimizeIndirectPrecedence(true);
+    node23.addJoin(new Precedence(node42));
+    // then
+    checkWhereCondition(
+        join("=", "_node23.text_ref", "_node42.text_ref"),
+        join("<=", "_node23.right_token", "_node42.left_token", -1)
+    );
+  }
 	
 	// WHERE condition for root node
 	@Test

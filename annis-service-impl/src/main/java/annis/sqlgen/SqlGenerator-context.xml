@@ -41,7 +41,9 @@ limitations under the License.
 	
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
-    parent="tableAccessStrategyFactory"/>
+    parent="tableAccessStrategyFactory">
+    <property name="optimizeIndirectPrecedence" value="${annis.optimize.indirect-precedence}"/>  
+  </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
 	parent="tableAccessStrategyFactory"/>

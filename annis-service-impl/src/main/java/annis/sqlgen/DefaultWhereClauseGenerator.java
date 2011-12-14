@@ -55,6 +55,9 @@ import annis.sqlgen.model.Sibling;
 public class DefaultWhereClauseGenerator 
 	extends AbstractWhereClauseGenerator
 {
+  
+  // optimize indirect precedence for index on leftToken - 1
+  private boolean optimizeIndirectPrecedence;
 
 	@Override
 	protected void addPointingRelationConditions(List<String> conditions,
@@ -184,9 +187,13 @@ public class DefaultWhereClauseGenerator
 
 		// indirect
 		if (min == 0 && max == 0) {
-			// FIXME: optimize indirect precedence
-			joinOnNode(conditions, node, target, "<", "right_token",
-					"left_token");
+		  if (optimizeIndirectPrecedence) {
+		    numberJoinOnNode(conditions, node, target, "<=", "right_token", 
+		        "left_token", -1);
+		  } else {
+        joinOnNode(conditions, node, target, "<", "right_token", 
+            "left_token");
+		  }
 
 		}
 		// exact distance
@@ -486,5 +493,15 @@ public class DefaultWhereClauseGenerator
 				.aliasedColumn(NODE_TABLE, "span"),
 				sqlString(node.getSpannedText(), textMatching)));
 	}
+
+  public boolean isOptimizeIndirectPrecedence()
+  {
+    return optimizeIndirectPrecedence;
+  }
+
+  public void setOptimizeIndirectPrecedence(boolean optimizeIndirectPrecedence)
+  {
+    this.optimizeIndirectPrecedence = optimizeIndirectPrecedence;
+  }
 
 }
