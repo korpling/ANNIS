@@ -31,14 +31,13 @@ public class SqlConstraints
 {
 
   private static boolean disableBetweenPredicate = false;
-  
+
   public static String join(String op, String lhs, String rhs)
   {
     return lhs + " " + op + " " + rhs;
   }
 
-  public static String numberJoin(String op, String lhs, String rhs,
-    int offset)
+  public static String numberJoin(String op, String lhs, String rhs, int offset)
   {
     String plus = offset >= 0 ? " + " : " - ";
     return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
@@ -47,25 +46,29 @@ public class SqlConstraints
   public static String bitSelect(String column, boolean[] bits)
   {
     StringBuilder sbBits = new StringBuilder();
-    for(int i=0; i < bits.length; i++)
+    for (int i = 0; i < bits.length; i++)
     {
       sbBits.append(bits[i] ? "1" : "0");
     }
-    return "(" + column + " & B'" + sbBits.toString() + "') "
-      + "= B'" + sbBits.toString() + "'";
+    return "(" + column + " & B'" + sbBits.toString() + "') " + "= B'"
+        + sbBits.toString() + "'";
   }
 
   public static String between(String lhs, String rhs, int min, int max)
   {
-    String betweenPredicate = disableBetweenPredicate ? "BETWEEN" : "BETWEEN SYMMETRIC";
+    String betweenPredicate = disableBetweenPredicate ? "BETWEEN"
+        : "BETWEEN SYMMETRIC";
     String minPlus = min >= 0 ? " + " : " - ";
     String maxPlus = max >= 0 ? " + " : " - ";
-    return lhs + " " + betweenPredicate +  " " + rhs + minPlus + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus + String.valueOf(Math.abs(max));
+    return lhs + " " + betweenPredicate + " " + rhs + minPlus
+        + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
+        + String.valueOf(Math.abs(max));
   }
 
   public static String between(String lhs, int min, int max)
   {
-    String betweenPredicate = disableBetweenPredicate ? "BETWEEN" : "BETWEEN SYMMETRIC";
+    String betweenPredicate = disableBetweenPredicate ? "BETWEEN"
+        : "BETWEEN SYMMETRIC";
     return lhs + " " + betweenPredicate + " " + min + " AND " + max;
   }
 
@@ -79,8 +82,7 @@ public class SqlConstraints
     if (values.isEmpty())
     {
       return in(lhs, "NULL");
-    }
-    else
+    } else
     {
       return in(lhs, StringUtils.join(values, ","));
     }
@@ -93,11 +95,12 @@ public class SqlConstraints
 
   public static String sqlString(String string, TextMatching textMatching)
   {
-    if (textMatching == TextMatching.REGEXP_EQUAL || textMatching == TextMatching.REGEXP_NOT_EQUAL)
-	{
-	  string = "^" + string + "$";
-	}
-	return sqlString(string);
+    if (textMatching == TextMatching.REGEXP_EQUAL
+        || textMatching == TextMatching.REGEXP_NOT_EQUAL)
+    {
+      string = "^" + string + "$";
+    }
+    return sqlString(string);
   }
 
   public static boolean isDisableBetweenPredicate()

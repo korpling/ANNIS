@@ -26,7 +26,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class TestSqlConstraints {
+public class TestSqlConstraints
+{
 
   /**
    * Use BETWEEN SYMMETRIC for between predicates.
@@ -44,7 +45,7 @@ public class TestSqlConstraints {
     String expected = "lhs BETWEEN SYMMETRIC " + min + " AND " + max;
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested.
    */
@@ -61,7 +62,7 @@ public class TestSqlConstraints {
     String expected = "lhs BETWEEN " + min + " AND " + max;
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Use BETWEEN SYMMETRIC for between predicates (explicit RHS version)
    */
@@ -75,12 +76,14 @@ public class TestSqlConstraints {
     // when
     String actual = between("lhs", "rhs", min, max);
     // then
-    String expected = "lhs BETWEEN SYMMETRIC rhs + " + min + " AND rhs + " + max;
+    String expected = "lhs BETWEEN SYMMETRIC rhs + " + min + " AND rhs + "
+        + max;
     assertEquals(expected, actual);
   }
-  
+
   /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested (explicit RHS version).
+   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested (explicit RHS
+   * version).
    */
   @Test
   public void shouldNotUseBetweenSymmetricRhs()
@@ -95,47 +98,49 @@ public class TestSqlConstraints {
     String expected = "lhs BETWEEN rhs + " + min + " AND rhs + " + max;
     assertEquals(expected, actual);
   }
-  
-	/**
-	 * A positive offset is added to the right-hand side of a join.
-	 */
-	@Test
-	public void shouldAddPositiveOffsetToNumberJoinRhs() {
-		String expected = "lhs <op> rhs + 0";
-		String actual = numberJoin("<op>", "lhs", "rhs", 0);
-		assertEquals(expected, actual);
-	}
-	
-	/**
-	 * A negative offset is subtracted from the right-hand side of a join.
-	 */
-	@Test
-	public void shouldSubstractNegativeOffsetFromNumberJoinRhs() {
-		String expected = "lhs <op> rhs - 1";
-		String actual = numberJoin("<op>", "lhs", "rhs", -1);
-		assertEquals(expected, actual);
-	}
-	
 
-	/**
-	 * An SQL string is enclosed in single quotes (').
-	 */
-	@Test
-	public void shouldUseSingleQuotesForSqlString() {
-		String string = "string";
-		assertThat(sqlString(string), is("'" + string + "'"));
-	}
-	
+  /**
+   * A positive offset is added to the right-hand side of a join.
+   */
+  @Test
+  public void shouldAddPositiveOffsetToNumberJoinRhs()
+  {
+    String expected = "lhs <op> rhs + 0";
+    String actual = numberJoin("<op>", "lhs", "rhs", 0);
+    assertEquals(expected, actual);
+  }
 
-	/**
-	 * The left-hand side and right-hand side are joined by an 
-	 * arbitrary infix operation.
-	 */
-	@Test
-	public void shouldJoinLhsAndRhsWithOp() {
-		String expected = "lhs <op> rhs";
-		String actual = join("<op>", "lhs", "rhs");
-		assertEquals(expected, actual);
-	}
-	
+  /**
+   * A negative offset is subtracted from the right-hand side of a join.
+   */
+  @Test
+  public void shouldSubstractNegativeOffsetFromNumberJoinRhs()
+  {
+    String expected = "lhs <op> rhs - 1";
+    String actual = numberJoin("<op>", "lhs", "rhs", -1);
+    assertEquals(expected, actual);
+  }
+
+  /**
+   * An SQL string is enclosed in single quotes (').
+   */
+  @Test
+  public void shouldUseSingleQuotesForSqlString()
+  {
+    String string = "string";
+    assertThat(sqlString(string), is("'" + string + "'"));
+  }
+
+  /**
+   * The left-hand side and right-hand side are joined by an arbitrary infix
+   * operation.
+   */
+  @Test
+  public void shouldJoinLhsAndRhsWithOp()
+  {
+    String expected = "lhs <op> rhs";
+    String actual = join("<op>", "lhs", "rhs");
+    assertEquals(expected, actual);
+  }
+
 }
