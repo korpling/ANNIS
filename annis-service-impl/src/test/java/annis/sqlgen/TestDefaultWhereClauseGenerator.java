@@ -114,6 +114,24 @@ public class TestDefaultWhereClauseGenerator
     when(annotations.size()).thenReturn(3);
   }
 
+  /**
+   * The sibling operator may optionally bind the same node to both operands. 
+   */
+  @Test
+  public void shouldAllowIdenticalNodeForSiblingTarget()
+  {
+    // given
+    generator.setAllowIdenticalSibling(true);
+    node23.addJoin(new Sibling(node42));
+    // then
+    checkWhereCondition(join("=", "_rank23.parent", "_rank42.parent"),
+        join("=", "_component23.type", "'d'"), "_component23.name IS NULL");
+  }
+
+  /**
+   * Indirect precedence on PostgreSQL may be optimized by an index on 
+   * (leftToken - 1). 
+   */
   @Test
   public void shouldOptimizizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
   {

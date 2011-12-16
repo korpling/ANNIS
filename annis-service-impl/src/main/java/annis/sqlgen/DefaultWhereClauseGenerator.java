@@ -57,6 +57,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   // optimize indirect precedence for index on leftToken - 1
   private boolean optimizeIndirectPrecedence;
+  
+  // allow binding of same node to both operands of sibling
+  private boolean allowIdenticalSibling;
 
   @Override
   protected void addPointingRelationConditions(List<String> conditions,
@@ -353,7 +356,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
-    joinOnNode(conditions, node, target, "<>", "id", "id");
+    
+    if ( ! allowIdenticalSibling ) {
+      joinOnNode(conditions, node, target, "<>", "id", "id");
+    }
   }
 
   @Override
@@ -506,6 +512,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   public void setOptimizeIndirectPrecedence(boolean optimizeIndirectPrecedence)
   {
     this.optimizeIndirectPrecedence = optimizeIndirectPrecedence;
+  }
+
+  public boolean isAllowIdenticalSibling()
+  {
+    return allowIdenticalSibling;
+  }
+
+  public void setAllowIdenticalSibling(boolean allowIdenticalSibling)
+  {
+    this.allowIdenticalSibling = allowIdenticalSibling;
   }
 
 }
