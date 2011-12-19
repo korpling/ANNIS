@@ -35,40 +35,48 @@ public class SqlConstraints
 
   /**
    * Test a column for true.
-   * @param lhs The column which should be checked for true.
+   * 
+   * @param lhs
+   *          The column which should be checked for true.
    */
   public static String isTrue(String lhs)
   {
     return lhs + " IS TRUE";
   }
-  
+
   /**
    * Test a column for true.
-   * @param lhs The column which should be checked for false.
+   * 
+   * @param lhs
+   *          The column which should be checked for false.
    */
   public static String isFalse(String lhs)
   {
     return lhs + " IS NOT TRUE";
   }
-  
+
   /**
    * Generate IS NULL predicate on column.
-   * @param lhs The column which should be checked for NULL values.
+   * 
+   * @param lhs
+   *          The column which should be checked for NULL values.
    */
   public static String isNull(String lhs)
   {
     return lhs + " IS NULL";
   }
-  
+
   /**
    * Generate IS NOT NULL predicate on column.
-   * @param lhs The column which should be checked for values that are not NULL.
+   * 
+   * @param lhs
+   *          The column which should be checked for values that are not NULL.
    */
   public static String isNotNull(String lhs)
   {
     return lhs + " IS NOT NULL";
   }
-  
+
   public static String join(String op, String lhs, String rhs)
   {
     return lhs + " " + op + " " + rhs;

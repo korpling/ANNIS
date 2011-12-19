@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class TestSqlConstraints
 {
-  
+
   @Before
   public void setup()
   {
@@ -56,7 +56,7 @@ public class TestSqlConstraints
     String expected = lhs + " IS TRUE";
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Test a column for false.
    */
@@ -71,7 +71,7 @@ public class TestSqlConstraints
     String expected = lhs + " IS NOT TRUE";
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Generate IS NULL predicate on a column.
    */
@@ -86,7 +86,7 @@ public class TestSqlConstraints
     String expected = lhs + " IS NULL";
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Generate IS NOT NULL predicate on a column.
    */
@@ -101,7 +101,7 @@ public class TestSqlConstraints
     String expected = lhs + " IS NOT NULL";
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Use BETWEEN SYMMETRIC for between predicates.
    */
@@ -137,7 +137,8 @@ public class TestSqlConstraints
   }
 
   /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure min < max.
+   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure
+   * min < max.
    */
   @Test
   public void shouldNotUseBetweenSymmetricMinMaxReversed()
@@ -152,7 +153,7 @@ public class TestSqlConstraints
     String expected = "lhs BETWEEN " + max + " AND " + min;
     assertEquals(expected, actual);
   }
-  
+
   /**
    * Use >= and <= comparison as a workaround for BETWEEN.
    */
@@ -224,8 +225,8 @@ public class TestSqlConstraints
   }
 
   /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure min < max (explicit RHS
-   * version).
+   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure
+   * min < max (explicit RHS version).
    */
   @Test
   public void shouldNotUseBetweenSymmetricRhsMinMaxReversed()
@@ -242,7 +243,8 @@ public class TestSqlConstraints
   }
 
   /**
-   * Use >= and <= comparison as a workaround for BETWEEN (explicit RHS version).
+   * Use >= and <= comparison as a workaround for BETWEEN (explicit RHS
+   * version).
    */
   @Test
   public void shouldNotUseBetweenPredicateRhs()
@@ -259,7 +261,8 @@ public class TestSqlConstraints
   }
 
   /**
-   * Use >= and <= comparison as a workaround for BETWEEN, make sure min < max (explicit RHS version).
+   * Use >= and <= comparison as a workaround for BETWEEN, make sure min < max
+   * (explicit RHS version).
    */
   @Test
   public void shouldNotUseBetweenPredicateRhsMinMaxReversed()
