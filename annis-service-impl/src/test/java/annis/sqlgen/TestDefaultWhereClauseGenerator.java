@@ -83,12 +83,14 @@ public class TestDefaultWhereClauseGenerator
   private DefaultWhereClauseGenerator generator;
 
   // dummy annotation set
-  @Mock Set<QueryAnnotation> annotations;
+  @Mock
+  Set<QueryAnnotation> annotations;
 
   // which side to attach component predicates (name and edgeType)
   // in an edge operation
-  @DataPoints public final static String[] componentPredicates =
-    { "lhs", "rhs", "both" };
+  @DataPoints
+  public final static String[] componentPredicates =
+  { "lhs", "rhs", "both" };
 
   @Before
   public void setup()
@@ -130,29 +132,40 @@ public class TestDefaultWhereClauseGenerator
 
   // helper method to check create component predicates (name, edgeType)
   // on the expected side
-  private void checkEdgeConditions(String componentPredicate, String edgeType, 
+  private void checkEdgeConditions(String componentPredicate, String edgeType,
       String componentName, String... expected)
   {
     List<String> expectedConditions = new ArrayList<String>();
-    if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate)) {
-      expectedConditions.add(join("=", "_component23.type", sqlString(edgeType)));
-      if (componentName == null) {
+    if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate))
+    {
+      expectedConditions
+          .add(join("=", "_component23.type", sqlString(edgeType)));
+      if (componentName == null)
+      {
         expectedConditions.add(isNull("_component23.name"));
-      } else {
-        expectedConditions.add(join("=", "_component23.name", sqlString(componentName)));
+      } else
+      {
+        expectedConditions.add(join("=", "_component23.name",
+            sqlString(componentName)));
       }
     }
-    if ("rhs".equals(componentPredicate) || "both".equals(componentPredicate)) {
-      expectedConditions.add(join("=", "_component42.type", sqlString(edgeType)));
-      if (componentName == null) {
+    if ("rhs".equals(componentPredicate) || "both".equals(componentPredicate))
+    {
+      expectedConditions
+          .add(join("=", "_component42.type", sqlString(edgeType)));
+      if (componentName == null)
+      {
         expectedConditions.add(isNull("_component42.name"));
-      } else {
-        expectedConditions.add(join("=", "_component42.name", sqlString(componentName)));
+      } else
+      {
+        expectedConditions.add(join("=", "_component42.name",
+            sqlString(componentName)));
       }
     }
     expectedConditions.addAll(asList(expected));
     generator.setComponentPredicates(componentPredicate);
-    checkWhereConditions(node23, expectedConditions.toArray(new String[] { }));
+    checkWhereConditions(node23, expectedConditions.toArray(new String[]
+    {}));
   }
 
   /**
@@ -165,7 +178,7 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addJoin(new Dominance(node42, 1));
     // then
-    checkEdgeConditions(componentPredicate, "d", null, 
+    checkEdgeConditions(componentPredicate, "d", null,
         join("=", "_rank23.pre", "_rank42.parent"));
   }
 
@@ -185,7 +198,8 @@ public class TestDefaultWhereClauseGenerator
   }
 
   /**
-   * WHERE conditions for annotated named direct dominance (> name [annotation]).
+   * WHERE conditions for annotated named direct dominance (> name
+   * [annotation]).
    */
   @Theory
   public void shouldGenerateWhereConditionsForNamedAndAnnotatedDirectDominance(
@@ -197,10 +211,12 @@ public class TestDefaultWhereClauseGenerator
     node42.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     // then
-    checkEdgeConditions(componentPredicate, "d", componentName, 
+    checkEdgeConditions(componentPredicate, "d", componentName,
         join("=", "_rank23.pre", "_rank42.parent"));
-    checkWhereConditions(node42,
-        join("=", "_rank_annotation42.edge_annotation_namespace", "'namespace3'"),
+    checkWhereConditions(
+        node42,
+        join("=", "_rank_annotation42.edge_annotation_namespace",
+            "'namespace3'"),
         join("=", "_rank_annotation42.edge_annotation_name", "'name3'"),
         join("~", "_rank_annotation42.edge_annotation_value", "'^value3$'"));
   }
@@ -216,11 +232,12 @@ public class TestDefaultWhereClauseGenerator
     node23.addJoin(new Dominance(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null,
-        join("<", "_rank23.pre", "_rank42.pre"), join("<", "_rank42.pre", "_rank23.post"));
+        join("<", "_rank23.pre", "_rank42.pre"),
+        join("<", "_rank42.pre", "_rank23.post"));
   }
 
   /**
-   *  WHERE conditions for exact dominance (>n).
+   * WHERE conditions for exact dominance (>n).
    */
   @Theory
   public void shouldGenerateWhereConditionsForExactDominance(
@@ -232,7 +249,8 @@ public class TestDefaultWhereClauseGenerator
     // then
     checkEdgeConditions(componentPredicate, "d", null,
         join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"), numberJoin("=", "_rank23.level", "_rank42.level", - distance));
+        join("<", "_rank42.pre", "_rank23.post"),
+        numberJoin("=", "_rank23.level", "_rank42.level", -distance));
   }
 
   /**
@@ -249,13 +267,14 @@ public class TestDefaultWhereClauseGenerator
     // then
     checkEdgeConditions(componentPredicate, "d", null,
         join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"), between("_rank23.level", "_rank42.level", -min, -max));
+        join("<", "_rank42.pre", "_rank23.post"),
+        between("_rank23.level", "_rank42.level", -min, -max));
   }
 
   /**
    * WHERE conditions for left dominance (>@l).
    */
-  // 
+  //
   @Theory
   public void shouldGenerateWhereConditionsForLeftDominance(
       String componentPredicate)
@@ -263,8 +282,12 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addJoin(new LeftDominance(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
-        join("=", "_rank23.pre", "_rank42.parent"), "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+    checkEdgeConditions(
+        componentPredicate,
+        "d",
+        null,
+        join("=", "_rank23.pre", "_rank42.parent"),
+        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
   }
 
   /**
@@ -277,8 +300,12 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addJoin(new RightDominance(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
-        join("=", "_rank23.pre", "_rank42.parent"), "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+    checkEdgeConditions(
+        componentPredicate,
+        "d",
+        null,
+        join("=", "_rank23.pre", "_rank42.parent"),
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
   }
 
   /**
@@ -289,12 +316,11 @@ public class TestDefaultWhereClauseGenerator
       String componentPredicate)
   {
     // given
-    String componentName = uniqueString();    
+    String componentName = uniqueString();
     node23.addJoin(new PointingRelation(node42, componentName, 1));
     // then
-    checkEdgeConditions(componentPredicate, "p", componentName, 
-        join("=", "_rank23.pre", "_rank42.parent")
-    );
+    checkEdgeConditions(componentPredicate, "p", componentName,
+        join("=", "_rank23.pre", "_rank42.parent"));
   }
 
   /**
@@ -317,8 +343,7 @@ public class TestDefaultWhereClauseGenerator
    * WHERE conditions for sibling ($).
    */
   @Theory
-  public void shouldGenerateWhereConditionsForSibling(
-      String componentPredicate)
+  public void shouldGenerateWhereConditionsForSibling(String componentPredicate)
   {
     // given
     node23.addJoin(new Sibling(node42));
@@ -329,7 +354,7 @@ public class TestDefaultWhereClauseGenerator
   }
 
   /**
-   * The sibling operator may optionally bind the same node to both operands. 
+   * The sibling operator may optionally bind the same node to both operands.
    */
   @Theory
   public void shouldAllowIdenticalNodeForSiblingTarget(
@@ -344,8 +369,8 @@ public class TestDefaultWhereClauseGenerator
   }
 
   /**
-   * Indirect precedence on PostgreSQL may be optimized by an index on 
-   * (leftToken - 1). 
+   * Indirect precedence on PostgreSQL may be optimized by an index on
+   * (leftToken - 1).
    */
   @Test
   public void shouldOptimizizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
@@ -357,7 +382,7 @@ public class TestDefaultWhereClauseGenerator
     checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
         numberJoin("<=", "_node23.right_token", "_node42.left_token", -1));
   }
-  
+
   /**
    * Inclusion benefits from two-sided boundaries for both left and right.
    */
@@ -374,7 +399,7 @@ public class TestDefaultWhereClauseGenerator
         join(">=", "_node23.right", "_node42.right"),
         join(">=", "_node42.right", "_node23.left"));
   }
-  
+
   // WHERE condition for root node
   @Test
   public void whereClauseForNodeRoot()

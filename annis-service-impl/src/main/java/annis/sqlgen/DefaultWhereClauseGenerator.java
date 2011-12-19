@@ -58,36 +58,44 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   // optimize indirect precedence for index on (leftToken - 1)
   private boolean optimizeIndirectPrecedence;
-  
+
   // allow binding of same node to both operands of sibling
   private boolean allowIdenticalSibling;
-  
+
   // generate two-sided boundaries for both left and right text borders
   // for the inclusion operators
   private boolean optimizeInclusion;
-  
-  // where to attach component constraints for edge operators 
+
+  // where to attach component constraints for edge operators
   // (lhs, rhs or both)
   private String componentPredicates;
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
       final String edgeType, String componentName)
   {
-    conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
-    if (componentName == null) {
-      conditions.add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
-    } else {
-      conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(componentName))); 
+    conditions.add(join("=", tables(node)
+        .aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
+    if (componentName == null)
+    {
+      conditions
+          .add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
+    } else
+    {
+      conditions.add(join("=",
+          tables(node).aliasedColumn(COMPONENT_TABLE, "name"),
+          sqlString(componentName)));
     }
   }
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
       QueryNode target, String componentName, String edgeType)
   {
-    if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates)) {
+    if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
+    {
       addComponentPredicates(conditions, node, edgeType, componentName);
     }
-    if ("rhs".equals(componentPredicates) || "both".equals(componentPredicates)) {
+    if ("rhs".equals(componentPredicates) || "both".equals(componentPredicates))
+    {
       addComponentPredicates(conditions, target, edgeType, componentName);
     }
   }
@@ -279,7 +287,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "<=", "left", "left");
     joinOnNode(conditions, node, target, ">=", "right", "right");
-    if (optimizeInclusion) {
+    if (optimizeInclusion)
+    {
       joinOnNode(conditions, target, node, "<=", "left", "right");
       joinOnNode(conditions, target, node, ">=", "right", "left");
     }
@@ -371,11 +380,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     Sibling sibling = (Sibling) join;
     String componentName = sibling.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
-    
+
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
-    
-    if ( ! allowIdenticalSibling ) {
+
+    if (!allowIdenticalSibling)
+    {
       joinOnNode(conditions, node, target, "<>", "id", "id");
     }
   }
