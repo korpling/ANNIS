@@ -26,7 +26,7 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.test.IsCollectionSize.size;
+import static annis.test.TestUtils.size;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
