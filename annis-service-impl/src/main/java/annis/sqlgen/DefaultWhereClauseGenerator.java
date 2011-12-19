@@ -17,7 +17,9 @@ package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.in;
+import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
+import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
@@ -69,6 +71,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // where to attach component constraints for edge operators
   // (lhs, rhs or both)
   private String componentPredicates;
+
+  // use dedicated is_token column
+  private boolean useIsTokenColumn;
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
       final String edgeType, String componentName)
@@ -499,15 +504,22 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   protected void addIsRootConditions(List<String> conditions,
       QueryData queryData, QueryNode node)
   {
-    conditions.add(tables(node).aliasedColumn(RANK_TABLE, "root") + " IS TRUE");
+    conditions.add(isTrue(tables(node).aliasedColumn(RANK_TABLE, "root")));
   }
 
   @Override
   protected void addIsTokenConditions(List<String> conditions,
       QueryData queryData, QueryNode node)
   {
-    conditions.add(tables(node).aliasedColumn(NODE_TABLE, "is_token")
-        + " IS TRUE");
+    if (useIsTokenColumn)
+    {
+      conditions
+          .add(isTrue(tables(node).aliasedColumn(NODE_TABLE, "is_token")));
+    } else
+    {
+      conditions.add(isNotNull(tables(node).aliasedColumn(NODE_TABLE,
+          "token_index")));
+    }
   }
 
   @Override
@@ -558,6 +570,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   public void setComponentPredicates(String componentPredicates)
   {
     this.componentPredicates = componentPredicates;
+  }
+
+  public boolean isUseIsTokenColumn()
+  {
+    return useIsTokenColumn;
+  }
+
+  public void setUseIsTokenColumn(boolean useIsTokenColumn)
+  {
+    this.useIsTokenColumn = useIsTokenColumn;
   }
 
 }

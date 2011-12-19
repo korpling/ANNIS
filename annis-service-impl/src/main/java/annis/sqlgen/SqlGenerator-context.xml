@@ -61,6 +61,7 @@ limitations under the License.
     <property name="allowIdenticalSibling" value="${annis.allow-identical-sibling}"/>
     <property name="optimizeInclusion" value="${annis.optimize-inclusion}"/>
     <property name="componentPredicates" value="${annis.component-predicates}"/>
+    <property name="useIsTokenColumn" value="${annis.use-is-token-column}"/>
   </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"

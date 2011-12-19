@@ -17,6 +17,9 @@ package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.isNull;
+import static annis.sqlgen.SqlConstraints.isTrue;
+import static annis.sqlgen.SqlConstraints.isFalse;
+import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
@@ -40,6 +43,36 @@ public class TestSqlConstraints
   }
 
   /**
+   * Test a column for true.
+   */
+  @Test
+  public void shouldGenerateIsTruePredicate()
+  {
+    // given
+    String lhs = uniqueString();
+    // when
+    String actual = isTrue(lhs);
+    // then
+    String expected = lhs + " IS TRUE";
+    assertEquals(expected, actual);
+  }
+  
+  /**
+   * Test a column for false.
+   */
+  @Test
+  public void shouldGenerateIsFalsePredicate()
+  {
+    // given
+    String lhs = uniqueString();
+    // when
+    String actual = isFalse(lhs);
+    // then
+    String expected = lhs + " IS NOT TRUE";
+    assertEquals(expected, actual);
+  }
+  
+  /**
    * Generate IS NULL predicate on a column.
    */
   @Test
@@ -51,6 +84,21 @@ public class TestSqlConstraints
     String actual = isNull(lhs);
     // then
     String expected = lhs + " IS NULL";
+    assertEquals(expected, actual);
+  }
+  
+  /**
+   * Generate IS NOT NULL predicate on a column.
+   */
+  @Test
+  public void shouldGenerateIsNotNullPredicate()
+  {
+    // given
+    String lhs = uniqueString();
+    // when
+    String actual = isNotNull(lhs);
+    // then
+    String expected = lhs + " IS NOT NULL";
     assertEquals(expected, actual);
   }
   

@@ -16,6 +16,7 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
@@ -373,14 +374,26 @@ public class TestDefaultWhereClauseGenerator
    * (leftToken - 1).
    */
   @Test
-  public void shouldOptimizizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
+  public void shouldOptimizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
   {
     // given
     generator.setOptimizeIndirectPrecedence(true);
     node23.addJoin(new Precedence(node42));
     // then
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         numberJoin("<=", "_node23.right_token", "_node42.left_token", -1));
+  }
+
+  /**
+   * WHERE conditions for inclusion (_i_).
+   */
+  @Test
+  public void shouldGenerateWhereConditionsForInclusion()
+  {
+    node23.addJoin(new Inclusion(node42));
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
+        join("<=", "_node23.left", "_node42.left"),
+        join(">=", "_node23.right", "_node42.right"));
   }
 
   /**
@@ -393,11 +406,34 @@ public class TestDefaultWhereClauseGenerator
     generator.setOptimizeInclusion(true);
     // when
     node23.addJoin(new Inclusion(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("<=", "_node23.left", "_node42.left"),
         join("<=", "_node42.left", "_node23.right"),
         join(">=", "_node23.right", "_node42.right"),
         join(">=", "_node42.right", "_node23.left"));
+  }
+
+  /**
+   * WHERE conditions for isToken (tok).
+   */
+  @Test
+  public void shouldGenerateWhereConditionsForIsToken()
+  {
+    // given
+    generator.setUseIsTokenColumn(true);
+    node23.setToken(true);
+    // then
+    checkWhereConditions("_node23.is_token IS TRUE");
+  }
+
+  @Test
+  public void shouldGenerateWhereConditionsForIsTokenTokenIndexAlternative()
+  {
+    // given
+    generator.setUseIsTokenColumn(false);
+    node23.setToken(true);
+    // then
+    checkWhereConditions(isNotNull("_node23.token_index"));
   }
 
   // WHERE condition for root node
@@ -405,7 +441,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeRoot()
   {
     node23.setRoot(true);
-    checkWhereCondition("_rank23.root IS TRUE");
+    checkWhereConditions("_rank23.root IS TRUE");
   }
 
   // WHERE condition for namespace
@@ -413,7 +449,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeNamespace()
   {
     node23.setNamespace("namespace");
-    checkWhereCondition(join("=", "_node23.namespace", "'namespace'"));
+    checkWhereConditions(join("=", "_node23.namespace", "'namespace'"));
   }
 
   // WHERE condition for name
@@ -421,7 +457,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeName()
   {
     node23.setName("name");
-    checkWhereCondition(join("=", "_node23.name", "'name'"));
+    checkWhereConditions(join("=", "_node23.name", "'name'"));
   }
 
   // WHERE condition for spanned text (string)
@@ -429,7 +465,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeSpanString()
   {
     node23.setSpannedText("string", TextMatching.EXACT_EQUAL);
-    checkWhereCondition(join("=", "_node23.span", "'string'"));
+    checkWhereConditions(join("=", "_node23.span", "'string'"));
   }
 
   // WHERE condition for spanned text (regexp)
@@ -437,7 +473,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeSpanRegexp()
   {
     node23.setSpannedText("regexp", TextMatching.REGEXP_EQUAL);
-    checkWhereCondition(join("~", "_node23.span", "'^regexp$'"));
+    checkWhereConditions(join("~", "_node23.span", "'^regexp$'"));
   }
 
   // WHERE condition for node annotation
@@ -449,7 +485,7 @@ public class TestDefaultWhereClauseGenerator
         "value2", TextMatching.EXACT_EQUAL));
     node23.addNodeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
-    checkWhereCondition(
+    checkWhereConditions(
         join("=", "_annotation23_1.node_annotation_namespace", "'namespace1'"),
         join("=", "_annotation23_1.node_annotation_name", "'name1'"),
         join("=", "_annotation23_2.node_annotation_namespace", "'namespace2'"),
@@ -469,7 +505,7 @@ public class TestDefaultWhereClauseGenerator
         "value2", TextMatching.EXACT_EQUAL));
     node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
-    checkWhereCondition(
+    checkWhereConditions(
         join("=", "_rank_annotation23_1.edge_annotation_namespace",
             "'namespace1'"),
         join("=", "_rank_annotation23_1.edge_annotation_name", "'name1'"),
@@ -483,20 +519,12 @@ public class TestDefaultWhereClauseGenerator
         join("~", "_rank_annotation23_3.edge_annotation_value", "'^value3$'"));
   }
 
-  // WHERE condition for isToken
-  @Test
-  public void whereClauseForNodeIsToken()
-  {
-    node23.setToken(true);
-    checkWhereCondition("_node23.is_token IS TRUE");
-  }
-
   // WHERE condition for _=_
   @Test
   public void whereClauseForNodeSameSpan()
   {
     node23.addJoin(new SameSpan(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left", "_node42.left"),
         join("=", "_node23.right", "_node42.right"));
   }
@@ -506,7 +534,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeLeftAlignment()
   {
     node23.addJoin(new LeftAlignment(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left", "_node42.left"));
   }
 
@@ -515,18 +543,8 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeRightAlignment()
   {
     node23.addJoin(new RightAlignment(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.right", "_node42.right"));
-  }
-
-  // WHERE condition for _i_
-  @Test
-  public void whereClauseForNodeInclusion()
-  {
-    node23.addJoin(new Inclusion(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.left", "_node42.left"),
-        join(">=", "_node23.right", "_node42.right"));
   }
 
   // WHERE condition for _ol_
@@ -534,7 +552,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeLeftOverlap()
   {
     node23.addJoin(new LeftOverlap(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("<=", "_node23.left", "_node42.left"),
         join("<=", "_node42.left", "_node23.right"),
         join("<=", "_node23.right", "_node42.right"));
@@ -546,7 +564,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeRightOverlap()
   {
     node23.addJoin(new RightOverlap(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join(">=", "_node23.right", "_node42.right"),
         join(">=", "_node42.right", "_node23.left"),
         join(">=", "_node23.left", "_node42.left"));
@@ -557,7 +575,7 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForNodeOverlap()
   {
     node23.addJoin(new Overlap(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("<=", "_node23.left", "_node42.right"),
         join("<=", "_node42.left", "_node23.right"));
   }
@@ -566,12 +584,12 @@ public class TestDefaultWhereClauseGenerator
   public void whereClauseForIdentity()
   {
     node23.addJoin(new Identical(node42));
-    checkWhereCondition(join("=", "_node23.id", "_node42.id"));
+    checkWhereConditions(join("=", "_node23.id", "_node42.id"));
   }
 
   // /// Helper
 
-  private void checkWhereCondition(String... expected)
+  private void checkWhereConditions(String... expected)
   {
     checkWhereConditions(node23, expected);
   }
