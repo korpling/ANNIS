@@ -55,11 +55,15 @@ import annis.sqlgen.model.Sibling;
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
 
-  // optimize indirect precedence for index on leftToken - 1
+  // optimize indirect precedence for index on (leftToken - 1)
   private boolean optimizeIndirectPrecedence;
   
   // allow binding of same node to both operands of sibling
   private boolean allowIdenticalSibling;
+  
+  // generate two-sided boundaries for both left and right text borders
+  // for the inclusion operators
+  private boolean optimizeInclusion;
 
   @Override
   protected void addPointingRelationConditions(List<String> conditions,
@@ -253,10 +257,13 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   protected void addInclusionConditions(List<String> conditions,
       QueryNode node, QueryNode target, Inclusion join, QueryData queryData)
   {
-    // FIMXE: optimizeInclusion
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "<=", "left", "left");
     joinOnNode(conditions, node, target, ">=", "right", "right");
+    if (optimizeInclusion) {
+      joinOnNode(conditions, target, node, "<=", "left", "right");
+      joinOnNode(conditions, target, node, ">=", "right", "left");
+    }
   }
 
   @Override
@@ -522,6 +529,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   public void setAllowIdenticalSibling(boolean allowIdenticalSibling)
   {
     this.allowIdenticalSibling = allowIdenticalSibling;
+  }
+
+  public boolean isOptimizeInclusion()
+  {
+    return optimizeInclusion;
+  }
+
+  public void setOptimizeInclusion(boolean optimizeInclusion)
+  {
+    this.optimizeInclusion = optimizeInclusion;
   }
 
 }

@@ -142,6 +142,23 @@ public class TestDefaultWhereClauseGenerator
     checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("<=", "_node23.right_token", "_node42.left_token", -1));
   }
+  
+  /**
+   * Inclusion benefits from two-sided boundaries for both left and right.
+   */
+  @Test
+  public void shouldOptimizeInclusion()
+  {
+    // given
+    generator.setOptimizeInclusion(true);
+    // when
+    node23.addJoin(new Inclusion(node42));
+    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
+        join("<=", "_node23.left", "_node42.left"),
+        join("<=", "_node42.left", "_node23.right"),
+        join(">=", "_node23.right", "_node42.right"),
+        join(">=", "_node42.right", "_node23.left"));
+  }
 
   // WHERE condition for root node
   @Test
