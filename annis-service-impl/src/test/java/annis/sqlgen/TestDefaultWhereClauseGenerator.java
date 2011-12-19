@@ -17,6 +17,7 @@ package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.isNull;
+import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
@@ -354,7 +355,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addJoin(new Precedence(node42));
     // then
     checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.right_token", "_node42.left_token", -1));
+        numberJoin("<=", "_node23.right_token", "_node42.left_token", -1));
   }
   
   /**
@@ -559,17 +560,6 @@ public class TestDefaultWhereClauseGenerator
     for (String item : expected)
       assertThat(actual, hasItem(item));
     assertThat(actual, is(size(expected.length)));
-  }
-
-  private String join(String op, String lhs, String rhs)
-  {
-    return lhs + " " + op + " " + rhs;
-  }
-
-  private String join(String op, String lhs, String rhs, int offset)
-  {
-    String plus = offset >= 0 ? " + " : " - ";
-    return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
   }
 
 }
