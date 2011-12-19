@@ -15,12 +15,19 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.isNull;
+import static annis.sqlgen.SqlConstraints.numberJoin;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.test.IsCollectionSize.size;
+import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueString;
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
@@ -34,6 +41,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theory;
 import org.mockito.Mock;
 
 import annis.model.QueryAnnotation;
@@ -59,6 +68,9 @@ import annis.sqlgen.model.Sibling;
  * FIXME: refactor tests, so they use the same condition constants everywhere
  * also, get rid of stupid helper functions like join (dup code)
  */
+/**
+ * Test generation of WHERE clause conditions for each operator and node search.
+ */
 public class TestDefaultWhereClauseGenerator
 {
 
@@ -69,12 +81,13 @@ public class TestDefaultWhereClauseGenerator
   // object under test: the adapter to that node
   private DefaultWhereClauseGenerator generator;
 
-  // more constants for easier testing
-  private final static String NAME = "name";
-
   // dummy annotation set
-  @Mock
-  Set<QueryAnnotation> annotations;
+  @Mock Set<QueryAnnotation> annotations;
+
+  // which side to attach component predicates (name and edgeType)
+  // in an edge operation
+  @DataPoints public final static String[] componentPredicates =
+    { "lhs", "rhs", "both" };
 
   @Before
   public void setup()
@@ -114,18 +127,219 @@ public class TestDefaultWhereClauseGenerator
     when(annotations.size()).thenReturn(3);
   }
 
+  // helper method to check create component predicates (name, edgeType)
+  // on the expected side
+  private void checkEdgeConditions(String componentPredicate, String edgeType, 
+      String componentName, String... expected)
+  {
+    List<String> expectedConditions = new ArrayList<String>();
+    if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate)) {
+      expectedConditions.add(join("=", "_component23.type", sqlString(edgeType)));
+      if (componentName == null) {
+        expectedConditions.add(isNull("_component23.name"));
+      } else {
+        expectedConditions.add(join("=", "_component23.name", sqlString(componentName)));
+      }
+    }
+    if ("rhs".equals(componentPredicate) || "both".equals(componentPredicate)) {
+      expectedConditions.add(join("=", "_component42.type", sqlString(edgeType)));
+      if (componentName == null) {
+        expectedConditions.add(isNull("_component42.name"));
+      } else {
+        expectedConditions.add(join("=", "_component42.name", sqlString(componentName)));
+      }
+    }
+    expectedConditions.addAll(asList(expected));
+    generator.setComponentPredicates(componentPredicate);
+    checkWhereConditions(node23, expectedConditions.toArray(new String[] { }));
+  }
+
+  /**
+   * WHERE conditions for direct dominance operator (>).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForNodeDirectDominance(
+      String componentPredicate)
+  {
+    // given
+    node23.addJoin(new Dominance(node42, 1));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null, 
+        join("=", "_rank23.pre", "_rank42.parent"));
+  }
+
+  /**
+   * WHERE conditions for named direct dominance operator (> name).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForNodeNamedDirectDominance(
+      String componentPredicate)
+  {
+    // given
+    String componentName = uniqueString();
+    node23.addJoin(new Dominance(node42, componentName, 1));
+    // then
+    checkEdgeConditions(componentPredicate, "d", componentName,
+        join("=", "_rank23.pre", "_rank42.parent"));
+  }
+
+  /**
+   * WHERE conditions for annotated named direct dominance (> name [annotation]).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForNamedAndAnnotatedDirectDominance(
+      String componentPredicate)
+  {
+    // given
+    String componentName = uniqueString();
+    node23.addJoin(new Dominance(node42, componentName, 1));
+    node42.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
+        "value3", TextMatching.REGEXP_EQUAL));
+    // then
+    checkEdgeConditions(componentPredicate, "d", componentName, 
+        join("=", "_rank23.pre", "_rank42.parent"));
+    checkWhereConditions(node42,
+        join("=", "_rank_annotation42.edge_annotation_namespace", "'namespace3'"),
+        join("=", "_rank_annotation42.edge_annotation_name", "'name3'"),
+        join("~", "_rank_annotation42.edge_annotation_value", "'^value3$'"));
+  }
+
+  /**
+   * WHERE conditions for indirect dominance (>*).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForIndirectDominance(
+      String componentPredicate)
+  {
+    // given
+    node23.addJoin(new Dominance(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("<", "_rank23.pre", "_rank42.pre"), join("<", "_rank42.pre", "_rank23.post"));
+  }
+
+  /**
+   *  WHERE conditions for exact dominance (>n).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForExactDominance(
+      String componentPredicate)
+  {
+    // given
+    int distance = uniqueInt();
+    node23.addJoin(new Dominance(node42, distance));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("<", "_rank23.pre", "_rank42.pre"),
+        join("<", "_rank42.pre", "_rank23.post"), numberJoin("=", "_rank23.level", "_rank42.level", - distance));
+  }
+
+  /**
+   * WHERE conditions for ranged dominance (>n,m).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForRangedDominance(
+      String componentPredicate)
+  {
+    // given
+    int min = uniqueInt(1, 10);
+    int max = min + uniqueInt(1, 10);
+    node23.addJoin(new Dominance(node42, min, max));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("<", "_rank23.pre", "_rank42.pre"),
+        join("<", "_rank42.pre", "_rank23.post"), between("_rank23.level", "_rank42.level", -min, -max));
+  }
+
+  /**
+   * WHERE conditions for left dominance (>@l).
+   */
+  // 
+  @Theory
+  public void shouldGenerateWhereConditionsForLeftDominance(
+      String componentPredicate)
+  {
+    // given
+    node23.addJoin(new LeftDominance(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("=", "_rank23.pre", "_rank42.parent"), "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+  }
+
+  /**
+   * WHERE conditions for right dominance (>@r).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForRightDominance(
+      String componentPredicate)
+  {
+    // given
+    node23.addJoin(new RightDominance(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("=", "_rank23.pre", "_rank42.parent"), "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+  }
+
+  /**
+   * WHERE conditions for direct pointing relation (->).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForDirectPointingRelation(
+      String componentPredicate)
+  {
+    // given
+    String componentName = uniqueString();    
+    node23.addJoin(new PointingRelation(node42, componentName, 1));
+    // then
+    checkEdgeConditions(componentPredicate, "p", componentName, 
+        join("=", "_rank23.pre", "_rank42.parent")
+    );
+  }
+
+  /**
+   * WHERE conditions for indirect pointing relation (->*).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForIndirectPointingRelation(
+      String componentPredicate)
+  {
+    // given
+    String componentName = uniqueString();
+    node23.addJoin(new PointingRelation(node42, componentName));
+    // then
+    checkEdgeConditions(componentPredicate, "p", componentName,
+        join("<", "_rank23.pre", "_rank42.pre"),
+        join("<", "_rank42.pre", "_rank23.post"));
+  }
+
+  /**
+   * WHERE conditions for sibling ($).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForSibling(
+      String componentPredicate)
+  {
+    // given
+    node23.addJoin(new Sibling(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("=", "_rank23.parent", "_rank42.parent"),
+        join("<>", "_node23.id", "_node42.id"));
+  }
+
   /**
    * The sibling operator may optionally bind the same node to both operands. 
    */
-  @Test
-  public void shouldAllowIdenticalNodeForSiblingTarget()
+  @Theory
+  public void shouldAllowIdenticalNodeForSiblingTarget(
+      String componentPredicates)
   {
     // given
     generator.setAllowIdenticalSibling(true);
     node23.addJoin(new Sibling(node42));
     // then
-    checkWhereCondition(join("=", "_rank23.parent", "_rank42.parent"),
-        join("=", "_component23.type", "'d'"), "_component23.name IS NULL");
+    checkEdgeConditions(componentPredicates, "d", null,
+        join("=", "_rank23.parent", "_rank42.parent"));
   }
 
   /**
@@ -159,7 +373,7 @@ public class TestDefaultWhereClauseGenerator
         join(">=", "_node23.right", "_node42.right"),
         join(">=", "_node42.right", "_node23.left"));
   }
-
+  
   // WHERE condition for root node
   @Test
   public void whereClauseForNodeRoot()
@@ -322,169 +536,6 @@ public class TestDefaultWhereClauseGenerator
         join("<=", "_node42.left", "_node23.right"));
   }
 
-  // WHERE condition for .
-  @Test
-  public void whereClauseForNodeDirectPrecedence()
-  {
-    node23.addJoin(new Precedence(node42, 1));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("=", "_node23.right_token", "_node42.left_token", -1));
-  }
-
-  // WHERE condition for .*
-  @Test
-  public void whereClauseForNodeIndirectPrecedence()
-  {
-    node23.addJoin(new Precedence(node42));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<", "_node23.right_token", "_node42.left_token"));
-  }
-
-  // WHERE condition for .n
-  @Test
-  public void whereClauseForNodeExactPrecedence()
-  {
-    node23.addJoin(new Precedence(node42, 10));
-    checkWhereCondition(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("=", "_node23.right_token", "_node42.left_token", -10));
-  }
-
-  // WHERE condition for .n,m
-  @Test
-  public void whereClauseForNodeRangedPrecedence()
-  {
-    node23.addJoin(new Precedence(node42, 10, 20));
-    checkWhereCondition(
-        join("=", "_node23.text_ref", "_node42.text_ref"),
-        "_node23.right_token BETWEEN SYMMETRIC _node42.left_token - 10 AND _node42.left_token - 20");
-  }
-
-  // WHERE condition for >
-  @Test
-  public void whereClauseForNodeDirectDominance()
-  {
-    node23.addJoin(new Dominance(node42, 1));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        "_component42.name IS NULL", join("=", "_rank23.pre", "_rank42.parent"));
-  }
-
-  // WHERE condition for > name
-  @Test
-  public void whereClauseDirectDominanceNamed()
-  {
-    node23.addJoin(new Dominance(node42, NAME, 1));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        join("=", "_component42.name", "'" + NAME + "'"),
-        join("=", "_rank23.pre", "_rank42.parent"));
-  }
-
-  // WHERE condition for > name [annotation]
-  @Test
-  public void whereClauseDirectDominanceNamedAndAnnotated()
-  {
-    node23.addJoin(new Dominance(node42, NAME, 1));
-    node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3",
-        "value3", TextMatching.REGEXP_EQUAL));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        join("=", "_component42.name", "'" + NAME + "'"),
-        join("=", "_rank23.pre", "_rank42.parent"));
-    checkWhereCondition(node42,
-        join("=", "_annotation42.node_annotation_namespace", "'namespace3'"),
-        join("=", "_annotation42.node_annotation_name", "'name3'"),
-        join("~", "_annotation42.node_annotation_value", "'^value3$'"));
-  }
-
-  // WHERE condition for >*
-  @Test
-  public void whereClauseForNodeIndirectDominance()
-  {
-    node23.addJoin(new Dominance(node42));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        "_component42.name IS NULL", join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"));
-  }
-
-  // WHERE condition for >n
-  @Test
-  public void whereClauseForNodeExactDominance()
-  {
-    node23.addJoin(new Dominance(node42, 10));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        "_component42.name IS NULL", join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"),
-        join("=", "_rank23.level", "_rank42.level", -10));
-  }
-
-  // WHERE condition for >n,m
-  @Test
-  public void whereClauseForNodeRangedDominance()
-  {
-    node23.addJoin(new Dominance(node42, 10, 20));
-    checkWhereCondition(join("=", "_component42.type", "'d'"),
-        "_component42.name IS NULL", join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"),
-        "_rank23.level BETWEEN SYMMETRIC _rank42.level - 10 AND _rank42.level - 20"
-
-    );
-  }
-
-  // WHERE condition for >@l
-  @Test
-  public void whereClauseForNodeLeftDominance()
-  {
-    node23.addJoin(new LeftDominance(node42));
-    checkWhereCondition(
-        join("=", "_component42.type", "'d'"),
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_component42.name IS NULL",
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
-  }
-
-  // WHERE condition for >@r
-  @Test
-  public void whereClauseForNodeRightDominance()
-  {
-    node23.addJoin(new RightDominance(node42));
-    checkWhereCondition(
-        join("=", "_component42.type", "'d'"),
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_component42.name IS NULL",
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
-  }
-
-  // WHERE condition for ->
-  @Test
-  public void whereClauseDirectPointingRelation()
-  {
-    node23.addJoin(new PointingRelation(node42, NAME, 1));
-    checkWhereCondition(join("=", "_component42.type", "'p'"),
-        join("=", "_component42.name", "'" + NAME + "'"),
-        join("=", "_rank23.pre", "_rank42.parent")
-
-    );
-  }
-
-  // WHERE condition for ->*
-  @Test
-  public void whereClauseIndirectPointingRelation()
-  {
-    node23.addJoin(new PointingRelation(node42, NAME));
-    checkWhereCondition(join("=", "_component42.type", "'p'"),
-        join("=", "_component42.name", "'" + NAME + "'"),
-        join("<", "_rank23.pre", "_rank42.pre"),
-        join("<", "_rank42.pre", "_rank23.post"));
-  }
-
-  // WHERE condition for $
-  @Test
-  public void whereClauseForNodeSibling()
-  {
-    node23.addJoin(new Sibling(node42));
-    checkWhereCondition(join("=", "_rank23.parent", "_rank42.parent"),
-        join("=", "_component23.type", "'d'"), "_component23.name IS NULL",
-        join("<>", "_node23.id", "_node42.id"));
-  }
-
   @Test
   public void whereClauseForIdentity()
   {
@@ -496,10 +547,10 @@ public class TestDefaultWhereClauseGenerator
 
   private void checkWhereCondition(String... expected)
   {
-    checkWhereCondition(node23, expected);
+    checkWhereConditions(node23, expected);
   }
 
-  private void checkWhereCondition(QueryNode node, String... expected)
+  private void checkWhereConditions(QueryNode node, String... expected)
   {
     List<QueryNode> alternative = new ArrayList<QueryNode>();
     alternative.add(node);

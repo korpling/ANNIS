@@ -17,6 +17,7 @@ package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.in;
+import static annis.sqlgen.SqlConstraints.isNull;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
@@ -64,6 +65,32 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // generate two-sided boundaries for both left and right text borders
   // for the inclusion operators
   private boolean optimizeInclusion;
+  
+  // where to attach component constraints for edge operators 
+  // (lhs, rhs or both)
+  private String componentPredicates;
+
+  private void addComponentPredicates(List<String> conditions, QueryNode node,
+      final String edgeType, String componentName)
+  {
+    conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
+    if (componentName == null) {
+      conditions.add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
+    } else {
+      conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "name"), sqlString(componentName))); 
+    }
+  }
+
+  private void addComponentPredicates(List<String> conditions, QueryNode node,
+      QueryNode target, String componentName, String edgeType)
+  {
+    if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates)) {
+      addComponentPredicates(conditions, node, edgeType, componentName);
+    }
+    if ("rhs".equals(componentPredicates) || "both".equals(componentPredicates)) {
+      addComponentPredicates(conditions, target, edgeType, componentName);
+    }
+  }
 
   @Override
   protected void addPointingRelationConditions(List<String> conditions,
@@ -96,27 +123,19 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         "left_token");
   }
 
+  // FIXME: why not in addSingleEdgeConditions() ?
   void addLeftOrRightDominance(List<String> conditions, QueryNode node,
       QueryNode target, QueryData queryData, RankTableJoin join,
       String aggregationFunction, String tokenBoarder)
   {
-    List<Long> corpusList = queryData.getCorpusList();
-    conditions.add(join("=",
-        tables(target).aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
+    RankTableJoin rankTableJoin = (RankTableJoin) join;
+    String componentName = rankTableJoin.getName();
+    addComponentPredicates(conditions, node, target, componentName, "d");
+
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
-    if (join.getName() != null)
-    {
-      conditions.add(join("=",
-          tables(target).aliasedColumn(COMPONENT_TABLE, "name"),
-          sqlString(join.getName())));
-    } else
-    {
-      conditions.add(tables(target).aliasedColumn(COMPONENT_TABLE, "name")
-          + " IS NULL");
-    }
-
+    List<Long> corpusList = queryData.getCorpusList();
     conditions.add(in(
         tables(target).aliasedColumn(NODE_TABLE, tokenBoarder),
         "SELECT "
@@ -344,23 +363,15 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     conditions.add(sb.toString());
   }
 
+  // FIXME: Why not in addSingleEdgeCondition
   @Override
   protected void addSiblingConditions(List<String> conditions, QueryNode node,
       QueryNode target, Sibling join, QueryData queryData)
   {
-    conditions.add(join("=", tables(node)
-        .aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
     Sibling sibling = (Sibling) join;
-    if (sibling.getName() != null)
-    {
-      conditions.add(join("=",
-          tables(node).aliasedColumn(COMPONENT_TABLE, "name"),
-          sqlString(sibling.getName())));
-    } else
-    {
-      conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name")
-          + " IS NULL");
-    }
+    String componentName = sibling.getName();
+    addComponentPredicates(conditions, node, target, componentName, "d");
+    
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
     
@@ -373,21 +384,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   protected void addSingleEdgeCondition(QueryNode node, QueryNode target,
       List<String> conditions, Join join, final String edgeType)
   {
-    conditions.add(join("=",
-        tables(target).aliasedColumn(COMPONENT_TABLE, "type"),
-        sqlString(edgeType)));
-
     RankTableJoin rankTableJoin = (RankTableJoin) join;
-    if (rankTableJoin.getName() != null)
-    {
-      conditions.add(join("=",
-          tables(target).aliasedColumn(COMPONENT_TABLE, "name"),
-          sqlString(rankTableJoin.getName())));
-    } else
-    {
-      conditions.add(tables(target).aliasedColumn(COMPONENT_TABLE, "name")
-          + " IS NULL");
-    }
+    String componentName = rankTableJoin.getName();
+    addComponentPredicates(conditions, node, target, componentName, edgeType);
 
     int min = rankTableJoin.getMinDistance();
     int max = rankTableJoin.getMaxDistance();
@@ -539,6 +538,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   public void setOptimizeInclusion(boolean optimizeInclusion)
   {
     this.optimizeInclusion = optimizeInclusion;
+  }
+
+  public String getComponentPredicates()
+  {
+    return componentPredicates;
+  }
+
+  public void setComponentPredicates(String componentPredicates)
+  {
+    this.componentPredicates = componentPredicates;
   }
 
 }

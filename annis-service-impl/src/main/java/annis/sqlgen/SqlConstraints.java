@@ -33,6 +33,15 @@ public class SqlConstraints
   private static boolean disableBetweenSymmetricPredicate = false;
   private static boolean disableBetweenPredicate = false;
 
+  /**
+   * Generate IS NULL predicate on column.
+   * @param lhs The column which should be checked for NULL values.
+   */
+  public static String isNull(String lhs)
+  {
+    return lhs + " IS NULL";
+  }
+  
   public static String join(String op, String lhs, String rhs)
   {
     return lhs + " " + op + " " + rhs;

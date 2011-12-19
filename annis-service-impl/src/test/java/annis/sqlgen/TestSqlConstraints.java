@@ -16,10 +16,12 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.isNull;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -37,6 +39,21 @@ public class TestSqlConstraints
     SqlConstraints.setDisableBetweenSymmetricPredicate(false);
   }
 
+  /**
+   * Generate IS NULL predicate on a column.
+   */
+  @Test
+  public void shouldGenerateIsNullPredicate()
+  {
+    // given
+    String lhs = uniqueString();
+    // when
+    String actual = isNull(lhs);
+    // then
+    String expected = lhs + " IS NULL";
+    assertEquals(expected, actual);
+  }
+  
   /**
    * Use BETWEEN SYMMETRIC for between predicates.
    */
