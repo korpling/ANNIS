@@ -60,13 +60,12 @@ public class KWICPanel extends Table
       {
         if (event.isDoubleClick())
         {
-          String script =
-            "console.log(document.getElementsByTagName(\"iframe\")[0].contentWindow);"
-            + " console.log(\"start script\");"
-            + " document.getElementsByTagName(\"iframe\")[0].contentWindow.hideVideo();"
-            + " console.log(\"done\");";
-          getWindow().
-            executeJavaScript(script);
+          String playCommand = ""
+            + "document.getElementById(\"" + mediaIDs.get(1) + "\")"
+            + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay(12, 30)";
+          String script = playCommand;
+
+          getWindow().executeJavaScript(script);
         }
       }
     });
@@ -212,7 +211,7 @@ public class KWICPanel extends Table
         {
           // add color
           l.addStyleName(
-            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));
+            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));          
         }
       }
       else
@@ -224,22 +223,8 @@ public class KWICPanel extends Table
           l.setDescription(a.getQualifiedName());
           l.addStyleName("kwic-anno");
         }
-      }
-
-//      l.addListener(new Listener()
-//      {
-//
-//        @Override
-//        public void componentEvent(Event event)
-//        {
-//          if (event.getClass() == ItemClickEvent.class)
-//          {
-//            getWindow().executeJavaScript("alert(" + event.getComponent() + ");");
-//          }
-//          getWindow().executeJavaScript("alert(" + event.getComponent() + ");");
-//        }
-//      });
-
+      }      
+      l.addStyleName("pointer");
       return l;
     }
 

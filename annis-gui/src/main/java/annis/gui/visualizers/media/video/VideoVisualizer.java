@@ -35,9 +35,7 @@ public class VideoVisualizer extends WriterVisualizer
       writer.append(input.getResourcePath("media_control.js"));
       writer.append("\"></script>");      
       writer.append("</head>");
-      writer.append("<body>");
-      writer.append("<h1>start:");
-      writer.append("s</h1>");      
+      writer.append("<body>");      
       writer.append("<video controls preload=none style=\"padding-top:70px\">");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);

@@ -1,24 +1,18 @@
-var startTime;
-var endTime;
+var endTime = undefined;
 
-
+/**
+ * this function is the interface for the KWIC-Visualizer, which search for 
+ * this global function in the DOM, so changing the signature will probably 
+ * causes serious problems
+ */
 var seekAndPlay = function (start, end) 
 {  
   $("video")[0].currentTime = start;
-  endTime = end;
   $("video")[0].play();
+  endTime = end;
 };
 
-var hideVideo = function ()
-{
-  $('video').hide();
-}
-
-$(document).ready(function() {	
-  // put this function to the dom, so we can access it from outside of 
-  // the iframe  
-  $('html')[0].seekAndPlay = seekAndPlay;   
-  $('html')[0].hideVideo = hideVideo;   
+$(document).ready(function() {	  
   var video = $('video');
   video[0].pause();   
 	
@@ -27,18 +21,15 @@ $(document).ready(function() {
   });
 	
 
-  video.on("seeked", function(event){
-    console.log(event.type);
-    console.log(video[0].currentTime);
+  video.on("seeked", function(){    
     video[0].play();
-  });
-    
-  video.on("timeupdate", function(event){
-    console.log(event.type);
-    console.log(video[0].currentTime);
-    if (video[0].currentTime > 20)
-      video[0].pause();    
-  });
+  }); 
   
+  video.on("timeupdate", function(){
+    if (endTime !== null && currentTime >= endTime) 
+    {
+      video[0].pause();
+    }
+  });
 });
 
