@@ -24,18 +24,18 @@ import annis.model.AnnotationGraph;
 import annis.resolver.ResolverEntry;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
-import com.google.gwt.dom.client.Style.TableLayout;
-import com.vaadin.event.LayoutEvents.LayoutClickEvent;
-import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,14 +145,16 @@ public class SingleResultPanel extends VerticalLayout implements
         int counter = 0;
         for (ResolverEntry e : entries)
         {
-          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap);
           String id = "resolver-" + resultNumber + "-" + counter++;
+          CustomLayout customLayout = this.customLayout(id);
+
+          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
+            markedCoveredMap, customLayout);
+
           if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
           {
             mediaIDs.add(id);
           }
-          p.setDebugId(id);
           visualizers.add(p);
         }
 
@@ -167,7 +169,7 @@ public class SingleResultPanel extends VerticalLayout implements
         }
 
         for (VisualizerPanel p : visualizers)
-        {          
+        {
           addComponent(p);
         }
       }
@@ -212,7 +214,6 @@ public class SingleResultPanel extends VerticalLayout implements
         markedExactMap.put("" + n.getId(),
           MatchedNodeColors.values()[color].name());
       }
-
     }
 
     markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
@@ -282,5 +283,24 @@ public class SingleResultPanel extends VerticalLayout implements
 
       getWindow().addWindow(infoWindow);
     }
+  }
+
+  private CustomLayout customLayout(String id)
+  {
+    String layout = ""
+      + "<div id=\"" + id + "\">"
+      + "  <div location=\"btEntry\"></div>"
+      + "  <div location=\"iframe\"></div>"      
+      + "</div>";
+    try
+    {
+      return new CustomLayout(new ByteArrayInputStream(layout.getBytes()));
+    }
+    catch (IOException ex)
+    {
+      Logger.getLogger(SingleResultPanel.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+    return null;
   }
 }
