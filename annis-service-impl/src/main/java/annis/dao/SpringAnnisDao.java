@@ -38,7 +38,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -207,14 +206,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public List<AnnotationGraph> annotate(QueryData queryData)
-  {
-    return executeQueryFunction(queryData, aomAnnotateSqlGenerator);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public SaltProject annotateSalt(QueryData queryData)
+  public SaltProject annotate(QueryData queryData)
   {
     return executeQueryFunction(queryData, saltAnnotateSqlGenerator);
   }
@@ -273,19 +265,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public AnnotationGraph retrieveAnnotationGraph(long textId)
+  public SaltProject retrieveAnnotationGraph(long textId)
   {
-    List<AnnotationGraph> graphs =
-      aomAnnotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
-    if (graphs.isEmpty())
-    {
-      return null;
-    }
-    if (graphs.size() > 1)
-    {
-      throw new IllegalStateException("Expected only one annotation graph");
-    }
-    return graphs.get(0);
+    SaltProject p =
+      saltAnnotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
+
+    return p;
+  }
+
+  @Override
+  public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
+    String documentName)
+  {
+    SaltProject p =
+      saltAnnotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
+      toplevelCorpusName, documentName);
+    return p;
   }
 
   @Override
@@ -293,6 +288,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<Annotation> listCorpusAnnotations(long corpusId)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
+    final List<Annotation> corpusAnnotations =
+      (List<Annotation>) getJdbcTemplate().query(sql,
+      listCorpusAnnotationsSqlHelper);
+    return corpusAnnotations;
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
+    String documentName)
+  {
+    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(
+      toplevelCorpusName, documentName);
     final List<Annotation> corpusAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
@@ -618,11 +626,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return saltAnnotateSqlGenerator;
   }
 
-  public void setSaltAnnotateSqlGenerator(SaltAnnotateSqlGenerator saltAnnotateSqlGenerator)
+  public void setSaltAnnotateSqlGenerator(
+    SaltAnnotateSqlGenerator saltAnnotateSqlGenerator)
   {
     this.saltAnnotateSqlGenerator = saltAnnotateSqlGenerator;
   }
-  
+
   public ByteHelper getByteHelper()
   {
     return byteHelper;
@@ -636,7 +645,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public AnnisBinary getBinary(String corpusName, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(corpusName,
+    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(
+      corpusName,
       offset, length), byteHelper);
   }
 }

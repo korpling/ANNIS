@@ -15,11 +15,13 @@
  */
 package annis.utils;
 
+import annis.service.objects.AnnisResultImpl;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
+import annis.service.ifaces.AnnisResultSet;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -44,7 +46,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
+import annis.service.objects.AnnisResultSetImpl;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 
 /**
@@ -57,36 +61,53 @@ import org.eclipse.emf.common.util.BasicEList;
 public class LegacyGraphConverter
 {
 
+  public static AnnisResultSet convertToResultSet(SaltProject p)
+  {
+    List<AnnotationGraph> annotationGraphs = convertToAOM(p);
+    AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
+    for (AnnotationGraph annotationGraph : annotationGraphs)
+    {
+      annisResultSet.add(new AnnisResultImpl(annotationGraph));
+    }
+    return annisResultSet;
+  }
+
   public static List<AnnotationGraph> convertToAOM(SaltProject p)
   {
     List<AnnotationGraph> result = new ArrayList<AnnotationGraph>();
 
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      Long[] matchedIDs = new Long[0];
-      SFeature featMatchedIDs = corpusGraph.getSFeature(ANNIS_NS,
-        FEAT_MATCHEDIDS);
-      if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
+      for (SDocument doc : corpusGraph.getSDocuments())
       {
-        matchedIDs = Utils.split2Long(featMatchedIDs.getSValueSTEXT(), ',');
-      }
-      if (corpusGraph.getSDocuments().size() > 0)
-      {
-        SDocument doc = corpusGraph.getSDocuments().get(0);
-        SDocumentGraph docGraph = doc.getSDocumentGraph();
-
-        result.add(convertToAnnotationGraph(docGraph, matchedIDs));
+        result.add(convertToAnnotationGraph(doc));
       }
     }
 
-    //throw new NotImplementedException();
+    return result;
+  }
+
+  public static AnnotationGraph convertToAnnotationGraph(SDocument document)
+  {
+    AnnotationGraph result = null;
+
+    String[] matchedIDs = new String[0];
+    SFeature featMatchedIDs = document.getSFeature(ANNIS_NS,
+      FEAT_MATCHEDIDS);
+    if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
+    {
+      matchedIDs = StringUtils.split(featMatchedIDs.getSValueSTEXT(), ',');
+    }
+    SDocumentGraph docGraph = document.getSDocumentGraph();
+    result = convertToAnnotationGraph(docGraph, matchedIDs);
+    
     return result;
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
-    Long[] matchedIDs)
+    String[] matchedIDs)
   {
-    Set<Long> matchSet = new HashSet<Long>(Arrays.asList(matchedIDs));
+    Set<String> matchSet = new HashSet<String>(Arrays.asList(matchedIDs));
     AnnotationGraph annoGraph = new AnnotationGraph();
 
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
@@ -140,10 +161,10 @@ public class LegacyGraphConverter
           + PROC_RIGHT).getSValueSNUMERIC());
         aNode.setRightToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
           + PROC_RIGHTTOKEN).getSValueSNUMERIC());
-        if (matchSet.contains(internalID))
+        if (matchSet.contains(aNode.getName()))
         {
           aNode.setMatchedNodeInQuery((long) Arrays.binarySearch(matchedIDs,
-            internalID)+1);
+            aNode.getName()) + 1);
         }
         else
         {
@@ -200,10 +221,5 @@ public class LegacyGraphConverter
     }
 
     return annoGraph;
-  }
-
-  public static String convertToPaulaInline(SCorpusGraph g)
-  {
-    throw new NotImplementedException();
   }
 }

@@ -16,6 +16,9 @@
 package annis.gui.visualizers;
 
 import annis.service.ifaces.AnnisResult;
+import annis.service.objects.AnnisResultImpl;
+import annis.utils.LegacyGraphConverter;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.HashMap;
@@ -35,6 +38,7 @@ import org.xml.sax.InputSource;
 public class VisualizerInput
 {
 
+  private SDocument document;
   private String namespace = "";
   private String paula = null;
   private Map<String, String> markableMap = new HashMap<String, String>();
@@ -239,16 +243,32 @@ public class VisualizerInput
     return paulaJDOM;
   }
 
-  public AnnisResult getResult()
-  {
-    return result;
-  }
-
+  @Deprecated
   public void setResult(AnnisResult result)
   {
     this.result = result;
   }
 
+  
+  public AnnisResult getResult()
+  {
+    if(result == null)
+    {
+      result = new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(document));
+    }
+    return result;
+  }
+
+  public SDocument getDocument()
+  {
+    return document;
+  }
+
+  public void setDocument(SDocument document)
+  {
+    this.document = document;
+  }
+  
   public String getResourcePathTemplate()
   {
     return resourcePathTemplate;

@@ -15,6 +15,19 @@
  */
 package annis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
@@ -44,5 +57,45 @@ public class CommonHelper
       }
     }
     return false;
+  }
+
+  public static Set<String> getTokenAnnotationLevelSet(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        for (SNode n : g.getSNodes())
+        {
+          if (n instanceof SToken)
+          {
+            for (SAnnotation anno : n.getSAnnotations())
+            {
+              result.add(anno.getQName());
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public static List<String> getCorpusPath(SCorpusGraph corpusGraph, SDocument doc)
+  {
+    List<String> result = new LinkedList<String>();
+
+    result.add(doc.getSName());
+    SCorpus c = corpusGraph.getSCorpus(doc);
+    
+    while (c != null)
+    {
+      result.add(c.getSName());
+      c = corpusGraph.getSCorpus(c.getSElementId());
+    }
+    return result;
   }
 }

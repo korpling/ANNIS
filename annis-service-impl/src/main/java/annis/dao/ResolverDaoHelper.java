@@ -45,8 +45,8 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
   @Override
   public PreparedStatement createPreparedStatement(Connection cnctn) throws SQLException
   {
-    String select = "SELECT corpus.id, corpus.name, "
-      + "corpus.version, "
+    String select = "SELECT resolver_vis_map.corpus, "
+      + "resolver_vis_map.version, "
       + "resolver_vis_map.namespace, "
       + "resolver_vis_map.element, "
       + "resolver_vis_map.vis_type, "
@@ -55,17 +55,14 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
       + "resolver_vis_map.mappings";
 
     String defaultFromWhere = 
-      " FROM resolver_vis_map, corpus as corpus, corpus as c2 WHERE ";
-    String corpusNameJoin = " resolver_vis_map.corpus = c2.name AND corpus.pre >= c2.pre AND corpus.post <= c2.post ";
+      " FROM resolver_vis_map WHERE ";
 
     // If (corp=null && ns=null && element=null) => show this visualisation no matter what
     String firstUnion =
       select
       + defaultFromWhere
       + " resolver_vis_map.corpus is NULL AND resolver_vis_map.namespace is NULL" 
-      + " AND resolver_vis_map.element is NULL"
-      + " AND corpus.id="
-      + "?"; // corpus
+      + " AND resolver_vis_map.element is NULL";
 
     // if (not_exists(my_corp+my_ns) && exists(corp=null && ms=my_ns && element=my_element.type)) => show this visulization for this hit;
     String secondUnion =
@@ -76,38 +73,34 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
       + " AND resolver_vis_map.element = "
       + "?" // type
       + " AND resolver_vis_map.namespace NOT IN ("
-          + "SELECT resolver_vis_map.namespace FROM resolver_vis_map, corpus as corpus, corpus as c2 WHERE " + corpusNameJoin
-          + " AND resolver_vis_map.namespace = "
+          + "SELECT resolver_vis_map.namespace FROM resolver_vis_map WHERE"
+          + " resolver_vis_map.namespace = "
           +  "?" //namespace
-          + " AND corpus.id = "
+          + " AND resolver_vis_map.corpus = "
           + "?" // corpus
-      + ")"
-      + " AND corpus.id="
-      + "?"; // corpus
+      + ")";
 
     // if (corp=my_corp && ns=my_ns && element=my_element.type) => show this visulization for this hit;
     String thirdUnion =
       select
       + defaultFromWhere
-      + corpusNameJoin
       + "AND resolver_vis_map.namespace = "
       + "?" //namespace
       + " AND resolver_vis_map.element = "
       + "?" //type
-      + " AND corpus.id = "
+      + " AND resolver_vis_map.corpus = "
       + "?"; //corpus
 
     // if (corp=my_corp && ns=null) => always show this visualization for this corpus;
     String fourthUnion =
       select
       +  defaultFromWhere
-      + corpusNameJoin
       + " AND resolver_vis_map.namespace IS NULL "
-      + " AND corpus.id = "
+      + " AND resolver_vis_map.corpus = "
       + "?"; // corpus
 
 
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     for(int i=0; i < requestCount; i++)
     {
       if(i > 0)
@@ -133,16 +126,17 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
     {
       if(offset < resolverRequest.length)
       {
-         stmt.setLong((offset*10) + 1, resolverRequest[offset].getCorpusId());
-         stmt.setString((offset*10) + 2, resolverRequest[offset].getNamespace());
-         stmt.setString((offset*10) + 3, resolverRequest[offset].getType().name());
-         stmt.setString((offset*10) + 4, resolverRequest[offset].getNamespace());
-         stmt.setLong((offset*10) + 5, resolverRequest[offset].getCorpusId());
-         stmt.setLong((offset*10) + 6, resolverRequest[offset].getCorpusId());
-         stmt.setString((offset*10) + 7, resolverRequest[offset].getNamespace());
-         stmt.setString((offset*10) + 8, resolverRequest[offset].getType().name());
-         stmt.setLong((offset*10) + 9, resolverRequest[offset].getCorpusId());
-         stmt.setLong((offset*10) + 10, resolverRequest[offset].getCorpusId());
+         stmt.setString((offset*8) + 1, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*8) + 2, resolverRequest[offset].getType().name());
+         stmt.setString((offset*8) + 3, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*8) + 4, resolverRequest[offset].getCorpusName());
+         
+         stmt.setString((offset*8) + 5, resolverRequest[offset].getNamespace());
+         stmt.setString((offset*8) + 6, resolverRequest[offset].getType().name());
+         stmt.setString((offset*8) + 7, resolverRequest[offset].getCorpusName());
+         
+         stmt.setString((offset*8) + 8, resolverRequest[offset].getCorpusName());
+         
       }
     }
   }
@@ -177,7 +171,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
 
       ResolverEntry e = new ResolverEntry(
         rs.getLong("id"),
-        rs.getString("name"),
+        rs.getString("corpus"),
         rs.getString("version"),
         rs.getString("namespace"),
         element == null ? null : ResolverEntry.ElementType.valueOf(element),

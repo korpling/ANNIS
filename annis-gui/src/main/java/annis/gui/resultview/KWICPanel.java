@@ -16,24 +16,31 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -42,18 +49,18 @@ import java.util.Set;
 public class KWICPanel extends Table
 {
 
-  private AnnisResult result;
+  private SDocument result;
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
-  private Map<AnnisNode, Long> markedAndCovered;
-  private long textID;
+  private Map<SNode, Long> markedAndCovered;
+  private STextualDS text;
 
-  public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
-    Map<AnnisNode, Long> markedAndCovered, long textID)
+  public KWICPanel(SDocument result, Set<String> tokenAnnos,
+    Map<SNode, Long> markedAndCovered, STextualDS text)
   {
     this.result = result;
     this.markedAndCovered = markedAndCovered;
-    this.textID = textID;
+    this.text = text;
 
     this.addStyleName("kwic");
     setSizeFull();
@@ -70,18 +77,30 @@ public class KWICPanel extends Table
     setWidth("100%");
     setHeight("-1px");
     setPageLength(0);
-    if (checkRTL(result.getGraph().getTokens()))
+
+    if (CommonHelper.containsRTLText(text.getSText()))
     {
       addStyleName("rtl");
     }
 
-    List<AnnisNode> token = result.getGraph().getTokens();
+    List<SToken> token = result.getSDocumentGraph().getSortedSTokenByText();
     ArrayList<Object> visible = new ArrayList<Object>(10);
-    Long lastTokenIndex = null;
+//    Long lastTokenIndex = null;
 
-    for (AnnisNode t : token)
+    for (SToken t : token)
     {
-      if (t.getTextId() == textID)
+      STextualDS tokenText = null;
+      EList<Edge> edges = t.getSDocumentGraph().getOutEdges(t.getSId());
+      for (Edge e : edges)
+      {
+        if (e instanceof STextualRelation)
+        {
+          STextualRelation textRel = (STextualRelation) e;
+          tokenText = textRel.getSTextualDS();
+          break;
+        }
+      }
+      if (tokenText == text)
       {
         // add a column for each token
         addGeneratedColumn(t, new TokenColumnGenerator(t));
@@ -89,21 +108,22 @@ public class KWICPanel extends Table
         setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 
-        if (lastTokenIndex != null && t.getTokenIndex() != null
-          && t.getTokenIndex().longValue() > (lastTokenIndex.longValue() + 1))
-        {
-          // add "(...)"
-          Long gapColumnID = t.getTokenIndex();
-          addGeneratedColumn(gapColumnID, new GapColumnGenerator());
-          setColumnWidth(gapColumnID, -1);
-          setColumnExpandRatio(gapColumnID, 0.0f);
-          visible.add(gapColumnID);
-
-        }
-        lastTokenIndex = t.getTokenIndex();
+        // TODO: howto detect gaps in Salt?
+//        if (lastTokenIndex != null && t.getTokenIndex() != null
+//          && t.getTokenIndex().longValue() > (lastTokenIndex.longValue() + 1))
+//        {
+//          // add "(...)"
+//          Long gapColumnID = t.getTokenIndex();
+//          addGeneratedColumn(gapColumnID, new GapColumnGenerator());
+//          setColumnWidth(gapColumnID, -1);
+//          setColumnExpandRatio(gapColumnID, 0.0f);
+//          visible.add(gapColumnID);
+//
+//        }
+//        lastTokenIndex = t.getTokenIndex();
       }
     }
-
+ 
     addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
     {
 
@@ -121,9 +141,8 @@ public class KWICPanel extends Table
 
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
-    
+
   }
-  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -171,28 +190,38 @@ public class KWICPanel extends Table
   public class TokenColumnGenerator implements KWICComponentGenerator
   {
 
-    private Map<String, Annotation> annotationsByQName;
-    private AnnisNode token;
+    private Map<String, SAnnotation> annotationsByQName;
+    private SToken token;
 
-    public TokenColumnGenerator(AnnisNode token)
+    public TokenColumnGenerator(SToken token)
     {
       this.token = token;
-      annotationsByQName = new HashMap<String, Annotation>();
-      for (Annotation a : token.getNodeAnnotations())
+      annotationsByQName = new HashMap<String, SAnnotation>();
+      for (SAnnotation a : token.getSAnnotations())
       {
-        annotationsByQName.put(a.getQualifiedName(), a);
+        annotationsByQName.put(a.getQName(), a);
       }
     }
 
     @Override
     public Object generateCell(String layer)
     {
+
+      BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+      textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+      SDocumentGraph docGraph = result.getSDocumentGraph();
+
       Label l = new Label("");
       l.setSizeUndefined();
 
       if ("tok".equals(layer))
       {
-        l.setValue(token.getSpannedText());
+
+        SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
+          textualRelation).get(0);
+        
+        l.setValue(((String) seq.getSSequentialDS().getSData()).
+            substring(seq.getSStart(), seq.getSEnd()));
         if (markedAndCovered.containsKey(token))
         {
           // add color
@@ -202,11 +231,11 @@ public class KWICPanel extends Table
       }
       else
       {
-        Annotation a = annotationsByQName.get(layer);
+        SAnnotation a = annotationsByQName.get(layer);
         if (a != null)
         {
           l.setValue(a.getValue());
-          l.setDescription(a.getQualifiedName());
+          l.setDescription(a.getQName());
           l.addStyleName("kwic-anno");
         }
       }
@@ -218,19 +247,5 @@ public class KWICPanel extends Table
     {
       return generateCell((String) itemId);
     }
-  }
-
-  private boolean checkRTL(List<AnnisNode> tokenList)
-  {
-    for (AnnisNode tok : tokenList)
-    {
-      String tokText = tok.getSpannedText();
-      if (CommonHelper.containsRTLText(tokText))
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 }

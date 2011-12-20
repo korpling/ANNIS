@@ -608,7 +608,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 		QueryData queryData = analyzeQuery(annisQuery, "annotate");
 		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
-		SaltProject result = annisDao.annotateSalt(queryData);
+		SaltProject result = annisDao.annotate(queryData);
       
       List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
       
@@ -673,9 +673,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doText(String textID)
   {
-    List<AnnotationGraph> result = new LinkedList<AnnotationGraph>();
-    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
-    result.add(graph);
+    List<SaltProject> result = new LinkedList<SaltProject>();
+    SaltProject p = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
+    result.add(p);
     printAsTable(result, "nodes", "edges");
   }
 

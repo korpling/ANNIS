@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -35,6 +36,8 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -162,7 +165,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
             {
               user = (AnnisUser) getApplication().getUser();
             }
-            AnnisResultSet result = query.loadBeans(start, limit, user);
+            SaltProject result = query.loadBeans(start, limit, user);
             
             updateTokenAnnos(result);
             
@@ -232,11 +235,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
     w.center();
   }
 
-  private void updateTokenAnnos(AnnisResultSet resultSet)
+  private void updateTokenAnnos(SaltProject p)
   {
+    Set<String> tokenAnnotationLevelSet  = CommonHelper.getTokenAnnotationLevelSet(p);
+    
     
     // add new annotations
-    for(String s : resultSet.getTokenAnnotationLevelSet())
+    for(String s : tokenAnnotationLevelSet)
     {
       if(!tokenAnnoVisible.containsKey(s))
       {
@@ -246,7 +251,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     miTokAnnos.removeChildren();
     
-    for(String a : resultSet.getTokenAnnotationLevelSet())
+    for(String a : tokenAnnotationLevelSet)
     {
       MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
       {

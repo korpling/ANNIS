@@ -32,6 +32,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -47,11 +49,13 @@ import java.util.logging.Logger;
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
 
-  public static final ThemeResource ICON_COLLAPSE = new ThemeResource("icon-collapse.gif");
-  public static final ThemeResource ICON_EXPAND = new ThemeResource("icon-expand.gif");
+  public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
+    "icon-collapse.gif");
+  public static final ThemeResource ICON_EXPAND = new ThemeResource(
+    "icon-expand.gif");
   private ApplicationResource resource = null;
   private AutoHeightIFrame iframe;
-  private AnnisResult result;
+  private SDocument result;
   private PluginSystem ps;
   private ResolverEntry entry;
   private Random rand = new Random();
@@ -59,38 +63,40 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersCovered;
   private Button btEntry;
 
-  public VisualizerPanel(final ResolverEntry entry, AnnisResult result,
-    PluginSystem ps, Map<String, String> markersExact, Map<String, String> markersCovered)
+  public VisualizerPanel(final ResolverEntry entry, SDocument result,
+    PluginSystem ps, Map<String, String> markersExact,
+    Map<String, String> markersCovered)
   {
     this.result = result;
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
-    
+
     this.setWidth("100%");
     this.setHeight("-1px");
-    
+
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
+
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setMargin(false);
     layout.setSpacing(false);
     layout.setWidth("100%");
     layout.setHeight("-1px");
-    
+
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
+    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+      + ChameleonTheme.BUTTON_SMALL);
     btEntry.addListener((Button.ClickListener) this);
     addComponent(btEntry);
   }
-  
 
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisRemoteServiceURL(getApplication().getProperty("AnnisRemoteService.URL"));
+    input.setAnnisRemoteServiceURL(getApplication().getProperty(
+      "AnnisRemoteService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
     input.setId("" + rand.nextLong());
@@ -105,7 +111,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     return input;
   }
 
-  private ApplicationResource createResource(final ByteArrayOutputStream byteStream, 
+  private ApplicationResource createResource(
+    final ByteArrayOutputStream byteStream,
     String mimeType)
   {
 
@@ -125,15 +132,15 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     return r;
   }
 
-  private AnnisResult getText(long textId)
+  private SaltProject getText(String toplevelCorpusName, String documentName)
   {
-    AnnisResult text = null;
+    SaltProject text = null;
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
-      text = service.getAnnisResult(textId);
+      text = service.getGraph(toplevelCorpusName, documentName);
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       Logger.getLogger(VisualizerPanel.class.getName()).log(Level.SEVERE,
         "General remote service exception", e);
@@ -146,7 +153,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   {
     super.detach();
 
-    if(resource != null)
+    if (resource != null)
     {
       getApplication().removeResource(resource);
     }
@@ -156,37 +163,40 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public void buttonClick(ClickEvent event)
   {
 
-    if(resource != null)
+    if (resource != null)
     {
       getApplication().removeResource(resource);
     }
-      
-    if(btEntry.getIcon() == ICON_EXPAND)
+
+    if (btEntry.getIcon() == ICON_EXPAND)
     {
       // expand
-      if(iframe == null)
+      if (iframe == null)
       {
-        
+
         VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
-        if(vis == null)
+        if (vis == null)
         {
           entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
           vis = ps.getVisualizer(entry.getVisType());
         }
         VisualizerInput input = createInput();
-        if(vis.isUsingText() && result.getGraph().getNodes().size() > 0)
+        if (vis.isUsingText() && result.getSDocumentGraph().getSNodes().size()
+          > 0)
         {
-          input.setResult(getText(result.getGraph().getNodes().get(0).getTextId()));
+          SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+            get(0).getSName(), result.getSName());
+          input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
         }
         else
         {
-          input.setResult(result);
+          input.setDocument(result);
         }
 
-        
+
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-          vis.writeOutput(input, outStream);
-       
+        vis.writeOutput(input, outStream);
+
         resource = createResource(outStream, vis.getContentType());
         String url = getApplication().getRelativeLocation(resource);
         iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
@@ -197,10 +207,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       btEntry.setIcon(ICON_COLLAPSE);
       iframe.setVisible(true);
     }
-    else if(btEntry.getIcon() == ICON_COLLAPSE)
+    else if (btEntry.getIcon() == ICON_COLLAPSE)
     {
       // collapse
-      if(iframe != null)
+      if (iframe != null)
       {
         iframe.setVisible(false);
       }

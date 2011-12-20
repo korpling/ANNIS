@@ -12,6 +12,7 @@ public class AnnisConstants
 {
   public static final String ANNIS_NS = "annis";
   public static final String FEAT_MATCHEDIDS = "matchedids";
+  public static final String FEAT_MATCHEDNODE = "matchednode";
   public static final String PROC_INTERNALID = "internalid";
   public static final String PROC_CORPUSREF = "corpusref";
   public static final String PROC_LEFT = "left";

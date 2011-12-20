@@ -18,8 +18,8 @@ package annis.gui.resultview;
 import annis.security.AnnisUser;
 import annis.security.IllegalCorpusAccessException;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.AnnisResultSetImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
@@ -49,7 +49,7 @@ public class AnnisResultQuery implements Serializable
     this.contextRight = contextRight;
   }
 
-  public AnnisResultSet loadBeans(int startIndex, int count, AnnisUser user) throws IllegalCorpusAccessException
+  public SaltProject loadBeans(int startIndex, int count, AnnisUser user) throws IllegalCorpusAccessException
   { 
     // check corpus selection by logged in user
     
@@ -64,12 +64,12 @@ public class AnnisResultQuery implements Serializable
       throw new IllegalCorpusAccessException("illegal corpus access");
     }
     
-    AnnisResultSet result = new AnnisResultSetImpl();
+    SaltProject result =  SaltFactory.eINSTANCE.createSaltProject();
     if(service != null)
     {
       try
       {
-        result = service.getResultSet(new LinkedList<Long>(filteredCorpora), aql, count, startIndex, contextLeft, contextRight);
+        result = service.query(new LinkedList<Long>(filteredCorpora), aql, count, startIndex, contextLeft, contextRight);
       }
       catch(RemoteException ex)
       {

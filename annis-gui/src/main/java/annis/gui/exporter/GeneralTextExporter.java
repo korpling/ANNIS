@@ -28,6 +28,8 @@ import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import annis.utils.LegacyGraphConverter;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -63,7 +65,7 @@ public class GeneralTextExporter implements Exporter, Serializable
     try
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
-      AnnisResultSet queryResult = null;
+      SaltProject queryResult = null;
 
       LinkedList<String> keys = new LinkedList<String>();
 
@@ -113,13 +115,13 @@ public class GeneralTextExporter implements Exporter, Serializable
       }
       
       int offset = 0;
-      while(offset == 0 || (queryResult != null && queryResult.size() > 0))
+      while(offset == 0 || (queryResult != null && queryResult.getSCorpusGraphs().size() > 0))
       {
 
-        queryResult = service.getResultSet(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
+        queryResult = service.query(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
 
 
-        convertText(queryResult, keys, args, out, offset);
+        convertText(LegacyGraphConverter.convertToResultSet(queryResult), keys, args, out, offset);
 
         out.flush();
         offset = offset + 50;

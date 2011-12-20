@@ -26,6 +26,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +41,15 @@ public class MetaDataPanel extends Panel
 {
   private Table tblMeta;
   private BeanItemContainer<Annotation> metaContainer;
-  private long id;
+  private String toplevelCorpusName;
+  private String documentName;
   
-  public MetaDataPanel(long id)
+  public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
     
-    this.id = id;
+    this.toplevelCorpusName = toplevelCorpusName;
+    this.documentName = documentName;
     
     setSizeFull();
     VerticalLayout layout = new VerticalLayout();
@@ -100,11 +103,11 @@ public class MetaDataPanel extends Panel
     super.attach();
     
     // load meta data from service
-    metaContainer.addAll(getMetaData(id));
+    metaContainer.addAll(getMetaData(toplevelCorpusName, documentName));
     
   }
   
-  private List<Annotation> getMetaData(long id)
+  private List<Annotation> getMetaData(String toplevelCorpusName, String documentName)
   {
     List<Annotation> result = new ArrayList<Annotation>();
     try
@@ -112,7 +115,7 @@ public class MetaDataPanel extends Panel
       AnnisService service = Helper.getService(getApplication(), getWindow());
       if(service != null)
       {
-        result = service.getMetadata(id);
+        result = service.getMetadata(toplevelCorpusName, documentName);
       }
     }
     catch(RemoteException ex)

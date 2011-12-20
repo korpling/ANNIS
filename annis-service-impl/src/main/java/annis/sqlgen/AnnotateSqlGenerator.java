@@ -35,7 +35,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import annis.model.QueryNode;
-import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import org.apache.commons.lang.Validate;
 
@@ -206,10 +205,16 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Deprecated
-  public List<AnnotationGraph> queryAnnotationGraph(
+  public T queryAnnotationGraph(
     JdbcTemplate jdbcTemplate, long textID)
   {
-    return (List<AnnotationGraph>) jdbcTemplate.query(getTextQuery(textID), this);
+    return (T) jdbcTemplate.query(getTextQuery(textID), this);
+  }
+
+  public T queryAnnotationGraph(
+    JdbcTemplate jdbcTemplate, String toplevelCorpusName, String documentName)
+  {
+    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName, documentName), this);
   }
 
   private IslandPolicies getMostRestrictivePolicy(
@@ -255,6 +260,18 @@ public abstract class AnnotateSqlGenerator<T>
     keySb.append("] AS key");
     String key = keySb.toString();
 
+    // key for annotation graph matches
+    StringBuilder keyNamesSb = new StringBuilder();
+    keyNamesSb.append("ARRAY[matches.name1");
+    for (int i = 2; i <= nodeCount; ++i)
+    {
+      keyNamesSb.append(",");
+      keyNamesSb.append("matches.name");
+      keyNamesSb.append(i);
+    }
+    keyNamesSb.append("] AS key_names");
+    String keyNames = keyNamesSb.toString();
+
     // sql for matches
     StringBuilder matchSb = new StringBuilder();
     matchSb.append("SELECT * FROM ");
@@ -277,6 +294,8 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append("SELECT DISTINCT \n");
     sb.append("\t");
     sb.append(key);
+    sb.append(", ");
+    sb.append(keyNames);
     sb.append(", facts.*");
     sb.append(
       ", corpus.path_name as path, corpus.path_name[1] as document_name \n");
@@ -419,6 +438,20 @@ public abstract class AnnotateSqlGenerator<T>
     return sql;
   }
 
+  public String getDocumentQuery(String toplevelCorpusName, String documentName)
+  {
+    String template = "SELECT DISTINCT \n"
+      + "\tARRAY[-1::bigint] AS key, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
+      + "FROM\n"
+      + "\tfacts AS facts, corpus as c, corpus as toplevel\n" + "WHERE\n"
+      + "\ttoplevel.name = ':toplevel_name' AND c.name = :document_name AND facts.corpus_ref = c.id\n"
+      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
+      + "ORDER BY facts.pre";
+    String sql = template.replace(":toplevel_name", String.valueOf(
+      toplevelCorpusName)).replace(":document_name", documentName);
+    return sql;
+  }
+
   public String getMatchedNodesViewName()
   {
     return matchedNodesViewName;
@@ -553,8 +586,8 @@ public abstract class AnnotateSqlGenerator<T>
         sb2.append("(\n");
         indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
 
-        sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")
-          + " = solutions.text" + i + " AND\n");
+        sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")).
+          append(" = solutions.text").append(i).append(" AND\n");
         indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
 
         String rangeMin = "solutions.min" + i;
