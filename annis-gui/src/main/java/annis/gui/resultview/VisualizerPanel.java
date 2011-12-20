@@ -58,6 +58,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
+  
 
   public VisualizerPanel(final ResolverEntry entry, AnnisResult result,
     PluginSystem ps, Map<String, String> markersExact, Map<String, String> markersCovered)
@@ -190,6 +191,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         resource = createResource(outStream, vis.getContentType());
         String url = getApplication().getRelativeLocation(resource);
         iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+       
 
         addComponent(iframe);
       }

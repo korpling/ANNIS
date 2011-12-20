@@ -22,12 +22,12 @@ import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
+
+import com.vaadin.event.LayoutEvents.*;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.event.ItemClickEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,18 +41,35 @@ import java.util.Set;
 public class KWICPanel extends Table
 {
 
-  private AnnisResult result;
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
-  private long textID;
 
   public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
-    Map<AnnisNode, Long> markedAndCovered, long textID)
+    Map<AnnisNode, Long> markedAndCovered, long textID,
+    final List<String> mediaIDs)
   {
-    this.result = result;
+
     this.markedAndCovered = markedAndCovered;
-    this.textID = textID;
+
+    this.addListener(new ItemClickEvent.ItemClickListener()
+    {
+
+      @Override
+      public void itemClick(ItemClickEvent event)
+      {
+        if (event.isDoubleClick())
+        {
+          String script =
+            "console.log(document.getElementsByTagName(\"iframe\")[0].contentWindow);"
+            + " console.log(\"start script\");"
+            + " document.getElementsByTagName(\"iframe\")[0].contentWindow.hideVideo();"
+            + " console.log(\"done\");";
+          getWindow().
+            executeJavaScript(script);
+        }
+      }
+    });
 
     this.addStyleName("kwic");
     setSizeFull();
@@ -120,9 +137,8 @@ public class KWICPanel extends Table
 
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
-    
+
   }
-  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -209,6 +225,21 @@ public class KWICPanel extends Table
           l.addStyleName("kwic-anno");
         }
       }
+
+//      l.addListener(new Listener()
+//      {
+//
+//        @Override
+//        public void componentEvent(Event event)
+//        {
+//          if (event.getClass() == ItemClickEvent.class)
+//          {
+//            getWindow().executeJavaScript("alert(" + event.getComponent() + ");");
+//          }
+//          getWindow().executeJavaScript("alert(" + event.getComponent() + ");");
+//        }
+//      });
+
       return l;
     }
 

@@ -24,14 +24,15 @@ import annis.model.AnnotationGraph;
 import annis.resolver.ResolverEntry;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
+import com.google.gwt.dom.client.Style.TableLayout;
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
@@ -70,6 +71,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
   private int resultNumber;
+  private Set<String> visibleTokenAnnos;
 
   public SingleResultPanel(final AnnisResult result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -79,6 +81,7 @@ public class SingleResultPanel extends VerticalLayout implements
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
+    this.visibleTokenAnnos = visibleTokenAnnos;
 
     calculateHelperVariables();
 
@@ -121,15 +124,7 @@ public class SingleResultPanel extends VerticalLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    kwicPanels = new ArrayList<KWICPanel>();
-    for (long textId : containedTexts)
-    {
 
-      KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
-        textId);
-      addComponent(kwic);
-      kwicPanels.add(kwic);
-    }
 
   }
 
@@ -144,10 +139,36 @@ public class SingleResultPanel extends VerticalLayout implements
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
 
+        List<String> mediaIDs = new LinkedList<String>();
+        List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+
+        int counter = 0;
         for (ResolverEntry e : entries)
         {
-          addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap));
+          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
+            markedCoveredMap);
+          String id = "resolver-" + resultNumber + "-" + counter++;
+          if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
+          {
+            mediaIDs.add(id);
+          }
+          p.setDebugId(id);
+          visualizers.add(p);
+        }
+
+        kwicPanels = new ArrayList<KWICPanel>();
+        for (long textId : containedTexts)
+        {
+
+          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+            markedAndCovered, textId, mediaIDs);
+          addComponent(kwic);
+          kwicPanels.add(kwic);
+        }
+
+        for (VisualizerPanel p : visualizers)
+        {          
+          addComponent(p);
         }
       }
       catch (RemoteException ex)
