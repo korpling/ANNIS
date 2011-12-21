@@ -1,3 +1,4 @@
+var startTime;
 var endTime = undefined;
 
 /**
@@ -9,7 +10,9 @@ var seekAndPlay = function (start, end)
 {  
   $("video")[0].currentTime = start;
   $("video")[0].play();
+  startTime = start;
   endTime = end;
+  
 };
 
 $(document).ready(function() {	  
@@ -26,7 +29,7 @@ $(document).ready(function() {
   }); 
   
   video.on("timeupdate", function(){
-    if (endTime !== null && currentTime >= endTime) 
+    if (endTime !== null && video[0].currentTime >= endTime) 
     {
       video[0].pause();
     }

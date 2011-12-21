@@ -20,6 +20,7 @@ import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
+import com.vaadin.data.Item;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 
@@ -60,13 +61,47 @@ public class KWICPanel extends Table
       {
         if (event.isDoubleClick())
         {
-          String playCommand = ""
-            + "document.getElementById(\"" + mediaIDs.get(1) + "\")"
-            + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay(12, 30)";
-          String script = playCommand;
 
-          getWindow().executeJavaScript(script);
+          AnnisNode token = (AnnisNode) event.getPropertyId();
+          String time = null;
+          for (Annotation anno : token.getNodeAnnotations())
+          {
+            if ("time".equals(anno.getName()))
+            {
+              time = anno.getValue();
+            }
+          }
+          time = (time == null) ? "no time given" : time;
+          String startTime = getStartTime(time);
+          String endTime = getEndTime(time);
+
+          for(String id : mediaIDs)
+            startMediaVis(id, startTime, endTime);
         }
+      }
+
+      private String getStartTime(String time)
+      {
+        return time.split("-")[0];
+      }
+
+      private String getEndTime(String time)
+      {
+        String[] split = time.split("-");
+        if (split.length < 2)
+        {
+          return "undefined";
+        }
+        return time.split("-")[1];
+      }
+
+      private void startMediaVis(String id, String startTime, String endTime)
+      {
+        String playCommand = ""
+            + "document.getElementById(\"" + id + "\")"
+            + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
+            + startTime + ", " + endTime + "); ";              
+          getWindow().executeJavaScript(playCommand);  
       }
     });
 
@@ -211,7 +246,7 @@ public class KWICPanel extends Table
         {
           // add color
           l.addStyleName(
-            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));          
+            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));
         }
       }
       else
@@ -223,7 +258,7 @@ public class KWICPanel extends Table
           l.setDescription(a.getQualifiedName());
           l.addStyleName("kwic-anno");
         }
-      }      
+      }
       l.addStyleName("pointer");
       return l;
     }
