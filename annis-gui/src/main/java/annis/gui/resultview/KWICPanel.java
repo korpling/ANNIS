@@ -20,7 +20,6 @@ import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
-import com.vaadin.data.Item;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 
@@ -75,8 +74,10 @@ public class KWICPanel extends Table
           String startTime = getStartTime(time);
           String endTime = getEndTime(time);
 
-          for(String id : mediaIDs)
+          for (String id : mediaIDs)
+          {
             startMediaVis(id, startTime, endTime);
+          }
         }
       }
 
@@ -98,10 +99,10 @@ public class KWICPanel extends Table
       private void startMediaVis(String id, String startTime, String endTime)
       {
         String playCommand = ""
-            + "document.getElementById(\"" + id + "\")"
-            + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
-            + startTime + ", " + endTime + "); ";              
-          getWindow().executeJavaScript(playCommand);  
+          + "document.getElementById(\"" + id + "\")"
+          + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
+          + startTime + ", " + endTime + "); ";
+        getWindow().executeJavaScript(playCommand);
       }
     });
 

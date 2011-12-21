@@ -36,7 +36,7 @@ public class VideoVisualizer extends WriterVisualizer
       writer.append("\"></script>");      
       writer.append("</head>");
       writer.append("<body>");      
-      writer.append("<video controls preload=none style=\"padding-top:70px\">");
+      writer.append("<video controls preload=\"metadata\" style=\"padding-top:70px;\">");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);
       writer.append("\" type=\"audio/ogg\">");
