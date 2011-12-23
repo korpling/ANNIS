@@ -118,6 +118,14 @@
     <url-pattern>/secure/Binary/*</url-pattern>
   </servlet-mapping>
   <servlet>
+    <servlet-name>ExternalFileServlet</servlet-name>
+    <servlet-class>annis.frontend.servlets.ExternalFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ExternalFileServlet</servlet-name>
+    <url-pattern>/secure/Externalfile/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
     <servlet-name>AttributeListServlet</servlet-name>
     <servlet-class>annis.frontend.servlets.AttributeListServlet</servlet-class>
   </servlet>

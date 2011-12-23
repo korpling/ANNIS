@@ -23,12 +23,12 @@ import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
+
+import com.vaadin.event.LayoutEvents.*;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.event.ItemClickEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,21 +39,24 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class KWICPanel extends Table
+public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 {
 
-  private AnnisResult result;
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
-  private long textID;
+  private List<String> mediaIDs;
+  private List<VisualizerPanel> mediaVisualizer;
 
   public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
-    Map<AnnisNode, Long> markedAndCovered, long textID)
+    Map<AnnisNode, Long> markedAndCovered, long textID, List<String> mediaIDs,
+    List<VisualizerPanel> mediaVisualizer)
   {
-    this.result = result;
+
     this.markedAndCovered = markedAndCovered;
-    this.textID = textID;
+    this.mediaIDs = mediaIDs;
+    this.mediaVisualizer = mediaVisualizer;
+    this.addListener((ItemClickEvent.ItemClickListener) this);
 
     this.addStyleName("kwic");
     setSizeFull();
@@ -121,9 +124,8 @@ public class KWICPanel extends Table
 
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
-    
+
   }
-  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -210,6 +212,7 @@ public class KWICPanel extends Table
           l.addStyleName("kwic-anno");
         }
       }
+      l.addStyleName("pointer");
       return l;
     }
 
@@ -232,5 +235,61 @@ public class KWICPanel extends Table
     }
 
     return false;
+  }
+
+  @Override
+  public void itemClick(ItemClickEvent event)
+  {
+    if (event.isDoubleClick())
+    {
+      AnnisNode token = (AnnisNode) event.getPropertyId();
+      String time = null;
+      
+      for (VisualizerPanel vis : mediaVisualizer)
+      {
+        vis.openVisualizer(false);
+      }
+      
+      for (Annotation anno : token.getNodeAnnotations())
+      {
+        if ("time".equals(anno.getName()))
+        {
+          time = anno.getValue();
+        }
+      }
+      
+      time = (time == null) ? "no time given" : time;
+      String startTime = getStartTime(time);
+      String endTime = getEndTime(time);
+
+      for (String id : mediaIDs)
+      {
+        startMediaVis(id, startTime, endTime);
+      }     
+    }
+  }
+
+  private String getStartTime(String time)
+  {
+    return time.split("-")[0];
+  }
+
+  private String getEndTime(String time)
+  {
+    String[] split = time.split("-");
+    if (split.length < 2)
+    {
+      return "undefined";
+    }
+    return time.split("-")[1];
+  }
+
+  private void startMediaVis(String id, String startTime, String endTime)
+  {
+    String playCommand = ""
+      + "document.getElementById(\"" + id + "\")"
+      + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
+      + startTime + ", " + endTime + "); ";
+    getWindow().executeJavaScript(playCommand);
   }
 }

@@ -17,16 +17,26 @@ public class AudioVisualizer extends WriterVisualizer
     {
       String binaryServletPath = input.getContextPath() + "/Binary?name="
         + input.getResult().getDocumentName();
+      writer.append("<!DOCTYPE html>");
+      writer.append("<html>");
+      writer.append("<head>");
       writer.append(
-        "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append("<script type=\"text/javascript\" src=\"");
+      writer.append(input.getResourcePath("jquery-1.7.1.min.js"));
+      writer.append("\"></script>");
+      writer.append("<script type=\"text/javascript\" src=\"");
+      writer.append(input.getResourcePath("media_control.js"));
+      writer.append("\"></script>");
+      writer.append("</head>");
       writer.append("<body>");
-      writer.append("<audio controls preload=none style=\"padding-top:70px\">");
-      writer.append("<source src=\"" + binaryServletPath
-        + "\" type=\"audio/ogg\">");
+      writer.append("<audio controls preload=\"metadata\" style=\"padding-top:70px;\">");
+      writer.append("<source src=\"");
+      writer.append(binaryServletPath);
+      writer.append("\" type=\"audio/ogg\">");
       writer.append("[Browser zu antik]");
       writer.append("</audio>");
       writer.append("</body></html>");
-
     }
     catch (IOException e)
     {

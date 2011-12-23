@@ -28,13 +28,14 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,6 +71,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
   private int resultNumber;
+  private Set<String> visibleTokenAnnos;
 
   public SingleResultPanel(final AnnisResult result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -79,6 +81,7 @@ public class SingleResultPanel extends VerticalLayout implements
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
+    this.visibleTokenAnnos = visibleTokenAnnos;
 
     calculateHelperVariables();
 
@@ -121,15 +124,7 @@ public class SingleResultPanel extends VerticalLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    kwicPanels = new ArrayList<KWICPanel>();
-    for (long textId : containedTexts)
-    {
 
-      KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
-        textId);
-      addComponent(kwic);
-      kwicPanels.add(kwic);
-    }
 
   }
 
@@ -144,10 +139,41 @@ public class SingleResultPanel extends VerticalLayout implements
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
 
+        List<String> mediaIDs = new LinkedList<String>();
+        List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+        List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+
+
+        int counter = 0;
         for (ResolverEntry e : entries)
         {
-          addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap));
+          String id = "resolver-" + resultNumber + "-" + counter++;
+          CustomLayout customLayout = this.customLayout(id);
+
+          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
+            markedCoveredMap, customLayout);
+
+          if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
+          {
+            mediaIDs.add(id);
+            mediaVisualizer.add(p);
+          }
+
+          visualizers.add(p);
+        }
+
+        kwicPanels = new ArrayList<KWICPanel>();
+        for (long textId : containedTexts)
+        {
+          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+            markedAndCovered, textId, mediaIDs, mediaVisualizer);
+          addComponent(kwic);
+          kwicPanels.add(kwic);
+        }
+
+        for (VisualizerPanel p : visualizers)
+        {
+          addComponent(p);
         }
       }
       catch (RemoteException ex)
@@ -191,7 +217,6 @@ public class SingleResultPanel extends VerticalLayout implements
         markedExactMap.put("" + n.getId(),
           MatchedNodeColors.values()[color].name());
       }
-
     }
 
     markedAndCovered = calculateMarkedAndCoveredIDs(result.getGraph());
@@ -261,5 +286,24 @@ public class SingleResultPanel extends VerticalLayout implements
 
       getWindow().addWindow(infoWindow);
     }
+  }
+
+  private CustomLayout customLayout(String id)
+  {
+    String layout = ""
+      + "<div id=\"" + id + "\">"
+      + "  <div location=\"btEntry\"></div>"
+      + "  <div location=\"iframe\"></div>"
+      + "</div>";
+    try
+    {
+      return new CustomLayout(new ByteArrayInputStream(layout.getBytes()));
+    }
+    catch (IOException ex)
+    {
+      Logger.getLogger(SingleResultPanel.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+    return null;
   }
 }
