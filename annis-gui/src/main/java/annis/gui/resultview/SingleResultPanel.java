@@ -141,6 +141,8 @@ public class SingleResultPanel extends VerticalLayout implements
 
         List<String> mediaIDs = new LinkedList<String>();
         List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+        List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+
 
         int counter = 0;
         for (ResolverEntry e : entries)
@@ -154,16 +156,17 @@ public class SingleResultPanel extends VerticalLayout implements
           if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
           {
             mediaIDs.add(id);
+            mediaVisualizer.add(p);
           }
+
           visualizers.add(p);
         }
 
         kwicPanels = new ArrayList<KWICPanel>();
         for (long textId : containedTexts)
         {
-
           KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-            markedAndCovered, textId, mediaIDs);
+            markedAndCovered, textId, mediaIDs, mediaVisualizer);
           addComponent(kwic);
           kwicPanels.add(kwic);
         }
@@ -290,7 +293,7 @@ public class SingleResultPanel extends VerticalLayout implements
     String layout = ""
       + "<div id=\"" + id + "\">"
       + "  <div location=\"btEntry\"></div>"
-      + "  <div location=\"iframe\"></div>"      
+      + "  <div location=\"iframe\"></div>"
       + "</div>";
     try
     {

@@ -45,13 +45,16 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   private BeanItemContainer<String> containerAnnos;
   private Map<AnnisNode, Long> markedAndCovered;
   private List<String> mediaIDs;
+  private List<VisualizerPanel> mediaVisualizer;
 
   public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
-    Map<AnnisNode, Long> markedAndCovered, long textID, List<String> mediaIDs)
+    Map<AnnisNode, Long> markedAndCovered, long textID, List<String> mediaIDs,
+    List<VisualizerPanel> mediaVisualizer)
   {
 
     this.markedAndCovered = markedAndCovered;
     this.mediaIDs = mediaIDs;
+    this.mediaVisualizer = mediaVisualizer;
     this.addListener((ItemClickEvent.ItemClickListener) this);
 
     this.addStyleName("kwic");
@@ -238,9 +241,14 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   {
     if (event.isDoubleClick())
     {
-
       AnnisNode token = (AnnisNode) event.getPropertyId();
       String time = null;
+      
+      for (VisualizerPanel vis : mediaVisualizer)
+      {
+        vis.openVisualizer(false);
+      }
+      
       for (Annotation anno : token.getNodeAnnotations())
       {
         if ("time".equals(anno.getName()))
@@ -248,6 +256,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           time = anno.getValue();
         }
       }
+      
       time = (time == null) ? "no time given" : time;
       String startTime = getStartTime(time);
       String endTime = getEndTime(time);
@@ -255,7 +264,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       for (String id : mediaIDs)
       {
         startMediaVis(id, startTime, endTime);
-      }
+      }     
     }
   }
 

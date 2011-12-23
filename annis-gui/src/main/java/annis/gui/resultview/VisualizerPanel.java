@@ -74,13 +74,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
     this.customLayout = costumLayout;
-    
+
     setContent(this.customLayout);
 
     this.setWidth("100%");
     this.setHeight("-1px");
 
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);    
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
@@ -160,9 +160,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
+    openVisualizer(true);
+  }
 
-    if (resource != null)
-    { 
+  public void openVisualizer(Boolean collapse)
+  {
+    if (resource != null && collapse)
+    {
       getApplication().removeResource(resource);
     }
 
@@ -204,7 +208,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       btEntry.setIcon(ICON_COLLAPSE);
       iframe.setVisible(true);
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE)
+    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
       // collapse
       if (iframe != null)
@@ -213,5 +217,5 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       }
       btEntry.setIcon(ICON_EXPAND);
     }
-  }  
+  }
 }
