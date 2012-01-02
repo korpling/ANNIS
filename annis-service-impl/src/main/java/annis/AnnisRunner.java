@@ -531,25 +531,6 @@ public class AnnisRunner extends AnnisBaseRunner
 	public void doShow(String setting) {
 		doSet("?" + setting);
 	}
-	
-  @Deprecated
-  public void doSqlGraph(String annisQuery)
-  {
-    // sql query
-    QueryData queryData = parse(annisQuery);
-    queryData.setCorpusList(corpusList);
-    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
-
-    String sql = findSqlGenerator.toSql(queryData);
-
-    out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
-
-    AOMAnnotateSqlGenerator ge = new AOMAnnotateSqlGenerator();
-    ge.setMatchedNodesViewName("matched_nodes");
-    out.println(ge.getContextQuery(corpusList, context, context, matchLimit, 0, queryData.getMaxWidth(),
-      new HashMap<Long, Properties>())
-      + ";");
-  }
   
   public void doSqlMatrix(String annisQuery)
   {

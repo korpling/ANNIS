@@ -185,26 +185,6 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Deprecated
-  public String explain(JdbcTemplate jdbcTemplate,
-    List<Long> corpusList,
-    int nodeCount, long offset, long limit, int left,
-    int right,
-    boolean analyze, Map<Long, Properties> corpusProperties)
-  {
-    ParameterizedSingleColumnRowMapper<String> planRowMapper =
-      new ParameterizedSingleColumnRowMapper<String>();
-
-    List<String> plan = jdbcTemplate.query(
-      (analyze ? "EXPLAIN ANALYZE " : "EXPLAIN ")
-      + "\n"
-      + getContextQuery(corpusList, left, right,
-      limit,
-      offset, nodeCount, corpusProperties),
-      planRowMapper);
-    return StringUtils.join(plan, "\n");
-  }
-
-  @Deprecated
   public T queryAnnotationGraph(
     JdbcTemplate jdbcTemplate, long textID)
   {
@@ -239,193 +219,7 @@ public abstract class AnnotateSqlGenerator<T>
     return result;
   }
 
-  @Deprecated
-  public String getContextQuery(List<Long> corpusList, int left,
-    int right, long limit, long offset, int nodeCount,
-    Map<Long, Properties> corpusProperties)
-  {
-
-    IslandPolicies islandsPolicy = getMostRestrictivePolicy(
-      corpusList, corpusProperties);
-
-    // key for annotation graph matches
-    StringBuilder keySb = new StringBuilder();
-    keySb.append("ARRAY[matches.id1");
-    for (int i = 2; i <= nodeCount; ++i)
-    {
-      keySb.append(",");
-      keySb.append("matches.id");
-      keySb.append(i);
-    }
-    keySb.append("] AS key");
-    String key = keySb.toString();
-
-    // key for annotation graph matches
-    StringBuilder keyNamesSb = new StringBuilder();
-    keyNamesSb.append("ARRAY[matches.name1");
-    for (int i = 2; i <= nodeCount; ++i)
-    {
-      keyNamesSb.append(",");
-      keyNamesSb.append("matches.name");
-      keyNamesSb.append(i);
-    }
-    keyNamesSb.append("] AS key_names");
-    String keyNames = keyNamesSb.toString();
-
-    // sql for matches
-    StringBuilder matchSb = new StringBuilder();
-    matchSb.append("SELECT * FROM ");
-    matchSb.append(matchedNodesViewName);
-    matchSb.append(" ORDER BY ");
-    matchSb.append("id1");
-    for (int i = 2; i <= nodeCount; ++i)
-    {
-      matchSb.append(", ");
-      matchSb.append("id");
-      matchSb.append(i);
-    }
-    matchSb.append(" OFFSET ");
-    matchSb.append(offset);
-    matchSb.append(" LIMIT ");
-    matchSb.append(limit);
-    String matchSql = matchSb.toString();
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("SELECT DISTINCT \n");
-    sb.append("\t");
-    sb.append(key);
-    sb.append(", ");
-    sb.append(keyNames);
-    sb.append(", facts.*");
-    sb.append(
-      ", corpus.path_name as path, corpus.path_name[1] as document_name \n");
-    sb.append("FROM\n");
-    sb.append("\t(");
-    sb.append(matchSql);
-    sb.append(") AS matches,\n");
-    sb.append("\t");
-    sb.append(FACTS_TABLE);
-    sb.append(" AS facts,\n");
-    sb.append("corpus\n");
-
-    sb.append("WHERE\n");
-    if (corpusList != null)
-    {
-      sb.append("\tfacts.toplevel_corpus IN (");
-      sb.append(corpusList.isEmpty() ? "NULL"
-        : StringUtils.join(corpusList, ","));
-      sb.append(") AND\n");
-    }
-    sb.append("\t(\n");
-
-    if (islandsPolicy == IslandPolicies.context)
-    {
-      for (int i = 1; i <= nodeCount; ++i)
-      {
-        if (i > 1)
-        {
-          sb.append("\n\t\tOR\n");
-        }
-
-        sb.append("\t\t(\n" + "\t\t\tfacts.text_ref = matches.text_ref");
-        sb.append(i);
-
-        String rangeStart = "matches.left_token" + i + " - "
-          + left;
-        String rangeEnd = "matches.right_token" + i + " + "
-          + right;
-
-        sb.append("\n" + "\t\t\tAND\n" + "\t\t\t(\n");
-        sb.append(contextRangeSubquery(rangeStart, rangeEnd,
-          "\t\t\t\t"));
-        sb.append("\t\t\t)\n");
-
-        sb.append("\n" + "\t\t)");
-      }
-    }
-    else if (islandsPolicy == IslandPolicies.none)
-    {
-      sb.append("\t\tfacts.text_ref IN(");
-      for (int i = 1; i <= nodeCount; i++)
-      {
-        if (i > 1)
-        {
-          sb.append(",");
-        }
-        sb.append("matches.text_ref");
-        sb.append(i);
-      }
-      sb.append(")\n\t\tAND\n\t\t(\n");
-
-      StringBuilder rangeStart = new StringBuilder();
-      StringBuilder rangeEnd = new StringBuilder();
-
-      rangeStart.append("ANY(ARRAY[");
-      rangeEnd.append("ANY(ARRAY[");
-
-      for (int i = 1; i <= nodeCount; i++)
-      {
-        if (i > 1)
-        {
-          rangeStart.append(",");
-          rangeEnd.append(",");
-        }
-        rangeStart.append("matches.left_token");
-        rangeStart.append(i);
-        rangeStart.append(" - ");
-        rangeStart.append(left);
-
-        rangeEnd.append("matches.right_token");
-        rangeEnd.append(i);
-        rangeEnd.append(" + ");
-        rangeEnd.append(right);
-      }
-
-      rangeStart.append("])");
-      rangeEnd.append("])");
-
-      sb.append(contextRangeSubquery(rangeStart.toString(),
-        rangeEnd.toString(), "\t\t\t"));
-
-      sb.append("\t\t)\n");
-    }
-    sb.append("\n\t)\n");
-    sb.append("\tAND corpus.id = corpus_ref\n");
-    sb.append("\nORDER BY key, facts.pre");
-    return sb.toString();
-  }
-
-  @Deprecated
-  private StringBuilder contextRangeSubquery(String rangeStart,
-    String rangeEnd, String indent)
-  {
-    StringBuilder sb = new StringBuilder();
-
-    // left token inside context range
-    sb.append(indent);
-    sb.append("(facts.left_token >= ");
-    sb.append(rangeStart);
-    sb.append(" AND facts.left_token <= ");
-    sb.append(rangeEnd);
-    sb.append(")\n");
-    // right token inside context range
-    sb.append(indent);
-    sb.append("OR(facts.right_token >= ");
-    sb.append(rangeStart);
-    sb.append(" AND facts.right_token <= ");
-    sb.append(rangeEnd);
-    sb.append(")\n");
-    // context range completly covered
-    sb.append(indent);
-    sb.append("OR(facts.left_token <= ");
-    sb.append(rangeStart);
-    sb.append(" AND facts.right_token >= ");
-    sb.append(rangeEnd);
-    sb.append(")\n");
-
-    return sb;
-  }
-
+  
   public String getTextQuery(long textID)
   {
     String template = "SELECT DISTINCT \n"
@@ -490,6 +284,17 @@ public abstract class AnnotateSqlGenerator<T>
     }
     sb.append(StringUtils.join(ids, ", "));
     sb.append("] AS key,\n");
+    
+    // key for annotation graph matches
+    
+    sb.append(indent).append("ARRAY[solutions.name1");
+    for (int i = 2; i <= alternative.size(); ++i)
+    {
+      sb.append(",");
+      sb.append("solutions.name");
+      sb.append(i);
+    }
+    sb.append("] AS key_names,\n");
 
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
