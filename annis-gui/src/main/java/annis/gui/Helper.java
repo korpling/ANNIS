@@ -19,6 +19,8 @@ import annis.exceptions.AnnisServiceFactoryException;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
@@ -39,6 +41,12 @@ import org.apache.commons.lang.StringUtils;
 public class Helper
 {
 
+  public static WebResource getAnnisWebResource(Application app)
+  {
+    Client c = Client.create();
+    return c.resource(app.getProperty("AnnisWebService.URL"));
+  }
+  
   public static AnnisService getService(Application app, Window window)
   {
     AnnisService service = null;

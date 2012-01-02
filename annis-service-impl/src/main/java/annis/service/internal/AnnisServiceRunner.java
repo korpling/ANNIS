@@ -15,8 +15,6 @@
  */
 package annis.service.internal;
 
-import java.io.File;
-
 import java.io.IOException;
 import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
@@ -31,19 +29,109 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
+import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.log4j.Appender;
+import org.apache.log4j.varia.LevelMatchFilter;
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.springframework.context.ConfigurableApplicationContext;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
-  
+
   private static Logger log = Logger.getLogger(AnnisServiceRunner.class);
-  private static Thread mainDaemonThread;
-  private static AnnisServiceRunner annisService;
+  private static AnnisServiceRunner annisServiceRunner;
+  private static boolean isShutdownRequested = false;
+  private static Thread mainThread;
   private HttpServer server;
-  
+
+  public static void main(String[] args) throws IOException
+  {
+    mainThread = Thread.currentThread();
+    
+    PropertyConfigurator.configure(System.getProperty("annis.home")
+      + "/conf/logging.properties");
+
+    annisServiceRunner = new AnnisServiceRunner();
+
+    // run as a deamon?
+    if (args.length == 1 && ("-d".equals(args[0])))
+    {
+      log.info("Running in Daemon mode");
+
+      File pidFile = new File(System.getProperty("annisservice.pid_file"));
+      pidFile.deleteOnExit();
+
+      annisServiceRunner.start();
+      closeSystemStreams();    
+    }
+    // no, run in debug mode
+    else
+    {
+      log.info("Running in Debug mode");
+      // create a logging appender for stdout
+      Logger.getRootLogger().addAppender(
+        new ConsoleAppender(new PatternLayout(
+        "%d{HH:mm:ss,SSS} [%t] %C{1} %p: %m\n")));
+      annisServiceRunner.start();
+    }
+    
+    addShutdownHook();
+
+    try
+    {
+      while (!isShutdownRequested)
+      {
+        Thread.sleep(1000);
+      }
+    }
+    catch (InterruptedException ex)
+    {
+      java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
+        log(Level.SEVERE, "interrupted in endless loop", ex);
+    }
+
+  }
+
+  /**
+   * shutdown the AnnisService - ensure that current work load finishes
+   */
+  public static void shutdown()
+  {
+    log.info("Shutting down...");
+    isShutdownRequested = true;
+
+    try
+    {
+      mainThread.join();
+    }
+    catch (InterruptedException e)
+    {
+      log.error(
+        "Interrupted which waiting on main daemon thread to complete.");
+    }
+  }
+
+  private static void closeSystemStreams()
+  {
+    System.err.close();
+    System.out.close();
+  }
+
+  static private void addShutdownHook()
+  {
+    Runtime.getRuntime().addShutdownHook(new Thread()
+    {
+
+      @Override
+      public void run()
+      {
+        AnnisServiceRunner.shutdown();
+      }
+    });
+  }
+
   protected void createWebServer()
   {
 
@@ -53,7 +141,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     ResourceConfig rc = new DefaultResourceConfig();
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       cxt);
-    
+
     int port = cxt.getBean(AnnisWebService.class).getPort();
     URI baseURI = UriBuilder.fromUri("http://localhost").port(port).build();
     try
@@ -75,66 +163,9 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
         log(Level.SEVERE, null, ex);
     }
-    
-  }
-  
-  public static void main(String[] args)
-  {
-    PropertyConfigurator.configure(System.getProperty("annis.home")
-      + "/conf/logging.properties");
-    
-    annisService = new AnnisServiceRunner();
 
-    // run as a deamon?
-    if (args.length == 1 && ("-d".equals(args[0])))
-    {
-      annisService.startAndDetach();
-    }
-    // no, run in debug mode
-    else
-    {
-      // create a logging appender for stdout
-      Logger.getRootLogger().addAppender(
-        new ConsoleAppender(new PatternLayout(
-        "%d{HH:mm:ss,SSS} [%t] %C{1} %p: %m\n")));
-      annisService.start();
-    }
-    
-    try
-    {
-      // endless loop
-      while (true)
-      {
-        System.in.read();
-      }
-    }
-    catch (IOException ex)
-    {
-      Logger.getLogger(AnnisServiceRunner.class.getName()).error(
-        "could not read form System.in", ex);
-    }
   }
 
-  /**
-   * start the AnnisService and detach from the shell
-   */
-  public void startAndDetach()
-  {
-    try
-    {
-      start();
-      daemonize();
-      
-    }
-    catch (Throwable e)
-    {
-      log.fatal("Startup failed.", e);
-      System.err.println("Startup failed.");
-      e.printStackTrace();
-      System.exit(1);
-    }
-  }
-  
   private void start()
   {
     log.info("Starting up...");
@@ -151,65 +182,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner
           log(Level.SEVERE, null, ex);
       }
     }
-    
-  }
-  
-  private void daemonize()
-  {
-    // save the current thread
-    mainDaemonThread = Thread.currentThread();
 
-    // add a shutdown hook to achieve an orderly shutdown
-    Runtime.getRuntime().addShutdownHook(new Thread()
-    {
-      
-      public void run()
-      {
-        annisService.shutdown();
-      }
-    });
-
-    // close stdout and stderr to detach process from shell
-    closeSystemStreams();
-    
-    log.info("Running as a daemon.");
-  }
-  
-  private void closeSystemStreams()
-  {
-    System.err.close();
-    System.out.close();
-  }
-
-  /**
-   * shutdown the AnnisService - ensure that current work load finishes,
-   * FIXME: shutdownrequested! - delete pid file
-   */
-  public void shutdown()
-  {
-    log.info("Shutting down...");
-
-    // block, until current thread completes
-    try
-    {
-      mainDaemonThread.join();
-    }
-    catch (InterruptedException e)
-    {
-      log.error("Interrupted while waiting on main daemon thread to complete.");
-    }
-    
-    if (server != null)
-    {
-      server.stop();
-    }
-
-    // delete pid file
-    boolean success = new File(System.getProperty("annisservice.pid_file")).
-      delete();
-    if (!success)
-    {
-      log.error("Couldn't delete pid file.");
-    }
   }
 }

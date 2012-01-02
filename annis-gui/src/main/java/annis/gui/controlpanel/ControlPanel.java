@@ -24,6 +24,7 @@ import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisCorpus;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -198,6 +199,7 @@ public class ControlPanel extends Panel
     @Override
     public void run()
     {
+//      WebResource res = Helper.getAnnisWebResource(getApplication());
       AnnisService service = Helper.getService(getApplication(), window);
       if(service != null)
       {

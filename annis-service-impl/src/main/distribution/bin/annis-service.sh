@@ -13,21 +13,12 @@ classpath=`$ANNIS_HOME/bin/classpath.sh`
 # the pid (process id) of the service is saved to this file
 pid_file=$ANNIS_HOME/var/annisservice.pid
 
-# export variables, so they can be used in launch_daemon()
-export ANNIS_HOME pid_file classpath
+jvm_args=""
+service_args=""
 
-launch_daemon() {
-	/bin/sh <<EOF
-		# build classpath
+export ANNIS_HOME pid_file jvm_args service_args classpath
 
-		# launch daemon and return pid
-		java -Dfile.encoding=UTF-8 -Dannis.home=\$ANNIS_HOME -Dannisservice.pid_file=\$pid_file -cp \$classpath annis.service.internal.AnnisServiceRunner -d <&- &
-		pid=\$!
-		echo \$pid
-EOF
-}
-
-start() {
+launch() {
 	case `status` in
 		0)
 			echo "AnnisService already running."
@@ -35,11 +26,12 @@ start() {
 		1)
 			# launch daemon and remember pid
 			echo -n "Starting AnnisService ... "
-			pid=`launch_daemon`
-
+			pid=`$ANNIS_HOME/bin/internal-service-launch.sh`
+         
 			# check if daemon is running
-			if ps -p "$pid" >/dev/null 2>&1; then
-		
+			if ps -p "$pid" > /dev/null 2>&1; then
+            
+            echo "writing PID"
 				# daemon is running, save pid
 				echo $pid > $pid_file
 				echo "done." 
@@ -58,7 +50,7 @@ stop() {
 	case `status` in
 		0)
 			kill `cat $pid_file`
-			sleep 1s
+			sleep 2s
 			case `status` in
 				1)
 					echo "AnnisService stopped."
@@ -76,7 +68,7 @@ stop() {
 	esac
 }
 
-# 0: running, 1: not running, 2: stale pid file
+# 0: running, 1: not running/no pid, 2: stale pid file
 status() {
 	# check if pid file exists
 	if [ -f $pid_file ]; then
@@ -94,15 +86,23 @@ status() {
 }
 
 case "$1" in
-	start)
-		start 
+	run)
+		java -Dfile.encoding=UTF-8 -Dannis.home="$ANNIS_HOME" -cp "$classpath" annis.service.internal.AnnisServiceRunner
 		;;
 	stop)
 		stop 
 		;;
+   start)
+      export service_args="-d"
+      export jvm_args="-Dannisservice.pid_file=$pid_file"
+      launch
+
+		;;
 	restart)
-		stop
-		start
+		export service_args="-d"
+      export jvm_args="-Dannisservice.pid_file=$pid_file"
+      stop
+		launch
 		;;
 	status)
 		case `status` in
@@ -118,7 +118,7 @@ case "$1" in
 		esac
 		;;
 	*)
-		echo "usage: annisservice.sh start|stop|restart|status"
+		echo "usage: annisservice.sh start|stop|run|restart|status"
 esac
 
 exit 0
