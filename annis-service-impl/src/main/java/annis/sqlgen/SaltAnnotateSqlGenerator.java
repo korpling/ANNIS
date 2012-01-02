@@ -94,7 +94,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       Validate.isTrue(!resultSet.wasNull(),
         "Match group identifier must not be null");
       Validate.isTrue(sqlKey.getBaseType() == Types.VARCHAR,
-        "Key in database must be from the type \"bigint\" but was \""
+        "Key in database must be from the type \"varchar\" but was \""
         + sqlKey.getBaseTypeName() + "\"");
 
       String[] keyArray = (String[]) sqlKey.getArray();

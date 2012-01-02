@@ -285,9 +285,8 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(StringUtils.join(ids, ", "));
     sb.append("] AS key,\n");
     
-    // key for annotation graph matches
-    
-    sb.append(indent).append("ARRAY[solutions.name1");
+    // key for annotation graph matches    
+    sb.append(indent).append(TABSTOP + "ARRAY[solutions.name1");
     for (int i = 2; i <= alternative.size(); ++i)
     {
       sb.append(",");

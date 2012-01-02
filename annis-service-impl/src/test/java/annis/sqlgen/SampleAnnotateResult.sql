@@ -1,10 +1,12 @@
 -- "das" & pos="VVFIN" & #1 . #2 
 -- queried on pcc2_plus (only one match)
 
+drop table if exists mymatch;
 create temporary table mymatch as (
 
 SELECT DISTINCT
   ARRAY[solutions.id1, solutions.id2] AS key,
+  ARRAY[solutions.name1,solutions.name2] AS key_names,
 0::integer AS matchstart,
   facts.id AS id,
   facts.text_ref AS text_ref,
@@ -40,8 +42,8 @@ SELECT DISTINCT
 FROM
   (
     SELECT DISTINCT
-      facts1.id AS id1, facts1.text_ref AS text1, facts1.left_token - 5 AS min1, facts1.right_token + 5 AS max1, 
-      facts2.id AS id2, facts2.text_ref AS text2, facts2.left_token - 5 AS min2, facts2.right_token + 5 AS max2
+      facts1.id AS id1, facts1.node_name AS name1, facts1.text_ref AS text1, facts1.left_token - 5 AS min1, facts1.right_token + 5 AS max1, 
+      facts2.id AS id2, facts2.node_name AS name2, facts2.text_ref AS text2, facts2.left_token - 5 AS min2, facts2.right_token + 5 AS max2
     FROM
       facts AS facts1,
       facts AS facts2
