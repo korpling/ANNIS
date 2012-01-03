@@ -18,10 +18,21 @@ package annis.service.internal;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.externalFiles.ExternalFileMgr;
+import annis.ql.parser.QueryData;
+import com.sun.jersey.api.JResponseAsResponse;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,12 +65,61 @@ public class AnnisWebService
     // log a message after successful startup
     log.info("AnnisWebService loaded.");
   }
-  
+
   @GET
+  @Path("search/count")
   @Produces("plain/text")
-  public String getWelcomeMessage()
+  public Response count(@QueryParam("q") String query,
+    @QueryParam("corpora") String rawCorpusNames)
   {
-    return "Welcome to the ANNIS corpus search";
+
+    if (query == null)
+    {
+      return Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'q'").build();
+    }
+    if (rawCorpusNames == null)
+    {
+      return Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'corpora'").build();
+    }
+
+    try
+    {
+      String[] splittedIDs = rawCorpusNames.split(",");
+      List<Long> corpusIDs = new LinkedList<Long>();
+      for (int i = 0; i < splittedIDs.length; i++)
+      {
+        try
+        {
+          corpusIDs.add(Long.parseLong(splittedIDs[i]));
+        }
+        catch (NumberFormatException ex)
+        {
+          return Response.status(Response.Status.BAD_REQUEST).type(
+            MediaType.TEXT_PLAIN).entity("invalid number: "
+            + splittedIDs[i]).build();
+        }
+      }
+
+      QueryData data = annisDao.parseAQL(query, corpusIDs);
+      //   List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
+      //    QueryData data = annisDao.parseAQL(query, annisDao.listCorpusByName(
+      //      corpusNames));
+      int count = annisDao.count(data);
+      return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
+    }
+    catch (Exception ex)
+    {
+      log.log(Level.SEVERE, null, ex);
+      StringWriter stacktrace = new StringWriter();
+      ex.printStackTrace(new PrintWriter(stacktrace));
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).type(
+        MediaType.TEXT_PLAIN).entity("Unknown exception occured\n\n"
+        + stacktrace.toString()).build();
+    }
   }
 
   public AnnisDao getAnnisDao()
@@ -111,6 +171,4 @@ public class AnnisWebService
   {
     this.port = port;
   }
-  
-  
 }

@@ -21,7 +21,7 @@
     <init-param>
       <description>URL of the AnnisRMIServer</description>
       <param-name>AnnisWebService.URL</param-name>
-      <param-value>rmi://localhost:5711/annis</param-value>
+      <param-value>http://localhost:5711/annis</param-value>
     </init-param>
     <init-param>
       <description>Path (or command) of the "dot" programm</description>

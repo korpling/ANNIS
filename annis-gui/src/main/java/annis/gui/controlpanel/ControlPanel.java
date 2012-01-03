@@ -22,7 +22,6 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
-import annis.service.AnnisService;
 import annis.service.ifaces.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -33,14 +32,11 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.collections15.set.ListOrderedSet;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 
@@ -55,7 +51,7 @@ public class ControlPanel extends Panel
   private SearchWindow searchWindow;
   private Window window;
   private String lastQuery;
-  private Map<Long,AnnisCorpus> lastCorpusSelection;
+  private Map<Long, AnnisCorpus> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
 
@@ -64,7 +60,7 @@ public class ControlPanel extends Panel
     super("Search Form");
     this.searchWindow = searchWindow;
     this.history = new ListOrderedSet<HistoryEntry>();
-    
+
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
@@ -99,28 +95,27 @@ public class ControlPanel extends Panel
     this.window = getWindow();
   }
 
-  public void setQuery(String query, Map<Long,AnnisCorpus> corpora)
+  public void setQuery(String query, Map<Long, AnnisCorpus> corpora)
   {
-    if(queryPanel != null && corpusList != null)
+    if (queryPanel != null && corpusList != null)
     {
       queryPanel.setQuery(query);
-      if(corpora != null)
+      if (corpora != null)
       {
         corpusList.selectCorpora(corpora);
       }
     }
   }
-  
-  public void setQuery(String query, Map<Long,AnnisCorpus> corpora, 
+
+  public void setQuery(String query, Map<Long, AnnisCorpus> corpora,
     int contextLeft, int contextRight)
   {
     setQuery(query, corpora);
     searchOptions.setLeftContext(contextLeft);
     searchOptions.setRightContext(contextRight);
   }
-  
-  
-  public Map<Long,AnnisCorpus> getSelectedCorpora()
+
+  public Map<Long, AnnisCorpus> getSelectedCorpora()
   {
     return corpusList.getSelectedCorpora();
   }
@@ -133,31 +128,33 @@ public class ControlPanel extends Panel
 
   public void executeQuery()
   {
-    if(getApplication() != null && getApplication().getUser() == null)
+    if (getApplication() != null && getApplication().getUser() == null)
     {
       getWindow().showNotification("Please login first",
         Window.Notification.TYPE_WARNING_MESSAGE);
     }
-    else if(getApplication() != null && corpusList != null && queryPanel != null)
+    else if (getApplication() != null && corpusList != null && queryPanel
+      != null)
     {
 
-      Map<Long,AnnisCorpus> rawCorpusSelection = corpusList.getSelectedCorpora();
+      Map<Long, AnnisCorpus> rawCorpusSelection =
+        corpusList.getSelectedCorpora();
 
       // filter corpus selection by logged in user
       lastCorpusSelection = new TreeMap<Long, AnnisCorpus>(rawCorpusSelection);
       AnnisUser user = (AnnisUser) getApplication().getUser();
-      if(user != null)
+      if (user != null)
       {
         lastCorpusSelection.keySet().retainAll(user.getCorpusIdList());
       }
       lastQuery = queryPanel.getQuery();
-      if(lastCorpusSelection.isEmpty())
+      if (lastCorpusSelection.isEmpty())
       {
         getWindow().showNotification("Please select a corpus",
           Window.Notification.TYPE_WARNING_MESSAGE);
         return;
       }
-      if("".equals(lastQuery))
+      if ("".equals(lastQuery))
       {
         getWindow().showNotification("Empty query",
           Window.Notification.TYPE_WARNING_MESSAGE);
@@ -167,13 +164,13 @@ public class ControlPanel extends Panel
       HistoryEntry e = new HistoryEntry();
       e.setQuery(lastQuery);
       e.setCorpora(getSelectedCorpora());
-      
+
       // remove it first in order to let it appear on the beginning of the list
-      history.remove(e);      
+      history.remove(e);
       history.add(0, e);
-      
+
       queryPanel.updateShortHistory(history.asList());
-      
+
       queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
@@ -181,8 +178,8 @@ public class ControlPanel extends Panel
       searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
         searchOptions.getLeftContext(), searchOptions.getRightContext(),
         searchOptions.getResultsPerPage());
-      
-      
+
+
     }
   }
 
@@ -190,7 +187,7 @@ public class ControlPanel extends Panel
   {
     return history;
   }
-  
+
   private class CountThread extends Thread
   {
 
@@ -199,43 +196,36 @@ public class ControlPanel extends Panel
     @Override
     public void run()
     {
-//      WebResource res = Helper.getAnnisWebResource(getApplication());
-      AnnisService service = Helper.getService(getApplication(), window);
-      if(service != null)
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+      //AnnisService service = Helper.getService(getApplication(), window);
+      if (res != null)
       {
         try
         {
-
-          count = service.getCount(new LinkedList<Long>(
-            lastCorpusSelection.keySet()), lastQuery);
-
+          count = Integer.parseInt(res.path("search").path("count").queryParam(
+            "q", lastQuery).queryParam("corpora",
+            StringUtils.join(lastCorpusSelection.keySet(), ",")).get(
+            String.class));
         }
-        catch(RemoteException ex)
-        {
-          Logger.getLogger(ControlPanel.class.getName()).log(
-            Level.SEVERE, null, ex);
-          window.showNotification(ex.getLocalizedMessage(),
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch(AnnisQLSemanticsException ex)
+        catch (AnnisQLSemanticsException ex)
         {
           window.showNotification(
             ex.getLocalizedMessage(), "Sematic error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
-        catch(AnnisQLSyntaxException ex)
+        catch (AnnisQLSyntaxException ex)
         {
           window.showNotification(
             ex.getLocalizedMessage(), "Syntax error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
-        catch(AnnisCorpusAccessException ex)
+        catch (AnnisCorpusAccessException ex)
         {
           window.showNotification(
-            ex.getLocalizedMessage(),"Corpus access error",
+            ex.getLocalizedMessage(), "Corpus access error",
             Window.Notification.TYPE_ERROR_MESSAGE);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           window.showNotification(
             ex.getLocalizedMessage(), "unknown exception",
