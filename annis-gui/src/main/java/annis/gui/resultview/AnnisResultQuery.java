@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -48,6 +49,7 @@ public class AnnisResultQuery implements Serializable
     this.aql = aql;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
+    this.app = app;
   }
 
   public SaltProject loadBeans(int startIndex, int count, AnnisUser user) throws
@@ -72,15 +74,18 @@ public class AnnisResultQuery implements Serializable
       WebResource annisResource = Helper.getAnnisWebResource(app);
       try
       {
-        result = annisResource.path("search").path("annotate").queryParam("q",
-          aql).queryParam("limit", "" + count).queryParam("offset", ""
-          + startIndex).queryParam("left", "" + contextLeft).queryParam("right", ""
-          + contextRight).get(SaltProject.class);
+        result = annisResource.path("search").path("annotate")
+          .queryParam("q", aql)
+          .queryParam("limit", "" + count)
+          .queryParam("offset", "" + startIndex)
+          .queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight)
+          .queryParam("corpora", StringUtils.join(corpora, ","))
+          .get(SaltProject.class);
       }
       catch (UniformInterfaceException ex)
       {
         Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE,
-          null, ex);
+          ex.getResponse().getEntity(String.class), ex);
       }
     }
     return result;

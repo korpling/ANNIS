@@ -16,11 +16,16 @@
 package annis.gui;
 
 import annis.exceptions.AnnisServiceFactoryException;
+import annis.provider.SaltProjectProvider;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
@@ -43,26 +48,29 @@ public class Helper
 
   public static WebResource getAnnisWebResource(Application app)
   {
-    Client c = Client.create();
+    ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
+    Client c = Client.create(rc);
     return c.resource(app.getProperty("AnnisWebService.URL"));
   }
-  
+
   public static AnnisService getService(Application app, Window window)
   {
     AnnisService service = null;
 
-    if(app == null || window == null)
+    if (app == null || window == null)
     {
       return service;
     }
 
     try
     {
-      service = AnnisServiceFactory.getClient(app.getProperty("AnnisRemoteService.URL"));
+      service = AnnisServiceFactory.getClient(app.getProperty(
+        "AnnisRemoteService.URL"));
     }
-    catch(AnnisServiceFactoryException ex)
+    catch (AnnisServiceFactoryException ex)
     {
-      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, "Could not connect to service", ex);
+      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE,
+        "Could not connect to service", ex);
       window.showNotification("Could not connect to service: " + ex.getMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
     }
@@ -76,7 +84,8 @@ public class Helper
     return context.getHttpSession().getServletContext().getContextPath();
   }
 
-  public static String generateCitation(Application app, String aql, List<String> corpora,
+  public static String generateCitation(Application app, String aql,
+    List<String> corpora,
     int contextLeft, int contextRight)
   {
     try
@@ -84,7 +93,7 @@ public class Helper
       StringBuilder sb = new StringBuilder();
 
       URI appURI = app.getURL().toURI();
-      
+
       sb.append(getContext(app));
       sb.append("/Cite/AQL(");
       sb.append(aql);
@@ -95,31 +104,31 @@ public class Helper
       sb.append("),CRIGHT(");
       sb.append(contextRight);
       sb.append(")");
-      
+
       try
       {
-        return new URI(appURI.getScheme(), null, 
+        return new URI(appURI.getScheme(), null,
           appURI.getHost(), appURI.getPort(),
-          sb.toString(), null, null)
-          .toASCIIString();
+          sb.toString(), null, null).toASCIIString();
       }
-      catch(URISyntaxException ex)
+      catch (URISyntaxException ex)
       {
         Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
       }
       return "ERROR";
     }
-    catch(URISyntaxException ex)
+    catch (URISyntaxException ex)
     {
       Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
     }
     return "ERROR";
   }
 
-  public static Map<Long, AnnisCorpus> calculateID2Corpus(Map<String, AnnisCorpus> corpusMap)
+  public static Map<Long, AnnisCorpus> calculateID2Corpus(
+    Map<String, AnnisCorpus> corpusMap)
   {
     TreeMap<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
-    for(AnnisCorpus c : corpusMap.values())
+    for (AnnisCorpus c : corpusMap.values())
     {
       result.put(c.getId(), c);
     }

@@ -15,12 +15,10 @@
  */
 package annis.provider;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackage;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,14 +30,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 /**
@@ -75,7 +68,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
     throws IOException, WebApplicationException
   {
-   
+
     Resource resource = new XMIResourceImpl();
     // add the project itself
     resource.getContents().add(project);
@@ -111,9 +104,15 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     IOException,
     WebApplicationException
   {
-    XMIResourceImpl resource = new XMIResourceImpl();
-    resource.load(entityStream, null);
+    ResourceSet resourceSet = new ResourceSetImpl();
+    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
+      SaltCommonPackage.eINSTANCE);
     
+    XMIResourceImpl resource = new XMIResourceImpl();
+    resourceSet.getResources().add(resource);
+    
+    resource.load(entityStream, null);
+
     return (SaltProject) resource.getContents().get(0);
   }
 }

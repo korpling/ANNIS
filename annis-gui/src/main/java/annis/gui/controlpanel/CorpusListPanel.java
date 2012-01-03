@@ -465,7 +465,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   }
 
   protected void selectCorpora(Map<String, AnnisCorpus> corpora)
-  {
+  { 
     if(tblCorpora != null)
     {
       tblCorpora.setValue(corpora.keySet());
