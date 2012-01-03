@@ -16,13 +16,11 @@
 package annis.gui.controlpanel;
 
 import annis.gui.beans.HistoryEntry;
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
 import annis.service.ifaces.AnnisCorpus;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
@@ -207,29 +205,21 @@ public class ControlPanel extends Panel
             StringUtils.join(lastCorpusSelection.keySet(), ",")).get(
             String.class));
         }
-        catch (AnnisQLSemanticsException ex)
+        catch (UniformInterfaceException ex)
         {
-          window.showNotification(
-            ex.getLocalizedMessage(), "Sematic error",
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch (AnnisQLSyntaxException ex)
-        {
-          window.showNotification(
-            ex.getLocalizedMessage(), "Syntax error",
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch (AnnisCorpusAccessException ex)
-        {
-          window.showNotification(
-            ex.getLocalizedMessage(), "Corpus access error",
-            Window.Notification.TYPE_ERROR_MESSAGE);
-        }
-        catch (Exception ex)
-        {
-          window.showNotification(
-            ex.getLocalizedMessage(), "unknown exception",
-            Window.Notification.TYPE_ERROR_MESSAGE);
+          if (ex.getResponse().getStatus() == 400)
+          {
+            window.showNotification(
+              ex.getResponse().getEntity(String.class), "parsing error",
+              Window.Notification.TYPE_ERROR_MESSAGE);
+          }
+          else
+          {
+            window.showNotification(
+              ex.getResponse().getEntity(String.class), "unknown error " + ex.
+              getResponse().getStatus(),
+              Window.Notification.TYPE_ERROR_MESSAGE);
+          }
         }
       }
 

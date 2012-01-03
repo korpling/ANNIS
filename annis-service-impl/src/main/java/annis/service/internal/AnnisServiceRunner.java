@@ -18,23 +18,20 @@ package annis.service.internal;
 import java.io.IOException;
 import java.util.logging.Level;
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger; 
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import annis.AnnisBaseRunner;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
-import org.apache.log4j.Appender;
-import org.apache.log4j.varia.LevelMatchFilter;
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
@@ -138,7 +135,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     // create beans
     ClassPathXmlApplicationContext cxt = new ClassPathXmlApplicationContext(
       "annis/service/internal/AnnisServiceRunner-context.xml");
-    ResourceConfig rc = new DefaultResourceConfig();
+    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       cxt);
 
@@ -147,6 +144,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     try
     {
       server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);
+      
     }
     catch (IOException ex)
     {
