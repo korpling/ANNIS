@@ -15,6 +15,7 @@
  */
 package annis.utils;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class Utils
 {
-  
+
   public static String min(List<Long> runtimeList)
   {
     long min = Long.MAX_VALUE;
@@ -35,7 +36,7 @@ public class Utils
     }
     return String.valueOf(min);
   }
-  
+
   public static String max(List<Long> runtimeList)
   {
     long max = Long.MIN_VALUE;
@@ -45,14 +46,14 @@ public class Utils
     }
     return String.valueOf(max);
   }
-  
+
   public static String avg(List<Long> runtimeList)
   {
     if (runtimeList.isEmpty())
     {
       return "";
     }
-    
+
     long sum = 0;
     for (long value : runtimeList)
     {
@@ -60,12 +61,12 @@ public class Utils
     }
     return String.valueOf(sum / runtimeList.size());
   }
-  
+
   public static Long[] split2Long(String text, char seperator)
   {
     String[] str = StringUtils.split(text, seperator);
     Long[] lng = new Long[str.length];
-    
+
     for (int i = 0; i < lng.length; i++)
     {
       try
@@ -78,7 +79,7 @@ public class Utils
           "Could not parse long value, assuming \"0\" as default", ex);
       }
     }
-    
+
     return lng;
   }
 
@@ -89,13 +90,13 @@ public class Utils
     MessageDigest md = MessageDigest.getInstance("SHA-256");
     md.update(s.getBytes("UTF-8"));
     byte[] digest = md.digest();
-    
+
     String hashVal = "";
     for (byte b : digest)
     {
       hashVal += String.format("%02x", b);
     }
-    
+
     return hashVal;
   }
 }

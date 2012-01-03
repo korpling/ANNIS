@@ -19,16 +19,34 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.externalFiles.ExternalFileMgr;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackage;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMLResourceFactoryImpl;
 import org.springframework.stereotype.Component;
 
 /**
@@ -94,6 +112,54 @@ public class AnnisWebService
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     int count = annisDao.count(data);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
+
+  }
+
+  @GET
+  @Path("search/annotate")
+  @Produces("application/xml")
+  public SaltProject annotate(@QueryParam("q") String query,
+    @QueryParam("corpora") String rawCorpusNames,
+    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
+    @DefaultValue("10") @QueryParam("limit") String limitRaw,
+    @DefaultValue("5") @QueryParam("left") String leftRaw,
+    @DefaultValue("5") @QueryParam("right") String rightRaw) throws IOException
+  {
+    if (query == null)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'q'").build());
+    }
+    if (rawCorpusNames == null)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'corpora'").build());
+    }
+
+    int offset = Integer.parseInt(offsetRaw);
+    int limit = Integer.parseInt(limitRaw);
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+
+    List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
+    List<Long> corpusIDs = annisDao.listCorpusByName(
+      corpusNames);
+    if (corpusIDs.size() != corpusNames.size())
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.NOT_FOUND).type(
+        "text/plain").entity("one ore more corpora are unknown to the system").
+        build());
+    }
+    QueryData data = annisDao.parseAQL(query, corpusIDs);
+    data.addExtension(new AnnotateQueryData(offset, limit, left,
+      right));
+    SaltProject p = annisDao.annotate(data);
+    return p;
 
   }
 

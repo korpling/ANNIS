@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.internal.exceptionmappers;
+package annis.service.internal.provider;
 
-import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSyntaxException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -25,14 +25,14 @@ import javax.ws.rs.ext.Provider;
  * @author thomas
  */
 @Provider
-public class AnnisCorpusAccessMapper implements
-  ExceptionMapper<AnnisCorpusAccessException>
+public class AnnisQLSyntaxMapper implements
+  ExceptionMapper<AnnisQLSyntaxException>
 {
 
   @Override
-  public Response toResponse(AnnisCorpusAccessException exception)
+  public Response toResponse(AnnisQLSyntaxException exception)
   {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Corpus access error: "
+    return Response.status(Response.Status.BAD_REQUEST).entity("Syntax error: "
       + exception.getMessage()).type("text/plain").build();
   }
 }
