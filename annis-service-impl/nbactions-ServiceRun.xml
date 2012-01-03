@@ -43,7 +43,6 @@
             <goals>
                 <goal>install</goal>
             </goals>
-            <preAction>build-with-dependencies</preAction>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>

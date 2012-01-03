@@ -43,14 +43,15 @@ public class ListCorpusAnnotationsSqlHelper implements
     String template = "SELECT parent.type, parent.name AS parent_name, "
       + "toplevel.name AS toplevel_name, ca.name, ca.value, ca.namespace "
       + "FROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
-      + "WHERE this.name = :docname "
-      + "AND toplevel.name = :toplevelname "
-      + "AND toplevel.top_level = true "
-      + "AND parent.pre >= toplevel.pre "
-      + "AND parent.post <= toplevel.post "
-      + "AND this.pre >= parent.pre "
-      + "AND this.post <= parent.post "
-      + "AND ca.corpus_ref = parent.id " + "ORDER BY parent.pre ASC";
+      + "WHERE this.name = ':docname' \n"
+      + "AND toplevel.name = ':toplevelname' \n"
+      + "AND toplevel.top_level = true \n"
+      + "AND parent.pre >= toplevel.pre \n"
+      + "AND parent.post <= toplevel.post \n"
+      + "AND this.pre >= parent.pre \n"
+      + "AND this.post <= parent.post \n"
+      + "AND ca.corpus_ref = parent.id \n" 
+      + "ORDER BY parent.pre ASC";
     String sql = template.replaceAll(":docname", corpusName).
       replaceAll(":toplevelname", toplevelCorpusName);
     return sql;

@@ -76,6 +76,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<KWICPanel> kwicPanels;
   private Button btInfo;
   private int resultNumber;
+  private List<String> path;
   
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -114,11 +115,9 @@ public class SingleResultPanel extends VerticalLayout implements
     btInfo.addListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
     
-    List<String> path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),
+    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),
       result);
     Collections.reverse(path);
-    
-    
     
     Label lblPath = new Label("Path: " + StringUtils.join(path, " > "));
     lblPath.setWidth("100%");
@@ -247,7 +246,7 @@ public class SingleResultPanel extends VerticalLayout implements
       Window infoWindow = new Window("Info for " + result.getSId());
       
       infoWindow.setModal(false);
-      MetaDataPanel meta = new MetaDataPanel(result.getSName(), result.getSName());
+      MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()-1));
       infoWindow.setContent(meta);
       infoWindow.setWidth("400px");
       infoWindow.setHeight("400px");
