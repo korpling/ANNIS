@@ -15,7 +15,6 @@
  */
 package annis.security;
 
-import annis.gui.Helper;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.ifaces.AnnisCorpus;
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -117,7 +115,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
                 {
 
                   String[] allGroups = groupNames.split("\\s*,\\s*");
-                  TreeMap<Long, AnnisCorpus> userCorpora = new TreeMap<Long, AnnisCorpus>();
+                  TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
                   for(String g : allGroups)
                   {
                     if("*".equals(g))
@@ -132,17 +130,16 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
                       String groupCorporaAsString = groupProps.getProperty(g, "");
                       String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
 
-                      Map<String, AnnisCorpus> name2Corpus = 
-                        Helper.calculateName2Corpus(getAllAvailableCorpora());
+                      Map<String, AnnisCorpus> allCorpora = getAllAvailableCorpora();
 
                       for(String groupCorpusName : corporaOfGroup)
                       {
                         try
                         {
-                          AnnisCorpus c = name2Corpus.get(groupCorpusName);
+                          AnnisCorpus c = allCorpora.get(groupCorpusName);
                           if(c != null)
                           {
-                            userCorpora.put(c.getId(), c);
+                            userCorpora.put(c.getName(), c);
                           }
                         }
                         catch(NumberFormatException ex)
@@ -182,7 +179,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
       {
         // add all corpora to fallback user
         AnnisUser user = new AnnisUser(FALLBACK_USER);
-        TreeMap<Long, AnnisCorpus> userCorpora = new TreeMap<Long, AnnisCorpus>();
+        TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
         userCorpora.putAll(getAllAvailableCorpora());
         user.setCorpusList(userCorpora);
         return user;
@@ -193,9 +190,9 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
     throw new AuthenticationException("invalid user name or password");
   }
   
-  private Map<Long, AnnisCorpus> getAllAvailableCorpora()
+  private Map<String, AnnisCorpus> getAllAvailableCorpora()
   {
-    HashMap<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
+    TreeMap<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
     try
     {
       String url = properties.getProperty("AnnisRemoteService.URL", "rmi://localhost:4711/AnnisService");
@@ -203,7 +200,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
       AnnisCorpusSet corpusSet = service.getCorpusSet();
       for(AnnisCorpus corpus : corpusSet)
       {
-        result.put(corpus.getId(), corpus);
+        result.put(corpus.getName(), corpus);
       }
     }
     catch(Exception e)

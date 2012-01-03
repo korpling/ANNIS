@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.internal.provider;
+package annis.provider;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackage;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.apache.commons.io.FileUtils;
@@ -34,24 +37,27 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 /**
  *
  * @author thomas
  */
 @Provider
-public class SaltProjectProvider implements MessageBodyWriter<SaltProject>
+public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
+  MessageBodyReader<SaltProject>
 {
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,
     Annotation[] annotations, MediaType mediaType)
   {
-    return
-      (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType) || MediaType.TEXT_XML_TYPE.isCompatible(mediaType))
-      && SaltProject.class.isAssignableFrom(type) ;
+    return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
+      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType))
+      && SaltProject.class.isAssignableFrom(type);
   }
 
   @Override
@@ -69,17 +75,8 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>
     MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
     throws IOException, WebApplicationException
   {
-    File tmpProject = File.createTempFile("annis-saltproject", ".salt");
-    tmpProject.deleteOnExit();
-    
-    ResourceSet resourceSet = new ResourceSetImpl();
-    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
-      SaltCommonPackage.eINSTANCE);
-    resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(
-      "salt", new XMIResourceFactoryImpl());
-    Resource resource = resourceSet.createResource(URI.createFileURI(tmpProject.
-      getAbsolutePath()));
-
+   
+    Resource resource = new XMIResourceImpl();
     // add the project itself
     resource.getContents().add(project);
 
@@ -95,12 +92,28 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>
         }
       }
     }
-    resource.save(null);
+    resource.save(entityStream, null);
+  }
+
+  @Override
+  public boolean isReadable(Class<?> type, Type genericType,
+    Annotation[] annotations, MediaType mediaType)
+  {
+    return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
+      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType))
+      && SaltProject.class.isAssignableFrom(type);
+  }
+
+  @Override
+  public SaltProject readFrom(Class<SaltProject> type, Type genericType,
+    Annotation[] annotations, MediaType mediaType,
+    MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws
+    IOException,
+    WebApplicationException
+  {
+    XMIResourceImpl resource = new XMIResourceImpl();
+    resource.load(entityStream, null);
     
-    // copy temporary file to output stream
-    IOUtils.copy(FileUtils.openInputStream(tmpProject), entityStream);
-    
-    // delete the unused file
-    tmpProject.delete();
+    return (SaltProject) resource.getContents().get(0);
   }
 }

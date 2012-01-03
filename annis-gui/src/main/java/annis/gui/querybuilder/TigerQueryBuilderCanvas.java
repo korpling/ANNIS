@@ -77,7 +77,7 @@ public class TigerQueryBuilderCanvas extends Panel
     area.addStyleName("no-vertical-drag-hints");
     area.addStyleName("no-horizontal-drag-hints");
     area.addStyleName("no-box-drag-hints");
-    
+
     canvas = new SimpleCanvas();
     canvas.setWidth("2000px");
     canvas.setHeight("2000px");
@@ -89,9 +89,9 @@ public class TigerQueryBuilderCanvas extends Panel
     areaPane.setDropHandler(handler);
 
     area.addComponent(canvas, "top:0px;left:0px");
-    
+
     setContent(areaPane);
-    
+
     addStyleName("no-vertical-drag-hints");
     addStyleName("no-horizontal-drag-hints");
     addStyleName("no-box-drag-hints");
@@ -109,27 +109,29 @@ public class TigerQueryBuilderCanvas extends Panel
     AnnisService service = Helper.getService(getApplication(), getWindow());
 
     // get current corpus selection
-    Map<Long, AnnisCorpus> corpusSelection = controlPanel.getSelectedCorpora();
+    Map<String, AnnisCorpus> corpusSelection = controlPanel.getSelectedCorpora();
 
-    if(service != null)
+    if (service != null)
     {
       try
       {
         AnnisAttributeSet atts =
-          service.getAttributeSet(new LinkedList<Long>(corpusSelection.keySet()), false, true);
+          service.getAttributeSet(new LinkedList<Long>(Helper.calculateID2Corpus(
+          corpusSelection).keySet()), false, true);
 
-        for(AnnisAttribute a : atts)
+        for (AnnisAttribute a : atts)
         {
-          if(a.getType() == AnnisAttribute.Type.node)
+          if (a.getType() == AnnisAttribute.Type.node)
           {
             result.add(a.getName());
           }
         }
 
       }
-      catch(RemoteException ex)
+      catch (RemoteException ex)
       {
-        Logger.getLogger(TigerQueryBuilderCanvas.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(TigerQueryBuilderCanvas.class.getName()).log(
+          Level.SEVERE, null, ex);
       }
     }
     return result;
@@ -139,7 +141,7 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     canvas.getLines().clear();
 
-    for(EdgeWindow e : edges)
+    for (EdgeWindow e : edges)
     {
       DragAndDropWrapper w1 = nodes.get(e.getSource());
       DragAndDropWrapper w2 = nodes.get(e.getTarget());
@@ -161,7 +163,8 @@ public class TigerQueryBuilderCanvas extends Panel
       // set position on half of the line for the edge window      
       ComponentPosition posEdge = area.getPosition(e);
 
-      float vectorLength = (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      float vectorLength = (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2
+        - y1, 2));
       float xM = x1 + (vectorLength / 2.0f) * ((x2 - x1) / vectorLength);
       float yM = y1 + (vectorLength / 2.0f) * ((y2 - y1) / vectorLength);
 
@@ -185,7 +188,8 @@ public class TigerQueryBuilderCanvas extends Panel
     canvas.requestRepaint();
   }
 
-  private List<Line2D> createArrow(double x, double y, double direction, double arrowLength)
+  private List<Line2D> createArrow(double x, double y, double direction,
+    double arrowLength)
   {
     LinkedList<Line2D> result = new LinkedList<Line2D>();
 
@@ -208,9 +212,9 @@ public class TigerQueryBuilderCanvas extends Panel
   public void prepareAddingEdge(NodeWindow sourceNode)
   {
     preparedEdgeSource = sourceNode;
-    for(NodeWindow w : nodes.keySet())
+    for (NodeWindow w : nodes.keySet())
     {
-      if(w != sourceNode)
+      if (w != sourceNode)
       {
         w.setPrepareEdgeDock(true);
       }
@@ -219,23 +223,23 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void addEdge(NodeWindow target)
   {
-    for(NodeWindow w : nodes.keySet())
+    for (NodeWindow w : nodes.keySet())
     {
       w.setPrepareEdgeDock(false);
     }
 
-    if(preparedEdgeSource != target)
+    if (preparedEdgeSource != target)
     {
       boolean valid = true;
-      for(EdgeWindow e : edges)
+      for (EdgeWindow e : edges)
       {
-        if(e.getSource() == preparedEdgeSource && e.getTarget() == target)
+        if (e.getSource() == preparedEdgeSource && e.getTarget() == target)
         {
           valid = false;
           break;
         }
       }
-      if(valid)
+      if (valid)
       {
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
         e.setWidth("70px");
@@ -280,9 +284,9 @@ public class TigerQueryBuilderCanvas extends Panel
   public void deleteNode(NodeWindow n)
   {
     LinkedList<EdgeWindow> edgesToRemove = new LinkedList<EdgeWindow>();
-    for(EdgeWindow e : edges)
+    for (EdgeWindow e : edges)
     {
-      if(e.getSource() == n || e.getTarget() == n)
+      if (e.getSource() == n || e.getTarget() == n)
       {
         edgesToRemove.add(e);
         area.removeComponent(e);
@@ -299,13 +303,13 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void clearAll()
   {
-    for(EdgeWindow w : edges)
+    for (EdgeWindow w : edges)
     {
       area.removeComponent(w);
     }
     edges.clear();
 
-    for(DragAndDropWrapper w : nodes.values())
+    for (DragAndDropWrapper w : nodes.values())
     {
       area.removeComponent(w);
     }
@@ -322,7 +326,8 @@ public class TigerQueryBuilderCanvas extends Panel
     private AbsoluteLayout layout;
     private TigerQueryBuilderCanvas parent;
 
-    public AbsoluteDropHandler(TigerQueryBuilderCanvas parent, AbsoluteLayout layout)
+    public AbsoluteDropHandler(TigerQueryBuilderCanvas parent,
+      AbsoluteLayout layout)
     {
       this.layout = layout;
       this.parent = parent;
@@ -332,9 +337,10 @@ public class TigerQueryBuilderCanvas extends Panel
     public void drop(DragAndDropEvent event)
     {
       WrapperTransferable t = (WrapperTransferable) event.getTransferable();
-      WrapperTargetDetails details = (WrapperTargetDetails) event.getTargetDetails();
+      WrapperTargetDetails details = (WrapperTargetDetails) event.
+        getTargetDetails();
 
-      if(t == null || details == null)
+      if (t == null || details == null)
       {
         return;
       }
@@ -350,7 +356,7 @@ public class TigerQueryBuilderCanvas extends Panel
       pos.setLeftValue(pos.getLeftValue() + xChange);
       pos.setTopValue(pos.getTopValue() + yChange);
 
-      if(parent != null)
+      if (parent != null)
       {
         parent.updateLinesAndEdgePositions();
       }
@@ -368,29 +374,32 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     StringBuilder query = new StringBuilder();
     StringBuffer nodeIdentityOperations = new StringBuffer();
-    Map<NodeWindow, Integer> nodeComponentMap = new HashMap<NodeWindow, Integer>();
+    Map<NodeWindow, Integer> nodeComponentMap =
+      new HashMap<NodeWindow, Integer>();
 
 
     //creating node definitions
     int componentCount = 0;
     int nodeID = 1;
-    for(NodeWindow nodeWindow : nodes.keySet())
+    for (NodeWindow nodeWindow : nodes.keySet())
     {
-      List<NodeWindow.ConstraintLayout> constraints = nodeWindow.getConstraints();
+      List<NodeWindow.ConstraintLayout> constraints =
+        nodeWindow.getConstraints();
 
-      if(componentCount++ > 0)
+      if (componentCount++ > 0)
       {
         query.append(" & ");
       }
 
-      if(constraints.size() > 0)
+      if (constraints.size() > 0)
       {
         int nodeComponentCount = 0;
-        for(NodeWindow.ConstraintLayout c : constraints)
+        for (NodeWindow.ConstraintLayout c : constraints)
         {
-          if(nodeComponentCount++ > 0)
+          if (nodeComponentCount++ > 0)
           {
-            nodeIdentityOperations.append("\n& #").append(componentCount).append(" = #").append(componentCount + 1);
+            nodeIdentityOperations.append("\n& #").append(componentCount).append(
+              " = #").append(componentCount + 1);
             query.append(" & ");
             componentCount++;
           }
@@ -398,9 +407,9 @@ public class TigerQueryBuilderCanvas extends Panel
           String quotes = c.getOperator().equals("=")
             || c.getOperator().equals("!=") ? "\"" : "/";
           String prefix = "";
-          if(c.getName().trim().isEmpty() || c.getName().trim().equals("tok"))
+          if (c.getName().trim().isEmpty() || c.getName().trim().equals("tok"))
           {
-            if(operator.equals("!="))
+            if (operator.equals("!="))
             {
               prefix = "tok" + c.getName()
                 + operator;
@@ -410,13 +419,14 @@ public class TigerQueryBuilderCanvas extends Panel
           {
             prefix = c.getName() + operator;
           }
-          if("".equals(c.getValue()))
+          if ("".equals(c.getValue()))
           {
             query.append(c.getName());
           }
           else
           {
-            query.append(prefix).append(quotes).append(c.getValue()).append(quotes);
+            query.append(prefix).append(quotes).append(c.getValue()).append(
+              quotes);
           }
         }
       }
@@ -431,10 +441,12 @@ public class TigerQueryBuilderCanvas extends Panel
     query.append(nodeIdentityOperations);
 
     //appending node relations
-    for(EdgeWindow edgeWindow : edges)
+    for (EdgeWindow edgeWindow : edges)
     {
       query.append("\n& ");
-      query.append('#').append(nodeComponentMap.get(edgeWindow.getSource())).append(" ").append(edgeWindow.getOperator()).append(" ").append("#").append(nodeComponentMap.get(edgeWindow.getTarget()));
+      query.append('#').append(nodeComponentMap.get(edgeWindow.getSource())).
+        append(" ").append(edgeWindow.getOperator()).append(" ").append("#").
+        append(nodeComponentMap.get(edgeWindow.getTarget()));
     }
 
     return query.toString();

@@ -116,12 +116,12 @@ public class Helper
     return "ERROR";
   }
 
-  public static Map<String, AnnisCorpus> calculateName2Corpus(Map<Long, AnnisCorpus> corpusMap)
+  public static Map<Long, AnnisCorpus> calculateID2Corpus(Map<String, AnnisCorpus> corpusMap)
   {
-    TreeMap<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
+    TreeMap<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
     for(AnnisCorpus c : corpusMap.values())
     {
-      result.put(c.getName(), c);
+      result.put(c.getId(), c);
     }
     return result;
   }

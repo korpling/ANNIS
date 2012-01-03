@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.internal.provider;
+package annis.provider;
 
-import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -25,14 +25,14 @@ import javax.ws.rs.ext.Provider;
  * @author thomas
  */
 @Provider
-public class AnnisCorpusAccessMapper implements
-  ExceptionMapper<AnnisCorpusAccessException>
+public class AnnisQLSemanticsMapper implements
+  ExceptionMapper<AnnisQLSemanticsException>
 {
 
   @Override
-  public Response toResponse(AnnisCorpusAccessException exception)
+  public Response toResponse(AnnisQLSemanticsException exception)
   {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Corpus access error: "
+    return Response.status(Response.Status.BAD_REQUEST).entity("Semantic error: "
       + exception.getMessage()).type("text/plain").build();
   }
 }

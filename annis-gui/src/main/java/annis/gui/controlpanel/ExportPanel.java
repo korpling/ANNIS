@@ -143,7 +143,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
 
         // check corpus access
         AnnisUser user = (AnnisUser) getApplication().getUser();
-        if(user == null || !user.getCorpusIdList().containsAll(
+        if(user == null || !user.getCorpusNameList().containsAll(
           corpusListPanel.getSelectedCorpora().keySet()))
         {
           getWindow().showNotification("Illegal corpus access",

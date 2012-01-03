@@ -30,7 +30,6 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -51,7 +50,7 @@ public class ControlPanel extends Panel
   private SearchWindow searchWindow;
   private Window window;
   private String lastQuery;
-  private Map<Long, AnnisCorpus> lastCorpusSelection;
+  private Map<String, AnnisCorpus> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
 
@@ -95,7 +94,7 @@ public class ControlPanel extends Panel
     this.window = getWindow();
   }
 
-  public void setQuery(String query, Map<Long, AnnisCorpus> corpora)
+  public void setQuery(String query, Map<String, AnnisCorpus> corpora)
   {
     if (queryPanel != null && corpusList != null)
     {
@@ -107,7 +106,7 @@ public class ControlPanel extends Panel
     }
   }
 
-  public void setQuery(String query, Map<Long, AnnisCorpus> corpora,
+  public void setQuery(String query, Map<String, AnnisCorpus> corpora,
     int contextLeft, int contextRight)
   {
     setQuery(query, corpora);
@@ -115,7 +114,7 @@ public class ControlPanel extends Panel
     searchOptions.setRightContext(contextRight);
   }
 
-  public Map<Long, AnnisCorpus> getSelectedCorpora()
+  public Map<String, AnnisCorpus> getSelectedCorpora()
   {
     return corpusList.getSelectedCorpora();
   }
@@ -137,15 +136,15 @@ public class ControlPanel extends Panel
       != null)
     {
 
-      Map<Long, AnnisCorpus> rawCorpusSelection =
+      Map<String, AnnisCorpus> rawCorpusSelection =
         corpusList.getSelectedCorpora();
 
       // filter corpus selection by logged in user
-      lastCorpusSelection = new TreeMap<Long, AnnisCorpus>(rawCorpusSelection);
+      lastCorpusSelection = new TreeMap<String, AnnisCorpus>(rawCorpusSelection);
       AnnisUser user = (AnnisUser) getApplication().getUser();
       if (user != null)
       {
-        lastCorpusSelection.keySet().retainAll(user.getCorpusIdList());
+        lastCorpusSelection.keySet().retainAll(user.getCorpusNameList());
       }
       lastQuery = queryPanel.getQuery();
       if (lastCorpusSelection.isEmpty())

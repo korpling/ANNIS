@@ -74,11 +74,11 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
     Add, Remove
   };
-  BeanContainer<Long, AnnisCorpus> corpusContainer;
+  BeanContainer<String, AnnisCorpus> corpusContainer;
   private Table tblCorpora;
   private ControlPanel controlPanel;
   private ComboBox cbSelection;
-  private Map<String, Map<Long, AnnisCorpus>> corpusSets = new TreeMap<String, Map<Long, AnnisCorpus>>();
+  private Map<String, Map<String, AnnisCorpus>> corpusSets = new TreeMap<String, Map<String, AnnisCorpus>>();
 
   public CorpusListPanel(ControlPanel controlPanel)
   {
@@ -119,8 +119,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     tblCorpora = new Table();
     addComponent(tblCorpora);
 
-    corpusContainer = new BeanContainer<Long, AnnisCorpus>(AnnisCorpus.class);
-    corpusContainer.setBeanIdProperty("id");
+    corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
+    corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
     tblCorpora.setContainerDataSource(corpusContainer);
@@ -167,7 +167,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
     
     AnnisUser user = (AnnisUser) getApplication().getUser();
-    Map<Long, AnnisCorpus> allCorpora = getCorpusList(user);
+    Map<String, AnnisCorpus> allCorpora = getCorpusList(user);
     corpusSets.put(ALL_CORPORA, allCorpora);
 
     if(user != null)
@@ -193,7 +193,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         if(p.startsWith(CORPUSSET_PREFIX))
         {
           String setName = p.substring(CORPUSSET_PREFIX.length());
-          Map<Long, AnnisCorpus> corpora = new TreeMap<Long, AnnisCorpus>();
+          Map<String, AnnisCorpus> corpora = new TreeMap<String, AnnisCorpus>();
 
           String corpusString = user.getProperty(p);
           if(!ALL_CORPORA.equals(setName) && corpusString != null)
@@ -205,11 +205,10 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
               {
                 try
                 {
-                  Long val = Long.parseLong(s);
-                  AnnisCorpus c = allCorpora.get(val);
+                  AnnisCorpus c = allCorpora.get(s);
                   if(c != null)
                   {
-                    corpora.put(c.getId(), c);
+                    corpora.put(c.getName(), c);
                   }
                 }
                 catch(NumberFormatException ex)
@@ -258,9 +257,9 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     tblCorpora.sort();
   }
 
-  private Map<Long, AnnisCorpus> getCorpusList(AnnisUser user)
+  private Map<String, AnnisCorpus> getCorpusList(AnnisUser user)
   {
-    Map<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
+    Map<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
     try
     {
       AnnisService service = Helper.getService(getApplication(), getWindow());
@@ -269,9 +268,9 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         AnnisCorpusSet corpora = service.getCorpusSet();
         for(AnnisCorpus c : corpora)
         {
-          if(user == null || user.getCorpusIdList().contains(c.getId()))
+          if(user == null || user.getCorpusNameList().contains(c.getName()))
           {
-            result.put(c.getId(), c);
+            result.put(c.getName(), c);
           }
         }
       }
@@ -300,7 +299,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       cbSelection.addItem(newItemCaption);
       cbSelection.setValue(newItemCaption);
 
-      corpusSets.put(newItemCaption, new TreeMap<Long, AnnisCorpus>());
+      corpusSets.put(newItemCaption, new TreeMap<String, AnnisCorpus>());
       updateCorpusList();
 
       // add the new item to the user configuration
@@ -339,7 +338,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   @Override
   public Action[] getActions(Object target, Object sender)
   {
-    Long corpusId = (Long) target;
+    String corpusName = (String) target;
     LinkedList<Action> result = new LinkedList<Action>();
 
     AnnisUser user = (AnnisUser) getApplication().getUser();
@@ -348,21 +347,21 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       return new Action[0];
     }
 
-    for(Map.Entry<String, Map<Long, AnnisCorpus>> entry : corpusSets.entrySet())
+    for(Map.Entry<String, Map<String, AnnisCorpus>> entry : corpusSets.entrySet())
     {
       if(entry.getValue() != null && !ALL_CORPORA.equals(entry.getKey())
-        && corpusId != null)
+        && corpusName != null)
       {
-        if(entry.getValue().containsKey(corpusId))
+        if(entry.getValue().containsKey(corpusName))
         {
           // add possibility to remove
-          result.add(new AddRemoveAction(ActionType.Remove, entry.getKey(), corpusId,
+          result.add(new AddRemoveAction(ActionType.Remove, entry.getKey(), corpusName,
             "Remove from " + entry.getKey()));
         }
         else
         {
           // add possibility to add
-          result.add(new AddRemoveAction(ActionType.Add, entry.getKey(), corpusId,
+          result.add(new AddRemoveAction(ActionType.Add, entry.getKey(), corpusName,
             "Add to " + entry.getKey()));
         }
       }
@@ -376,8 +375,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     AddRemoveAction a = (AddRemoveAction) action;
 
-    Map<Long, AnnisCorpus> set = corpusSets.get(a.getCorpusSet());
-    Map<Long, AnnisCorpus> allCorpora = corpusSets.get(ALL_CORPORA);
+    Map<String, AnnisCorpus> set = corpusSets.get(a.getCorpusSet());
+    Map<String, AnnisCorpus> allCorpora = corpusSets.get(ALL_CORPORA);
 
     if(a.type == ActionType.Remove)
     {
@@ -412,7 +411,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         }
       }
 
-      for(Map.Entry<String, Map<Long, AnnisCorpus>> entry : corpusSets.entrySet())
+      for(Map.Entry<String, Map<String, AnnisCorpus>> entry : corpusSets.entrySet())
       {
         if(!ALL_CORPORA.equals(entry.getKey()))
         {
@@ -465,7 +464,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
   }
 
-  protected void selectCorpora(Map<Long, AnnisCorpus> corpora)
+  protected void selectCorpora(Map<String, AnnisCorpus> corpora)
   {
     if(tblCorpora != null)
     {
@@ -473,11 +472,11 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
   }
 
-  protected Map<Long, AnnisCorpus> getSelectedCorpora()
+  protected Map<String, AnnisCorpus> getSelectedCorpora()
   {
-    HashMap<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
+    HashMap<String, AnnisCorpus> result = new HashMap<String, AnnisCorpus>();
 
-    for(Long id : corpusContainer.getItemIds())
+    for(String id : corpusContainer.getItemIds())
     {
       if(tblCorpora.isSelected(id))
       {
@@ -541,9 +540,9 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
     private ActionType type;
     private String corpusSet;
-    private long corpusId;
+    private String corpusId;
 
-    public AddRemoveAction(ActionType type, String corpusSet, long corpusId, String caption)
+    public AddRemoveAction(ActionType type, String corpusSet, String corpusId, String caption)
     {
       super(caption);
       this.type = type;
@@ -556,7 +555,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       return type;
     }
 
-    public long getCorpusId()
+    public String getCorpusId()
     {
       return corpusId;
     }

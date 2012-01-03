@@ -135,7 +135,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     // create beans
     ClassPathXmlApplicationContext cxt = new ClassPathXmlApplicationContext(
       "annis/service/internal/AnnisServiceRunner-context.xml");
-    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal");
+    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       cxt);
 
