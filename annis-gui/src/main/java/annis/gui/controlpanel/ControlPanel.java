@@ -30,9 +30,11 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang.StringUtils;
 
@@ -200,9 +202,15 @@ public class ControlPanel extends Panel
       {
         try
         {
+          Set<String> corpusNames = new TreeSet<String>();
+          for(AnnisCorpus c : lastCorpusSelection.values())
+          {
+            corpusNames.add(c.getName());
+          }
+          
           count = Integer.parseInt(res.path("search").path("count").queryParam(
             "q", lastQuery).queryParam("corpora",
-            StringUtils.join(lastCorpusSelection.keySet(), ",")).get(
+            StringUtils.join(corpusNames, ",")).get(
             String.class));
         }
         catch (UniformInterfaceException ex)

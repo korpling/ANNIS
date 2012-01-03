@@ -312,7 +312,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<Long> listCorpusByName(List<String> corpusNames)
   {
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
-    final List<Long> result = getSimpleJdbcTemplate().query(sql,
+    final List<Long> result = getJdbcTemplate().query(sql,
       listCorpusByNameDaoHelper);
     return result;
   }

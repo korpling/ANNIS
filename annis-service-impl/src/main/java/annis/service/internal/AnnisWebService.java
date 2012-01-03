@@ -19,11 +19,9 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.externalFiles.ExternalFileMgr;
 import annis.ql.parser.QueryData;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -84,26 +82,16 @@ public class AnnisWebService
         "missing required parameter 'corpora'").build();
     }
 
-    String[] splittedIDs = rawCorpusNames.split(",");
-    List<Long> corpusIDs = new LinkedList<Long>();
-    for (int i = 0; i < splittedIDs.length; i++)
+    List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
+    List<Long> corpusIDs = annisDao.listCorpusByName(
+      corpusNames);
+    if (corpusIDs.size() != corpusNames.size())
     {
-      try
-      {
-        corpusIDs.add(Long.parseLong(splittedIDs[i]));
-      }
-      catch (NumberFormatException ex)
-      {
-        return Response.status(Response.Status.BAD_REQUEST).type(
-          MediaType.TEXT_PLAIN).entity("invalid number: "
-          + splittedIDs[i]).build();
-      }
+      return Response.status(Response.Status.NOT_FOUND).type(
+        "text/plain").entity("one ore more corpora are unknown to the system").
+        build();
     }
-
     QueryData data = annisDao.parseAQL(query, corpusIDs);
-    //   List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
-    //    QueryData data = annisDao.parseAQL(query, annisDao.listCorpusByName(
-    //      corpusNames));
     int count = annisDao.count(data);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
 
