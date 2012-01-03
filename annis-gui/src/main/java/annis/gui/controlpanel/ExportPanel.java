@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -163,9 +162,11 @@ public class ExportPanel extends Panel implements Button.ClickListener
             exporter.convertText(queryPanel.getQuery(),
               Integer.parseInt((String) cbLeftContext.getValue()),
               Integer.parseInt((String) cbRightContext.getValue()),
-              StringUtils.join(corpusListPanel.getSelectedCorpora().keySet().toArray()),
+              corpusListPanel.getSelectedCorpora(),
               null, (String) txtParameters.getValue(),
-              Helper.getService(getApplication(), getWindow()), new OutputStreamWriter(out));
+              Helper.getService(getApplication(), getWindow()), 
+              Helper.getAnnisWebResource(getApplication()),
+              new OutputStreamWriter(out));
           }
         }).start();
 

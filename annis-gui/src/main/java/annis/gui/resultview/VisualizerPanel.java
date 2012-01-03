@@ -24,6 +24,7 @@ import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
@@ -137,8 +138,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     SaltProject text = null;
     try
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      text = service.getGraph(toplevelCorpusName, documentName);
+      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      text = annisResource.path("graphs").path(toplevelCorpusName).path(
+        documentName).get(SaltProject.class);
     }
     catch (Exception e)
     {

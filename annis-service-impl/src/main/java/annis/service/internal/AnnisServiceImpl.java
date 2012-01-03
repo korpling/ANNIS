@@ -95,31 +95,20 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public SaltProject query(List<Long> corpusList, String annisQuery,
-    int limit, int offset, int contextLeft, int contextRight)
-    throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException
-  {
-    contextLeft = Math.min(maxContext, contextLeft);
-    contextRight = Math.min(maxContext, contextRight);
-
-    QueryData queryData = analyzeQuery(annisQuery, corpusList);
-    queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft,
-      contextRight));
-    SaltProject p = annisDao.annotate(queryData);
-
-    return p;
-  }
-
-  @Override
   public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL,
     int limit, int offset, int contextLeft, int contextRight) throws
     RemoteException,
     AnnisQLSemanticsException, AnnisQLSyntaxException,
     AnnisCorpusAccessException
   {
-    SaltProject p = query(corpusList, annisQL, limit, offset, contextLeft,
-      contextRight);
+    contextLeft = Math.min(maxContext, contextLeft);
+    contextRight = Math.min(maxContext, contextRight);
+
+    QueryData queryData = analyzeQuery(annisQL, corpusList);
+    queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft,
+      contextRight));
+    SaltProject p = annisDao.annotate(queryData);
+
     return LegacyGraphConverter.convertToResultSet(p);
 
   }
@@ -151,30 +140,14 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public SaltProject getGraph(Long textId) throws RemoteException
+  public AnnisResult getAnnisResult(Long textId) throws RemoteException
   {
     SaltProject p = annisDao.retrieveAnnotationGraph(textId);
     if (p != null)
-    {
-      return p;
+    {      
+      return new AnnisResultImpl(LegacyGraphConverter.convertToAOM(p).get(0));
     }
     throw new AnnisServiceException("no text found with id = " + textId);
-  }
-
-  @Override
-  public SaltProject getGraph(String toplevelCorpusName, String documentName)
-    throws RemoteException
-  {
-    SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
-      documentName);
-    return p;
-  }
-
-  @Override
-  public AnnisResult getAnnisResult(Long textId) throws RemoteException
-  {
-    SaltProject p = getGraph(textId);
-    return new AnnisResultImpl(LegacyGraphConverter.convertToAOM(p).get(0));
   }
 
   @Override

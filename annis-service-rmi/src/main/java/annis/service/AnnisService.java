@@ -66,40 +66,6 @@ public interface AnnisService extends Remote
    * @param offset The first result to output. Offset 1 will output results from 2 to n result .
    * @param contextLeft The number of token before the first match.
    * @param contextRight The number of token before after the last match.
-   * @return A list containing vectors with the matching IDs. Each entry of the list corresponds to one matching n-tupel.
-   * @throws RemoteException
-   * @throws AnnisQLSemanticsException
-   * @throws AnnisQLSyntaxException
-   * @throws AnnisCorpusAccessException
-   */
-  public SaltProject query(List<Long> corpusList, String annisQL,
-    int limit, int offset, int contextLeft, int contextRight) throws
-    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException;
-
-  /**
-   * 
-   * @param textId The ID of the text that should be generated.
-   * @return
-   * @throws RemoteException
-   */
-  public SaltProject getGraph(Long textId) throws RemoteException;
-
-  /**
-   * 
-   * @return
-   * @throws RemoteException
-   */
-  public SaltProject getGraph(String toplevelCorpusName, String documentName) throws RemoteException;
-
-  /**
-   * 
-   * @param corpusList
-   * @param annisQL
-   * @param limit The maximum number of items of the returned result set.
-   * @param offset The first result to output. Offset 1 will output results from 2 to n result .
-   * @param contextLeft The number of token before the first match.
-   * @param contextRight The number of token before after the last match.
    * @return
    * @throws RemoteException
    * @throws AnnisQLSemanticsException

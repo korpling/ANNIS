@@ -194,7 +194,8 @@ public abstract class AnnotateSqlGenerator<T>
   public T queryAnnotationGraph(
     JdbcTemplate jdbcTemplate, String toplevelCorpusName, String documentName)
   {
-    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName, documentName), this);
+    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName,
+      documentName), this);
   }
 
   private IslandPolicies getMostRestrictivePolicy(
@@ -219,11 +220,10 @@ public abstract class AnnotateSqlGenerator<T>
     return result;
   }
 
-  
   public String getTextQuery(long textID)
   {
     String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
       + "FROM\n"
       + "\tfacts AS facts, corpus as c\n" + "WHERE\n"
       + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
@@ -235,10 +235,10 @@ public abstract class AnnotateSqlGenerator<T>
   public String getDocumentQuery(String toplevelCorpusName, String documentName)
   {
     String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
       + "FROM\n"
       + "\tfacts AS facts, corpus as c, corpus as toplevel\n" + "WHERE\n"
-      + "\ttoplevel.name = ':toplevel_name' AND c.name = :document_name AND facts.corpus_ref = c.id\n"
+      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
       + "ORDER BY facts.pre";
     String sql = template.replace(":toplevel_name", String.valueOf(
@@ -284,7 +284,7 @@ public abstract class AnnotateSqlGenerator<T>
     }
     sb.append(StringUtils.join(ids, ", "));
     sb.append("] AS key,\n");
-    
+
     // key for annotation graph matches    
     sb.append(indent).append(TABSTOP + "ARRAY[solutions.name1");
     for (int i = 2; i <= alternative.size(); ++i)

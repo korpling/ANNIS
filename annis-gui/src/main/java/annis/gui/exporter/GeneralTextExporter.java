@@ -18,6 +18,8 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.Helper;
+import annis.gui.resultview.AnnisResultQuery;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,9 +28,12 @@ import annis.model.AnnisNode;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.ifaces.AnnisCorpus;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.utils.LegacyGraphConverter;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.*;
 import java.util.HashMap;
@@ -36,32 +41,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 public class GeneralTextExporter implements Exporter, Serializable
 {
 
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight, 
-    String corpusListAsString, String keysAsString, String argsAsString, 
-    AnnisService service, Writer out)
+  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
+    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
+    AnnisService service, WebResource annisResource, Writer out)
   {
-
-    /** The selected corpora */
-    List<Long> corpusIdList = new LinkedList<Long>();
-
-    for(String corpusId : corpusListAsString.split(","))
-    {
-      try
-      {
-        corpusIdList.add(Long.parseLong(corpusId));
-      }
-      catch(NumberFormatException ex)
-      {
-        // ignore
-      }
-    }
-    // END getting the needed parameters from the query
-
     try
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
@@ -69,18 +58,20 @@ public class GeneralTextExporter implements Exporter, Serializable
 
       LinkedList<String> keys = new LinkedList<String>();
 
-      if(keysAsString == null)
+      if (keysAsString == null)
       {
         // auto set
         keys.add("tok");
+        LinkedList<Long> corpusIDs = new LinkedList<Long>(
+          Helper.calculateID2Corpus(corpora).keySet());
         AnnisAttributeSet attributes =
-          service.getAttributeSet(corpusIdList, false, false);
-        for(AnnisAttribute a : attributes)
+          service.getAttributeSet(corpusIDs, false, false);
+        for (AnnisAttribute a : attributes)
         {
-          if(a.getName() != null)
+          if (a.getName() != null)
           {
             String[] namespaceAndName = a.getName().split(":", 2);
-            if(namespaceAndName.length > 1)
+            if (namespaceAndName.length > 1)
             {
               keys.add(namespaceAndName[1]);
             }
@@ -95,33 +86,50 @@ public class GeneralTextExporter implements Exporter, Serializable
       {
         // manually specified
         String[] keysSplitted = keysAsString.split("\\,");
-        for(String k : keysSplitted)
+        for (String k : keysSplitted)
         {
           keys.add(k.trim());
         }
       }
-      
-      Map<String,String> args = new HashMap<String, String>();
-      for(String s : argsAsString.split("&"))
+
+      Map<String, String> args = new HashMap<String, String>();
+      for (String s : argsAsString.split("&"))
       {
         String[] splitted = s.split("=", 2);
         String key = splitted[0];
         String val = "";
-        if(splitted.length > 1)
+        if (splitted.length > 1)
         {
           val = splitted[1];
         }
         args.put(key, val);
       }
-      
+
       int offset = 0;
-      while(offset == 0 || (queryResult != null && queryResult.getSCorpusGraphs().size() > 0))
+      while (offset == 0 || (queryResult != null
+        && queryResult.getSCorpusGraphs().size() > 0))
       {
 
-        queryResult = service.query(corpusIdList, queryAnnisQL, 50, offset, contextLeft, contextRight);
+        try
+        {
+          queryResult = annisResource.path("search").path("annotate")
+            .queryParam("q", queryAnnisQL)
+            .queryParam("limit", "" + 50)
+            .queryParam("offset", "" + offset)
+            .queryParam("left", "" + contextLeft)
+            .queryParam("right", "" + contextRight)
+            .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
+            .get(SaltProject.class);
+        }
+        catch (UniformInterfaceException ex)
+        {
+          Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE,
+            ex.getResponse().getEntity(String.class), ex);
+        }
 
 
-        convertText(LegacyGraphConverter.convertToResultSet(queryResult), keys, args, out, offset);
+        convertText(LegacyGraphConverter.convertToResultSet(queryResult), keys,
+          args, out, offset);
 
         out.flush();
         offset = offset + 50;
@@ -133,33 +141,38 @@ public class GeneralTextExporter implements Exporter, Serializable
       out.append("finished");
 
     }
-    catch(AnnisQLSemanticsException ex)
+    catch (AnnisQLSemanticsException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+        null, ex);
     }
-    catch(AnnisQLSyntaxException ex)
+    catch (AnnisQLSyntaxException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+        null, ex);
     }
-    catch(AnnisCorpusAccessException ex)
+    catch (AnnisCorpusAccessException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+        null, ex);
     }
-    catch(RemoteException ex)
+    catch (RemoteException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+        null, ex);
     }
-    catch(IOException ex)
+    catch (IOException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+        null, ex);
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys, 
-    Map<String,String> args, Writer out, int offset) throws IOException
+  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys,
+    Map<String, String> args, Writer out, int offset) throws IOException
   {
     int counter = 0;
-    for(AnnisResult annisResult : queryResult)
+    for (AnnisResult annisResult : queryResult)
     {
       Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
 
@@ -167,10 +180,10 @@ public class GeneralTextExporter implements Exporter, Serializable
       out.append((counter + offset) + ". ");
       List<AnnisNode> tok = annisResult.getGraph().getTokens();
 
-      for(AnnisNode annisNode : tok)
+      for (AnnisNode annisNode : tok)
       {
         Long tokID = annisNode.getId();
-        if(matchedNodeIds.contains(tokID))
+        if (matchedNodeIds.contains(tokID))
         {
           out.append("[");
           out.append(annisNode.getSpannedText());
@@ -191,6 +204,4 @@ public class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
     }
   }
-
-  
 }

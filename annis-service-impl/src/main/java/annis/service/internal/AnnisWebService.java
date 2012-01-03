@@ -24,10 +24,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -128,8 +130,8 @@ public class AnnisWebService
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-    int left = Integer.parseInt(leftRaw);
-    int right = Integer.parseInt(rightRaw);
+    int left = Math.min(maxContext, Integer.parseInt(leftRaw));
+    int right = Math.min(maxContext, Integer.parseInt(rightRaw));
 
     List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
     List<Long> corpusIDs = annisDao.listCorpusByName(
@@ -147,6 +149,25 @@ public class AnnisWebService
     SaltProject p = annisDao.annotate(data);
     return p;
 
+  }
+
+  @GET
+  @Path("graphs/{top}/{doc}")
+  public SaltProject graph(@PathParam("top") String toplevelCorpusName,
+    @PathParam("doc") String documentName)
+  {
+    try
+    {
+      SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
+        documentName);
+      return p;
+    }
+    catch (Exception ex)
+    {
+      log.log(Level.SEVERE, "error when accessing graph " + toplevelCorpusName
+        + "/" + documentName, ex);
+      throw new WebApplicationException(ex);
+    }
   }
 
   public AnnisDao getAnnisDao()
