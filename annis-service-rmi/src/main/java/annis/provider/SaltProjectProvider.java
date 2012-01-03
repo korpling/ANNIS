@@ -15,21 +15,25 @@
  */
 package annis.provider;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackage;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -73,12 +77,11 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     // add the project itself
     resource.getContents().add(project);
 
-    // add all SCorpusGraph, SDocument and SDocumentGraph elements
+    // add all SDocumentGraph elements
     for (SCorpusGraph corpusGraph : project.getSCorpusGraphs())
     {
       for (SDocument doc : corpusGraph.getSDocuments())
       {
-        resource.getContents().add(doc);
         if (doc.getSDocumentGraph() != null)
         {
           resource.getContents().add(doc.getSDocumentGraph());
@@ -113,6 +116,17 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     
     resource.load(entityStream, null);
 
-    return (SaltProject) resource.getContents().get(0);
+    SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
+    
+    for(EObject o : resource.getContents())
+    {
+      if(o instanceof SaltProject)
+      {
+        project = (SaltProject) o;
+        break;
+      }
+    }
+    
+    return project;
   }
 }
