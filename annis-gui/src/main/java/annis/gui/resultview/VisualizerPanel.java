@@ -32,11 +32,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
@@ -62,6 +61,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
+  private KWICPanel kwicPanel;
   public CustomLayout customLayout;
 
   public VisualizerPanel(final ResolverEntry entry, AnnisResult result,
@@ -199,7 +199,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
         resource = createResource(outStream, vis.getContentType());
         String url = getApplication().getRelativeLocation(resource);
-        iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+        iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
 
 
         customLayout.addComponent(iframe, "iframe");
@@ -216,6 +216,20 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         iframe.setVisible(false);
       }
       btEntry.setIcon(ICON_EXPAND);
+    }
+  }
+
+  public void setKwicPanel(KWICPanel kwicPanel)
+  {
+    this.kwicPanel = kwicPanel;
+  }
+
+  public void startMediaVisFromKWIC()
+  {
+    if (kwicPanel != null)
+    {
+      kwicPanel.startMediaVisualizers();
+      kwicPanel = null;
     }
   }
 }

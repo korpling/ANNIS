@@ -166,11 +166,12 @@ public class SingleResultPanel extends VerticalLayout implements
         for (long textId : containedTexts)
         {
           KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-            markedAndCovered, textId, mediaIDs, mediaVisualizer);
+            markedAndCovered, textId, mediaIDs, mediaVisualizer, this);
           addComponent(kwic);
           kwicPanels.add(kwic);
         }
 
+        
         for (VisualizerPanel p : visualizers)
         {
           addComponent(p);

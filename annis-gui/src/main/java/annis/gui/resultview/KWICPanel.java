@@ -16,7 +16,6 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -47,15 +46,20 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   private Map<AnnisNode, Long> markedAndCovered;
   private List<String> mediaIDs;
   private List<VisualizerPanel> mediaVisualizer;
+  private SingleResultPanel parent;
+  // only used for media files
+  private String startTime;
+  private String endTime;
 
   public KWICPanel(AnnisResult result, Set<String> tokenAnnos,
     Map<AnnisNode, Long> markedAndCovered, long textID, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer)
+    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent)
   {
 
     this.markedAndCovered = markedAndCovered;
     this.mediaIDs = mediaIDs;
     this.mediaVisualizer = mediaVisualizer;
+    this.parent = parent;
     this.addListener((ItemClickEvent.ItemClickListener) this);
 
     this.addStyleName("kwic");
@@ -244,12 +248,12 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
       AnnisNode token = (AnnisNode) event.getPropertyId();
       String time = null;
-      
+
       for (VisualizerPanel vis : mediaVisualizer)
       {
         vis.openVisualizer(false);
       }
-      
+
       for (Annotation anno : token.getNodeAnnotations())
       {
         if ("time".equals(anno.getName()))
@@ -257,15 +261,15 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           time = anno.getValue();
         }
       }
-      
-      time = (time == null) ? "no time given" : time;
-      String startTime = getStartTime(time);
-      String endTime = getEndTime(time);
 
-      for (String id : mediaIDs)
+      time = (time == null) ? "no time given" : time;
+      startTime = getStartTime(time);
+      endTime = getEndTime(time);
+      for (VisualizerPanel vp : mediaVisualizer)
       {
-        startMediaVis(id, startTime, endTime);
-      }     
+        vp.setKwicPanel(this);
+      }
+      startMediaVisualizers();
     }
   }
 
@@ -284,12 +288,15 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     return time.split("-")[1];
   }
 
-  private void startMediaVis(String id, String startTime, String endTime)
+  public void startMediaVisualizers()
   {
-    String playCommand = ""
-      + "document.getElementById(\"" + id + "\")"
-      + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
-      + startTime + ", " + endTime + "); ";
-    getWindow().executeJavaScript(playCommand);
+    for (String id : mediaIDs)
+    {
+      String playCommand = ""
+        + "document.getElementById(\"" + id + "\")"
+        + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
+        + startTime + ", " + endTime + "); ";
+      getWindow().executeJavaScript(playCommand);
+    }
   }
 }
