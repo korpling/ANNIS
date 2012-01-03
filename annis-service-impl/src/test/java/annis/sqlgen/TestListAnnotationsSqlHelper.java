@@ -15,13 +15,12 @@
  */
 package annis.sqlgen;
 
-import static org.junit.Assert.assertEquals;
+import static annis.test.TestUtils.size;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static annis.test.IsCollectionSize.size;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +31,6 @@ import org.junit.Test;
 
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisAttributeImpl;
-import org.junit.Ignore;
 
 public class TestListAnnotationsSqlHelper {
 

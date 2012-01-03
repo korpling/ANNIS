@@ -34,8 +34,8 @@ import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.Each.each;
 import static org.mockito.Mockito.mock;
 import static annis.test.IsCollection.isCollection;
-import static annis.test.IsCollectionEmpty.empty;
-import static annis.test.IsCollectionSize.size;
+import static annis.test.TestUtils.empty;
+import static annis.test.TestUtils.size;
 
 import java.util.ArrayList;
 import java.util.Arrays;

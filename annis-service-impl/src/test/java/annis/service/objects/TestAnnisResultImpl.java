@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static annis.test.IsCollectionSize.size;
+import static annis.test.TestUtils.size;
 
 import java.util.ArrayList;
 import java.util.Arrays;

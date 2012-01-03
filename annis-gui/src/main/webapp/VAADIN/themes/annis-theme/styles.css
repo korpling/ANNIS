@@ -17,11 +17,15 @@
 }
 
 .kwic {
-  font-size: 11px;
+  font-size: 11px;  
 }
 
 .kwic-anno {
-  color: grey;
+  color: grey;  
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .toolbar .v-panel-content {

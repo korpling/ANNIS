@@ -38,7 +38,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     super();
 
     iframe = Document.get().createIFrameElement();
-
     setElement(iframe);
 
 
