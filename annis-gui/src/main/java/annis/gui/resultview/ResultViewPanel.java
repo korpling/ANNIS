@@ -15,17 +15,16 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
-import annis.gui.Helper;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.ifaces.AnnisCorpus;
-import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -35,6 +34,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -49,11 +49,11 @@ import java.util.logging.Logger;
  */
 public class ResultViewPanel extends Panel implements PagingCallback
 {
-  
+
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
-  private Map<Long,AnnisCorpus> corpora;
+  private Map<String, AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private VerticalLayout layout;
@@ -61,9 +61,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
-  private TreeMap<String,Boolean> tokenAnnoVisible;
+  private TreeMap<String, Boolean> tokenAnnoVisible;
 
-  public ResultViewPanel(String aql, Map<Long, AnnisCorpus> corpora,
+  public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
     int contextLeft, int contextRight, int pageSize,
     PluginSystem ps)
   {
@@ -74,7 +74,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.contextRight = contextRight;
     this.pageSize = pageSize;
     this.ps = ps;
-    
+
     setSizeFull();
 
     VerticalLayout mainLayout = (VerticalLayout) getContent();
@@ -84,8 +84,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     miTokAnnos = mbResult.addItem("Token Annotations", null);
-    
-    mbResult.addItem("Show Citation URL", new MenuBar.Command() {
+
+    mbResult.addItem("Show Citation URL", new MenuBar.Command()
+    {
 
       @Override
       public void menuSelected(MenuItem selectedItem)
@@ -93,7 +94,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
         showCitationURLWindow();
       }
     });
-    
+
     paging = new PagingComponent(0, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
@@ -116,17 +117,17 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
-    
+
     layout.addComponent(progressResult);
   }
 
   @Override
   public void attach()
-  {    
+  {
     query = new AnnisResultQuery(corpora.keySet(), aql,
-      contextLeft, contextRight, Helper.getService(getApplication(), getWindow()));
+      contextLeft, contextRight, getApplication());
     createPage(0, pageSize);
-    
+
     super.attach();
   }
 
@@ -138,16 +139,16 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void createPage(final int start, final int limit)
   {
-    
-    if(query != null)
+
+    if (query != null)
     {
       progressResult.setEnabled(true);
       progressResult.setVisible(true);
-      if(resultPanel != null )
+      if (resultPanel != null)
       {
         resultPanel.setVisible(false);
       }
-      
+
       Runnable r = new Runnable()
       {
 
@@ -158,122 +159,128 @@ public class ResultViewPanel extends Panel implements PagingCallback
           {
 
             AnnisUser user = null;
-            if(getApplication() != null)
+            if (getApplication() != null)
             {
               user = (AnnisUser) getApplication().getUser();
             }
-            AnnisResultSet result = query.loadBeans(start, limit, user);
-            
+            SaltProject result = query.loadBeans(start, limit, user);
+
             updateTokenAnnos(result);
-            
-            if(resultPanel != null)
+
+            if (resultPanel != null)
             {
               layout.removeComponent(resultPanel);
             }
-            resultPanel = new ResultSetPanel(result, start, ps, getVisibleTokenAnnos());
-            
+            resultPanel = new ResultSetPanel(result, start, ps,
+              getVisibleTokenAnnos());
+
             layout.addComponent(resultPanel);
             resultPanel.setVisible(true);
-            
+
           }
-          catch(AnnisQLSemanticsException ex)
+          catch (AnnisQLSemanticsException ex)
           {
             paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
           }
-          catch(AnnisQLSyntaxException ex)
+          catch (AnnisQLSyntaxException ex)
           {
             paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
           }
-          catch(AnnisCorpusAccessException ex)
+          catch (AnnisCorpusAccessException ex)
           {
             paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
           }
-          catch(Exception ex)
+          catch (Exception ex)
           {
-            Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE, "unknown exception in result view", ex);
+            Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE,
+              "unknown exception in result view", ex);
             paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
           }
           finally
           {
             progressResult.setVisible(false);
-            progressResult.setEnabled(false);            
+            progressResult.setEnabled(false);
           }
         }
       };
       Thread t = new Thread(r);
       t.start();
-      
+
     }
   }
-  
+
   private Set<String> getVisibleTokenAnnos()
   {
     TreeSet<String> result = new TreeSet<String>();
-    
-    for(Entry<String,Boolean> e : tokenAnnoVisible.entrySet())
+
+    for (Entry<String, Boolean> e : tokenAnnoVisible.entrySet())
     {
-      if(e.getValue().booleanValue() == true)
+      if (e.getValue().booleanValue() == true)
       {
         result.add(e.getKey());
       }
     }
-    
+
     return result;
   }
-  
+
   private void showCitationURLWindow()
   {
-    final Window w = 
+    final Window w =
       new CitationWindow(
-        getApplication(),
-        aql, corpora, contextLeft, contextRight);
-    
+      getApplication(),
+      aql, corpora, contextLeft, contextRight);
+
     getWindow().addWindow(w);
     w.center();
   }
 
-  private void updateTokenAnnos(AnnisResultSet resultSet)
+  private void updateTokenAnnos(SaltProject p)
   {
-    
+    Set<String> tokenAnnotationLevelSet = CommonHelper.
+      getTokenAnnotationLevelSet(p);
+
+
     // add new annotations
-    for(String s : resultSet.getTokenAnnotationLevelSet())
+    for (String s : tokenAnnotationLevelSet)
     {
-      if(!tokenAnnoVisible.containsKey(s))
+      if (!tokenAnnoVisible.containsKey(s))
       {
         tokenAnnoVisible.put(s, Boolean.TRUE);
       }
     }
-    
+
     miTokAnnos.removeChildren();
-    
-    for(String a : resultSet.getTokenAnnotationLevelSet())
+
+    for (String a : tokenAnnotationLevelSet)
     {
       MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
       {
+
         @Override
         public void menuSelected(MenuItem selectedItem)
         {
-          
-          if(selectedItem.isChecked())
+
+          if (selectedItem.isChecked())
           {
             tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
           }
           else
-          { 
+          {
             tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
           }
-          
+
           resultPanel.setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
         }
       });
-      
+
       miSingleTokAnno.setCheckable(true);
       miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
-      
+
     }
-    
+
   }
-  
+
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {

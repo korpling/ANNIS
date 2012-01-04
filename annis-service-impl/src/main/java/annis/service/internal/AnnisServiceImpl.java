@@ -16,6 +16,7 @@
 package annis.service.internal;
 
 import annis.service.ifaces.AnnisBinaryMetaData;
+import annis.service.ifaces.AnnisResult;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -39,13 +40,13 @@ import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpusSet;
-import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSetImpl;
 import annis.service.objects.AnnisResultImpl;
-import annis.service.objects.AnnisResultSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.utils.LegacyGraphConverter;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 
 // TODO: Exceptions aufräumen
@@ -58,7 +59,6 @@ public class AnnisServiceImpl implements AnnisService
   private AnnisDao annisDao;
   private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
-
   private int maxContext = 10;
 
   /**
@@ -80,35 +80,37 @@ public class AnnisServiceImpl implements AnnisService
   {
   }
 
-
-	private QueryData analyzeQuery(String annisQuery, List<Long> corpusList) {
-		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
-		return queryData;
-	}
-
-  @Override
-  public int getCount(List<Long> corpusList, String annisQuery) throws RemoteException, AnnisQLSemanticsException
+  private QueryData analyzeQuery(String annisQuery, List<Long> corpusList)
   {
-		QueryData queryData = analyzeQuery(annisQuery, corpusList);
-		return annisDao.count(queryData);
+    QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+    return queryData;
   }
 
   @Override
-  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQuery, int limit, int offset, int contextLeft, int contextRight)
-    throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
+  public int getCount(List<Long> corpusList, String annisQuery) throws
+    RemoteException, AnnisQLSemanticsException
+  {
+    QueryData queryData = analyzeQuery(annisQuery, corpusList);
+    return annisDao.count(queryData);
+  }
+
+  @Override
+  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL,
+    int limit, int offset, int contextLeft, int contextRight) throws
+    RemoteException,
+    AnnisQLSemanticsException, AnnisQLSyntaxException,
+    AnnisCorpusAccessException
   {
     contextLeft = Math.min(maxContext, contextLeft);
     contextRight = Math.min(maxContext, contextRight);
 
-	QueryData queryData = analyzeQuery(annisQuery, corpusList);
-	queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft, contextRight));
-    List<AnnotationGraph> annotationGraphs = annisDao.annotate(queryData);
-    AnnisResultSetImpl annisResultSet = new AnnisResultSetImpl();
-    for(AnnotationGraph annotationGraph : annotationGraphs)
-    {
-      annisResultSet.add(new AnnisResultImpl(annotationGraph));
-    }
-    return annisResultSet;
+    QueryData queryData = analyzeQuery(annisQL, corpusList);
+    queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft,
+      contextRight));
+    SaltProject p = annisDao.annotate(queryData);
+
+    return LegacyGraphConverter.convertToResultSet(p);
+
   }
 
   @Override
@@ -128,10 +130,11 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public String getPaula(Long textId) throws RemoteException
   {
-    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
-    if(graph != null)
+    SaltProject p = annisDao.retrieveAnnotationGraph(textId);
+    List<AnnotationGraph> graphs = LegacyGraphConverter.convertToAOM(p);
+    if (graphs.size() >= 1)
     {
-      return new AnnisResultImpl(graph).getPaula();
+      return new AnnisResultImpl(graphs.get(0)).getPaula();
     }
     throw new AnnisServiceException("no text found with id = " + textId);
   }
@@ -139,22 +142,22 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public AnnisResult getAnnisResult(Long textId) throws RemoteException
   {
-    AnnotationGraph graph = annisDao.retrieveAnnotationGraph(textId);
-    if(graph != null)
-    {
-      return new AnnisResultImpl(graph);
+    SaltProject p = annisDao.retrieveAnnotationGraph(textId);
+    if (p != null)
+    {      
+      return new AnnisResultImpl(LegacyGraphConverter.convertToAOM(p).get(0));
     }
     throw new AnnisServiceException("no text found with id = " + textId);
   }
 
   @Override
-  public boolean isValidQuery(String annisQuery) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException
+  public boolean isValidQuery(String annisQuery) throws RemoteException,
+    AnnisQLSemanticsException, AnnisQLSyntaxException
   {
     annisDao.parseAQL(annisQuery, new LinkedList<Long>());
     return true;
   }
 
- 
   public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException
   {
     log.debug("Retrieving binary file with id = " + id);
@@ -163,16 +166,24 @@ public class AnnisServiceImpl implements AnnisService
     {
       return externalFileMgr.getBinary(id);
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       throw new AnnisBinaryNotFoundException(e.getMessage());
     }
   }
 
   @Override
-  public List<Annotation> getMetadata(long corpusId) throws RemoteException, AnnisServiceException
+  public List<Annotation> getMetadata(long corpusId) throws RemoteException,
+    AnnisServiceException
   {
     return annisDao.listCorpusAnnotations(corpusId);
+  }
+
+  @Override
+  public List<Annotation> getMetadata(String toplevelCorpusName,
+    String documentName) throws RemoteException
+  {
+    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
   }
 
   @Override
@@ -182,13 +193,14 @@ public class AnnisServiceImpl implements AnnisService
     return annisDao.getResolverEntries(request);
   }
 
-
   @Override
-  public String getWeka(List<Long> corpusList, String annisQL) throws RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException, AnnisCorpusAccessException
+  public String getWeka(List<Long> corpusList, String annisQL) throws
+    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
+    AnnisCorpusAccessException
   {
-	  QueryData queryData = analyzeQuery(annisQL, corpusList) ;
+    QueryData queryData = analyzeQuery(annisQL, corpusList);
     List<AnnotatedMatch> matches = annisDao.matrix(queryData);
-    if(matches.isEmpty())
+    if (matches.isEmpty())
     {
       return "(empty)";
     }
@@ -249,7 +261,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public AnnisBinaryMetaData getBinaryMeta(String corpusName)
   {
-    return annisDao.getBinary(corpusName, 1, 1);    
+    return annisDao.getBinary(corpusName, 1, 1);
   }
 
   @Override

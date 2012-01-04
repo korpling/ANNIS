@@ -32,6 +32,7 @@ import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
 public interface AnnisService extends Remote
 {
@@ -167,6 +168,9 @@ public interface AnnisService extends Remote
 
   public List<Annotation> getMetadata(long corpusId) throws RemoteException,
     AnnisServiceException;
+
+  public List<Annotation> getMetadata(String toplevelCorpusName,
+    String documentName) throws RemoteException;
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
     throws RemoteException;

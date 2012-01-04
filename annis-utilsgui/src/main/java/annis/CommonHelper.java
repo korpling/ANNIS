@@ -15,6 +15,24 @@
  */
 package annis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import org.eclipse.emf.common.util.BasicEList;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
@@ -44,5 +62,69 @@ public class CommonHelper
       }
     }
     return false;
+  }
+
+  public static Set<String> getTokenAnnotationLevelSet(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        for (SNode n : g.getSNodes())
+        {
+          if (n instanceof SToken)
+          {
+            for (SAnnotation anno : n.getSAnnotations())
+            {
+              result.add(anno.getQName());
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
+    SDocument doc)
+  {
+    final List<String> result = new LinkedList<String>();
+
+    result.add(doc.getSName());
+    SCorpus c = corpusGraph.getSCorpus(doc);
+    BasicEList<SCorpus> cAsList = new BasicEList<SCorpus>();
+    cAsList.add(c);
+    corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
+      "getRootCorpora",
+      new SGraphTraverseHandler()
+      {
+
+        @Override
+        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+          long order)
+        {
+          result.add(currNode.getSName());
+        }
+
+        @Override
+        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId,
+          SNode currNode, SRelation edge, SNode fromNode, long order)
+        {
+        }
+
+        @Override
+        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SRelation edge, SNode currNode, long order)
+        {
+          return true;
+        }
+      });
+    return result;
   }
 }

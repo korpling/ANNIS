@@ -30,7 +30,7 @@ public class AnnisUser extends Properties
   public final static String PASSWORD = "password";
   
   
-  private Map<Long,AnnisCorpus> corpusList;
+  private Map<String, AnnisCorpus> corpusList;
   private String userName = "";
   
   public String getSurName()
@@ -46,30 +46,30 @@ public class AnnisUser extends Properties
   /** (Almost) empty constructor, use this to load a stored property file*/
   public AnnisUser(String userName)
   {
-    this.corpusList = new TreeMap<Long,AnnisCorpus>();
+    this.corpusList = new TreeMap<String,AnnisCorpus>();
     this.userName = userName;
   }
 
   /** legacy construct */
   public AnnisUser(String userName, String surName, String givenName)
   {
-    this.corpusList = new TreeMap<Long,AnnisCorpus>();
+    this.corpusList = new TreeMap<String,AnnisCorpus>();
     this.userName = userName;
     setSurName(surName);
     setGivenName(givenName);
   }
 
-  public Map<Long, AnnisCorpus> getCorpusList()
+  public Map<String, AnnisCorpus> getCorpusList()
   {
     return corpusList;
   }
 
-  public void setCorpusList(Map<Long, AnnisCorpus> corpusList)
+  public void setCorpusList(Map<String, AnnisCorpus> corpusList)
   {
     this.corpusList = corpusList;
   }
 
-  public Set<Long> getCorpusIdList()
+  public Set<String> getCorpusNameList()
   {
     return corpusList.keySet();
   }

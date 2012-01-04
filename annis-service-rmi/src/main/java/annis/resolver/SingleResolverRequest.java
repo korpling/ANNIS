@@ -27,20 +27,20 @@ import java.io.Serializable;
 public class SingleResolverRequest implements Serializable
 {
 
-  private long corpusId;
+  private String corpusName;
   private String namespace;
   private ResolverEntry.ElementType type;
 
-  public SingleResolverRequest(long corpusId, String namespace, ElementType type)
+  public SingleResolverRequest(String corpusName, String namespace, ElementType type)
   {
-    this.corpusId = corpusId;
+    this.corpusName = corpusName;
     this.namespace = namespace;
     this.type = type;
   }
 
-  public long getCorpusId()
+  public String getCorpusName()
   {
-    return corpusId;
+    return corpusName;
   }
 
   public String getNamespace()
@@ -65,7 +65,7 @@ public class SingleResolverRequest implements Serializable
       return false;
     }
     final SingleResolverRequest other = (SingleResolverRequest) obj;
-    if (this.corpusId != other.corpusId)
+    if (!this.corpusName.equals(other.corpusName))
     {
       return false;
     }
@@ -84,10 +84,13 @@ public class SingleResolverRequest implements Serializable
   public int hashCode()
   {
     int hash = 7;
-    hash = 17 * hash + (int) (this.corpusId ^ (this.corpusId >>> 32));
-    hash = 17 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
-    hash = 17 * hash + (this.type != null ? this.type.hashCode() : 0);
+    hash =
+      41 * hash + (this.corpusName != null ? this.corpusName.hashCode() : 0);
+    hash = 41 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+    hash = 41 * hash + (this.type != null ? this.type.hashCode() : 0);
     return hash;
   }
+
+  
 
 }

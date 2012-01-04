@@ -61,13 +61,14 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>3.0.5.RELEASE</version>
+      <version>3.0.7.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>3.0.5.RELEASE</version>
+      <version>3.0.7.RELEASE</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -110,11 +111,13 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>1.8.5</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
       <version>1.1</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -136,6 +139,44 @@
       <artifactId>opencsv</artifactId>
       <version>2.0</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>1.11</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly2</artifactId>
+      <version>1.11</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
+      <version>1.11</version>
+      <exclusions>
+        <exclusion>  
+          <groupId>org.springframework</groupId>  
+          <artifactId>spring-aop</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>org.springframework</groupId>  
+          <artifactId>spring-web</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>org.springframework</groupId>  
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>org.springframework</groupId>  
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>org.springframework</groupId>  
+          <artifactId>spring-context</artifactId>
+        </exclusion>      
+      </exclusions> 
     </dependency>
 
   </dependencies>

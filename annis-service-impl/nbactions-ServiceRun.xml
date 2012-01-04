@@ -6,6 +6,7 @@
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
+            <preAction>build-with-dependencies</preAction>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
@@ -35,6 +36,15 @@
                 <exec.args>${profiler.args} -Dannis.home=src/main/distribution/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>build</actionName>
+            <goals>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </action>
     </actions>

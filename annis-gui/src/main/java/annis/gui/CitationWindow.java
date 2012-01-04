@@ -25,6 +25,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -36,7 +37,7 @@ public class CitationWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow(Application app, String query, Map<Long, AnnisCorpus> corpora, 
+  public CitationWindow(Application app, String query, Map<String, AnnisCorpus> corpora, 
     int contextLeft, int contextRight)
   {
     super("Citation");
@@ -44,11 +45,7 @@ public class CitationWindow extends Window
     VerticalLayout wLayout = (VerticalLayout) getContent();
     wLayout.setSizeFull();
     
-    LinkedList<String> corpusNames = new LinkedList<String>();
-    for(AnnisCorpus c : corpora.values())
-    {
-      corpusNames.add(c.getName());
-    }
+    List<String> corpusNames = new LinkedList<String>(corpora.keySet());
     String url = Helper.generateCitation(app, 
       query, corpusNames, contextLeft, contextRight);
     TextArea txtCitation = new TextArea();

@@ -240,8 +240,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       return;
     }
 
-    Map<Long, AnnisCorpus> userCorpora = user.getCorpusList();
-    Map<String, AnnisCorpus> name2Corpus = Helper.calculateName2Corpus(userCorpora);
+    Map<String, AnnisCorpus> userCorpora = user.getCorpusList();
 
     Matcher m = citationPattern.matcher(relativeUri);
     if(m.matches())
@@ -254,16 +253,16 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       }
 
       // CIDS      
-      HashMap<Long, AnnisCorpus> selectedCorpora = new HashMap<Long, AnnisCorpus>();
+      HashMap<String, AnnisCorpus> selectedCorpora = new HashMap<String, AnnisCorpus>();
       if(m.group(2) != null)
       {
         String[] cids = m.group(2).split(",");
         for(String name : cids)
         {
-          AnnisCorpus c = name2Corpus.get(name);
+          AnnisCorpus c = userCorpora.get(name);
           if(c != null)
           {
-            selectedCorpora.put(c.getId(), c);
+            selectedCorpora.put(c.getName(), c);
           }
         }
       }
@@ -337,7 +336,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     }
   }
 
-  public void showQueryResult(String aql, Map<Long, AnnisCorpus> corpora, int contextLeft,
+  public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora, int contextLeft,
     int contextRight, int pageSize)
   {
     // remove old result from view

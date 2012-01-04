@@ -17,7 +17,8 @@ package annis.gui.resultview;
 
 import annis.resolver.ResolverEntry;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResult;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.rmi.RemoteException;
 
 /**
@@ -26,6 +27,6 @@ import java.rmi.RemoteException;
  */
 public interface ResolverProvider
 {
-  public ResolverEntry[] getResolverEntries(AnnisResult result, AnnisService service) throws RemoteException;
+  public ResolverEntry[] getResolverEntries(SDocument result, AnnisService service) throws RemoteException;
   
 }

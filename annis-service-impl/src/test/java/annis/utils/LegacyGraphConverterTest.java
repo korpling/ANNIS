@@ -73,7 +73,6 @@ public class LegacyGraphConverterTest
    * Test of convertToAOM method, of class LegacyGraphConverter.
    */
   @Test
-  @Ignore
   public void testConvertToAOM() throws SQLException
   {
 

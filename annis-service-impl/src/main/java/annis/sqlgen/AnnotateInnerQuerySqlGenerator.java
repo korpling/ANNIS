@@ -48,6 +48,7 @@ public class AnnotateInnerQuerySqlGenerator
 
       fields.add("\n" + indent + TABSTOP
         + tables.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") + " - "
         + annotateQueryData.getLeft() + " AS min" + i);
