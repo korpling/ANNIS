@@ -15,8 +15,6 @@
  */
 package annis.ql.parser;
 
-import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
-import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newPathExpr;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -35,28 +33,27 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
-import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
-import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
-import de.deutschdiachrondigital.dddquery.node.APathExpr;
-import de.deutschdiachrondigital.dddquery.node.PExpr;
-import de.deutschdiachrondigital.dddquery.node.Start;
+import annis.model.QueryNode;
+import annis.ql.node.AAndExpr;
+import annis.ql.node.PExpr;
+import annis.ql.node.Start;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:annis/sqlgen/SqlGenerator-context.xml", 
-		"classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"})
+@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
 public class TestQueryAnalysis {
 
 	// simple QueryAnalysis instance with mocked dependencies
-	private QueryAnalysis queryAnalysis;
-	private @Mock DnfTransformer dnfTransformer;
-	private @Mock ClauseAnalysis clauseAnalysis;
+	@InjectMocks private QueryAnalysis queryAnalysis = new QueryAnalysis();
+	@Mock private DnfTransformer dnfTransformer;
+	@Mock private ClauseAnalysis clauseAnalysis;
+	@Mock private NodeRelationNormalizer nodeRelationNormalizer;
 	
 	// QueryAnalysis instance that is managed by Spring (has ClauseAnalyzer injected)
 	@Autowired private QueryAnalysis springManagedQueryAnalysis;
@@ -64,9 +61,6 @@ public class TestQueryAnalysis {
 	@Before
 	public void setup() {
 		initMocks(this);
-		queryAnalysis = new QueryAnalysis();
-		queryAnalysis.setDnfTransformer(dnfTransformer);
-		queryAnalysis.setClauseAnalysis(clauseAnalysis);
 	}
 	
 	// extract the annotations from one clause
@@ -78,9 +72,9 @@ public class TestQueryAnalysis {
 		
 		// contains two clauses
 		final ArrayList<PExpr> clauses = new ArrayList<PExpr>();
-		final APathExpr clause1 = newPathExpr();
-		final APathExpr clause2 = newPathExpr();
+		AAndExpr clause1 = new AAndExpr();
 		clauses.add(clause1);
+		AAndExpr clause2 = new AAndExpr();
 		clauses.add(clause2);
 		when(dnfTransformer.listClauses(statement)).thenReturn(clauses);
 		
@@ -103,7 +97,7 @@ public class TestQueryAnalysis {
 		when(clauseAnalysis.getMetaAnnotations()).thenReturn(annotations1, annotations2);
 		
 		// finally the corpus list on which this query should be evaluated
-		List<Long> corpusList = mock(List.class);
+		List<Long> corpusList = new ArrayList<Long>();
 		
 		// analyze the entire query
 		QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
@@ -122,9 +116,9 @@ public class TestQueryAnalysis {
 		inOrder.verify(dnfTransformer).listClauses(statement);
 		
 		// then each clause is analyzed independently
-		inOrder.verify(clauseAnalysis).caseAPathExpr(clause1);
+		inOrder.verify(clauseAnalysis).caseAAndExpr(clause1);
 		inOrder.verify(clauseAnalysis).nodesCount();
-		inOrder.verify(clauseAnalysis).caseAPathExpr(clause2);
+		inOrder.verify(clauseAnalysis).caseAAndExpr(clause2);
 		inOrder.verify(clauseAnalysis).nodesCount();
 	}
 	

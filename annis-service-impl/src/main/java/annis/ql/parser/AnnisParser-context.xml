@@ -24,6 +24,15 @@ limitations under the License.
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
 	">
 	
+  <!-- Properties configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>file:${annis.home}/conf/annis-service.properties</value>
+      </list>
+    </property>
+  </bean>
+  
 	<!-- Annis QL Parser -->
 	<bean id="annisParser" class="annis.ql.parser.AnnisParser">
 		<lookup-method name="getInternalParser" bean="annisInternalParser"/>
