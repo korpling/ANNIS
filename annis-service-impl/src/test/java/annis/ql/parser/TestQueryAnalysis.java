@@ -20,8 +20,11 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -55,13 +58,56 @@ public class TestQueryAnalysis {
 	@Mock private ClauseAnalysis clauseAnalysis;
 	@Mock private NodeRelationNormalizer nodeRelationNormalizer;
 	
-	// QueryAnalysis instance that is managed by Spring (has ClauseAnalyzer injected)
+	// QueryAnalysis instance that is managed by Spring (has Adapters injected)
 	@Autowired private QueryAnalysis springManagedQueryAnalysis;
+	
+	// test data
+	private Start statement = new Start();
+	private ArrayList<Long> corpusList = new ArrayList<Long>();
 	
 	@Before
 	public void setup() {
 		initMocks(this);
 	}
+
+  @Test
+  public void shouldDuplicateNodesInEdgeRelations()
+  {
+    // given
+    queryAnalysis.setNormalizeNodesInEdgeRelations(true);
+    AAndExpr clause1 = new AAndExpr();
+    AAndExpr clause2 = new AAndExpr();
+    setupStatement(statement, clause1, clause2);
+    // when
+    queryAnalysis.analyzeQuery(statement, corpusList);
+    // then
+    verify(nodeRelationNormalizer).caseAAndExpr(clause1);
+    verify(nodeRelationNormalizer).caseAAndExpr(clause2);
+  }
+
+  @Test
+  public void shouldNotDuplicateNodesInEdgeRelations()
+  {
+    // given
+    queryAnalysis.setNormalizeNodesInEdgeRelations(false);
+    AAndExpr clause1 = new AAndExpr();
+    AAndExpr clause2 = new AAndExpr();
+    setupStatement(statement, clause1, clause2);
+    // when
+    queryAnalysis.analyzeQuery(statement, corpusList);
+    // then
+    verifyZeroInteractions(nodeRelationNormalizer);
+  }
+
+  private void setupStatement(Start statement, PExpr... exprs)
+  {
+    ArrayList<PExpr> clauses = new ArrayList<PExpr>();
+    for (PExpr expr: exprs)
+    {
+      clauses.add(expr);
+    }
+    given(dnfTransformer.listClauses(statement)).willReturn(clauses);
+  }
 	
 	// extract the annotations from one clause
 	@SuppressWarnings("unchecked")
@@ -127,14 +173,21 @@ public class TestQueryAnalysis {
 	public void springManagedInstanceHasAllDependencies() {
 		assertThat(springManagedQueryAnalysis.getClauseAnalysis(), is(not(nullValue())));
 		assertThat(springManagedQueryAnalysis.getDnfTransformer(), is(not(nullValue())));
+		assertThat(springManagedQueryAnalysis.getNodeRelationNormalizer(), is(not(nullValue())));
 	}
 	
 	// getClauseAnalysis() returns new instance on each call
 	@Test
 	public void springManagedInstanceIsThreadSafe() {
-		ClauseAnalysis clauseAnalysis1 = springManagedQueryAnalysis.getClauseAnalysis();
-		ClauseAnalysis clauseAnalysis2 = springManagedQueryAnalysis.getClauseAnalysis();
-		assertThat(clauseAnalysis1, is(not(sameInstance(clauseAnalysis2))));
+    ClauseAnalysis clauseAnalysis1 = springManagedQueryAnalysis.getClauseAnalysis();
+    ClauseAnalysis clauseAnalysis2 = springManagedQueryAnalysis.getClauseAnalysis();
+    assertThat(clauseAnalysis1, is(not(sameInstance(clauseAnalysis2))));
+    DnfTransformer dnfTransformer1 = springManagedQueryAnalysis.getDnfTransformer();
+    DnfTransformer dnfTransformer2 = springManagedQueryAnalysis.getDnfTransformer();
+    assertThat(dnfTransformer1, is(not(sameInstance(dnfTransformer2))));
+    NodeRelationNormalizer nodeRelationNormalizer1 = springManagedQueryAnalysis.getNodeRelationNormalizer();
+    NodeRelationNormalizer nodeRelationNormalizer2 = springManagedQueryAnalysis.getNodeRelationNormalizer();
+    assertThat(nodeRelationNormalizer1, is(not(sameInstance(nodeRelationNormalizer2))));
 	}
 	
 }
