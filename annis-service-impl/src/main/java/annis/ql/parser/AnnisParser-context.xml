@@ -24,6 +24,15 @@ limitations under the License.
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
 	">
 	
+  <!-- Properties configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>file:${annis.home}/conf/annis-service.properties</value>
+      </list>
+    </property>
+  </bean>
+  
 	<!-- Annis QL Parser -->
 	<bean id="annisParser" class="annis.ql.parser.AnnisParser">
 		<lookup-method name="getInternalParser" bean="annisInternalParser"/>
@@ -47,9 +56,15 @@ limitations under the License.
     <property name="precedenceBound" value="${annis.precedence-restriction}"/>
   </bean>
 
+  <bean id="nodeRelationNormalizer" class="annis.ql.parser.NodeRelationNormalizer" scope="prototype">
+  </bean>
+  
   <bean id="aqlAnalysis" class="annis.ql.parser.QueryAnalysis">
     <lookup-method name="getDnfTransformer" bean="aqlDnfTransformer"/>
     <lookup-method name="getClauseAnalysis" bean="aqlClauseAnalysis"/>
+    <lookup-method name="getNodeRelationNormalizer" bean="nodeRelationNormalizer"/>
+    
+    <property name="normalizeNodesInEdgeRelations" value="${annis.normalize-nodes-in-edge-relations}"/>
   </bean>
 
 </beans>

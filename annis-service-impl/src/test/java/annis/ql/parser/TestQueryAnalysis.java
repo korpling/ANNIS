@@ -15,15 +15,16 @@
  */
 package annis.ql.parser;
 
-import de.deutschdiachrondigital.dddquery.parser.QueryAnalysis;
-import static de.deutschdiachrondigital.dddquery.helper.AstBuilder.newPathExpr;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -35,39 +36,78 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
-import de.deutschdiachrondigital.dddquery.parser.ClauseAnalysis;
-import de.deutschdiachrondigital.dddquery.parser.DnfTransformer;
-import de.deutschdiachrondigital.dddquery.node.APathExpr;
-import de.deutschdiachrondigital.dddquery.node.PExpr;
-import de.deutschdiachrondigital.dddquery.node.Start;
+import annis.model.QueryNode;
+import annis.ql.node.AAndExpr;
+import annis.ql.node.PExpr;
+import annis.ql.node.Start;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:annis/sqlgen/SqlGenerator-context.xml", 
-		"classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"})
+@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
 public class TestQueryAnalysis {
 
 	// simple QueryAnalysis instance with mocked dependencies
-	private QueryAnalysis queryAnalysis;
-	private @Mock DnfTransformer dnfTransformer;
-	private @Mock ClauseAnalysis clauseAnalysis;
+	@InjectMocks private QueryAnalysis queryAnalysis = new QueryAnalysis();
+	@Mock private DnfTransformer dnfTransformer;
+	@Mock private ClauseAnalysis clauseAnalysis;
+	@Mock private NodeRelationNormalizer nodeRelationNormalizer;
 	
-	// QueryAnalysis instance that is managed by Spring (has ClauseAnalyzer injected)
+	// QueryAnalysis instance that is managed by Spring (has Adapters injected)
 	@Autowired private QueryAnalysis springManagedQueryAnalysis;
+	
+	// test data
+	private Start statement = new Start();
+	private ArrayList<Long> corpusList = new ArrayList<Long>();
 	
 	@Before
 	public void setup() {
 		initMocks(this);
-		queryAnalysis = new QueryAnalysis();
-		queryAnalysis.setDnfTransformer(dnfTransformer);
-		queryAnalysis.setClauseAnalysis(clauseAnalysis);
 	}
+
+  @Test
+  public void shouldDuplicateNodesInEdgeRelations()
+  {
+    // given
+    queryAnalysis.setNormalizeNodesInEdgeRelations(true);
+    AAndExpr clause1 = new AAndExpr();
+    AAndExpr clause2 = new AAndExpr();
+    setupStatement(statement, clause1, clause2);
+    // when
+    queryAnalysis.analyzeQuery(statement, corpusList);
+    // then
+    verify(nodeRelationNormalizer).caseAAndExpr(clause1);
+    verify(nodeRelationNormalizer).caseAAndExpr(clause2);
+  }
+
+  @Test
+  public void shouldNotDuplicateNodesInEdgeRelations()
+  {
+    // given
+    queryAnalysis.setNormalizeNodesInEdgeRelations(false);
+    AAndExpr clause1 = new AAndExpr();
+    AAndExpr clause2 = new AAndExpr();
+    setupStatement(statement, clause1, clause2);
+    // when
+    queryAnalysis.analyzeQuery(statement, corpusList);
+    // then
+    verifyZeroInteractions(nodeRelationNormalizer);
+  }
+
+  private void setupStatement(Start statement, PExpr... exprs)
+  {
+    ArrayList<PExpr> clauses = new ArrayList<PExpr>();
+    for (PExpr expr: exprs)
+    {
+      clauses.add(expr);
+    }
+    given(dnfTransformer.listClauses(statement)).willReturn(clauses);
+  }
 	
 	// extract the annotations from one clause
 	@SuppressWarnings("unchecked")
@@ -78,9 +118,9 @@ public class TestQueryAnalysis {
 		
 		// contains two clauses
 		final ArrayList<PExpr> clauses = new ArrayList<PExpr>();
-		final APathExpr clause1 = newPathExpr();
-		final APathExpr clause2 = newPathExpr();
+		AAndExpr clause1 = new AAndExpr();
 		clauses.add(clause1);
+		AAndExpr clause2 = new AAndExpr();
 		clauses.add(clause2);
 		when(dnfTransformer.listClauses(statement)).thenReturn(clauses);
 		
@@ -103,7 +143,7 @@ public class TestQueryAnalysis {
 		when(clauseAnalysis.getMetaAnnotations()).thenReturn(annotations1, annotations2);
 		
 		// finally the corpus list on which this query should be evaluated
-		List<Long> corpusList = mock(List.class);
+		List<Long> corpusList = new ArrayList<Long>();
 		
 		// analyze the entire query
 		QueryData queryData = queryAnalysis.analyzeQuery(statement, corpusList);
@@ -122,9 +162,9 @@ public class TestQueryAnalysis {
 		inOrder.verify(dnfTransformer).listClauses(statement);
 		
 		// then each clause is analyzed independently
-		inOrder.verify(clauseAnalysis).caseAPathExpr(clause1);
+		inOrder.verify(clauseAnalysis).caseAAndExpr(clause1);
 		inOrder.verify(clauseAnalysis).nodesCount();
-		inOrder.verify(clauseAnalysis).caseAPathExpr(clause2);
+		inOrder.verify(clauseAnalysis).caseAAndExpr(clause2);
 		inOrder.verify(clauseAnalysis).nodesCount();
 	}
 	
@@ -133,14 +173,21 @@ public class TestQueryAnalysis {
 	public void springManagedInstanceHasAllDependencies() {
 		assertThat(springManagedQueryAnalysis.getClauseAnalysis(), is(not(nullValue())));
 		assertThat(springManagedQueryAnalysis.getDnfTransformer(), is(not(nullValue())));
+		assertThat(springManagedQueryAnalysis.getNodeRelationNormalizer(), is(not(nullValue())));
 	}
 	
 	// getClauseAnalysis() returns new instance on each call
 	@Test
 	public void springManagedInstanceIsThreadSafe() {
-		ClauseAnalysis clauseAnalysis1 = springManagedQueryAnalysis.getClauseAnalysis();
-		ClauseAnalysis clauseAnalysis2 = springManagedQueryAnalysis.getClauseAnalysis();
-		assertThat(clauseAnalysis1, is(not(sameInstance(clauseAnalysis2))));
+    ClauseAnalysis clauseAnalysis1 = springManagedQueryAnalysis.getClauseAnalysis();
+    ClauseAnalysis clauseAnalysis2 = springManagedQueryAnalysis.getClauseAnalysis();
+    assertThat(clauseAnalysis1, is(not(sameInstance(clauseAnalysis2))));
+    DnfTransformer dnfTransformer1 = springManagedQueryAnalysis.getDnfTransformer();
+    DnfTransformer dnfTransformer2 = springManagedQueryAnalysis.getDnfTransformer();
+    assertThat(dnfTransformer1, is(not(sameInstance(dnfTransformer2))));
+    NodeRelationNormalizer nodeRelationNormalizer1 = springManagedQueryAnalysis.getNodeRelationNormalizer();
+    NodeRelationNormalizer nodeRelationNormalizer2 = springManagedQueryAnalysis.getNodeRelationNormalizer();
+    assertThat(nodeRelationNormalizer1, is(not(sameInstance(nodeRelationNormalizer2))));
 	}
 	
 }
