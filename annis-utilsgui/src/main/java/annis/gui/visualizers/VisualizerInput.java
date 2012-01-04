@@ -217,7 +217,7 @@ public class VisualizerInput
     if(paula == null)
     {
       // construct Paula from result
-      paula = result.getPaula();
+      paula = getResult().getPaula();
     }
     return paula;
   }

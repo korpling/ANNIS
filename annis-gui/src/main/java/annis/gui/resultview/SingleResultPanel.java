@@ -280,7 +280,7 @@ public class SingleResultPanel extends VerticalLayout implements
       currentMatchPos = 1;
       graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
         GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
-        (SGraphTraverseHandler) this);
+        (SGraphTraverseHandler) this, true);
     }
 
     @Override
