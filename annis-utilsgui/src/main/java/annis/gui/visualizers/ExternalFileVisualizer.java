@@ -107,7 +107,7 @@ public class ExternalFileVisualizer extends WriterVisualizer
        + "<param name=\"movie\" value=\"%s/mediaplayer/player_mp3_maxi.swf\" />\n"
        + "<param name=\"bgcolor\" value=\"#ffffff\" />\n"
        + "<param name=\"FlashVars\" value=\"mp3="
-       + "%s/secure/Binary/%d"
+       + "%s/secure/Externalfile/%d"
         + "&amp;width=85&amp;showstop=1&amp;showvolume=1&amp;showslider=0&amp;bgcolor1=dfe8f6&amp;bgcolor2=bad0ee&amp;sliderovercolor=ffffff&amp;buttoncolor=000000&amp;buttonovercolor=ffffff&amp;textcolor=000000\" />\n"
        + "</object>";
 

@@ -25,7 +25,6 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import java.rmi.RemoteException;
 import java.util.Arrays;
