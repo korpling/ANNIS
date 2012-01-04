@@ -30,10 +30,15 @@ import org.apache.log4j.Logger;
  */
 public class QueryAnalysis
 {
-  private final Logger log = Logger.getLogger(QueryAnalysis.class);
+  // logging
+  private final static Logger log = Logger.getLogger(QueryAnalysis.class);
 
+  // use each node in exactly one edge relation
+  private boolean normalizeNodesInEdgeRelations;
+  
   private DnfTransformer dummyDnfTransformer;
   private ClauseAnalysis dummyClauseAnalysis;
+  private NodeRelationNormalizer nodeRelationNormalizer;
 
   public QueryData analyzeQuery(Start statement, List<Long> corpusList)
   {
@@ -54,8 +59,11 @@ public class QueryAnalysis
 		// analyze each clause independently
 		for (PExpr clause : clauses)
     {
-      NodeRelationNormalizer nodeRelationNormalizer = new NodeRelationNormalizer();
-      clause.apply(nodeRelationNormalizer);
+		  if (normalizeNodesInEdgeRelations)
+		  {
+		    NodeRelationNormalizer nodeRelationNormalizer = getNodeRelationNormalizer();
+		    clause.apply(nodeRelationNormalizer);
+		  }
 
 			// get a fresh clause analyzer from Spring
 			ClauseAnalysis clauseAnalysis = getClauseAnalysis();
@@ -91,6 +99,27 @@ public class QueryAnalysis
   public void setClauseAnalysis(ClauseAnalysis clauseAnalysis)
   {
     this.dummyClauseAnalysis = clauseAnalysis;
+  }
+
+  public NodeRelationNormalizer getNodeRelationNormalizer()
+  {
+    return nodeRelationNormalizer;
+  }
+
+  public void setNodeRelationNormalizer(
+      NodeRelationNormalizer nodeRelationNormalizer)
+  {
+    this.nodeRelationNormalizer = nodeRelationNormalizer;
+  }
+
+  public boolean isNormalizeNodesInEdgeRelations()
+  {
+    return normalizeNodesInEdgeRelations;
+  }
+
+  public void setNormalizeNodesInEdgeRelations(boolean normalizeNodesInEdgeRelations)
+  {
+    this.normalizeNodesInEdgeRelations = normalizeNodesInEdgeRelations;
   }
 
 
