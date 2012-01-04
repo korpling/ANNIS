@@ -259,8 +259,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSProcessing(node, resultSet, PROC_RIGHTTOKEN, "node", "right_token");
       addLongSProcessing(node, resultSet, PROC_TOKENINDEX, "node", "token_index");
 
-      int matchedNode = key.indexOf(id);
-      if (matchedNode > -1)
+      int matchedNode = key.indexOf(id)+1;
+      if (matchedNode > 0)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
       }

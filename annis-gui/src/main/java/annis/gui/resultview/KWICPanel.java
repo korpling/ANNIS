@@ -17,10 +17,8 @@ package annis.gui.resultview;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -225,8 +223,8 @@ public class KWICPanel extends Table
         if (markedAndCovered.containsKey(token))
         {
           // add color
-          l.addStyleName(
-            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token)));
+          String styleName = MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
+          l.addStyleName(styleName);
         }
       }
       else

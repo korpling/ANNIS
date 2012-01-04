@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
 import annis.service.objects.AnnisResultSetImpl;
-import org.apache.commons.lang.NotImplementedException;
+import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 
@@ -91,12 +91,12 @@ public class LegacyGraphConverter
   {
     AnnotationGraph result = null;
 
-    String[] matchedIDs = new String[0];
+    List<String> matchedIDs = new ArrayList<String>();
     SFeature featMatchedIDs = document.getSFeature(ANNIS_NS,
       FEAT_MATCHEDIDS);
     if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
     {
-      matchedIDs = StringUtils.split(featMatchedIDs.getSValueSTEXT(), ',');
+      matchedIDs = Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
     result = convertToAnnotationGraph(docGraph, matchedIDs);
@@ -105,9 +105,9 @@ public class LegacyGraphConverter
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
-    String[] matchedIDs)
+    List<String> matchedIDs)
   {
-    Set<String> matchSet = new HashSet<String>(Arrays.asList(matchedIDs));
+    Set<String> matchSet = new HashSet<String>(matchedIDs);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
@@ -163,8 +163,8 @@ public class LegacyGraphConverter
           + PROC_RIGHTTOKEN).getSValueSNUMERIC());
         if (matchSet.contains(aNode.getName()))
         {
-          aNode.setMatchedNodeInQuery((long) Arrays.binarySearch(matchedIDs,
-            aNode.getName()) + 1);
+          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getId()) + 1);
+          annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else
         {
