@@ -36,7 +36,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,9 +46,9 @@ import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
 import annis.service.objects.AnnisResultSetImpl;
-import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -133,17 +132,22 @@ public class LegacyGraphConverter
         aNode.setName(sNode.getSName());
         aNode.setNamespace(sNode.getSLayers().get(0).getSName());
 
-        BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
-        textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-        SDataSourceSequence seq = docGraph.getOverlappedDSSequences(sNode,
-          textualRelation).get(0);
         if (sNode instanceof SToken)
         {
-          aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
-            substring(seq.getSStart(), seq.getSEnd()));
-          aNode.setToken(true);
-          aNode.setTokenIndex(sNode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-            getSValueSNUMERIC());
+          BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+          textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+          EList<SDataSourceSequence> seqList =
+            docGraph.getOverlappedDSSequences(sNode,
+            textualRelation);
+          if (seqList != null)
+          {
+            SDataSourceSequence seq = seqList.get(0);
+            aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
+              substring(seq.getSStart(), seq.getSEnd()));
+            aNode.setToken(true);
+            aNode.setTokenIndex(sNode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
+              getSValueSNUMERIC());
+          }
         }
         else
         {
