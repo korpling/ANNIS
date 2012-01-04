@@ -45,7 +45,8 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
   @Override
   public PreparedStatement createPreparedStatement(Connection cnctn) throws SQLException
   {
-    String select = "SELECT resolver_vis_map.corpus, "
+    String select = "SELECT resolver_vis_map.id, "
+      + "resolver_vis_map.corpus, "
       + "resolver_vis_map.version, "
       + "resolver_vis_map.namespace, "
       + "resolver_vis_map.element, "
