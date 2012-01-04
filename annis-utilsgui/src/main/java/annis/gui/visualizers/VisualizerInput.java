@@ -154,11 +154,13 @@ public class VisualizerInput
    * matched nodes and not covered token.
    * @return
    */
+  @Deprecated
   public Map<String, String> getMarkableExactMap()
   {
     return markableExactMap;
   }
 
+  @Deprecated
   public void setMarkableExactMap(Map<String, String> markableExactMap)
   {
     this.markableExactMap = markableExactMap;
@@ -169,6 +171,7 @@ public class VisualizerInput
    * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
    * @return
    */
+  @Deprecated
   public Map<String, String> getMarkableMap()
   {
     return markableMap;
@@ -179,6 +182,7 @@ public class VisualizerInput
    * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
    * @param markableMap
    */
+  @Deprecated
   public void setMarkableMap(Map<String, String> markableMap)
   {
     this.markableMap = markableMap;

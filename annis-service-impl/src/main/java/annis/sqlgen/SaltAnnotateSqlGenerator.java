@@ -251,13 +251,13 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       moveNodeProperties(null, node, graph, id);
 
-      addLongSProcessing(node, PROC_INTERNALID, internalID);
-      addLongSProcessing(node, resultSet, PROC_CORPUSREF, "node", "corpus_ref");
-      addLongSProcessing(node, resultSet, PROC_LEFT, "node", "left");
-      addLongSProcessing(node, resultSet, PROC_LEFTTOKEN, "node", "left_token");
-      addLongSProcessing(node, resultSet, PROC_RIGHT, "node", "right");
-      addLongSProcessing(node, resultSet, PROC_RIGHTTOKEN, "node", "right_token");
-      addLongSProcessing(node, resultSet, PROC_TOKENINDEX, "node", "token_index");
+      addLongSFeature(node, FEAT_INTERNALID, internalID);
+      addLongSFeature(node, resultSet, FEAT_CORPUSREF, "node", "corpus_ref");
+      addLongSFeature(node, resultSet, FEAT_LEFT, "node", "left");
+      addLongSFeature(node, resultSet, FEAT_LEFTTOKEN, "node", "left_token");
+      addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
+      addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
+      addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
       int matchedNode = key.indexOf(id)+1;
       if (matchedNode > 0)
@@ -302,6 +302,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     return node;
   }
 
+  /*
   private void addLongSProcessing(SNode node, String name,
     long value) throws SQLException
   {
@@ -318,7 +319,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   {
     addLongSProcessing(node, name, longValue(resultSet, table, tupleName));
   }
-
+  */
+  
   private void addLongSFeature(SNode node, String name,
     long value) throws SQLException
   {
@@ -513,12 +515,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           rel.getSLayers().add(layer);
           rel.addSType(edgeName);
 
-          SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
-            createSProcessingAnnotation();
-          procInternalID.setSNS(ANNIS_NS);
-          procInternalID.setSName(PROC_INTERNALID);
-          procInternalID.setSValue(Long.valueOf(pre));
-          rel.addSProcessingAnnotation(procInternalID);
+          SFeature featInternalID = SaltFactory.eINSTANCE.
+            createSFeature();
+          featInternalID.setSNS(ANNIS_NS);
+          featInternalID.setSName(FEAT_INTERNALID);
+          featInternalID.setSValue(Long.valueOf(pre));
+          rel.addSFeature(featInternalID);
 
           graph.addSRelation(rel);
         }

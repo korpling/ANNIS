@@ -64,7 +64,7 @@ import org.eclipse.emf.common.util.BasicEList;
 public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
-  
+
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
   private SDocument result;
@@ -77,7 +77,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
-  
+
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos)
@@ -86,58 +86,58 @@ public class SingleResultPanel extends VerticalLayout implements
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
-    
+
     calculateHelperVariables();
-    
+
     setWidth("100%");
     setHeight("-1px");
-    
-    
+
+
     setWidth("100%");
     setHeight("-1px");
     setMargin(false);
     setSpacing(false);
-    
+
     HorizontalLayout infoBar = new HorizontalLayout();
     infoBar.addStyleName("docPath");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
-    
+
     addComponent(infoBar);
-    
+
     Label lblNumber = new Label("" + (resultNumber + 1));
     infoBar.addComponent(lblNumber);
     lblNumber.setSizeUndefined();
-    
+
     btInfo = new Button();
     btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
-    
+
     path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),
       result);
     Collections.reverse(path);
-    
+
     Label lblPath = new Label("Path: " + StringUtils.join(path, " > "));
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
-    
+
     kwicPanels = new ArrayList<KWICPanel>();
     for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
     {
-      
+
       KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
         text);
       addComponent(kwic);
       kwicPanels.add(kwic);
     }
-    
+
   }
-  
+
   @Override
   public void attach()
   {
@@ -148,7 +148,7 @@ public class SingleResultPanel extends VerticalLayout implements
       {
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
-        
+
         for (ResolverEntry e : entries)
         {
           addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
@@ -163,10 +163,10 @@ public class SingleResultPanel extends VerticalLayout implements
           getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
       }
     }
-    
+
     super.attach();
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if (kwicPanels != null)
@@ -177,41 +177,51 @@ public class SingleResultPanel extends VerticalLayout implements
       }
     }
   }
-  
+
   private void calculateHelperVariables()
   {
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
-    
+
     for (SNode n : result.getSDocumentGraph().getSNodes())
     {
-      
+
       SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_MATCHEDNODE);
       Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
-      
+
       if (match != null)
       {
         int color = Math.max(0, Math.min((int) match.longValue() - 1,
           MatchedNodeColors.values().length - 1));
-        markedExactMap.put("" + n.getSName(),
-          MatchedNodeColors.values()[color].name());
+        SFeature feat = n.getSFeature(AnnisConstants.ANNIS_NS,
+          AnnisConstants.FEAT_INTERNALID);
+        if (feat != null)
+        {
+          markedExactMap.put("" + feat.getSValueSNUMERIC(),
+            MatchedNodeColors.values()[color].name());
+        }
       }
-      
+
     }
-    
+
     markedAndCovered = calculateMarkedAndCoveredIDs(result);
-    
+
     for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
     {
       int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
         - 1,
         MatchedNodeColors.values().length - 1));
-      markedCoveredMap.put("" + markedEntry.getKey().getSId(),
-        MatchedNodeColors.values()[color].name());
+      SFeature feat = markedEntry.getKey().getSFeature(AnnisConstants.ANNIS_NS,
+        AnnisConstants.FEAT_INTERNALID);
+      if(feat != null)
+      {
+        markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
+          MatchedNodeColors.values()[color].name());
+      }
     }
   }
-  
+
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
     SDocument doc)
   {
@@ -224,54 +234,55 @@ public class SingleResultPanel extends VerticalLayout implements
       SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_MATCHEDNODE);
       Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
-      
+
       if (match != null)
       {
         matchedNodes.add(n.getSId());
         initialCovered.put(n, match);
       }
     }
-    
+
     CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.
       getSDocumentGraph(), initialCovered);
-    
+
     return cmc.getMatchedAndCovered();
   }
-  
+
   @Override
   public void buttonClick(ClickEvent event)
   {
     if (event.getButton() == btInfo)
-    {      
+    {
       Window infoWindow = new Window("Info for " + result.getSId());
-      
+
       infoWindow.setModal(false);
-      MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()-1));
+      MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()
+        - 1));
       infoWindow.setContent(meta);
       infoWindow.setWidth("400px");
       infoWindow.setHeight("400px");
-      
+
       getWindow().addWindow(infoWindow);
     }
   }
-  
+
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
-    
+
     private Map<SNode, Long> matchedAndCovered;
     private long currentMatchPos;
-    
+
     public CoveredMatchesCalculator(SDocumentGraph graph,
       Map<SNode, Long> initialMatches)
     {
       this.matchedAndCovered = initialMatches;
-      
+
       currentMatchPos = 0;
       graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
         GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
         (SGraphTraverseHandler) this);
     }
-    
+
     @Override
     public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
       String traversalId, SNode currNode, SRelation edge, SNode fromNode,
@@ -281,19 +292,19 @@ public class SingleResultPanel extends VerticalLayout implements
       {
         currentMatchPos = matchedAndCovered.get(fromNode);
       }
-      
+
       if (currNode instanceof SToken)
       {
         matchedAndCovered.put(currNode, currentMatchPos);
       }
     }
-    
+
     @Override
     public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
       SNode currNode, SRelation edge, SNode fromNode, long order)
     {
     }
-    
+
     @Override
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
       String traversalId, SRelation edge, SNode currNode, long order)
@@ -308,7 +319,7 @@ public class SingleResultPanel extends VerticalLayout implements
         return false;
       }
     }
-    
+
     public Map<SNode, Long> getMatchedAndCovered()
     {
       return matchedAndCovered;

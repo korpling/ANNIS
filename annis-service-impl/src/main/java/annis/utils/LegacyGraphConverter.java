@@ -96,11 +96,12 @@ public class LegacyGraphConverter
       FEAT_MATCHEDIDS);
     if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
     {
-      matchedIDs = Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
+      matchedIDs =
+        Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
     result = convertToAnnotationGraph(docGraph, matchedIDs);
-    
+
     return result;
   }
 
@@ -116,12 +117,11 @@ public class LegacyGraphConverter
 
     for (SNode sNode : docGraph.getSNodes())
     {
-      SProcessingAnnotation procInternalID =
-        sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-        + PROC_INTERNALID);
-      if (procInternalID != null)
+      SFeature featInternalID =
+        sNode.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+      if (featInternalID != null)
       {
-        long internalID = procInternalID.getSValueSNUMERIC();
+        long internalID = featInternalID.getSValueSNUMERIC();
         AnnisNode aNode = new AnnisNode(internalID);
 
         for (SAnnotation sAnno : sNode.getSAnnotations())
@@ -142,8 +142,8 @@ public class LegacyGraphConverter
           aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
             substring(seq.getSStart(), seq.getSEnd()));
           aNode.setToken(true);
-          aNode.setTokenIndex(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-            + PROC_TOKENINDEX).getSValueSNUMERIC());
+          aNode.setTokenIndex(sNode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
+            getSValueSNUMERIC());
         }
         else
         {
@@ -151,19 +151,19 @@ public class LegacyGraphConverter
           aNode.setTokenIndex(null);
         }
 
-        aNode.setCorpus(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_CORPUSREF).getSValueSNUMERIC());
-        aNode.setLeft(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_LEFT).getSValueSNUMERIC());
-        aNode.setLeftToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_LEFTTOKEN).getSValueSNUMERIC());
-        aNode.setRight(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_RIGHT).getSValueSNUMERIC());
-        aNode.setRightToken(sNode.getSProcessingAnnotation(ANNIS_NS + "::"
-          + PROC_RIGHTTOKEN).getSValueSNUMERIC());
+        aNode.setCorpus(sNode.getSFeature(ANNIS_NS, FEAT_CORPUSREF).
+          getSValueSNUMERIC());
+        aNode.setLeft(sNode.getSFeature(ANNIS_NS, FEAT_LEFT).getSValueSNUMERIC());
+        aNode.setLeftToken(sNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
+          getSValueSNUMERIC());
+        aNode.setRight(
+          sNode.getSFeature(ANNIS_NS, FEAT_RIGHT).getSValueSNUMERIC());
+        aNode.setRightToken(sNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
+          getSValueSNUMERIC());
         if (matchSet.contains(aNode.getName()))
         {
-          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getId()) + 1);
+          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getName())
+            + 1);
           annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else
@@ -178,18 +178,16 @@ public class LegacyGraphConverter
 
     for (SRelation rel : docGraph.getSRelations())
     {
-      SProcessingAnnotation procPre = rel.getSProcessingAnnotation(ANNIS_NS
-        + "::"
-        + PROC_INTERNALID);
+      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
 
-      if (procPre != null)
+      if (featPre != null)
       {
         Edge aEdge = new Edge();
         aEdge.setSource(allNodes.get(rel.getSource()));
         aEdge.setDestination(allNodes.get(rel.getTarget()));
 
         aEdge.setEdgeType(EdgeType.UNKNOWN);
-        aEdge.setPre(procPre.getSValueSNUMERIC());
+        aEdge.setPre(featPre.getSValueSNUMERIC());
 
         aEdge.setNamespace(rel.getSLayers().get(0).getSName());
         aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
