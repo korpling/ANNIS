@@ -9,6 +9,7 @@ import static annis.sqlgen.TableAccessStrategy.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -43,6 +44,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -503,19 +506,26 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           rel = pointingrel;
         }
 
-        rel.setSSource(nodeByPre.get(parent));
-        rel.setSTarget(targetNode);
-        rel.getSLayers().add(layer);
-        rel.addSType(edgeName);
+        try
+        {
+          rel.setSSource(nodeByPre.get(parent));
+          rel.setSTarget(targetNode);
+          rel.getSLayers().add(layer);
+          rel.addSType(edgeName);
 
-        SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
-          createSProcessingAnnotation();
-        procInternalID.setSNS(ANNIS_NS);
-        procInternalID.setSName(PROC_INTERNALID);
-        procInternalID.setSValue(Long.valueOf(pre));
-        rel.addSProcessingAnnotation(procInternalID);
+          SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
+            createSProcessingAnnotation();
+          procInternalID.setSNS(ANNIS_NS);
+          procInternalID.setSName(PROC_INTERNALID);
+          procInternalID.setSValue(Long.valueOf(pre));
+          rel.addSProcessingAnnotation(procInternalID);
 
-        graph.addSRelation(rel);
+          graph.addSRelation(rel);
+        }
+        catch(SaltException ex)
+        {
+          Logger.getLogger(SaltAnnotateSqlGenerator.class.getName()).log(Level.WARNING, "invalid edge detected", ex);
+        }
       } // end if no existing relation
 
       // add edge annotations

@@ -52,17 +52,17 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
       + "resolver_vis_map.vis_type, "
       + "resolver_vis_map.display_name, "
       + "resolver_vis_map.order, "
-      + "resolver_vis_map.mappings";
+      + "resolver_vis_map.mappings\n";
 
     String defaultFromWhere = 
-      " FROM resolver_vis_map WHERE ";
+      "FROM resolver_vis_map \nWHERE ";
 
     // If (corp=null && ns=null && element=null) => show this visualisation no matter what
     String firstUnion =
       select
       + defaultFromWhere
       + " resolver_vis_map.corpus is NULL AND resolver_vis_map.namespace is NULL" 
-      + " AND resolver_vis_map.element is NULL";
+      + " AND resolver_vis_map.element is NULL\n";
 
     // if (not_exists(my_corp+my_ns) && exists(corp=null && ms=my_ns && element=my_element.type)) => show this visulization for this hit;
     String secondUnion =
@@ -78,26 +78,28 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
           +  "?" //namespace
           + " AND resolver_vis_map.corpus = "
           + "?" // corpus
-      + ")";
+      + ")\n";
 
     // if (corp=my_corp && ns=my_ns && element=my_element.type) => show this visulization for this hit;
     String thirdUnion =
       select
       + defaultFromWhere
-      + "AND resolver_vis_map.namespace = "
+      + " resolver_vis_map.namespace = "
       + "?" //namespace
       + " AND resolver_vis_map.element = "
       + "?" //type
       + " AND resolver_vis_map.corpus = "
-      + "?"; //corpus
+      + "?" //corpus
+      + "\n"; 
 
     // if (corp=my_corp && ns=null) => always show this visualization for this corpus;
     String fourthUnion =
       select
       +  defaultFromWhere
-      + " AND resolver_vis_map.namespace IS NULL "
+      + "  resolver_vis_map.namespace IS NULL "
       + " AND resolver_vis_map.corpus = "
-      + "?"; // corpus
+      + "?" // corpus
+      + "\n";
 
 
     StringBuilder result = new StringBuilder();
