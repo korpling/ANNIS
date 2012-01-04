@@ -153,6 +153,7 @@ public class AnnisWebService
 
   @GET
   @Path("graphs/{top}/{doc}")
+  @Produces("application/xml")
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
