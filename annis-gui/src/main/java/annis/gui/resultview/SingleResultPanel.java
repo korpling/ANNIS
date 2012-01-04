@@ -214,7 +214,7 @@ public class SingleResultPanel extends VerticalLayout implements
         MatchedNodeColors.values().length - 1));
       SFeature feat = markedEntry.getKey().getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_INTERNALID);
-      if(feat != null)
+      if (feat != null)
       {
         markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
           MatchedNodeColors.values()[color].name());
@@ -277,7 +277,7 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       this.matchedAndCovered = initialMatches;
 
-      currentMatchPos = 0;
+      currentMatchPos = 1;
       graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
         GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
         (SGraphTraverseHandler) this);
@@ -288,15 +288,12 @@ public class SingleResultPanel extends VerticalLayout implements
       String traversalId, SNode currNode, SRelation edge, SNode fromNode,
       long order)
     {
-      if (matchedAndCovered.containsKey(fromNode))
+      if (matchedAndCovered.containsKey(fromNode) && !matchedAndCovered.containsKey(currNode))
       {
         currentMatchPos = matchedAndCovered.get(fromNode);
-      }
-
-      if (currNode instanceof SToken)
-      {
         matchedAndCovered.put(currNode, currentMatchPos);
       }
+
     }
 
     @Override
@@ -309,7 +306,7 @@ public class SingleResultPanel extends VerticalLayout implements
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
       String traversalId, SRelation edge, SNode currNode, long order)
     {
-      if (edge instanceof SDominanceRelation
+      if (edge == null || edge instanceof SDominanceRelation
         || edge instanceof SSpanningRelation)
       {
         return true;
