@@ -551,13 +551,13 @@ public class TestDefaultWhereClauseGenerator
   }
 
   @Test
-  public void shouldGenerateWhereConditionsForIsTokenTokenIndexAlternative()
+  public void shouldGenerateWhereConditionsForIsTokenSpanAlternative()
   {
     // given
     generator.setUseIsTokenColumn(false);
     node23.setToken(true);
     // then
-    checkWhereConditions(isNotNull("_node23.token_index"));
+    checkWhereConditions(isNotNull("_node23.span"));
   }
 
   // WHERE condition for root node

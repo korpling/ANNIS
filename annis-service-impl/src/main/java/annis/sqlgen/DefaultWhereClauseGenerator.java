@@ -533,7 +533,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     } else
     {
       conditions.add(isNotNull(tables(node).aliasedColumn(NODE_TABLE,
-          "token_index")));
+          "span")));
     }
   }
 
