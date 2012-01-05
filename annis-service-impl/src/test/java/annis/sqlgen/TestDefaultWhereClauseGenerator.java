@@ -28,12 +28,13 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.test.TestUtils.size;
 import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueLong;
 import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -44,13 +45,16 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
@@ -73,6 +77,7 @@ import annis.sqlgen.model.Sibling;
 /**
  * Test generation of WHERE clause conditions for each operator and node search.
  */
+@RunWith(Theories.class)
 public class TestDefaultWhereClauseGenerator
 {
 
@@ -84,14 +89,16 @@ public class TestDefaultWhereClauseGenerator
   private DefaultWhereClauseGenerator generator;
 
   // dummy annotation set
-  @Mock
-  Set<QueryAnnotation> annotations;
+  @Mock private Set<QueryAnnotation> annotations;
 
   // which side to attach component predicates (name and edgeType)
   // in an edge operation
   @DataPoints
   public final static String[] componentPredicates =
   { "lhs", "rhs", "both" };
+  
+  // test data
+  @Mock private QueryData queryData;
 
   @Before
   public void setup()
@@ -353,21 +360,138 @@ public class TestDefaultWhereClauseGenerator
         join("=", "_rank23.parent", "_rank42.parent"),
         join("<>", "_node23.id", "_node42.id"));
   }
-
+  
   /**
    * The sibling operator may optionally bind the same node to both operands.
    */
   @Theory
   public void shouldAllowIdenticalNodeForSiblingTarget(
-      String componentPredicates)
+      String componentPredicate)
   {
     // given
     generator.setAllowIdenticalSibling(true);
     node23.addJoin(new Sibling(node42));
     // then
-    checkEdgeConditions(componentPredicates, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null,
         join("=", "_rank23.parent", "_rank42.parent"));
   }
+
+  /**
+   * WHERE conditions for common ancestor ($*).
+   */
+  @Theory
+  public void shouldGenerateWhereConditionsForCommonAncestor(String componentPredicate)
+  {
+    // given
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+        join("<>", "_node23.id", "_node42.id"));
+  }
+  
+  /**
+   * The common ancestor operator may optionally bind the same node to both operands.
+   */
+  @Theory
+  public void shouldAllowIdenticalNodeForCommonAncestorTarget(
+      String componentPredicate)
+  {
+    // given
+    generator.setAllowIdenticalSibling(true);
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)");
+  }
+  
+  /**
+   * The common ancestor operator may optionally use a predicate on toplevel_corpus
+   * in the EXISTS subquery.
+   */
+  @Theory
+  public void shouldUseToplevelCorpusPredicateForCommonAncestor(
+      String componentPredicate)
+  {
+    // given
+    generator.setUseToplevelCorpusPredicateInCommonAncestorSubquery(true);
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post AND toplevel_corpus IN(" + corpusId + "))",
+            join("<>", "_node23.id", "_node42.id"));
+  }  
+
+  /**
+   * The common ancestor operator should skip the predicate on toplevel_corpus
+   * in the EXISTS subquery if the corpus list is empty.
+   */
+  @Theory
+  public void shouldSkipToplevelCorpusPredicateForCommonAncestorIfCorpusListIsEmpty(
+      String componentPredicate)
+  {
+    // given
+    generator.setUseToplevelCorpusPredicateInCommonAncestorSubquery(true);
+    given(queryData.getCorpusList()).willReturn(new ArrayList<Long>());
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            join("<>", "_node23.id", "_node42.id"));
+  }  
+
+  /**
+   * The common ancestor operator should skip the predicate on toplevel_corpus
+   * in the EXISTS subquery if the corpus list is NULL.
+   */
+  @Theory
+  public void shouldSkipToplevelCorpusPredicateForCommonAncestorIfCorpusListIsNull(
+      String componentPredicate)
+  {
+    // given
+    generator.setUseToplevelCorpusPredicateInCommonAncestorSubquery(true);
+    given(queryData.getCorpusList()).willReturn(null);
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            join("<>", "_node23.id", "_node42.id"));
+  }  
+
+  /**
+   * The common ancestor operator may optionally use a predicate on toplevel_corpus
+   * in the EXISTS subquery.
+   */
+  @Theory
+  public void shouldUseComponentRefPredicateForCommonAncestor(
+      String componentPredicate)
+  {
+    // given
+    generator.setUseComponentRefPredicateInCommonAncestorSubquery(true);
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    node23.addJoin(new CommonAncestor(node42));
+    // then
+    checkEdgeConditions(componentPredicate, "d", null,
+        join("=", "_rank23.component_ref", "_rank42.component_ref"),
+        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+            "ancestor.component_ref = _rank23.component_ref AND" + "\n\t" +
+            "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            join("<>", "_node23.id", "_node42.id"));
+  }  
 
   /**
    * Indirect precedence on PostgreSQL may be optimized by an index on
@@ -598,7 +722,6 @@ public class TestDefaultWhereClauseGenerator
   {
     List<QueryNode> alternative = new ArrayList<QueryNode>();
     alternative.add(node);
-    QueryData queryData = mock(QueryData.class);
     Set<String> actual = generator.whereConditions(queryData, alternative, "");
     for (String item : expected)
       assertThat(actual, hasItem(item));

@@ -32,9 +32,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
-import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
@@ -74,6 +74,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   // use dedicated is_token column
   private boolean useIsTokenColumn;
+  
+  // use predicate on toplevel_corpus in EXISTS subquery for common ancestor operator
+  private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
+  
+  // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
+  private boolean useComponentRefPredicateInCommonAncestorSubquery;
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
       final String edgeType, String componentName)
@@ -336,20 +342,20 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       QueryNode node, QueryNode target, CommonAncestor join, QueryData queryData)
   {
     List<Long> corpusList = queryData.getCorpusList();
-    conditions.add(join("=", tables(node)
-        .aliasedColumn(COMPONENT_TABLE, "type"), sqlString("d")));
-    if (join.getName() != null)
-    {
-      conditions.add(join("=",
-          tables(node).aliasedColumn(COMPONENT_TABLE, "name"),
-          sqlString(join.getName())));
-    } else
-    {
-      conditions.add(tables(node).aliasedColumn(COMPONENT_TABLE, "name")
-          + " IS NULL");
-    }
+    String componentName = join.getName();
+    addComponentPredicates(conditions, node, target, componentName, "d");
 
-    joinOnNode(conditions, node, target, "<>", "id", "id");
+    if (!allowIdenticalSibling)
+    {
+      joinOnNode(conditions, node, target, "<>", "id", "id");
+    }
+    
+    if (useComponentRefPredicateInCommonAncestorSubquery)
+    {
+      conditions.add(join("=", 
+          tables(node).aliasedColumn(RANK_TABLE, "component_ref"), 
+          tables(target).aliasedColumn(RANK_TABLE, "component_ref")));
+    }
 
     // fugly
     TableAccessStrategy tas = tables(null);
@@ -357,10 +363,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
     String pre = tas.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
     String post = tas.column("ancestor", tas.columnName(RANK_TABLE, "post"));
+    String component = tas.column("ancestor", tas.columnName(RANK_TABLE, "component_ref"));
+    String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
 
     StringBuffer sb = new StringBuffer();
     sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE)
         + " AS ancestor WHERE\n");
+    if (useComponentRefPredicateInCommonAncestorSubquery)
+    {
+      sb.append("\t" + component + " = " + component1 + " AND\n");
+    }
     sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post
         + " AND\n");
     sb.append("\t"
@@ -370,10 +382,13 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         + " AND "
         + pre2
         + " < "
-        + post
-        + " AND toplevel_corpus IN("
-        + (corpusList == null || corpusList.isEmpty() ? "NULL" : StringUtils
-            .join(corpusList, ",")) + "))");
+        + post);
+    if (useToplevelCorpusPredicateInCommonAncestorSubquery && ! (corpusList == null || corpusList.isEmpty() ) ) {
+      sb.append(" AND toplevel_corpus IN(");
+      sb.append(StringUtils.join(corpusList, ","));
+      sb.append(")");
+    }
+    sb.append(")");
     conditions.add(sb.toString());
   }
 
@@ -580,6 +595,28 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   public void setUseIsTokenColumn(boolean useIsTokenColumn)
   {
     this.useIsTokenColumn = useIsTokenColumn;
+  }
+
+  public boolean isUseToplevelCorpusPredicateInCommonAncestorSubquery()
+  {
+    return useToplevelCorpusPredicateInCommonAncestorSubquery;
+  }
+
+  public void setUseToplevelCorpusPredicateInCommonAncestorSubquery(
+      boolean useToplevelCorpusPredicateInCommonAncestorSubquery)
+  {
+    this.useToplevelCorpusPredicateInCommonAncestorSubquery = useToplevelCorpusPredicateInCommonAncestorSubquery;
+  }
+
+  public boolean isUseComponentRefPredicateInCommonAncestorSubquery()
+  {
+    return useComponentRefPredicateInCommonAncestorSubquery;
+  }
+
+  public void setUseComponentRefPredicateInCommonAncestorSubquery(
+      boolean useComponentRefPredicateInCommonAncestorSubquery)
+  {
+    this.useComponentRefPredicateInCommonAncestorSubquery = useComponentRefPredicateInCommonAncestorSubquery;
   }
 
 }

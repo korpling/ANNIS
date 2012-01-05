@@ -75,6 +75,8 @@ limitations under the License.
 		<property name="optimizeInclusion" value="${annis.optimize-inclusion}" />
 		<property name="componentPredicates" value="${annis.component-predicates}" />
 		<property name="useIsTokenColumn" value="${annis.use-is-token-column}" />
+		<property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
+		<property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
 	</bean>
 
 	<bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
