@@ -34,6 +34,9 @@ import annis.ql.parser.QueryData;
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   implements SelectClauseSqlGenerator<QueryData>
 {
+  
+  // optimize DISTINCT operation in SELECT clause
+  private boolean optimizeDistinct;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -43,7 +46,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     Validate.isTrue(alternative.size() <= maxWidth,
       "BUG: nodes.size() > maxWidth");
 
-    boolean isDistinct = false;
+    boolean isDistinct = false || ! optimizeDistinct;
     List<String> ids = new ArrayList<String>();
     int i = 0;
     for (QueryNode node : alternative)
@@ -110,5 +113,15 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
     return match;
+  }
+
+  public boolean isOptimizeDistinct()
+  {
+    return optimizeDistinct;
+  }
+
+  public void setOptimizeDistinct(boolean optimizeDistinct)
+  {
+    this.optimizeDistinct = optimizeDistinct;
   }
 }

@@ -156,7 +156,7 @@ limitations under the License.
 	<bean
 		id="matrixSqlGenerator"
 		class="annis.sqlgen.MatrixSqlGenerator"
-		parent="findSqlGenerator">
+		parent="tableAccessStrategyFactory">
 		
 		<property name="innerQuerySqlGenerator" ref="findSqlGenerator"/>
 		<property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator"/>
@@ -169,7 +169,7 @@ limitations under the License.
 		
 	<bean 
 		id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-		parent="findSqlGenerator">
+		parent="tableAccessStrategyFactory">
 
 		<property name="sortSolutions" value="${annis.annotate.sort-solutions}"/>
 
@@ -211,6 +211,8 @@ limitations under the License.
 		class="annis.sqlgen.FindSqlGenerator" 
 		parent="tableAccessStrategyFactory">
 		
+		<property name="optimizeDistinct" value="${annis.optimize-distinct}"/>
+		
 		<property name="selectClauseSqlGenerator" ref="findSqlGenerator"/>
 		
 		<property name="fromClauseSqlGenerators">
@@ -232,7 +234,7 @@ limitations under the License.
 	<bean 
 		id="countSqlGenerator" 
 		class="annis.sqlgen.CountSqlGenerator" 
-		parent="findSqlGenerator">
+		parent="tableAccessStrategyFactory">
 		
 		<property name="selectClauseSqlGenerator" ref="countSqlGenerator"/>
 		
