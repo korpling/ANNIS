@@ -32,18 +32,21 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
-  implements SelectClauseSqlGenerator<QueryData>
+    implements SelectClauseSqlGenerator<QueryData>
 {
+
+  // optimize DISTINCT operation in SELECT clause
+  private boolean optimizeDistinct;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
-    String indent)
+      String indent)
   {
     int maxWidth = queryData.getMaxWidth();
     Validate.isTrue(alternative.size() <= maxWidth,
-      "BUG: nodes.size() > maxWidth");
+        "BUG: nodes.size() > maxWidth");
 
-    boolean isDistinct = false;
+    boolean isDistinct = false || !optimizeDistinct;
     List<String> ids = new ArrayList<String>();
     int i = 0;
     for (QueryNode node : alternative)
@@ -59,16 +62,17 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     {
       ids.add("NULL");
     }
-    
-    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE, "toplevel_corpus"));
-    
+
+    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "toplevel_corpus"));
+
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
-      + StringUtils.join(ids, ", ");
+        + StringUtils.join(ids, ", ");
   }
 
   @Override
   public List<Match> extractData(ResultSet rs) throws SQLException,
-    DataAccessException
+      DataAccessException
   {
     List<Match> matches = new ArrayList<Match>();
     int rowNum = 0;
@@ -91,12 +95,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     for (int column = 1; column <= columnCount; ++column)
     {
       long id = rs.getLong((column));
-      
-      if(metaData.getColumnName(column).startsWith("id"))
+
+      if (metaData.getColumnName(column).startsWith("id"))
       {
         match.add(id);
-      }
-      else if(metaData.getColumnName(column).startsWith("toplevel_corpus"))
+      } else if (metaData.getColumnName(column).startsWith("toplevel_corpus"))
       {
         match.setToplevelCorpusId(id);
       }
@@ -110,5 +113,15 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
     return match;
+  }
+
+  public boolean isOptimizeDistinct()
+  {
+    return optimizeDistinct;
+  }
+
+  public void setOptimizeDistinct(boolean optimizeDistinct)
+  {
+    this.optimizeDistinct = optimizeDistinct;
   }
 }
