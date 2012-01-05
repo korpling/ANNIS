@@ -28,21 +28,21 @@ import org.apache.commons.lang.StringUtils;
 public class HistoryEntry implements CitationProvider, Serializable
 {
 
-  private Map<Long, AnnisCorpus> corpora;
+  private Map<String, AnnisCorpus> corpora;
   private String query;
 
   public HistoryEntry()
   {
-    corpora = new HashMap<Long, AnnisCorpus>();
+    corpora = new HashMap<String, AnnisCorpus>();
   }
 
   @Override
-  public Map<Long, AnnisCorpus> getCorpora()
+  public Map<String, AnnisCorpus> getCorpora()
   {
     return corpora;
   }
 
-  public void setCorpora(Map<Long, AnnisCorpus> corpora)
+  public void setCorpora(Map<String, AnnisCorpus> corpora)
   {
     this.corpora = corpora;
   }

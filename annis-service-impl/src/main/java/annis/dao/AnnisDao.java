@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Properties;
 
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -33,43 +32,52 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 public interface AnnisDao
 {
 
-
-  public AnnotationGraph retrieveAnnotationGraph(long textId);
+  public SaltProject retrieveAnnotationGraph(long textId);
+  public SaltProject retrieveAnnotationGraph(String toplevelCorpusName, String documentName);
 
   public List<AnnisCorpus> listCorpora();
 
   public List<Long> listCorpusByName(List<String> corpusNames);
 
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
-      boolean listValues, boolean onlyMostFrequentValues);
+    boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
+    String documentName);
 
   public AnnisBinary getBinary(String corpusName, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
-  
+
   @Deprecated
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
 // new 
+  int count(QueryData queryData);
 
-    int count(QueryData queryData);
-	List<Match> find(QueryData queryData);
-	List<AnnotationGraph> annotate(QueryData queryData);
-   SaltProject annotateSalt(QueryData queryData);
-	String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData, final boolean analyze);
-    List<AnnotatedMatch> matrix(QueryData queryData);
-    public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<QueryData, T> generator);
+  List<Match> find(QueryData queryData);
 
-	// needed in AnnisRunner
-	public HashMap<Long, Properties> getCorpusConfiguration();
-	public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration);
+  SaltProject annotate(QueryData queryData);
 
-	///// configuration
-	void setTimeout(int milliseconds);
-	int getTimeout();
+  String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
+    final boolean analyze);
 
+  List<AnnotatedMatch> matrix(QueryData queryData);
+
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGenerator<QueryData, T> generator);
+
+  // needed in AnnisRunner
+  public HashMap<Long, Properties> getCorpusConfiguration();
+
+  public void setCorpusConfiguration(
+    HashMap<Long, Properties> corpusConfiguration);
+
+  ///// configuration
+  void setTimeout(int milliseconds);
+
+  int getTimeout();
 }

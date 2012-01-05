@@ -16,7 +16,10 @@
 package annis.gui.exporter;
 
 import annis.service.AnnisService;
+import annis.service.ifaces.AnnisCorpus;
+import com.sun.jersey.api.client.WebResource;
 import java.io.Writer;
+import java.util.Map;
 
 /**
  *
@@ -25,6 +28,6 @@ import java.io.Writer;
 public interface Exporter
 {
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight, 
-    String corpusListAsString, String keysAsString, String argsAsString, 
-    AnnisService service, Writer out);
+    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString, 
+    AnnisService service, WebResource annisResource, Writer out);
 }

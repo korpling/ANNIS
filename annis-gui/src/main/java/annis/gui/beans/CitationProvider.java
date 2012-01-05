@@ -25,7 +25,7 @@ import java.util.Map;
 public interface CitationProvider
 {
   public String getQuery();
-  public Map<Long,AnnisCorpus> getCorpora();
+  public Map<String,AnnisCorpus> getCorpora();
   public int getLeftContext();
   public int getRightContext();
   

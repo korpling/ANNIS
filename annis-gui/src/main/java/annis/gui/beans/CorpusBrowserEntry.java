@@ -100,10 +100,10 @@ public class CorpusBrowserEntry implements CitationProvider, Serializable
   }
 
   @Override
-  public Map<Long, AnnisCorpus> getCorpora()
+  public Map<String, AnnisCorpus> getCorpora()
   {
-    Map<Long, AnnisCorpus> result = new HashMap<Long, AnnisCorpus>();
-    result.put(corpus.getId(), corpus);
+    Map<String, AnnisCorpus> result = new HashMap<String, AnnisCorpus>();
+    result.put(corpus.getName(), corpus);
     return result;
   }
 

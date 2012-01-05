@@ -24,18 +24,19 @@ import annis.resolver.ResolverEntry;
 
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisResult;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Random;
@@ -55,39 +56,41 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     "icon-expand.gif");
   private ApplicationResource resource = null;
   private AutoHeightIFrame iframe;
-  private AnnisResult result;
+  private SDocument result;
   private PluginSystem ps;
   private ResolverEntry entry;
   private Random rand = new Random();
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  public CustomLayout customLayout;
 
-  public VisualizerPanel(final ResolverEntry entry, AnnisResult result,
+  public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout)
+    Map<String, String> markersCovered)
   {
     this.result = result;
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
-    this.customLayout = costumLayout;
-
-    setContent(this.customLayout);
 
     this.setWidth("100%");
     this.setHeight("-1px");
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
+    VerticalLayout layout = (VerticalLayout) getContent();
+    layout.setMargin(false);
+    layout.setSpacing(false);
+    layout.setWidth("100%");
+    layout.setHeight("-1px");
+
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
     btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
       + ChameleonTheme.BUTTON_SMALL);
     btEntry.addListener((Button.ClickListener) this);
-    customLayout.addComponent(btEntry, "btEntry");
+    addComponent(btEntry);
   }
 
   private VisualizerInput createInput()
@@ -130,13 +133,14 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     return r;
   }
 
-  private AnnisResult getText(long textId)
+  private SaltProject getText(String toplevelCorpusName, String documentName)
   {
-    AnnisResult text = null;
+    SaltProject text = null;
     try
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      text = service.getAnnisResult(textId);
+      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      text = annisResource.path("graphs").path(toplevelCorpusName).path(
+        documentName).get(SaltProject.class);
     }
     catch (Exception e)
     {
@@ -160,12 +164,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
-    openVisualizer(true);
-  }
 
-  public void openVisualizer(Boolean collapse)
-  {
-    if (resource != null && collapse)
+    if (resource != null)
     {
       getApplication().removeResource(resource);
     }
@@ -183,14 +183,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
           vis = ps.getVisualizer(entry.getVisType());
         }
         VisualizerInput input = createInput();
-        if (vis.isUsingText() && result.getGraph().getNodes().size() > 0)
+        if (vis.isUsingText() && result.getSDocumentGraph().getSNodes().size()
+          > 0)
         {
-          input.setResult(getText(
-            result.getGraph().getNodes().get(0).getTextId()));
+          SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+            get(0).getSName(), result.getSName());
+          input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
         }
         else
         {
-          input.setResult(result);
+          input.setDocument(result);
         }
 
 
@@ -201,14 +203,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         String url = getApplication().getRelativeLocation(resource);
         iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
 
-
-        customLayout.addComponent(iframe, "iframe");
+        addComponent(iframe);
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
       iframe.setVisible(true);
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
+    else if (btEntry.getIcon() == ICON_COLLAPSE)
     {
       // collapse
       if (iframe != null)

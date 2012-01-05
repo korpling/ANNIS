@@ -16,6 +16,9 @@
 package annis.gui.visualizers;
 
 import annis.service.ifaces.AnnisResult;
+import annis.service.objects.AnnisResultImpl;
+import annis.utils.LegacyGraphConverter;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.HashMap;
@@ -35,6 +38,7 @@ import org.xml.sax.InputSource;
 public class VisualizerInput
 {
 
+  private SDocument document;
   private String namespace = "";
   private String paula = null;
   private Map<String, String> markableMap = new HashMap<String, String>();
@@ -150,11 +154,13 @@ public class VisualizerInput
    * matched nodes and not covered token.
    * @return
    */
+  @Deprecated
   public Map<String, String> getMarkableExactMap()
   {
     return markableExactMap;
   }
 
+  @Deprecated
   public void setMarkableExactMap(Map<String, String> markableExactMap)
   {
     this.markableExactMap = markableExactMap;
@@ -165,6 +171,7 @@ public class VisualizerInput
    * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
    * @return
    */
+  @Deprecated
   public Map<String, String> getMarkableMap()
   {
     return markableMap;
@@ -175,6 +182,7 @@ public class VisualizerInput
    * The values must be HTML compatible color definitions like #000000 or red. For detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
    * @param markableMap
    */
+  @Deprecated
   public void setMarkableMap(Map<String, String> markableMap)
   {
     this.markableMap = markableMap;
@@ -209,7 +217,7 @@ public class VisualizerInput
     if(paula == null)
     {
       // construct Paula from result
-      paula = result.getPaula();
+      paula = getResult().getPaula();
     }
     return paula;
   }
@@ -239,16 +247,32 @@ public class VisualizerInput
     return paulaJDOM;
   }
 
-  public AnnisResult getResult()
-  {
-    return result;
-  }
-
+  @Deprecated
   public void setResult(AnnisResult result)
   {
     this.result = result;
   }
 
+  
+  public AnnisResult getResult()
+  {
+    if(result == null)
+    {
+      result = new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(document));
+    }
+    return result;
+  }
+
+  public SDocument getDocument()
+  {
+    return document;
+  }
+
+  public void setDocument(SDocument document)
+  {
+    this.document = document;
+  }
+  
   public String getResourcePathTemplate()
   {
     return resourcePathTemplate;

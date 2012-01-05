@@ -6,10 +6,10 @@ package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.*;
 
-import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -44,12 +44,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
+import static annis.model.AnnisConstants.*;
 
 /**
  *
@@ -82,24 +85,23 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     // assumes that the result set is sorted by key, pre
     nodeByPre.clear();
 
-    // set the matched keys
     SDocument document = null;
 
-    List<Long> lastKey = new LinkedList<Long>();
+    List<String> lastKey = new LinkedList<String>();
 
     int match_index = 0;
 
     while (resultSet.next())
     {
-      Array sqlKey = resultSet.getArray("key");
+      Array sqlKey = resultSet.getArray("key_names");
       Validate.isTrue(!resultSet.wasNull(),
         "Match group identifier must not be null");
-      Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-        "Key in database must be from the type \"bigint\" but was \""
+      Validate.isTrue(sqlKey.getBaseType() == Types.VARCHAR,
+        "Key in database must be from the type \"varchar\" but was \""
         + sqlKey.getBaseTypeName() + "\"");
 
-      Long[] keyArray = (Long[]) sqlKey.getArray();
-      List<Long> key = Arrays.asList(keyArray);
+      String[] keyArray = (String[]) sqlKey.getArray();
+      List<String> key = Arrays.asList(keyArray);
 
       if (!lastKey.equals(key))
       {
@@ -122,16 +124,19 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
         corpusGraph.setSName("match_" + (match_index + matchstart));
 
-        SFeature feature = SaltFactory.eINSTANCE.createSFeature();
-        feature.setSNS(AnnisConstants.NAMESPACE);
-        feature.setSName(AnnisConstants.FEAT_MATCHEDIDS);
-        feature.setSValue(StringUtils.join(keyArray, ","));
-        corpusGraph.addSFeature(feature);
         project.getSCorpusGraphs().add(corpusGraph);
 
         graph = SaltFactory.eINSTANCE.createSDocumentGraph();
         document = SaltFactory.eINSTANCE.createSDocument();
+        
+        // set the matched keys
+        SFeature feature = SaltFactory.eINSTANCE.createSFeature();
+        feature.setSNS(ANNIS_NS);
+        feature.setSName(FEAT_MATCHEDIDS);
+        feature.setSValue(StringUtils.join(keyArray, ","));
+        document.addSFeature(feature);
 
+        
         ArrayList<String> path =
           new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
           "path").getArray()));
@@ -156,13 +161,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         corpusGraph.addSDocument(corpus, document);
 
         document.setSDocumentGraph(graph);
-
         match_index++;
       } // end if new key
 
       // get node data
       SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
-        tokenByIndex);
+        tokenByIndex, key);
       long pre = longValue(resultSet, RANK_TABLE, "pre");
       if (!resultSet.wasNull())
       {
@@ -176,6 +180,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     {
       createPrimaryText(graph, tokenTexts, tokenByIndex);
     }
+
 
     return project;
   }
@@ -215,7 +220,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
   private SNode createOrFindNewNode(ResultSet resultSet,
     SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
-    TreeMap<Long, SToken> tokenByIndex) throws SQLException
+    TreeMap<Long, SToken> tokenByIndex, List<String> key) throws SQLException
   {
     String id = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
@@ -246,13 +251,19 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       moveNodeProperties(null, node, graph, id);
 
-      SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
-        createSProcessingAnnotation();
-      procInternalID.setSNS(AnnisConstants.NAMESPACE);
-      procInternalID.setSName(AnnisConstants.PROC_INTERNALID);
-      procInternalID.setSValue(Long.valueOf(internalID));
+      addLongSFeature(node, FEAT_INTERNALID, internalID);
+      addLongSFeature(node, resultSet, FEAT_CORPUSREF, "node", "corpus_ref");
+      addLongSFeature(node, resultSet, FEAT_LEFT, "node", "left");
+      addLongSFeature(node, resultSet, FEAT_LEFTTOKEN, "node", "left_token");
+      addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
+      addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
+      addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
-      node.addSProcessingAnnotation(procInternalID);
+      int matchedNode = key.indexOf(id)+1;
+      if (matchedNode > 0)
+      {
+        addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
+      }
 
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
       EList<SLayer> layerList = graph.getSLayerByName(namespace);
@@ -289,6 +300,41 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     // TODO: what more do we have to do?
     return node;
+  }
+
+  /*
+  private void addLongSProcessing(SNode node, String name,
+    long value) throws SQLException
+  {
+    SProcessingAnnotation proc = SaltFactory.eINSTANCE.
+      createSProcessingAnnotation();
+    proc.setSNS(ANNIS_NS);
+    proc.setSName(name);
+    proc.setSValue(value);
+    node.addSProcessingAnnotation(proc);
+  }
+
+  private void addLongSProcessing(SNode node, ResultSet resultSet, String name,
+    String table, String tupleName) throws SQLException
+  {
+    addLongSProcessing(node, name, longValue(resultSet, table, tupleName));
+  }
+  */
+  
+  private void addLongSFeature(SNode node, String name,
+    long value) throws SQLException
+  {
+    SFeature feat = SaltFactory.eINSTANCE.createSFeature();
+    feat.setSNS(ANNIS_NS);
+    feat.setSName(name);
+    feat.setSValue(value);
+    node.addSFeature(feat);
+  }
+
+  private void addLongSFeature(SNode node, ResultSet resultSet, String name,
+    String table, String tupleName) throws SQLException
+  {
+    addLongSFeature(node, name, longValue(resultSet, table, tupleName));
   }
 
   private SStructuredNode recreateNode(Class<? extends SStructuredNode> clazz,
@@ -387,8 +433,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     }
 
     EList<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
-    SLayer layer = (layerList != null && layerList.size() > 0) ? 
-      layerList.get(0) : null;
+    SLayer layer = (layerList != null && layerList.size() > 0)
+      ? layerList.get(0) : null;
     if (layer == null)
     {
       layer = SaltFactory.eINSTANCE.createSLayer();
@@ -462,19 +508,26 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
           rel = pointingrel;
         }
 
-        rel.setSSource(nodeByPre.get(parent));
-        rel.setSTarget(targetNode);
-        rel.getSLayers().add(layer);
-        rel.addSType(edgeName);
+        try
+        {
+          rel.setSSource(nodeByPre.get(parent));
+          rel.setSTarget(targetNode);
+          rel.getSLayers().add(layer);
+          rel.addSType(edgeName);
 
-        SProcessingAnnotation procInternalID = SaltFactory.eINSTANCE.
-          createSProcessingAnnotation();
-        procInternalID.setSNS(AnnisConstants.NAMESPACE);
-        procInternalID.setSName(AnnisConstants.PROC_INTERNALID);
-        procInternalID.setSValue(Long.valueOf(pre));
-        rel.addSProcessingAnnotation(procInternalID);
+          SFeature featInternalID = SaltFactory.eINSTANCE.
+            createSFeature();
+          featInternalID.setSNS(ANNIS_NS);
+          featInternalID.setSName(FEAT_INTERNALID);
+          featInternalID.setSValue(Long.valueOf(pre));
+          rel.addSFeature(featInternalID);
 
-        graph.addSRelation(rel);
+          graph.addSRelation(rel);
+        }
+        catch(SaltException ex)
+        {
+          Logger.getLogger(SaltAnnotateSqlGenerator.class.getName()).log(Level.WARNING, "invalid edge detected", ex);
+        }
       } // end if no existing relation
 
       // add edge annotations

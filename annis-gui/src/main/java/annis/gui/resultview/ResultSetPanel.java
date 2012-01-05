@@ -16,16 +16,17 @@
 package annis.gui.resultview;
 
 import annis.gui.PluginSystem;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.Edge;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -41,80 +42,89 @@ import java.util.Set;
  */
 public class ResultSetPanel extends VerticalLayout implements ResolverProvider
 {
+
   private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
-  
-  public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-  
+  public static final String FILESYSTEM_CACHE_RESULT =
+    "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
   public List<SingleResultPanel> resultPanelList;
-  
-  public ResultSetPanel(AnnisResultSet resultSet, int start, PluginSystem ps, 
+
+  public ResultSetPanel(SaltProject p, int start, PluginSystem ps,
     Set<String> visibleTokenAnnos)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
-    cacheResolver = new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
-    
+    cacheResolver =
+      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
+
     setWidth("100%");
     setHeight("-1px");
-    
+
     addStyleName("result-view");
-    
-    int i=start; 
-    for(AnnisResult r : resultSet)
+
+    int i = start;
+    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      SingleResultPanel panel = new SingleResultPanel(r, i, this, ps, visibleTokenAnnos);
-      addComponent(panel);
-      resultPanelList.add(panel);
-      i++;
+      for(SDocument doc : corpusGraph.getSDocuments())
+      {
+        SingleResultPanel panel = new SingleResultPanel(doc, i, this, ps,
+          visibleTokenAnnos);
+        addComponent(panel);
+        resultPanelList.add(panel);
+        i++;
+      }
     }
   }
 
-  
   @Override
-  public ResolverEntry[] getResolverEntries(AnnisResult result, AnnisService service) throws RemoteException
+  public ResolverEntry[] getResolverEntries(SDocument doc,
+    AnnisService service) throws RemoteException
   {
     HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
-    
-    long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
 
     // create a request for resolver entries
-    HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
+    HashSet<SingleResolverRequest> resolverRequests =
+      new HashSet<SingleResolverRequest>();
 
-    Set<String> nodeNamespaces = new HashSet<String>();
-    for(AnnisNode node : result.getGraph().getNodes())
+    Set<String> nodeLayers = new HashSet<String>();
+    for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
-      nodeNamespaces.add(node.getNamespace());
-      for(Annotation annotation : node.getNodeAnnotations())
+      for (SLayer layer : n.getSLayers())
       {
-        nodeNamespaces.add(annotation.getNamespace());
+        nodeLayers.add(layer.getSName());
       }
     }
-    Set<String> edgeNamespaces = new HashSet<String>();
-    for(Edge e : result.getGraph().getEdges())
+
+    Set<String> edgeLayers = new HashSet<String>();
+    for (SRelation e : doc.getSDocumentGraph().getSRelations())
     {
-      edgeNamespaces.add(e.getNamespace());
-      for(Annotation annotation : e.getAnnotations())
+      for (SLayer layer : e.getSLayers())
       {
-        edgeNamespaces.add(annotation.getNamespace());
+        edgeLayers.add(layer.getSName());
       }
     }
-    for(String ns : nodeNamespaces)
+
+    for (String ns : nodeLayers)
     {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
+        getSRootCorpus().get(0).getSName(), ns,
+        ElementType.node));
     }
-    for(String ns : edgeNamespaces)
+    for (String ns : edgeLayers)
     {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
+        getSRootCorpus().get(0).getSName(), ns,
+        ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique
-    if(cacheResolver.containsKey(resolverRequests))
+    if (cacheResolver.containsKey(resolverRequests))
     {
       visSet.addAll(cacheResolver.get(resolverRequests));
     }
     else
     {
       List<ResolverEntry> resolverList =
-        service.getResolverEntries(resolverRequests.toArray(new SingleResolverRequest[0]));
+        service.getResolverEntries(resolverRequests.toArray(
+        new SingleResolverRequest[0]));
       visSet.addAll(resolverList);
       cacheResolver.put(resolverRequests, resolverList);
     }
@@ -126,11 +136,11 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       @Override
       public int compare(ResolverEntry o1, ResolverEntry o2)
       {
-        if(o1.getOrder() < o2.getOrder())
+        if (o1.getOrder() < o2.getOrder())
         {
           return -1;
         }
-        else if(o1.getOrder() > o2.getOrder())
+        else if (o1.getOrder() > o2.getOrder())
         {
           return 1;
         }
@@ -139,17 +149,15 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
           return 0;
         }
       }
-
     });
     return visArray;
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    for(SingleResultPanel p : resultPanelList)
+    for (SingleResultPanel p : resultPanelList)
     {
       p.setVisibleTokenAnnosVisible(annos);
     }
   }
-  
 }

@@ -292,8 +292,8 @@ public class CorpusBrowserPanel extends Panel
     public void valueChange(ValueChangeEvent event)
     {
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
-      HashMap<Long, AnnisCorpus> corpusMap = new HashMap<Long, AnnisCorpus>();
-      corpusMap.put(corpus.getId(), corpus);
+      HashMap<String, AnnisCorpus> corpusMap = new HashMap<String, AnnisCorpus>();
+      corpusMap.put(corpus.getName(), corpus);
       if(controlPanel != null)
       {
         controlPanel.setQuery(cbe.getExample(), corpusMap);

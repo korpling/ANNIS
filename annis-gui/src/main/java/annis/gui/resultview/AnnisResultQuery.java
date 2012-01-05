@@ -15,18 +15,20 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.Helper;
 import annis.security.AnnisUser;
 import annis.security.IllegalCorpusAccessException;
-import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.AnnisResultSetImpl;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.Application;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -34,49 +36,58 @@ import java.util.logging.Logger;
  */
 public class AnnisResultQuery implements Serializable
 {
-  private Set<Long> corpora;
+
+  private Set<String> corpora;
   private String aql;
-  private transient AnnisService service;
+  private Application app;
   private int contextLeft, contextRight;
-  
-  public AnnisResultQuery(Set<Long> corpora, String aql, int contextLeft, 
-    int contextRight, AnnisService service)
+
+  public AnnisResultQuery(Set<String> corpora, String aql, int contextLeft,
+    int contextRight, Application app)
   {
     this.corpora = corpora;
     this.aql = aql;
-    this.service = service;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
+    this.app = app;
   }
 
-  public AnnisResultSet loadBeans(int startIndex, int count, AnnisUser user) throws IllegalCorpusAccessException
-  { 
+  public SaltProject loadBeans(int startIndex, int count, AnnisUser user) throws
+    IllegalCorpusAccessException
+  {
     // check corpus selection by logged in user
-    
-    Set<Long> filteredCorpora = new TreeSet<Long>(corpora);
-    if(user != null)
+
+    Set<String> filteredCorpora = new TreeSet<String>(corpora);
+    if (user != null)
     {
-      filteredCorpora.retainAll(user.getCorpusIdList());
+      filteredCorpora.retainAll(user.getCorpusNameList());
     }
-    
-    if(filteredCorpora.size() != corpora.size())
+
+    if (filteredCorpora.size() != corpora.size())
     {
       throw new IllegalCorpusAccessException("illegal corpus access");
     }
-    
-    AnnisResultSet result = new AnnisResultSetImpl();
-    if(service != null)
+
+    SaltProject result = SaltFactory.eINSTANCE.createSaltProject();
+    if (app != null)
     {
+      WebResource annisResource = Helper.getAnnisWebResource(app);
       try
       {
-        result = service.getResultSet(new LinkedList<Long>(filteredCorpora), aql, count, startIndex, contextLeft, contextRight);
+        result = annisResource.path("search").path("annotate")
+          .queryParam("q", aql)
+          .queryParam("limit", "" + count)
+          .queryParam("offset", "" + startIndex)
+          .queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight)
+          .queryParam("corpora", StringUtils.join(corpora, ","))
+          .get(SaltProject.class);
       }
-      catch(RemoteException ex)
+      catch (UniformInterfaceException ex)
       {
-        Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE,
+          ex.getResponse().getEntity(String.class), ex);
       }
     }
     return result;
   }
-  
 }

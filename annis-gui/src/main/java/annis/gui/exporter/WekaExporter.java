@@ -18,15 +18,19 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.Helper;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 import annis.service.AnnisService;
+import annis.service.ifaces.AnnisCorpus;
+import com.sun.jersey.api.client.WebResource;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class WekaExporter implements Exporter, Serializable
 {
@@ -34,47 +38,37 @@ public class WekaExporter implements Exporter, Serializable
   private static final long serialVersionUID = -8182635617256833563L;
 
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight, String corpusListAsString, String keysAsString, String argsAsString, AnnisService service, Writer out)
+  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
+    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
+    AnnisService service, WebResource annisResource, Writer out)
   {
     //this is a full result export
-    List<Long> corpusIdList = new LinkedList<Long>();
-
-    for(String corpusId : corpusListAsString.split(","))
-    {
-      try
-      {
-        corpusIdList.add(Long.parseLong(corpusId));
-      }
-      catch(NumberFormatException ex)
-      {
-        // ignore
-      }
-    }
-
+    List<Long> corpusIdList = new LinkedList<Long>(
+      Helper.calculateID2Corpus(corpora).keySet());
+    
     try
     {
       out.append(service.getWeka(corpusIdList, queryAnnisQL));
     }
-
-
-
-
-    catch(AnnisQLSemanticsException ex)
+    catch (AnnisQLSemanticsException ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }    catch(AnnisQLSyntaxException ex)
+    }
+    catch (AnnisQLSyntaxException ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }    catch(AnnisCorpusAccessException ex)
+    }
+    catch (AnnisCorpusAccessException ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }    catch(RemoteException ex)
+    }
+    catch (RemoteException ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }    catch(IOException ex)
+    }
+    catch (IOException ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-
 }

@@ -358,8 +358,6 @@ public class SearchResultServlet extends HttpServlet
   {
     HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
     
-    long corpusIdFromFirstNode = result.getGraph().getNodes().get(0).getCorpus();
-
     // create a request for resolver entries
     HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
 
@@ -381,13 +379,14 @@ public class SearchResultServlet extends HttpServlet
         edgeNamespaces.add(annotation.getNamespace());
       }
     }
+    String[] path = result.getPath();
     for(String ns : nodeNamespaces)
     {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.node));
+      resolverRequests.add(new SingleResolverRequest(path[0], ns, ElementType.node));
     }
     for(String ns : edgeNamespaces)
     {
-      resolverRequests.add(new SingleResolverRequest(corpusIdFromFirstNode, ns, ElementType.edge));
+      resolverRequests.add(new SingleResolverRequest(path[0], ns, ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique
