@@ -105,7 +105,6 @@ CREATE TABLE facts
   parent    bigint,
   root      boolean,
   level      bigint,
-
   component_id      bigint,
   edge_type    char(1),
   edge_namespace  varchar(255),
@@ -150,6 +149,15 @@ CREATE TABLE extData
    
 );
 
+CREATE TABLE media_files
+(
+  file  bytea,
+  corpus_ref  bigint  NOT NULL  REFERENCES corpus(id) ON DELETE CASCADE,
+  bytes bigint,
+  mime_type character varying(40),
+  title character varying(40),
+  UNIQUE (corpus_ref)
+);
 
 -- stats
 CREATE TABLE corpus_stats
