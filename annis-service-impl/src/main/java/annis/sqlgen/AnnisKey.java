@@ -1,12 +1,23 @@
 package annis.sqlgen;
 
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static java.util.Arrays.asList;
+
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import org.apache.log4j.Logger;
 
+//FIXME: key and key_names are hard-coded
 public class AnnisKey
 {
+  
+  // logging with log4j
+  private static Logger log = Logger.getLogger(AnnisKey.class);
 
   /**
    * Generate list of column aliases that are used to identify a node
@@ -67,6 +78,26 @@ public class AnnisKey
     return s;
   }
 
-  
+  public List<String> retrieveKey(ResultSet resultSet)
+  {
+    try
+    {
+      Array sqlArray = resultSet.getArray("key_names");
+      int baseType = sqlArray.getBaseType();
+      String baseTypeName = sqlArray.getBaseTypeName();
+      if (baseType != Types.VARCHAR)
+      {
+        throw new IllegalStateException(
+            "Key must be of the type 'varchar' but was: " + baseTypeName);
+      }
+      String[] keyArray = (String[]) sqlArray.getArray();
+      return asList(keyArray);
+    } catch (SQLException e)
+    {
+      log.error("Exception thrown while retrieving key array", e);
+      throw new IllegalStateException(
+          "Could not retrieve key from JDBC results set", e);
+    }
+  }
   
 }
