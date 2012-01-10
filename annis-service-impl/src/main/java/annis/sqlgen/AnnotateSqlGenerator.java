@@ -17,7 +17,6 @@ package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
@@ -30,13 +29,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import org.apache.commons.lang.Validate;
 
 /**
  * 
@@ -182,6 +181,11 @@ public abstract class AnnotateSqlGenerator<T>
     factsTas.setColumnAliases(columnAliases);
 
 
+  }
+
+  public AnnisKey createAnnisKey()
+  {
+    throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
   @Deprecated
@@ -575,4 +579,5 @@ public abstract class AnnotateSqlGenerator<T>
   {
     return factsTas;
   }
+
 }
