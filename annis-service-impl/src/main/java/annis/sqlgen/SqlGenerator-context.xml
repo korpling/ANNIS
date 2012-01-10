@@ -185,11 +185,14 @@ limitations under the License.
 		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
 	</bean>
 
+  <bean id="annotationGraphKey" class="annis.sqlgen.AnnisKey" scope="prototype"/>
+
 	<bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
 		parent="tableAccessStrategyFactory">
 
 		<property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
+    <property name="annotationGraphKey" ref="annotationGraphKey"/>
 		<property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
 		<property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
 		<property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />

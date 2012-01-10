@@ -26,6 +26,9 @@ public class AnnotateInnerQuerySqlGenerator
   // sort solutions
   private boolean sortSolutions;
 
+  // annotation graph key generation
+  private AnnisKey key;
+  
   @Override
   public Object extractData(ResultSet rs) throws SQLException,
     DataAccessException
@@ -40,23 +43,25 @@ public class AnnotateInnerQuerySqlGenerator
   {
     AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
 
-    List<String> fields = new ArrayList<String>();
+    List<String> selectClauseForNode = new ArrayList<String>();
     for (int i = 1; i <= alternative.size(); ++i)
     {
       QueryNode node = alternative.get(i - 1);
       TableAccessStrategy tables = tables(node);
 
-      fields.add("\n" + indent + TABSTOP
-        + tables.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
+      List<String> fields = new ArrayList<String>();
+      fields.addAll(key.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") + " - "
         + annotateQueryData.getLeft() + " AS min" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") + " + "
         + annotateQueryData.getRight() + " AS max" + i);
+      
+      selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields, ", "));
+      
     }
 
-    return "DISTINCT" + StringUtils.join(fields, ", ");
+    return "DISTINCT" + StringUtils.join(selectClauseForNode, ", ");
   }
 
   @Override
@@ -129,6 +134,16 @@ public class AnnotateInnerQuerySqlGenerator
   public void setSortSolutions(boolean sortSolutions)
   {
     this.sortSolutions = sortSolutions;
+  }
+
+  public AnnisKey getKey()
+  {
+    return key;
+  }
+
+  public void setKey(AnnisKey key)
+  {
+    this.key = key;
   }
 	
 }
