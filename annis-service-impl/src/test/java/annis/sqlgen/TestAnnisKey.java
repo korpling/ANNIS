@@ -5,6 +5,7 @@ import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -172,6 +173,40 @@ public class TestAnnisKey
     key.retrieveKey(resultSet);
     // then
     assertThat(key.isNewKey(), is(false));
+  }
+  
+  /**
+   * A node is a match of a search term in the query if its name is part of 
+   * the key.
+   */
+  @Test
+  public void shouldSignalMatchedNodes() throws SQLException
+  {
+    // given
+    String[] keys = { uniqueString(3), uniqueString(3), uniqueString(3) };
+    Array array = createKeyJdbcArray(keys);
+    given(resultSet.getArray("key_names")).willReturn(array);
+    // when
+    key.retrieveKey(resultSet);
+    // then
+    for (int i = 0; i < keys.length; ++i) {
+      assertThat(key.getMatchedNodeIndex(keys[i]), is(i + 1));
+    }
+  }
+  
+  /**
+   * Return {@code null} for unmatched nodes.
+   */
+  @Test
+  public void shouldReturnNullForUnmatchedNodes() throws SQLException
+  {
+    // given
+    Array array = createKeyJdbcArray(uniqueString());
+    given(resultSet.getArray("key_names")).willReturn(array);
+    // when
+    key.retrieveKey(resultSet);
+    // then
+    assertThat(key.getMatchedNodeIndex(uniqueString()), is(nullValue()));
   }
   
 }
