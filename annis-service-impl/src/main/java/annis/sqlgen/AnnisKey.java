@@ -18,6 +18,12 @@ public class AnnisKey
   
   // logging with log4j
   private static Logger log = Logger.getLogger(AnnisKey.class);
+  
+  // the last key
+  private List<String> lastKey;
+  
+  // the current key
+  private List<String> currentKey;
 
   /**
    * Generate list of column aliases that are used to identify a node
@@ -78,6 +84,12 @@ public class AnnisKey
     return s;
   }
 
+  /**
+   * Retrieve (and validate) the annotation graph key from the current row
+   * of the JDBC result set.
+   *
+   * @param resultSet The JDBC result set returned by an ANNOTATE query.
+   */
   public List<String> retrieveKey(ResultSet resultSet)
   {
     try
@@ -91,13 +103,25 @@ public class AnnisKey
             "Key must be of the type 'varchar' but was: " + baseTypeName);
       }
       String[] keyArray = (String[]) sqlArray.getArray();
-      return asList(keyArray);
+      lastKey = currentKey;
+      currentKey = asList(keyArray);
+      return currentKey;
     } catch (SQLException e)
     {
       log.error("Exception thrown while retrieving key array", e);
       throw new IllegalStateException(
           "Could not retrieve key from JDBC results set", e);
     }
+  }
+
+  /**
+   * Has the key changed from the last row to this one.
+   *
+   * @return True, if the key has changed from the last row to this one.
+   */
+  public boolean isNewKey()
+  {
+    return currentKey == null || ! currentKey.equals(lastKey);
   }
   
 }

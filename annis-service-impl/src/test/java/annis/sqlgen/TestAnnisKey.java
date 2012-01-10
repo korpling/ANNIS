@@ -81,6 +81,9 @@ public class TestAnnisKey
     assertThat(actual, is(expected));    
   }
   
+  /**
+   * The key should be retrieved (and validated) from the JDBC result set.
+   */
   @Test
   public void shouldRetreiveKeyFromResultSetAndValidateIt() throws SQLException
   {
@@ -97,6 +100,7 @@ public class TestAnnisKey
     assertThat(actual, is(expected));
   }
 
+  // create a JDBC array from an array of strings
   private Array createKeyJdbcArray(String... keys) throws SQLException
   {
     Array array = mock(Array.class); 
@@ -105,6 +109,9 @@ public class TestAnnisKey
     return array;
   }
   
+  /**
+   * Signal illegal state if there is an SQL error.
+   */
   @Test(expected=IllegalStateException.class)
   public void errorIfResultSetThrowsSqlException() throws SQLException
   {
@@ -114,6 +121,9 @@ public class TestAnnisKey
     key.retrieveKey(resultSet);
   }
   
+  /**
+   * Signal illegal state if the JDBC array base type is not VARCHAR.
+   */
   @Test(expected=IllegalStateException.class)
   public void errorIfVarCharIsNotBaseTypeOfKeyArray() throws SQLException
   {
@@ -123,6 +133,45 @@ public class TestAnnisKey
     given(resultSet.getArray("key_names")).willReturn(array);
     // when
     key.retrieveKey(resultSet);
+  }
+  
+  /**
+   * Signal if the key changes from one row to the next.
+   */
+  @Test
+  public void shouldSignalNewKey() throws SQLException
+  {
+    // given
+    String key1 = uniqueString(3);
+    String key2 = uniqueString(3);
+    Array array1 = createKeyJdbcArray(key1);
+    Array array2 = createKeyJdbcArray(key2);
+    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    // when
+    key.retrieveKey(resultSet);
+    resultSet.next();
+    key.retrieveKey(resultSet);
+    // then
+    assertThat(key.isNewKey(), is(true));
+  }
+  
+  /**
+   * Don't signal new key if the same key is used in two consecutive rows.
+   */
+  @Test
+  public void shouldRecognizeOldKey() throws SQLException
+  {
+    // given
+    String key1 = uniqueString(3);
+    Array array1 = createKeyJdbcArray(key1);
+    Array array2 = createKeyJdbcArray(key1);
+    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    // when
+    key.retrieveKey(resultSet);
+    resultSet.next();
+    key.retrieveKey(resultSet);
+    // then
+    assertThat(key.isNewKey(), is(false));
   }
   
 }
