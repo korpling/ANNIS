@@ -27,7 +27,7 @@ public class AnnotateInnerQuerySqlGenerator
   private boolean sortSolutions;
 
   // annotation graph key generation
-  private AnnisKey key;
+  private AnnisKey annotationGraphKey;
   
   @Override
   public Object extractData(ResultSet rs) throws SQLException,
@@ -50,7 +50,7 @@ public class AnnotateInnerQuerySqlGenerator
       TableAccessStrategy tables = tables(node);
 
       List<String> fields = new ArrayList<String>();
-      fields.addAll(key.generateInnerQueryColumns(tables, i));
+      fields.addAll(annotationGraphKey.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") + " - "
         + annotateQueryData.getLeft() + " AS min" + i);
@@ -136,14 +136,14 @@ public class AnnotateInnerQuerySqlGenerator
     this.sortSolutions = sortSolutions;
   }
 
-  public AnnisKey getKey()
+  public AnnisKey getAnnotationGraphKey()
   {
-    return key;
+    return annotationGraphKey;
   }
 
-  public void setKey(AnnisKey key)
+  public void setAnnotationGraphKey(AnnisKey annotationGraphKey)
   {
-    this.key = key;
+    this.annotationGraphKey = annotationGraphKey;
   }
 	
 }
