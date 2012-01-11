@@ -68,12 +68,12 @@ public class TestAnnotateInnerQuerySqlGenerator
     given(annotateQueryData.getLeft()).willReturn(left);
     given(annotateQueryData.getRight()).willReturn(right);
     given(queryData.getExtensions()).willReturn(newSet((Object) annotateQueryData));
-    String idAlias1 = uniqueAlphaString();
-    String nameAlias1 = uniqueAlphaString();
-    String idAlias2 = uniqueAlphaString();
-    String nameAlias2 = uniqueAlphaString();
-    given(key.generateInnerQueryColumns(tableAccessStrategy, 1)).willReturn(asList(idAlias1 + " AS " + "id1", nameAlias1 + " AS " + "name1"));
-    given(key.generateInnerQueryColumns(tableAccessStrategy, 2)).willReturn(asList(idAlias2 + " AS " + "id2", nameAlias2 + " AS " + "name2"));
+    String key1Column1 = uniqueAlphaString();
+    String key1Column2 = uniqueAlphaString();
+    String key2Column1 = uniqueAlphaString();
+    String key2Column2 = uniqueAlphaString();
+    given(key.generateInnerQueryColumns(tableAccessStrategy, 1)).willReturn(asList(key1Column1, key1Column2));
+    given(key.generateInnerQueryColumns(tableAccessStrategy, 2)).willReturn(asList(key2Column1, key2Column2));
     String textRefAlias1 = uniqueAlphaString();
     String leftTokenAlias1 = uniqueAlphaString();
     String rightTokenAlias1 = uniqueAlphaString();
@@ -87,14 +87,14 @@ public class TestAnnotateInnerQuerySqlGenerator
     String actual = generator.selectClause(queryData, alternative, INDENT);
     // then
     String expected = "DISTINCT" + "\n" + INDENT + TABSTOP + 
-        idAlias1 + " AS " + "id" + 1 + ", " +
-        nameAlias1  + " AS " + "name" + 1 + ", " + 
+        key1Column1 + ", " +
+        key1Column2 + ", " + 
         textRefAlias1  + " AS " + "text" + 1 + ", " + 
         leftTokenAlias1  + " - " + left + " AS " + "min" + 1 + ", " + 
         rightTokenAlias1  + " + " + right + " AS " + "max" + 1 + ", " + 
         "\n" + INDENT + TABSTOP + 
-        idAlias2 + " AS " + "id" + 2 + ", " +
-        nameAlias2  + " AS " + "name" + 2 + ", " + 
+        key2Column1 + ", " +
+        key2Column2 + ", " + 
         textRefAlias2  + " AS " + "text" + 2 + ", " + 
         leftTokenAlias2  + " - " + left + " AS " + "min" + 2 + ", " + 
         rightTokenAlias2  + " + " + right + " AS " + "max" + 2;
