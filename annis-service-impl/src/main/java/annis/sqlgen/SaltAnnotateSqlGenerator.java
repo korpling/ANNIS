@@ -61,10 +61,6 @@ import static annis.model.AnnisConstants.*;
 public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 {
 
-  public SaltAnnotateSqlGenerator()
-  {
-  }
-
   @Override
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
