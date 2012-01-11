@@ -50,6 +50,9 @@ public abstract class AnnotateSqlGenerator<T>
   WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {
 
+  // include document name in SELECT clause
+  private boolean includeDocumentNameInAnnotateQuery;
+  
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy factsTas;
@@ -183,7 +186,7 @@ public abstract class AnnotateSqlGenerator<T>
 
   }
 
-  public AnnisKey createAnnisKey()
+  protected AnnisKey createAnnisKey()
   {
     throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
   }
@@ -276,29 +279,16 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     StringBuilder sb = new StringBuilder();
-
+    AnnisKey key = createAnnisKey();
+    
     sb.append("DISTINCT\n");
-    sb.append(indent).append(TABSTOP + "ARRAY[");
-
-    // solutions key
-    List<String> ids = new ArrayList<String>();
-    for (int i = 1; i <= alternative.size(); ++i)
-    {
-      ids.add("solutions.id" + i);
+    List<String> keyColumns = key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.size());
+    for (String keyColumn : keyColumns) {
+      indent(sb, indent + TABSTOP);
+      sb.append(keyColumn);
+      sb.append(",\n");
     }
-    sb.append(StringUtils.join(ids, ", "));
-    sb.append("] AS key,\n");
-
-    // key for annotation graph matches    
-    sb.append(indent).append(TABSTOP + "ARRAY[solutions.name1");
-    for (int i = 2; i <= alternative.size(); ++i)
-    {
-      sb.append(",");
-      sb.append("solutions.name");
-      sb.append(i);
-    }
-    sb.append("] AS key_names,\n");
-
+    indent(sb, indent + TABSTOP);
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
@@ -342,9 +332,13 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(",\n").append(indent).append(TABSTOP);
 
     // corpus.path_name
-    sb.append("corpus.path_name AS path,\n").append(indent).append(TABSTOP);
-    sb.append("corpus.path_name[1] AS document_name");
-
+    sb.append("corpus.path_name AS path");
+    
+    if (includeDocumentNameInAnnotateQuery) {
+      sb.append(",\n");
+      indent(sb, indent +TABSTOP);
+      sb.append("corpus.path_name[1] AS document_name");
+    }
     return sb.toString();
   }
 
@@ -578,6 +572,17 @@ public abstract class AnnotateSqlGenerator<T>
   public TableAccessStrategy getFactsTas()
   {
     return factsTas;
+  }
+
+  public boolean isIncludeDocumentNameInAnnotateQuery()
+  {
+    return includeDocumentNameInAnnotateQuery;
+  }
+
+  public void setIncludeDocumentNameInAnnotateQuery(
+      boolean includeDocumentNameInAnnotateQuery)
+  {
+    this.includeDocumentNameInAnnotateQuery = includeDocumentNameInAnnotateQuery;
   }
 
 }

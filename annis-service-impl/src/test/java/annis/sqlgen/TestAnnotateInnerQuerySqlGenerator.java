@@ -52,7 +52,6 @@ public class TestAnnotateInnerQuerySqlGenerator
     initMocks(this);
   }
   
-  
   /**
    * The SELECT clause consists of the column text_ref, left, right and the 
    * key columns for each node in the query alternative. Left and right are
