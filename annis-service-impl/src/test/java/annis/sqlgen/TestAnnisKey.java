@@ -123,6 +123,18 @@ public class TestAnnisKey
   }
   
   /**
+   * Signal illegal state if the key is NULL.
+   */
+  @Test(expected=IllegalStateException.class)
+  public void errorIfKeyIsNull() throws SQLException
+  {
+    // given
+    given(resultSet.wasNull()).willReturn(true);
+    // when
+    key.retrieveKey(resultSet);
+  }
+  
+  /**
    * Signal illegal state if the JDBC array base type is not VARCHAR.
    */
   @Test(expected=IllegalStateException.class)

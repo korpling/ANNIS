@@ -95,6 +95,9 @@ public class AnnisKey
     try
     {
       Array sqlArray = resultSet.getArray("key_names");
+      if (resultSet.wasNull()) {
+        throw new IllegalStateException("Match group identifier must not be null");
+      }
       int baseType = sqlArray.getBaseType();
       String baseTypeName = sqlArray.getBaseTypeName();
       if (baseType != Types.VARCHAR)
