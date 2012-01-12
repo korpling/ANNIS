@@ -4,7 +4,41 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.TableAccessStrategy.*;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_CORPUSREF;
+import static annis.model.AnnisConstants.FEAT_INTERNALID;
+import static annis.model.AnnisConstants.FEAT_LEFT;
+import static annis.model.AnnisConstants.FEAT_LEFTTOKEN;
+import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static annis.model.AnnisConstants.FEAT_RIGHT;
+import static annis.model.AnnisConstants.FEAT_RIGHTTOKEN;
+import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
+import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
+import org.springframework.dao.DataAccessException;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -31,28 +65,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.springframework.dao.DataAccessException;
-import static annis.model.AnnisConstants.*;
 
 /**
  *
@@ -83,23 +95,15 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     SDocument document = null;
 
-    List<String> lastKey = new LinkedList<String>();
-
     int match_index = 0;
 
+    AnnisKey key = createAnnisKey();
+    
     while (resultSet.next())
     {
-      Array sqlKey = resultSet.getArray("key_names");
-      Validate.isTrue(!resultSet.wasNull(),
-        "Match group identifier must not be null");
-      Validate.isTrue(sqlKey.getBaseType() == Types.VARCHAR,
-        "Key in database must be from the type \"varchar\" but was \""
-        + sqlKey.getBaseTypeName() + "\"");
+      List<String> annotationGraphKey = key.retrieveKey(resultSet);
 
-      String[] keyArray = (String[]) sqlKey.getArray();
-      List<String> key = Arrays.asList(keyArray);
-
-      if (!lastKey.equals(key))
+      if (key.isNewKey())
       {
 
         // create the text for the last graph
@@ -107,8 +111,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         {
           createPrimaryText(graph, tokenTexts, tokenByIndex);
         }
-
-        lastKey = key;
 
         // new match, reset everything        
         nodeByPre.clear();
@@ -129,7 +131,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         SFeature feature = SaltFactory.eINSTANCE.createSFeature();
         feature.setSNS(ANNIS_NS);
         feature.setSName(FEAT_MATCHEDIDS);
-        feature.setSValue(StringUtils.join(keyArray, ","));
+        feature.setSValue(StringUtils.join(annotationGraphKey, ","));
         document.addSFeature(feature);
 
         
@@ -162,7 +164,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       // get node data
       SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
-        tokenByIndex, key);
+        tokenByIndex, annotationGraphKey);
       long pre = longValue(resultSet, RANK_TABLE, "pre");
       if (!resultSet.wasNull())
       {

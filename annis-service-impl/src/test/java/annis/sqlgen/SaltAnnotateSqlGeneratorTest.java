@@ -49,7 +49,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 public class SaltAnnotateSqlGeneratorTest
 {
 
-  CSVResultSetProvider resultSetProvider;
+  // class under test
+  private CSVResultSetProvider resultSetProvider;
+  
+  // dependencies
+  private AnnisKey annisKey = new AnnisKey();
+  
+  // test data
   private SaltProject project;
 
   @Before
@@ -62,7 +68,11 @@ public class SaltAnnotateSqlGeneratorTest
 
     ResultSet resultSet = resultSetProvider.getResultSet();
 
-    SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator();
+    SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator() {
+      protected AnnisKey createAnnisKey() {
+        return annisKey;
+      }
+    };
 
     project = instance.extractData(resultSet);
     assertNotNull(project);

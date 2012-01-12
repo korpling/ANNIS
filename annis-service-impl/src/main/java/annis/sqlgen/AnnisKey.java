@@ -38,9 +38,9 @@ public class AnnisKey
       TableAccessStrategy tableAccessStrategy, int index)
   {
     List<String> columns = new ArrayList<String>();
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "id") + index
+    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "id")
         + " AS " + "id" + index);
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "name") + index
+    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "name")
         + " AS " + "name" + index);
     return columns;
   }

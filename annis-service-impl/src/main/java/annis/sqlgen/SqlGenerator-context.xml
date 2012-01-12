@@ -202,6 +202,8 @@ limitations under the License.
 
 	<bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
 		parent="tableAccessStrategyFactory">
+		
+		<lookup-method name="createAnnisKey" bean="annotationGraphKey"/>
 
 		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 

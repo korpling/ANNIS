@@ -55,8 +55,8 @@ public class TestAnnisKey
     List<String> actual = key.generateInnerQueryColumns(tableAccessStrategy, index);
     // then
     List<String> expected = asList(
-        idAlias + index + " AS id" + index,
-        nameAlias + index + " AS name" + index);
+        idAlias + " AS id" + index,
+        nameAlias + " AS name" + index);
     assertThat(actual, is(expected));
   }
 
