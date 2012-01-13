@@ -48,9 +48,9 @@ public class CsvResultSetProvider
   private Map<String, Integer> header;
   boolean wasNull;
 
-  public CSVResultSetProvider(InputStream csvStream) throws SQLException
+  public CsvResultSetProvider(InputStream csvStream) throws SQLException
   {
-    MockitoAnnotations.initMocks((CSVResultSetProvider) this);
+    MockitoAnnotations.initMocks((CsvResultSetProvider) this);
 
     header = new HashMap<String, Integer>();
     reader = new CSVReader(new InputStreamReader(csvStream), ';', '"');
@@ -64,7 +64,7 @@ public class CsvResultSetProvider
     }
     catch (IOException ex)
     {
-      Logger.getLogger(CSVResultSetProvider.class.getName()).
+      Logger.getLogger(CsvResultSetProvider.class.getName()).
         log(Level.SEVERE, null, ex);
     }
 
@@ -323,7 +323,7 @@ public class CsvResultSetProvider
           }
           catch (NumberFormatException ex)
           {
-            Logger.getLogger(CSVResultSetProvider.class.getName()).log(
+            Logger.getLogger(CsvResultSetProvider.class.getName()).log(
               Level.SEVERE, null, ex);
           }
         }
