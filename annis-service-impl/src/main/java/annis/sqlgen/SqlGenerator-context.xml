@@ -222,7 +222,7 @@ limitations under the License.
 
 	</bean>
 
-	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AOMAnnotateSqlGenerator"
+	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
 		parent="annotateSqlGenerator">
 	</bean>
 

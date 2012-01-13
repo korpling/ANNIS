@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class CSVResultSetProvider
+public class CsvResultSetProvider
 {
 
   @Mock

@@ -16,7 +16,7 @@
 package annis.sqlgen;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import annis.test.CSVResultSetProvider;
+import annis.test.CsvResultSetProvider;
 import java.sql.SQLException;
 import static org.mockito.MockitoAnnotations.initMocks;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
 public class SaltAnnotateSqlGeneratorTest
 {
 
-  CSVResultSetProvider resultSetProvider;
+  CsvResultSetProvider resultSetProvider;
   private SaltProject project;
 
   public SaltAnnotateSqlGeneratorTest()
@@ -69,7 +69,7 @@ public class SaltAnnotateSqlGeneratorTest
   {
     initMocks(this);
 
-    resultSetProvider = new CSVResultSetProvider(getClass().getResourceAsStream(
+    resultSetProvider = new CsvResultSetProvider(getClass().getResourceAsStream(
       "SampleAnnotateResult.csv"));
 
     ResultSet resultSet = resultSetProvider.getResultSet();

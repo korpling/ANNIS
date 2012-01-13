@@ -12,9 +12,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.sqlgen.AOMAnnotateSqlGenerator;
+import annis.sqlgen.AomAnnotateSqlGenerator;
 import annis.sqlgen.SaltAnnotateSqlGenerator;
-import annis.test.CSVResultSetProvider;
+import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class LegacyGraphConverterTest
 {
 
   @Autowired
-  AOMAnnotateSqlGenerator aomSqlGen;
+  AomAnnotateSqlGenerator aomSqlGen;
 
   public LegacyGraphConverterTest()
   {
@@ -80,11 +80,11 @@ public class LegacyGraphConverterTest
 
 
     SaltProject p =
-      saltSqlGen.extractData(new CSVResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
+      saltSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
 
     List<AnnotationGraph> expected =
-      aomSqlGen.extractData(new CSVResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
+      aomSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
 
     List<AnnotationGraph> result = LegacyGraphConverter.convertToAOM(p);
