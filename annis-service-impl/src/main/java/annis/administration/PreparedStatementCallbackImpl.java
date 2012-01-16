@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.activation.MimetypesFileTypeMap;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 
@@ -37,14 +38,16 @@ public class PreparedStatementCallbackImpl implements
   private FileInputStream fileStream;
   private File file;
   private String mimeType;
+  private int corpusRef;
 
-  public PreparedStatementCallbackImpl(String absolutePath, String mimeType)
+  public PreparedStatementCallbackImpl(String absolutePath, String corpusRef)
   {
     try
     {
       this.file = new File(absolutePath);
-      fileStream = new FileInputStream(file);      
-      this.mimeType = mimeType;
+      fileStream = new FileInputStream(file);
+      this.mimeType = new MimetypesFileTypeMap().getContentType(file);
+      this.corpusRef = Integer.parseInt(corpusRef);
     }
     catch (FileNotFoundException ex)
     {
@@ -59,13 +62,13 @@ public class PreparedStatementCallbackImpl implements
   {
     // this method is not implemented for long as file-lenght, so we need to cast to int
     ps.setBinaryStream(1, fileStream, (int) file.length());
-    ps.setInt(2, 1);
+    ps.setInt(2, this.corpusRef);
     ps.setLong(3, file.length());
     ps.setString(4, this.mimeType);
     ps.setString(5, file.getName());
     ps.executeUpdate();
     try
-    {     
+    {
       fileStream.close();
     }
     catch (IOException ex)

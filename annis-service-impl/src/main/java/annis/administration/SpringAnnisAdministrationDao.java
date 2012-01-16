@@ -15,12 +15,12 @@
  */
 package annis.administration;
 
-import annis.administration.PreparedStatementCallbackImpl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +48,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import annis.externalFiles.ExternalFileMgrDAO;
-import java.io.FileInputStream;
-import java.sql.PreparedStatement;
 import javax.activation.MimetypesFileTypeMap;
-import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * - Transaktionen
@@ -85,7 +84,7 @@ public class SpringAnnisAdministrationDao
   {
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
-    "component", "rank", "edge_annotation",    
+    "component", "rank", "edge_annotation",
     FILE_RESOLVER_VIS_MAP
   };
   private String[] tablesToCopyManually =
@@ -242,17 +241,48 @@ public class SpringAnnisAdministrationDao
 
     // search for annotations that have binary data
     String selectSql =
-      "SELECT DISTINCT value FROM _node_annotation WHERE value ~ :extFileRegExp";
-    SqlParameterSource selectArgs = makeArgs().addValue("extFileRegExp",
-      extFileRegExp);
-    List<String> list = simpleJdbcTemplate.query(selectSql, stringRowMapper(),
-      selectArgs);
+      "SELECT DISTINCT value, corpus_ref FROM _node, _node_annotation WHERE value LIKE "
+      + "'[ExtFile]%'" + " AND node_ref = id";
 
-    for (String externalData : list)
+    /* we need the value and the corpus_ref of the media_file, so the first 
+     * value of the String array is the name of the file and the second is the 
+     * corpus_ref */
+    List<String[]> list = simpleJdbcTemplate.getJdbcOperations().query(
+      selectSql,
+      new ResultSetExtractor<List<String[]>>()
+      {
+
+        @Override
+        public List<String[]> extractData(ResultSet rs) throws SQLException,
+          DataAccessException
+        {
+          ArrayList<String[]> result = new ArrayList<String[]>();
+          while (rs.next())
+          {
+            String[] tmp =
+            {
+              rs.getString("value"), rs.getString("corpus_ref")
+            };
+            result.add(tmp);
+          }
+          return result;
+        }
+      });
+
+    for (String[] externalData : list)
     {
+      assert externalData.length > 1;
       // get rid of marker
-      String filename = externalData.replaceFirst(extFilePattern, "");
+      String filename = externalData[0].replaceFirst(extFilePattern, "");
 
+      log.info("import " + filename + " to staging area");
+      PreparedStatementCallbackImpl preStat = new PreparedStatementCallbackImpl(path
+        + "/ExtData/" + filename, externalData[1]);
+      String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
+
+      simpleJdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
+
+      /* this code is for the old ExternalFileServlet and can be deleted */
       // copy file to extData directory
       File file = new File(filename);
       try
@@ -268,6 +298,7 @@ public class SpringAnnisAdministrationDao
         throw new FileAccessException(e);
       }
 
+
       // store reference in database
       // XXX: mp3 mime type hard-coded
       String name = file.getName();
@@ -282,15 +313,8 @@ public class SpringAnnisAdministrationDao
       String updateValueSql =
         "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
       SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue(
-        "externalData", externalData);
+        "externalData", externalData[0]);
       simpleJdbcTemplate.update(updateValueSql, updateArgs);
-
-      log.info("import " + filename + " to staging area");
-      PreparedStatementCallbackImpl preStat = new PreparedStatementCallbackImpl(path
-        + "/ExtData/" + filename, mimeType);
-      String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
-
-      simpleJdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
     }
   }
 
