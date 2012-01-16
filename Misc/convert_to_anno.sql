@@ -123,7 +123,28 @@ INSERT INTO s_facts (
   FROM facts_2014
 ;
 
+-- indices
 SELECT 1 FROM simplefactsindex('s_facts');
+CREATE INDEX idx__sample_n__2015
+  ON s_facts
+  USING btree
+  ((sample & B'10000'::"bit"));
+CREATE INDEX idx__sample_n_na__2015
+  ON s_facts
+  USING btree
+  ((sample & B'01000'::"bit"));
+CREATE INDEX idx__sample_n_r_c__2015
+  ON s_facts
+  USING btree
+  ((sample & B'00100'::"bit"));
+CREATE INDEX idx__sample_n_r_c_ea__2015
+  ON s_facts
+  USING btree
+  ((sample & B'00010'::"bit"));
+CREATE INDEX idx__sample_n_r_c_na__2015
+  ON s_facts
+  USING btree
+  ((sample & B'00001'::"bit"));
 
 VACUUM ANALYZE s_facts;
 VACUUM ANALYZE s_node_anno;
