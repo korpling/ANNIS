@@ -9,14 +9,16 @@ CREATE TABLE s_node_anno (
   namespace varchar(150),
   "name" varchar(150),
   val varchar(1500),
+  occurences bigint,
   UNIQUE(namespace, "name", val)
 );
 
-INSERT INTO s_node_anno(namespace, "name", val)
+INSERT INTO s_node_anno(namespace, "name", val, occurences)
 (
-  SELECT DISTINCT node_annotation_namespace, node_annotation_name, node_annotation_value
+  SELECT node_annotation_namespace, node_annotation_name, node_annotation_value, count(*) as occurences
   FROM facts_2014 
   WHERE (sample & B'01000') = B'01000'
+  GROUP BY node_annotation_namespace, node_annotation_name, node_annotation_value
 );
 
 -- indexes on node annotations
@@ -24,6 +26,7 @@ CREATE INDEX idx_s_node_anno_name ON s_node_anno (
 "name" varchar_pattern_ops, val varchar_pattern_ops);
 CREATE INDEX idx_s_node_anno_namespace ON s_node_anno (
 namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops);
+CREATE INDEX idx_s_node_anno_occurences ON s_node_anno (occurences);
 
 -- copy and adjust facts table
 CREATE TABLE s_facts (
@@ -112,7 +115,7 @@ INSERT INTO s_facts (
     edge_namespace,
     edge_name,
     (SELECT id FROM s_node_anno AS na 
-      WHERE na.namespace = node_annotation_namespace ů
+      WHERE na.namespace = node_annotation_namespace
         AND na.name = node_annotation_name
         AND na.val = node_annotation_value
     ),
@@ -146,7 +149,7 @@ CREATE INDEX idx__sample_n_r_c_na__2015
   USING btree
   ((sample & B'00001'::"bit"));
 
-ALTER TABLE s_facts ALTER node_anno SET STATISTICS 1000;
+ALTER TABLE s_facts ALTER node_anno SET STATISTICS 2000;
 
 VACUUM ANALYZE s_facts;
 VACUUM ANALYZE s_node_anno;
