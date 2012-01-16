@@ -51,6 +51,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		AnnisBaseRunner.getInstance("annisAdminRunner", "annis/administration/AnnisAdminRunner-context.xml").run(args);
 	}
 
+  @Override
 	public void run(String[] args) {
 		
 		// print help if no argument is given
@@ -291,7 +292,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		if (s.length() > length)
 			return s;
 
-		StringBuffer padded = new StringBuffer();
+		StringBuilder padded = new StringBuilder();
 		for (int i = 0; i < length - s.length(); ++i)
 			padded.append(" ");
 		padded.append(o);

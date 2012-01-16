@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import annis.administration.PreparedStatementCallbackImpl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -47,7 +48,10 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import annis.externalFiles.ExternalFileMgrDAO;
+import java.io.FileInputStream;
+import java.sql.PreparedStatement;
 import javax.activation.MimetypesFileTypeMap;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 
 /**
  * - Transaktionen
@@ -81,7 +85,7 @@ public class SpringAnnisAdministrationDao
   {
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
-    "component", "rank", "edge_annotation",
+    "component", "rank", "edge_annotation",    
     FILE_RESOLVER_VIS_MAP
   };
   private String[] tablesToCopyManually =
@@ -89,12 +93,14 @@ public class SpringAnnisAdministrationDao
     "corpus", "corpus_annotation",
     "text",
     FILE_RESOLVER_VIS_MAP,
-    "corpus_stats"
+    "corpus_stats",
+    "media_files"
   };
   // tables created during import
   private String[] createdTables =
   {
-    "corpus_stats"
+    "corpus_stats",
+    "media_files"
   };
 
   ///// Subtasks of creating the database
@@ -103,7 +109,7 @@ public class SpringAnnisAdministrationDao
     String sql = "SELECT count(*) FROM pg_database WHERE datname = :database";
     SqlParameterSource args = makeArgs().addValue("database", database);
     int count = simpleJdbcTemplate.queryForInt(sql, args);
-    if(count != 0)
+    if (count != 0)
     {
       log.debug("dropping existing database");
       jdbcOperations.execute("DROP DATABASE " + database);
@@ -115,7 +121,7 @@ public class SpringAnnisAdministrationDao
     String sql = "SELECT count(*) FROM pg_user WHERE usename = :username";
     SqlParameterSource args = makeArgs().addValue("username", username);
     int count = simpleJdbcTemplate.queryForInt(sql, args);
-    if(count != 0)
+    if (count != 0)
     {
       log.debug("dropping existing user");
       jdbcOperations.execute("DROP USER " + username);
@@ -125,13 +131,16 @@ public class SpringAnnisAdministrationDao
   void createUser(String username, String password)
   {
     log.info("creating user: " + username);
-    jdbcOperations.execute("CREATE USER " + username + " PASSWORD '" + password + "'");
+    jdbcOperations.execute("CREATE USER " + username + " PASSWORD '" + password
+      + "'");
   }
 
   void createDatabase(String database)
   {
-    log.info("creating database: " + database + " ENCODING = 'UTF8' TEMPLATE template0");
-    jdbcOperations.execute("CREATE DATABASE " + database + " ENCODING = 'UTF8' TEMPLATE template0");
+    log.info("creating database: " + database
+      + " ENCODING = 'UTF8' TEMPLATE template0");
+    jdbcOperations.execute("CREATE DATABASE " + database
+      + " ENCODING = 'UTF8' TEMPLATE template0");
   }
 
   void installPlPgSql()
@@ -141,7 +150,7 @@ public class SpringAnnisAdministrationDao
     {
       jdbcOperations.execute("CREATE LANGUAGE plpgsql");
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       log.warn("plpqsql was already installed: " + ex.getMessage());
     }
@@ -162,7 +171,8 @@ public class SpringAnnisAdministrationDao
   void populateSchema()
   {
     log.info("populating the schemas with default values");
-    bulkloadTableFromResource("resolver_vis_map", new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
+    bulkloadTableFromResource("resolver_vis_map",
+      new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
   }
@@ -171,7 +181,7 @@ public class SpringAnnisAdministrationDao
   void dropIndexes()
   {
     log.info("dropping indexes");
-    for(String index : listIndexesOnTables(allTables()))
+    for (String index : listIndexesOnTables(allTables()))
     {
       log.debug("dropping index: " + index);
       jdbcOperations.execute("DROP INDEX " + index);
@@ -181,29 +191,31 @@ public class SpringAnnisAdministrationDao
   void createStagingArea(boolean useTemporary)
   {
     log.info("creating staging area");
-    MapSqlParameterSource args = makeArgs()
-      .addValue(":tmp", useTemporary ? "TEMPORARY" : "UNLOGGED");
+    MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
+      ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area.sql", args);
   }
 
   void bulkImport(String path)
   {
     log.info("bulk-loading data");
-    for(String table : importedTables)
+    for (String table : importedTables)
     {
-      if(table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
+      if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
         try
         {
-          bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
+          bulkloadTableFromResource(tableInStagingArea(table),
+            new FileSystemResource(new File(path, table + ".tab")));
         }
-        catch(FileAccessException e)
+        catch (FileAccessException e)
         {
         }
       }
       else
       {
-        bulkloadTableFromResource(tableInStagingArea(table), new FileSystemResource(new File(path, table + ".tab")));
+        bulkloadTableFromResource(tableInStagingArea(table),
+          new FileSystemResource(new File(path, table + ".tab")));
       }
     }
   }
@@ -229,11 +241,14 @@ public class SpringAnnisAdministrationDao
     String extFileRegExp = "^" + extFilePattern + ".+$";
 
     // search for annotations that have binary data
-    String selectSql = "SELECT DISTINCT value FROM _node_annotation WHERE value ~ :extFileRegExp";
-    SqlParameterSource selectArgs = makeArgs().addValue("extFileRegExp", extFileRegExp);
-    List<String> list = simpleJdbcTemplate.query(selectSql, stringRowMapper(), selectArgs);
+    String selectSql =
+      "SELECT DISTINCT value FROM _node_annotation WHERE value ~ :extFileRegExp";
+    SqlParameterSource selectArgs = makeArgs().addValue("extFileRegExp",
+      extFileRegExp);
+    List<String> list = simpleJdbcTemplate.query(selectSql, stringRowMapper(),
+      selectArgs);
 
-    for(String externalData : list)
+    for (String externalData : list)
     {
       // get rid of marker
       String filename = externalData.replaceFirst(extFilePattern, "");
@@ -248,7 +263,7 @@ public class SpringAnnisAdministrationDao
         log.debug("copying '" + src + "' to '" + dst + "'");
         FileUtils.copyFile(src, dst);
       }
-      catch(IOException e)
+      catch (IOException e)
       {
         throw new FileAccessException(e);
       }
@@ -264,11 +279,19 @@ public class SpringAnnisAdministrationDao
       log.debug("external file '" + filename + "' inserted with id " + id);
 
       // update annotation value, set name to audio:audioFile
-      String updateValueSql = "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
-      SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue("externalData", externalData);
+      String updateValueSql =
+        "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
+      SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue(
+        "externalData", externalData);
       simpleJdbcTemplate.update(updateValueSql, updateArgs);
-    }
 
+      log.info("import " + filename + " to staging area");
+      PreparedStatementCallbackImpl preStat = new PreparedStatementCallbackImpl(path
+        + "/ExtData/" + filename, mimeType);
+      String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
+
+      simpleJdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
+    }
   }
 
   void computeLeftTokenRightToken()
@@ -282,7 +305,7 @@ public class SpringAnnisAdministrationDao
     log.info("computing real root for rank");
     executeSqlFromScript("root.sql");
   }
-  
+
   void computeLevel()
   {
     log.info("computing values for rank.level");
@@ -298,7 +321,8 @@ public class SpringAnnisAdministrationDao
   void computeCorpusPath(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-    log.info("computing path information of the corpus tree for corpus with ID " + corpusID);
+    log.info("computing path information of the corpus tree for corpus with ID "
+      + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
   }
 
@@ -311,7 +335,8 @@ public class SpringAnnisAdministrationDao
     log.info("updating IDs in staging area");
     executeSqlFromScript("update_ids.sql");
     log.info("query for the new corpus ID");
-    long result = jdbcOperations.queryForLong("SELECT MAX(toplevel_corpus) FROM _node");
+    long result = jdbcOperations.queryForLong(
+      "SELECT MAX(toplevel_corpus) FROM _node");
     log.info("new corpus ID is " + result);
     return result;
   }
@@ -331,27 +356,30 @@ public class SpringAnnisAdministrationDao
   void insertCorpus()
   {
     log.info("moving corpus from staging area to main db");
-    for(String table : tablesToCopyManually)
+    for (String table : tablesToCopyManually)
     {
-      int numOfEntries = jdbcOperations.queryForInt("SELECT COUNT(*) from " + tableInStagingArea(table));
-      if(numOfEntries > 0)
+      int numOfEntries = jdbcOperations.queryForInt("SELECT COUNT(*) from "
+        + tableInStagingArea(table));
+
+      if (numOfEntries > 0)
       {
-        StringBuffer sql = new StringBuffer();
-        if(table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
+        StringBuilder sql = new StringBuilder();
+        if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
         {
           sql.append("INSERT INTO ");
           sql.append(table);
           //FIXME DIRTY!!! find a better way instead of naming the column-names in code 
-          sql.append("(corpus, version, namespace, element, vis_type, display_name, \"order\", mappings)");
+          sql.append(
+            "(corpus, version, namespace, element, vis_type, display_name, \"order\", mappings)");
           sql.append(" (SELECT * FROM ");
-          sql.append(tableInStagingArea(table) + ")");
+          sql.append(tableInStagingArea(table)).append(")");
         }
         else
         {
           sql.append("INSERT INTO ");
           sql.append(table);
           sql.append(" (SELECT * FROM ");
-          sql.append(tableInStagingArea(table) + ")");
+          sql.append(tableInStagingArea(table)).append(")");
         }
         jdbcOperations.execute(sql.toString());
       }
@@ -366,7 +394,7 @@ public class SpringAnnisAdministrationDao
     List<String> tables = importedAndCreatedTables();
     Collections.reverse(tables);
 
-    for(String table : tables)
+    for (String table : tables)
     {
       jdbcOperations.execute("DROP TABLE " + tableInStagingArea(table));
     }
@@ -383,7 +411,7 @@ public class SpringAnnisAdministrationDao
 
   void analyzeStagingTables()
   {
-    for(String t : importedTables)
+    for (String t : importedTables)
     {
       log.info("analyzing " + t);
       jdbcOperations.execute("ANALYZE " + tableInStagingArea(t));
@@ -414,10 +442,12 @@ public class SpringAnnisAdministrationDao
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("facts.sql", args);
 
-    log.info("updating values in materialized facts table for corpus with ID " + corpusID);
+    log.info("updating values in materialized facts table for corpus with ID "
+      + corpusID);
     executeSqlFromScript("update_facts.sql", args);
 
-    log.info("clustering materialized facts table for corpus with ID " + corpusID);
+    log.info("clustering materialized facts table for corpus with ID "
+      + corpusID);
     executeSqlFromScript("cluster.sql", args);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
@@ -435,16 +465,18 @@ public class SpringAnnisAdministrationDao
   List<Long> listToplevelCorpora()
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
-    return simpleJdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
+    return simpleJdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.
+      newInstance(Long.class));
   }
 
   void deleteCorpora(List<Long> ids)
   {
 
     log.debug("recursivly deleting corpora: " + ids);
-    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids", StringUtils.join(ids, ", ")));
+    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
+      StringUtils.join(ids, ", ")));
 
-    for(long l : ids)
+    for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
@@ -458,7 +490,8 @@ public class SpringAnnisAdministrationDao
 
   List<Map<String, Object>> listCorpusStats()
   {
-    return simpleJdbcTemplate.queryForList("SELECT * FROM corpus_info ORDER BY name");
+    return simpleJdbcTemplate.queryForList(
+      "SELECT * FROM corpus_info ORDER BY name");
   }
 
   List<Map<String, Object>> listTableStats()
@@ -514,7 +547,8 @@ public class SpringAnnisAdministrationDao
 
   // reads the content from a resource into a string
   @SuppressWarnings("unchecked")
-  private String readSqlFromResource(Resource resource, MapSqlParameterSource args)
+  private String readSqlFromResource(Resource resource,
+    MapSqlParameterSource args)
   {
     // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
     Map parameters = args != null ? args.getValues() : new HashMap();
@@ -523,37 +557,41 @@ public class SpringAnnisAdministrationDao
     {
       StringBuilder sqlBuf = new StringBuilder();
       reader = new BufferedReader(new FileReader(resource.getFile()));
-      for(String line = reader.readLine(); line != null; line = reader.readLine())
+      for (String line = reader.readLine(); line != null; line =
+          reader.readLine())
       {
         sqlBuf.append(line).append("\n");
       }
       String sql = sqlBuf.toString();
-      for(Object placeHolder : parameters.keySet())
+      for (Object placeHolder : parameters.keySet())
       {
         String key = placeHolder.toString();
         String value = parameters.get(placeHolder).toString();
-        log.debug("substitution for parameter '" + key + "' in SQL script: " + value);
+        log.debug("substitution for parameter '" + key + "' in SQL script: "
+          + value);
 
         sql = sql.replaceAll(key, value);
       }
       return sql;
     }
-    catch(IOException e)
+    catch (IOException e)
     {
       log.error("Couldn't read SQL script from resource file.", e);
-      throw new FileAccessException("Couldn't read SQL script from resource file.", e);
+      throw new FileAccessException(
+        "Couldn't read SQL script from resource file.", e);
     }
     finally
     {
-      if(reader != null)
+      if (reader != null)
       {
         try
         {
           reader.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-          java.util.logging.Logger.getLogger(SpringAnnisAdministrationDao.class.getName()).log(Level.SEVERE, null, ex);
+          java.util.logging.Logger.getLogger(SpringAnnisAdministrationDao.class.
+            getName()).log(Level.SEVERE, null, ex);
         }
       }
     }
@@ -577,8 +615,10 @@ public class SpringAnnisAdministrationDao
   // bulk-loads a table from a resource
   private void bulkloadTableFromResource(String table, Resource resource)
   {
-    log.debug("bulk-loading data from '" + resource.getFilename() + "' into table '" + table + "'");
-    String sql = "COPY " + table + " FROM STDIN WITH DELIMITER E'\t' NULL AS 'NULL'";
+    log.debug("bulk-loading data from '" + resource.getFilename()
+      + "' into table '" + table + "'");
+    String sql = "COPY " + table
+      + " FROM STDIN WITH DELIMITER E'\t' NULL AS 'NULL'";
 
     try
     {
@@ -592,11 +632,11 @@ public class SpringAnnisAdministrationDao
       DataSourceUtils.releaseConnection(con, dataSource);
 
     }
-    catch(SQLException e)
+    catch (SQLException e)
     {
       throw new DatabaseAccessException(e);
     }
-    catch(IOException e)
+    catch (IOException e)
     {
       throw new FileAccessException(e);
     }
@@ -607,7 +647,8 @@ public class SpringAnnisAdministrationDao
   // exploits the fact that the index has the same name as the constraint
   private List<String> listIndexesOnTables(List<String> tables)
   {
-    String sql = ""
+    String sql =
+      ""
       + "SELECT indexname "
       + "FROM pg_indexes "
       + "WHERE tablename IN ( :tables ) "
@@ -638,14 +679,15 @@ public class SpringAnnisAdministrationDao
       + "WHERE x.indexrelid = c.oid "
       + "AND c.relname IN ( :indexes ) "
       + "AND pg_stat_get_numscans(x.indexrelid) " + scansOp + " 0";
-    SqlParameterSource args = makeArgs().addValue("indexes", listIndexesOnTables(tables));
+    SqlParameterSource args = makeArgs().addValue("indexes",
+      listIndexesOnTables(tables));
     return simpleJdbcTemplate.query(sql, stringRowMapper(), args);
   }
 
   private List<String> quotedArray(String... values)
   {
     List<String> result = new ArrayList<String>();
-    for(String value : values)
+    for (String value : values)
     {
       result.add("'" + value + "'");
     }
@@ -660,8 +702,10 @@ public class SpringAnnisAdministrationDao
       + "WHERE x.indexrelid = c.oid "
       + "AND c.relname = i.indexname "
       + "AND i.tablename IN ( :tables )";
-    String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(tables), ", "));
-    return simpleJdbcTemplate.query(sql, new ParameterizedSingleColumnRowMapper<String>());
+    String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(
+      tables), ", "));
+    return simpleJdbcTemplate.query(sql,
+      new ParameterizedSingleColumnRowMapper<String>());
   }
 
   public List<String> listUsedIndexes(String... tables)
@@ -673,8 +717,10 @@ public class SpringAnnisAdministrationDao
       + "AND c.relname = i.indexname "
       + "AND i.tablename IN ( :tables ) "
       + "AND pg_stat_get_numscans(x.indexrelid) != 0";
-    String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(tables), ", "));
-    return simpleJdbcTemplate.query(sql, new ParameterizedSingleColumnRowMapper<String>());
+    String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(
+      tables), ", "));
+    return simpleJdbcTemplate.query(sql,
+      new ParameterizedSingleColumnRowMapper<String>());
   }
 
   public boolean resetStatistics()
@@ -684,7 +730,7 @@ public class SpringAnnisAdministrationDao
       simpleJdbcTemplate.queryForList("SELECT pg_stat_reset()");
       return true;
     }
-    catch(DataAccessException e)
+    catch (DataAccessException e)
     {
       return false;
     }

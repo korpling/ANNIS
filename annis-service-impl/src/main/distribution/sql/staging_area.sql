@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS _node_annotation;
 DROP TABLE IF EXISTS _node;
 DROP TABLE IF EXISTS _corpus;
 DROP TABLE IF EXISTS _text;
+DROP TABLE IF EXISTS _media_files;
 
 
 -- corpora
@@ -120,4 +121,13 @@ CREATE :tmp TABLE _resolver_vis_map
   "display_name"   varchar(100) NOT NULL, -- the name of the layer which shall be shown for display
   "order" bigint default '0', -- the order of the layers, in which they shall be shown
   "mappings" varchar(100)			    
+);
+
+CREATE :tmp TABLE _media_files
+(
+  file  bytea NOT NULL,
+  corpus_ref  bigint NOT NULL,
+  bytes bigint NOT NULL,
+  mime_type character varying(40) NOT NULL,
+  title character varying(40) NOT NULL  
 );
