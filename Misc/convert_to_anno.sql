@@ -57,6 +57,7 @@ CREATE TABLE s_facts (
   edge_annotation_value character varying(1500), -- annotation value
   sample bit(5) -- Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]
 );
+ALTER TABLE s_facts ADD CHECK(toplevel_corpus = 2015);
 
 INSERT INTO s_facts (
   id,
@@ -111,7 +112,7 @@ INSERT INTO s_facts (
     edge_namespace,
     edge_name,
     (SELECT id FROM s_node_anno AS na 
-      WHERE na.namespace = node_annotation_namespace 
+      WHERE na.namespace = node_annotation_namespace ů
         AND na.name = node_annotation_name
         AND na.val = node_annotation_value
     ),
@@ -123,3 +124,6 @@ INSERT INTO s_facts (
 ;
 
 SELECT 1 FROM simplefactsindex('s_facts');
+
+VACUUM ANALYZE s_facts;
+VACUUM ANALYZE s_node_anno;
