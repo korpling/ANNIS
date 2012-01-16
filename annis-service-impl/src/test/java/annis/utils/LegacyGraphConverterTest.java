@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.sqlgen.AOMAnnotateSqlGenerator;
+import annis.sqlgen.AnnisKey;
 import annis.sqlgen.SaltAnnotateSqlGenerator;
 import annis.test.CSVResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -76,7 +77,13 @@ public class LegacyGraphConverterTest
   public void testConvertToAOM() throws SQLException
   {
 
-    SaltAnnotateSqlGenerator saltSqlGen = new SaltAnnotateSqlGenerator();
+    SaltAnnotateSqlGenerator saltSqlGen = new SaltAnnotateSqlGenerator() {
+      @Override
+      protected AnnisKey createAnnisKey()
+      {
+        return new AnnisKey();
+      }
+    };
 
 
     SaltProject p =
