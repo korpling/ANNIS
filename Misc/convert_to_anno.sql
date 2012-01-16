@@ -146,5 +146,7 @@ CREATE INDEX idx__sample_n_r_c_na__2015
   USING btree
   ((sample & B'00001'::"bit"));
 
+ALTER TABLE s_facts ALTER node_anno SET STATISTICS 1000;
+
 VACUUM ANALYZE s_facts;
 VACUUM ANALYZE s_node_anno;
