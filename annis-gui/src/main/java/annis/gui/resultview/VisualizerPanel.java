@@ -31,6 +31,7 @@ import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -38,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
@@ -63,34 +65,33 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
+  private KWICPanel kwicPanel;
+  public CustomLayout customLayout;
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered)
+    Map<String, String> markersCovered, CustomLayout costumLayout)
   {
     this.result = result;
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
+    this.customLayout = costumLayout;
+
+    setContent(this.customLayout);
 
     this.setWidth("100%");
     this.setHeight("-1px");
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setMargin(false);
-    layout.setSpacing(false);
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
-
     btEntry = new Button(entry.getDisplayName());
     btEntry.setIcon(ICON_EXPAND);
     btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
       + ChameleonTheme.BUTTON_SMALL);
     btEntry.addListener((Button.ClickListener) this);
-    addComponent(btEntry);
+    customLayout.addComponent(btEntry, "btEntry");
   }
 
   private VisualizerInput createInput()
@@ -164,8 +165,12 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
+    openVisualizer(true);
+  }
 
-    if (resource != null)
+  public void openVisualizer(Boolean collapse)
+  {
+    if (resource != null && collapse)
     {
       getApplication().removeResource(resource);
     }
@@ -186,13 +191,18 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         if (vis.isUsingText() && result.getSDocumentGraph().getSNodes().size()
           > 0)
         {
+
           SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
             get(0).getSName(), result.getSName());
+
           input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
+
         }
         else
         {
+
           input.setDocument(result);
+
         }
 
 
@@ -201,15 +211,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
         resource = createResource(outStream, vis.getContentType());
         String url = getApplication().getRelativeLocation(resource);
-        iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+        iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
 
-        addComponent(iframe);
+
+        customLayout.addComponent(iframe, "iframe");
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
       iframe.setVisible(true);
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE)
+    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
       // collapse
       if (iframe != null)
@@ -217,6 +228,20 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         iframe.setVisible(false);
       }
       btEntry.setIcon(ICON_EXPAND);
+    }
+  }
+
+  public void setKwicPanel(KWICPanel kwicPanel)
+  {
+    this.kwicPanel = kwicPanel;
+  }
+
+  public void startMediaVisFromKWIC()
+  {
+    if (kwicPanel != null)
+    {
+      kwicPanel.startMediaVisualizers();
+      kwicPanel = null;
     }
   }
 }

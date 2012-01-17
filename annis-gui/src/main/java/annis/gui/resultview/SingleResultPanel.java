@@ -27,6 +27,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
@@ -43,11 +44,14 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,6 +81,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
+  private Set<String> visibleTokenAnnos;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -86,6 +91,7 @@ public class SingleResultPanel extends VerticalLayout implements
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
+    this.visibleTokenAnnos = visibleTokenAnnos;
 
     calculateHelperVariables();
 
@@ -125,17 +131,6 @@ public class SingleResultPanel extends VerticalLayout implements
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
-
-    kwicPanels = new ArrayList<KWICPanel>();
-    for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-    {
-
-      KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos, markedAndCovered,
-        text);
-      addComponent(kwic);
-      kwicPanels.add(kwic);
-    }
-
   }
 
   @Override
@@ -148,11 +143,43 @@ public class SingleResultPanel extends VerticalLayout implements
       {
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
+        List<String> mediaIDs = new LinkedList<String>();
+        List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+        List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
 
+
+        int counter = 0;
         for (ResolverEntry e : entries)
         {
-          addComponent(new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap));
+          String id = "resolver-" + resultNumber + "-" + counter++;
+          CustomLayout customLayout = this.customLayout(id);
+
+          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
+            markedCoveredMap, customLayout);
+
+          if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
+          {
+            mediaIDs.add(id);
+            mediaVisualizer.add(p);
+          }
+
+          visualizers.add(p);
+        }
+
+        kwicPanels = new ArrayList<KWICPanel>();
+        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+        {
+          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+            markedAndCovered, text, mediaIDs, mediaVisualizer, this);
+
+          addComponent(kwic);
+          kwicPanels.add(kwic);
+        }
+
+
+        for (VisualizerPanel p : visualizers)
+        {
+          addComponent(p);
         }
       }
       catch (RemoteException ex)
@@ -288,7 +315,8 @@ public class SingleResultPanel extends VerticalLayout implements
       String traversalId, SNode currNode, SRelation edge, SNode fromNode,
       long order)
     {
-      if (matchedAndCovered.containsKey(fromNode) && !matchedAndCovered.containsKey(currNode))
+      if (matchedAndCovered.containsKey(fromNode) && !matchedAndCovered.
+        containsKey(currNode))
       {
         currentMatchPos = matchedAndCovered.get(fromNode);
         matchedAndCovered.put(currNode, currentMatchPos);
@@ -321,5 +349,24 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       return matchedAndCovered;
     }
+  }
+
+  private CustomLayout customLayout(String id)
+  {
+    String layout = ""
+      + "<div id=\"" + id + "\">"
+      + "  <div location=\"btEntry\"></div>"
+      + "  <div location=\"iframe\"></div>"
+      + "</div>";
+    try
+    {
+      return new CustomLayout(new ByteArrayInputStream(layout.getBytes()));
+    }
+    catch (IOException ex)
+    {
+      Logger.getLogger(SingleResultPanel.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+    return null;
   }
 }
