@@ -28,7 +28,7 @@ import org.mockito.Mock;
 
 public class TestAnnisAdminRunner {
 	
-	@Mock private CorpusAdministration administration;
+	@Mock private FullFactsCorpusAdministration administration;
 	private AnnisAdminRunner main;
 	
 	@Before

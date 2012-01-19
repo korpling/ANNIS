@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION getNodeAnno("name" varchar(150), val varchar(1500), toplevel_corpus bigint[]) 
+CREATE OR REPLACE FUNCTION getNodeAnno("name" varchar(150), val varchar(1500), toplevel_corpus bigint[]) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
   SELECT id FROM s_node_anno 

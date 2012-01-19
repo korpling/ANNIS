@@ -1,4 +1,4 @@
-﻿-- http://www.pgsql.cz/index.php/PostgreSQL_SQL_Tricks#Using_IMMUTABLE_functions_as_hints_for_the_optimizer
+-- http://www.pgsql.cz/index.php/PostgreSQL_SQL_Tricks#Using_IMMUTABLE_functions_as_hints_for_the_optimizer
 
 DROP TABLE IF EXISTS s_facts;
 DROP TABLE IF EXISTS s_node_anno;
