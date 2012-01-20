@@ -55,13 +55,17 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
   private Map<SNode, Long> markedAndCovered;
-  private STextualDS text;  
+  private STextualDS text;
   private List<String> mediaIDs;
   private List<VisualizerPanel> mediaVisualizer;
   private SingleResultPanel parent;
-  // only used for media files
+  // only used for media files  
   private String startTime;
   private String endTime;
+  private String[] media_annotions =
+  {
+    "time"
+  };
 
   public KWICPanel(SDocument result, Set<String> tokenAnnos,
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
@@ -73,7 +77,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     this.mediaIDs = mediaIDs;
     this.mediaVisualizer = mediaVisualizer;
     this.parent = parent;
-    this.addListener((ItemClickEvent.ItemClickListener) this);     
+    this.addListener((ItemClickEvent.ItemClickListener) this);
     this.addStyleName("kwic");
     setSizeFull();
     setHeight("-1px");
@@ -267,7 +271,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
       return generateCell((String) itemId);
     }
-  }  
+  }
 
   private boolean checkRTL(List<AnnisNode> tokenList)
   {
@@ -298,10 +302,14 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
       for (SAnnotation anno : token.getSAnnotations())
       {
-        if ("time".equals(anno.getName()))
+        for (String media_anno : media_annotions)
         {
-          time = anno.getValueString();
+          if (media_anno.equals(anno.getName()))
+          {
+            time = anno.getValueString();
+          }
         }
+
       }
 
       time = (time == null) ? "no time given" : time;
