@@ -13,7 +13,7 @@ CREATE TABLE node_anno_:id
 )
 INHERITS(node_anno);
 
-INSERT INTO node_anno(toplevel_corpus, namespace, "name", val, occurences)
+INSERT INTO node_anno_:id(toplevel_corpus, namespace, "name", val, occurences)
 (
   SELECT :id, namespace, "name", "value", count(*) as occurences
   FROM  _node_annotation
@@ -27,7 +27,7 @@ CREATE INDEX idx__node_anno_name__:id ON node_anno_:id (
 CREATE INDEX idx__node_anno_namespace__:id ON node_anno_:id (
   namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
 );
-CREATE INDEX idx__node_anno_occurences__:id ON node_anno (occurences);
+CREATE INDEX idx__node_anno_occurences__:id ON node_anno_:id (occurences);
 
 ---------------
 -- EDGE_ANNO --
@@ -40,7 +40,7 @@ CREATE TABLE edge_anno_:id
 )
 INHERITS(edge_anno);
 
-INSERT INTO edge_anno(toplevel_corpus, namespace, "name", val, occurences)
+INSERT INTO edge_anno_:id(toplevel_corpus, namespace, "name", val, occurences)
 (
   SELECT :id, namespace, "name", "value", count(*) as occurences
   FROM  _edge_annotation
@@ -54,7 +54,7 @@ CREATE INDEX idx__edge_anno_name__:id ON edge_anno_:id (
 CREATE INDEX idx__edge_anno_namespace__:id ON edge_anno_:id (
   namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
 );
-CREATE INDEX idx__edge_anno_occurences__:id ON edge_anno (occurences);
+CREATE INDEX idx__edge_anno_occurences__:id ON edge_anno_:id (occurences);
 
 ------------
 -- FACTS --
@@ -156,12 +156,12 @@ FROM
 
     (SELECT id FROM node_anno_:id AS na 
       WHERE na.namespace = _node_annotation.namespace
-        AND na.name = _node_annotation."name"
+        AND na."name" = _node_annotation."name"
         AND na.val = _node_annotation."value"
     ) AS node_anno,
     (SELECT id FROM edge_anno_:id AS ea 
       WHERE ea.namespace = _edge_annotation.namespace
-        AND ea.name = _edge_annotation."name"
+        AND ea."name" = _edge_annotation."name"
         AND ea.val = _edge_annotation."value"
     ) AS edge_anno,
 

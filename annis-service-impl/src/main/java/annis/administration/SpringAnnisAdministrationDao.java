@@ -459,19 +459,24 @@ public class SpringAnnisAdministrationDao
   void deleteCorpora(List<Long> ids)
   {
 
-    log.debug("recursivly deleting corpora: " + ids);
-    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
-      StringUtils.join(ids, ", ")));
-
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
+      log.debug("dropping node_anno table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS node_anno_" + l);
+      log.debug("dropping edge_anno table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS edge_anno_" + l);
 //      log.debug("dropping node annotation table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
 //      log.debug("dropping node table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_" + l);
     }
+
+
+    log.debug("recursivly deleting corpora: " + ids);
+    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
+      StringUtils.join(ids, ", ")));
 
   }
 

@@ -60,12 +60,12 @@ CREATE INDEX idx__facts_level__:id
   (level, corpus_ref);
 
 CREATE INDEX idx__facts_node_anno__:id
-  ON facts
+  ON facts_:id
   USING btree
   (node_anno, corpus_ref);
 
 CREATE INDEX idx__facts_edge_anno__:id
-  ON facts
+  ON facts_:id
   USING btree
   (edge_anno, corpus_ref);
 
