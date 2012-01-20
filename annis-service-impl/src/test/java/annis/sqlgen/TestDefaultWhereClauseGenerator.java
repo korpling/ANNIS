@@ -128,6 +128,7 @@ public class TestDefaultWhereClauseGenerator
         "edge_annotation_value");
     generator = new DefaultWhereClauseGenerator()
     {
+      @Override
       protected TableAccessStrategy createTableAccessStrategy()
       {
         return tableAccessStrategy;

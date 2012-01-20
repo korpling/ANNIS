@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.administration.SchemeType;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.SqlConstraints.isNotNull;
@@ -54,52 +55,48 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import java.util.LinkedList;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
 
   // optimize indirect precedence for index on (leftToken - 1)
   private boolean optimizeIndirectPrecedence;
-
   // allow binding of same node to both operands of sibling
   private boolean allowIdenticalSibling;
-
   // generate two-sided boundaries for both left and right text borders
   // for the inclusion operators
   private boolean optimizeInclusion;
-
   // where to attach component constraints for edge operators
   // (lhs, rhs or both)
   private String componentPredicates;
-
   // use dedicated is_token column
   private boolean useIsTokenColumn;
-  
   // use predicate on toplevel_corpus in EXISTS subquery for common ancestor operator
   private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
-  
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
+  private SchemeType tableLayout;
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-      final String edgeType, String componentName)
+    final String edgeType, String componentName)
   {
-    conditions.add(join("=", tables(node)
-        .aliasedColumn(COMPONENT_TABLE, "type"), sqlString(edgeType)));
+    conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"),
+      sqlString(edgeType)));
     if (componentName == null)
     {
-      conditions
-          .add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
-    } else
+      conditions.add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
+    }
+    else
     {
       conditions.add(join("=",
-          tables(node).aliasedColumn(COMPONENT_TABLE, "name"),
-          sqlString(componentName)));
+        tables(node).aliasedColumn(COMPONENT_TABLE, "name"),
+        sqlString(componentName)));
     }
   }
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-      QueryNode target, String componentName, String edgeType)
+    QueryNode target, String componentName, String edgeType)
   {
     if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
@@ -113,114 +110,175 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addPointingRelationConditions(List<String> conditions,
-      QueryNode node, QueryNode target, PointingRelation join,
-      QueryData queryData)
+    QueryNode node, QueryNode target, PointingRelation join,
+    QueryData queryData)
   {
     addSingleEdgeCondition(node, target, conditions, join, "p");
   }
 
   @Override
   protected void addDominanceConditions(List<String> conditions,
-      QueryNode node, QueryNode target, Dominance join, QueryData queryData)
+    QueryNode node, QueryNode target, Dominance join, QueryData queryData)
   {
     addSingleEdgeCondition(node, target, conditions, join, "d");
   }
 
   @Override
   protected void addRightDominanceConditions(List<String> conditions,
-      QueryNode node, QueryNode target, RightDominance join, QueryData queryData)
+    QueryNode node, QueryNode target, RightDominance join, QueryData queryData)
   {
     addLeftOrRightDominance(conditions, node, target, queryData, join, "max",
-        "right_token");
+      "right_token");
   }
 
   @Override
   protected void addLeftDominanceConditions(List<String> conditions,
-      QueryNode node, QueryNode target, LeftDominance join, QueryData queryData)
+    QueryNode node, QueryNode target, LeftDominance join, QueryData queryData)
   {
     addLeftOrRightDominance(conditions, node, target, queryData, join, "min",
-        "left_token");
+      "left_token");
   }
 
   // FIXME: why not in addSingleEdgeConditions() ?
   void addLeftOrRightDominance(List<String> conditions, QueryNode node,
-      QueryNode target, QueryData queryData, RankTableJoin join,
-      String aggregationFunction, String tokenBoarder)
+    QueryNode target, QueryData queryData, RankTableJoin join,
+    String aggregationFunction, String tokenBoarder)
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
 
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
-        tables(target).aliasedColumn(RANK_TABLE, "parent")));
+      tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
     List<Long> corpusList = queryData.getCorpusList();
     conditions.add(in(
-        tables(target).aliasedColumn(NODE_TABLE, tokenBoarder),
-        "SELECT "
-            + aggregationFunction
-            + "(lrsub."
-            + tokenBoarder
-            + ") FROM "
-            + FACTS_TABLE
-            + " as lrsub "
-            + "WHERE parent="
-            + tables(node).aliasedColumn(RANK_TABLE, "pre")
-            + " AND corpus_ref="
-            + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref")
-            + " AND toplevel_corpus IN("
-            + (corpusList == null || corpusList.isEmpty() ? "NULL"
-                : StringUtils.join(corpusList, ",")) + ")"));
+      tables(target).aliasedColumn(NODE_TABLE, tokenBoarder),
+      "SELECT "
+      + aggregationFunction
+      + "(lrsub."
+      + tokenBoarder
+      + ") FROM "
+      + FACTS_TABLE
+      + " as lrsub "
+      + "WHERE parent="
+      + tables(node).aliasedColumn(RANK_TABLE, "pre")
+      + " AND corpus_ref="
+      + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref")
+      + " AND toplevel_corpus IN("
+      + (corpusList == null || corpusList.isEmpty() ? "NULL"
+      : StringUtils.join(corpusList, ",")) + ")"));
   }
 
   void joinOnNode(List<String> conditions, QueryNode node, QueryNode target,
-      String operator, String leftColumn, String rightColumn)
+    String operator, String leftColumn, String rightColumn)
   {
     conditions.add(join(operator,
-        tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target)
-            .aliasedColumn(NODE_TABLE, rightColumn)));
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn)));
   }
 
   void betweenJoinOnNode(List<String> conditions, QueryNode node,
-      QueryNode target, String leftColumn, String rightColumn, int min, int max)
+    QueryNode target, String leftColumn, String rightColumn, int min, int max)
   {
     conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
-        tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
   }
 
   void numberJoinOnNode(List<String> conditions, QueryNode node,
-      QueryNode target, String operator, String leftColumn, String rightColumn,
-      int offset)
+    QueryNode target, String operator, String leftColumn, String rightColumn,
+    int offset)
   {
     conditions.add(numberJoin(operator,
-        tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target)
-            .aliasedColumn(NODE_TABLE, rightColumn), offset));
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn), offset));
   }
 
   @Override
   protected void addAnnotationConditions(List<String> conditions,
-      QueryNode node, int index, QueryAnnotation annotation, String table)
+    QueryNode node, int index, QueryAnnotation annotation, String table,
+    QueryData queryData)
   {
-    if (annotation.getNamespace() != null)
+
+    switch (tableLayout)
     {
-      conditions.add(join("=",
-          tables(node).aliasedColumn(table, "namespace", index),
-          sqlString(annotation.getNamespace())));
+      case ANNO_TABLE:
+
+        
+        TextMatching tm = annotation.getTextMatching();
+        
+        StringBuilder sbFunc = new StringBuilder("get");
+
+        sbFunc.append(StringUtils.capitalize(StringUtils.removeEnd(table, "_annotation")));
+        sbFunc.append("AnnoBy");
+
+        List<String> params = new LinkedList<String>();
+
+        if (annotation.getNamespace() != null)
+        {
+          params.add("'" + annotation.getNamespace() + "'");
+          sbFunc.append("Namespace");
+        }
+        if (annotation.getName() != null)
+        {
+          params.add("'" + annotation.getName() + "'");
+          sbFunc.append("Name");
+        }
+        if (annotation.getValue() != null)
+        {
+          params.add("'" + annotation.getValue() + "'");
+          sbFunc.append("Val");
+        }
+        if (tm == TextMatching.REGEXP_EQUAL
+          || tm == TextMatching.REGEXP_NOT_EQUAL)
+        {
+          sbFunc.append("Regex");
+        }
+
+        params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")
+          + "]");
+
+        sbFunc.append("(");
+        sbFunc.append(StringUtils.join(params, ", "));
+        sbFunc.append(")");
+
+        
+        String cond = 
+          tables(node).aliasedColumn(table, "anno", index)
+          + "= ANY(" + sbFunc.toString() + ")";
+        
+        if(tm == TextMatching.EXACT_NOT_EQUAL || tm == TextMatching.REGEXP_NOT_EQUAL)
+        {
+          cond = "NOT (" + cond + ")";
+        }
+        conditions.add(cond);
+        
+        break;
+      case FULLFACTS:
+        if (annotation.getNamespace() != null)
+        {
+          conditions.add(join("=",
+            tables(node).aliasedColumn(table, "namespace", index),
+            sqlString(annotation.getNamespace())));
+        }
+        conditions.add(join("=",
+          tables(node).aliasedColumn(table, "name", index),
+          sqlString(annotation.getName())));
+        if (annotation.getValue() != null)
+        {
+          TextMatching textMatching = annotation.getTextMatching();
+          conditions.add(join(textMatching.sqlOperator(), tables(node).
+            aliasedColumn(table, "value", index),
+            sqlString(annotation.getValue(), textMatching)));
+        }
+        break;
     }
-    conditions.add(join("=", tables(node).aliasedColumn(table, "name", index),
-        sqlString(annotation.getName())));
-    if (annotation.getValue() != null)
-    {
-      TextMatching textMatching = annotation.getTextMatching();
-      conditions.add(join(textMatching.sqlOperator(), tables(node)
-          .aliasedColumn(table, "value", index),
-          sqlString(annotation.getValue(), textMatching)));
-    }
+
   }
 
   @Override
   protected void addPrecedenceConditions(List<String> conditions,
-      QueryNode node, QueryNode target, Precedence join, QueryData queryData)
+    QueryNode node, QueryNode target, Precedence join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 
@@ -234,8 +292,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       if (optimizeIndirectPrecedence)
       {
         numberJoinOnNode(conditions, node, target, "<=", "right_token",
-            "left_token", -1);
-      } else
+          "left_token", -1);
+      }
+      else
       {
         joinOnNode(conditions, node, target, "<", "right_token", "left_token");
       }
@@ -245,14 +304,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     else if (min == max)
     {
       numberJoinOnNode(conditions, node, target, "=", "right_token",
-          "left_token", -min);
+        "left_token", -min);
 
     }
     // ranged distance
     else
     {
       betweenJoinOnNode(conditions, node, target, "right_token", "left_token",
-          -min, -max);
+        -min, -max);
       // conditions.add(numberJoin("<=",
       // tables(node).aliasedColumn(NODE_TABLE, "right_token"),
       // tables(target).aliasedColumn(NODE_TABLE, "left_token"), -min));
@@ -264,7 +323,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addRightOverlapConditions(List<String> conditions,
-      QueryNode target, QueryNode node, RightOverlap join, QueryData queryData)
+    QueryNode target, QueryNode node, RightOverlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, ">=", "right", "right");
@@ -274,7 +333,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addLeftOverlapConditions(List<String> conditions,
-      QueryNode target, QueryNode node, LeftOverlap join, QueryData queryData)
+    QueryNode target, QueryNode node, LeftOverlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "<=", "left", "left");
@@ -284,7 +343,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addOverlapConditions(List<String> conditions, QueryNode node,
-      QueryNode target, Overlap join, QueryData queryData)
+    QueryNode target, Overlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "<=", "left", "right");
@@ -293,7 +352,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addInclusionConditions(List<String> conditions,
-      QueryNode node, QueryNode target, Inclusion join, QueryData queryData)
+    QueryNode node, QueryNode target, Inclusion join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "<=", "left", "left");
@@ -307,7 +366,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addRightAlignmentConditions(List<String> conditions,
-      QueryNode node, QueryNode target, RightAlignment join, QueryData queryData)
+    QueryNode node, QueryNode target, RightAlignment join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "right", "right");
@@ -315,7 +374,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addLeftAlignmentConditions(List<String> conditions,
-      QueryNode node, QueryNode target, LeftAlignment join, QueryData queryData)
+    QueryNode node, QueryNode target, LeftAlignment join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left", "left");
@@ -323,14 +382,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addIdenticalConditions(List<String> conditions,
-      QueryNode node, QueryNode target, Identical join, QueryData queryData)
+    QueryNode node, QueryNode target, Identical join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "id", "id");
   }
 
   @Override
   protected void addSameSpanConditions(List<String> conditions, QueryNode node,
-      QueryNode target, SameSpan join, QueryData queryData)
+    QueryNode target, SameSpan join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left", "left");
@@ -339,7 +398,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addCommonAncestorConditions(List<String> conditions,
-      QueryNode node, QueryNode target, CommonAncestor join, QueryData queryData)
+    QueryNode node, QueryNode target, CommonAncestor join, QueryData queryData)
   {
     List<Long> corpusList = queryData.getCorpusList();
     String componentName = join.getName();
@@ -349,12 +408,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     {
       joinOnNode(conditions, node, target, "<>", "id", "id");
     }
-    
+
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
-      conditions.add(join("=", 
-          tables(node).aliasedColumn(RANK_TABLE, "component_ref"), 
-          tables(target).aliasedColumn(RANK_TABLE, "component_ref")));
+      conditions.add(join("=",
+        tables(node).aliasedColumn(RANK_TABLE, "component_ref"),
+        tables(target).aliasedColumn(RANK_TABLE, "component_ref")));
     }
 
     // fugly
@@ -363,27 +422,30 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
     String pre = tas.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
     String post = tas.column("ancestor", tas.columnName(RANK_TABLE, "post"));
-    String component = tas.column("ancestor", tas.columnName(RANK_TABLE, "component_ref"));
+    String component = tas.column("ancestor", tas.columnName(RANK_TABLE,
+      "component_ref"));
     String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
 
     StringBuffer sb = new StringBuffer();
     sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE)
-        + " AS ancestor WHERE\n");
+      + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
       sb.append("\t" + component + " = " + component1 + " AND\n");
     }
     sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post
-        + " AND\n");
+      + " AND\n");
     sb.append("\t"
-        + pre
-        + " < "
-        + pre2
-        + " AND "
-        + pre2
-        + " < "
-        + post);
-    if (useToplevelCorpusPredicateInCommonAncestorSubquery && ! (corpusList == null || corpusList.isEmpty() ) ) {
+      + pre
+      + " < "
+      + pre2
+      + " AND "
+      + pre2
+      + " < "
+      + post);
+    if (useToplevelCorpusPredicateInCommonAncestorSubquery && !(corpusList
+      == null || corpusList.isEmpty()))
+    {
       sb.append(" AND toplevel_corpus IN(");
       sb.append(StringUtils.join(corpusList, ","));
       sb.append(")");
@@ -395,14 +457,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // FIXME: Why not in addSingleEdgeCondition
   @Override
   protected void addSiblingConditions(List<String> conditions, QueryNode node,
-      QueryNode target, Sibling join, QueryData queryData)
+    QueryNode target, Sibling join, QueryData queryData)
   {
     Sibling sibling = (Sibling) join;
     String componentName = sibling.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
 
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"),
-        tables(target).aliasedColumn(RANK_TABLE, "parent")));
+      tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
     if (!allowIdenticalSibling)
     {
@@ -412,7 +474,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addSingleEdgeCondition(QueryNode node, QueryNode target,
-      List<String> conditions, Join join, final String edgeType)
+    List<String> conditions, Join join, final String edgeType)
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
@@ -425,74 +487,77 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     if (min == 1 && max == 1)
     {
       conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
-          tables(target).aliasedColumn(RANK_TABLE, "parent")));
+        tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
       // indirect
-    } else
+    }
+    else
     {
       conditions.add(join("<", tables(node).aliasedColumn(RANK_TABLE, "pre"),
-          tables(target).aliasedColumn(RANK_TABLE, "pre")));
+        tables(target).aliasedColumn(RANK_TABLE, "pre")));
       conditions.add(join("<", tables(target).aliasedColumn(RANK_TABLE, "pre"),
-          tables(node).aliasedColumn(RANK_TABLE, "post")));
+        tables(node).aliasedColumn(RANK_TABLE, "post")));
 
       // exact
       if (min > 0 && min == max)
       {
         conditions.add(numberJoin("=",
-            tables(node).aliasedColumn(RANK_TABLE, "level"), tables(target)
-                .aliasedColumn(RANK_TABLE, "level"), -min));
+          tables(node).aliasedColumn(RANK_TABLE, "level"), tables(target).
+          aliasedColumn(RANK_TABLE, "level"), -min));
 
         // range
-      } else if (min > 0 && min < max)
+      }
+      else if (min > 0 && min < max)
       {
         conditions.add(between(tables(node).aliasedColumn(RANK_TABLE, "level"),
-            tables(target).aliasedColumn(RANK_TABLE, "level"), -min, -max));
+          tables(target).aliasedColumn(RANK_TABLE, "level"), -min, -max));
       }
     }
   }
 
   @Override
   protected void addTokenArityConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     QueryNode.Range tokenArity = node.getTokenArity();
     if (tokenArity.getMin() == tokenArity.getMax())
     {
       conditions.add(numberJoin("=",
-          tables(node).aliasedColumn(NODE_TABLE, "left_token"), tables(node)
-              .aliasedColumn(NODE_TABLE, "right_token"),
-          -(tokenArity.getMin()) + 1));
-    } else
+        tables(node).aliasedColumn(NODE_TABLE, "left_token"), tables(node).
+        aliasedColumn(NODE_TABLE, "right_token"),
+        -(tokenArity.getMin()) + 1));
+    }
+    else
     {
       conditions.add(between(
-          tables(node).aliasedColumn(NODE_TABLE, "left_token"), tables(node)
-              .aliasedColumn(NODE_TABLE, "right_token"),
-          -(tokenArity.getMin()) + 1, -(tokenArity.getMax()) + 1));
+        tables(node).aliasedColumn(NODE_TABLE, "left_token"), tables(node).
+        aliasedColumn(NODE_TABLE, "right_token"),
+        -(tokenArity.getMin()) + 1, -(tokenArity.getMax()) + 1));
     }
   }
 
   @Override
   protected void addNodeArityConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     // fugly
     List<Long> corpusList = queryData.getCorpusList();
     TableAccessStrategy tas = tables(null);
     String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
-    String parent = tas
-        .column("children", tas.columnName(RANK_TABLE, "parent"));
+    String parent = tas.column("children", tas.columnName(RANK_TABLE, "parent"));
     String pre = tas.column("children", tas.columnName(RANK_TABLE, "pre"));
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + pre + ")\n");
     sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
     sb.append("\tWHERE " + parent + " = " + pre1 + " AND toplevel_corpus IN("
-        + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","))
-        + ")" + ")");
+      + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","))
+      + ")" + ")");
     QueryNode.Range arity = node.getArity();
     if (arity.getMin() == arity.getMax())
     {
       conditions.add(join("=", sb.toString(), String.valueOf(arity.getMin())));
-    } else
+    }
+    else
     {
       conditions.add(between(sb.toString(), arity.getMin(), arity.getMax()));
     }
@@ -500,51 +565,50 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   @Override
   protected void addNodeNameCondition(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "name"),
-        sqlString(node.getName())));
+      sqlString(node.getName())));
   }
 
   @Override
   protected void addNodeNamespaceConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
-    conditions
-        .add(join("=", tables(node).aliasedColumn(NODE_TABLE, "namespace"),
-            sqlString(node.getNamespace())));
+    conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "namespace"),
+      sqlString(node.getNamespace())));
   }
 
   @Override
   protected void addIsRootConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     conditions.add(isTrue(tables(node).aliasedColumn(RANK_TABLE, "root")));
   }
 
   @Override
   protected void addIsTokenConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     if (useIsTokenColumn)
     {
-      conditions
-          .add(isTrue(tables(node).aliasedColumn(NODE_TABLE, "is_token")));
-    } else
+      conditions.add(isTrue(tables(node).aliasedColumn(NODE_TABLE, "is_token")));
+    }
+    else
     {
       conditions.add(isNotNull(tables(node).aliasedColumn(NODE_TABLE,
-          "span")));
+        "span")));
     }
   }
 
   @Override
   protected void addSpanConditions(List<String> conditions,
-      QueryData queryData, QueryNode node)
+    QueryData queryData, QueryNode node)
   {
     TextMatching textMatching = node.getSpanTextMatching();
     conditions.add(join(textMatching.sqlOperator(),
-        tables(node).aliasedColumn(NODE_TABLE, "span"),
-        sqlString(node.getSpannedText(), textMatching)));
+      tables(node).aliasedColumn(NODE_TABLE, "span"),
+      sqlString(node.getSpannedText(), textMatching)));
   }
 
   public boolean isOptimizeIndirectPrecedence()
@@ -603,9 +667,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   public void setUseToplevelCorpusPredicateInCommonAncestorSubquery(
-      boolean useToplevelCorpusPredicateInCommonAncestorSubquery)
+    boolean useToplevelCorpusPredicateInCommonAncestorSubquery)
   {
-    this.useToplevelCorpusPredicateInCommonAncestorSubquery = useToplevelCorpusPredicateInCommonAncestorSubquery;
+    this.useToplevelCorpusPredicateInCommonAncestorSubquery =
+      useToplevelCorpusPredicateInCommonAncestorSubquery;
   }
 
   public boolean isUseComponentRefPredicateInCommonAncestorSubquery()
@@ -614,9 +679,25 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   public void setUseComponentRefPredicateInCommonAncestorSubquery(
-      boolean useComponentRefPredicateInCommonAncestorSubquery)
+    boolean useComponentRefPredicateInCommonAncestorSubquery)
   {
-    this.useComponentRefPredicateInCommonAncestorSubquery = useComponentRefPredicateInCommonAncestorSubquery;
+    this.useComponentRefPredicateInCommonAncestorSubquery =
+      useComponentRefPredicateInCommonAncestorSubquery;
   }
 
+  
+  public String getTableLayout()
+  {
+    return tableLayout.name().toLowerCase();
+  }
+
+  public void setTableLayout(SchemeType tableLayout)
+  {
+    this.tableLayout = tableLayout;
+  }
+
+  public void setTableLayout(String tableLayout)
+  {
+    this.tableLayout = SchemeType.valueOf(tableLayout.toUpperCase());
+  }
 }

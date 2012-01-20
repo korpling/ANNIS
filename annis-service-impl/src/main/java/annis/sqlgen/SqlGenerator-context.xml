@@ -77,6 +77,7 @@ limitations under the License.
 		<property name="useIsTokenColumn" value="${annis.use-is-token-column}" />
 		<property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
 		<property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
+      <property name="tableLayout" value="${annis.table-layout}" />
 	</bean>
 
 	<bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
@@ -115,6 +116,7 @@ limitations under the License.
 				<entry key="namespace" value="node_annotation_namespace" />
 				<entry key="name" value="node_annotation_name" />
 				<entry key="value" value="node_annotation_value" />
+            <entry key="anno" value="node_anno" />
 			</util:map>
 		</entry>
 		<entry key="component">
@@ -129,6 +131,7 @@ limitations under the License.
 				<entry key="namespace" value="edge_annotation_namespace" />
 				<entry key="name" value="edge_annotation_name" />
 				<entry key="value" value="edge_annotation_value" />
+            <entry key="anno" value="edge_anno" />
 			</util:map>
 		</entry>
 		<entry key="facts">
