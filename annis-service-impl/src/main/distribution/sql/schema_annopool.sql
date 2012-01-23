@@ -42,18 +42,19 @@ COMMENT ON COLUMN text.text IS 'raw text data';
 CREATE TYPE annotype AS ENUM ('node', 'edge');
 -- collect all node annotations
 CREATE TABLE annotation_pool (
-  id bigserial PRIMARY KEY,
+  id bigserial,
   toplevel_corpus bigint REFERENCES corpus(id),
   namespace varchar(150),
   "name" varchar(150),
   val varchar(1500),
   "type" annotype,
   occurences bigint,
+  PRIMARY KEY(id),
   UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
 
 CREATE TABLE facts (
-  fid bigserial PRIMARY KEY,
+  fid bigserial,
   id bigint,
   text_ref bigint REFERENCES text(id),
   corpus_ref bigint REFERENCES corpus(id),
@@ -79,7 +80,8 @@ CREATE TABLE facts (
   edge_name character varying(255), -- name of the edges in this component
   node_anno_ref bigint REFERENCES annotation_pool(id),
   edge_anno_ref bigint REFERENCES annotation_pool(id),
-  sample bit(5) -- Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]
+  sample bit(5), -- Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]
+  PRIMARY KEY (fid)
 );
 
 COMMENT ON COLUMN facts.component_id IS 'component id';

@@ -20,7 +20,6 @@ import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
@@ -40,9 +39,9 @@ import annis.ql.parser.QueryData;
 import org.apache.commons.lang.Validate;
 
 /**
- * 
+ *
  * @param <T> Type into which the JDBC result set is transformed
- * 
+ *
  * @author thomas
  */
 public abstract class AnnotateSqlGenerator<T>
@@ -328,16 +327,34 @@ public abstract class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-    addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "namespace");
-    addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "name");
-    addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "value");
-    addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
-    addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
-    addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
+    if (tableLayout == SchemeType.FULLFACTS)
+    {
+      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "namespace");
+      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "name");
+      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "value");
+      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
+      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
+      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
+    }
 
     sb.append(indent).append(TABSTOP);
     sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
     sb.append(",\n").append(indent).append(TABSTOP);
+
+    if (tableLayout == SchemeType.ANNO_POOL)
+    {
+      sb.append("node_anno.namespace AS node_annotation_namespace,\n").append(
+        indent).append(TABSTOP);
+      sb.append("node_anno.\"name\" AS node_annotation_name,\n").append(indent).
+        append(TABSTOP);
+      sb.append("node_anno.\"val\" AS node_annotation_value,\n").append(indent).
+        append(TABSTOP);
+      sb.append("edge_anno.namespace AS edge_annotation_namespace,\n").append(
+        indent).append(TABSTOP);
+      sb.append("edge_anno.\"name\" AS edge_annotation_name,\n").append(indent).
+        append(TABSTOP);
+      sb.append("edge_anno.\"val\" AS edge_annotation_value,\n");
+    }
 
     // corpus.path_name
     sb.append("corpus.path_name AS path,\n").append(indent).append(TABSTOP);
@@ -454,22 +471,34 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
     HashSet<String> conditions = new HashSet<String>();
-    conditions.add(sb.toString());
-    
-    if(tableLayout == SchemeType.ANNO_POOL)
+
+    if (tableLayout == SchemeType.ANNO_POOL)
     {
-      for (int i = 1; i <= alternative.size(); ++i)
-      {
-        // join with node annotations
-        sb.append(" AND\n");
-        indent(sb, indent);
-        sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"));
-        sb.append(" = ");
-        sb.append(tables.aliasedColumn(ANNOTATION_POOL_TABLE, "id"));
-      }
-      
+
+      // join with node annotations
+      sb.append(" AND\n");
+      indent(sb, indent + TABSTOP);
+      sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"));
+      sb.append(" = node_anno.id");
+      sb.append(" AND\n");
+      // join with edge annotations
+      indent(sb, indent + TABSTOP);
+      sb.append(tables.aliasedColumn(EDGE_ANNOTATION_TABLE, "anno_ref"));
+      sb.append(" = edge_anno.id AND\n");
+
+      // restrict toplevel corpus
+      indent(sb, indent + TABSTOP);
+      sb.append("node_anno.toplevel_corpus IN (");
+      sb.append(StringUtils.join(corpusList, ", "));
+      sb.append(") AND \n");
+      indent(sb, indent + TABSTOP);
+      sb.append("edge_anno.toplevel_corpus IN (");
+      sb.append(StringUtils.join(corpusList, ", "));
+      sb.append(")\n");
     }
-    
+
+    conditions.add(sb.toString());
+
     return conditions;
   }
 
@@ -551,15 +580,18 @@ public abstract class AnnotateSqlGenerator<T>
 
     indent(sb, indent + TABSTOP);
     sb.append(TableAccessStrategy.CORPUS_TABLE);
-    
-    if(tableLayout == SchemeType.ANNO_POOL)
+
+    if (tableLayout == SchemeType.ANNO_POOL)
     {
       sb.append(", \n");
-
       indent(sb, indent + TABSTOP);
       sb.append(TableAccessStrategy.ANNOTATION_POOL_TABLE);
+      sb.append(" AS node_anno, \n");
+      indent(sb, indent + TABSTOP);
+      sb.append(TableAccessStrategy.ANNOTATION_POOL_TABLE);
+      sb.append(" AS edge_anno");
     }
-    
+
     return sb.toString();
   }
 
@@ -599,7 +631,7 @@ public abstract class AnnotateSqlGenerator<T>
   {
     return factsTas;
   }
-  
+
   public String getTableLayout()
   {
     return tableLayout.name().toLowerCase();

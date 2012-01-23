@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS edge_anno_:id;
 
 CREATE TABLE annotation_pool_:id
 (
+  PRIMARY KEY(id),
   CHECK(toplevel_corpus = :id)
 )
 INHERITS(annotation_pool);
@@ -63,7 +64,8 @@ CREATE TABLE facts_:id
   n_na_rownum INTEGER,
   n_r_c_ea_rownum INTEGER,
   n_r_c_rownum INTEGER,
-  n_r_c_na_rownum INTEGER
+  n_r_c_na_rownum INTEGER,
+  PRIMARY KEY(fid),
   -- check constraints
   CHECK(toplevel_corpus = :id)
 )
