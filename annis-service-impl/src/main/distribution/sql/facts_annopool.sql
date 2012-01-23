@@ -7,54 +7,50 @@ DROP TABLE IF EXISTS edge_anno_:id;
 -- NODE_ANNO --
 ---------------
 
-CREATE TABLE node_anno_:id
+CREATE TABLE annotation_pool_:id
 (
   CHECK(toplevel_corpus = :id)
 )
-INHERITS(node_anno);
+INHERITS(annotation_pool);
 
-INSERT INTO node_anno_:id(toplevel_corpus, namespace, "name", val, occurences)
+INSERT INTO annotation_pool_:id(toplevel_corpus, namespace, "name", val, "type", occurences)
 (
-  SELECT :id, namespace, "name", "value", count(*) as occurences
+  SELECT :id, namespace, "name", "value", 'node', count(*) as occurences
   FROM  _node_annotation
   GROUP BY namespace, "name", "value"
 );
 
 -- indexes on node annotations
-CREATE INDEX idx__node_anno_name__:id ON node_anno_:id (
+CREATE INDEX idx__node_annotation_pool_name__:id ON annotation_pool_:id (
   "name" varchar_pattern_ops, val varchar_pattern_ops
-);
-CREATE INDEX idx__node_anno_namespace__:id ON node_anno_:id (
+) WHERE "type" = 'node';
+CREATE INDEX idx__node_annotation_pool_namespace__:id ON annotation_pool_:id (
   namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
-);
-CREATE INDEX idx__node_anno_occurences__:id ON node_anno_:id (occurences);
+) WHERE "type" = 'node';
+CREATE INDEX idx__node_annotation_pool_occurences__:id ON annotation_pool_:id (occurences) 
+  WHERE "type" = 'node';
 
 ---------------
 -- EDGE_ANNO --
 ---------------
 
 
-CREATE TABLE edge_anno_:id
+INSERT INTO annotation_pool_:id(toplevel_corpus, namespace, "name", val, "type", occurences)
 (
-  CHECK(toplevel_corpus = :id)
-)
-INHERITS(edge_anno);
-
-INSERT INTO edge_anno_:id(toplevel_corpus, namespace, "name", val, occurences)
-(
-  SELECT :id, namespace, "name", "value", count(*) as occurences
+  SELECT :id, namespace, "name", "value", 'edge', count(*) as occurences
   FROM  _edge_annotation
   GROUP BY namespace, "name", "value"
 );
 
 -- indexes on edge annotations
-CREATE INDEX idx__edge_anno_name__:id ON edge_anno_:id (
+CREATE INDEX idx__edge_annotation_pool_name__:id ON annotation_pool_:id (
   "name" varchar_pattern_ops, val varchar_pattern_ops
-);
-CREATE INDEX idx__edge_anno_namespace__:id ON edge_anno_:id (
+) WHERE "type" = 'edge';
+CREATE INDEX idx__edge_annotation_pool_namespace__:id ON annotation_pool_:id (
   namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
-);
-CREATE INDEX idx__edge_anno_occurences__:id ON edge_anno_:id (occurences);
+) WHERE "type" = 'edge';
+CREATE INDEX idx__edge_annotation_pool_occurences__:id ON annotation_pool_:id (occurences)
+  WHERE "type" = 'edge';
 
 ------------
 -- FACTS --
@@ -100,8 +96,8 @@ INSERT INTO facts_:id
   edge_type,
   edge_namespace,
   edge_name,
-  node_anno,
-  edge_anno,
+  node_anno_ref,
+  edge_anno_ref,
   sample,
   n_rownum,
   n_na_rownum,
@@ -113,18 +109,18 @@ INSERT INTO facts_:id
 SELECT
   *,
   row_number() OVER (PARTITION BY id) AS n_rownum,
-  row_number() OVER (PARTITION BY id, node_anno) AS n_na_rownum,
+  row_number() OVER (PARTITION BY id, node_anno_ref) AS n_na_rownum,
   row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno) AS n_r_c_ea_rownum,
+                                  edge_anno_ref) AS n_r_c_ea_rownum,
   row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id) AS n_r_c_rownum,
   row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno) AS n_r_c_na_rownum
+                                  node_anno_ref) AS n_r_c_na_rownum
 FROM
 (
   SELECT
@@ -154,16 +150,18 @@ FROM
     _component.namespace AS edge_namespace,
     _component.name AS edge_name,
 
-    (SELECT id FROM node_anno_:id AS na 
+    (SELECT id FROM annotation_pool_:id AS na 
       WHERE na.namespace = _node_annotation.namespace
         AND na."name" = _node_annotation."name"
         AND na.val = _node_annotation."value"
-    ) AS node_anno,
-    (SELECT id FROM edge_anno_:id AS ea 
+        AND na."type" = 'node'
+    ) AS node_anno_ref,
+    (SELECT id FROM annotation_pool_:id AS ea 
       WHERE ea.namespace = _edge_annotation.namespace
         AND ea."name" = _edge_annotation."name"
         AND ea.val = _edge_annotation."value"
-    ) AS edge_anno,
+        AND ea."type" = 'edge'
+    ) AS edge_anno_ref,
 
     B'00000' AS sample
   FROM

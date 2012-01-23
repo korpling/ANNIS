@@ -202,14 +202,13 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
     switch (tableLayout)
     {
-      case ANNO_TABLE:
+      case ANNO_POOL:
 
-        
+
         TextMatching tm = annotation.getTextMatching();
-        
+
         StringBuilder sbFunc = new StringBuilder("get");
 
-        sbFunc.append(StringUtils.capitalize(StringUtils.removeEnd(table, "_annotation")));
         sbFunc.append("AnnoBy");
 
         List<String> params = new LinkedList<String>();
@@ -238,21 +237,25 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")
           + "]");
 
+        params.add("'"
+          + StringUtils.removeEnd(table, "_annotation").toLowerCase() + "'");
+
         sbFunc.append("(");
         sbFunc.append(StringUtils.join(params, ", "));
         sbFunc.append(")");
 
-        
-        String cond = 
-          tables(node).aliasedColumn(table, "anno", index)
+
+        String cond =
+          tables(node).aliasedColumn(table, "anno_ref", index)
           + "= ANY(" + sbFunc.toString() + ")";
-        
-        if(tm == TextMatching.EXACT_NOT_EQUAL || tm == TextMatching.REGEXP_NOT_EQUAL)
+
+        if (tm == TextMatching.EXACT_NOT_EQUAL || tm
+          == TextMatching.REGEXP_NOT_EQUAL)
         {
           cond = "NOT (" + cond + ")";
         }
         conditions.add(cond);
-        
+
         break;
       case FULLFACTS:
         if (annotation.getNamespace() != null)
@@ -685,7 +688,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       useComponentRefPredicateInCommonAncestorSubquery;
   }
 
-  
   public String getTableLayout()
   {
     return tableLayout.name().toLowerCase();

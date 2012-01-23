@@ -50,10 +50,8 @@ import annis.externalFiles.ExternalFileMgrDAO;
 import javax.activation.MimetypesFileTypeMap;
 
 /**
- * - Transaktionen
- * - Datenbank-Zugriffsrechte für verschiedene Methoden
- * - Reihenfolge der Aufrufe
- * - Skripte in $ANNIS_HOME/scripts
+ * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
+ * Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts
  */
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class SpringAnnisAdministrationDao
@@ -158,8 +156,9 @@ public class SpringAnnisAdministrationDao
 
   void createFunctionAnnoGetter()
   {
-    log.info("creating immutable functions for getting annotations");
-    executeSqlFromScript("functions_anno_get.sql");
+    log.info(
+      "creating immutable functions for getting annotations from the annotation pool");
+    executeSqlFromScript("functions_annopool_get.sql");
   }
 
   void createSchema(SchemeType type)
@@ -463,10 +462,10 @@ public class SpringAnnisAdministrationDao
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
-      log.debug("dropping node_anno table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS node_anno_" + l);
-      log.debug("dropping edge_anno table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS edge_anno_" + l);
+      log.debug("dropping annotation_pool table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS annotation_pool_" + l);
+      log.debug("dropping annotations table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS annotations_" + l);
 //      log.debug("dropping node annotation table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
 //      log.debug("dropping node table for corpus " + l);
@@ -657,10 +656,11 @@ public class SpringAnnisAdministrationDao
 
   /*
    * Returns the CREATE INDEX statement for all indexes on the Annis tables,
-   * that are not auto-created by PostgreSQL (primary keys and unique constraints).
-   * 
-   * @param used	If True, return used indexes.
-   * 				If False, return unused indexes (scan count is 0).
+   * that are not auto-created by PostgreSQL (primary keys and unique
+   * constraints).
+   *
+   * @param used	If True, return used indexes. If False, return unused indexes
+   * (scan count is 0).
    */
   public List<String> listIndexDefinitions(boolean used, List<String> tables)
   {

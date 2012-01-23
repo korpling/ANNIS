@@ -23,7 +23,7 @@ public enum SchemeType
 {
 
   FULLFACTS(FullFactsCorpusAdministration.class, "Full facts", "fullfacts"),
-  ANNO_TABLE(AnnoTableCorpusAdministration.class, "Annotation tables", "annotable");
+  ANNO_POOL(AnnoTableCorpusAdministration.class, "Annotation pool", "annopool");
   
   private final Class<? extends CorpusAdministration> adminClazz;
   private final String description;

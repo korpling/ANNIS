@@ -39,26 +39,17 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
+CREATE TYPE annotype AS ENUM ('node', 'edge');
 -- collect all node annotations
-CREATE TABLE node_anno (
+CREATE TABLE annotation_pool (
   id bigserial PRIMARY KEY,
   toplevel_corpus bigint REFERENCES corpus(id),
   namespace varchar(150),
   "name" varchar(150),
   val varchar(1500),
+  "type" annotype,
   occurences bigint,
-  UNIQUE(namespace, "name", val, toplevel_corpus)
-);
-
--- collect all node annotations
-CREATE TABLE edge_anno (
-  id bigserial PRIMARY KEY,
-  toplevel_corpus bigint REFERENCES corpus(id),
-  namespace varchar(150),
-  "name" varchar(150),
-  val varchar(1500),
-  occurences bigint,
-  UNIQUE(namespace, "name", val, toplevel_corpus)
+  UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
 
 CREATE TABLE facts (
@@ -86,8 +77,8 @@ CREATE TABLE facts (
   edge_type character(1), -- edge type of this component
   edge_namespace character varying(255), -- optional namespace of the edges’ names
   edge_name character varying(255), -- name of the edges in this component
-  node_anno bigint REFERENCES node_anno(id),
-  edge_anno bigint REFERENCES node_anno(id),
+  node_anno_ref bigint REFERENCES annotation_pool(id),
+  edge_anno_ref bigint REFERENCES annotation_pool(id),
   sample bit(5) -- Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]
 );
 

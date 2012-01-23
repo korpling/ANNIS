@@ -15,10 +15,12 @@
  */
 package annis.sqlgen;
 
+import annis.administration.SchemeType;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
@@ -32,7 +34,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -55,6 +56,7 @@ public abstract class AnnotateSqlGenerator<T>
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy factsTas;
   private boolean optimizeOverlap;
+  private SchemeType tableLayout;
 
   public static class AnnotateQueryData
   {
@@ -447,12 +449,27 @@ public abstract class AnnotateSqlGenerator<T>
     // corpus constriction
     sb.append(" AND\n");
     indent(sb, indent + TABSTOP);
-    sb.append(tables.aliasedColumn(TableAccessStrategy.CORPUS_TABLE, "id"));
+    sb.append(tables.aliasedColumn(CORPUS_TABLE, "id"));
     sb.append(" = ");
     sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
     HashSet<String> conditions = new HashSet<String>();
     conditions.add(sb.toString());
+    
+    if(tableLayout == SchemeType.ANNO_POOL)
+    {
+      for (int i = 1; i <= alternative.size(); ++i)
+      {
+        // join with node annotations
+        sb.append(" AND\n");
+        indent(sb, indent);
+        sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"));
+        sb.append(" = ");
+        sb.append(tables.aliasedColumn(ANNOTATION_POOL_TABLE, "id"));
+      }
+      
+    }
+    
     return conditions;
   }
 
@@ -531,11 +548,18 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(
       tableJoinsInFromClauseSqlGenerator.fromClauseForNode(null, true));
     sb.append(",\n");
-    // sb.append("facts AS facts");
 
     indent(sb, indent + TABSTOP);
     sb.append(TableAccessStrategy.CORPUS_TABLE);
+    
+    if(tableLayout == SchemeType.ANNO_POOL)
+    {
+      sb.append(", \n");
 
+      indent(sb, indent + TABSTOP);
+      sb.append(TableAccessStrategy.ANNOTATION_POOL_TABLE);
+    }
+    
     return sb.toString();
   }
 
@@ -574,5 +598,15 @@ public abstract class AnnotateSqlGenerator<T>
   public TableAccessStrategy getFactsTas()
   {
     return factsTas;
+  }
+  
+  public String getTableLayout()
+  {
+    return tableLayout.name().toLowerCase();
+  }
+
+  public void setTableLayout(String tableLayout)
+  {
+    this.tableLayout = SchemeType.valueOf(tableLayout.toUpperCase());
   }
 }
