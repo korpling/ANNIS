@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
 import javax.sql.DataSource;
+import org.apache.log4j.Logger;
 import org.postgresql.Driver;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,10 +102,10 @@ public abstract class CorpusAdministration
       getAdministrationDao().insertCorpus();
       getAdministrationDao().computeCorpusPath(corpusID);
       getAdministrationDao().createAnnotations(corpusID);
-      
+
       // create the new facts table partition
       getAdministrationDao().createFacts(corpusID, getSchemeType());
-      
+
       if (temporaryStagingArea)
       {
         getAdministrationDao().dropStagingArea();

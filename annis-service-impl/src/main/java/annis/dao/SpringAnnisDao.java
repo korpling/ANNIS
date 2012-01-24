@@ -15,28 +15,6 @@
  */
 package annis.dao;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
-
 import annis.model.Annotation;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
@@ -47,20 +25,26 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
-import annis.sqlgen.AOMAnnotateSqlGenerator;
-import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.CountSqlGenerator;
-import annis.sqlgen.FindSqlGenerator;
-import annis.sqlgen.ListAnnotationsSqlHelper;
-import annis.sqlgen.ByteHelper;
-import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
-import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.MatrixSqlGenerator;
-import annis.sqlgen.SaltAnnotateSqlGenerator;
-import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.*;
 import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
@@ -274,7 +258,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
     String documentName)
   {

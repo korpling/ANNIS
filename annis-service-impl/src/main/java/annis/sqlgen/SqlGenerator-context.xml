@@ -62,14 +62,14 @@ limitations under the License.
 
 	<!-- FROM clause generator -->
   <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator"
-         parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" />
 
   <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
-         parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" />
 
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
     <property name="optimizeIndirectPrecedence" value="${annis.optimize-indirect-precedence}" />
     <property name="allowIdenticalSibling" value="${annis.allow-identical-sibling}" />
     <property name="optimizeInclusion" value="${annis.optimize-inclusion}" />
@@ -81,13 +81,13 @@ limitations under the License.
   </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
-         parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" />
 
   <bean id="sampleWhereClause" class="annis.sqlgen.SampleWhereClause"
-         parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" />
 
   <bean id="metaDataAndCorpusWhereClauseGenerator" class="annis.sqlgen.MetaDataAndCorpusWhereClauseGenerator"
-         parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" />
 
   <util:map id="factsTableAliases">
     <entry key="node" value="facts" />
@@ -161,7 +161,7 @@ limitations under the License.
   <util:map id="emptyColumnAliases" />
 
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
-         scope="prototype">
+        scope="prototype">
 
     <property name="tableAliases" ref="factsTableAliases" />
     <property name="columnAliases" ref="factsColumnAliases" />
@@ -179,7 +179,7 @@ limitations under the License.
 	<!-- new -->
 
   <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
     <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
@@ -199,7 +199,7 @@ limitations under the License.
   </bean>
 
   <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
@@ -211,7 +211,7 @@ limitations under the License.
   </bean>
 
   <bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
@@ -237,11 +237,11 @@ limitations under the License.
   </bean>
 
   <bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AOMAnnotateSqlGenerator"
-         parent="annotateSqlGenerator">
+        parent="annotateSqlGenerator">
   </bean>
 
   <bean id="saltAnnotateSqlGenerator" class="annis.sqlgen.SaltAnnotateSqlGenerator"
-         parent="annotateSqlGenerator">
+        parent="annotateSqlGenerator">
   </bean>
 
   <util:list id="defaultFromClauseGenerators">
@@ -257,7 +257,7 @@ limitations under the License.
   </util:list>
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
 
@@ -268,7 +268,7 @@ limitations under the License.
   </bean>
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="selectClauseSqlGenerator" ref="countSqlGenerator" />
 
