@@ -15,7 +15,6 @@
  */
 package annis.administration;
 
-import annis.AnnisRunnerException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -24,10 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.apache.log4j.Logger;
 import org.postgresql.Driver;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
+import annis.AnnisRunnerException;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -38,7 +38,7 @@ public abstract class CorpusAdministration
 
   private Logger log = Logger.getLogger(this.getClass());
 
-  public CorpusAdministration()
+    public CorpusAdministration()
   {
   }
 
@@ -73,23 +73,27 @@ public abstract class CorpusAdministration
     getAdministrationDao().deleteCorpora(ids);
     log.info("Finished deleting corpora: " + ids);
   }
-
+  
+  
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword)
   {
+
     log.info("initializing database with schema "
       + getSchemeType().getDescription());
 
+    log.info("Creating Annis database and user.");
+
     // connect as super user to the default database to create new user and database
     getAdministrationDao().setDataSource(createDataSource(host, port,
-      defaultDatabase,
-      superUser, superPassword));
+      defaultDatabase, superUser, superPassword));
 
     getAdministrationDao().dropDatabase(database);
     getAdministrationDao().dropUser(user);
     getAdministrationDao().createUser(user, password);
     getAdministrationDao().createDatabase(database);
+
 
     // switch to new database, but still as super user to install stored procedure compute_rank_level
     getAdministrationDao().setDataSource(createDataSource(host, port, database,
@@ -99,47 +103,59 @@ public abstract class CorpusAdministration
 
     // switch to new database as new user for the rest
     getAdministrationDao().setDataSource(createDataSource(host, port, database,
-      user,
-      password));
+      user, password));
 
     getAdministrationDao().createSchema(getSchemeType());
-    getAdministrationDao().populateResolverTable();
+    getAdministrationDao().populateSchema();
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password);
   }
-  
+
   @Transactional(readOnly = false)
   public void importCorpora(boolean temporaryStagingArea,
     List<String> paths)
   {
+
     // import each corpus
     for (String path : paths)
     {
       log.info("Importing corpus from: " + path);
+
       getAdministrationDao().createStagingArea(temporaryStagingArea);
       getAdministrationDao().bulkImport(path);
       getAdministrationDao().computeTopLevelCorpus();
+
       long corpusID = getAdministrationDao().updateIds();
+
       getAdministrationDao().importBinaryData(path);
+
       getAdministrationDao().createStagingAreaIndexes();
       getAdministrationDao().analyzeStagingTables();
-      //			// finish transaction here to debug computation of left|right-token
-      //if (true) return;
+
+      // finish transaction here to debug computation of left|right-token
+      // if (true) return;
       getAdministrationDao().computeLeftTokenRightToken();
-      //      if (true) return;
+//      if (true) return;
       getAdministrationDao().computeRealRoot();
       getAdministrationDao().computeLevel();
       getAdministrationDao().computeCorpusStatistics();
       getAdministrationDao().updateCorpusStatsId(corpusID);
+
       getAdministrationDao().applyConstraints();
       getAdministrationDao().analyzeStagingTables();
+
       getAdministrationDao().insertCorpus();
+
       getAdministrationDao().computeCorpusPath(corpusID);
+
       getAdministrationDao().createAnnotations(corpusID);
 
       // create the new facts table partition
       getAdministrationDao().createFacts(corpusID, getSchemeType());
+      // the entries, which where here done, are possible after generating facts
+      getAdministrationDao().updateCorpusStatistic(corpusID);
+
 
       if (temporaryStagingArea)
       {
@@ -150,11 +166,13 @@ public abstract class CorpusAdministration
     }
   }
 
-  
+
   public void importCorpora(boolean temporaryStagingArea, String... paths)
   {
     importCorpora(temporaryStagingArea, Arrays.asList(paths));
   }
+
+
 
   public List<Map<String, Object>> listCorpusStats()
   {
@@ -166,15 +184,16 @@ public abstract class CorpusAdministration
     return getAdministrationDao().listTableStats();
   }
 
+  public List<String> listUsedIndexes()
+  {
+    return getAdministrationDao().listUsedIndexes();
+  }
+
   public List<String> listUnusedIndexes()
   {
     return getAdministrationDao().listUnusedIndexes();
   }
 
-  public List<String> listUsedIndexes()
-  {
-    return getAdministrationDao().listUsedIndexes();
-  }
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
@@ -201,6 +220,7 @@ public abstract class CorpusAdministration
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }
 
+
   ///// Getter / Setter
   public abstract SpringAnnisAdministrationDao getAdministrationDao();
 
@@ -208,4 +228,5 @@ public abstract class CorpusAdministration
     SpringAnnisAdministrationDao administrationDao);
 
   public abstract SchemeType getSchemeType();
+
 }

@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ *(int to = 0; to < 10; to++) 
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,8 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import annis.externalFiles.ExternalFileMgrDAO;
 import javax.activation.MimetypesFileTypeMap;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
@@ -87,12 +90,14 @@ public class SpringAnnisAdministrationDao
     "corpus", "corpus_annotation",
     "text",
     FILE_RESOLVER_VIS_MAP,
-    "corpus_stats"
+    "corpus_stats",
+    "media_files"
   };
   // tables created during import
   private String[] createdTables =
   {
-    "corpus_stats"
+    "corpus_stats",
+    "media_files"
   };
 
   ///// Subtasks of creating the database
@@ -154,6 +159,7 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("unique_toplevel_corpus_name.sql");
   }
 
+
   void createFunctionAnnoGetter()
   {
     log.info(
@@ -166,10 +172,10 @@ public class SpringAnnisAdministrationDao
     log.info("creating Annis database schema (" + type.getDescription() + ")");
     executeSqlFromScript("schema_" + type.getScriptAppendix() + ".sql");
   }
-
-  void populateResolverTable()
+  
+  void populateSchema()
   {
-    log.info("populating resolver table with default information");
+    log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
     // update the sequence
@@ -241,17 +247,48 @@ public class SpringAnnisAdministrationDao
 
     // search for annotations that have binary data
     String selectSql =
-      "SELECT DISTINCT value FROM _node_annotation WHERE value ~ :extFileRegExp";
-    SqlParameterSource selectArgs = makeArgs().addValue("extFileRegExp",
-      extFileRegExp);
-    List<String> list = simpleJdbcTemplate.query(selectSql, stringRowMapper(),
-      selectArgs);
+      "SELECT DISTINCT value, corpus_ref FROM _node, _node_annotation WHERE value LIKE "
+      + "'[ExtFile]%'" + " AND node_ref = id";
 
-    for (String externalData : list)
+    /* we need the value and the corpus_ref of the media_file, so the first 
+     * value of the String array is the name of the file and the second is the 
+     * corpus_ref */
+    List<String[]> list = simpleJdbcTemplate.getJdbcOperations().query(
+      selectSql,
+      new ResultSetExtractor<List<String[]>>()
+      {
+
+        @Override
+        public List<String[]> extractData(ResultSet rs) throws SQLException,
+          DataAccessException
+        {
+          ArrayList<String[]> result = new ArrayList<String[]>();
+          while (rs.next())
+          {
+            String[] tmp =
+            {
+              rs.getString("value"), rs.getString("corpus_ref")
+            };
+            result.add(tmp);
+          }
+          return result;
+        }
+      });
+
+    for (String[] externalData : list)
     {
+      assert externalData.length > 1;
       // get rid of marker
-      String filename = externalData.replaceFirst(extFilePattern, "");
+      String filename = externalData[0].replaceFirst(extFilePattern, "");
 
+      log.info("import " + filename + " to staging area");
+      PreparedStatementCallbackImpl preStat = new PreparedStatementCallbackImpl(path
+        + "/ExtData/" + filename, externalData[1]);
+      String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
+
+      simpleJdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
+
+      /* this code is for the old ExternalFileServlet and can be deleted */
       // copy file to extData directory
       File file = new File(filename);
       try
@@ -267,6 +304,7 @@ public class SpringAnnisAdministrationDao
         throw new FileAccessException(e);
       }
 
+
       // store reference in database
       // XXX: mp3 mime type hard-coded
       String name = file.getName();
@@ -281,10 +319,9 @@ public class SpringAnnisAdministrationDao
       String updateValueSql =
         "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
       SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue(
-        "externalData", externalData);
+        "externalData", externalData[0]);
       simpleJdbcTemplate.update(updateValueSql, updateArgs);
     }
-
   }
 
   void computeLeftTokenRightToken()
@@ -311,6 +348,13 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("corpus_stats.sql");
   }
 
+  void updateCorpusStatistic(long corpusId)
+  {
+    log.info("updating statistics for top-level corpus");
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusId);
+    executeSqlFromScript("corpus_stats_upd.sql", args);
+  }
+
   void computeCorpusPath(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
@@ -326,7 +370,19 @@ public class SpringAnnisAdministrationDao
   long updateIds()
   {
     log.info("updating IDs in staging area");
-    executeSqlFromScript("update_ids.sql");
+
+    int numOfEntries = jdbcOperations.queryForInt(
+      "SELECT COUNT(*) from corpus_stats");
+
+    if (numOfEntries > 0)
+    {
+      long recentCorpusId = jdbcOperations.queryForLong(
+        "SELECT max(id) FROM corpus_stats");      
+      log.info("the id from recently imported corpus:" + recentCorpusId);
+      MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
+      executeSqlFromScript("update_ids.sql", args);
+    }
+
     log.info("query for the new corpus ID");
     long result = jdbcOperations.queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
@@ -353,9 +409,12 @@ public class SpringAnnisAdministrationDao
     {
       int numOfEntries = jdbcOperations.queryForInt("SELECT COUNT(*) from "
         + tableInStagingArea(table));
+
+
       if (numOfEntries > 0)
       {
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
+
         if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
         {
           sql.append("INSERT INTO ");
@@ -364,14 +423,14 @@ public class SpringAnnisAdministrationDao
           sql.append(
             "(corpus, version, namespace, element, vis_type, display_name, \"order\", mappings)");
           sql.append(" (SELECT * FROM ");
-          sql.append(tableInStagingArea(table) + ")");
+          sql.append(tableInStagingArea(table)).append(")");
         }
         else
         {
           sql.append("INSERT INTO ");
           sql.append(table);
           sql.append(" (SELECT * FROM ");
-          sql.append(tableInStagingArea(table) + ")");
+          sql.append(tableInStagingArea(table)).append(")");
         }
         jdbcOperations.execute(sql.toString());
       }
@@ -459,7 +518,6 @@ public class SpringAnnisAdministrationDao
 
   void deleteCorpora(List<Long> ids)
   {
-
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
@@ -470,7 +528,7 @@ public class SpringAnnisAdministrationDao
       jdbcOperations.execute("DROP TABLE IF EXISTS annotations_" + l);
 //      log.debug("dropping node annotation table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
-//      log.debug("dropping node table for corpus " + l);
+//      log.debug("dropping node table for corpus " + l);//			
 //      jdbcOperations.execute("DROP TABLE node_" + l);
     }
 
@@ -531,6 +589,8 @@ public class SpringAnnisAdministrationDao
   private MapSqlParameterSource makeArgs()
   {
     return new MapSqlParameterSource();
+
+
   }
 
   private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
@@ -580,6 +640,8 @@ public class SpringAnnisAdministrationDao
         try
         {
           reader.close();
+
+
         }
         catch (IOException ex)
         {

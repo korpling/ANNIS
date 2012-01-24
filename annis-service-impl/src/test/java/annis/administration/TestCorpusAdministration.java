@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 
+
 public class TestCorpusAdministration
 {
 
@@ -142,10 +143,13 @@ public class TestCorpusAdministration
     inOrder.verify(administrationDao).createAnnotations(corpusID);
 
     // the facts child table must be created
+
     inOrder.verify(administrationDao).createFacts(corpusID, type);
 
-    // drop the staging area
-    inOrder.verify(administrationDao).dropStagingArea();
+    inOrder.verify(administrationDao).updateCorpusStatistic(corpusID);
+
+    // drop the staging area is not necessary, because we have no staging area in this test
+    // inOrder.verify(administrationDao).dropStagingArea();
 
     // analyze facts table
     inOrder.verify(administrationDao).analyzeFacts(corpusID);

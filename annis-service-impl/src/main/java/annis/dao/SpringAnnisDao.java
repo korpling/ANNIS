@@ -15,20 +15,6 @@
  */
 package annis.dao;
 
-import annis.model.Annotation;
-import annis.ql.node.Start;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryAnalysis;
-import annis.ql.parser.QueryData;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisCorpus;
-import annis.sqlgen.*;
-import annis.utils.Utils;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +32,31 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
+import annis.model.Annotation;
+import annis.ql.node.Start;
+import annis.ql.parser.AnnisParser;
+import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.QueryData;
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
+import annis.service.ifaces.AnnisAttribute;
+import annis.service.ifaces.AnnisBinary;
+import annis.service.ifaces.AnnisCorpus;
+import annis.sqlgen.AomAnnotateSqlGenerator;
+import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.CountSqlGenerator;
+import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.ListAnnotationsSqlHelper;
+import annis.sqlgen.ByteHelper;
+import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
+import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.MatrixSqlGenerator;
+import annis.sqlgen.SaltAnnotateSqlGenerator;
+import annis.sqlgen.SqlGenerator;
+import annis.utils.Utils;
+import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
@@ -54,7 +65,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
   private CountSqlGenerator countSqlGenerator;
-  private AOMAnnotateSqlGenerator aomAnnotateSqlGenerator;
+  private AomAnnotateSqlGenerator aomAnnotateSqlGenerator;
   private SaltAnnotateSqlGenerator saltAnnotateSqlGenerator;
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
@@ -560,13 +571,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public AOMAnnotateSqlGenerator getAomAnnotateSqlGenerator()
+  public AomAnnotateSqlGenerator getAomAnnotateSqlGenerator()
   {
     return aomAnnotateSqlGenerator;
   }
 
   public void setAomAnnotateSqlGenerator(
-    AOMAnnotateSqlGenerator aomAnnotateSqlGenerator)
+    AomAnnotateSqlGenerator aomAnnotateSqlGenerator)
   {
     this.aomAnnotateSqlGenerator = aomAnnotateSqlGenerator;
   }
@@ -631,7 +642,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnisBinary getBinary(String corpusName, int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(
-      corpusName,
-      offset, length), byteHelper);
+      corpusName, offset, length), byteHelper);
   }
 }
