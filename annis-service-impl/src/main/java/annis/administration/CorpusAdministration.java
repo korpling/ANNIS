@@ -112,7 +112,7 @@ public class CorpusAdministration
       // create the new facts table partition
       administrationDao.createFacts(corpusID);
       // the entries, which where here done, are possible after generating facts
-      administrationDao.updateCorpusStatistic(corpusID);
+      administrationDao.updateCorpusStatistic();
 
 
       if (temporaryStagingArea)

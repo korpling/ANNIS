@@ -342,11 +342,10 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("corpus_stats.sql");
   }
 
-  void updateCorpusStatistic(long corpusId)
+  void updateCorpusStatistic()
   {
     log.info("updating statistics for top-level corpus");
-    MapSqlParameterSource args = makeArgs().addValue(":id", corpusId);
-    executeSqlFromScript("corpus_stats_upd.sql", args);
+    executeSqlFromScript("corpus_stats_upd.sql");
   }
 
   void computeCorpusPath(long corpusID)
