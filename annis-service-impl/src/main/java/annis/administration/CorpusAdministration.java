@@ -74,6 +74,41 @@ public abstract class CorpusAdministration
     log.info("Finished deleting corpora: " + ids);
   }
 
+  public void initializeDatabase(String host, String port, String database,
+    String user, String password, String defaultDatabase, String superUser,
+    String superPassword)
+  {
+    log.info("initializing database with schema "
+      + getSchemeType().getDescription());
+
+    // connect as super user to the default database to create new user and database
+    getAdministrationDao().setDataSource(createDataSource(host, port,
+      defaultDatabase,
+      superUser, superPassword));
+
+    getAdministrationDao().dropDatabase(database);
+    getAdministrationDao().dropUser(user);
+    getAdministrationDao().createUser(user, password);
+    getAdministrationDao().createDatabase(database);
+
+    // switch to new database, but still as super user to install stored procedure compute_rank_level
+    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+      superUser, superPassword));
+    getAdministrationDao().installPlPgSql();
+    getAdministrationDao().createFunctionUniqueToplevelCorpusName();
+
+    // switch to new database as new user for the rest
+    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+      user,
+      password));
+
+    getAdministrationDao().createSchema(getSchemeType());
+    getAdministrationDao().populateResolverTable();
+
+    // write database information to property file
+    writeDatabasePropertiesFile(host, port, database, user, password);
+  }
+  
   @Transactional(readOnly = false)
   public void importCorpora(boolean temporaryStagingArea,
     List<String> paths)
@@ -115,41 +150,7 @@ public abstract class CorpusAdministration
     }
   }
 
-  public void initializeDatabase(String host, String port, String database,
-    String user, String password, String defaultDatabase, String superUser,
-    String superPassword)
-  {
-    log.info("initializing database with schema "
-      + getSchemeType().getDescription());
-
-    // connect as super user to the default database to create new user and database
-    getAdministrationDao().setDataSource(createDataSource(host, port,
-      defaultDatabase,
-      superUser, superPassword));
-
-    getAdministrationDao().dropDatabase(database);
-    getAdministrationDao().dropUser(user);
-    getAdministrationDao().createUser(user, password);
-    getAdministrationDao().createDatabase(database);
-
-    // switch to new database, but still as super user to install stored procedure compute_rank_level
-    getAdministrationDao().setDataSource(createDataSource(host, port, database,
-      superUser, superPassword));
-    getAdministrationDao().installPlPgSql();
-    getAdministrationDao().createFunctionUniqueToplevelCorpusName();
-
-    // switch to new database as new user for the rest
-    getAdministrationDao().setDataSource(createDataSource(host, port, database,
-      user,
-      password));
-
-    getAdministrationDao().createSchema(getSchemeType());
-    getAdministrationDao().populateResolverTable();
-
-    // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password);
-  }
-
+  
   public void importCorpora(boolean temporaryStagingArea, String... paths)
   {
     importCorpora(temporaryStagingArea, Arrays.asList(paths));
