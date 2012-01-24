@@ -225,13 +225,19 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         }
         if (annotation.getValue() != null)
         {
-          params.add("'" + annotation.getValue() + "'");
+
           sbFunc.append("Val");
-        }
-        if (tm == TextMatching.REGEXP_EQUAL
-          || tm == TextMatching.REGEXP_NOT_EQUAL)
-        {
-          sbFunc.append("Regex");
+
+          if (tm == TextMatching.REGEXP_EQUAL
+            || tm == TextMatching.REGEXP_NOT_EQUAL)
+          {
+            sbFunc.append("Regex");
+            params.add("'^" + annotation.getValue() + "$'");
+          }
+          else
+          {
+            params.add("'" + annotation.getValue() + "'");
+          }
         }
 
         params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")

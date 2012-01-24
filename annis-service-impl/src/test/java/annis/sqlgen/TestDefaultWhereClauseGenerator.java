@@ -224,10 +224,8 @@ public class TestDefaultWhereClauseGenerator
         join("=", "_rank23.pre", "_rank42.parent"));
     checkWhereConditions(
         node42,
-        join("=", "_rank_annotation42.edge_annotation_namespace",
-            "'namespace3'"),
-        join("=", "_rank_annotation42.edge_annotation_name", "'name3'"),
-        join("~", "_rank_annotation42.edge_annotation_value", "'^value3$'"));
+        "_rank_annotation42.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^value3$', ARRAY[], 'edge'))"
+    );
   }
 
   /**
@@ -611,14 +609,10 @@ public class TestDefaultWhereClauseGenerator
     node23.addNodeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     checkWhereConditions(
-        join("=", "_annotation23_1.node_annotation_namespace", "'namespace1'"),
-        join("=", "_annotation23_1.node_annotation_name", "'name1'"),
-        join("=", "_annotation23_2.node_annotation_namespace", "'namespace2'"),
-        join("=", "_annotation23_2.node_annotation_name", "'name2'"),
-        join("=", "_annotation23_2.node_annotation_value", "'value2'"),
-        join("=", "_annotation23_3.node_annotation_namespace", "'namespace3'"),
-        join("=", "_annotation23_3.node_annotation_name", "'name3'"),
-        join("~", "_annotation23_3.node_annotation_value", "'^value3$'"));
+      "_annotation23_1.anno_ref= ANY(getAnnoByNamespaceName('namespace1', 'name1', ARRAY[], 'node'))",
+      "_annotation23_2.anno_ref= ANY(getAnnoByNamespaceNameVal('namespace2', 'name2', 'value2', ARRAY[], 'node'))",
+      "_annotation23_3.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^value3$', ARRAY[], 'node'))"
+    );
   }
 
   // WHERE condition for node annotation
@@ -631,17 +625,10 @@ public class TestDefaultWhereClauseGenerator
     node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     checkWhereConditions(
-        join("=", "_rank_annotation23_1.edge_annotation_namespace",
-            "'namespace1'"),
-        join("=", "_rank_annotation23_1.edge_annotation_name", "'name1'"),
-        join("=", "_rank_annotation23_2.edge_annotation_namespace",
-            "'namespace2'"),
-        join("=", "_rank_annotation23_2.edge_annotation_name", "'name2'"),
-        join("=", "_rank_annotation23_2.edge_annotation_value", "'value2'"),
-        join("=", "_rank_annotation23_3.edge_annotation_namespace",
-            "'namespace3'"),
-        join("=", "_rank_annotation23_3.edge_annotation_name", "'name3'"),
-        join("~", "_rank_annotation23_3.edge_annotation_value", "'^value3$'"));
+      "_rank_annotation23_1.anno_ref= ANY(getAnnoByNamespaceName('namespace1', 'name1', ARRAY[], 'edge'))",
+      "_rank_annotation23_2.anno_ref= ANY(getAnnoByNamespaceNameVal('namespace2', 'name2', 'value2', ARRAY[], 'edge'))",
+      "_rank_annotation23_3.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^value3$', ARRAY[], 'edge'))"
+    );
   }
 
   // WHERE condition for _=_
