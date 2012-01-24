@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -51,7 +50,6 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
-import annis.sqlgen.AomAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
@@ -64,16 +62,14 @@ import org.eclipse.emf.common.util.URI;
 public class AnnisRunner extends AnnisBaseRunner
 {
 
-	// logging
-	private Logger log = Logger.getLogger(this.getClass());
-
-	// SQL generators for query functions
-	private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
-	private SqlGenerator<QueryData, Integer> countSqlGenerator;
-	private SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator;
-	private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
-
-	// dependencies
+  // logging
+  private Logger log = Logger.getLogger(this.getClass());
+  // SQL generators for query functions
+  private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
+  private SqlGenerator<QueryData, Integer> countSqlGenerator;
+  private SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator;
+  private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
+  // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
   // map Annis queries to DDDquery
@@ -84,60 +80,64 @@ public class AnnisRunner extends AnnisBaseRunner
   private int matchLimit;
   private boolean isDDDQueryMode;
   private QueryAnalysis queryAnalysis;
+  // settings
+  private int limit;
+  private int offset;
+  private int left;
+  private int right;
+  private List<Long> corpusList;
+  private boolean clearCaches;
 
-	// settings
-	private int limit;
-	private int offset;
-	private int left;
-	private int right;
-	private List<Long> corpusList;
-	private boolean clearCaches;
-  
-	  public enum OS
-	  {
+  public enum OS
+  {
 
-	    linux,
-	    other
-	  }
+    linux,
+    other
+  }
 
-	  // benchmarking
-	private static class Benchmark {
-		private String functionCall;
-		private QueryData queryData;
-		private long avgTimeInMilliseconds;
-		private long bestTimeInMilliseconds;
-		private String sql;
-		private String plan;
-		private int runs;
-		private int errors;
-		
-		public Benchmark(String functionCall, QueryData queryData) {
-			super();
-			this.functionCall = functionCall;
-			this.queryData = queryData;
-		}
-		
-	}
-	private List<Benchmark> benchmarks;
-	private static final int SEQUENTIAL_RUNS = 5;
-  
+  // benchmarking
+  private static class Benchmark
+  {
+
+    private String functionCall;
+    private QueryData queryData;
+    private long avgTimeInMilliseconds;
+    private long bestTimeInMilliseconds;
+    private long worstTimeInMilliseconds;
+    private String sql;
+    private String plan;
+    private int runs;
+    private int errors;
+
+    public Benchmark(String functionCall, QueryData queryData)
+    {
+      super();
+      this.functionCall = functionCall;
+      this.queryData = queryData;
+    }
+  }
+  private List<AnnisRunner.Benchmark> benchmarks;
+  private static final int SEQUENTIAL_RUNS = 5;
+
   public static void main(String[] args)
   {
     // get runner from Spring
-    AnnisBaseRunner.getInstance("annisRunner", "annis/AnnisRunner-context.xml").run(args);
+    AnnisBaseRunner.getInstance("annisRunner", "annis/AnnisRunner-context.xml").
+      run(args);
   }
 
   public AnnisRunner()
   {
     corpusList = new LinkedList<Long>();
-	benchmarks = new ArrayList<Benchmark>();
+    benchmarks = new ArrayList<AnnisRunner.Benchmark>();
     isDDDQueryMode = false;
   }
 
   // switch between AQL as input mode and DDDQuery
   public void doLanguage(String newLanguage)
   {
-    if("ddd".equalsIgnoreCase(newLanguage) || "dddquery".equalsIgnoreCase(newLanguage))
+    if ("ddd".equalsIgnoreCase(newLanguage) || "dddquery".equalsIgnoreCase(
+      newLanguage))
     {
       isDDDQueryMode = true;
       System.out.println("new input language is DDDQuery");
@@ -166,15 +166,15 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Map<String, List<String>> output = new HashMap<String, List<String>>();
 
-    if(fInput.exists())
+    if (fInput.exists())
     {
       try
       {
         String[] content = FileUtils.readFileToString(fInput).split("\n");
 
-        for(String query : content)
+        for (String query : content)
         {
-          if(query.trim().length() > 0)
+          if (query.trim().length() > 0)
           {
             Map<String, Set<String>> map = proposedIndexHelper(query.trim());
             for (Map.Entry<String, Set<String>> t : map.entrySet())
@@ -195,15 +195,15 @@ public class AnnisRunner extends AnnisBaseRunner
             }
           }
         }
-        
-        for (Entry<String,List<String>> entry: output.entrySet())
+
+        for (Entry<String, List<String>> entry : output.entrySet())
         {
           File fOutput = new File(entry.getKey() + "_attributes.csv");
           FileUtils.writeLines(fOutput, entry.getValue());
         }
 
       }
-      catch(IOException ex)
+      catch (IOException ex)
       {
         log.warn("Problem reading queries.txt", ex);
       }
@@ -238,300 +238,452 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println(sql);
   }
 
-	// FIXME: missing tests
-	public void doSql(String functionCall) {
-		SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(functionCall);
-		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-		QueryData queryData = analyzeQuery(annisQuery, null);
-		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+  // FIXME: missing tests
+  public void doSql(String functionCall)
+  {
+    SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
+      functionCall);
+    String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+    QueryData queryData = analyzeQuery(annisQuery, null);
+    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
+      + limit + "; offset = " + offset);
 
-		out.println(generator.toSql(queryData));
-	}
-	
-	public void doExplain(String functionCall, boolean analyze) {
-		SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(functionCall);
-		String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-		QueryData queryData = analyzeQuery(annisQuery, null);
-		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
+    out.println(generator.toSql(queryData));
+  }
 
-		out.println(annisDao.explain(generator, queryData, analyze));
-	}
-  
-	public void doPlan(String functionCall) {
-		doExplain(functionCall, false);
-	}
-	
-	public void doAnalyze(String functionCall) {
-		doExplain(functionCall, true);
-	}
-	
-	private SqlGenerator<QueryData,?> getGeneratorForQueryFunction(String functionCall) {
-		String[] split = functionCall.split(" ", 2);
-		
-		Validate.isTrue(split.length == 2, "bad call to plan");
-		String function = split[0];
+  public void doExplain(String functionCall, boolean analyze)
+  {
+    SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
+      functionCall);
+    String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
+    QueryData queryData = analyzeQuery(annisQuery, null);
+    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
+      + limit + "; offset = " + offset);
 
-		SqlGenerator<QueryData,?> generator = null;
-		if ("count".equals(function))
-			generator = countSqlGenerator;
-		if ("find".equals(function))
-			generator = findSqlGenerator;
-		if ("annotate".equals(function))
-			generator = annotateSqlGenerator;
-		if ("matrix".equals(function))
-			generator = matrixSqlGenerator;
-		Validate.notNull(generator, "don't now query function: " + function);
-		
-		return generator;
-	}
+    out.println(annisDao.explain(generator, queryData, analyze));
+  }
 
-	private String getAnnisQueryFromFunctionCall(String functionCall) {
-		String[] split = functionCall.split(" ", 2);
-		
-		Validate.isTrue(split.length == 2, "bad call to plan");
-		return split[1];
-	}
+  public void doPlan(String functionCall)
+  {
+    doExplain(functionCall, false);
+  }
 
-	public void doRecord(String dummy) {
-		out.println("recording new benchmark session");
-		benchmarks.clear();
-	}
-	
-	public void doBenchmark(String benchmarkCount) {
-		int count = Integer.parseInt(benchmarkCount);
-		out.println("---> executing " + benchmarks.size() + " queries " + count + " times");
+  public void doAnalyze(String functionCall)
+  {
+    doExplain(functionCall, true);
+  }
 
-		OS currentOS = OS.other;
-		try {
-			currentOS = OS.valueOf(System.getProperty("os.name").toLowerCase());
-		} catch (IllegalArgumentException ex) {
-		}
-		if (clearCaches) {
-			resetCaches(currentOS);
-		}
+  private SqlGenerator<QueryData, ?> getGeneratorForQueryFunction(
+    String functionCall)
+  {
+    String[] split = functionCall.split(" ", 2);
 
-        List<Benchmark> session = new ArrayList<Benchmark>();
-		
-		// create sql + plan for each query and create count copies for each benchmark
-		for (Benchmark benchmark : benchmarks) {
-			SqlGenerator<QueryData,?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
-			benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).toSql(benchmark.queryData);
-			out.println("---> SQL query for: " + benchmark.functionCall);
-			out.println(benchmark.sql);
-			try {
-				benchmark.plan = annisDao.explain(generator, benchmark.queryData, true);
-				out.println("---> query plan for: " + benchmark.functionCall);
-				out.println(benchmark.plan);
-			} catch (RuntimeException e) { // nested DataAccessException would be better
-				out.println("---> query plan failed for " + benchmark.functionCall);
-			}
-			benchmark.bestTimeInMilliseconds = Long.MAX_VALUE;
-			out.println("---> running query sequentially " + SEQUENTIAL_RUNS + " times");
-			String options = benchmarkOptions(benchmark.queryData);
-			for (int i = 0; i < SEQUENTIAL_RUNS; ++i) {
-				if (i > 0)
-					out.print(", ");
-				long start = new Date().getTime();
-				try {
-					annisDao.executeQueryFunction(benchmark.queryData, generator);
-				} catch (RuntimeException e) {
-					// don't care
-				}
-				long end = new Date().getTime();
-				long runtime = end - start;
-				benchmark.bestTimeInMilliseconds = Math.min(benchmark.bestTimeInMilliseconds, end - start);
-				out.print(runtime + " ms");
-			}
-			out.println();
-			out.println(benchmark.bestTimeInMilliseconds + " ms best time for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
-			session.addAll(Collections.nCopies(count, benchmark));
-		}
-		
-		// shuffle the benchmark queries
-		Collections.shuffle(session);
-		out.println();
-		out.println("---> running queries in random order");
-		
-		// execute the queries, record test times
-		for (Benchmark benchmark : session) {
-			if (benchmark.errors >= 3)
-				continue;
-			boolean error = false;
-			SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(benchmark.functionCall);
-			long start = new Date().getTime();
-			try {
-				annisDao.executeQueryFunction(benchmark.queryData, generator);
-			} catch (RuntimeException e) {
-				error = true;
-			}
-			long end = new Date().getTime();
-			long runtime = end - start;
-			benchmark.avgTimeInMilliseconds += runtime;
-			++benchmark.runs;
-			if (error)
-				++benchmark.errors;
-			String options = benchmarkOptions(benchmark.queryData);
-			out.println(runtime + " ms for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options) + (error ? " ERROR" : ""));
-		}
-		
-		// compute average runtime for each query
-		out.println();
-		out.println("---> benchmark complete");
-		for (Benchmark benchmark : benchmarks) {
-			benchmark.avgTimeInMilliseconds = Math.round(benchmark.avgTimeInMilliseconds / benchmark.runs);
-			String options = benchmarkOptions(benchmark.queryData);
-			out.println(benchmark.avgTimeInMilliseconds + " ms (avg for " + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", " + benchmark.errors + " errors)" : ")") + " for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
-		}
+    Validate.isTrue(split.length == 2, "bad call to plan");
+    String function = split[0];
 
-		// compute average runtime for each query
-		out.println();
-		out.println("---> best times");
-		for (Benchmark benchmark : benchmarks) {
-			String options = benchmarkOptions(benchmark.queryData);
-			out.println(benchmark.bestTimeInMilliseconds + " ms (avg for " + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", " + benchmark.errors + " errors)" : ")") + " for '" + benchmark.functionCall + ("".equals(options) ? "'" : "' with " + options));
-		}
-		out.println();
-	}
-	
-	public String benchmarkOptions(QueryData queryData) {
-		List<Long> corpusList = queryData.getCorpusList();
-		List<QueryAnnotation> metaData = queryData.getMetaData();
-		Set<Object> extensions = queryData.getExtensions();
-		List<String> fields = new ArrayList<String>();
-		if (! corpusList.isEmpty() )
-			fields.add("corpus = " + corpusList);
-		if (! metaData.isEmpty() )
-			fields.add("meta = " + metaData);
-		for (Object extension : extensions) {
-			String toString = extension.toString();
-			if (! "".equals(toString) )
-				fields.add(toString);
-		}
-		return StringUtils.join(fields, ", ");
-	}
-	
-	  private void resetCaches(OS currentOS)
-	  {
-	    switch(currentOS)
-	    {
-	      case linux:
-	        try
-	        {
-	          log.info("resetting caches");
-	          log.debug("syncing");
-	          Runtime.getRuntime().exec("sync").waitFor();
-	          File dropCaches = new File("/proc/sys/vm/drop_caches");
-	          if(dropCaches.canWrite())
-	          {
-	            log.debug("clearing file system cache");
-	            Writer w = new FileWriter(dropCaches);
-	            w.write("3");
-	            w.close();
-	          }
-	          else
-	          {
-	            log.warn("Cannot clear file system cache of the operating system");
-	          }
-	          
-	          File postgresScript = new File("/etc/init.d/postgresql");
-	          if(postgresScript.exists() && postgresScript.isFile())
-	          {
-	            log.debug("restarting postgresql");
-	            Runtime.getRuntime().exec(postgresScript.getAbsolutePath() + " restart")
-	              .waitFor();
-	          }
-	          else
-	          {
-	            log.warn("Cannot restart postgresql");
-	          }
-	          
-	        }
-	        catch(Exception ex)
-	        {
-	          log.error( null, ex);
-	        }
+    SqlGenerator<QueryData, ?> generator = null;
+    if ("count".equals(function))
+    {
+      generator = countSqlGenerator;
+    }
+    if ("find".equals(function))
+    {
+      generator = findSqlGenerator;
+    }
+    if ("annotate".equals(function))
+    {
+      generator = annotateSqlGenerator;
+    }
+    if ("matrix".equals(function))
+    {
+      generator = matrixSqlGenerator;
+    }
+    Validate.notNull(generator, "don't now query function: " + function);
 
-	        break;
-	      default:
-	        log.warn("Cannot reset cache on this operating system");
-	    }
-	  }
+    return generator;
+  }
 
-	public void doSet(String callToSet) {
-		String[] split = callToSet.split(" ", 3);
-		Validate.isTrue(split.length > 0, "syntax error: set " + callToSet);
-		
-		String setting = split[0];
-		String value = null;
-		
-		boolean show = split.length == 1 && setting.startsWith("?");
-		if (show)
-			setting = setting.substring(1);
-		else {
-			Validate.isTrue(split.length == 3 && "TO".toLowerCase().equals(split[1]), "syntax error: set " + callToSet);
-			value = split[2];
-		}
-		
-		if ("limit".equals(setting)) {
-			if (show)
-				value = String.valueOf(limit);
-			else
-				limit = Integer.parseInt(value);
-		}
-		else if ("offset".equals(setting)) {
-			if (show)
-				value = String.valueOf(offset);
-			else
-				offset = Integer.parseInt(value);
-		} else if ("left".equals(setting)) {
-			if (show)
-				value = String.valueOf(left);
-			else
-				left = Integer.parseInt(value);
-		} else if ("right".equals(setting)) {
-			if (show)
-				value = String.valueOf(right);
-			else
-				right = Integer.parseInt(value);
-		} else if ("context".equals(setting)) {
-			if (show) {
-				if (left != right) 
-					value = "(left != right)";
-				else
-					value = String.valueOf(left);
-			} else {
-				left = Integer.parseInt(value);
-				right = left;
-			}
-		} else if ("timeout".equals(setting)) {
-			if (show)
-				value = String.valueOf(annisDao.getTimeout());
-			else
-				annisDao.setTimeout(Integer.parseInt(value));
-		} else if ("clear-caches".equals(setting)) {
-			if (show) {
-				value = String.valueOf(clearCaches);
-			} else {
-				clearCaches = Boolean.parseBoolean(value);
-			}
-		} else if ("corpus-list".equals(setting)) {
-			corpusList.clear();
-			if ( ! "all".equals(value) ) {
-				String[] list = value.split(" ");
-				for (String corpus : list)
-					corpusList.add(Long.parseLong(corpus));
-			}
-		} else {
-			out.println("ERROR: unknown option: " + setting);
-		}
+  private String getAnnisQueryFromFunctionCall(String functionCall)
+  {
+    String[] split = functionCall.split(" ", 2);
 
-		out.println(setting + ": " + value);
-	}
-	
-	public void doShow(String setting) {
-		doSet("?" + setting);
-	}
-  
+    Validate.isTrue(split.length == 2, "bad call to plan");
+    return split[1];
+  }
+
+  public void doRecord(String dummy)
+  {
+    out.println("recording new benchmark session");
+    benchmarks.clear();
+  }
+
+  public void doBenchmark(String benchmarkCount)
+  {
+    int count = Integer.parseInt(benchmarkCount);
+    out.println("---> executing " + benchmarks.size() + " queries " + count
+      + " times");
+
+    AnnisRunner.OS currentOS = AnnisRunner.OS.other;
+    try
+    {
+      currentOS = AnnisRunner.OS.valueOf(System.getProperty("os.name").
+        toLowerCase());
+    }
+    catch (IllegalArgumentException ex)
+    {
+    }
+
+    List<AnnisRunner.Benchmark> session = new ArrayList<AnnisRunner.Benchmark>();
+
+    // create sql + plan for each query and create count copies for each benchmark
+    for (AnnisRunner.Benchmark benchmark : benchmarks)
+    {
+      if (clearCaches)
+      {
+        resetCaches(currentOS);
+      }
+
+      SqlGenerator<QueryData, ?> generator =
+        getGeneratorForQueryFunction(benchmark.functionCall);
+      benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).toSql(
+        benchmark.queryData);
+      out.println("---> SQL query for: " + benchmark.functionCall);
+      out.println(benchmark.sql);
+      try
+      {
+        benchmark.plan = annisDao.explain(generator, benchmark.queryData, false);
+        out.println("---> query plan for: " + benchmark.functionCall);
+        out.println(benchmark.plan);
+      }
+      catch (RuntimeException e)
+      { // nested DataAccessException would be better
+        out.println("---> query plan failed for " + benchmark.functionCall);
+      }
+      benchmark.bestTimeInMilliseconds = Long.MAX_VALUE;
+      benchmark.worstTimeInMilliseconds = Long.MIN_VALUE;
+      out.println("---> running query sequentially " + SEQUENTIAL_RUNS
+        + " times");
+      String options = benchmarkOptions(benchmark.queryData);
+      for (int i = 0; i < SEQUENTIAL_RUNS; ++i)
+      {
+        if (i > 0)
+        {
+          out.print(", ");
+        }
+        long start = new Date().getTime();
+        try
+        {
+          annisDao.executeQueryFunction(benchmark.queryData, generator);
+        }
+        catch (RuntimeException e)
+        {
+          // don't care
+        }
+        long end = new Date().getTime();
+        long runtime = end - start;
+        benchmark.bestTimeInMilliseconds =
+          Math.min(benchmark.bestTimeInMilliseconds, runtime);
+        benchmark.worstTimeInMilliseconds =
+          Math.max(benchmark.worstTimeInMilliseconds, runtime);
+        out.print(runtime + " ms");
+      }
+      out.println();
+      out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
+        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
+        + options));
+      session.addAll(Collections.nCopies(count, benchmark));
+    }
+
+    // clear cache again in order to treat the last query in the list equal to 
+    // the others
+    if (clearCaches)
+    {
+      resetCaches(currentOS);
+    }
+    
+    // shuffle the benchmark queries
+    Collections.shuffle(session);
+    out.println();
+    out.println("---> running queries in random order");
+
+    // execute the queries, record test times
+    for (AnnisRunner.Benchmark benchmark : session)
+    {
+      if (benchmark.errors >= 3)
+      {
+        continue;
+      }
+      boolean error = false;
+      SqlGenerator<QueryData, ?> generator =
+        getGeneratorForQueryFunction(benchmark.functionCall);
+      long start = new Date().getTime();
+      try
+      {
+        annisDao.executeQueryFunction(benchmark.queryData, generator);
+      }
+      catch (RuntimeException e)
+      {
+        error = true;
+      }
+      long end = new Date().getTime();
+      long runtime = end - start;
+      benchmark.avgTimeInMilliseconds += runtime;
+      ++benchmark.runs;
+      if (error)
+      {
+        ++benchmark.errors;
+      }
+      String options = benchmarkOptions(benchmark.queryData);
+      out.println(runtime + " ms for '" + benchmark.functionCall + ("".equals(
+        options) ? "'" : "' with " + options) + (error ? " ERROR" : ""));
+    }
+
+    // compute average runtime for each query
+    out.println();
+    out.println("---> benchmark complete");
+    for (AnnisRunner.Benchmark benchmark : benchmarks)
+    {
+      benchmark.avgTimeInMilliseconds = Math.round(benchmark.avgTimeInMilliseconds
+        / benchmark.runs);
+      String options = benchmarkOptions(benchmark.queryData);
+      out.println(benchmark.avgTimeInMilliseconds + " ms (avg for "
+        + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
+        + benchmark.errors + " errors)" : ")") + " for '"
+        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
+        + options));
+    }
+
+
+    // show best runtime for each query
+    out.println();
+    out.println("---> worst times");
+    for (AnnisRunner.Benchmark benchmark : benchmarks)
+    {
+      String options = benchmarkOptions(benchmark.queryData);
+      out.println(benchmark.worstTimeInMilliseconds + " ms ("
+        + (benchmark.errors > 0 ? "?"
+        + benchmark.errors + " errors)" : ")") + " for '"
+        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
+        + options));
+    }
+
+    // show best runtime for each query
+    out.println();
+    out.println("---> best times");
+    for (AnnisRunner.Benchmark benchmark : benchmarks)
+    {
+      String options = benchmarkOptions(benchmark.queryData);
+      out.println(benchmark.bestTimeInMilliseconds + " ms ("
+        + (benchmark.errors > 0 ? "?"
+        + benchmark.errors + " errors)" : ")") + " for '"
+        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
+        + options));
+    }
+    out.println();
+  }
+
+  public String benchmarkOptions(QueryData queryData)
+  {
+    List<Long> corpusList = queryData.getCorpusList();
+    List<QueryAnnotation> metaData = queryData.getMetaData();
+    Set<Object> extensions = queryData.getExtensions();
+    List<String> fields = new ArrayList<String>();
+    if (!corpusList.isEmpty())
+    {
+      fields.add("corpus = " + corpusList);
+    }
+    if (!metaData.isEmpty())
+    {
+      fields.add("meta = " + metaData);
+    }
+    for (Object extension : extensions)
+    {
+      String toString = extension.toString();
+      if (!"".equals(toString))
+      {
+        fields.add(toString);
+      }
+    }
+    return StringUtils.join(fields, ", ");
+  }
+
+  private void resetCaches(AnnisRunner.OS currentOS)
+  {
+    switch (currentOS)
+    {
+      case linux:
+        try
+        {
+          log.info("resetting caches");
+          log.debug("syncing");
+          Runtime.getRuntime().exec("sync").waitFor();
+          File dropCaches = new File("/proc/sys/vm/drop_caches");
+          if (dropCaches.canWrite())
+          {
+            log.debug("clearing file system cache");
+            Writer w = new FileWriter(dropCaches);
+            w.write("3");
+            w.close();
+          }
+          else
+          {
+            log.warn("Cannot clear file system cache of the operating system");
+          }
+
+          File postgresScript = new File("/etc/init.d/postgresql");
+          if (postgresScript.exists() && postgresScript.isFile())
+          {
+            log.debug("restarting postgresql");
+            Runtime.getRuntime().exec(postgresScript.getAbsolutePath()
+              + " restart").waitFor();
+          }
+          else
+          {
+            log.warn("Cannot restart postgresql");
+          }
+
+        }
+        catch (Exception ex)
+        {
+          log.error(null, ex);
+        }
+
+        break;
+      default:
+        log.warn("Cannot reset cache on this operating system");
+    }
+  }
+
+  public void doSet(String callToSet)
+  {
+    String[] split = callToSet.split(" ", 3);
+    Validate.isTrue(split.length > 0, "syntax error: set " + callToSet);
+
+    String setting = split[0];
+    String value = null;
+
+    boolean show = split.length == 1 && setting.startsWith("?");
+    if (show)
+    {
+      setting = setting.substring(1);
+    }
+    else
+    {
+      Validate.isTrue(split.length == 3 && "TO".toLowerCase().equals(split[1]), "syntax error: set "
+        + callToSet);
+      value = split[2];
+    }
+
+    if ("limit".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(limit);
+      }
+      else
+      {
+        limit = Integer.parseInt(value);
+      }
+    }
+    else if ("offset".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(offset);
+      }
+      else
+      {
+        offset = Integer.parseInt(value);
+      }
+    }
+    else if ("left".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(left);
+      }
+      else
+      {
+        left = Integer.parseInt(value);
+      }
+    }
+    else if ("right".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(right);
+      }
+      else
+      {
+        right = Integer.parseInt(value);
+      }
+    }
+    else if ("context".equals(setting))
+    {
+      if (show)
+      {
+        if (left != right)
+        {
+          value = "(left != right)";
+        }
+        else
+        {
+          value = String.valueOf(left);
+        }
+      }
+      else
+      {
+        left = Integer.parseInt(value);
+        right = left;
+      }
+    }
+    else if ("timeout".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(annisDao.getTimeout());
+      }
+      else
+      {
+        annisDao.setTimeout(Integer.parseInt(value));
+      }
+    }
+    else if ("clear-caches".equals(setting))
+    {
+      if (show)
+      {
+        value = String.valueOf(clearCaches);
+      }
+      else
+      {
+        clearCaches = Boolean.parseBoolean(value);
+      }
+    }
+    else if ("corpus-list".equals(setting))
+    {
+      corpusList.clear();
+      if (!"all".equals(value))
+      {
+        String[] list = value.split(" ");
+        for (String corpus : list)
+        {
+          corpusList.add(Long.parseLong(corpus));
+        }
+      }
+    }
+    else
+    {
+      out.println("ERROR: unknown option: " + setting);
+    }
+
+    out.println(setting + ": " + value);
+  }
+
+  public void doShow(String setting)
+  {
+    doSet("?" + setting);
+  }
+
   public void doSqlMatrix(String annisQuery)
   {
     // sql query
@@ -549,26 +701,31 @@ public class AnnisRunner extends AnnisBaseRunner
       + ";");
   }
 
-	private QueryData analyzeQuery(String annisQuery, String queryFunction) {
-		QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
-		queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-		queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
-		if (annisQuery != null)
-			benchmarks.add(new Benchmark(queryFunction + " " + annisQuery, queryData));
-		out.println("NOTICE: corpus = " + queryData.getCorpusList());
-		return queryData;
-	}
-	
+  private QueryData analyzeQuery(String annisQuery, String queryFunction)
+  {
+    QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+    queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
+    queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
+    if (annisQuery != null)
+    {
+      benchmarks.add(new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
+        queryData));
+    }
+    out.println("NOTICE: corpus = " + queryData.getCorpusList());
+    return queryData;
+  }
+
   public void doCount(String annisQuery)
   {
-	  out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+    out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
   }
-  
+
   public void doMatrix(String annisQuery)
   {
 //	    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
-	    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery, "matrix"));
-    if(matches.isEmpty())
+    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
+      "matrix"));
+    if (matches.isEmpty())
     {
       out.println("(empty");
     }
@@ -579,26 +736,27 @@ public class AnnisRunner extends AnnisBaseRunner
     }
   }
 
-	public void doFind(String annisQuery) {
-		List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
-		printAsTable(matches);
-	}
-  
+  public void doFind(String annisQuery)
+  {
+    List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
+    printAsTable(matches);
+  }
 
   public void doAnnotate(String annisQuery)
   {
-		QueryData queryData = analyzeQuery(annisQuery, "annotate");
-		out.println("NOTICE: left = " + left + "; right = " + right + "; limit = " + limit + "; offset = " + offset);
-		SaltProject result = annisDao.annotate(queryData);
-      
-      List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
-      
-      URI uri = URI.createFileURI("/tmp/annissalt");
-      result.saveSaltProject_DOT(uri);
-      
+    QueryData queryData = analyzeQuery(annisQuery, "annotate");
+    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
+      + limit + "; offset = " + offset);
+    SaltProject result = annisDao.annotate(queryData);
 
-      //		out.println("Returned " + graphs.size() + " annotations graphs.");
-		// FIXME: annotations graphen visualisieren
+    List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
+
+    URI uri = URI.createFileURI("/tmp/annissalt");
+    result.saveSaltProject_DOT(uri);
+
+
+    //		out.println("Returned " + graphs.size() + " annotations graphs.");
+    // FIXME: annotations graphen visualisieren
 //    printAsTable(graphs, "nodes", "edges");
   }
 
@@ -606,13 +764,13 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     corpusList = new LinkedList<Long>();
     String[] splits = StringUtils.split(list, " ");
-    for(String split : splits)
+    for (String split : splits)
     {
       try
       {
         corpusList.add(Long.parseLong(split));
       }
-      catch(NumberFormatException e)
+      catch (NumberFormatException e)
       {
         // check if there is a corpus with this name
         LinkedList<String> splitList = new LinkedList<String>();
@@ -621,7 +779,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
     }
 
-    if(corpusList.isEmpty())
+    if (corpusList.isEmpty())
     {
       setPrompt("no corpus>");
     }
@@ -648,7 +806,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.parseLong(corpusId));
+    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.
+      parseLong(corpusId));
     printAsTable(corpusAnnotations, "namespace", "name", "value");
   }
 
@@ -674,7 +833,7 @@ public class AnnisRunner extends AnnisBaseRunner
     String strAQL = qdAQL.toString();
     String strDDD = qdDDD.toString();
 
-    if(strAQL.equals(strDDD))
+    if (strAQL.equals(strDDD))
     {
       System.out.println(strAQL);
       System.out.println("both are equal");
@@ -712,16 +871,17 @@ public class AnnisRunner extends AnnisBaseRunner
     // extract WHERE clause
 
     Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
-    if(mWhere.find())
+    if (mWhere.find())
     {
       String whereClause = sql.substring(mWhere.end());
       //out.println("WHERE clause:\n" + whereClause);
 
-      for(String table : result.keySet())
+      for (String table : result.keySet())
       {
         Set<String> attr = result.get(table);
-        Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").matcher(whereClause);
-        while(mFacts.find())
+        Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").
+          matcher(whereClause);
+        while (mFacts.find())
         {
           attr.add(mFacts.group(1).trim());
         }
@@ -748,7 +908,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private QueryData parse(String input)
   {
-    if(isDDDQueryMode)
+    if (isDDDQueryMode)
     {
       return annisDao.parseDDDQuery(input, getCorpusList());
     }
@@ -839,46 +999,57 @@ public class AnnisRunner extends AnnisBaseRunner
     this.matchLimit = matchLimit;
   }
 
-public QueryAnalysis getQueryAnalysis() {
-	return queryAnalysis;
-}
+  public QueryAnalysis getQueryAnalysis()
+  {
+    return queryAnalysis;
+  }
 
-public void setQueryAnalysis(QueryAnalysis queryAnalysis) {
-	this.queryAnalysis = queryAnalysis;
-}
+  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
+  {
+    this.queryAnalysis = queryAnalysis;
+  }
 
-public SqlGenerator<QueryData, Integer> getCountSqlGenerator() {
-	return countSqlGenerator;
-}
+  public SqlGenerator<QueryData, Integer> getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
 
-public void setCountSqlGenerator(SqlGenerator<QueryData, Integer> countSqlGenerator) {
-	this.countSqlGenerator = countSqlGenerator;
-}
+  public void setCountSqlGenerator(
+    SqlGenerator<QueryData, Integer> countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
+  }
 
-public SqlGenerator<QueryData, List<AnnotationGraph>> getAnnotateSqlGenerator() {
-	return annotateSqlGenerator;
-}
+  public SqlGenerator<QueryData, List<AnnotationGraph>> getAnnotateSqlGenerator()
+  {
+    return annotateSqlGenerator;
+  }
 
-public void setAnnotateSqlGenerator(
-		SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator) {
-	this.annotateSqlGenerator = annotateSqlGenerator;
-}
+  public void setAnnotateSqlGenerator(
+    SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator)
+  {
+    this.annotateSqlGenerator = annotateSqlGenerator;
+  }
 
-public SqlGenerator<QueryData, List<Match>> getFindSqlGenerator() {
-	return findSqlGenerator;
-}
+  public SqlGenerator<QueryData, List<Match>> getFindSqlGenerator()
+  {
+    return findSqlGenerator;
+  }
 
-public void setFindSqlGenerator(SqlGenerator<QueryData, List<Match>> findSqlGenerator) {
-	this.findSqlGenerator = findSqlGenerator;
-}
+  public void setFindSqlGenerator(
+    SqlGenerator<QueryData, List<Match>> findSqlGenerator)
+  {
+    this.findSqlGenerator = findSqlGenerator;
+  }
 
-public SqlGenerator<QueryData, List<AnnotatedMatch>> getMatrixSqlGenerator() {
-	return matrixSqlGenerator;
-}
+  public SqlGenerator<QueryData, List<AnnotatedMatch>> getMatrixSqlGenerator()
+  {
+    return matrixSqlGenerator;
+  }
 
-public void setMatrixSqlGenerator(
-		SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator) {
-	this.matrixSqlGenerator = matrixSqlGenerator;
-}
-
+  public void setMatrixSqlGenerator(
+    SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator)
+  {
+    this.matrixSqlGenerator = matrixSqlGenerator;
+  }
 }
