@@ -395,7 +395,17 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       }
       for (SFeature feat : from.getSFeatures())
       {
-        to.addSFeature(feat);
+        // filter the features, do not include salt::SNAME 
+        if (
+            !(
+            SaltFactory.SALT_CORE_NAMESPACE.equals(feat.getSNS())
+            && SaltFactory.SALT_CORE_SFEATURES.SNAME.toString().equals(feat.
+            getSName())
+            )
+          )
+        {
+          to.addSFeature(feat);
+        }
       }
       for (SProcessingAnnotation proc : from.getSProcessingAnnotations())
       {
