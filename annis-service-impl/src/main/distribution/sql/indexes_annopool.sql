@@ -6,29 +6,25 @@ BEGIN; -- transaction
 CREATE INDEX idx__facts_component_id__:id
   ON facts_:id
   USING btree
-  (component_id);
+  (component_id, corpus_ref);
 
-CREATE INDEX idx__facts_continuous__:id
-  ON facts_:id
-  USING btree
-  (continuous);
 
 CREATE INDEX idx__facts_edge_name__:id
   ON facts_:id
   USING btree
-  (edge_name varchar_pattern_ops);
+  (edge_name varchar_pattern_ops, corpus_ref);
 
 
 CREATE INDEX idx__facts_edge_namespace__:id
   ON facts_:id
   USING btree
-  (edge_namespace varchar_pattern_ops);
+  (edge_namespace varchar_pattern_ops, corpus_ref);
 
 
 CREATE INDEX idx__facts_edge_type__:id
   ON facts_:id
   USING btree
-  (edge_type);
+  (edge_type, corpus_ref);
 
 
 CREATE INDEX idx__facts_id__:id
@@ -39,91 +35,116 @@ CREATE INDEX idx__facts_id__:id
 CREATE INDEX idx__facts_is_token__:id
   ON facts_:id
   USING btree
-  (is_token);
+  (is_token, corpus_ref);
+
+CREATE INDEX idx__facts_is_token2__:id
+  ON facts_:id
+  USING btree
+  (is_token, text_ref);
 
 
 CREATE INDEX idx__facts_left__:id
   ON facts_:id
   USING btree
-  ("left");
+  ("left", text_ref);
 
 
 CREATE INDEX idx__facts_left_token__:id
   ON facts_:id
   USING btree
-  (left_token);
+  (left_token, text_ref);
 
 
 CREATE INDEX idx__facts_level__:id
   ON facts_:id
   USING btree
-  ("level");
+  ("level", corpus_ref);
 
 CREATE INDEX idx__facts_node_anno__:id
   ON facts_:id
   USING btree
-  (node_anno_ref);
+  (node_anno_ref, corpus_ref);
+
+CREATE INDEX idx__facts_node_anno2__:id
+  ON facts_:id
+  USING btree
+  (node_anno_ref, text_ref);
 
 CREATE INDEX idx__facts_edge_annotation__:id
   ON facts_:id
   USING btree
-  (edge_anno_ref);
+  (edge_anno_ref, corpus_ref);
 
 CREATE INDEX idx__facts_node_name__:id
   ON facts_:id
   USING btree
-  (node_name varchar_pattern_ops);
+  (node_name varchar_pattern_ops, corpus_ref);
+
+CREATE INDEX idx__facts_node_name2__:id
+  ON facts_:id
+  USING btree
+  (node_name varchar_pattern_ops, text_ref);
 
 
 CREATE INDEX idx__facts_node_namespace__:id
   ON facts_:id
   USING btree
-  (node_namespace varchar_pattern_ops);
+  (node_namespace varchar_pattern_ops, corpus_ref);
+
+CREATE INDEX idx__facts_node_namespace2__:id
+  ON facts_:id
+  USING btree
+  (node_namespace varchar_pattern_ops, text_ref);
 
 
 CREATE INDEX idx__facts_parent__:id
   ON facts_:id
   USING btree
-  (parent);
+  (parent, corpus_ref);
 
 
 CREATE INDEX idx__facts_post__:id
   ON facts_:id
   USING btree
-  (post);
+  (post, corpus_ref);
 
 
 CREATE INDEX idx__facts_pre__:id
   ON facts_:id
   USING btree
-  (pre);
+  (pre, corpus_ref);
 
 CREATE INDEX idx__facts_right__:id
   ON facts_:id
   USING btree
-  ("right");
+  ("right", text_ref);
 
 
 CREATE INDEX idx__facts_right_token__:id
   ON facts_:id
   USING btree
-  (right_token);
+  (right_token, text_ref);
 
 CREATE INDEX idx__facts_root__:id
   ON facts_:id
   USING btree
-  (root);
+  (root, corpus_ref);
 
 CREATE INDEX idx__facts_span__:id
   ON facts_:id
   USING btree
-  (span varchar_pattern_ops);
+  (span varchar_pattern_ops, corpus_ref);
+
+CREATE INDEX idx__facts_span2__:id
+  ON facts_:id
+  USING btree
+  (span varchar_pattern_ops, text_ref);
 
 
 CREATE INDEX idx__facts_token_index__:id
   ON facts_:id
   USING btree
-  (token_index);
+  (token_index, text_ref);
 
 CREATE INDEX idx__facts_corpus_ref_index__:id
   ON facts_:id

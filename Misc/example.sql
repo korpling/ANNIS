@@ -1,4 +1,4 @@
-﻿-- count pos="ART" & pos="NN" & pos="VAPP" & #1 . #2 & #2 .1,30 #3
+-- count pos="ART" & pos="NN" & pos="VAPP" & #1 . #2 & #2 .1,30 #3
 
 SELECT 
   count(*)

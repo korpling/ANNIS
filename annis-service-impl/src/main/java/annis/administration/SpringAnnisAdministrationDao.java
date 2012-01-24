@@ -423,6 +423,8 @@ public class SpringAnnisAdministrationDao
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
+    jdbcOperations.execute("ALTER TABLE facts_" + corpusID + " ALTER node_anno_ref SET STATISTICS 2000");
+    jdbcOperations.execute("ALTER TABLE facts_" + corpusID + " ALTER edge_anno_ref SET STATISTICS 2000");
     jdbcOperations.execute("ANALYZE facts_" + corpusID);
   }
 
