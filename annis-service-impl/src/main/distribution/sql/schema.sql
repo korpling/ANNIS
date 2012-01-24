@@ -186,7 +186,14 @@ CREATE TABLE corpus_stats
   u_edges        bigint,
   avg_level      real,
   avg_children    real,
-  avg_duplicates    real
+  avg_duplicates  real,
+  max_corpus_id bigint  NULL,
+  max_corpus_pre bigint NULL,
+  max_corpus_post bigint NULL,
+  max_text_id bigint NULL,
+  max_rank_post bigint NULL,
+  max_component_id bigint NULL,
+  max_node_id bigint NULL
 );
 
 CREATE VIEW corpus_info AS SELECT 

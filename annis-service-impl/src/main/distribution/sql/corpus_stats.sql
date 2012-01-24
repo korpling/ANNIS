@@ -62,5 +62,19 @@ CREATE TABLE _corpus_stats AS SELECT
 	) AS avg_children,
 
     -- avg duplicates in rank per node
-    (SELECT avg(count - 1) FROM (SELECT count(pre) FROM _rank GROUP BY node_ref) t) AS avg_duplicates
+    (SELECT avg(count - 1) FROM (SELECT count(pre) FROM _rank GROUP BY node_ref) t) AS avg_duplicates,
+
+    -- max corpus id
+    (SELECT max(id) + 1 FROM _corpus) AS max_corpus_id,
+
+    -- max corpus pre
+    (SELECT max(pre) + 1 FROM _corpus) AS max_corpus_pre,
+
+    -- max corpus post
+    (SELECT max(post) + 1 FROM _corpus) AS max_corpus_post,
+
+    -- max text id
+    (SELECT max(id) + 1 FROM _text) AS max_text_id
+
+    -- the last values where copied in corpus_stats_upd.sql    
 ;

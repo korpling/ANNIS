@@ -91,8 +91,8 @@ public class CorpusAdministration
       administrationDao.createStagingAreaIndexes();
       administrationDao.analyzeStagingTables();
 
-//			// finish transaction here to debug computation of left|right-token
-      //if (true) return;
+      // finish transaction here to debug computation of left|right-token
+      // if (true) return;
       administrationDao.computeLeftTokenRightToken();
 //      if (true) return;
       administrationDao.computeRealRoot();
@@ -111,6 +111,8 @@ public class CorpusAdministration
 
       // create the new facts table partition
       administrationDao.createFacts(corpusID);
+      // the entries, which where here done, are possible after generating facts
+      administrationDao.updateCorpusStatistic(corpusID);
 
 
       if (temporaryStagingArea)

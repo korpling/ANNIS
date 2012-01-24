@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ *(int to = 0; to < 10; to++) 
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -342,6 +342,13 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("corpus_stats.sql");
   }
 
+  void updateCorpusStatistic(long corpusId)
+  {
+    log.info("updating statistics for top-level corpus");
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusId);
+    executeSqlFromScript("corpus_stats_upd.sql", args);
+  }
+
   void computeCorpusPath(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
@@ -357,7 +364,19 @@ public class SpringAnnisAdministrationDao
   long updateIds()
   {
     log.info("updating IDs in staging area");
-    executeSqlFromScript("update_ids.sql");
+
+    int numOfEntries = jdbcOperations.queryForInt(
+      "SELECT COUNT(*) from corpus_stats");
+
+    if (numOfEntries > 0)
+    {
+      long recentCorpusId = jdbcOperations.queryForLong(
+        "SELECT max(id) FROM corpus_stats");      
+      log.info("the id from recently imported corpus:" + recentCorpusId);
+      MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
+      executeSqlFromScript("update_ids.sql", args);
+    }
+
     log.info("query for the new corpus ID");
     long result = jdbcOperations.queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
@@ -506,7 +525,7 @@ public class SpringAnnisAdministrationDao
       jdbcOperations.execute("DROP TABLE facts_" + l);
 //      log.debug("dropping node annotation table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
-//      log.debug("dropping node table for corpus " + l);
+//      log.debug("dropping node table for corpus " + l);//			
 //      jdbcOperations.execute("DROP TABLE node_" + l);
     }
 
@@ -562,6 +581,8 @@ public class SpringAnnisAdministrationDao
   private MapSqlParameterSource makeArgs()
   {
     return new MapSqlParameterSource();
+
+
   }
 
   private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
@@ -611,6 +632,8 @@ public class SpringAnnisAdministrationDao
         try
         {
           reader.close();
+
+
         }
         catch (IOException ex)
         {
