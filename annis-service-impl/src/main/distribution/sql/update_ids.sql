@@ -17,7 +17,7 @@ SET
  id = id + (SELECT max_node_id FROM corpus_stats WHERE id = :id),
  text_ref = text_ref + (SELECT  max_text_id FROM corpus_stats WHERE id = :id),
  corpus_ref = corpus_ref + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id),
- toplevel_corpus = toplevel_corpus + (SELECT id FROM corpus_stats WHERE id = :id);
+ toplevel_corpus = toplevel_corpus + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id);
     
 UPDATE _text SET id = id + (SELECT  max_text_id FROM corpus_stats WHERE id = :id);
     

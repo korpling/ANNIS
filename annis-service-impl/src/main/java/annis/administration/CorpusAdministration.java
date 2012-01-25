@@ -154,7 +154,7 @@ public abstract class CorpusAdministration
       // create the new facts table partition
       getAdministrationDao().createFacts(corpusID, getSchemeType());
       // the entries, which where here done, are possible after generating facts
-      getAdministrationDao().updateCorpusStatistic(corpusID);
+      getAdministrationDao().updateCorpusStatistic();
 
 
       if (temporaryStagingArea)
