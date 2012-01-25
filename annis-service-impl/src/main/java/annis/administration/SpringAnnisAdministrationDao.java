@@ -482,9 +482,7 @@ public class SpringAnnisAdministrationDao
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
-    jdbcOperations.execute("ALTER TABLE facts_" + corpusID + " ALTER node_anno_ref SET STATISTICS 2000");
-    jdbcOperations.execute("ALTER TABLE facts_" + corpusID + " ALTER edge_anno_ref SET STATISTICS 2000");
-    jdbcOperations.execute("ANALYZE facts_" + corpusID);
+    jdbcOperations.execute("VACUUM ANALYZE facts_" + corpusID);
   }
 
   void createFacts(long corpusID, SchemeType type)
@@ -499,10 +497,13 @@ public class SpringAnnisAdministrationDao
       + corpusID);
     executeSqlFromScript("update_facts.sql", args);
 
-    log.info("clustering materialized facts table for corpus with ID "
-      + corpusID);
-    executeSqlFromScript("cluster.sql", args);
-
+    if(type == SchemeType.FULLFACTS)
+    {
+      log.info("clustering materialized facts table for corpus with ID "
+        + corpusID);
+      executeSqlFromScript("cluster.sql", args);
+    }
+    
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript("indexes_" + type.getScriptAppendix() + ".sql", args);
 
