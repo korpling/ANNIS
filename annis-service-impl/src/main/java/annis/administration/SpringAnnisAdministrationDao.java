@@ -481,7 +481,7 @@ public class SpringAnnisAdministrationDao
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
-    jdbcOperations.execute("VACUUM ANALYZE facts_" + corpusID);
+    jdbcOperations.execute("ANALYZE facts_" + corpusID);
   }
 
   void createFacts(long corpusID, SchemeType type)
