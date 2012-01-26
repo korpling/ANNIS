@@ -266,8 +266,8 @@ public abstract class AnnotateSqlGenerator<T>
         + "\tfacts AS facts, corpus as c, annotation_pool as node_anno, annotation_pool as edge_anno\n"
         + "WHERE\n"
         + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-        + "\tAND node_anno.id = facts.node_anno_ref\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref\n"
+        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.\"type\" = 'node'\n"
+        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.\"type\" = 'edge'\n"
         + "ORDER BY facts.pre";
       String sql = template.replace(":text_id", String.valueOf(textID));
       return sql;
@@ -315,8 +315,8 @@ public abstract class AnnotateSqlGenerator<T>
         + "WHERE\n"
         + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
         + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.toplevel_corpus = toplevel.id\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.toplevel_corpus = toplevel.id\n"
+        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.\"type\" = 'node' AND node_anno.toplevel_corpus = toplevel.id\n"
+        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.\"type\" = 'edge' AND edge_anno.toplevel_corpus = toplevel.id\n"
         + "ORDER BY facts.pre";
       String sql = template.replace(":toplevel_name", String.valueOf(
         toplevelCorpusName)).replace(":document_name", documentName);
@@ -558,11 +558,17 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"));
       sb.append(" = node_anno.id");
       sb.append(" AND\n");
+      indent(sb, indent + TABSTOP);
+      sb.append(" node_anno.\"type\" = 'node'");
+      sb.append(" AND\n");
       // join with edge annotations
       indent(sb, indent + TABSTOP);
       sb.append(tables.aliasedColumn(EDGE_ANNOTATION_TABLE, "anno_ref"));
       sb.append(" = edge_anno.id AND\n");
-
+      indent(sb, indent + TABSTOP);
+      sb.append(" edge_anno.\"type\" = 'edge'");
+      sb.append(" AND\n");
+      
       // restrict toplevel corpus
       indent(sb, indent + TABSTOP);
       sb.append("node_anno.toplevel_corpus IN (");

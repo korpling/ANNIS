@@ -151,8 +151,6 @@ public class TestCorpusAdministration
     // drop the staging area is not necessary, because we have no staging area in this test
     inOrder.verify(administrationDao).dropStagingArea();
 
-    inOrder.verify(administrationDao).updateCorpusStatistic();
-
     // analyze facts table
     inOrder.verify(administrationDao).analyzeFacts(corpusID);
 
