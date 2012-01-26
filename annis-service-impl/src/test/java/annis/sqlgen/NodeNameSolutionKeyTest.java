@@ -22,11 +22,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class TestAnnisKey
+public class NodeNameSolutionKeyTest
 {
 
   // class under test
-  private AnnisKey key = new AnnisKey();
+  private SolutionKey<List<String>> key = new NodeNameSolutionKey();
   
   // test data
   @Mock private TableAccessStrategy tableAccessStrategy;
@@ -221,4 +221,23 @@ public class TestAnnisKey
     assertThat(key.getMatchedNodeIndex(uniqueString()), is(nullValue()));
   }
   
+  /**
+   * The string representation is the node names concatenated with ","
+   */
+  @Test
+  public void shouldCreateStringRepresentationOfKey() throws SQLException
+  {
+    // given
+    String key1 = uniqueString(3);
+    String key2 = uniqueString(3);
+    String key3 = uniqueString(3);
+    Array array = createKeyJdbcArray(key1, key2, key3);
+    given(resultSet.getArray("key_names")).willReturn(array);
+    // when
+    key.retrieveKey(resultSet);
+    String actual = key.getCurrentKeyAsString();
+    // then
+    String expected = key1 + "," + key2 + "," + key3;
+    assertThat(actual, is(expected));
+  }
 }

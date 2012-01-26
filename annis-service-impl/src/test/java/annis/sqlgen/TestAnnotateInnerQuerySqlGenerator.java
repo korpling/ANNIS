@@ -38,7 +38,7 @@ public class TestAnnotateInnerQuerySqlGenerator
 
   // dependencies
   @Mock private TableAccessStrategy tableAccessStrategy; 
-  @Mock private AnnisKey key;
+  @Mock private SolutionKey key;
   
   // test data
   @Mock private QueryData queryData;

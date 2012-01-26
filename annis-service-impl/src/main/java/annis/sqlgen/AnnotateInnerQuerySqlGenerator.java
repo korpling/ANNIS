@@ -27,7 +27,7 @@ public class AnnotateInnerQuerySqlGenerator
   private boolean sortSolutions;
 
   // annotation graph key generation
-  private AnnisKey annotationGraphKey;
+  private SolutionKey annotationGraphKey;
   
   @Override
   public Object extractData(ResultSet rs) throws SQLException,
@@ -136,12 +136,12 @@ public class AnnotateInnerQuerySqlGenerator
     this.sortSolutions = sortSolutions;
   }
 
-  public AnnisKey getAnnotationGraphKey()
+  public SolutionKey getAnnotationGraphKey()
   {
     return annotationGraphKey;
   }
 
-  public void setAnnotationGraphKey(AnnisKey annotationGraphKey)
+  public void setAnnotationGraphKey(SolutionKey annotationGraphKey)
   {
     this.annotationGraphKey = annotationGraphKey;
   }

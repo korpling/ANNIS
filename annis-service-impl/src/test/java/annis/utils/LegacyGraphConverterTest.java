@@ -28,7 +28,8 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.sqlgen.AnnisKey;
+import annis.sqlgen.NodeNameSolutionKey;
+import annis.sqlgen.SolutionKey;
 import annis.sqlgen.AomAnnotateSqlGenerator;
 import annis.sqlgen.SaltAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
@@ -82,9 +83,9 @@ public class LegacyGraphConverterTest
 
     SaltAnnotateSqlGenerator saltSqlGen = new SaltAnnotateSqlGenerator() {
       @Override
-      protected AnnisKey createAnnisKey()
+      protected SolutionKey createAnnisKey()
       {
-        return new AnnisKey();
+        return new NodeNameSolutionKey();
       }
     };
 

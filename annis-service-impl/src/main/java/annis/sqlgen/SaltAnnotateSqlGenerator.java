@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -97,11 +96,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     int match_index = 0;
 
-    AnnisKey key = createAnnisKey();
+    SolutionKey<?> key = createAnnisKey();
     
     while (resultSet.next())
     {
-      List<String> annotationGraphKey = key.retrieveKey(resultSet);
+      //List<String> annotationGraphKey = 
+      key.retrieveKey(resultSet);
 
       if (key.isNewKey())
       {
@@ -131,7 +131,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         SFeature feature = SaltFactory.eINSTANCE.createSFeature();
         feature.setSNS(ANNIS_NS);
         feature.setSName(FEAT_MATCHEDIDS);
-        feature.setSValue(StringUtils.join(annotationGraphKey, ","));
+        feature.setSValue(key.getCurrentKeyAsString());
         document.addSFeature(feature);
 
         
@@ -164,7 +164,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
       // get node data
       SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
-        tokenByIndex, annotationGraphKey);
+        tokenByIndex, key);
       long pre = longValue(resultSet, RANK_TABLE, "pre");
       if (!resultSet.wasNull())
       {
@@ -218,7 +218,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
   private SNode createOrFindNewNode(ResultSet resultSet,
     SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
-    TreeMap<Long, SToken> tokenByIndex, List<String> key) throws SQLException
+    TreeMap<Long, SToken> tokenByIndex, SolutionKey<?> key) throws SQLException
   {
     String id = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
@@ -257,8 +257,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
-      int matchedNode = key.indexOf(id)+1;
-      if (matchedNode > 0)
+      Integer matchedNode = key.getMatchedNodeIndex(id);
+      if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
       }

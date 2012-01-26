@@ -186,7 +186,7 @@ public abstract class AnnotateSqlGenerator<T>
 
   }
 
-  protected AnnisKey createAnnisKey()
+  protected SolutionKey<?> createAnnisKey()
   {
     throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
   }
@@ -279,7 +279,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     StringBuilder sb = new StringBuilder();
-    AnnisKey key = createAnnisKey();
+    SolutionKey<?> key = createAnnisKey();
     
     sb.append("DISTINCT\n");
     List<String> keyColumns = key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.size());

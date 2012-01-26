@@ -10,14 +10,15 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 //FIXME: key and key_names are hard-coded
-public class AnnisKey
+public class NodeNameSolutionKey implements SolutionKey<List<String>>
 {
   
   // logging with log4j
-  private static Logger log = Logger.getLogger(AnnisKey.class);
+  private static Logger log = Logger.getLogger(NodeNameSolutionKey.class);
   
   // the last key
   private List<String> lastKey;
@@ -25,15 +26,7 @@ public class AnnisKey
   // the current key
   private List<String> currentKey;
 
-  /**
-   * Generate list of column aliases that are used to identify a node
-   * in a matching solution in the inner query of an ANNOTATE function query.
-   *  
-   * @param tableAccessStrategy TODO
-   * @param index TODO
-   * @return  A list of column aliases that are used in the SELECT clause of
-   *          the inner query.
-   */
+  @Override
   public List<String> generateInnerQueryColumns(
       TableAccessStrategy tableAccessStrategy, int index)
   {
@@ -45,14 +38,7 @@ public class AnnisKey
     return columns;
   }
 
-  /**
-   * Generate the key(s) for an annotation graph.
-   * 
-   * @param tableAccessStrategy TODO
-   * @param size TODO
-   * @return A list of column aliases that are used in the SELECT clause of
-   *         the outer ANNOTATE query.
-   */
+  @Override
   public List<String> generateOuterQueryColumns(
       TableAccessStrategy tableAccessStrategy, int size)
   {
@@ -84,12 +70,7 @@ public class AnnisKey
     return s;
   }
 
-  /**
-   * Retrieve (and validate) the annotation graph key from the current row
-   * of the JDBC result set.
-   *
-   * @param resultSet The JDBC result set returned by an ANNOTATE query.
-   */
+  @Override
   public List<String> retrieveKey(ResultSet resultSet)
   {
     try
@@ -117,29 +98,23 @@ public class AnnisKey
     }
   }
 
-  /**
-   * Has the key changed from the last row to this one.
-   *
-   * @return True, if the key has changed from the last row to this one.
-   */
+  @Override
   public boolean isNewKey()
   {
     return currentKey == null || ! currentKey.equals(lastKey);
   }
 
-  /**
-   * Retrieve the search term index for which a given node is a match. 
-   * A node is a match for a given search term if its name is part of the
-   * current row's key.
-   * 
-   * @param name A node name
-   * @return The index of the search term for which the node is a match 
-   *         (starting with 1) or {@code null} if the node is not a match.
-   */
+  @Override
   public Integer getMatchedNodeIndex(String name)
   {
     int index = currentKey.indexOf(name);
     return index == -1 ? null : index + 1;
+  }
+
+  @Override
+  public String getCurrentKeyAsString()
+  {
+    return StringUtils.join(currentKey, ",");
   }
   
 }

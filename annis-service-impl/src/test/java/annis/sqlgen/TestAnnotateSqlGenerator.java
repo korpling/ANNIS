@@ -49,14 +49,14 @@ public class TestAnnotateSqlGenerator
     protected TableAccessStrategy createTableAccessStrategy() {
       return tableAccessStrategy;
     };
-    protected AnnisKey createAnnisKey() {
+    protected SolutionKey createAnnisKey() {
       return annisKey;
     };
   };
   
   // dependencies
   @Mock private TableAccessStrategy tableAccessStrategy;
-  @Mock private AnnisKey annisKey;
+  @Mock private SolutionKey annisKey;
   
   // test data
   @Mock private QueryData queryData;
