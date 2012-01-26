@@ -47,7 +47,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
-import annis.sqlgen.AOMAnnotateSqlGenerator;
+import annis.sqlgen.AomAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
@@ -70,7 +70,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
   private CountSqlGenerator countSqlGenerator;
-  private AOMAnnotateSqlGenerator aomAnnotateSqlGenerator;
+  private AomAnnotateSqlGenerator aomAnnotateSqlGenerator;
   private SaltAnnotateSqlGenerator saltAnnotateSqlGenerator;
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
@@ -575,13 +575,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public AOMAnnotateSqlGenerator getAomAnnotateSqlGenerator()
+  public AomAnnotateSqlGenerator getAomAnnotateSqlGenerator()
   {
     return aomAnnotateSqlGenerator;
   }
 
   public void setAomAnnotateSqlGenerator(
-    AOMAnnotateSqlGenerator aomAnnotateSqlGenerator)
+    AomAnnotateSqlGenerator aomAnnotateSqlGenerator)
   {
     this.aomAnnotateSqlGenerator = aomAnnotateSqlGenerator;
   }
@@ -646,7 +646,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnisBinary getBinary(String corpusName, int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(
-      corpusName,
-      offset, length), byteHelper);
+      corpusName, offset, length), byteHelper);
   }
 }

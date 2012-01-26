@@ -105,7 +105,6 @@ CREATE TABLE facts
   parent    bigint,
   root      boolean,
   level      bigint,
-
   component_id      bigint,
   edge_type    char(1),
   edge_namespace  varchar(255),
@@ -150,6 +149,15 @@ CREATE TABLE extData
    
 );
 
+CREATE TABLE media_files
+(
+  file  bytea NOT NULL,
+  corpus_ref  bigint NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
+  bytes bigint NOT NULL,
+  mime_type character varying(40) NOT NULL,
+  title character varying(40) NOT NULL,
+  UNIQUE (corpus_ref, title)
+);
 
 -- stats
 CREATE TABLE corpus_stats
@@ -178,7 +186,14 @@ CREATE TABLE corpus_stats
   u_edges        bigint,
   avg_level      real,
   avg_children    real,
-  avg_duplicates    real
+  avg_duplicates  real,
+  max_corpus_id bigint  NULL,
+  max_corpus_pre bigint NULL,
+  max_corpus_post bigint NULL,
+  max_text_id bigint NULL,
+  max_rank_post bigint NULL,
+  max_component_id bigint NULL,
+  max_node_id bigint NULL
 );
 
 CREATE VIEW corpus_info AS SELECT 

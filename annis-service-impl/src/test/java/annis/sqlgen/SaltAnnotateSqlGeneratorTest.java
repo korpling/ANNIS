@@ -29,7 +29,7 @@ import org.eclipse.emf.common.util.EList;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.test.CSVResultSetProvider;
+import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -50,7 +50,7 @@ public class SaltAnnotateSqlGeneratorTest
 {
 
   // class under test
-  private CSVResultSetProvider resultSetProvider;
+  private CsvResultSetProvider resultSetProvider;
   
   // dependencies
   private AnnisKey annisKey = new AnnisKey();
@@ -63,7 +63,7 @@ public class SaltAnnotateSqlGeneratorTest
   {
     initMocks(this);
 
-    resultSetProvider = new CSVResultSetProvider(getClass().getResourceAsStream(
+    resultSetProvider = new CsvResultSetProvider(getClass().getResourceAsStream(
       "SampleAnnotateResult.csv"));
 
     ResultSet resultSet = resultSetProvider.getResultSet();

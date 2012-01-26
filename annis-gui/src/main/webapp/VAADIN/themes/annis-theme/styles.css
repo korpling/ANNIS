@@ -24,9 +24,10 @@
   color: grey;  
 }
 
-.pointer {
+.pointer, .clickable {
   cursor: pointer;
 }
+
 
 .toolbar .v-panel-content {
   background-color: #ecf0f6;
@@ -100,6 +101,7 @@ textarea.citation {
 
 .v-ff7 .v-button-wrap { overflow: visible; }
 .v-ff8 .v-button-wrap { overflow: visible; }
+.v-ff9 .v-button-wrap { overflow: visible; }
 
 /* 
  split button should have the some appearance on focus as the other buttons 

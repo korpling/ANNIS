@@ -1,61 +1,31 @@
-CREATE TEMPORARY TABLE _max (
-    corpus_id bigint NULL,
-    corpus_post bigint NULL,
-    rank_post bigint NULL,
-    component_id bigint NULL,
-    node_id bigint NULL,
-    text_id bigint NULL
-);
-
-INSERT INTO _max VALUES (
-    (SELECT max(id) + 1 FROM corpus),
-    (SELECT max(post) + 1 FROM corpus),
-    (SELECT max(post) + 1 FROM facts),
-    (SELECT max(component_id) + 1 FROM facts),
---    (SELECT max(id) + 1 FROM node),
-    (SELECT max(id) + 1 FROM facts),
-    (SELECT max(id) + 1 FROM text)
-);
-
-UPDATE _max
-SET
-corpus_id = (CASE WHEN corpus_id IS NULL THEN 0 ELSE corpus_id END),
-corpus_post = (CASE WHEN corpus_post IS NULL THEN 0 ELSE corpus_post END),
-rank_post = (CASE WHEN rank_post IS NULL THEN 0 ELSE rank_post END),
-component_id = (CASE WHEN component_id IS NULL THEN 0 ELSE component_id END),
-node_id = (CASE WHEN node_id IS NULL THEN 0 ELSE node_id END),
-text_id = (CASE WHEN text_id IS NULL THEN 0 ELSE text_id END)
-;
-
-UPDATE _node_annotation SET node_ref = node_ref + (SELECT node_id FROM _max);
+UPDATE _node_annotation SET node_ref = node_ref + (SELECT  max_node_id FROM corpus_stats WHERE id = :id);
     
 UPDATE _rank
 SET 
- pre = pre + (SELECT rank_post FROM _max),
- post = post + (SELECT rank_post FROM _max),
- node_ref = node_ref + (SELECT node_id FROM _max),
- parent = parent + (SELECT rank_post FROM _max),
- component_ref = component_ref + (SELECT component_id FROM _max);
+ pre = pre + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
+ post = post + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
+ node_ref = node_ref + (SELECT max_node_id FROM corpus_stats WHERE id = :id),
+ parent = parent + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
+ component_ref = component_ref + (SELECT max_component_id FROM corpus_stats WHERE id = :id);
 
-UPDATE _component SET id = id + (SELECT component_id FROM _max);
+UPDATE _component SET id = id + (SELECT max_component_id FROM corpus_stats WHERE id = :id);
 
-UPDATE _edge_annotation SET rank_ref = rank_ref + (SELECT rank_post FROM _max);
+UPDATE _edge_annotation SET rank_ref = rank_ref + (SELECT  max_rank_post FROM corpus_stats WHERE id = :id);
     
 UPDATE _node
 SET 
- id = id + (SELECT node_id FROM _max),
- text_ref = text_ref + (SELECT text_id FROM _max),
- corpus_ref = corpus_ref + (SELECT corpus_id FROM _max),
- toplevel_corpus = toplevel_corpus + (SELECT corpus_id FROM _max);
+ id = id + (SELECT max_node_id FROM corpus_stats WHERE id = :id),
+ text_ref = text_ref + (SELECT  max_text_id FROM corpus_stats WHERE id = :id),
+ corpus_ref = corpus_ref + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id),
+ toplevel_corpus = toplevel_corpus + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id);
     
-UPDATE _text SET id = id + (SELECT text_id FROM _max);
+UPDATE _text SET id = id + (SELECT  max_text_id FROM corpus_stats WHERE id = :id);
     
 UPDATE _corpus
 SET 
- id = id + (SELECT corpus_id FROM _max),
- pre = pre + (SELECT corpus_post FROM _max),
- post = post + (SELECT corpus_post FROM _max);
+ id = id + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id),
+ pre = pre + (SELECT max_corpus_post FROM corpus_stats WHERE id = :id),
+ post = post + (SELECT max_corpus_post FROM corpus_stats WHERE id = :id);
 
-UPDATE _corpus_annotation SET corpus_ref = corpus_ref + (SELECT corpus_id FROM _max);
+UPDATE _corpus_annotation SET corpus_ref = corpus_ref + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id);
 
-DROP TABLE _max;

@@ -18,8 +18,10 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
 import annis.model.AnnisConstants;
+import annis.model.AnnisNode;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -46,7 +48,7 @@ import org.eclipse.emf.common.util.EList;
  *
  * @author thomas
  */
-public class KWICPanel extends Table
+public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 {
   
   private SDocument result;
@@ -54,14 +56,28 @@ public class KWICPanel extends Table
   private BeanItemContainer<String> containerAnnos;
   private Map<SNode, Long> markedAndCovered;
   private STextualDS text;
+  private List<String> mediaIDs;
+  private List<VisualizerPanel> mediaVisualizer;
+  private SingleResultPanel parent;
+  // only used for media files  
+  private String startTime;
+  private String endTime;
+  private String[] media_annotations =
+  {
+    "time"
+  };
   
   public KWICPanel(SDocument result, Set<String> tokenAnnos,
-    Map<SNode, Long> markedAndCovered, STextualDS text)
+    Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
+    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent)
   {
     this.result = result;
     this.markedAndCovered = markedAndCovered;
     this.text = text;
-    
+    this.mediaIDs = mediaIDs;
+    this.mediaVisualizer = mediaVisualizer;
+    this.parent = parent;
+    this.addListener((ItemClickEvent.ItemClickListener) this);
     this.addStyleName("kwic");
     setSizeFull();
     setHeight("-1px");
@@ -102,27 +118,28 @@ public class KWICPanel extends Table
       }
       
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
-          AnnisConstants.FEAT_TOKENINDEX);
+        AnnisConstants.FEAT_TOKENINDEX);
       if (tokenText == text)
       {
         // TODO: howto nativly detect gaps in Salt?
         if (lastTokenIndex != null && featTokenIndex != null
-          && featTokenIndex.getSValueSNUMERIC().longValue() > (lastTokenIndex.longValue() + 1))
+          && featTokenIndex.getSValueSNUMERIC().longValue() > (lastTokenIndex.
+          longValue() + 1))
         {
           // add "(...)"
           Long gapColumnID = featTokenIndex.getSValueSNUMERIC();
           addGeneratedColumn(gapColumnID, new GapColumnGenerator());
           setColumnExpandRatio(gapColumnID, 0.0f);
-          visible.add(gapColumnID);          
+          visible.add(gapColumnID);
         }
-        
+
         // add a column for each token
         addGeneratedColumn(t, new TokenColumnGenerator(t));
         setColumnExpandRatio(t, 0.0f);
         visible.add(t);
-
-
-        if(featTokenIndex != null)
+        
+        
+        if (featTokenIndex != null)
         {
           lastTokenIndex = featTokenIndex.getSValueSNUMERIC();
         }
@@ -244,7 +261,15 @@ public class KWICPanel extends Table
           l.setValue(a.getValue());
           l.setDescription(a.getQName());
           l.addStyleName("kwic-anno");
-        }
+          
+          for (String media_anno : media_annotations)
+          {
+            if (media_anno.equals(a.getName()))
+            {
+              l.addStyleName("clickable");
+            }            
+          }
+        }        
       }
       return l;
     }
@@ -253,6 +278,83 @@ public class KWICPanel extends Table
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       return generateCell((String) itemId);
+    }
+  }
+  
+  private boolean checkRTL(List<AnnisNode> tokenList)
+  {
+    for (AnnisNode tok : tokenList)
+    {
+      String tokText = tok.getSpannedText();
+      if (CommonHelper.containsRTLText(tokText))
+      {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  @Override
+  public void itemClick(ItemClickEvent event)
+  {
+    if (event.isDoubleClick())
+    {
+      SToken token = (SToken) event.getPropertyId();
+      String time = null;
+      
+      for (VisualizerPanel vis : mediaVisualizer)
+      {
+        vis.openVisualizer(false);
+      }
+      
+      for (SAnnotation anno : token.getSAnnotations())
+      {
+        for (String media_anno : media_annotations)
+        {
+          if (media_anno.equals(anno.getName()))
+          {
+            time = anno.getValueString();
+          }
+        }
+        
+      }
+      
+      time = (time == null) ? "no time given" : time;
+      startTime = getStartTime(time);
+      endTime = getEndTime(time);
+      for (VisualizerPanel vp : mediaVisualizer)
+      {
+        vp.setKwicPanel(this);
+      }
+      startMediaVisualizers();
+    }
+  }
+  
+  private String getStartTime(String time)
+  {
+    return time.split("-")[0];
+  }
+  
+  private String getEndTime(String time)
+  {
+    String[] split = time.split("-");
+    if (split.length < 2)
+    {
+      return "undefined";
+    }
+    return time.split("-")[1];
+  }
+  
+  public void startMediaVisualizers()
+  {
+    for (String id : mediaIDs)
+    {
+      String playCommand = ""
+        + "document.getElementById(\"" + id + "\")"
+        + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
+        + startTime + ", " + endTime + "); ";
+      getWindow().executeJavaScript(playCommand);
     }
   }
 }

@@ -4,6 +4,22 @@
  */
 package annis.sqlgen;
 
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang.Validate;
+import org.springframework.dao.DataAccessException;
+
 import annis.dao.AnnisNodeRowMapper;
 import annis.dao.AnnotationRowMapper;
 import annis.dao.DocumentNameMapRow;
@@ -12,38 +28,22 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.lang.Validate;
-import org.springframework.dao.DataAccessException;
-import org.springframework.util.Assert;
 
 /**
  *
  * @author thomas
  */
-public class AOMAnnotateSqlGenerator extends AnnotateSqlGenerator<List<AnnotationGraph>>
+public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<AnnotationGraph>>
 {
 
   private static final Logger log =
-    Logger.getLogger(AOMAnnotateSqlGenerator.class.getName());
+    Logger.getLogger(AomAnnotateSqlGenerator.class.getName());
   private EdgeRowMapper edgeRowMapper;
   private AnnisNodeRowMapper annisNodeRowMapper;
   private AnnotationRowMapper nodeAnnotationRowMapper;
   private AnnotationRowMapper edgeAnnotationRowMapper;
 
-  public AOMAnnotateSqlGenerator()
+  public AomAnnotateSqlGenerator()
   {
     edgeRowMapper = new EdgeRowMapper();
     edgeRowMapper.setTableAccessStrategy(getFactsTas());
