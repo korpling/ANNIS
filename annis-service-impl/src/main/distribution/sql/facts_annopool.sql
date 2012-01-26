@@ -60,11 +60,6 @@ CREATE INDEX idx__edge_annotation_pool_occurences__:id ON annotation_pool_:id (o
 CREATE TABLE facts_:id
 (
   -- temporary columns for calculating the sample_*
-  n_rownum INTEGER,
-  n_na_rownum INTEGER,
-  n_r_c_ea_rownum INTEGER,
-  n_r_c_rownum INTEGER,
-  n_r_c_na_rownum INTEGER,
   PRIMARY KEY(fid),
   -- check constraints
   CHECK(toplevel_corpus = :id)
@@ -100,29 +95,28 @@ INSERT INTO facts_:id
   edge_name,
   node_anno_ref,
   edge_anno_ref,
-  sample,
-  n_rownum,
-  n_na_rownum,
-  n_r_c_ea_rownum,
-  n_r_c_rownum,
-  n_r_c_na_rownum
+  n_sample,
+  n_na_sample,
+  n_r_c_ea_sample,
+  n_r_c_sample,
+  n_r_c_na_sample
 )
 
 SELECT
   *,
-  row_number() OVER (PARTITION BY id) AS n_rownum,
-  row_number() OVER (PARTITION BY id, node_anno_ref) AS n_na_rownum,
-  row_number() OVER (PARTITION BY id,
+  (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
+  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample,
+  (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno_ref) AS n_r_c_ea_rownum,
-  row_number() OVER (PARTITION BY id,
+                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
+  (row_number() OVER (PARTITION BY id,
                                   parent,
-                                  component_id) AS n_r_c_rownum,
-  row_number() OVER (PARTITION BY id,
+                                  component_id) = 1) AS n_r_c_rownum,
+  (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno_ref) AS n_r_c_na_rownum
+                                  node_anno_ref) = 1) AS n_r_c_na_rownum
 FROM
 (
   SELECT
@@ -163,9 +157,7 @@ FROM
         AND ea."name" = _edge_annotation."name"
         AND ea.val = _edge_annotation."value"
         AND ea."type" = 'edge'
-    ) AS edge_anno_ref,
-
-    B'00000' AS sample
+    ) AS edge_anno_ref
   FROM
     _node
     JOIN _rank ON (_rank.node_ref = _node.id)

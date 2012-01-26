@@ -80,7 +80,11 @@ CREATE TABLE facts (
   edge_name character varying(255), -- name of the edges in this component
   node_anno_ref bigint REFERENCES annotation_pool(id),
   edge_anno_ref bigint REFERENCES annotation_pool(id),
-  sample bit(5), -- Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]
+  n_sample boolean,
+  n_na_sample boolean,
+  n_r_c_ea_sample boolean,
+  n_r_c_sample boolean,
+  n_r_c_na_sample boolean,
   PRIMARY KEY (fid)
 );
 
@@ -98,8 +102,6 @@ COMMENT ON COLUMN facts.component_id IS 'component id';
 COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
-
-COMMENT ON COLUMN facts.sample IS 'Bit mask if sample for join of original table [n, n_na, n_r_c, n_r_c_ea, n_r_c_na]';
 
 -- external data
 CREATE TABLE extData

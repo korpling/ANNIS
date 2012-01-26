@@ -492,16 +492,13 @@ public class SpringAnnisAdministrationDao
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript("facts_" + type.getScriptAppendix() + ".sql", args);
 
-    log.info("updating values in materialized facts table for corpus with ID "
-      + corpusID);
-    executeSqlFromScript("update_facts.sql", args);
+//    log.info("updating values in materialized facts table for corpus with ID "
+//      + corpusID);
+//    executeSqlFromScript("update_facts.sql", args);
 
-    if(type == SchemeType.FULLFACTS)
-    {
-      log.info("clustering materialized facts table for corpus with ID "
-        + corpusID);
-      executeSqlFromScript("cluster.sql", args);
-    }
+    log.info("clustering materialized facts table for corpus with ID "
+      + corpusID);
+    executeSqlFromScript("cluster.sql", args);
     
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript("indexes_" + type.getScriptAppendix() + ".sql", args);
