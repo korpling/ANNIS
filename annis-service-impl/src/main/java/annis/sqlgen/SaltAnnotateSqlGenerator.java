@@ -96,7 +96,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
 
     int match_index = 0;
 
-    SolutionKey<?> key = createAnnisKey();
+    SolutionKey<?> key = createSolutionKey();
     
     while (resultSet.next())
     {

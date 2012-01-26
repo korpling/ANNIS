@@ -53,7 +53,7 @@ public interface SolutionKey<KeyType>
    * @return The index of the search term for which the node is a match 
    *         (starting with 1) or {@code null} if the node is not a match.
    */
-  public abstract Integer getMatchedNodeIndex(String name);
+  public abstract Integer getMatchedNodeIndex(Object id);
 
   /**
    * Returns the String representation of the key that can be used

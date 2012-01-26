@@ -49,7 +49,7 @@ public class TestAnnotateSqlGenerator
     protected TableAccessStrategy createTableAccessStrategy() {
       return tableAccessStrategy;
     };
-    protected SolutionKey createAnnisKey() {
+    protected SolutionKey createSolutionKey() {
       return annisKey;
     };
   };
@@ -81,7 +81,7 @@ public class TestAnnotateSqlGenerator
     // given
     generator = new DummyAnnotateSqlGenerator();
     // when
-    generator.createAnnisKey();
+    generator.createSolutionKey();
   }
 
   /**

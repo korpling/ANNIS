@@ -22,16 +22,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class NodeNameSolutionKeyTest
+public class NodeIdPostgreSqlArraySolutionKeyTest
 {
 
   // class under test
-  private SolutionKey<List<String>> key = new NodeNameSolutionKey();
+  private SolutionKey<List<Integer>> key = new NodeIdPostgreSqlArraySolutionKey();
   
   // test data
   @Mock private TableAccessStrategy tableAccessStrategy;
   @Mock private ResultSet resultSet;
-
+  
+  // name of the key column
+  private static final String KEY = "key";
+  
   @Before
   public void setup()
   {
@@ -47,16 +50,12 @@ public class NodeNameSolutionKeyTest
   {
     // given
     String idAlias = uniqueString(3);
-    String nameAlias = uniqueString(3);
     given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "id")).willReturn(idAlias);
-    given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "name")).willReturn(nameAlias);
     int index = uniqueInt(1, 10);
     // when
     List<String> actual = key.generateInnerQueryColumns(tableAccessStrategy, index);
     // then
-    List<String> expected = asList(
-        idAlias + " AS id" + index,
-        nameAlias + " AS name" + index);
+    List<String> expected = asList(idAlias + " AS id" + index);
     assertThat(actual, is(expected));
   }
 
@@ -69,16 +68,12 @@ public class NodeNameSolutionKeyTest
   {
     // given
     String idAlias = uniqueString(3);
-    String nameAlias = uniqueString(3);
     given(tableAccessStrategy.aliasedColumn("solutions", "id")).willReturn(idAlias);
-    given(tableAccessStrategy.aliasedColumn("solutions", "name")).willReturn(nameAlias);
     int size = 3;
     // when
     List<String> actual = key.generateOuterQueryColumns(tableAccessStrategy, size);
     // then
-    List<String> expected = asList(
-        "ARRAY[" + idAlias + "1" + ", " + idAlias + "2" + ", " + idAlias + "3" + "] AS key",
-        "ARRAY[" + nameAlias + "1" + ", " + nameAlias + "2" + ", " + nameAlias + "3" + "] AS key_names");
+    List<String> expected = asList("ARRAY[" + idAlias + "1" + ", " + idAlias + "2" + ", " + idAlias + "3" + "] AS key");
     assertThat(actual, is(expected));    
   }
   
@@ -89,23 +84,23 @@ public class NodeNameSolutionKeyTest
   public void shouldRetreiveKeyFromResultSetAndValidateIt() throws SQLException
   {
     // given
-    String key1 = uniqueString(3);
-    String key2 = uniqueString(3);
-    String key3 = uniqueString(3);
+    Integer key1 = uniqueInt(100);
+    Integer key2 = uniqueInt(100);
+    Integer key3 = uniqueInt(100);
     Array array = createKeyJdbcArray(key1, key2, key3);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(KEY)).willReturn(array);
     // when
-    List<String> actual = key.retrieveKey(resultSet);
+    List<Integer> actual = key.retrieveKey(resultSet);
     // then
-    List<String> expected = asList(key1, key2, key3);
+    List<Integer> expected = asList(key1, key2, key3);
     assertThat(actual, is(expected));
   }
 
   // create a JDBC array from an array of strings
-  private Array createKeyJdbcArray(String... keys) throws SQLException
+  private Array createKeyJdbcArray(Integer... keys) throws SQLException
   {
     Array array = mock(Array.class); 
-    given(array.getBaseType()).willReturn(Types.VARCHAR);
+    given(array.getBaseType()).willReturn(Types.BIGINT);
     given(array.getArray()).willReturn(keys);
     return array;
   }
@@ -138,12 +133,12 @@ public class NodeNameSolutionKeyTest
    * Signal illegal state if the JDBC array base type is not VARCHAR.
    */
   @Test(expected=IllegalStateException.class)
-  public void errorIfVarCharIsNotBaseTypeOfKeyArray() throws SQLException
+  public void errorIfBigIntIsNotBaseTypeOfKeyArray() throws SQLException
   {
     // given
-    Array array = mock(Array.class);
-    given(array.getBaseType()).willReturn(Types.BIGINT);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    Array array = createKeyJdbcArray(uniqueInt());
+    given(array.getBaseType()).willReturn(Types.VARCHAR);
+    given(resultSet.getArray(KEY)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
   }
@@ -155,11 +150,11 @@ public class NodeNameSolutionKeyTest
   public void shouldSignalNewKey() throws SQLException
   {
     // given
-    String key1 = uniqueString(3);
-    String key2 = uniqueString(3);
+    Integer key1 = uniqueInt(100);
+    Integer key2 = uniqueInt(100);
     Array array1 = createKeyJdbcArray(key1);
     Array array2 = createKeyJdbcArray(key2);
-    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    given(resultSet.getArray(KEY)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
     resultSet.next();
@@ -175,10 +170,10 @@ public class NodeNameSolutionKeyTest
   public void shouldRecognizeOldKey() throws SQLException
   {
     // given
-    String key1 = uniqueString(3);
+    Integer key1 = uniqueInt(100);
     Array array1 = createKeyJdbcArray(key1);
     Array array2 = createKeyJdbcArray(key1);
-    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    given(resultSet.getArray(KEY)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
     resultSet.next();
@@ -195,9 +190,9 @@ public class NodeNameSolutionKeyTest
   public void shouldSignalMatchedNodes() throws SQLException
   {
     // given
-    String[] keys = { uniqueString(3), uniqueString(3), uniqueString(3) };
+    Integer[] keys = { uniqueInt(100), uniqueInt(100), uniqueInt(100) };
     Array array = createKeyJdbcArray(keys);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(KEY)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     // then
@@ -213,8 +208,8 @@ public class NodeNameSolutionKeyTest
   public void shouldReturnNullForUnmatchedNodes() throws SQLException
   {
     // given
-    Array array = createKeyJdbcArray(uniqueString());
-    given(resultSet.getArray("key_names")).willReturn(array);
+    Array array = createKeyJdbcArray(uniqueInt());
+    given(resultSet.getArray(KEY)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     // then
@@ -228,11 +223,11 @@ public class NodeNameSolutionKeyTest
   public void shouldCreateStringRepresentationOfKey() throws SQLException
   {
     // given
-    String key1 = uniqueString(3);
-    String key2 = uniqueString(3);
-    String key3 = uniqueString(3);
+    Integer key1 = uniqueInt(100);
+    Integer key2 = uniqueInt(100);
+    Integer key3 = uniqueInt(100);
     Array array = createKeyJdbcArray(key1, key2, key3);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(KEY)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     String actual = key.getCurrentKeyAsString();

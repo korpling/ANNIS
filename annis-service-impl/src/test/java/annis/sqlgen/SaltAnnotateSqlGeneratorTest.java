@@ -53,7 +53,7 @@ public class SaltAnnotateSqlGeneratorTest
   private CsvResultSetProvider resultSetProvider;
   
   // dependencies
-  private SolutionKey annisKey = new NodeNameSolutionKey();
+  private SolutionKey<?> solutionKey = new NodeNameAndIdPostgreSqlArraySolutionKey();
   
   // test data
   private SaltProject project;
@@ -69,8 +69,8 @@ public class SaltAnnotateSqlGeneratorTest
     ResultSet resultSet = resultSetProvider.getResultSet();
 
     SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator() {
-      protected SolutionKey createAnnisKey() {
-        return annisKey;
+      protected SolutionKey<?> createSolutionKey() {
+        return solutionKey;
       }
     };
 

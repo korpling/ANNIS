@@ -6,53 +6,60 @@ import static java.util.Arrays.asList;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-//FIXME: key and key_names are hard-coded
-public class NodeNameSolutionKey implements SolutionKey<List<String>>
+public class PostgreSqlArraySolutionKey<BaseType> 
+  implements SolutionKey<List<BaseType>>
 {
-  
+
   // logging with log4j
-  private static Logger log = Logger.getLogger(NodeNameSolutionKey.class);
+  private static Logger log = Logger.getLogger(NodeNamePostgreSqlArraySolutionKey.class);
   
   // the last key
-  private List<String> lastKey;
+  private List<BaseType> lastKey;
   
   // the current key
-  private List<String> currentKey;
+  private List<BaseType> currentKey;
+  
+  // the column that is used to identify a node
+  private String idColumn;
+  
+  // the name of the column that is used for the key in the outer query
+  private String keyColumn;
+  
+  // the SQL type of the column that is used to identify a node
+  private int idSqlType;
+
+  public PostgreSqlArraySolutionKey(String idColumn, String keyColumn, int idSqlType)
+  {
+    this.idColumn = idColumn;
+    this.keyColumn = keyColumn;
+    this.idSqlType = idSqlType;
+  }
 
   @Override
-  public List<String> generateInnerQueryColumns(
-      TableAccessStrategy tableAccessStrategy, int index)
+  public List<String> generateInnerQueryColumns(TableAccessStrategy tableAccessStrategy, int index)
   {
     List<String> columns = new ArrayList<String>();
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "id")
-        + " AS " + "id" + index);
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, "name")
-        + " AS " + "name" + index);
+    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumn)
+        + " AS " + idColumn + index);
     return columns;
   }
 
   @Override
-  public List<String> generateOuterQueryColumns(
-      TableAccessStrategy tableAccessStrategy, int size)
+  public List<String> generateOuterQueryColumns(TableAccessStrategy tableAccessStrategy, int size)
   {
-    String idAlias = tableAccessStrategy.aliasedColumn("solutions", "id");
-    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", "name");
+    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", idColumn);
     List<String> columns = new ArrayList<String>();
-    columns.add(createKeyArray(idAlias, "key", size));
-    columns.add(createKeyArray(nameAlias, "key_names", size));
+    columns.add(createKeyArray(nameAlias, keyColumn, size));
     return columns;
   }
 
-  // create a key array
-  // example: ARRAY[solutions.id1, solutions.id2, solutions.id3] AS key
-  private String createKeyArray(String column, String alias, int size)
+  protected String createKeyArray(String column, String alias, int size)
   {
     StringBuilder sb = new StringBuilder();
     sb.append("ARRAY[");
@@ -71,22 +78,22 @@ public class NodeNameSolutionKey implements SolutionKey<List<String>>
   }
 
   @Override
-  public List<String> retrieveKey(ResultSet resultSet)
+  public List<BaseType> retrieveKey(ResultSet resultSet)
   {
     try
     {
-      Array sqlArray = resultSet.getArray("key_names");
+      Array sqlArray = resultSet.getArray(keyColumn);
       if (resultSet.wasNull()) {
         throw new IllegalStateException("Match group identifier must not be null");
       }
       int baseType = sqlArray.getBaseType();
       String baseTypeName = sqlArray.getBaseTypeName();
-      if (baseType != Types.VARCHAR)
+      if (baseType != idSqlType)
       {
-        throw new IllegalStateException(
-            "Key must be of the type 'varchar' but was: " + baseTypeName);
+        throw new IllegalStateException("Wrong key column type: " + baseTypeName);
       }
-      String[] keyArray = (String[]) sqlArray.getArray();
+      @SuppressWarnings("unchecked")
+      BaseType[] keyArray = (BaseType[]) sqlArray.getArray();
       lastKey = currentKey;
       currentKey = asList(keyArray);
       return currentKey;
@@ -105,9 +112,9 @@ public class NodeNameSolutionKey implements SolutionKey<List<String>>
   }
 
   @Override
-  public Integer getMatchedNodeIndex(String name)
+  public Integer getMatchedNodeIndex(Object id)
   {
-    int index = currentKey.indexOf(name);
+    int index = currentKey.indexOf(id);
     return index == -1 ? null : index + 1;
   }
 
@@ -116,5 +123,5 @@ public class NodeNameSolutionKey implements SolutionKey<List<String>>
   {
     return StringUtils.join(currentKey, ",");
   }
-  
+
 }
