@@ -2,7 +2,6 @@ package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,9 @@ public class NodeNameAndIdPostgreSqlArraySolutionKey extends PostgreSqlArraySolu
   
   public NodeNameAndIdPostgreSqlArraySolutionKey()
   {
-    super(null, "key_names", Types.VARCHAR);
+    super();
+    setIdColumnName("name");
+    setKeyColumnName("key_names");
   }
   
   @Override

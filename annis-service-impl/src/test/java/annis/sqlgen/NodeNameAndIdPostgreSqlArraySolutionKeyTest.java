@@ -135,20 +135,6 @@ public class NodeNameAndIdPostgreSqlArraySolutionKeyTest
   }
   
   /**
-   * Signal illegal state if the JDBC array base type is not VARCHAR.
-   */
-  @Test(expected=IllegalStateException.class)
-  public void errorIfVarCharIsNotBaseTypeOfKeyArray() throws SQLException
-  {
-    // given
-    Array array = mock(Array.class);
-    given(array.getBaseType()).willReturn(Types.BIGINT);
-    given(resultSet.getArray("key_names")).willReturn(array);
-    // when
-    key.retrieveKey(resultSet);
-  }
-  
-  /**
    * Signal if the key changes from one row to the next.
    */
   @Test

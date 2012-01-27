@@ -12,12 +12,18 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+/**
+ * TODO Document semantics of of multiple ID columns
+ * TODO Code supporting multiple ID columns complicates things unnecessarily
+ *
+ * @param <BaseType>
+ */
 public class PostgreSqlArraySolutionKey<BaseType> 
   implements SolutionKey<List<BaseType>>
 {
 
   // logging with log4j
-  private static Logger log = Logger.getLogger(NodeNamePostgreSqlArraySolutionKey.class);
+  private static Logger log = Logger.getLogger(PostgreSqlArraySolutionKey.class);
   
   // the last key
   private List<BaseType> lastKey;
@@ -25,37 +31,27 @@ public class PostgreSqlArraySolutionKey<BaseType>
   // the current key
   private List<BaseType> currentKey;
   
-  // the column that is used to identify a node
-  private String idColumn;
+  // the column name identifying a node
+  private String idColumnName;
   
-  // the name of the column that is used for the key in the outer query
-  private String keyColumn;
+  // the name of the ID array in the outer query
+  private String keyColumnName;
   
-  // the SQL type of the column that is used to identify a node
-  private int idSqlType;
-
-  public PostgreSqlArraySolutionKey(String idColumn, String keyColumn, int idSqlType)
-  {
-    this.idColumn = idColumn;
-    this.keyColumn = keyColumn;
-    this.idSqlType = idSqlType;
-  }
-
   @Override
   public List<String> generateInnerQueryColumns(TableAccessStrategy tableAccessStrategy, int index)
   {
     List<String> columns = new ArrayList<String>();
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumn)
-        + " AS " + idColumn + index);
+    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumnName)
+        + " AS " + idColumnName + index);
     return columns;
   }
 
   @Override
   public List<String> generateOuterQueryColumns(TableAccessStrategy tableAccessStrategy, int size)
   {
-    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", idColumn);
     List<String> columns = new ArrayList<String>();
-    columns.add(createKeyArray(nameAlias, keyColumn, size));
+    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", idColumnName);
+    columns.add(createKeyArray(nameAlias, keyColumnName, size));
     return columns;
   }
 
@@ -82,15 +78,9 @@ public class PostgreSqlArraySolutionKey<BaseType>
   {
     try
     {
-      Array sqlArray = resultSet.getArray(keyColumn);
+      Array sqlArray = resultSet.getArray(keyColumnName);
       if (resultSet.wasNull()) {
         throw new IllegalStateException("Match group identifier must not be null");
-      }
-      int baseType = sqlArray.getBaseType();
-      String baseTypeName = sqlArray.getBaseTypeName();
-      if (baseType != idSqlType)
-      {
-        throw new IllegalStateException("Wrong key column type: " + baseTypeName);
       }
       @SuppressWarnings("unchecked")
       BaseType[] keyArray = (BaseType[]) sqlArray.getArray();
@@ -123,11 +113,25 @@ public class PostgreSqlArraySolutionKey<BaseType>
   {
     return StringUtils.join(currentKey, ",");
   }
-  
-  @Override
-  public String getKeyColumnName()
+
+  public String getIdColumnName()
   {
-    return keyColumn;
+    return idColumnName;
   }
 
+  public void setIdColumnName(String idColumnName)
+  {
+    this.idColumnName = idColumnName;
+  }
+
+  public String getKeyColumnName()
+  {
+    return keyColumnName;
+  }
+
+  public void setKeyColumnName(String keyColumnName)
+  {
+    this.keyColumnName = keyColumnName;
+  }
+  
 }
