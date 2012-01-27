@@ -9,6 +9,7 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.test.TestUtils.uniqueAlphaString;
 import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -49,14 +50,14 @@ public class TestAnnotateSqlGenerator
     protected TableAccessStrategy createTableAccessStrategy() {
       return tableAccessStrategy;
     };
-    protected SolutionKey createSolutionKey() {
-      return annisKey;
+    protected SolutionKey<?> createSolutionKey() {
+      return solutionKey;
     };
   };
   
   // dependencies
   @Mock private TableAccessStrategy tableAccessStrategy;
-  @Mock private SolutionKey annisKey;
+  @Mock private SolutionKey<?> solutionKey;
   
   // test data
   @Mock private QueryData queryData;
@@ -97,7 +98,7 @@ public class TestAnnotateSqlGenerator
     given(annotateQueryData.getOffset()).willReturn(offset);
     String keyColumn1 = uniqueAlphaString();
     String keyColumn2 = uniqueAlphaString();
-    given(annisKey.generateOuterQueryColumns(eq(tableAccessStrategy), anyInt())).willReturn(asList(keyColumn1, keyColumn2));
+    given(solutionKey.generateOuterQueryColumns(eq(tableAccessStrategy), anyInt())).willReturn(asList(keyColumn1, keyColumn2));
     String idAlias = createColumnAlias(NODE_TABLE, "id");
     String textRefAlias = createColumnAlias(NODE_TABLE, "text_ref");
     String corpusRefAlias = createColumnAlias(NODE_TABLE, "corpus_ref");
@@ -170,6 +171,24 @@ public class TestAnnotateSqlGenerator
     System.out.println();
     System.out.println("---> Expected");
     System.out.println(expected);
+    assertThat(actual, is(expected));
+  }
+  
+  /**
+   * The result should be ordered by the solution key and the pre value of the node
+   */
+  @Test
+  public void shouldOrderByKeyAndPreValue()
+  {
+    // given
+    String preAlias = createColumnAlias(RANK_TABLE, "pre");
+    String keyAlias1 = uniqueString(3);
+    String keyAlias2 = uniqueString(3);
+    given(solutionKey.getKeyColumns()).willReturn(asList(keyAlias1, keyAlias2));
+    // when
+    String actual = generator.orderByClause(queryData, alternative, INDENT);
+    // then
+    String expected = keyAlias1 + ", " + keyAlias2 + ", " + preAlias;
     assertThat(actual, is(expected));
   }
 

@@ -115,7 +115,7 @@ public class PostgreSqlArraySolutionKeyTest
    * Signal illegal state if there is an SQL error.
    */
   @Test(expected=IllegalStateException.class)
-  public void errorIfResultSetThrowsSqlException() throws SQLException
+  public void errorIfResultSetThrowsSqlExceptionInRetrieveKey() throws SQLException
   {
     // given
     given(resultSet.getArray(anyString())).willThrow(new SQLException());
@@ -226,5 +226,46 @@ public class PostgreSqlArraySolutionKeyTest
     // then
     String expected = key1 + "," + key2 + "," + key3;
     assertThat(actual, is(expected));
+  }
+  
+  /**
+   * Return the name of the key array as key column.
+   */
+  @Test
+  public void shouldReturnKeyArrayNameAsKeyColumn()
+  {
+    // when
+    List<String> keyColumns = key.getKeyColumns();
+    // then
+    assertThat(keyColumns, is(asList(keyColumnName)));
+  }
+  
+  /**
+   * The node ID is the value of the ID column of aliased for the outer query.
+   */
+  @Test
+  public void shouldReturnTheIdOfTheNode() throws SQLException
+  {
+    // given
+    Object expected = new Object();
+    String idAlias = uniqueString(3);
+    given(tableAccessStrategy.columnName(NODE_TABLE, idColumnName)).willReturn(idAlias);
+    given(resultSet.getObject(idAlias)).willReturn(expected);
+    // when
+    Object actual = key.getNodeId(resultSet, tableAccessStrategy);
+    // then
+    assertThat(actual, is(expected));
+  }
+  
+  /**
+   * Signal illegal state if there is an SQL error.
+   */
+  @Test(expected=IllegalStateException.class)
+  public void errorIfResultSetThrowsSqlExceptionInGetNodeId() throws SQLException
+  {
+    // given
+    given(resultSet.getObject(anyString())).willThrow(new SQLException());
+    // when
+    key.getNodeId(resultSet, tableAccessStrategy);
   }
 }

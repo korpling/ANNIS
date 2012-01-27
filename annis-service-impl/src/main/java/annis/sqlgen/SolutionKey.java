@@ -63,7 +63,12 @@ public interface SolutionKey<KeyType>
   public abstract String getCurrentKeyAsString();
   
   /**
-   * Returns the name of the key column.
+   * Returns the name of the key columns.
    */
-  public abstract String getKeyColumnName();
+  public abstract List<String> getKeyColumns();
+  
+  /**
+   * Returns the node ID of the current row in a result set.
+   */
+  public abstract Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy);
 }

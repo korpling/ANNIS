@@ -220,14 +220,14 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, SolutionKey<?> key) throws SQLException
   {
-    String id = stringValue(resultSet, NODE_TABLE, "node_name");
+    String name = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
 
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
     boolean isToken = !resultSet.wasNull();
 
     URI nodeURI = graph.getSElementPath();
-    nodeURI = nodeURI.appendFragment(id);
+    nodeURI = nodeURI.appendFragment(name);
     SStructuredNode node = (SStructuredNode) graph.getSNode(nodeURI.toString());
     if (node == null)
     {
@@ -247,7 +247,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         node = struct;
       }
 
-      moveNodeProperties(null, node, graph, id);
+      node.setSName(name);
+      graph.addNode(node);
 
       addLongSFeature(node, FEAT_INTERNALID, internalID);
       addLongSFeature(node, resultSet, FEAT_CORPUSREF, "node", "corpus_ref");
@@ -257,7 +258,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
-      Integer matchedNode = key.getMatchedNodeIndex(id);
+      Object nodeId = key.getNodeId(resultSet, getFactsTas());
+      Integer matchedNode = key.getMatchedNodeIndex(nodeId);
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);

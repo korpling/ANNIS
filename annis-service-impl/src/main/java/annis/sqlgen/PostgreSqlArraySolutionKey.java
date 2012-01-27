@@ -114,6 +114,28 @@ public class PostgreSqlArraySolutionKey<BaseType>
     return StringUtils.join(currentKey, ",");
   }
 
+  @Override
+  public List<String> getKeyColumns()
+  {
+    return asList(keyColumnName);
+  }
+
+  @Override
+  public Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy)
+  {
+    try {
+      String idAlias = tableAccessStrategy.columnName(NODE_TABLE, idColumnName);
+      Object nodeId = resultSet.getObject(idAlias);
+      return nodeId;
+    }
+    catch (SQLException e)
+    {
+      log.error("Exception thrown while retrieving node ID", e);
+      throw new IllegalStateException(
+          "Could not retrieve node ID from JDBC results set", e);
+    }
+  }
+  
   public String getIdColumnName()
   {
     return idColumnName;
@@ -133,5 +155,5 @@ public class PostgreSqlArraySolutionKey<BaseType>
   {
     this.keyColumnName = keyColumnName;
   }
-  
+
 }
