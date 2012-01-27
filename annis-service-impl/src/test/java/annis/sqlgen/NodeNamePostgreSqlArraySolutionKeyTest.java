@@ -31,11 +31,13 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
   // test data
   @Mock private TableAccessStrategy tableAccessStrategy;
   @Mock private ResultSet resultSet;
-
+  private String keyColumnName;
+  
   @Before
   public void setup()
   {
     initMocks(this);
+    keyColumnName = key.getKeyColumnName();
   }
 
   /**
@@ -71,7 +73,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     List<String> actual = key.generateOuterQueryColumns(tableAccessStrategy, size);
     // then
     List<String> expected = asList(
-        "ARRAY[" + nameAlias + "1" + ", " + nameAlias + "2" + ", " + nameAlias + "3" + "] AS key_names");
+        "ARRAY[" + nameAlias + "1" + ", " + nameAlias + "2" + ", " + nameAlias + "3" + "] AS " + keyColumnName);
     assertThat(actual, is(expected));    
   }
   
@@ -86,7 +88,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     String key2 = uniqueString(3);
     String key3 = uniqueString(3);
     Array array = createKeyJdbcArray(key1, key2, key3);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     List<String> actual = key.retrieveKey(resultSet);
     // then
@@ -136,7 +138,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     // given
     Array array = mock(Array.class);
     given(array.getBaseType()).willReturn(Types.BIGINT);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
   }
@@ -152,7 +154,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     String key2 = uniqueString(3);
     Array array1 = createKeyJdbcArray(key1);
     Array array2 = createKeyJdbcArray(key2);
-    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    given(resultSet.getArray(keyColumnName)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
     resultSet.next();
@@ -171,7 +173,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     String key1 = uniqueString(3);
     Array array1 = createKeyJdbcArray(key1);
     Array array2 = createKeyJdbcArray(key1);
-    given(resultSet.getArray("key_names")).willReturn(array1, array2);
+    given(resultSet.getArray(keyColumnName)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
     resultSet.next();
@@ -190,7 +192,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     // given
     String[] keys = { uniqueString(3), uniqueString(3), uniqueString(3) };
     Array array = createKeyJdbcArray(keys);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     // then
@@ -207,7 +209,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
   {
     // given
     Array array = createKeyJdbcArray(uniqueString());
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     // then
@@ -225,7 +227,7 @@ public class NodeNamePostgreSqlArraySolutionKeyTest
     String key2 = uniqueString(3);
     String key3 = uniqueString(3);
     Array array = createKeyJdbcArray(key1, key2, key3);
-    given(resultSet.getArray("key_names")).willReturn(array);
+    given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
     String actual = key.getCurrentKeyAsString();

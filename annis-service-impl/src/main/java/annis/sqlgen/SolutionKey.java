@@ -61,4 +61,9 @@ public interface SolutionKey<KeyType>
    * {@link annis.model.AnnisConstants.FEAT_MACHTEDIDS} property.
    */
   public abstract String getCurrentKeyAsString();
+  
+  /**
+   * Returns the name of the key column.
+   */
+  public abstract String getKeyColumnName();
 }

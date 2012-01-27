@@ -236,8 +236,8 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       {
         SToken tok = SaltFactory.eINSTANCE.createSToken();
         node = tok;
-
-        // get spanned text of token
+ 
+       // get spanned text of token
         tokenTexts.put(tokenIndex, stringValue(resultSet, NODE_TABLE, "span"));
         tokenByIndex.put(tokenIndex, tok);
       }

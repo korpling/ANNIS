@@ -8,7 +8,7 @@ public class NodeNamePostgreSqlArraySolutionKey extends PostgreSqlArraySolutionK
 
   public NodeNamePostgreSqlArraySolutionKey()
   {
-    super("name", "key_names", Types.VARCHAR);
+    super("name", "key", Types.VARCHAR);
   }
 
 }

@@ -194,7 +194,7 @@ limitations under the License.
 
 		<property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
-    <property name="solutionKey" ref="nodeNameAndIdPostgreSqlAndIdSolutionKey"/>
+    <property name="solutionKey" ref="nodeNamePostgreSqlArraySolutionKey"/>
 		<property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
 		<property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
 		<property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
@@ -205,7 +205,7 @@ limitations under the License.
 	<bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
 		parent="tableAccessStrategyFactory">
 		
-		<lookup-method name="createSolutionKey" bean="nodeNameAndIdPostgreSqlAndIdSolutionKey"/>
+		<lookup-method name="createSolutionKey" bean="nodeNamePostgreSqlArraySolutionKey"/>
 
 		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 

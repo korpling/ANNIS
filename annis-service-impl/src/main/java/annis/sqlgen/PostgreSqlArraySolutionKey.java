@@ -123,5 +123,11 @@ public class PostgreSqlArraySolutionKey<BaseType>
   {
     return StringUtils.join(currentKey, ",");
   }
+  
+  @Override
+  public String getKeyColumnName()
+  {
+    return keyColumn;
+  }
 
 }
