@@ -185,11 +185,19 @@ limitations under the License.
 		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
 	</bean>
 
+  <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
+    <property name="idColumnName" value="${annis.node-id-column-name}"/>
+    <property name="keyColumnName" value="key"/>
+  </bean>
+
+  <bean id="nodeNameAndIdPostgreSqlAndIdSolutionKey" class="annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey" scope="prototype"/>
+
 	<bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
 		parent="tableAccessStrategyFactory">
 
 		<property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
+    <property name="solutionKey" ref="postgreSqlArraySolutionKey"/>
 		<property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
 		<property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
 		<property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
@@ -199,10 +207,13 @@ limitations under the License.
 
 	<bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
 		parent="tableAccessStrategyFactory">
+		
+		<lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
 		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
 		<property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
+		<property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
 		<property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
 		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
