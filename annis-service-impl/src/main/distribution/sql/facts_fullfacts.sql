@@ -50,18 +50,24 @@ INSERT INTO facts_:id
 SELECT
 *,
   (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
-  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample,
+  (row_number() OVER (PARTITION BY id, node_annotation_namespace,
+                                    node_annotation_name,
+                                    node_annotation_value) = 1) AS n_na_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
+                                  edge_annotation_namespace,
+                                  edge_annotation_name,
+                                  edge_annotation_value) = 1) AS n_r_c_ea_rownum,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id) = 1) AS n_r_c_rownum,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_rownum
+                                  node_annotation_namespace,
+                                  node_annotation_name,
+                                  node_annotation_value) = 1) AS n_r_c_na_rownum
 FROM
 (
   SELECT
@@ -74,7 +80,7 @@ FROM
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
-    FALSE AS is_token,
+    (_node.token_index IS NOT NULL) is_token,
     _node.continuous AS continuous,
     _node.span AS span,
     _node.left_token AS left_token,
