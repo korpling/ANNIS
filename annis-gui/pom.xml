@@ -7,6 +7,7 @@
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <version>2.3.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>annis-gui</artifactId>
@@ -63,19 +64,19 @@
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCommon</artifactId>
-                  <version>1.1.3-SNAPSHOT</version>
+                  <version>1.1.3</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-graph</artifactId>
-                  <version>1.1.3-SNAPSHOT</version>
+                  <version>1.1.3</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCore</artifactId>
-                  <version>1.1.3-SNAPSHOT</version>
+                  <version>1.1.3</version>
                   <type>bundle</type>
                 </artifactItem>
               </artifactItems>
