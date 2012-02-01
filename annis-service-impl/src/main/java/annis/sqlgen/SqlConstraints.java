@@ -24,7 +24,7 @@ import annis.model.QueryNode.TextMatching;
 
 /**
  * TODO: write documentation for BaseSqlClauseGenerator, fix name
- * 
+ *
  * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  */
 public class SqlConstraints
@@ -35,9 +35,8 @@ public class SqlConstraints
 
   /**
    * Test a column for true.
-   * 
-   * @param lhs
-   *          The column which should be checked for true.
+   *
+   * @param lhs The column which should be checked for true.
    */
   public static String isTrue(String lhs)
   {
@@ -46,9 +45,8 @@ public class SqlConstraints
 
   /**
    * Test a column for true.
-   * 
-   * @param lhs
-   *          The column which should be checked for false.
+   *
+   * @param lhs The column which should be checked for false.
    */
   public static String isFalse(String lhs)
   {
@@ -57,9 +55,8 @@ public class SqlConstraints
 
   /**
    * Generate IS NULL predicate on column.
-   * 
-   * @param lhs
-   *          The column which should be checked for NULL values.
+   *
+   * @param lhs The column which should be checked for NULL values.
    */
   public static String isNull(String lhs)
   {
@@ -68,9 +65,8 @@ public class SqlConstraints
 
   /**
    * Generate IS NOT NULL predicate on column.
-   * 
-   * @param lhs
-   *          The column which should be checked for values that are not NULL.
+   *
+   * @param lhs The column which should be checked for values that are not NULL.
    */
   public static String isNotNull(String lhs)
   {
@@ -96,13 +92,13 @@ public class SqlConstraints
       sbBits.append(bits[i] ? "1" : "0");
     }
     return "(" + column + " & B'" + sbBits.toString() + "') " + "= B'"
-        + sbBits.toString() + "'";
+      + sbBits.toString() + "'";
   }
 
   public static String between(String lhs, String rhs, int min, int max)
   {
     if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
-        && min > max)
+      && min > max)
     {
       int tmp = min;
       min = max;
@@ -113,22 +109,23 @@ public class SqlConstraints
     if (disableBetweenPredicate)
     {
       return lhs + " >= " + rhs + minPlus + String.valueOf(Math.abs(min))
-          + " AND " + lhs + " <= " + rhs + maxPlus
-          + String.valueOf(Math.abs(max));
-    } else
+        + " AND " + lhs + " <= " + rhs + maxPlus
+        + String.valueOf(Math.abs(max));
+    }
+    else
     {
       String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
-          : "BETWEEN SYMMETRIC";
+        : "BETWEEN SYMMETRIC";
       return lhs + " " + betweenPredicate + " " + rhs + minPlus
-          + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
-          + String.valueOf(Math.abs(max));
+        + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
+        + String.valueOf(Math.abs(max));
     }
   }
 
   public static String between(String lhs, int min, int max)
   {
     if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
-        && min > max)
+      && min > max)
     {
       int tmp = min;
       min = max;
@@ -137,10 +134,11 @@ public class SqlConstraints
     if (disableBetweenPredicate)
     {
       return lhs + " >= " + min + " AND " + lhs + " <= " + max;
-    } else
+    }
+    else
     {
       String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
-          : "BETWEEN SYMMETRIC";
+        : "BETWEEN SYMMETRIC";
       return lhs + " " + betweenPredicate + " " + min + " AND " + max;
     }
   }
@@ -155,7 +153,8 @@ public class SqlConstraints
     if (values.isEmpty())
     {
       return in(lhs, "NULL");
-    } else
+    }
+    else
     {
       return in(lhs, StringUtils.join(values, ","));
     }
@@ -169,7 +168,7 @@ public class SqlConstraints
   public static String sqlString(String string, TextMatching textMatching)
   {
     if (textMatching == TextMatching.REGEXP_EQUAL
-        || textMatching == TextMatching.REGEXP_NOT_EQUAL)
+      || textMatching == TextMatching.REGEXP_NOT_EQUAL)
     {
       string = "^" + string + "$";
     }
@@ -182,7 +181,7 @@ public class SqlConstraints
   }
 
   public static void setDisableBetweenSymmetricPredicate(
-      boolean disableBetweenPredicate)
+    boolean disableBetweenPredicate)
   {
     SqlConstraints.disableBetweenSymmetricPredicate = disableBetweenPredicate;
   }
@@ -196,5 +195,4 @@ public class SqlConstraints
   {
     SqlConstraints.disableBetweenPredicate = disableBetweenPredicate;
   }
-
 }

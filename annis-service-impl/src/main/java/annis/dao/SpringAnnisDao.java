@@ -23,12 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
+import java.util.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -274,6 +269,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
+  @Transactional(readOnly = true)
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
     String documentName)
   {

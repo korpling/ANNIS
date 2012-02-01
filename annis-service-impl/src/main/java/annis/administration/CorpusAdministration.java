@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,119 +22,45 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.postgresql.Driver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
-
 import annis.AnnisRunnerException;
 import org.apache.log4j.Logger;
 
-public class CorpusAdministration
+/**
+ *
+ * @author thomas
+ */
+public abstract class CorpusAdministration
 {
 
   private Logger log = Logger.getLogger(this.getClass());
-  @Autowired
-  private SpringAnnisAdministrationDao administrationDao;
 
-  public void initializeDatabase(String host, String port, String database,
-    String user, String password, String defaultDatabase, String superUser,
-    String superPassword)
+    public CorpusAdministration()
   {
-    log.info("Creating Annis database and user.");
-
-    // connect as super user to the default database to create new user and database
-    administrationDao.setDataSource(createDataSource(host, port, defaultDatabase,
-      superUser, superPassword));
-    administrationDao.dropDatabase(database);
-    administrationDao.dropUser(user);
-    administrationDao.createUser(user, password);
-    administrationDao.createDatabase(database);
-
-    // switch to new database, but still as super user to install stored procedure compute_rank_level
-    administrationDao.setDataSource(createDataSource(host, port, database,
-      superUser, superPassword));
-    administrationDao.installPlPgSql();
-    administrationDao.createFunctionUniqueToplevelCorpusName();
-
-    // switch to new database as new user for the rest
-    administrationDao.setDataSource(createDataSource(host, port, database, user,
-      password));
-    administrationDao.createSchema();
-    administrationDao.populateSchema();
-    administrationDao.rebuildIndexes();
-
-    // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password);
   }
 
-  @Transactional(readOnly = false)
-  public void importCorpora(boolean temporaryStagingArea, List<String> paths)
+  protected DataSource createDataSource(String host, String port,
+    String database,
+    String user, String password)
   {
+    String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
 
-    // import each corpus
-    for (String path : paths)
-    {
-      log.info("Importing corpus from: " + path);
+    // DriverManagerDataSource is deprecated
+    // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
 
-      administrationDao.createStagingArea(temporaryStagingArea);
-      administrationDao.bulkImport(path);
-      administrationDao.computeTopLevelCorpus();
-
-      long corpusID = administrationDao.updateIds();
-
-      administrationDao.importBinaryData(path);
-
-      administrationDao.createStagingAreaIndexes();
-      administrationDao.analyzeStagingTables();
-
-      // finish transaction here to debug computation of left|right-token
-      // if (true) return;
-      administrationDao.computeLeftTokenRightToken();
-//      if (true) return;
-      administrationDao.computeRealRoot();
-      administrationDao.computeLevel();
-      administrationDao.computeCorpusStatistics();
-      administrationDao.updateCorpusStatsId(corpusID);
-
-      administrationDao.applyConstraints();
-      administrationDao.analyzeStagingTables();
-
-      administrationDao.insertCorpus();
-
-      administrationDao.computeCorpusPath(corpusID);
-
-      administrationDao.createAnnotations(corpusID);
-
-      // create the new facts table partition
-      administrationDao.createFacts(corpusID);
-      // the entries, which where here done, are possible after generating facts
-      administrationDao.updateCorpusStatistic();
-
-
-      if (temporaryStagingArea)
-      {
-        administrationDao.dropStagingArea();
-      }
-      administrationDao.analyzeFacts(corpusID);
-
-      log.info("Finished import from: " + path);
-    }
-  }
-
-  public void importCorpora(boolean temporaryStagingArea, String... paths)
-  {
-    importCorpora(temporaryStagingArea, Arrays.asList(paths));
+    // why is this better?
+    // XXX: how to construct the datasource?    
+    return new SimpleDriverDataSource(new Driver(), url, user, password);
   }
 
   @Transactional(readOnly = false)
   public void deleteCorpora(List<Long> ids)
   {
     // check if corpus exists
-    List<Long> corpora = administrationDao.listToplevelCorpora();
+    List<Long> corpora = getAdministrationDao().listToplevelCorpora();
     for (long id : ids)
     {
       if (!corpora.contains(id))
@@ -143,34 +69,134 @@ public class CorpusAdministration
           + id);
       }
     }
-
     log.info("Deleting corpora: " + ids);
-    administrationDao.deleteCorpora(ids);
+    getAdministrationDao().deleteCorpora(ids);
     log.info("Finished deleting corpora: " + ids);
   }
+  
+  
+  public void initializeDatabase(String host, String port, String database,
+    String user, String password, String defaultDatabase, String superUser,
+    String superPassword)
+  {
+
+    log.info("initializing database with schema "
+      + getSchemeType().getDescription());
+
+    log.info("Creating Annis database and user.");
+
+    // connect as super user to the default database to create new user and database
+    getAdministrationDao().setDataSource(createDataSource(host, port,
+      defaultDatabase, superUser, superPassword));
+
+    getAdministrationDao().dropDatabase(database);
+    getAdministrationDao().dropUser(user);
+    getAdministrationDao().createUser(user, password);
+    getAdministrationDao().createDatabase(database);
+
+
+    // switch to new database, but still as super user to install stored procedure compute_rank_level
+    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+      superUser, superPassword));
+    getAdministrationDao().installPlPgSql();
+    getAdministrationDao().createFunctionUniqueToplevelCorpusName();
+
+    // switch to new database as new user for the rest
+    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+      user, password));
+
+    getAdministrationDao().createSchema(getSchemeType());
+    getAdministrationDao().populateSchema();
+
+    // write database information to property file
+    writeDatabasePropertiesFile(host, port, database, user, password);
+  }
+
+  @Transactional(readOnly = false)
+  public void importCorpora(boolean temporaryStagingArea,
+    List<String> paths)
+  {
+
+    // import each corpus
+    for (String path : paths)
+    {
+      log.info("Importing corpus from: " + path);
+
+      getAdministrationDao().createStagingArea(temporaryStagingArea);
+      getAdministrationDao().bulkImport(path);
+      getAdministrationDao().computeTopLevelCorpus();
+
+      long corpusID = getAdministrationDao().updateIds();
+
+      getAdministrationDao().importBinaryData(path);
+
+      getAdministrationDao().createStagingAreaIndexes();
+      getAdministrationDao().analyzeStagingTables();
+
+      // finish transaction here to debug computation of left|right-token
+      // if (true) return;
+      getAdministrationDao().computeLeftTokenRightToken();
+//      if (true) return;
+      getAdministrationDao().computeRealRoot();
+      getAdministrationDao().computeLevel();
+      getAdministrationDao().computeCorpusStatistics();
+      getAdministrationDao().updateCorpusStatsId(corpusID);
+
+      getAdministrationDao().applyConstraints();
+      getAdministrationDao().analyzeStagingTables();
+
+      getAdministrationDao().insertCorpus();
+
+      getAdministrationDao().computeCorpusPath(corpusID);
+
+      getAdministrationDao().createAnnotations(corpusID);
+
+      // create the new facts table partition
+      getAdministrationDao().createFacts(corpusID, getSchemeType());
+      // the entries, which where here done, are possible after generating facts
+      getAdministrationDao().updateCorpusStatistic();
+
+
+      if (temporaryStagingArea)
+      {
+        getAdministrationDao().dropStagingArea();
+      }
+      getAdministrationDao().analyzeFacts(corpusID);
+      log.info("Finished import from: " + path);
+    }
+  }
+
+
+  public void importCorpora(boolean temporaryStagingArea, String... paths)
+  {
+    importCorpora(temporaryStagingArea, Arrays.asList(paths));
+  }
+
+
 
   public List<Map<String, Object>> listCorpusStats()
   {
-    return administrationDao.listCorpusStats();
+    return getAdministrationDao().listCorpusStats();
   }
 
   public List<Map<String, Object>> listTableStats()
   {
-    return administrationDao.listTableStats();
+    return getAdministrationDao().listTableStats();
   }
 
   public List<String> listUsedIndexes()
   {
-    return administrationDao.listUsedIndexes();
+    return getAdministrationDao().listUsedIndexes();
   }
 
   public List<String> listUnusedIndexes()
   {
-    return administrationDao.listUnusedIndexes();
+    return getAdministrationDao().listUnusedIndexes();
   }
 
+
   ///// Helper
-  private void writeDatabasePropertiesFile(String host, String port,
+  protected void writeDatabasePropertiesFile(String host, String port,
     String database, String user, String password)
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
@@ -194,27 +220,13 @@ public class CorpusAdministration
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }
 
-  private DataSource createDataSource(String host, String port, String database,
-    String user, String password)
-  {
-    String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-
-    // DriverManagerDataSource is deprecated
-    // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
-
-    // why is this better?
-    // XXX: how to construct the datasource?    
-    return new SimpleDriverDataSource(new Driver(), url, user, password);
-  }
 
   ///// Getter / Setter
-  public SpringAnnisAdministrationDao getAdministrationDao()
-  {
-    return administrationDao;
-  }
+  public abstract SpringAnnisAdministrationDao getAdministrationDao();
 
-  public void setAdministrationDao(SpringAnnisAdministrationDao databaseUtils)
-  {
-    this.administrationDao = databaseUtils;
-  }
+  public abstract void setAdministrationDao(
+    SpringAnnisAdministrationDao administrationDao);
+
+  public abstract SchemeType getSchemeType();
+
 }

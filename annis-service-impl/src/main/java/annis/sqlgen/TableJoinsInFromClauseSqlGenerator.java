@@ -45,7 +45,7 @@ public class TableJoinsInFromClauseSqlGenerator
 	}
 	
 	public String fromClauseForNode(QueryNode node, boolean leftJoin) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		
 		// every node uses the node table
 		sb.append(tableAliasDefinition(node, NODE_TABLE, 1));

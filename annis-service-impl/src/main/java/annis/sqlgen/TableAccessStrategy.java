@@ -33,6 +33,7 @@ public class TableAccessStrategy {
 	public final static String COMPONENT_TABLE = "component";
 	public final static String NODE_ANNOTATION_TABLE = "node_annotation";
 	public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
+   public final static String ANNOTATION_POOL_TABLE = "annotation_pool";
 	public final static String FACTS_TABLE = "facts";
   	public final static String CORPUS_TABLE = "corpus";
   	public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";

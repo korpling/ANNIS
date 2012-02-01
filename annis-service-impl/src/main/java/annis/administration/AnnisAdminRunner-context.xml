@@ -39,14 +39,22 @@
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
-	
+   
+   <!-- factory bean -->
+	<bean id="annisSpringFactory" class="annis.administration.AnnisSpringFactory">
+     <property name="tableLayout" value="${annis.table-layout}"/>
+   </bean>
+     
 	<!-- AnnisAdminRunner -->
 	<bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
 		<property name="keepStagingArea" value="${annis.import.keep-staging-area}"/>
 	</bean>
 	
 	<!-- Public API for corpus administration -->
-	<bean id="corpusAdministration" class="annis.administration.CorpusAdministration"/>
+	<bean id="corpusAdministration" 
+    factory-bean="annisSpringFactory" factory-method="createCorpusAdministration">
+      <property name="administrationDao" ref="administrationDao"/>
+   </bean>
 
 	<!-- Database API for administration tasks -->
 	<bean id="administrationDao" class="annis.administration.SpringAnnisAdministrationDao">

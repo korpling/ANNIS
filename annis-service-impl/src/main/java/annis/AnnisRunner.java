@@ -152,12 +152,12 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("3");
+    doCorpus("tiger2");
     doSet("limit to 10");
-    doSet("offset to 10");
+    doSet("offset to 100");
     doSet("left to 5");
     doSet("right to 5");
-    doAnnotate("tok & tok & #1 . #2");
+    doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
   }
 
   public void doProposedIndex(String ignore)

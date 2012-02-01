@@ -35,6 +35,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.log4j.lf5.LogLevel;
 
 /**
  *
@@ -63,7 +66,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     int i = start;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      for(SDocument doc : corpusGraph.getSDocuments())
+      for (SDocument doc : corpusGraph.getSDocuments())
       {
         SingleResultPanel panel = new SingleResultPanel(doc, i, this, ps,
           visibleTokenAnnos);
@@ -98,7 +101,15 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     {
       for (SLayer layer : e.getSLayers())
       {
-        edgeLayers.add(layer.getSName());
+        try
+        {
+          edgeLayers.add(layer.getSName());
+        }
+        catch(NullPointerException ex)
+        {
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
+            "NullPointerException when using Salt, was trying to get layer name", ex);
+        }
       }
     }
 
