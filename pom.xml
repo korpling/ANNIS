@@ -29,14 +29,7 @@
     <repository>
       <id>korpling</id>
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
-    </repository>
-    
-    <repository>
-      <id>saltnpepper</id>
-      <name>SaltNPepper</name>
-      <url>http://korpling.german.hu-berlin.de/~annis/maven2/saltnpepper/</url>
-    </repository>
-  
+    </repository>  
   </repositories>
 
   <build>

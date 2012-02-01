@@ -177,64 +177,73 @@ limitations under the License.
 
 
 	<!-- new -->
+	<bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
+		parent="tableAccessStrategyFactory">
 
-  <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-        parent="tableAccessStrategyFactory">
+		<property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
+		<property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
-    <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
-    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
+		<property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
+		<property name="fromClauseSqlGenerators">
+			<util:list>
+				<ref bean="matrixSqlGenerator" />
+			</util:list>
+		</property>
+		<property name="whereClauseSqlGenerators">
+			<util:list>
+				<ref bean="matrixSqlGenerator" />
+			</util:list>
+		</property>
+		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
+	</bean>
 
-    <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="matrixSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="matrixSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
+  <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
+    <property name="idColumnName" value="${annis.node-id-column-name}"/>
+    <property name="keyColumnName" value="key"/>
   </bean>
 
-  <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-        parent="tableAccessStrategyFactory">
+  <bean id="nodeNameAndIdPostgreSqlAndIdSolutionKey" class="annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey" scope="prototype"/>
 
-    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
+	<bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
+		parent="tableAccessStrategyFactory">
 
-    <property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-    <property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-    <property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-  </bean>
+		<property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
-        parent="tableAccessStrategyFactory">
+    <property name="solutionKey" ref="postgreSqlArraySolutionKey"/>
+		<property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+		<property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
+		<property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+		<property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+		<property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+	</bean>
 
-    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
+	<bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
+		parent="tableAccessStrategyFactory">
+		
+		<lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
-    <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
+		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
-    <property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-    <property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
+		<property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
+		<property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
-    <property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="annotateSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="annotateSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
-    <property name="tableLayout" value="${annis.table-layout}" />
+		<property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
-  </bean>
+		<property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
+		<property name="fromClauseSqlGenerators">
+			<util:list>
+				<ref bean="annotateSqlGenerator" />
+			</util:list>
+		</property>
+		<property name="whereClauseSqlGenerators">
+			<util:list>
+				<ref bean="annotateSqlGenerator" />
+			</util:list>
+		</property>
+		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
+      <property name="tableLayout" value="${annis.table-layout}" />
+	</bean>
 
 	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
         parent="annotateSqlGenerator">

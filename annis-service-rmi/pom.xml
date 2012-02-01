@@ -10,7 +10,6 @@
   </parent>
 
   <artifactId>annis-service-rmi</artifactId>
-
   <name>annis-service-rmi</name>
   
   <properties>

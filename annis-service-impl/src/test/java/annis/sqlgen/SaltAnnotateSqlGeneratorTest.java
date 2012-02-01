@@ -15,10 +15,21 @@
  */
 package annis.sqlgen;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import annis.test.CsvResultSetProvider;
-import java.sql.SQLException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Comparator;
+
+import org.eclipse.emf.common.util.ECollections;
+import org.eclipse.emf.common.util.EList;
+import org.junit.Before;
+import org.junit.Test;
+
+import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -28,17 +39,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNamedElement;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.sql.ResultSet;
-import java.util.Comparator;
-import org.eclipse.emf.common.util.ECollections;
-import org.eclipse.emf.common.util.EList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -47,22 +49,14 @@ import static org.junit.Assert.*;
 public class SaltAnnotateSqlGeneratorTest
 {
 
-  CsvResultSetProvider resultSetProvider;
+  // class under test
+  private CsvResultSetProvider resultSetProvider;
+  
+  // dependencies
+  private SolutionKey<?> solutionKey = new NodeNameAndIdPostgreSqlArraySolutionKey();
+  
+  // test data
   private SaltProject project;
-
-  public SaltAnnotateSqlGeneratorTest()
-  {
-  }
-
-  @BeforeClass
-  public static void setUpClass() throws Exception
-  {
-  }
-
-  @AfterClass
-  public static void tearDownClass() throws Exception
-  {
-  }
 
   @Before
   public void setUp() throws SQLException
@@ -74,16 +68,15 @@ public class SaltAnnotateSqlGeneratorTest
 
     ResultSet resultSet = resultSetProvider.getResultSet();
 
-    SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator();
+    SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator() {
+      protected SolutionKey<?> createSolutionKey() {
+        return solutionKey;
+      }
+    };
 
     project = instance.extractData(resultSet);
     assertNotNull(project);
 
-  }
-
-  @After
-  public void tearDown()
-  {
   }
 
   @Test

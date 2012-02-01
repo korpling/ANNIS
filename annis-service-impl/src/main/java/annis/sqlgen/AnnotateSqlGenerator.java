@@ -31,12 +31,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import org.apache.commons.lang.Validate;
 
 /**
  *
@@ -51,11 +52,14 @@ public abstract class AnnotateSqlGenerator<T>
   WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {
 
+  // include document name in SELECT clause
+  private boolean includeDocumentNameInAnnotateQuery;
+  
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy factsTas;
   private boolean optimizeOverlap;
-  private SchemeType tableLayout;
+  private SchemeType tableLayout = SchemeType.ANNO_POOL;
 
   public static class AnnotateQueryData
   {
@@ -183,6 +187,11 @@ public abstract class AnnotateSqlGenerator<T>
     factsTas.setColumnAliases(columnAliases);
 
 
+  }
+
+  protected SolutionKey<?> createSolutionKey()
+  {
+    throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
   /**
@@ -350,29 +359,16 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     StringBuilder sb = new StringBuilder();
-
+    SolutionKey<?> key = createSolutionKey();
+    
     sb.append("DISTINCT\n");
-    sb.append(indent).append(TABSTOP + "ARRAY[");
-
-    // solutions key
-    List<String> ids = new ArrayList<String>();
-    for (int i = 1; i <= alternative.size(); ++i)
-    {
-      ids.add("solutions.id" + i);
+    List<String> keyColumns = key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.size());
+    for (String keyColumn : keyColumns) {
+      indent(sb, indent + TABSTOP);
+      sb.append(keyColumn);
+      sb.append(",\n");
     }
-    sb.append(StringUtils.join(ids, ", "));
-    sb.append("] AS key,\n");
-
-    // key for annotation graph matches    
-    sb.append(indent).append(TABSTOP + "ARRAY[solutions.name1");
-    for (int i = 2; i <= alternative.size(); ++i)
-    {
-      sb.append(",");
-      sb.append("solutions.name");
-      sb.append(i);
-    }
-    sb.append("] AS key_names,\n");
-
+    indent(sb, indent + TABSTOP);
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
@@ -431,12 +427,17 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append("edge_anno.\"name\" AS edge_annotation_name,\n").append(indent).
         append(TABSTOP);
       sb.append("edge_anno.\"val\" AS edge_annotation_value,\n");
+      sb.append(indent).append(TABSTOP);
     }
 
     // corpus.path_name
-    sb.append("corpus.path_name AS path,\n").append(indent).append(TABSTOP);
-    sb.append("corpus.path_name[1] AS document_name");
-
+    sb.append("corpus.path_name AS path");
+    
+    if (includeDocumentNameInAnnotateQuery) {
+      sb.append(",\n");
+      indent(sb, indent +TABSTOP);
+      sb.append("corpus.path_name[1] AS document_name");
+    }
     return sb.toString();
   }
 
@@ -638,7 +639,17 @@ public abstract class AnnotateSqlGenerator<T>
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    return "key, " + tables(null).aliasedColumn(RANK_TABLE, "pre");
+    SolutionKey<?> key = createSolutionKey();
+    List<String> keyColumns = key.getKeyColumns();
+    StringBuilder sb = new StringBuilder();
+    for (String keyColumn : keyColumns) {
+      sb.append(keyColumn);
+      sb.append(", ");
+    }
+    String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
+    sb.append(preColumn);
+    String orderByClause = sb.toString();
+    return orderByClause;
   }
 
   @Override
@@ -715,13 +726,26 @@ public abstract class AnnotateSqlGenerator<T>
     return factsTas;
   }
 
+
   public String getTableLayout()
   {
     return tableLayout.name().toLowerCase();
   }
+  
 
   public void setTableLayout(String tableLayout)
   {
     this.tableLayout = SchemeType.valueOf(tableLayout.toUpperCase());
   }
+  public boolean isIncludeDocumentNameInAnnotateQuery()
+  {
+    return includeDocumentNameInAnnotateQuery;
+  }
+
+  public void setIncludeDocumentNameInAnnotateQuery(
+      boolean includeDocumentNameInAnnotateQuery)
+  {
+    this.includeDocumentNameInAnnotateQuery = includeDocumentNameInAnnotateQuery;
+  }
+
 }
