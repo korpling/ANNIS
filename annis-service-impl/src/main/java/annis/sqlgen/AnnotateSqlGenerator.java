@@ -513,7 +513,8 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     SolutionKey<?> key = createSolutionKey();
-    List<String> keyColumns = key.getKeyColumns();
+    int size = alternative.size();
+    List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
     for (String keyColumn : keyColumns) {
       sb.append(keyColumn);

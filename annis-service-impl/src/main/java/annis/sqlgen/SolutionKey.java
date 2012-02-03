@@ -64,8 +64,9 @@ public interface SolutionKey<KeyType>
   
   /**
    * Returns the name of the key columns.
+   * @param size The number of matched nodes in a solution.
    */
-  public abstract List<String> getKeyColumns();
+  public abstract List<String> getKeyColumns(int size);
   
   /**
    * Returns the node ID of the current row in a result set.
