@@ -145,6 +145,95 @@ public class TestAnnotateSqlGenerator
         + INDENT + TABSTOP + leftAlias + " AS " + "left" + ",\n"
         + INDENT + TABSTOP + rightAlias + " AS " + "right" + ",\n"
         + INDENT + TABSTOP + tokenIndexAlias + " AS " + "token_index" + ",\n"
+        + INDENT + TABSTOP + continuousAlias + " AS " + "continuous" + ",\n"
+        + INDENT + TABSTOP + spanAlias + " AS " + "span" + ",\n"
+        + INDENT + TABSTOP + leftTokenAlias + " AS " + "left_token" + ",\n"
+        + INDENT + TABSTOP + rightTokenAlias + " AS " + "right_token" + ",\n"
+        + INDENT + TABSTOP + preAlias + " AS " + "pre" + ",\n"
+        + INDENT + TABSTOP + postAlias + " AS " + "post" + ",\n"
+        + INDENT + TABSTOP + parentAlias + " AS " + "parent" + ",\n"
+        + INDENT + TABSTOP + rootAlias + " AS " + "root" + ",\n"
+        + INDENT + TABSTOP + levelAlias + " AS " + "level" + ",\n"
+        + INDENT + TABSTOP + componentIdAlias + " AS " + "component_id" + ",\n"
+        + INDENT + TABSTOP + componentTypeAlias + " AS " + "edge_type" + ",\n"
+        + INDENT + TABSTOP + componentNameAlias + " AS " + "edge_name" + ",\n"
+        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n"
+        + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
+        + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
+        + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
+        + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
+        + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
+        + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n"
+        + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
+    System.out.println("---> Actual");
+    System.out.println(actual);
+    System.out.println();
+    System.out.println("---> Expected");
+    System.out.println(expected);
+    assertThat(actual, is(expected));
+  }
+  
+  /**
+   * The SELECT clause consists of the key columns, columns required to 
+   * generate an Annis node and columns that contain the document hierarchy 
+   * of the node.
+   */
+  @Test
+  public void shouldGenerateSelectClauseWithIsTokenColumn()
+  {
+    // given
+    generator.setIncludeIsTokenColumn(true);
+    int offset = uniqueInt(10);
+    given(annotateQueryData.getOffset()).willReturn(offset);
+    String keyColumn1 = uniqueAlphaString();
+    String keyColumn2 = uniqueAlphaString();
+    given(solutionKey.generateOuterQueryColumns(eq(tableAccessStrategy), anyInt())).willReturn(asList(keyColumn1, keyColumn2));
+    String idAlias = createColumnAlias(NODE_TABLE, "id");
+    String textRefAlias = createColumnAlias(NODE_TABLE, "text_ref");
+    String corpusRefAlias = createColumnAlias(NODE_TABLE, "corpus_ref");
+    String toplevelCorpusAlias = createColumnAlias(NODE_TABLE, "toplevel_corpus");
+    String nodeNamespaceAlias = createColumnAlias(NODE_TABLE, "namespace");
+    String nodeNameAlias = createColumnAlias(NODE_TABLE, "name");
+    String leftAlias = createColumnAlias(NODE_TABLE, "left");
+    String rightAlias = createColumnAlias(NODE_TABLE, "right");
+    String tokenIndexAlias = createColumnAlias(NODE_TABLE, "token_index");
+    String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
+    String continuousAlias = createColumnAlias(NODE_TABLE, "continuous");
+    String spanAlias = createColumnAlias(NODE_TABLE, "span");
+    String leftTokenAlias = createColumnAlias(NODE_TABLE, "left_token");
+    String rightTokenAlias = createColumnAlias(NODE_TABLE, "right_token");
+    String preAlias = createColumnAlias(RANK_TABLE, "pre");
+    String postAlias = createColumnAlias(RANK_TABLE, "post");
+    String parentAlias = createColumnAlias(RANK_TABLE, "parent");
+    String rootAlias = createColumnAlias(RANK_TABLE, "root");
+    String levelAlias = createColumnAlias(RANK_TABLE, "level");
+    String componentIdAlias = createColumnAlias(COMPONENT_TABLE, "id");
+    String componentTypeAlias = createColumnAlias(COMPONENT_TABLE, "type");
+    String componentNameAlias = createColumnAlias(COMPONENT_TABLE, "name");
+    String componentNamespaceAlias = createColumnAlias(COMPONENT_TABLE, "namespace");
+    String nodeAnnotatationNamespaceAlias = createColumnAlias(NODE_ANNOTATION_TABLE, "namespace");
+    String nodeAnnotatationNameAlias = createColumnAlias(NODE_ANNOTATION_TABLE, "name");
+    String nodeAnnotatationValueAlias = createColumnAlias(NODE_ANNOTATION_TABLE, "value");
+    String edgeAnnotationNamespaceAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "namespace");
+    String edgeAnnotationNameAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "name");
+    String edgeAnnotationValueAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "value");
+    String pathNameAlias = createColumnAlias(CORPUS_TABLE, "path_name");
+    // when
+    String actual = generator.selectClause(queryData, alternative, INDENT);
+    // then
+    String expected = "DISTINCT" + "\n"
+        + INDENT + TABSTOP + keyColumn1 + ",\n"
+        + INDENT + TABSTOP + keyColumn2 + ",\n"
+        + INDENT + TABSTOP + offset + "::integer" + " AS " + "matchstart" + ",\n"
+        + INDENT + TABSTOP + idAlias + " AS " + "id" + ",\n"
+        + INDENT + TABSTOP + textRefAlias + " AS " + "text_ref" + ",\n"
+        + INDENT + TABSTOP + corpusRefAlias + " AS " + "corpus_ref" + ",\n"
+        + INDENT + TABSTOP + toplevelCorpusAlias + " AS " + "toplevel_corpus" + ",\n"
+        + INDENT + TABSTOP + nodeNamespaceAlias + " AS " + "node_namespace" + ",\n"
+        + INDENT + TABSTOP + nodeNameAlias + " AS " + "node_name" + ",\n"
+        + INDENT + TABSTOP + leftAlias + " AS " + "left" + ",\n"
+        + INDENT + TABSTOP + rightAlias + " AS " + "right" + ",\n"
+        + INDENT + TABSTOP + tokenIndexAlias + " AS " + "token_index" + ",\n"
         + INDENT + TABSTOP + isTokenAlias + " AS " + "is_token" + ",\n"
         + INDENT + TABSTOP + continuousAlias + " AS " + "continuous" + ",\n"
         + INDENT + TABSTOP + spanAlias + " AS " + "span" + ",\n"
