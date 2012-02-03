@@ -53,6 +53,9 @@ public abstract class AnnotateSqlGenerator<T>
   // include document name in SELECT clause
   private boolean includeDocumentNameInAnnotateQuery;
   
+  // include is_token column in SELECT clause
+  private boolean includeIsTokenColumn;
+  
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy factsTas;
@@ -306,7 +309,9 @@ public abstract class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "left");
     addSelectClauseAttribute(fields, NODE_TABLE, "right");
     addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
-    addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
+    if (includeIsTokenColumn) {
+      addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
+    }
     addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
     addSelectClauseAttribute(fields, NODE_TABLE, "span");
     addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
@@ -593,6 +598,16 @@ public abstract class AnnotateSqlGenerator<T>
       boolean includeDocumentNameInAnnotateQuery)
   {
     this.includeDocumentNameInAnnotateQuery = includeDocumentNameInAnnotateQuery;
+  }
+
+  public boolean isIncludeIsTokenColumn()
+  {
+    return includeIsTokenColumn;
+  }
+
+  public void setIncludeIsTokenColumn(boolean includeIsTokenColumn)
+  {
+    this.includeIsTokenColumn = includeIsTokenColumn;
   }
 
 }
