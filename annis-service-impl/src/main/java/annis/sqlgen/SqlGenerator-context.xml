@@ -123,6 +123,7 @@ limitations under the License.
     </entry>
     <entry key="component">
       <util:map>
+        <entry key="id" value="component_id" />
         <entry key="name" value="edge_name" />
         <entry key="type" value="edge_type" />
         <entry key="namespace" value="edge_namespace" />
