@@ -20,6 +20,7 @@ import annis.model.Annotation;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
 public class MetaDataPanel extends Panel
 {
 
-  private VerticalLayout layout;  
+  private VerticalLayout layout;
   private String toplevelCorpusName;
   private String documentName;
 
@@ -57,7 +58,7 @@ public class MetaDataPanel extends Panel
     setSizeFull();
     layout = new VerticalLayout();
     setContent(layout);
-    layout.setSizeFull();    
+    layout.setSizeFull();
   }
 
   @Override
@@ -70,17 +71,28 @@ public class MetaDataPanel extends Panel
     BeanItemContainer<Annotation> mData =
       new BeanItemContainer<Annotation>(Annotation.class);
 
+    // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName.equals(toplevelCorpusName))
     {
       mData.addAll(getMetaData(toplevelCorpusName, documentName));
-      setupTable(mData);
+      layout.addComponent(setupTable(mData));
     }
     else
     {
       Map<String, List<Annotation>> hashMData = splitListAnnotations();
+      List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
+      Accordion accordion = new Accordion();
+      accordion.setSizeFull();
+      layout.addComponent(accordion);
+
+      for (BeanItemContainer<Annotation> item : l)
+      {
+        String corpusName = item.getIdByIndex(0).getCorpusName();
+        accordion.addTab(setupTable(item),
+          (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
+          : "document: "+ corpusName);
+      }
     }
-
-
   }
 
   private List<Annotation> getMetaData(String toplevelCorpusName,
@@ -106,12 +118,10 @@ public class MetaDataPanel extends Panel
     return result;
   }
 
-  private void setupTable(BeanItemContainer<Annotation> metaData)
+  private Table setupTable(BeanItemContainer<Annotation> metaData)
   {
     final BeanItemContainer<Annotation> mData = metaData;
     Table tblMeta = new Table();
-    layout.addComponent(tblMeta);
-
     tblMeta.setContainerDataSource(mData);
     tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator()
     {
@@ -154,6 +164,7 @@ public class MetaDataPanel extends Panel
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
+    return tblMeta;
   }
 
   private Map<String, List<Annotation>> splitListAnnotations()
@@ -164,8 +175,7 @@ public class MetaDataPanel extends Panel
 
     for (Annotation metaDatum : metadata)
     {
-      // namespace is the name of the corpus, which included the annotation
-      String corpus = metaDatum.getNamespace();
+      String corpus = metaDatum.getCorpusName();
       if (!hashMetaData.containsKey(corpus))
       {
         hashMetaData.put(corpus, new ArrayList<Annotation>());
@@ -185,7 +195,7 @@ public class MetaDataPanel extends Panel
   {
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
       new ArrayList<BeanItemContainer<Annotation>>();
-    
+
     for (List<Annotation> list : splittedAnnotationsList.values())
     {
       BeanItemContainer<Annotation> metaContainer =
