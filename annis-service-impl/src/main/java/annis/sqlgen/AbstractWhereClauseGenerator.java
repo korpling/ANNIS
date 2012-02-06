@@ -32,6 +32,7 @@ public abstract class AbstractWhereClauseGenerator extends
     TableAccessStrategyFactory implements WhereClauseSqlGenerator<QueryData>
 {
 
+  @Override
   public Set<String> whereConditions(QueryData queryData,
       List<QueryNode> alternative, String indent)
   {
@@ -143,7 +144,7 @@ public abstract class AbstractWhereClauseGenerator extends
       {
         ++i;
         addAnnotationConditions(conditions, node, i, annotation,
-            NODE_ANNOTATION_TABLE);
+            NODE_ANNOTATION_TABLE, queryData);
       }
 
       // edge annotations
@@ -152,7 +153,7 @@ public abstract class AbstractWhereClauseGenerator extends
       {
         ++j;
         addAnnotationConditions(conditions, node, j, annotation,
-            EDGE_ANNOTATION_TABLE);
+            EDGE_ANNOTATION_TABLE, queryData);
       }
     }
 
@@ -218,7 +219,8 @@ public abstract class AbstractWhereClauseGenerator extends
       QueryNode node, QueryNode target, Precedence join, QueryData queryData);
 
   protected abstract void addAnnotationConditions(List<String> conditions,
-      QueryNode node, int index, QueryAnnotation annotation, String table);
+      QueryNode node, int index, QueryAnnotation annotation, String table,
+      QueryData queryData);
 
   protected abstract void addLeftDominanceConditions(List<String> conditions,
       QueryNode node, QueryNode target, LeftDominance join, QueryData queryData);

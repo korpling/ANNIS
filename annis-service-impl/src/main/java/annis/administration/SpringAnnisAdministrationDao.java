@@ -53,10 +53,8 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * - Transaktionen
- * - Datenbank-Zugriffsrechte für verschiedene Methoden
- * - Reihenfolge der Aufrufe
- * - Skripte in $ANNIS_HOME/scripts
+ * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
+ * Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts
  */
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class SpringAnnisAdministrationDao
@@ -161,12 +159,20 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("unique_toplevel_corpus_name.sql");
   }
 
-  void createSchema()
+
+  void createFunctionAnnoGetter()
   {
-    log.info("creating Annis database schema");
-    executeSqlFromScript("schema.sql");
+    log.info(
+      "creating immutable functions for getting annotations from the annotation pool");
+    executeSqlFromScript("functions_annopool_get.sql");
   }
 
+  void createSchema(SchemeType type)
+  {
+    log.info("creating Annis database schema (" + type.getDescription() + ")");
+    executeSqlFromScript("schema_" + type.getScriptAppendix() + ".sql");
+  }
+  
   void populateSchema()
   {
     log.info("populating the schemas with default values");
@@ -403,9 +409,11 @@ public class SpringAnnisAdministrationDao
       int numOfEntries = jdbcOperations.queryForInt("SELECT COUNT(*) from "
         + tableInStagingArea(table));
 
+
       if (numOfEntries > 0)
       {
         StringBuilder sql = new StringBuilder();
+
         if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
         {
           sql.append("INSERT INTO ");
@@ -476,31 +484,21 @@ public class SpringAnnisAdministrationDao
     jdbcOperations.execute("ANALYZE facts_" + corpusID);
   }
 
-  void createFacts(long corpusID)
+  void createFacts(long corpusID, SchemeType type)
   {
 
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts.sql", args);
-
-    log.info("updating values in materialized facts table for corpus with ID "
-      + corpusID);
-    executeSqlFromScript("update_facts.sql", args);
-
+    executeSqlFromScript("facts_" + type.getScriptAppendix() + ".sql", args);
+    
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
     executeSqlFromScript("cluster.sql", args);
-
+    
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_facts.sql", args);
+    executeSqlFromScript("indexes_" + type.getScriptAppendix() + ".sql", args);
 
-  }
-
-  void rebuildIndexes()
-  {
-    log.info("creating general indexes");
-    executeSqlFromScript("indexes.sql");
   }
 
   ///// Other sub tasks
@@ -513,20 +511,24 @@ public class SpringAnnisAdministrationDao
 
   void deleteCorpora(List<Long> ids)
   {
-
-    log.debug("recursivly deleting corpora: " + ids);
-    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
-      StringUtils.join(ids, ", ")));
-
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
       jdbcOperations.execute("DROP TABLE facts_" + l);
+      log.debug("dropping annotation_pool table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS annotation_pool_" + l);
+      log.debug("dropping annotations table for corpus " + l);
+      jdbcOperations.execute("DROP TABLE IF EXISTS annotations_" + l);
 //      log.debug("dropping node annotation table for corpus " + l);
 //      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
 //      log.debug("dropping node table for corpus " + l);//			
 //      jdbcOperations.execute("DROP TABLE node_" + l);
     }
+
+
+    log.debug("recursivly deleting corpora: " + ids);
+    executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
+      StringUtils.join(ids, ", ")));
 
   }
 
@@ -711,10 +713,11 @@ public class SpringAnnisAdministrationDao
 
   /*
    * Returns the CREATE INDEX statement for all indexes on the Annis tables,
-   * that are not auto-created by PostgreSQL (primary keys and unique constraints).
-   * 
-   * @param used	If True, return used indexes.
-   * 				If False, return unused indexes (scan count is 0).
+   * that are not auto-created by PostgreSQL (primary keys and unique
+   * constraints).
+   *
+   * @param used	If True, return used indexes. If False, return unused indexes
+   * (scan count is 0).
    */
   public List<String> listIndexDefinitions(boolean used, List<String> tables)
   {

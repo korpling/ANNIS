@@ -18,7 +18,7 @@ package de.deutschdiachrondigital.dddquery.helper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import annis.administration.CorpusAdministration;
+import annis.administration.FullFactsCorpusAdministration;
 import annis.administration.SpringAnnisAdministrationDao;
 import annis.dao.AnnisDao;
 import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
@@ -51,8 +51,8 @@ public class BeanFactory {
 //		System.out.println("service running...");
 	}
 	
-	public CorpusAdministration getAdministration() {
-		return (CorpusAdministration) ctx.getBean("administration");
+	public FullFactsCorpusAdministration getAdministration() {
+		return (FullFactsCorpusAdministration) ctx.getBean("administration");
 	}
 
 	public SpringAnnisAdministrationDao getImportCorpus() {

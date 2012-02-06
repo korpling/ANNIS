@@ -24,19 +24,20 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 
+
 public class TestCorpusAdministration
 {
 
   @Mock
   private SpringAnnisAdministrationDao administrationDao;
-  private CorpusAdministration administration;
+  private AnnoTableCorpusAdministration administration;
 
   @Before
   public void setup()
   {
     initMocks(this);
 
-    administration = new CorpusAdministration();
+    administration = new AnnoTableCorpusAdministration();
     administration.setAdministrationDao(administrationDao);
   }
 
@@ -45,7 +46,8 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    administration.importCorpora(false, path);
+    SchemeType type = SchemeType.ANNO_POOL;
+    administration.importCorpora(true, path);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);
@@ -53,7 +55,7 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that the corpus was imported
-    verifyImport(inOrder, path);
+    verifyImport(inOrder, path, type);
 
     verifyPostImport(inOrder);
 
@@ -67,7 +69,9 @@ public class TestCorpusAdministration
     String path1 = "somePath";
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
-    administration.importCorpora(false, path1, path2, path3);
+    SchemeType type = SchemeType.ANNO_POOL;
+
+    administration.importCorpora(true, path1, path2, path3);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);
@@ -76,9 +80,9 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that each corpus was inserted in order
-    verifyImport(inOrder, path1);
-    verifyImport(inOrder, path2);
-    verifyImport(inOrder, path3);
+    verifyImport(inOrder, path1, type);
+    verifyImport(inOrder, path2, type);
+    verifyImport(inOrder, path3, type);
 
     // that should be it
     verifyNoMoreInteractions(administrationDao);
@@ -95,10 +99,10 @@ public class TestCorpusAdministration
   }
 
   // a correct import requires this order
-  private void verifyImport(InOrder inOrder, String path)
+  private void verifyImport(InOrder inOrder, String path, SchemeType type)
   {
     // create the staging area
-    inOrder.verify(administrationDao).createStagingArea(false);
+    inOrder.verify(administrationDao).createStagingArea(true);
 
     // bulk import the data
     inOrder.verify(administrationDao).bulkImport(path);
@@ -139,13 +143,13 @@ public class TestCorpusAdministration
     inOrder.verify(administrationDao).createAnnotations(corpusID);
 
     // the facts child table must be created
-    inOrder.verify(administrationDao).createFacts(corpusID);
 
-    // drop the staging area is not necessary, because we have no
-    // staging area in this test
-    // inOrder.verify(administrationDao).dropStagingArea();
+    inOrder.verify(administrationDao).createFacts(corpusID, type);
 
     inOrder.verify(administrationDao).updateCorpusStatistic();
+
+    // drop the staging area is not necessary, because we have no staging area in this test
+    inOrder.verify(administrationDao).dropStagingArea();
 
     // analyze facts table
     inOrder.verify(administrationDao).analyzeFacts(corpusID);

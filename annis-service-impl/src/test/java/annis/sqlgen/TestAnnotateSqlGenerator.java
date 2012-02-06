@@ -2,11 +2,11 @@ package annis.sqlgen;
 
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.test.TestUtils.uniqueAlphaString;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
 
+import annis.administration.SchemeType;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
@@ -91,8 +92,26 @@ public class TestAnnotateSqlGenerator
    * of the node.
    */
   @Test
-  public void shouldGenerateSelectClause()
+  public void shouldGenerateSelectClauseAnnoPool()
   {
+    shouldGenerateSelectClause(SchemeType.ANNO_POOL);
+  }
+  
+  /**
+   * The SELECT clause consists of the key columns, columns required to 
+   * generate an Annis node and columns that contain the document hierarchy 
+   * of the node.
+   */
+  @Test
+  public void shouldGenerateSelectClauseFullFacts()
+  {
+    shouldGenerateSelectClause(SchemeType.FULLFACTS);
+  }
+    
+  private void shouldGenerateSelectClause(SchemeType type)
+  {
+    generator.setTableLayout(type.name());
+    
     // given
     int offset = uniqueInt(10);
     given(annotateQueryData.getOffset()).willReturn(offset);
@@ -108,7 +127,7 @@ public class TestAnnotateSqlGenerator
     String leftAlias = createColumnAlias(NODE_TABLE, "left");
     String rightAlias = createColumnAlias(NODE_TABLE, "right");
     String tokenIndexAlias = createColumnAlias(NODE_TABLE, "token_index");
-    String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
+//    String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
     String continuousAlias = createColumnAlias(NODE_TABLE, "continuous");
     String spanAlias = createColumnAlias(NODE_TABLE, "span");
     String leftTokenAlias = createColumnAlias(NODE_TABLE, "left_token");
@@ -128,6 +147,7 @@ public class TestAnnotateSqlGenerator
     String edgeAnnotationNamespaceAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "namespace");
     String edgeAnnotationNameAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "name");
     String edgeAnnotationValueAlias = createColumnAlias(EDGE_ANNOTATION_TABLE, "value");
+
     String pathNameAlias = createColumnAlias(CORPUS_TABLE, "path_name");
     // when
     String actual = generator.selectClause(queryData, alternative, INDENT);
@@ -157,14 +177,28 @@ public class TestAnnotateSqlGenerator
         + INDENT + TABSTOP + componentIdAlias + " AS " + "component_id" + ",\n"
         + INDENT + TABSTOP + componentTypeAlias + " AS " + "edge_type" + ",\n"
         + INDENT + TABSTOP + componentNameAlias + " AS " + "edge_name" + ",\n"
-        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n"
-        + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
-        + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
-        + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n"
-        + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
+        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n";
+        if (type == SchemeType.FULLFACTS)
+        {
+          expected = expected
+            + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
+            + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
+            + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
+            + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
+            + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
+            + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n";
+        }
+        else if(type == SchemeType.ANNO_POOL)
+        {
+          expected = expected
+            + INDENT + TABSTOP + "node_anno.namespace AS node_annotation_namespace,\n"
+            + INDENT + TABSTOP + "node_anno.\"name\" AS node_annotation_name,\n"
+            + INDENT + TABSTOP + "node_anno.\"val\" AS node_annotation_value,\n"
+            + INDENT + TABSTOP + "edge_anno.namespace AS edge_annotation_namespace,\n"
+            + INDENT + TABSTOP + "edge_anno.\"name\" AS edge_annotation_name,\n"
+            + INDENT + TABSTOP + "edge_anno.\"val\" AS edge_annotation_value,\n";
+        }
+        expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
     System.out.println("---> Actual");
     System.out.println(actual);
     System.out.println();
@@ -182,6 +216,8 @@ public class TestAnnotateSqlGenerator
   public void shouldGenerateSelectClauseWithIsTokenColumn()
   {
     // given
+    SchemeType type = SchemeType.FULLFACTS;
+    generator.setTableLayout(type.name());
     generator.setIncludeIsTokenColumn(true);
     int offset = uniqueInt(10);
     given(annotateQueryData.getOffset()).willReturn(offset);
@@ -247,19 +283,33 @@ public class TestAnnotateSqlGenerator
         + INDENT + TABSTOP + componentIdAlias + " AS " + "component_id" + ",\n"
         + INDENT + TABSTOP + componentTypeAlias + " AS " + "edge_type" + ",\n"
         + INDENT + TABSTOP + componentNameAlias + " AS " + "edge_name" + ",\n"
-        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n"
+        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n";
+    if (type == SchemeType.FULLFACTS)
+    {
+      expected = expected
         + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
         + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
         + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
         + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
         + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n"
-        + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
+        + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n";
+    }
+    else if(type == SchemeType.ANNO_POOL)
+    {
+      expected = expected
+        + INDENT + TABSTOP + "node_anno.namespace AS node_annotation_namespace,\n"
+        + INDENT + TABSTOP + "node_anno.\"name\" AS node_annotation_name,\n"
+        + INDENT + TABSTOP + "node_anno.\"val\" AS node_annotation_value,\n"
+        + INDENT + TABSTOP + "edge_anno.namespace AS edge_annotation_namespace,\n"
+        + INDENT + TABSTOP + "edge_anno.\"name\" AS edge_annotation_name,\n"
+        + INDENT + TABSTOP + "edge_anno.\"val\" AS edge_annotation_value,\n";
+    }
+    expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
+          
     System.out.println("---> Actual");
-    System.out.println(actual);
-    System.out.println();
+    System.out.println(actual.replace("\t", "\\t").replace("\n", "\\n\n"));
     System.out.println("---> Expected");
-    System.out.println(expected);
+    System.out.println(expected.replace("\t", "\\t").replace("\n", "\\n\n"));
     assertThat(actual, is(expected));
   }
   

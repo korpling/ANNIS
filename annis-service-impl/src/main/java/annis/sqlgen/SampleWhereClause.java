@@ -16,6 +16,8 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.bitSelect;
+import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
@@ -72,27 +74,32 @@ public class SampleWhereClause extends TableAccessStrategyFactory
       if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
       {
         conditions.add("-- artificial node subview");
-        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{true, false, false, false, false}));
+        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_sample")));
+        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{true, false, false, false, false}));
       }
       else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
       {
         conditions.add("-- artificial node-rank-component subview");
-        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, true, false, false}));
+        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_sample")));
+        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, true, false, false}));
       }
       else if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable())
       {
         conditions.add("-- artificial node-node_annotation subview");
-        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, true, false, false, false}));
+        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_na_sample")));
+        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, true, false, false, false}));
       }
       else if(!t.usesNodeAnnotationTable())
       {
         conditions.add("-- artificial node-rank-component-edge_annotation subview");
-        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, true, false}));
+        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_ea_sample")));
+        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, true, false}));
       }
       else if(!t.usesEdgeAnnotationTable())
       {
         conditions.add("-- artificial node-rank-component-node_annotation subview");
-        conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, false, true}));
+        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_na_sample")));
+        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, false, true}));
       }
     }
     return conditions;

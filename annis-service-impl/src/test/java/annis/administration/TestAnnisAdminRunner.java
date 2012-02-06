@@ -15,20 +15,18 @@
  */
 package annis.administration;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 
 public class TestAnnisAdminRunner {
 	
-	@Mock private CorpusAdministration administration;
+	@Mock private FullFactsCorpusAdministration administration;
 	private AnnisAdminRunner main;
 	
 	@Before
