@@ -15,10 +15,8 @@
  */
 package annis.gui;
 
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.model.Annotation;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Component;
@@ -27,11 +25,9 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
