@@ -384,7 +384,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append("::integer AS matchstart,\n");
+    sb.append(extension.get(0).getOffset()).append(" AS matchstart,\n");
 
     List<String> fields = new ArrayList<String>();
     // facts.fid is never evaluated in the result set
