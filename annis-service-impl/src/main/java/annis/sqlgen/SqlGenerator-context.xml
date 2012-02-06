@@ -200,6 +200,8 @@ limitations under the License.
 
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor"/>
 
+  <bean id="csvCorpusPathExtractor" class="annis.sqlgen.CsvCorpusPathExtractor"/>
+
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
@@ -252,7 +254,7 @@ limitations under the License.
 		</property>
 		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
       <property name="tableLayout" value="${annis.table-layout}" />
-    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
+    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
   </bean>
 
 	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
