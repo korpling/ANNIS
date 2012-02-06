@@ -145,6 +145,7 @@ public class TestDefaultWhereClauseGenerator
       String componentName, String... expected)
   {
     List<String> expectedConditions = new ArrayList<String>();
+    expectedConditions.add(join("=", "_component23.id", "_component42.id"));
     if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate))
     {
       expectedConditions
