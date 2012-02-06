@@ -64,6 +64,9 @@ public abstract class AnnotateSqlGenerator<T>
   private boolean optimizeOverlap;
   private SchemeType tableLayout = SchemeType.ANNO_POOL;
 
+  // helper to extract the corpus path from a JDBC result set
+  private CorpusPathExtractor corpusPathExtractor;
+  
   public static class AnnotateQueryData
   {
 
@@ -192,6 +195,12 @@ public abstract class AnnotateSqlGenerator<T>
 
   }
 
+  /**
+   * Create a solution key to be used inside a single call to
+   * {@code extractData}.
+   * 
+   * This method must be overridden in child classes or by Spring.
+   */
   protected SolutionKey<?> createSolutionKey()
   {
     throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
@@ -762,6 +771,16 @@ public abstract class AnnotateSqlGenerator<T>
   public void setIncludeIsTokenColumn(boolean includeIsTokenColumn)
   {
     this.includeIsTokenColumn = includeIsTokenColumn;
+  }
+
+  public CorpusPathExtractor getCorpusPathExtractor()
+  {
+    return corpusPathExtractor;
+  }
+
+  public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
+  {
+    this.corpusPathExtractor = corpusPathExtractor;
   }
 
 }

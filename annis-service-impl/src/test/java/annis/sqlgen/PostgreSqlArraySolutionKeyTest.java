@@ -1,6 +1,7 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.test.TestUtils.createJdbcArray;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
@@ -9,13 +10,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import org.junit.Before;
@@ -93,7 +92,7 @@ public class PostgreSqlArraySolutionKeyTest
     String key1 = uniqueString(3);
     String key2 = uniqueString(3);
     String key3 = uniqueString(3);
-    Array array = createKeyJdbcArray(key1, key2, key3);
+    Array array = createJdbcArray(key1, key2, key3);
     given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     List<String> actual = key.retrieveKey(resultSet);
@@ -102,15 +101,6 @@ public class PostgreSqlArraySolutionKeyTest
     assertThat(actual, is(expected));
   }
 
-  // create a JDBC array from an array of strings
-  private Array createKeyJdbcArray(String... keys) throws SQLException
-  {
-    Array array = mock(Array.class); 
-    given(array.getBaseType()).willReturn(Types.VARCHAR);
-    given(array.getArray()).willReturn(keys);
-    return array;
-  }
-  
   /**
    * Signal illegal state if there is an SQL error.
    */
@@ -144,8 +134,8 @@ public class PostgreSqlArraySolutionKeyTest
     // given
     String key1 = uniqueString(3);
     String key2 = uniqueString(3);
-    Array array1 = createKeyJdbcArray(key1);
-    Array array2 = createKeyJdbcArray(key2);
+    Array array1 = createJdbcArray(key1);
+    Array array2 = createJdbcArray(key2);
     given(resultSet.getArray(keyColumnName)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
@@ -163,8 +153,8 @@ public class PostgreSqlArraySolutionKeyTest
   {
     // given
     String key1 = uniqueString(3);
-    Array array1 = createKeyJdbcArray(key1);
-    Array array2 = createKeyJdbcArray(key1);
+    Array array1 = createJdbcArray(key1);
+    Array array2 = createJdbcArray(key1);
     given(resultSet.getArray(keyColumnName)).willReturn(array1, array2);
     // when
     key.retrieveKey(resultSet);
@@ -183,7 +173,7 @@ public class PostgreSqlArraySolutionKeyTest
   {
     // given
     String[] keys = { uniqueString(3), uniqueString(3), uniqueString(3) };
-    Array array = createKeyJdbcArray(keys);
+    Array array = createJdbcArray(keys);
     given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
@@ -200,7 +190,7 @@ public class PostgreSqlArraySolutionKeyTest
   public void shouldReturnNullForUnmatchedNodes() throws SQLException
   {
     // given
-    Array array = createKeyJdbcArray(uniqueString());
+    Array array = createJdbcArray(uniqueString());
     given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);
@@ -218,7 +208,7 @@ public class PostgreSqlArraySolutionKeyTest
     String key1 = uniqueString(3);
     String key2 = uniqueString(3);
     String key3 = uniqueString(3);
-    Array array = createKeyJdbcArray(key1, key2, key3);
+    Array array = createJdbcArray(key1, key2, key3);
     given(resultSet.getArray(keyColumnName)).willReturn(array);
     // when
     key.retrieveKey(resultSet);

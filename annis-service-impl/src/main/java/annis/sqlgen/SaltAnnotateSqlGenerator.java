@@ -22,11 +22,9 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -76,7 +74,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   {
   }
   
-
   @Override
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
@@ -140,11 +137,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         feature.setSValue(key.getCurrentKeyAsString());
         document.addSFeature(feature);
         
-        
-        ArrayList<String> path =
-          new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
-          "path").getArray()));
-        Collections.reverse(path);
+        List<String> path = getCorpusPathExtractor().extractCorpusPath(resultSet, "path");
         
         SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
         toplevelCorpus.setSName(path.get(0));
@@ -578,4 +571,5 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   {
     return resultSet.getString(getFactsTas().columnName(table, column));
   }
+
 }

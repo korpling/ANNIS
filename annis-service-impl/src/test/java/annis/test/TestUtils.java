@@ -3,6 +3,11 @@ package annis.test;
 
 
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +31,18 @@ public class TestUtils {
   
   // FIXME: either rename the class or exclude it from maven testing
   @Test public void dummyTest() { }
+  
+  /**
+   * Create a mocked JDBC array.
+   * 
+   * @param keys The array that should be returned by the {@code getArray} method.
+   */
+  public static <T> Array createJdbcArray(T... keys) throws SQLException
+  {
+    Array array = mock(Array.class); 
+    given(array.getArray()).willReturn(keys);
+    return array;
+  }
   
   /**
    * Create a set from a list of items.

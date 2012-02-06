@@ -4,8 +4,10 @@
  */
 package annis.utils;
 
+import static annis.test.TestUtils.uniqueString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -28,6 +30,8 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
+import annis.sqlgen.ArrayCorpusPathExtractor;
+import annis.sqlgen.CorpusPathExtractor;
 import annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.AomAnnotateSqlGenerator;
@@ -88,7 +92,8 @@ public class LegacyGraphConverterTest
         return new NodeNameAndIdPostgreSqlArraySolutionKey();
       }
     };
-
+    CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
+    saltSqlGen.setCorpusPathExtractor(corpusPathExtractor);
 
     SaltProject p =
       saltSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.

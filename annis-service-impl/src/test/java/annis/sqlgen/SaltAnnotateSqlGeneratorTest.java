@@ -73,6 +73,8 @@ public class SaltAnnotateSqlGeneratorTest
         return solutionKey;
       }
     };
+    CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
+    instance.setCorpusPathExtractor(corpusPathExtractor);
 
     project = instance.extractData(resultSet);
     assertNotNull(project);
