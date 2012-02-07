@@ -123,6 +123,7 @@ limitations under the License.
     </entry>
     <entry key="component">
       <util:map>
+        <entry key="id" value="component_id" />
         <entry key="name" value="edge_name" />
         <entry key="type" value="edge_type" />
         <entry key="namespace" value="edge_namespace" />
@@ -159,6 +160,44 @@ limitations under the License.
   <util:map id="emptyTableAliases" />
 
   <util:map id="emptyColumnAliases" />
+
+  <util:map id="annotateOuterQueryColumnAliases">
+    <entry key="node">
+      <util:map>
+        <entry key="namespace" value="node_namespace"/>
+        <entry key="name" value="node_name"/>
+      </util:map>    
+    </entry>
+    <entry key="node_annotation">
+      <util:map>
+        <entry key="node_ref" value="id"/>
+        <entry key="namespace" value="node_annotation_namespace"/>
+        <entry key="name" value="node_annotation_name"/>
+        <entry key="value" value="node_annotation_value"/>
+      </util:map>
+    </entry>
+    <entry key="edge_annotation">
+      <util:map>
+        <entry key="rank_ref" value="pre"/>
+        <entry key="namespace" value="edge_annotation_namespace"/>
+        <entry key="name" value="edge_annotation_name"/>
+        <entry key="value" value="edge_annotation_value"/>
+      </util:map>
+    </entry>
+    <entry key="rank">
+      <util:map>
+        <entry key="node_ref" value="id"/>
+      </util:map>
+    </entry>
+    <entry key="component">
+      <util:map>
+        <entry key="id" value="component_id"/>
+        <entry key="name" value="edge_name"/>
+        <entry key="namespace" value="edge_namespace"/>
+        <entry key="type" value="edge_type"/>
+      </util:map>
+    </entry>
+  </util:map>
 
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
         scope="prototype">
@@ -197,12 +236,21 @@ limitations under the License.
 		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
 	</bean>
 
+  <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor"/>
+
+  <bean id="csvCorpusPathExtractor" class="annis.sqlgen.CsvCorpusPathExtractor"/>
+
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
 
   <bean id="nodeNameAndIdPostgreSqlAndIdSolutionKey" class="annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey" scope="prototype"/>
+
+  <bean id="multipleColumnsSolutionKey" class="annis.sqlgen.MultipleColumnsSolutionKey" scope="prototype">
+    <property name="idColumnName" value="${annis.node-id-column-name}"/>
+    <property name="keyColumnName" value="key"/>
+  </bean>
 
 	<bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
 		parent="tableAccessStrategyFactory">
@@ -225,6 +273,7 @@ limitations under the License.
 		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
 		<property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
+    <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
 		<property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
 		<property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
@@ -243,7 +292,13 @@ limitations under the License.
 		</property>
 		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
       <property name="tableLayout" value="${annis.table-layout}" />
-	</bean>
+    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <property name="outerQueryTableAccessStrategy">
+      <bean class="annis.sqlgen.TableAccessStrategy">
+        <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
+      </bean>
+    </property>
+  </bean>
 
 	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
         parent="annotateSqlGenerator">

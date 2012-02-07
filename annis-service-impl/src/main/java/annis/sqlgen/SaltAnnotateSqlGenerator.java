@@ -22,11 +22,9 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -76,7 +74,6 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   {
   }
   
-
   @Override
   public SaltProject extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
@@ -140,11 +137,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         feature.setSValue(key.getCurrentKeyAsString());
         document.addSFeature(feature);
         
-        
-        ArrayList<String> path =
-          new ArrayList<String>(Arrays.asList((String[]) resultSet.getArray(
-          "path").getArray()));
-        Collections.reverse(path);
+        List<String> path = getCorpusPathExtractor().extractCorpusPath(resultSet, "path");
         
         SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
         toplevelCorpus.setSName(path.get(0));
@@ -265,7 +258,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
-      Object nodeId = key.getNodeId(resultSet, getFactsTas());
+      Object nodeId = key.getNodeId(resultSet, getOuterQueryTableAccessStrategy());
       Integer matchedNode = key.getMatchedNodeIndex(nodeId);
       if (matchedNode != null)
       {
@@ -570,12 +563,13 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   protected long longValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getLong(getFactsTas().columnName(table, column));
+    return resultSet.getLong(getOuterQueryTableAccessStrategy().columnName(table, column));
   }
   
   protected String stringValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getString(getFactsTas().columnName(table, column));
+    return resultSet.getString(getOuterQueryTableAccessStrategy().columnName(table, column));
   }
+
 }

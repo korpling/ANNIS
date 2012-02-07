@@ -3,6 +3,11 @@ package annis.test;
 
 
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +31,18 @@ public class TestUtils {
   
   // FIXME: either rename the class or exclude it from maven testing
   @Test public void dummyTest() { }
+  
+  /**
+   * Create a mocked JDBC array.
+   * 
+   * @param keys The array that should be returned by the {@code getArray} method.
+   */
+  public static <T> Array createJdbcArray(T... keys) throws SQLException
+  {
+    Array array = mock(Array.class); 
+    given(array.getArray()).willReturn(keys);
+    return array;
+  }
   
   /**
    * Create a set from a list of items.
@@ -66,6 +83,32 @@ public class TestUtils {
    */
   public static String uniqueString(int length) {
     return RandomStringUtils.randomAlphanumeric(length);
+  }
+
+  /**
+   * Generates a string consisting of {@code prefix} and a random suffix
+   * of 10 characters or numbers.
+   * 
+   * @param prefix The prefix of the string.
+   */
+  public static String uniqueString(String prefix)
+  {
+    return uniqueString(prefix, 10);
+  }
+  
+  /**
+   * Generates a string consisting of {@code prefix} and a random suffix
+   * of {@code length} characters or numbers.
+   * 
+   * @param prefix The prefix of the string.
+   * @param length The length of the random suffix.
+   */
+  public static String uniqueString(String prefix, int length)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(prefix);
+    sb.append(uniqueString(length));
+    return sb.toString();
   }
   
   /**
