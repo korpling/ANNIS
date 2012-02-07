@@ -60,7 +60,7 @@ public abstract class AnnotateSqlGenerator<T>
   
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
-  private TableAccessStrategy factsTas;
+  private TableAccessStrategy outerQueryTableAccessStrategy;
   private boolean optimizeOverlap;
   private SchemeType tableLayout = SchemeType.ANNO_POOL;
 
@@ -145,54 +145,6 @@ public abstract class AnnotateSqlGenerator<T>
 
   public AnnotateSqlGenerator()
   {
-    // FIXME: totally ugly, but the query has fixed column names 
-    // (and needs its own column aliasing)
-    // TableAccessStrategyFactory wants a corpus selection 
-    // strategy
-    // solution: build AnnisNodes with API and refactor 
-    // SqlGenerator to accept GROUP BY nodes
-    Map<String, String> nodeColumns = new HashMap<String, String>();
-    nodeColumns.put("namespace", "node_namespace");
-    nodeColumns.put("name", "node_name");
-
-    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("node_ref", "id");
-    nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
-    nodeAnnotationColumns.put("name", "node_annotation_name");
-    nodeAnnotationColumns.put("value", "node_annotation_value");
-
-    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("rank_ref", "pre");
-    edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
-    edgeAnnotationColumns.put("name", "edge_annotation_name");
-    edgeAnnotationColumns.put("value", "edge_annotation_value");
-
-    Map<String, String> edgeColumns = new HashMap<String, String>();
-    edgeColumns.put("node_ref", "id");
-
-    Map<String, String> componentColumns = new HashMap<String, String>();
-    componentColumns.put("id", "component_id");
-    componentColumns.put("name", "edge_name");
-    componentColumns.put("namespace", "edge_namespace");
-    componentColumns.put("type", "edge_type");
-
-    edgeColumns.put("name", "edge_name");
-    edgeColumns.put("namespace", "edge_namespace");
-
-    Map<String, Map<String, String>> columnAliases =
-      new HashMap<String, Map<String, String>>();
-    columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
-    columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE,
-      nodeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE,
-      edgeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
-    columnAliases.put(COMPONENT_TABLE, componentColumns);
-
-    factsTas = new TableAccessStrategy(null);
-    factsTas.setColumnAliases(columnAliases);
-
-
   }
 
   /**
@@ -460,7 +412,7 @@ public abstract class AnnotateSqlGenerator<T>
   {
     TableAccessStrategy tas = tables(null);
     fields.add(tas.aliasedColumn(table, column) + " AS "
-      + factsTas.columnName(table, column));
+      + outerQueryTableAccessStrategy.columnName(table, column));
   }
 
   @Override
@@ -736,9 +688,9 @@ public abstract class AnnotateSqlGenerator<T>
     this.optimizeOverlap = optimizeOverlap;
   }
 
-  public TableAccessStrategy getFactsTas()
+  public TableAccessStrategy getOuterQueryTableAccessStrategy()
   {
-    return factsTas;
+    return outerQueryTableAccessStrategy;
   }
 
 
@@ -781,6 +733,12 @@ public abstract class AnnotateSqlGenerator<T>
   public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
   {
     this.corpusPathExtractor = corpusPathExtractor;
+  }
+
+  public void setOuterQueryTableAccessStrategy(
+      TableAccessStrategy outerQueryTableAccessStrategy)
+  {
+    this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
   }
 
 }

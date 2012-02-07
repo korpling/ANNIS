@@ -4,6 +4,10 @@
  */
 package annis.sqlgen;
 
+import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,14 +24,12 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
-import annis.dao.AnnisNodeRowMapper;
-import annis.dao.AnnotationRowMapper;
 import annis.dao.DocumentNameMapRow;
-import annis.dao.EdgeRowMapper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
+import annis.model.Edge.EdgeType;
 
 /**
  *
@@ -38,32 +40,77 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
 
   private static final Logger log =
     Logger.getLogger(AomAnnotateSqlGenerator.class.getName());
-  private EdgeRowMapper edgeRowMapper;
-  private AnnisNodeRowMapper annisNodeRowMapper;
-  private AnnotationRowMapper nodeAnnotationRowMapper;
-  private AnnotationRowMapper edgeAnnotationRowMapper;
 
-  public AomAnnotateSqlGenerator()
+  public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy) throws SQLException
   {
-    edgeRowMapper = new EdgeRowMapper();
-    edgeRowMapper.setTableAccessStrategy(getFactsTas());
+    AnnisNode annisNode = new AnnisNode(longValue(resultSet, NODE_TABLE, "id", tableAccessStrategy));
+    
+    annisNode.setCorpus(longValue(resultSet, NODE_TABLE, "corpus_ref", tableAccessStrategy));
+    annisNode.setTextId(longValue(resultSet, NODE_TABLE, "text_ref", tableAccessStrategy));
+    annisNode.setLeft(longValue(resultSet, NODE_TABLE, "left", tableAccessStrategy));
+    annisNode.setRight(longValue(resultSet, NODE_TABLE, "right", tableAccessStrategy));
+    annisNode.setNamespace(stringValue(resultSet, NODE_TABLE, "namespace", tableAccessStrategy));
+    annisNode.setName(stringValue(resultSet, NODE_TABLE, "name", tableAccessStrategy));
+    annisNode.setTokenIndex(longValue(resultSet, NODE_TABLE, "token_index", tableAccessStrategy));
+    if (resultSet.wasNull())
+      annisNode.setTokenIndex(null);
+    annisNode.setSpannedText(stringValue(resultSet, NODE_TABLE, "span", tableAccessStrategy));
+    annisNode.setLeftToken(longValue(resultSet, NODE_TABLE, "left_token", tableAccessStrategy));
+    annisNode.setRightToken(longValue(resultSet, NODE_TABLE, "right_token", tableAccessStrategy));
+    
+    return annisNode;
+  }
+  
+  public Edge mapEdge(ResultSet resultSet, TableAccessStrategy tableAccessStrategy)
+      throws SQLException {
+    Edge edge = new Edge();
+    
+    edge.setPre(longValue(resultSet, RANK_TABLE, "pre", tableAccessStrategy));
+    edge.setEdgeType(EdgeType.parseEdgeType(stringValue(resultSet, RANK_TABLE, "edge_type", tableAccessStrategy)));
+    edge.setNamespace(stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy));
+    edge.setName(stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
+    edge.setDestination(new AnnisNode(longValue(resultSet, RANK_TABLE, "node_ref", tableAccessStrategy)));
+    
+    // create nodes for src with rank value (parent) as id.
+    // this must later be fixed by AnnotationGraphDaoHelper.fixSourceNodeIds().
+    // this is simpler than chaining the edgeByPre map in AnnisResultSetBuilder
+    // and making the EdgeRowMapper thread-safe.
+    // FIXME: use custum mapRow(resultSet, edgeByPre) function, throw Exception here
+    // also, no need to implement Spring RowMapper
+    long parent = longValue(resultSet, RANK_TABLE, "parent", tableAccessStrategy);
+    if ( ! resultSet.wasNull() )
+      edge.setSource(new AnnisNode(parent));
+    
+    return edge;
+  }
+  
+  public Annotation mapAnnotation(ResultSet resultSet, TableAccessStrategy tableAccessStrategy, String table) throws SQLException
+  {
+    // NOT NULL constraint on NAME => NULL indicates no annotation (of this type)
+    String name = stringValue(resultSet, table, "name", tableAccessStrategy);
+    if (resultSet.wasNull())
+      return null;
+    
+    String namespace = stringValue(resultSet, table, "namespace", tableAccessStrategy);
+    String value = stringValue(resultSet, table, "value", tableAccessStrategy);
+    
+    return new Annotation(namespace, name, value);
+  }
 
-    annisNodeRowMapper = new AnnisNodeRowMapper();
-    annisNodeRowMapper.setTableAccessStrategy(getFactsTas());
+  private long longValue(ResultSet resultSet, String table, String column, TableAccessStrategy tableAccessStrategy) throws SQLException {
+    return resultSet.getLong(tableAccessStrategy.columnName(table, column));
+  }
 
-    nodeAnnotationRowMapper = new AnnotationRowMapper(
-      TableAccessStrategy.NODE_ANNOTATION_TABLE);
-    nodeAnnotationRowMapper.setTableAccessStrategy(getFactsTas());
-
-    edgeAnnotationRowMapper = new AnnotationRowMapper(
-      TableAccessStrategy.EDGE_ANNOTATION_TABLE);
-    edgeAnnotationRowMapper.setTableAccessStrategy(getFactsTas());
+  private String stringValue(ResultSet resultSet, String table, String column, TableAccessStrategy tableAccessStrategy) throws SQLException {
+    return resultSet.getString(tableAccessStrategy.columnName(table, column));
   }
 
   @Override
   public List<AnnotationGraph> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
+    TableAccessStrategy tableAccessStrategy = createTableAccessStrategy();
+    
     // function result
     List<AnnotationGraph> graphs =
       new LinkedList<AnnotationGraph>();
@@ -126,8 +173,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
       graph.setPath((String[]) path.getArray());
 
       // get node data
-      AnnisNode node = annisNodeRowMapper.mapRow(resultSet,
-        rowNum);
+      AnnisNode node = mapNode(resultSet, tableAccessStrategy);
 
       // add node to graph if it is new, else get known copy
       long id = node.getId();
@@ -161,7 +207,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
       }
 
       // get edge data
-      Edge edge = edgeRowMapper.mapRow(resultSet, rowNum);
+      Edge edge = mapEdge(resultSet, tableAccessStrategy);
 
       // add edge to graph if it is new, else get known copy
       long pre = edge.getPre();
@@ -190,13 +236,13 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
 
       // add annotation data
       Annotation nodeAnnotation =
-        nodeAnnotationRowMapper.mapRow(resultSet, rowNum);
+        mapAnnotation(resultSet, tableAccessStrategy, TableAccessStrategy.NODE_ANNOTATION_TABLE);
       if (nodeAnnotation != null)
       {
         node.addNodeAnnotation(nodeAnnotation);
       }
       Annotation edgeAnnotation =
-        edgeAnnotationRowMapper.mapRow(resultSet, rowNum);
+          mapAnnotation(resultSet, tableAccessStrategy, TableAccessStrategy.EDGE_ANNOTATION_TABLE);
       if (edgeAnnotation != null)
       {
         edge.addAnnotation(edgeAnnotation);
@@ -244,23 +290,4 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
     edge.setDestination(nodeById.get(destinationId));
   }
 
-  public AnnisNodeRowMapper getAnnisNodeRowMapper()
-  {
-    return annisNodeRowMapper;
-  }
-
-  public EdgeRowMapper getEdgeRowMapper()
-  {
-    return edgeRowMapper;
-  }
-
-  public AnnotationRowMapper getEdgeAnnotationRowMapper()
-  {
-    return edgeAnnotationRowMapper;
-  }
-
-  public AnnotationRowMapper getNodeAnnotationRowMapper()
-  {
-    return nodeAnnotationRowMapper;
-  }
 }

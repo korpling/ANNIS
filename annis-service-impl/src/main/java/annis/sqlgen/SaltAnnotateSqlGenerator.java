@@ -258,7 +258,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
-      Object nodeId = key.getNodeId(resultSet, getFactsTas());
+      Object nodeId = key.getNodeId(resultSet, getOuterQueryTableAccessStrategy());
       Integer matchedNode = key.getMatchedNodeIndex(nodeId);
       if (matchedNode != null)
       {
@@ -563,13 +563,13 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   protected long longValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getLong(getFactsTas().columnName(table, column));
+    return resultSet.getLong(getOuterQueryTableAccessStrategy().columnName(table, column));
   }
   
   protected String stringValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getString(getFactsTas().columnName(table, column));
+    return resultSet.getString(getOuterQueryTableAccessStrategy().columnName(table, column));
   }
 
 }

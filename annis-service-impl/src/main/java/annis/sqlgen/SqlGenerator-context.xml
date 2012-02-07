@@ -161,6 +161,45 @@ limitations under the License.
 
   <util:map id="emptyColumnAliases" />
 
+  <util:map id="annotateOuterQueryColumnAliases">
+    <entry key="node">
+      <util:map>
+        <entry key="namespace" value="node_namespace"/>
+        <entry key="name" value="node_name"/>
+      </util:map>    
+    </entry>
+    <entry key="node_annotations">
+      <util:map>
+        <entry key="node_ref" value="id"/>
+        <entry key="namespace" value="node_annotation_namespace"/>
+        <entry key="name" value="node_annotation_name"/>
+        <entry key="value" value="node_annotation_value"/>
+      </util:map>
+    </entry>
+    <entry key="edge_annotations">
+      <util:map>
+        <entry key="rank_ref" value="pre"/>
+        <entry key="namespace" value="edge_annotation_namespace"/>
+        <entry key="name" value="edge_annotation_name"/>
+        <entry key="value" value="edge_annotation_value"/>
+      </util:map>
+    </entry>
+    <entry key="rank">
+      <util:map>
+        <entry key="node_ref" value="id"/>
+      </util:map>
+    </entry>
+    <entry key="component">
+      <util:map>
+        <entry key="id" value="component_id"/>
+        <entry key="name" value="edge_name"/>
+        <entry key="namespace" value="edge_namespace"/>
+        <entry key="type" value="edge_type"/>
+      </util:map>
+    </entry>
+  </util:map>
+
+
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
         scope="prototype">
 
@@ -255,6 +294,11 @@ limitations under the License.
 		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
       <property name="tableLayout" value="${annis.table-layout}" />
     <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <property name="outerQueryTableAccessStrategy">
+      <bean class="annis.sqlgen.TableAccessStrategy">
+        <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
+      </bean>
+    </property>
   </bean>
 
 	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"

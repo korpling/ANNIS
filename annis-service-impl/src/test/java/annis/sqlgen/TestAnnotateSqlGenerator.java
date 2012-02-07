@@ -21,7 +21,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
@@ -71,6 +73,51 @@ public class TestAnnotateSqlGenerator
   {
     initMocks(this);
     given(queryData.getExtensions(AnnotateQueryData.class)).willReturn(asList(annotateQueryData));
+    setupOuterQueryFactsTableColumnAliases(generator);
+  }
+  
+  public static void setupOuterQueryFactsTableColumnAliases(AnnotateSqlGenerator<?> generator) {
+    Map<String, String> nodeColumns = new HashMap<String, String>();
+    nodeColumns.put("namespace", "node_namespace");
+    nodeColumns.put("name", "node_name");
+
+    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
+    nodeAnnotationColumns.put("node_ref", "id");
+    nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
+    nodeAnnotationColumns.put("name", "node_annotation_name");
+    nodeAnnotationColumns.put("value", "node_annotation_value");
+
+    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
+    nodeAnnotationColumns.put("rank_ref", "pre");
+    edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
+    edgeAnnotationColumns.put("name", "edge_annotation_name");
+    edgeAnnotationColumns.put("value", "edge_annotation_value");
+
+    Map<String, String> edgeColumns = new HashMap<String, String>();
+    edgeColumns.put("node_ref", "id");
+
+    Map<String, String> componentColumns = new HashMap<String, String>();
+    componentColumns.put("id", "component_id");
+    componentColumns.put("name", "edge_name");
+    componentColumns.put("namespace", "edge_namespace");
+    componentColumns.put("type", "edge_type");
+
+    edgeColumns.put("name", "edge_name");
+    edgeColumns.put("namespace", "edge_namespace");
+
+    Map<String, Map<String, String>> columnAliases =
+      new HashMap<String, Map<String, String>>();
+    columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
+    columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE,
+      nodeAnnotationColumns);
+    columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE,
+      edgeAnnotationColumns);
+    columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
+    columnAliases.put(TableAccessStrategy.COMPONENT_TABLE, componentColumns);
+    
+    TableAccessStrategy outerQueryTableAccessStrategy = new TableAccessStrategy();
+    outerQueryTableAccessStrategy.setColumnAliases(columnAliases);
+    generator.setOuterQueryTableAccessStrategy(outerQueryTableAccessStrategy);
   }
   
   /**

@@ -76,6 +76,8 @@ public class SaltAnnotateSqlGeneratorTest
     CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
     instance.setCorpusPathExtractor(corpusPathExtractor);
 
+    TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(instance);
+
     project = instance.extractData(resultSet);
     assertNotNull(project);
 

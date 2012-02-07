@@ -84,6 +84,32 @@ public class TestUtils {
   public static String uniqueString(int length) {
     return RandomStringUtils.randomAlphanumeric(length);
   }
+
+  /**
+   * Generates a string consisting of {@code prefix} and a random suffix
+   * of 10 characters or numbers.
+   * 
+   * @param prefix The prefix of the string.
+   */
+  public static String uniqueString(String prefix)
+  {
+    return uniqueString(prefix, 10);
+  }
+  
+  /**
+   * Generates a string consisting of {@code prefix} and a random suffix
+   * of {@code length} characters or numbers.
+   * 
+   * @param prefix The prefix of the string.
+   * @param length The length of the random suffix.
+   */
+  public static String uniqueString(String prefix, int length)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(prefix);
+    sb.append(uniqueString(length));
+    return sb.toString();
+  }
   
   /**
    * Generates a random string consisting of 10 characters.
