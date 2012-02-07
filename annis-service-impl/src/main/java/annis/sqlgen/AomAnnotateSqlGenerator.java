@@ -109,7 +109,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
   public List<AnnotationGraph> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    TableAccessStrategy tableAccessStrategy = createTableAccessStrategy();
+    TableAccessStrategy tableAccessStrategy = getOuterQueryTableAccessStrategy();
     
     // function result
     List<AnnotationGraph> graphs =

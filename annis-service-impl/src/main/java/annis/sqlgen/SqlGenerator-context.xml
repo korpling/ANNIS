@@ -166,11 +166,9 @@ limitations under the License.
       <util:map>
         <entry key="namespace" value="node_namespace"/>
         <entry key="name" value="node_name"/>
-        <entry key="left" value='"left"'/>
-        <entry key="right" value='"right"'/>
       </util:map>    
     </entry>
-    <entry key="node_annotations">
+    <entry key="node_annotation">
       <util:map>
         <entry key="node_ref" value="id"/>
         <entry key="namespace" value="node_annotation_namespace"/>
@@ -178,7 +176,7 @@ limitations under the License.
         <entry key="value" value="node_annotation_value"/>
       </util:map>
     </entry>
-    <entry key="edge_annotations">
+    <entry key="edge_annotation">
       <util:map>
         <entry key="rank_ref" value="pre"/>
         <entry key="namespace" value="edge_annotation_namespace"/>
