@@ -202,48 +202,48 @@ public class TestAnnotateSqlGenerator
     String expected = "DISTINCT" + "\n"
         + INDENT + TABSTOP + keyColumn1 + ",\n"
         + INDENT + TABSTOP + keyColumn2 + ",\n"
-        + INDENT + TABSTOP + offset + " AS " + "matchstart" + ",\n"
-        + INDENT + TABSTOP + idAlias + " AS " + "id" + ",\n"
-        + INDENT + TABSTOP + textRefAlias + " AS " + "text_ref" + ",\n"
-        + INDENT + TABSTOP + corpusRefAlias + " AS " + "corpus_ref" + ",\n"
-        + INDENT + TABSTOP + toplevelCorpusAlias + " AS " + "toplevel_corpus" + ",\n"
-        + INDENT + TABSTOP + nodeNamespaceAlias + " AS " + "node_namespace" + ",\n"
-        + INDENT + TABSTOP + nodeNameAlias + " AS " + "node_name" + ",\n"
-        + INDENT + TABSTOP + leftAlias + " AS " + "left" + ",\n"
-        + INDENT + TABSTOP + rightAlias + " AS " + "right" + ",\n"
-        + INDENT + TABSTOP + tokenIndexAlias + " AS " + "token_index" + ",\n"
-        + INDENT + TABSTOP + continuousAlias + " AS " + "continuous" + ",\n"
-        + INDENT + TABSTOP + spanAlias + " AS " + "span" + ",\n"
-        + INDENT + TABSTOP + leftTokenAlias + " AS " + "left_token" + ",\n"
-        + INDENT + TABSTOP + rightTokenAlias + " AS " + "right_token" + ",\n"
-        + INDENT + TABSTOP + preAlias + " AS " + "pre" + ",\n"
-        + INDENT + TABSTOP + postAlias + " AS " + "post" + ",\n"
-        + INDENT + TABSTOP + parentAlias + " AS " + "parent" + ",\n"
-        + INDENT + TABSTOP + rootAlias + " AS " + "root" + ",\n"
-        + INDENT + TABSTOP + levelAlias + " AS " + "level" + ",\n"
-        + INDENT + TABSTOP + componentIdAlias + " AS " + "component_id" + ",\n"
-        + INDENT + TABSTOP + componentTypeAlias + " AS " + "edge_type" + ",\n"
-        + INDENT + TABSTOP + componentNameAlias + " AS " + "edge_name" + ",\n"
-        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n";
+        + INDENT + TABSTOP + offset + " AS \"" + "matchstart" + "\",\n"
+        + INDENT + TABSTOP + idAlias + " AS \"" + "id" + "\",\n"
+        + INDENT + TABSTOP + textRefAlias + " AS \"" + "text_ref" + "\",\n"
+        + INDENT + TABSTOP + corpusRefAlias + " AS \"" + "corpus_ref" + "\",\n"
+        + INDENT + TABSTOP + toplevelCorpusAlias + " AS \"" + "toplevel_corpus" + "\",\n"
+        + INDENT + TABSTOP + nodeNamespaceAlias + " AS \"" + "node_namespace" + "\",\n"
+        + INDENT + TABSTOP + nodeNameAlias + " AS \"" + "node_name" + "\",\n"
+        + INDENT + TABSTOP + leftAlias + " AS \"" + "left" + "\",\n"
+        + INDENT + TABSTOP + rightAlias + " AS \"" + "right" + "\",\n"
+        + INDENT + TABSTOP + tokenIndexAlias + " AS \"" + "token_index" + "\",\n"
+        + INDENT + TABSTOP + continuousAlias + " AS \"" + "continuous" + "\",\n"
+        + INDENT + TABSTOP + spanAlias + " AS \"" + "span" + "\",\n"
+        + INDENT + TABSTOP + leftTokenAlias + " AS \"" + "left_token" + "\",\n"
+        + INDENT + TABSTOP + rightTokenAlias + " AS \"" + "right_token" + "\",\n"
+        + INDENT + TABSTOP + preAlias + " AS \"" + "pre" + "\",\n"
+        + INDENT + TABSTOP + postAlias + " AS \"" + "post" + "\",\n"
+        + INDENT + TABSTOP + parentAlias + " AS \"" + "parent" + "\",\n"
+        + INDENT + TABSTOP + rootAlias + " AS \"" + "root" + "\",\n"
+        + INDENT + TABSTOP + levelAlias + " AS \"" + "level" + "\",\n"
+        + INDENT + TABSTOP + componentIdAlias + " AS \"" + "component_id" + "\",\n"
+        + INDENT + TABSTOP + componentTypeAlias + " AS \"" + "edge_type" + "\",\n"
+        + INDENT + TABSTOP + componentNameAlias + " AS \"" + "edge_name" + "\",\n"
+        + INDENT + TABSTOP + componentNamespaceAlias + " AS \"" + "edge_namespace" + "\",\n";
         if (type == SchemeType.FULLFACTS)
         {
           expected = expected
-            + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
-            + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
-            + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
-            + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
-            + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
-            + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n";
+            + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS \"" + "node_annotation_namespace" + "\",\n"
+            + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS \"" + "node_annotation_name" + "\",\n"
+            + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS \"" + "node_annotation_value" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS \"" + "edge_annotation_namespace" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
         }
         else if(type == SchemeType.ANNO_POOL)
         {
           expected = expected
-            + INDENT + TABSTOP + "node_anno.namespace AS node_annotation_namespace,\n"
-            + INDENT + TABSTOP + "node_anno.\"name\" AS node_annotation_name,\n"
-            + INDENT + TABSTOP + "node_anno.\"val\" AS node_annotation_value,\n"
-            + INDENT + TABSTOP + "edge_anno.namespace AS edge_annotation_namespace,\n"
-            + INDENT + TABSTOP + "edge_anno.\"name\" AS edge_annotation_name,\n"
-            + INDENT + TABSTOP + "edge_anno.\"val\" AS edge_annotation_value,\n";
+            + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"
+            + INDENT + TABSTOP + "node_anno.\"name\" AS \"node_annotation_name\",\n"
+            + INDENT + TABSTOP + "node_anno.\"val\" AS \"node_annotation_value\",\n"
+            + INDENT + TABSTOP + "edge_anno.namespace AS \"edge_annotation_namespace\",\n"
+            + INDENT + TABSTOP + "edge_anno.\"name\" AS \"edge_annotation_name\",\n"
+            + INDENT + TABSTOP + "edge_anno.\"val\" AS \"edge_annotation_value\",\n";
         }
         expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
     System.out.println("---> Actual");
@@ -307,52 +307,51 @@ public class TestAnnotateSqlGenerator
     String expected = "DISTINCT" + "\n"
         + INDENT + TABSTOP + keyColumn1 + ",\n"
         + INDENT + TABSTOP + keyColumn2 + ",\n"
-        + INDENT + TABSTOP + offset + " AS " + "matchstart" + ",\n"
-        + INDENT + TABSTOP + idAlias + " AS " + "id" + ",\n"
-        + INDENT + TABSTOP + textRefAlias + " AS " + "text_ref" + ",\n"
-        + INDENT + TABSTOP + corpusRefAlias + " AS " + "corpus_ref" + ",\n"
-        + INDENT + TABSTOP + toplevelCorpusAlias + " AS " + "toplevel_corpus" + ",\n"
-        + INDENT + TABSTOP + nodeNamespaceAlias + " AS " + "node_namespace" + ",\n"
-        + INDENT + TABSTOP + nodeNameAlias + " AS " + "node_name" + ",\n"
-        + INDENT + TABSTOP + leftAlias + " AS " + "left" + ",\n"
-        + INDENT + TABSTOP + rightAlias + " AS " + "right" + ",\n"
-        + INDENT + TABSTOP + tokenIndexAlias + " AS " + "token_index" + ",\n"
-        + INDENT + TABSTOP + isTokenAlias + " AS " + "is_token" + ",\n"
-        + INDENT + TABSTOP + continuousAlias + " AS " + "continuous" + ",\n"
-        + INDENT + TABSTOP + spanAlias + " AS " + "span" + ",\n"
-        + INDENT + TABSTOP + leftTokenAlias + " AS " + "left_token" + ",\n"
-        + INDENT + TABSTOP + rightTokenAlias + " AS " + "right_token" + ",\n"
-        + INDENT + TABSTOP + preAlias + " AS " + "pre" + ",\n"
-        + INDENT + TABSTOP + postAlias + " AS " + "post" + ",\n"
-        + INDENT + TABSTOP + parentAlias + " AS " + "parent" + ",\n"
-        + INDENT + TABSTOP + rootAlias + " AS " + "root" + ",\n"
-        + INDENT + TABSTOP + levelAlias + " AS " + "level" + ",\n"
-        + INDENT + TABSTOP + componentIdAlias + " AS " + "component_id" + ",\n"
-        + INDENT + TABSTOP + componentTypeAlias + " AS " + "edge_type" + ",\n"
-        + INDENT + TABSTOP + componentNameAlias + " AS " + "edge_name" + ",\n"
-        + INDENT + TABSTOP + componentNamespaceAlias + " AS " + "edge_namespace" + ",\n";
-    if (type == SchemeType.FULLFACTS)
-    {
-      expected = expected
-        + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS " + "node_annotation_namespace" + ",\n"
-        + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS " + "node_annotation_name" + ",\n"
-        + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS " + "node_annotation_value" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS " + "edge_annotation_namespace" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS " + "edge_annotation_name" + ",\n"
-        + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS " + "edge_annotation_value" + ",\n";
-    }
-    else if(type == SchemeType.ANNO_POOL)
-    {
-      expected = expected
-        + INDENT + TABSTOP + "node_anno.namespace AS node_annotation_namespace,\n"
-        + INDENT + TABSTOP + "node_anno.\"name\" AS node_annotation_name,\n"
-        + INDENT + TABSTOP + "node_anno.\"val\" AS node_annotation_value,\n"
-        + INDENT + TABSTOP + "edge_anno.namespace AS edge_annotation_namespace,\n"
-        + INDENT + TABSTOP + "edge_anno.\"name\" AS edge_annotation_name,\n"
-        + INDENT + TABSTOP + "edge_anno.\"val\" AS edge_annotation_value,\n";
-    }
-    expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
-          
+        + INDENT + TABSTOP + offset + " AS \"" + "matchstart" + "\",\n"
+        + INDENT + TABSTOP + idAlias + " AS \"" + "id" + "\",\n"
+        + INDENT + TABSTOP + textRefAlias + " AS \"" + "text_ref" + "\",\n"
+        + INDENT + TABSTOP + corpusRefAlias + " AS \"" + "corpus_ref" + "\",\n"
+        + INDENT + TABSTOP + toplevelCorpusAlias + " AS \"" + "toplevel_corpus" + "\",\n"
+        + INDENT + TABSTOP + nodeNamespaceAlias + " AS \"" + "node_namespace" + "\",\n"
+        + INDENT + TABSTOP + nodeNameAlias + " AS \"" + "node_name" + "\",\n"
+        + INDENT + TABSTOP + leftAlias + " AS \"" + "left" + "\",\n"
+        + INDENT + TABSTOP + rightAlias + " AS \"" + "right" + "\",\n"
+        + INDENT + TABSTOP + tokenIndexAlias + " AS \"" + "token_index" + "\",\n"
+        + INDENT + TABSTOP + isTokenAlias + " AS " + "\"is_token" + "\",\n"
+        + INDENT + TABSTOP + continuousAlias + " AS \"" + "continuous" + "\",\n"
+        + INDENT + TABSTOP + spanAlias + " AS \"" + "span" + "\",\n"
+        + INDENT + TABSTOP + leftTokenAlias + " AS \"" + "left_token" + "\",\n"
+        + INDENT + TABSTOP + rightTokenAlias + " AS \"" + "right_token" + "\",\n"
+        + INDENT + TABSTOP + preAlias + " AS \"" + "pre" + "\",\n"
+        + INDENT + TABSTOP + postAlias + " AS \"" + "post" + "\",\n"
+        + INDENT + TABSTOP + parentAlias + " AS \"" + "parent" + "\",\n"
+        + INDENT + TABSTOP + rootAlias + " AS \"" + "root" + "\",\n"
+        + INDENT + TABSTOP + levelAlias + " AS \"" + "level" + "\",\n"
+        + INDENT + TABSTOP + componentIdAlias + " AS \"" + "component_id" + "\",\n"
+        + INDENT + TABSTOP + componentTypeAlias + " AS \"" + "edge_type" + "\",\n"
+        + INDENT + TABSTOP + componentNameAlias + " AS \"" + "edge_name" + "\",\n"
+        + INDENT + TABSTOP + componentNamespaceAlias + " AS \"" + "edge_namespace" + "\",\n";
+        if (type == SchemeType.FULLFACTS)
+        {
+          expected = expected
+            + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS \"" + "node_annotation_namespace" + "\",\n"
+            + INDENT + TABSTOP + nodeAnnotatationNameAlias + " AS \"" + "node_annotation_name" + "\",\n"
+            + INDENT + TABSTOP + nodeAnnotatationValueAlias + " AS \"" + "node_annotation_value" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationNamespaceAlias + " AS \"" + "edge_annotation_namespace" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
+            + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
+        }
+        else if(type == SchemeType.ANNO_POOL)
+        {
+          expected = expected
+            + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"
+            + INDENT + TABSTOP + "node_anno.\"name\" AS \"node_annotation_name\",\n"
+            + INDENT + TABSTOP + "node_anno.\"val\" AS \"node_annotation_value\",\n"
+            + INDENT + TABSTOP + "edge_anno.namespace AS \"edge_annotation_namespace\",\n"
+            + INDENT + TABSTOP + "edge_anno.\"name\" AS \"edge_annotation_name\",\n"
+            + INDENT + TABSTOP + "edge_anno.\"val\" AS \"edge_annotation_value\",\n";
+        }
+        expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";
     System.out.println("---> Actual");
     System.out.println(actual.replace("\t", "\\t").replace("\n", "\\n\n"));
     System.out.println("---> Expected");

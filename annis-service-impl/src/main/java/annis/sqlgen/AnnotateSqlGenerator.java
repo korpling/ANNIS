@@ -336,7 +336,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append(" AS matchstart,\n");
+    sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
 
     List<String> fields = new ArrayList<String>();
     // facts.fid is never evaluated in the result set
@@ -382,17 +382,17 @@ public abstract class AnnotateSqlGenerator<T>
 
     if (tableLayout == SchemeType.ANNO_POOL)
     {
-      sb.append("node_anno.namespace AS node_annotation_namespace,\n").append(
+      sb.append("node_anno.namespace AS \"node_annotation_namespace\",\n").append(
         indent).append(TABSTOP);
-      sb.append("node_anno.\"name\" AS node_annotation_name,\n").append(indent).
+      sb.append("node_anno.\"name\" AS \"node_annotation_name\",\n").append(indent).
         append(TABSTOP);
-      sb.append("node_anno.\"val\" AS node_annotation_value,\n").append(indent).
+      sb.append("node_anno.\"val\" AS \"node_annotation_value\",\n").append(indent).
         append(TABSTOP);
-      sb.append("edge_anno.namespace AS edge_annotation_namespace,\n").append(
+      sb.append("edge_anno.namespace AS \"edge_annotation_namespace\",\n").append(
         indent).append(TABSTOP);
-      sb.append("edge_anno.\"name\" AS edge_annotation_name,\n").append(indent).
+      sb.append("edge_anno.\"name\" AS \"edge_annotation_name\",\n").append(indent).
         append(TABSTOP);
-      sb.append("edge_anno.\"val\" AS edge_annotation_value,\n");
+      sb.append("edge_anno.\"val\" AS \"edge_annotation_value\",\n");
       sb.append(indent).append(TABSTOP);
     }
 
@@ -411,8 +411,9 @@ public abstract class AnnotateSqlGenerator<T>
     String table, String column)
   {
     TableAccessStrategy tas = tables(null);
-    fields.add(tas.aliasedColumn(table, column) + " AS "
-      + outerQueryTableAccessStrategy.columnName(table, column));
+    fields.add(tas.aliasedColumn(table, column) + " AS \""
+      + outerQueryTableAccessStrategy.columnName(table, column)
+      + "\"");
   }
 
   @Override
