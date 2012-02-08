@@ -31,10 +31,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
 
-import annis.administration.SchemeType;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
+import annis.sqlgen.dblayout.AnnoPoolLayout;
+import annis.sqlgen.dblayout.FullFactsLayout;
 
 public class TestAnnotateSqlGenerator
 {
@@ -141,7 +143,7 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldGenerateSelectClauseAnnoPool()
   {
-    shouldGenerateSelectClause(SchemeType.ANNOPOOL);
+    shouldGenerateSelectClause(new AnnoPoolLayout());
   }
   
   /**
@@ -152,12 +154,12 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldGenerateSelectClauseFullFacts()
   {
-    shouldGenerateSelectClause(SchemeType.FULLFACTS);
+    shouldGenerateSelectClause(new FullFactsLayout());
   }
     
-  private void shouldGenerateSelectClause(SchemeType type)
+  private void shouldGenerateSelectClause(AbstractDatabaseLayout dbLayout)
   {
-    generator.setTableLayout(type.name());
+    generator.setDbLayout(dbLayout);
     
     // given
     int offset = uniqueInt(10);
@@ -225,7 +227,7 @@ public class TestAnnotateSqlGenerator
         + INDENT + TABSTOP + componentTypeAlias + " AS \"" + "edge_type" + "\",\n"
         + INDENT + TABSTOP + componentNameAlias + " AS \"" + "edge_name" + "\",\n"
         + INDENT + TABSTOP + componentNamespaceAlias + " AS \"" + "edge_namespace" + "\",\n";
-        if (type == SchemeType.FULLFACTS)
+        if (dbLayout instanceof FullFactsLayout)
         {
           expected = expected
             + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS \"" + "node_annotation_namespace" + "\",\n"
@@ -235,7 +237,7 @@ public class TestAnnotateSqlGenerator
             + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
             + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
         }
-        else if(type == SchemeType.ANNOPOOL)
+        else if(dbLayout instanceof AnnoPoolLayout)
         {
           expected = expected
             + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"
@@ -263,8 +265,8 @@ public class TestAnnotateSqlGenerator
   public void shouldGenerateSelectClauseWithIsTokenColumn()
   {
     // given
-    SchemeType type = SchemeType.FULLFACTS;
-    generator.setTableLayout(type.name());
+    AbstractDatabaseLayout dbLayout = new FullFactsLayout();
+    generator.setDbLayout(dbLayout);
     generator.setIncludeIsTokenColumn(true);
     int offset = uniqueInt(10);
     given(annotateQueryData.getOffset()).willReturn(offset);
@@ -331,7 +333,7 @@ public class TestAnnotateSqlGenerator
         + INDENT + TABSTOP + componentTypeAlias + " AS \"" + "edge_type" + "\",\n"
         + INDENT + TABSTOP + componentNameAlias + " AS \"" + "edge_name" + "\",\n"
         + INDENT + TABSTOP + componentNamespaceAlias + " AS \"" + "edge_namespace" + "\",\n";
-        if (type == SchemeType.FULLFACTS)
+        if (dbLayout instanceof FullFactsLayout)
         {
           expected = expected
             + INDENT + TABSTOP + nodeAnnotatationNamespaceAlias + " AS \"" + "node_annotation_namespace" + "\",\n"
@@ -341,7 +343,7 @@ public class TestAnnotateSqlGenerator
             + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
             + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
         }
-        else if(type == SchemeType.ANNOPOOL)
+        else if(dbLayout instanceof AnnoPoolLayout)
         {
           expected = expected
             + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"

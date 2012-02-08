@@ -16,12 +16,18 @@
 package annis.sqlgen.dblayout;
 
 import annis.administration.FullFactsCorpusAdministration;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.TableAccessStrategy;
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import static annis.sqlgen.SqlConstraints.sqlString;
+import static annis.sqlgen.SqlConstraints.join;
 
 /**
  *
@@ -117,6 +123,27 @@ public class FullFactsLayout extends AbstractDatabaseLayout<FullFactsCorpusAdmin
   {
     return new LinkedList<String>();
   }
-  
-  
+
+  @Override
+  public void addAnnotationConditions(List<String> conditions, QueryNode node,
+    int index, QueryAnnotation annotation, String table, QueryData queryData,
+    TableAccessStrategy tas)
+  {
+    if (annotation.getNamespace() != null)
+    {
+      conditions.add(join("=",
+        tas.aliasedColumn(table, "namespace", index),
+        sqlString(annotation.getNamespace())));
+    }
+    conditions.add(join("=",
+      tas.aliasedColumn(table, "name", index),
+      sqlString(annotation.getName())));
+    if (annotation.getValue() != null)
+    {
+      QueryNode.TextMatching textMatching = annotation.getTextMatching();
+      conditions.add(join(textMatching.sqlOperator(), tas.aliasedColumn(table,
+        "value", index),
+        sqlString(annotation.getValue(), textMatching)));
+    };
+  }
 }

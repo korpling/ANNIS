@@ -16,6 +16,9 @@
 package annis.sqlgen.dblayout;
 
 import annis.administration.CorpusAdministration;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.List;
 
@@ -43,4 +46,8 @@ public abstract class AbstractDatabaseLayout<AdminClazz extends CorpusAdministra
     TableAccessStrategy tas, List<Long> corpusList);
   
   public abstract List<String> getAnnotateFromTables();
+  
+  public abstract void addAnnotationConditions(List<String> conditions,
+    QueryNode node, int index, QueryAnnotation annotation, String table,
+    QueryData queryData, TableAccessStrategy tas);
 }

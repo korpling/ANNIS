@@ -27,6 +27,7 @@ import org.postgresql.Driver;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import org.apache.log4j.Logger;
 
 /**
@@ -36,9 +37,10 @@ import org.apache.log4j.Logger;
 public abstract class CorpusAdministration
 {
 
+  private AbstractDatabaseLayout dbLayout;
   private Logger log = Logger.getLogger(this.getClass());
 
-    public CorpusAdministration()
+  public CorpusAdministration()
   {
   }
 
@@ -73,15 +75,14 @@ public abstract class CorpusAdministration
     getAdministrationDao().deleteCorpora(ids);
     log.info("Finished deleting corpora: " + ids);
   }
-  
-  
+
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword)
   {
 
     log.info("initializing database with schema "
-      + getSchemeType().getDescription());
+      + dbLayout.getDescription());
 
     log.info("Creating Annis database and user.");
 
@@ -105,7 +106,7 @@ public abstract class CorpusAdministration
     getAdministrationDao().setDataSource(createDataSource(host, port, database,
       user, password));
 
-    getAdministrationDao().createSchema(getSchemeType());
+    getAdministrationDao().createSchema(dbLayout);
     getAdministrationDao().populateSchema();
 
     // write database information to property file
@@ -152,7 +153,7 @@ public abstract class CorpusAdministration
       getAdministrationDao().createAnnotations(corpusID);
 
       // create the new facts table partition
-      getAdministrationDao().createFacts(corpusID, getSchemeType());
+      getAdministrationDao().createFacts(corpusID, dbLayout);
       // the entries, which where here done, are possible after generating facts
       getAdministrationDao().updateCorpusStatistic();
 
@@ -166,13 +167,10 @@ public abstract class CorpusAdministration
     }
   }
 
-
   public void importCorpora(boolean temporaryStagingArea, String... paths)
   {
     importCorpora(temporaryStagingArea, Arrays.asList(paths));
   }
-
-
 
   public List<Map<String, Object>> listCorpusStats()
   {
@@ -193,7 +191,6 @@ public abstract class CorpusAdministration
   {
     return getAdministrationDao().listUnusedIndexes();
   }
-
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
@@ -220,13 +217,20 @@ public abstract class CorpusAdministration
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }
 
-
   ///// Getter / Setter
+
+  public AbstractDatabaseLayout getDbLayout()
+  {
+    return dbLayout;
+  }
+
+  public void setDbLayout(AbstractDatabaseLayout dbLayout)
+  {
+    this.dbLayout = dbLayout;
+  }
+  
   public abstract SpringAnnisAdministrationDao getAdministrationDao();
 
   public abstract void setAdministrationDao(
     SpringAnnisAdministrationDao administrationDao);
-
-  public abstract SchemeType getSchemeType();
-
 }

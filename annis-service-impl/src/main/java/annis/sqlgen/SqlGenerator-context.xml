@@ -80,7 +80,11 @@ limitations under the License.
     <property name="useIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
     <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
-    <property name="tableLayout" value="${annis.table-layout}" />
+    <property name="dbLayout" >
+      <bean factory-bean="annisSpringFactory" factory-method="getDatabaseLayout">
+        <constructor-arg value="${annis.table-layout}" />
+      </bean>
+    </property>
   </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"

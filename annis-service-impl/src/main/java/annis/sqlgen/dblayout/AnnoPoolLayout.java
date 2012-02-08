@@ -18,7 +18,11 @@ package annis.sqlgen.dblayout;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import annis.administration.AnnoTableCorpusAdministration;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import annis.sqlgen.TableAccessStrategy;
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -135,7 +139,70 @@ public class AnnoPoolLayout extends AbstractDatabaseLayout<AnnoTableCorpusAdmini
 
     tables.add(TableAccessStrategy.ANNOTATION_POOL_TABLE + " AS node_anno");
     tables.add(TableAccessStrategy.ANNOTATION_POOL_TABLE + " AS edge_anno");
-    
+
     return tables;
+  }
+
+  @Override
+  public void addAnnotationConditions(List<String> conditions, QueryNode node,
+    int index, QueryAnnotation annotation, String table, QueryData queryData, 
+    TableAccessStrategy tas)
+  {
+    QueryNode.TextMatching tm = annotation.getTextMatching();
+
+    StringBuilder sbFunc = new StringBuilder("get");
+
+    sbFunc.append("AnnoBy");
+
+    List<String> params = new LinkedList<String>();
+
+    if (annotation.getNamespace() != null)
+    {
+      params.add("'" + annotation.getNamespace() + "'");
+      sbFunc.append("Namespace");
+    }
+    if (annotation.getName() != null)
+    {
+      params.add("'" + annotation.getName() + "'");
+      sbFunc.append("Name");
+    }
+    if (annotation.getValue() != null)
+    {
+
+      sbFunc.append("Val");
+
+      if (tm == QueryNode.TextMatching.REGEXP_EQUAL
+        || tm == QueryNode.TextMatching.REGEXP_NOT_EQUAL)
+      {
+        sbFunc.append("Regex");
+        params.add("'^" + annotation.getValue() + "$'");
+      }
+      else
+      {
+        params.add("'" + annotation.getValue() + "'");
+      }
+    }
+
+    params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")
+      + "]");
+
+    params.add("'"
+      + StringUtils.removeEnd(table, "_annotation").toLowerCase() + "'");
+
+    sbFunc.append("(");
+    sbFunc.append(StringUtils.join(params, ", "));
+    sbFunc.append(")");
+
+
+    String cond =
+      tas.aliasedColumn(table, "anno_ref", index)
+      + "= ANY(" + sbFunc.toString() + ")";
+
+    if (tm == QueryNode.TextMatching.EXACT_NOT_EQUAL || tm
+      == QueryNode.TextMatching.REGEXP_NOT_EQUAL)
+    {
+      cond = "NOT (" + cond + ")";
+    }
+    conditions.add(cond);
   }
 }

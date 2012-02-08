@@ -48,6 +48,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import annis.externalFiles.ExternalFileMgrDAO;
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import javax.activation.MimetypesFileTypeMap;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -167,7 +168,7 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("functions_annopool_get.sql");
   }
 
-  void createSchema(SchemeType type)
+  void createSchema(AbstractDatabaseLayout type)
   {
     log.info("creating Annis database schema (" + type.getDescription() + ")");
     executeSqlFromScript("schema_" + type.getScriptAppendix() + ".sql");
@@ -484,20 +485,20 @@ public class SpringAnnisAdministrationDao
     jdbcOperations.execute("ANALYZE facts_" + corpusID);
   }
 
-  void createFacts(long corpusID, SchemeType type)
+  void createFacts(long corpusID, AbstractDatabaseLayout layout)
   {
 
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts_" + type.getScriptAppendix() + ".sql", args);
+    executeSqlFromScript("facts_" + layout.getScriptAppendix() + ".sql", args);
     
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
     executeSqlFromScript("cluster.sql", args);
     
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_" + type.getScriptAppendix() + ".sql", args);
+    executeSqlFromScript("indexes_" + layout.getScriptAppendix() + ".sql", args);
 
   }
 

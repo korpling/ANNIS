@@ -84,7 +84,9 @@ public class AnnisSpringFactory
     }
     else
     {
-      return layout.createCorpusAdministration();
+      CorpusAdministration cadm = layout.createCorpusAdministration();
+      cadm.setDbLayout(layout);
+      return cadm;
     }
   }
 

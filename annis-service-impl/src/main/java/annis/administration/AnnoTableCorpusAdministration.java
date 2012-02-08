@@ -53,12 +53,6 @@ public class AnnoTableCorpusAdministration extends CorpusAdministration
   {
     this.administrationDao = administrationDao;
   }
-
-  @Override
-  public SchemeType getSchemeType()
-  {
-    return SchemeType.ANNOPOOL;
-  }
   
   
 }

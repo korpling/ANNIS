@@ -37,13 +37,5 @@ public class FullFactsCorpusAdministration extends CorpusAdministration
   {
     this.administrationDao = administrationDao;
   }
-
-  @Override
-  public SchemeType getSchemeType()
-  {
-    return SchemeType.FULLFACTS;
-  }
-  
-  
-  
+    
 }

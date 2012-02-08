@@ -15,6 +15,8 @@
  */
 package annis.administration;
 
+import annis.sqlgen.dblayout.AbstractDatabaseLayout;
+import annis.sqlgen.dblayout.AnnoPoolLayout;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -46,7 +48,7 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    SchemeType type = SchemeType.ANNOPOOL;
+    AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
     administration.importCorpora(true, path);
 
     // insertion of a corpus needs to follow an exact order
@@ -55,7 +57,7 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that the corpus was imported
-    verifyImport(inOrder, path, type);
+    verifyImport(inOrder, path, dbLayout);
 
     verifyPostImport(inOrder);
 
@@ -69,7 +71,7 @@ public class TestCorpusAdministration
     String path1 = "somePath";
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
-    SchemeType type = SchemeType.ANNOPOOL;
+    AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
 
     administration.importCorpora(true, path1, path2, path3);
 
@@ -80,9 +82,9 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that each corpus was inserted in order
-    verifyImport(inOrder, path1, type);
-    verifyImport(inOrder, path2, type);
-    verifyImport(inOrder, path3, type);
+    verifyImport(inOrder, path1, dbLayout);
+    verifyImport(inOrder, path2, dbLayout);
+    verifyImport(inOrder, path3, dbLayout);
 
     // that should be it
     verifyNoMoreInteractions(administrationDao);
@@ -99,7 +101,7 @@ public class TestCorpusAdministration
   }
 
   // a correct import requires this order
-  private void verifyImport(InOrder inOrder, String path, SchemeType type)
+  private void verifyImport(InOrder inOrder, String path, AbstractDatabaseLayout dbLayout)
   {
     // create the staging area
     inOrder.verify(administrationDao).createStagingArea(true);
@@ -144,7 +146,7 @@ public class TestCorpusAdministration
 
     // the facts child table must be created
 
-    inOrder.verify(administrationDao).createFacts(corpusID, type);
+    inOrder.verify(administrationDao).createFacts(corpusID, dbLayout);
 
     inOrder.verify(administrationDao).updateCorpusStatistic();
 
