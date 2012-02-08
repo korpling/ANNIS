@@ -55,12 +55,18 @@ public abstract class AnnotateSqlGenerator<T>
   // include document name in SELECT clause
   private boolean includeDocumentNameInAnnotateQuery;
   
+  // include is_token column in SELECT clause
+  private boolean includeIsTokenColumn;
+  
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
-  private TableAccessStrategy factsTas;
+  private TableAccessStrategy outerQueryTableAccessStrategy;
   private boolean optimizeOverlap;
   private SchemeType tableLayout = SchemeType.ANNO_POOL;
 
+  // helper to extract the corpus path from a JDBC result set
+  private CorpusPathExtractor corpusPathExtractor;
+  
   public static class AnnotateQueryData
   {
 
@@ -139,56 +145,14 @@ public abstract class AnnotateSqlGenerator<T>
 
   public AnnotateSqlGenerator()
   {
-    // FIXME: totally ugly, but the query has fixed column names 
-    // (and needs its own column aliasing)
-    // TableAccessStrategyFactory wants a corpus selection 
-    // strategy
-    // solution: build AnnisNodes with API and refactor 
-    // SqlGenerator to accept GROUP BY nodes
-    Map<String, String> nodeColumns = new HashMap<String, String>();
-    nodeColumns.put("namespace", "node_namespace");
-    nodeColumns.put("name", "node_name");
-
-    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("node_ref", "id");
-    nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
-    nodeAnnotationColumns.put("name", "node_annotation_name");
-    nodeAnnotationColumns.put("value", "node_annotation_value");
-
-    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
-    nodeAnnotationColumns.put("rank_ref", "pre");
-    edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
-    edgeAnnotationColumns.put("name", "edge_annotation_name");
-    edgeAnnotationColumns.put("value", "edge_annotation_value");
-
-    Map<String, String> edgeColumns = new HashMap<String, String>();
-    edgeColumns.put("node_ref", "id");
-
-    Map<String, String> componentColumns = new HashMap<String, String>();
-    componentColumns.put("id", "component_id");
-    componentColumns.put("name", "edge_name");
-    componentColumns.put("namespace", "edge_namespace");
-    componentColumns.put("type", "edge_type");
-
-    edgeColumns.put("name", "edge_name");
-    edgeColumns.put("namespace", "edge_namespace");
-
-    Map<String, Map<String, String>> columnAliases =
-      new HashMap<String, Map<String, String>>();
-    columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
-    columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE,
-      nodeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.EDGE_ANNOTATION_TABLE,
-      edgeAnnotationColumns);
-    columnAliases.put(TableAccessStrategy.RANK_TABLE, edgeColumns);
-    columnAliases.put(COMPONENT_TABLE, componentColumns);
-
-    factsTas = new TableAccessStrategy(null);
-    factsTas.setColumnAliases(columnAliases);
-
-
   }
 
+  /**
+   * Create a solution key to be used inside a single call to
+   * {@code extractData}.
+   * 
+   * This method must be overridden in child classes or by Spring.
+   */
   protected SolutionKey<?> createSolutionKey()
   {
     throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
@@ -372,7 +336,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<AnnotateQueryData> extension =
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append("::integer AS matchstart,\n");
+    sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
 
     List<String> fields = new ArrayList<String>();
     // facts.fid is never evaluated in the result set
@@ -386,7 +350,9 @@ public abstract class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "left");
     addSelectClauseAttribute(fields, NODE_TABLE, "right");
     addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
-    addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
+    if (includeIsTokenColumn) {
+      addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
+    }
     addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
     addSelectClauseAttribute(fields, NODE_TABLE, "span");
     addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
@@ -416,17 +382,17 @@ public abstract class AnnotateSqlGenerator<T>
 
     if (tableLayout == SchemeType.ANNO_POOL)
     {
-      sb.append("node_anno.namespace AS node_annotation_namespace,\n").append(
+      sb.append("node_anno.namespace AS \"node_annotation_namespace\",\n").append(
         indent).append(TABSTOP);
-      sb.append("node_anno.\"name\" AS node_annotation_name,\n").append(indent).
+      sb.append("node_anno.\"name\" AS \"node_annotation_name\",\n").append(indent).
         append(TABSTOP);
-      sb.append("node_anno.\"val\" AS node_annotation_value,\n").append(indent).
+      sb.append("node_anno.\"val\" AS \"node_annotation_value\",\n").append(indent).
         append(TABSTOP);
-      sb.append("edge_anno.namespace AS edge_annotation_namespace,\n").append(
+      sb.append("edge_anno.namespace AS \"edge_annotation_namespace\",\n").append(
         indent).append(TABSTOP);
-      sb.append("edge_anno.\"name\" AS edge_annotation_name,\n").append(indent).
+      sb.append("edge_anno.\"name\" AS \"edge_annotation_name\",\n").append(indent).
         append(TABSTOP);
-      sb.append("edge_anno.\"val\" AS edge_annotation_value,\n");
+      sb.append("edge_anno.\"val\" AS \"edge_annotation_value\",\n");
       sb.append(indent).append(TABSTOP);
     }
 
@@ -445,8 +411,9 @@ public abstract class AnnotateSqlGenerator<T>
     String table, String column)
   {
     TableAccessStrategy tas = tables(null);
-    fields.add(tas.aliasedColumn(table, column) + " AS "
-      + factsTas.columnName(table, column));
+    fields.add(tas.aliasedColumn(table, column) + " AS \""
+      + outerQueryTableAccessStrategy.columnName(table, column)
+      + "\"");
   }
 
   @Override
@@ -640,7 +607,8 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     SolutionKey<?> key = createSolutionKey();
-    List<String> keyColumns = key.getKeyColumns();
+    int size = alternative.size();
+    List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
     for (String keyColumn : keyColumns) {
       sb.append(keyColumn);
@@ -721,9 +689,9 @@ public abstract class AnnotateSqlGenerator<T>
     this.optimizeOverlap = optimizeOverlap;
   }
 
-  public TableAccessStrategy getFactsTas()
+  public TableAccessStrategy getOuterQueryTableAccessStrategy()
   {
-    return factsTas;
+    return outerQueryTableAccessStrategy;
   }
 
 
@@ -746,6 +714,32 @@ public abstract class AnnotateSqlGenerator<T>
       boolean includeDocumentNameInAnnotateQuery)
   {
     this.includeDocumentNameInAnnotateQuery = includeDocumentNameInAnnotateQuery;
+  }
+
+  public boolean isIncludeIsTokenColumn()
+  {
+    return includeIsTokenColumn;
+  }
+
+  public void setIncludeIsTokenColumn(boolean includeIsTokenColumn)
+  {
+    this.includeIsTokenColumn = includeIsTokenColumn;
+  }
+
+  public CorpusPathExtractor getCorpusPathExtractor()
+  {
+    return corpusPathExtractor;
+  }
+
+  public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
+  {
+    this.corpusPathExtractor = corpusPathExtractor;
+  }
+
+  public void setOuterQueryTableAccessStrategy(
+      TableAccessStrategy outerQueryTableAccessStrategy)
+  {
+    this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
   }
 
 }

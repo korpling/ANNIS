@@ -4,3 +4,4 @@
 -- SET enable_mergejoin TO off;
 -- SET enable_hashjoin TO off;
 -- SET enable_bitmapscan TO off;
+-- SET enable_material TO off;

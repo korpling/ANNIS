@@ -98,6 +98,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   private void addComponentPredicates(List<String> conditions, QueryNode node,
     QueryNode target, String componentName, String edgeType)
   {
+    conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "id"), tables(target).aliasedColumn(COMPONENT_TABLE, "id")));
     if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
       addComponentPredicates(conditions, node, edgeType, componentName);

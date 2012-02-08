@@ -28,10 +28,13 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey;
-import annis.sqlgen.SolutionKey;
 import annis.sqlgen.AomAnnotateSqlGenerator;
+import annis.sqlgen.ArrayCorpusPathExtractor;
+import annis.sqlgen.CorpusPathExtractor;
+import annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey;
 import annis.sqlgen.SaltAnnotateSqlGenerator;
+import annis.sqlgen.SolutionKey;
+import annis.sqlgen.TestAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
@@ -88,8 +91,11 @@ public class LegacyGraphConverterTest
         return new NodeNameAndIdPostgreSqlArraySolutionKey();
       }
     };
+    CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
+    saltSqlGen.setCorpusPathExtractor(corpusPathExtractor);
 
-
+    TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltSqlGen);
+    
     SaltProject p =
       saltSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
@@ -214,13 +220,13 @@ public class LegacyGraphConverterTest
   {
     for (Annotation a : annos1)
     {
-      assertTrue("annotation " + a.getQualifiedName() + "->" + a.getName()
+      assertTrue("annotation " + a.getQualifiedName() + "->" + a.getValue()
         + " from set 1 is not included in set 2", annos2.contains(a));
     }
 
     for (Annotation a : annos2)
     {
-      assertTrue("annotation " + a.getQualifiedName() + "->" + a.getName()
+      assertTrue("annotation " + a.getQualifiedName() + "->" + a.getValue()
         + " from set 2 is not included in set 1", annos2.contains(a));
     }
   }

@@ -116,6 +116,16 @@ CREATE TABLE extData
    
 );
 
+CREATE TABLE media_files
+(
+  file  bytea NOT NULL,
+  corpus_ref  bigint NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
+  bytes bigint NOT NULL,
+  mime_type character varying(40) NOT NULL,
+  title character varying(40) NOT NULL,
+  UNIQUE (corpus_ref, title)
+);
+
 
 -- stats
 CREATE TABLE corpus_stats

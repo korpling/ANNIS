@@ -39,7 +39,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -305,9 +304,12 @@ public class SingleResultPanel extends VerticalLayout implements
       this.matchedAndCovered = initialMatches;
 
       currentMatchPos = 1;
-      graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
-        GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
-        (SGraphTraverseHandler) this, true);
+      if(initialMatches.size() > 0)
+      {
+        graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
+          GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
+          (SGraphTraverseHandler) this, true);
+      }
     }
 
     @Override

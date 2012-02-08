@@ -1,7 +1,7 @@
 package annis.sqlgen;
 
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static java.util.Arrays.asList;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -9,48 +9,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * TODO Document semantics of of multiple ID columns
- * TODO Code supporting multiple ID columns complicates things unnecessarily
+ * TODO Document semantics of of multiple ID columns TODO Code supporting
+ * multiple ID columns complicates things unnecessarily
  *
  * @param <BaseType>
  */
-public class PostgreSqlArraySolutionKey<BaseType> 
+public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<BaseType>
   implements SolutionKey<List<BaseType>>
 {
 
   // logging with log4j
   private static Logger log = Logger.getLogger(PostgreSqlArraySolutionKey.class);
-  
-  // the last key
-  private List<BaseType> lastKey;
-  
-  // the current key
-  private List<BaseType> currentKey;
-  
-  // the column name identifying a node
-  private String idColumnName;
-  
   // the name of the ID array in the outer query
   private String keyColumnName;
-  
-  @Override
-  public List<String> generateInnerQueryColumns(TableAccessStrategy tableAccessStrategy, int index)
-  {
-    List<String> columns = new ArrayList<String>();
-    columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumnName)
-        + " AS " + idColumnName + index);
-    return columns;
-  }
 
   @Override
-  public List<String> generateOuterQueryColumns(TableAccessStrategy tableAccessStrategy, int size)
+  public List<String> generateOuterQueryColumns(
+    TableAccessStrategy tableAccessStrategy, int size)
   {
     List<String> columns = new ArrayList<String>();
-    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", idColumnName);
+    String nameAlias = tableAccessStrategy.aliasedColumn("solutions",
+      getIdColumnName());
     columns.add(createKeyArray(nameAlias, keyColumnName, size));
     return columns;
   }
@@ -61,7 +43,8 @@ public class PostgreSqlArraySolutionKey<BaseType>
     sb.append("ARRAY[");
     sb.append(column);
     sb.append(1);
-    for (int i = 2; i <= size; ++i) {
+    for (int i = 2; i <= size; ++i)
+    {
       sb.append(", ");
       sb.append(column);
       sb.append(i);
@@ -79,71 +62,29 @@ public class PostgreSqlArraySolutionKey<BaseType>
     try
     {
       Array sqlArray = resultSet.getArray(keyColumnName);
-      if (resultSet.wasNull()) {
-        throw new IllegalStateException("Match group identifier must not be null");
+      if (resultSet.wasNull())
+      {
+        throw new IllegalStateException(
+          "Match group identifier must not be null");
       }
       @SuppressWarnings("unchecked")
       BaseType[] keyArray = (BaseType[]) sqlArray.getArray();
-      lastKey = currentKey;
-      currentKey = asList(keyArray);
-      return currentKey;
-    } catch (SQLException e)
-    {
-      log.error("Exception thrown while retrieving key array", e);
-      throw new IllegalStateException(
-          "Could not retrieve key from JDBC results set", e);
-    }
-  }
-
-  @Override
-  public boolean isNewKey()
-  {
-    return currentKey == null || ! currentKey.equals(lastKey);
-  }
-
-  @Override
-  public Integer getMatchedNodeIndex(Object id)
-  {
-    int index = currentKey.indexOf(id);
-    return index == -1 ? null : index + 1;
-  }
-
-  @Override
-  public String getCurrentKeyAsString()
-  {
-    return StringUtils.join(currentKey, ",");
-  }
-
-  @Override
-  public List<String> getKeyColumns()
-  {
-    return asList(keyColumnName);
-  }
-
-  @Override
-  public Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy)
-  {
-    try {
-      String idAlias = tableAccessStrategy.columnName(NODE_TABLE, idColumnName);
-      Object nodeId = resultSet.getObject(idAlias);
-      return nodeId;
+      setLastKey(getCurrentKey());
+      setCurrentKey(asList(keyArray));
+      return getCurrentKey();
     }
     catch (SQLException e)
     {
-      log.error("Exception thrown while retrieving node ID", e);
+      log.error("Exception thrown while retrieving key array", e);
       throw new IllegalStateException(
-          "Could not retrieve node ID from JDBC results set", e);
+        "Could not retrieve key from JDBC results set", e);
     }
   }
-  
-  public String getIdColumnName()
-  {
-    return idColumnName;
-  }
 
-  public void setIdColumnName(String idColumnName)
+  @Override
+  public List<String> getKeyColumns(int size)
   {
-    this.idColumnName = idColumnName;
+    return asList(keyColumnName);
   }
 
   public String getKeyColumnName()
@@ -155,5 +96,4 @@ public class PostgreSqlArraySolutionKey<BaseType>
   {
     this.keyColumnName = keyColumnName;
   }
-
 }

@@ -15,21 +15,21 @@
  */
 package annis.gui;
 
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.model.Annotation;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,36 +39,95 @@ import java.util.logging.Logger;
  */
 public class MetaDataPanel extends Panel
 {
-  private Table tblMeta;
-  private BeanItemContainer<Annotation> metaContainer;
+
+  private VerticalLayout layout;
   private String toplevelCorpusName;
   private String documentName;
-  
+
   public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
-    
+
     this.toplevelCorpusName = toplevelCorpusName;
     this.documentName = documentName;
-    
+
     setSizeFull();
-    VerticalLayout layout = new VerticalLayout();
+    layout = new VerticalLayout();
     setContent(layout);
-    layout.setSizeFull();    
-    metaContainer = new BeanItemContainer<Annotation>(Annotation.class);
-    
-    tblMeta = new Table();
-    layout.addComponent(tblMeta);
-    
-    tblMeta.setContainerDataSource(metaContainer);
-    tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator() {
+    layout.setSizeFull();
+  }
+
+  @Override
+  public void attach()
+  {
+
+    super.attach();
+
+    // load meta data from service
+    BeanItemContainer<Annotation> mData =
+      new BeanItemContainer<Annotation>(Annotation.class);
+
+    // are we called from the corpusBrowser or there is no subcorpus stay here:
+    if (documentName.equals(toplevelCorpusName))
+    {
+      mData.addAll(getMetaData(toplevelCorpusName, documentName));
+      layout.addComponent(setupTable(mData));
+    }
+    else
+    {
+      Map<String, List<Annotation>> hashMData = splitListAnnotations();
+      List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
+      Accordion accordion = new Accordion();
+      accordion.setSizeFull();
+      layout.addComponent(accordion);
+
+      for (BeanItemContainer<Annotation> item : l)
+      {
+        String corpusName = item.getIdByIndex(0).getCorpusName();
+        accordion.addTab(setupTable(item),
+          (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
+          : "document: "+ corpusName);
+      }
+    }
+  }
+
+  private List<Annotation> getMetaData(String toplevelCorpusName,
+    String documentName)
+  {
+    List<Annotation> result = new ArrayList<Annotation>();
+    try
+    {
+      AnnisService service = Helper.getService(getApplication(), getWindow());
+      if (service != null)
+      {
+        result = service.getMetadata(toplevelCorpusName, documentName);
+      }
+    }
+    catch (RemoteException ex)
+    {
+      Logger.getLogger(MetaDataPanel.class.getName()).log(Level.SEVERE,
+        null, ex);
+      getWindow().showNotification("Remote exception: "
+        + ex.getLocalizedMessage(),
+        Notification.TYPE_WARNING_MESSAGE);
+    }
+    return result;
+  }
+
+  private Table setupTable(BeanItemContainer<Annotation> metaData)
+  {
+    final BeanItemContainer<Annotation> mData = metaData;
+    Table tblMeta = new Table();
+    tblMeta.setContainerDataSource(mData);
+    tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator()
+    {
 
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
-        Annotation anno = metaContainer.getItem(itemId).getBean();
+        Annotation anno = mData.getItem(itemId).getBean();
         String qName = anno.getName();
-        if(anno.getNamespace() != null)
+        if (anno.getNamespace() != null)
         {
           qName = anno.getNamespace() + ":" + qName;
         }
@@ -77,56 +136,70 @@ public class MetaDataPanel extends Panel
         return l;
       }
     });
-    tblMeta.addGeneratedColumn("genvalue", new Table.ColumnGenerator() {
+    tblMeta.addGeneratedColumn("genvalue", new Table.ColumnGenerator()
+    {
 
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
-        Annotation anno = metaContainer.getItem(itemId).getBean();
+        Annotation anno = mData.getItem(itemId).getBean();
         Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
         return l;
       }
     });
-    
-    
-    tblMeta.setVisibleColumns(new String[] {"genname", "genvalue"});
-    tblMeta.setColumnHeaders(new String[] {"Name", "Value"});
+
+
+    tblMeta.setVisibleColumns(new String[]
+      {
+        "genname", "genvalue"
+      });
+    tblMeta.setColumnHeaders(new String[]
+      {
+        "Name", "Value"
+      });
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
+    return tblMeta;
   }
 
-  @Override
-  public void attach()
-  {    
-    
-    super.attach();
-    
-    // load meta data from service
-    metaContainer.addAll(getMetaData(toplevelCorpusName, documentName));
-    
-  }
-  
-  private List<Annotation> getMetaData(String toplevelCorpusName, String documentName)
+  private Map<String, List<Annotation>> splitListAnnotations()
   {
-    List<Annotation> result = new ArrayList<Annotation>();
-    try
+    List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
+    Map<String, List<Annotation>> hashMetaData =
+      new HashMap<String, List<Annotation>>();
+
+    for (Annotation metaDatum : metadata)
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      if(service != null)
+      String corpus = metaDatum.getCorpusName();
+      if (!hashMetaData.containsKey(corpus))
       {
-        result = service.getMetadata(toplevelCorpusName, documentName);
+        hashMetaData.put(corpus, new ArrayList<Annotation>());
+        hashMetaData.get(corpus).add(metaDatum);
+      }
+      else
+      {
+        hashMetaData.get(corpus).add(metaDatum);
       }
     }
-    catch(RemoteException ex)
-    {
-      Logger.getLogger(MetaDataPanel.class.getName()).log(Level.SEVERE,
-        null, ex);
-      getWindow().showNotification("Remote exception: " + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
-    }
-    return result;
+
+    return hashMetaData;
   }
-  
-  
+
+  private List<BeanItemContainer<Annotation>> putInBeanContainer(
+    Map<String, List<Annotation>> splittedAnnotationsList)
+  {
+    List<BeanItemContainer<Annotation>> listOfBeanItemCon =
+      new ArrayList<BeanItemContainer<Annotation>>();
+
+    for (List<Annotation> list : splittedAnnotationsList.values())
+    {
+      BeanItemContainer<Annotation> metaContainer =
+        new BeanItemContainer<Annotation>(Annotation.class);
+      metaContainer.addAll(list);
+      listOfBeanItemCon.add(metaContainer);
+    }
+
+    return listOfBeanItemCon;
+  }
 }
