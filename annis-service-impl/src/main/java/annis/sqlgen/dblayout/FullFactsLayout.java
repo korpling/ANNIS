@@ -39,13 +39,13 @@ public class FullFactsLayout extends AbstractDatabaseLayout<FullFactsCorpusAdmin
   @Override
   public String getDescription()
   {
-    return "Annotation pool";
+    return "Full facts";
   }
 
   @Override
   public String getScriptAppendix()
   {
-    return "annopool";
+    return "fullfacts";
   }
 
   @Override

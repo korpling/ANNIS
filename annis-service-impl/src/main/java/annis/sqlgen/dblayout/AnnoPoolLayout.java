@@ -15,14 +15,12 @@
  */
 package annis.sqlgen.dblayout;
 
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import annis.administration.AnnoTableCorpusAdministration;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.TableAccessStrategy;
-import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,13 +36,13 @@ public class AnnoPoolLayout extends AbstractDatabaseLayout<AnnoTableCorpusAdmini
   @Override
   public String getDescription()
   {
-    return "Full facts";
+    return "Annotation pool";
   }
 
   @Override
   public String getScriptAppendix()
   {
-    return "fullfacts";
+    return "annopool";
   }
 
   @Override
