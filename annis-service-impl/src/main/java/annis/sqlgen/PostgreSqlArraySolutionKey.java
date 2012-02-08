@@ -1,6 +1,7 @@
 package annis.sqlgen;
 
 import static java.util.Arrays.asList;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -11,8 +12,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * TODO Document semantics of of multiple ID columns
- * TODO Code supporting multiple ID columns complicates things unnecessarily
+ * TODO Document semantics of of multiple ID columns TODO Code supporting
+ * multiple ID columns complicates things unnecessarily
  *
  * @param <BaseType>
  */
@@ -22,15 +23,16 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
 
   // logging with log4j
   private static Logger log = Logger.getLogger(PostgreSqlArraySolutionKey.class);
-  
   // the name of the ID array in the outer query
   private String keyColumnName;
-  
+
   @Override
-  public List<String> generateOuterQueryColumns(TableAccessStrategy tableAccessStrategy, int size)
+  public List<String> generateOuterQueryColumns(
+    TableAccessStrategy tableAccessStrategy, int size)
   {
     List<String> columns = new ArrayList<String>();
-    String nameAlias = tableAccessStrategy.aliasedColumn("solutions", getIdColumnName());
+    String nameAlias = tableAccessStrategy.aliasedColumn("solutions",
+      getIdColumnName());
     columns.add(createKeyArray(nameAlias, keyColumnName, size));
     return columns;
   }
@@ -41,7 +43,8 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
     sb.append("ARRAY[");
     sb.append(column);
     sb.append(1);
-    for (int i = 2; i <= size; ++i) {
+    for (int i = 2; i <= size; ++i)
+    {
       sb.append(", ");
       sb.append(column);
       sb.append(i);
@@ -59,19 +62,22 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
     try
     {
       Array sqlArray = resultSet.getArray(keyColumnName);
-      if (resultSet.wasNull()) {
-        throw new IllegalStateException("Match group identifier must not be null");
+      if (resultSet.wasNull())
+      {
+        throw new IllegalStateException(
+          "Match group identifier must not be null");
       }
       @SuppressWarnings("unchecked")
       BaseType[] keyArray = (BaseType[]) sqlArray.getArray();
       setLastKey(getCurrentKey());
       setCurrentKey(asList(keyArray));
       return getCurrentKey();
-    } catch (SQLException e)
+    }
+    catch (SQLException e)
     {
       log.error("Exception thrown while retrieving key array", e);
       throw new IllegalStateException(
-          "Could not retrieve key from JDBC results set", e);
+        "Could not retrieve key from JDBC results set", e);
     }
   }
 
@@ -90,5 +96,4 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
   {
     this.keyColumnName = keyColumnName;
   }
-
 }

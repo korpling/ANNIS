@@ -98,6 +98,17 @@ public class CsvResultSetProvider
       {
         return wasNull;
       }
+    });
+    
+    when(rs.findColumn(anyString())).thenAnswer(new Answer<Integer>()
+    {
+
+      @Override
+      public Integer answer(InvocationOnMock invocation) throws Throwable
+      {
+        String arg = (String) invocation.getArguments()[0];
+        return getColumnByName(arg)+1;
+      }
       
     });
 
@@ -108,7 +119,8 @@ public class CsvResultSetProvider
       @Override
       public String answer(InvocationOnMock invocation) throws Throwable
       {
-        return getStringValue((Integer) invocation.getArguments()[0]);
+        int idx = (Integer) invocation.getArguments()[0];
+        return getStringValue(idx-1);
       }
     });
 
@@ -118,7 +130,8 @@ public class CsvResultSetProvider
       @Override
       public Long answer(InvocationOnMock invocation) throws Throwable
       {
-        return getLongValue((Integer) invocation.getArguments()[0]);
+        int idx = (Integer) invocation.getArguments()[0];
+        return getLongValue(idx-1);
       }
     });
 
@@ -128,7 +141,8 @@ public class CsvResultSetProvider
       @Override
       public Integer answer(InvocationOnMock invocation) throws Throwable
       {
-        return getIntValue((Integer) invocation.getArguments()[0]);
+        int idx = (Integer) invocation.getArguments()[0];
+        return getIntValue(idx-1);
       }
     });
 
@@ -138,7 +152,8 @@ public class CsvResultSetProvider
       @Override
       public Boolean answer(InvocationOnMock invocation) throws Throwable
       {
-        return getBooleanValue((Integer) invocation.getArguments()[0]);
+        int idx = (Integer) invocation.getArguments()[0];
+        return getBooleanValue(idx-1);
       }
     });
 
@@ -148,10 +163,22 @@ public class CsvResultSetProvider
       @Override
       public Array answer(InvocationOnMock invocation) throws Throwable
       {
+        int idx = (Integer) invocation.getArguments()[0];
         return new DummySQLArray(getArrayValue(
-          (Integer) invocation.getArguments()[0], Types.VARCHAR), Types.VARCHAR,
+          idx-1, Types.VARCHAR), Types.VARCHAR,
           "VARCHAR");
 
+      }
+    });
+
+    when(rs.getObject(anyInt())).thenAnswer(new Answer<Object>()
+    {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable
+      {
+        int idx = (Integer) invocation.getArguments()[0];
+        return getStringValue(idx-1);
       }
     });
 
@@ -219,6 +246,17 @@ public class CsvResultSetProvider
             (String) invocation.getArguments()[0]), Types.VARCHAR),
             Types.VARCHAR, "VARCHAR");
         }
+      }
+    });
+
+    when(rs.getObject(anyString())).thenAnswer(new Answer<Object>()
+    {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable
+      {
+        return getStringValue(getColumnByName(
+          (String) invocation.getArguments()[0]));
       }
     });
 
