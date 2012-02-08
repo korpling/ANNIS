@@ -31,6 +31,9 @@ limitations under the License.
     </property>
   </bean>
 
+  <!-- available database layouts -->
+  <bean id="annoPoolLayout" class="annis.sqlgen.dblayout.AnnoPoolLayout"></bean>
+  <bean id="fullFactsLayout" class="annis.sqlgen.dblayout.FullFactsLayout"></bean>
 
 	<!-- Configure use of BETWEEN SYMMETRIC -->
   <bean
@@ -290,8 +293,12 @@ limitations under the License.
 				<ref bean="annotateSqlGenerator" />
 			</util:list>
 		</property>
-		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
-      <property name="tableLayout" value="${annis.table-layout}" />
+    <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
+    <property name="dbLayout">
+      <bean factory-bean="annisSpringFactory" factory-method="getDatabaseLayout">
+        <constructor-arg value="${annis.table-layout}" />
+      </bean>
+    </property>
     <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy">
       <bean class="annis.sqlgen.TableAccessStrategy">

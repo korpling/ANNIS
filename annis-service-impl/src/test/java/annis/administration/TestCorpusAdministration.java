@@ -46,7 +46,7 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    SchemeType type = SchemeType.ANNO_POOL;
+    SchemeType type = SchemeType.ANNOPOOL;
     administration.importCorpora(true, path);
 
     // insertion of a corpus needs to follow an exact order
@@ -69,7 +69,7 @@ public class TestCorpusAdministration
     String path1 = "somePath";
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
-    SchemeType type = SchemeType.ANNO_POOL;
+    SchemeType type = SchemeType.ANNOPOOL;
 
     administration.importCorpora(true, path1, path2, path3);
 

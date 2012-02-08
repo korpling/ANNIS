@@ -76,7 +76,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
-  private SchemeType tableLayout = SchemeType.ANNO_POOL;
+  private SchemeType tableLayout = SchemeType.ANNOPOOL;
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
     final String edgeType, String componentName)
@@ -203,7 +203,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
     switch (tableLayout)
     {
-      case ANNO_POOL:
+      case ANNOPOOL:
 
 
         TextMatching tm = annotation.getTextMatching();

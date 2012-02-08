@@ -58,7 +58,9 @@
 		
 	<!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
-		
+
+  <import resource="classpath:annis/AnnisCommon-context.xml"/>
+      
 	<!-- DddQueryParser -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>

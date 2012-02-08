@@ -57,7 +57,7 @@ public class AnnoTableCorpusAdministration extends CorpusAdministration
   @Override
   public SchemeType getSchemeType()
   {
-    return SchemeType.ANNO_POOL;
+    return SchemeType.ANNOPOOL;
   }
   
   

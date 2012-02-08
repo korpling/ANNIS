@@ -141,7 +141,7 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldGenerateSelectClauseAnnoPool()
   {
-    shouldGenerateSelectClause(SchemeType.ANNO_POOL);
+    shouldGenerateSelectClause(SchemeType.ANNOPOOL);
   }
   
   /**
@@ -235,7 +235,7 @@ public class TestAnnotateSqlGenerator
             + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
             + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
         }
-        else if(type == SchemeType.ANNO_POOL)
+        else if(type == SchemeType.ANNOPOOL)
         {
           expected = expected
             + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"
@@ -341,7 +341,7 @@ public class TestAnnotateSqlGenerator
             + INDENT + TABSTOP + edgeAnnotationNameAlias + " AS \"" + "edge_annotation_name" + "\",\n"
             + INDENT + TABSTOP + edgeAnnotationValueAlias + " AS \"" + "edge_annotation_value" + "\",\n";
         }
-        else if(type == SchemeType.ANNO_POOL)
+        else if(type == SchemeType.ANNOPOOL)
         {
           expected = expected
             + INDENT + TABSTOP + "node_anno.namespace AS \"node_annotation_namespace\",\n"
