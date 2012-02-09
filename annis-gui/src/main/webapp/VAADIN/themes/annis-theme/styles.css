@@ -94,14 +94,12 @@ textarea.citation {
 /* HACKS (or workarounds for browser/vaadin bugs) */
 
 /* 
- image only buttons don't render their icons in Firefox 7'
+ image only buttons don't render their icons in Firefox >= 7'
  - https://vaadin.com/de/forum/-/message_boards/view_message/778075
  - http://dev.vaadin.com/ticket/7713
 */
 
-.v-ff7 .v-button-wrap { overflow: visible; }
-.v-ff8 .v-button-wrap { overflow: visible; }
-.v-ff9 .v-button-wrap { overflow: visible; }
+.v-ff .v-button-wrap { overflow: visible; }
 
 /* 
  split button should have the some appearance on focus as the other buttons 

@@ -109,6 +109,7 @@ public abstract class AnnisBaseRunner
 
     ConsoleReader console = new ConsoleReader();
     console.setUseHistory(true);
+    console.getHistory().setHistoryFile(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setBellEnabled(true);
 
     String[] commands = detectAvailableCommands().toArray(new String[0]);
@@ -142,7 +143,7 @@ public abstract class AnnisBaseRunner
       {
         error(e);
       }
-    }
+    } // end while
   }
 
   protected void error(Throwable e)

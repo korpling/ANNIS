@@ -4,6 +4,7 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,10 +52,24 @@ public class AbstractSolutionKey<BaseType>
 
   public Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy)
   {
-    try {
+    try 
+    {
       String idAlias = tableAccessStrategy.columnName(NODE_TABLE, getIdColumnName());
-      Object nodeId = resultSet.getObject(idAlias);
-      return nodeId;
+      int idAliasIdx = resultSet.findColumn(idAlias);
+      if(resultSet.getMetaData() != null)
+      {
+        switch(resultSet.getMetaData().getColumnType(idAliasIdx))
+        {
+          case Types.VARCHAR:
+            return resultSet.getString(idAliasIdx);
+          case Types.BIGINT:
+            return resultSet.getLong(idAliasIdx);
+          case Types.INTEGER:
+            return resultSet.getInt(idAliasIdx);
+        }
+      }
+      // default
+      return resultSet.getObject(idAliasIdx);
     }
     catch (SQLException e)
     {
