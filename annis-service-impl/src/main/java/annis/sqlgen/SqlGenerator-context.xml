@@ -292,7 +292,7 @@ limitations under the License.
 		</property>
 		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
       <property name="tableLayout" value="${annis.table-layout}" />
-    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy">
       <bean class="annis.sqlgen.TableAccessStrategy">
         <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
