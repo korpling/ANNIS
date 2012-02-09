@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.sql.ResultSet;
@@ -66,7 +67,10 @@ public class AbstractSolutionKeyTest
     Object expected = new Object();
     String idAlias = uniqueString(3);
     given(tableAccessStrategy.columnName(NODE_TABLE, idColumnName)).willReturn(idAlias);
+    given(resultSet.getObject(1)).willReturn(expected);
+    given(resultSet.findColumn(idAlias)).willReturn(1);
     given(resultSet.getObject(idAlias)).willReturn(expected);
+    
     // when
     Object actual = key.getNodeId(resultSet, tableAccessStrategy);
     // then
@@ -81,6 +85,7 @@ public class AbstractSolutionKeyTest
   {
     // given
     given(resultSet.getObject(anyString())).willThrow(new SQLException());
+    given(resultSet.getObject(anyInt())).willThrow(new SQLException());
     // when
     key.getNodeId(resultSet, tableAccessStrategy);
   }
