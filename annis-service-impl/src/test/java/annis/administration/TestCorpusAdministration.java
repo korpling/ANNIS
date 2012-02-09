@@ -33,6 +33,7 @@ public class TestCorpusAdministration
   @Mock
   private SpringAnnisAdministrationDao administrationDao;
   private AnnoTableCorpusAdministration administration;
+  private  AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
 
   @Before
   public void setup()
@@ -41,6 +42,7 @@ public class TestCorpusAdministration
 
     administration = new AnnoTableCorpusAdministration();
     administration.setAdministrationDao(administrationDao);
+    administration.setDbLayout(dbLayout);
   }
 
   @Test
@@ -48,7 +50,6 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
     administration.importCorpora(true, path);
 
     // insertion of a corpus needs to follow an exact order
@@ -71,8 +72,7 @@ public class TestCorpusAdministration
     String path1 = "somePath";
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
-    AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
-
+    
     administration.importCorpora(true, path1, path2, path3);
 
     // insertion of a corpus needs to follow an exact order

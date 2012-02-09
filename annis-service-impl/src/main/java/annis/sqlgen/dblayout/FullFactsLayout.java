@@ -102,12 +102,12 @@ public class FullFactsLayout extends AbstractDatabaseLayout<FullFactsCorpusAdmin
   {
     ArrayList<String> fields = new ArrayList<String>();
 
-    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace"));
-    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "name"));
-    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "value"));
-    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "namespace"));
-    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "name"));
-    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "value"));
+    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace") + " AS \"node_annotation_namespace\"");
+    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "name") + " AS \"node_annotation_name\"");
+    fields.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "value") + " AS \"node_annotation_value\"");
+    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "namespace") + " AS \"edge_annotation_namespace\"");
+    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "name") + " AS \"edge_annotation_name\"");
+    fields.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "value") + " AS \"edge_annotation_value\"");
     return fields;
   }
 

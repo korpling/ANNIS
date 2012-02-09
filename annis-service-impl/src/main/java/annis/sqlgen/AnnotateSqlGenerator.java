@@ -244,8 +244,9 @@ public abstract class AnnotateSqlGenerator<T>
     SolutionKey<?> key = createSolutionKey();
 
     sb.append("DISTINCT\n");
+    TableAccessStrategy tas = createTableAccessStrategy();
     List<String> keyColumns =
-      key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.
+      key.generateOuterQueryColumns(tas, alternative.
       size());
     for (String keyColumn : keyColumns)
     {
@@ -290,7 +291,7 @@ public abstract class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
 
     fields.addAll(
-      dbLayout.getAnnotateSelectFields(outerQueryTableAccessStrategy));
+      dbLayout.getAnnotateSelectFields(tas));
 
 
     sb.append(indent).append(TABSTOP);

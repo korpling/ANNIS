@@ -16,6 +16,7 @@
 package annis.sqlgen.dblayout;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import annis.administration.AnnoTableCorpusAdministration;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
@@ -118,7 +119,7 @@ public class AnnoPoolLayout extends AbstractDatabaseLayout<AnnoTableCorpusAdmini
       + " = node_anno.id");
     joins.add("node_anno.\"type\" = 'node'");
     // join with edge annotations
-    joins.add(tas.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref")
+    joins.add(tas.aliasedColumn(EDGE_ANNOTATION_TABLE, "anno_ref")
       + " = edge_anno.id");
     joins.add("edge_anno.\"type\" = 'edge'");
 
