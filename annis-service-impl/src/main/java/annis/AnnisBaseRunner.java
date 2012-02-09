@@ -109,6 +109,8 @@ public abstract class AnnisBaseRunner
 
     ConsoleReader console = new ConsoleReader();
     console.setUseHistory(true);
+    File annisDir = new File(System.getProperty("user.home") + "/.annis/");
+    annisDir.mkdirs();
     console.getHistory().setHistoryFile(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setBellEnabled(true);
 
