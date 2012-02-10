@@ -15,8 +15,6 @@
  */
 package annis.administration;
 
-import annis.sqlgen.dblayout.DatabaseLayout;
-import annis.sqlgen.dblayout.AnnoPoolLayout;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -32,17 +30,15 @@ public class TestCorpusAdministration
 
   @Mock
   private DefaultAdministrationDao administrationDao;
-  private APCorpusAdministration administration;
-  private  DatabaseLayout dbLayout = new AnnoPoolLayout();
+  private CorpusAdministration administration;
 
   @Before
   public void setup()
   {
     initMocks(this);
 
-    administration = new APCorpusAdministration();
+    administration = new CorpusAdministration();
     administration.setAdministrationDao(administrationDao);
-    administration.setDbLayout(dbLayout);
   }
 
   @Test
@@ -50,7 +46,7 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    administration.importCorpora(true, path);
+    administration.importCorpora(path);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);
@@ -58,7 +54,7 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that the corpus was imported
-    verifyImport(inOrder, path, dbLayout);
+    verifyImport(inOrder, path);
 
     verifyPostImport(inOrder);
 
@@ -73,7 +69,7 @@ public class TestCorpusAdministration
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
     
-    administration.importCorpora(true, path1, path2, path3);
+    administration.importCorpora(path1, path2, path3);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);
@@ -82,9 +78,9 @@ public class TestCorpusAdministration
     verifyPreImport(inOrder);
 
     // verify that each corpus was inserted in order
-    verifyImport(inOrder, path1, dbLayout);
-    verifyImport(inOrder, path2, dbLayout);
-    verifyImport(inOrder, path3, dbLayout);
+    verifyImport(inOrder, path1);
+    verifyImport(inOrder, path2);
+    verifyImport(inOrder, path3);
 
     // that should be it
     verifyNoMoreInteractions(administrationDao);
@@ -101,7 +97,7 @@ public class TestCorpusAdministration
   }
 
   // a correct import requires this order
-  private void verifyImport(InOrder inOrder, String path, DatabaseLayout dbLayout)
+  private void verifyImport(InOrder inOrder, String path)
   {
     // create the staging area
     inOrder.verify(administrationDao).createStagingArea(true);
@@ -146,7 +142,7 @@ public class TestCorpusAdministration
 
     // the facts child table must be created
 
-    inOrder.verify(administrationDao).createFacts(corpusID, dbLayout);
+    inOrder.verify(administrationDao).createFacts(corpusID);
 
     inOrder.verify(administrationDao).updateCorpusStatistic();
 

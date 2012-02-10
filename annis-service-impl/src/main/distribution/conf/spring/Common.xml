@@ -18,7 +18,7 @@
   </bean>
   
   	<!-- AnnisDao -->
-  <import resource="file:${annis.home}/conf/spring/${annis.mode}/Dao.xml"/>
-  <import resource="file:${annis.home}/conf/spring/${annis.mode}/SqlGenerator.xml" />
+  <import resource="${annis.mode}/Dao.xml"/>
+  <import resource="${annis.mode}/SqlGenerator.xml" />
  
 </beans>

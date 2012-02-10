@@ -13,8 +13,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
 	">
      
-   <import resource="file:${annis.home}/conf/spring/Common.xml" />
-   <import resource="file:${annis.home}/conf/spring/${annis.mode}/AdminDao.xml" />
+   <import resource="Common.xml" />
+   <import resource="${annis.mode}/AdminDao.xml" />
 
 	<!-- Enable bean autowiring -->
 	<context:annotation-config/>

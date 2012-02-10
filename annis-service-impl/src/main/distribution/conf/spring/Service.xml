@@ -6,7 +6,7 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
-  <import resource="file:${annis.home}/conf/spring/Common.xml" />
+  <import resource="Common.xml" />
 
 	<!-- DddQueryMapper -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
