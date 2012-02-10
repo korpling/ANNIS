@@ -21,12 +21,6 @@
 	
 	<!-- Enable AspectJ-style AOP annotations -->
   <aop:aspectj-autoproxy/>
-
-	<!-- database connection configuration -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="location" value="file:${annis.home}/conf/database.properties"/>
-    <property name="placeholderPrefix" value="$dao{"/>
-  </bean>
 	
 	<!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>

@@ -11,21 +11,9 @@
   
 	<!-- Enable bean autowiring -->
 	<context:annotation-config/>
-  
-  	<!-- Properties configuration -->
-  <bean id="properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="locations">
-      <list>
-        <value>file:${annis.home}/conf/annis-service.properties</value>
-        <value>file:${annis.home}/conf/database.properties</value>
-      </list>
-    </property>
-    <property name="ignoreUnresolvablePlaceholders" value="true" />
-    <property name="ignoreResourceNotFound" value="false" />
-  </bean>
-  
+   
   	<!-- AnnisDao -->
-  <import resource="file:${annis.home}/conf/spring/modes/#{annis.mode}/Dao.xml"/>
-  <import resource="file:${annis.home}/conf/spring/modes/#{annis.mode}/SqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/Dao.xml"/>
+  <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/SqlGenerator.xml" />
  
 </beans>
