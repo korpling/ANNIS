@@ -228,22 +228,13 @@ public abstract class AnnotateSqlGenerator<T>
     else
     {
       String template = "SELECT DISTINCT \n"
-        + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name,"
-        + "node_anno.namespace AS node_annotation_namespace, "
-        + "node_anno.\"name\" AS node_annotation_name, "
-        + "node_anno.val AS node_annotation_value,\n"
-        + "edge_anno.namespace AS edge_annotation_namespace, "
-        + "edge_anno.\"name\" AS edge_annotation_name, "
-        + "edge_anno.val AS edge_annotation_value\n"
-        + "FROM\n"
-        + "\tfacts AS facts, corpus as c, annotation_pool as node_anno, annotation_pool as edge_anno\n"
-        + "WHERE\n"
-        + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.\"type\" = 'node'\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.\"type\" = 'edge'\n"
-        + "ORDER BY facts.pre";
-      String sql = template.replace(":text_id", String.valueOf(textID));
-      return sql;
+          + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
+          + "FROM\n"
+          + "\tfacts AS facts, corpus as c\n" + "WHERE\n"
+          + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
+          + "ORDER BY facts.pre";
+        String sql = template.replace(":text_id", String.valueOf(textID));
+        return sql;
     }
   }
 
@@ -275,25 +266,15 @@ public abstract class AnnotateSqlGenerator<T>
     else
     {
       String template = "SELECT DISTINCT \n"
-        + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name, "
-        + "node_anno.namespace AS node_annotation_namespace, "
-        + "node_anno.\"name\" AS node_annotation_name, "
-        + "node_anno.val AS node_annotation_value,\n"
-        + "edge_anno.namespace AS edge_annotation_namespace, "
-        + "edge_anno.\"name\" AS edge_annotation_name, "
-        + "edge_anno.val AS edge_annotation_value\n"
-        + "FROM\n"
-        + "\tfacts AS facts, corpus as c, corpus as toplevel, \n"
-        + "\tannotation_pool as node_anno, annotation_pool as edge_anno\n"
-        + "WHERE\n"
-        + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
-        + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.\"type\" = 'node' AND node_anno.toplevel_corpus = toplevel.id\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.\"type\" = 'edge' AND edge_anno.toplevel_corpus = toplevel.id\n"
-        + "ORDER BY facts.pre";
-      String sql = template.replace(":toplevel_name", String.valueOf(
-        toplevelCorpusName)).replace(":document_name", documentName);
-      return sql;
+          + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
+          + "FROM\n"
+          + "\tfacts AS facts, corpus as c, corpus as toplevel\n" + "WHERE\n"
+          + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
+          + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
+          + "ORDER BY facts.pre";
+        String sql = template.replace(":toplevel_name", String.valueOf(
+          toplevelCorpusName)).replace(":document_name", documentName);
+        return sql;
     }
   }
 
