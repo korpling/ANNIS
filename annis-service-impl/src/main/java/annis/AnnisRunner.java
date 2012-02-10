@@ -123,8 +123,9 @@ public class AnnisRunner extends AnnisBaseRunner
   public static void main(String[] args)
   {
     // get runner from Spring
-    AnnisBaseRunner.getInstance("annisRunner", Utils.getConfigFile(
-      "spring/AnnisRunner-context.xml").getAbsolutePath()).run(args);
+    String path = Utils.getAnnisFile(
+      "conf/spring/Shell.xml").getAbsolutePath();
+    AnnisBaseRunner.getInstance("annisRunner", "file:" + path).run(args);
   }
 
   public AnnisRunner()

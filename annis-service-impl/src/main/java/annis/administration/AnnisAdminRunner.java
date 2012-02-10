@@ -37,6 +37,7 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
+import annis.utils.Utils;
 
 public class AnnisAdminRunner extends AnnisBaseRunner {
 	
@@ -47,7 +48,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 	
 	public static void main(String[] args) {
 		// get Runner from Spring
-		AnnisBaseRunner.getInstance("annisAdminRunner", "annis/administration/AnnisAdminRunner-context.xml").run(args);
+		AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
 	}
 
   @Override

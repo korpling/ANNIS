@@ -28,7 +28,7 @@ import org.apache.commons.lang.Validate;
 public class Utils
 {
 
-  public static File getAnnisConfigLocation()
+  public static File getAnnisHomeLocation()
   {
     String annisHome = System.getProperty("annis.home");
     Validate.notNull(annisHome);
@@ -36,9 +36,9 @@ public class Utils
     return fAnnisHome;
   }
   
-  public static File getConfigFile(String subpath)
+  public static File getAnnisFile(String subpath)
   {
-    File annisConfig = getAnnisConfigLocation();
+    File annisConfig = getAnnisHomeLocation();
     return new File(annisConfig, subpath);
   }
   

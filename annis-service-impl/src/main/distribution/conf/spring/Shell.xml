@@ -31,9 +31,6 @@ limitations under the License.
 	">
 
    <import resource="file:${annis.home}/conf/spring/Common.xml" />
-
-	<!-- Enable bean autowiring -->
-	<context:annotation-config/>
  
 	<!-- DddQueryMapper -->
 	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
