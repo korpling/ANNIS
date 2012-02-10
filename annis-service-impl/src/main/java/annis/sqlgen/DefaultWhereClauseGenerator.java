@@ -36,7 +36,6 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -76,7 +75,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
-  private AbstractDatabaseLayout dbLayout;
   
   
   private void addComponentPredicates(List<String> conditions, QueryNode node,
@@ -201,8 +199,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData)
   {
-    dbLayout.addAnnotationConditions(conditions, node, index, annotation, table,
-      queryData, tables(node));
+    // TODO
   }
 
   @Override
@@ -612,16 +609,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     this.useComponentRefPredicateInCommonAncestorSubquery =
       useComponentRefPredicateInCommonAncestorSubquery;
-  }
-
-  public AbstractDatabaseLayout getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(AbstractDatabaseLayout dbLayout)
-  {
-    this.dbLayout = dbLayout;
   }
 
   

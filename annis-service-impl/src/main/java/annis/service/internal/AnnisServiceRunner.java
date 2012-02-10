@@ -21,9 +21,9 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger; 
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import annis.AnnisBaseRunner;
+import annis.utils.Utils;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -33,6 +33,8 @@ import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -133,8 +135,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
 
     // create beans
-    ClassPathXmlApplicationContext cxt = new ClassPathXmlApplicationContext(
-      "annis/service/internal/AnnisServiceRunner-context.xml");
+    AbstractXmlApplicationContext cxt = new FileSystemXmlApplicationContext(
+      Utils.getConfigFile("spring/AnnisServiceRunner-context.xml").getAbsolutePath());
     ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       cxt);

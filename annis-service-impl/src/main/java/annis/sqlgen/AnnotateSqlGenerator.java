@@ -35,7 +35,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.dblayout.AbstractDatabaseLayout;
 
 /**
  *
@@ -58,7 +57,6 @@ public abstract class AnnotateSqlGenerator<T>
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy outerQueryTableAccessStrategy;
   private boolean optimizeOverlap;
-  private AbstractDatabaseLayout dbLayout;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
 
@@ -201,18 +199,14 @@ public abstract class AnnotateSqlGenerator<T>
   @Deprecated
   public String getTextQuery(long textID)
   {
-    String template = dbLayout.getTextQueryTemplate(textID);
-    String sql = template.replace(":text_id", String.valueOf(textID));
-    return sql;
+    // TODO
+    return "TODO";
   }
 
   public String getDocumentQuery(String toplevelCorpusName, String documentName)
   {
-    String template = dbLayout.getDocumentQueryTemplate(toplevelCorpusName,
-      documentName);
-    String sql = template.replace(":toplevel_name", String.valueOf(
-      toplevelCorpusName)).replace(":document_name", documentName);
-    return sql;
+    // TODO
+    return "TODO";
   }
 
   public String getMatchedNodesViewName()
@@ -289,10 +283,6 @@ public abstract class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-
-    fields.addAll(
-      dbLayout.getAnnotateSelectFields(tas));
-
 
     sb.append(indent).append(TABSTOP);
     sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
@@ -420,14 +410,6 @@ public abstract class AnnotateSqlGenerator<T>
 
     HashSet<String> result = new HashSet<String>();
 
-    List<String> cond = dbLayout.getAnnotateWhereConditions(tables, corpusList);
-    if (cond.size() > 0)
-    {
-      sb.append(indent).append(TABSTOP).append("AND ");
-      sb.append(
-        StringUtils.join(cond, "\n" + indent + TABSTOP + "AND "));
-    }
-
     result.add(sb.toString());
 
     return result;
@@ -524,14 +506,6 @@ public abstract class AnnotateSqlGenerator<T>
     indent(sb, indent + TABSTOP);
     sb.append(TableAccessStrategy.CORPUS_TABLE);
 
-    List<String> fromTables = dbLayout.getAnnotateFromTables();
-    if (fromTables.size() > 0)
-    {
-      sb.append(", \n");
-      indent(sb, indent + TABSTOP);
-      sb.append(StringUtils.join(fromTables, ", \n" + indent + TABSTOP));
-    }
-
     return sb.toString();
   }
 
@@ -570,16 +544,6 @@ public abstract class AnnotateSqlGenerator<T>
   public TableAccessStrategy getOuterQueryTableAccessStrategy()
   {
     return outerQueryTableAccessStrategy;
-  }
-
-  public AbstractDatabaseLayout getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(AbstractDatabaseLayout dbLayout)
-  {
-    this.dbLayout = dbLayout;
   }
 
   public boolean isIncludeDocumentNameInAnnotateQuery()

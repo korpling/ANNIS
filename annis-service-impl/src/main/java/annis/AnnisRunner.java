@@ -54,6 +54,7 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.LegacyGraphConverter;
+import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import org.eclipse.emf.common.util.URI;
@@ -122,8 +123,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public static void main(String[] args)
   {
     // get runner from Spring
-    AnnisBaseRunner.getInstance("annisRunner", "annis/AnnisRunner-context.xml").
-      run(args);
+    AnnisBaseRunner.getInstance("annisRunner", Utils.getConfigFile(
+      "spring/AnnisRunner-context.xml").getAbsolutePath()).run(args);
   }
 
   public AnnisRunner()
@@ -400,7 +401,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       resetCaches(currentOS);
     }
-    
+
     // shuffle the benchmark queries
     Collections.shuffle(session);
     out.println();

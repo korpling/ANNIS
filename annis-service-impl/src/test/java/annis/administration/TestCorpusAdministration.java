@@ -15,7 +15,7 @@
  */
 package annis.administration;
 
-import annis.sqlgen.dblayout.AbstractDatabaseLayout;
+import annis.sqlgen.dblayout.DatabaseLayout;
 import annis.sqlgen.dblayout.AnnoPoolLayout;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -31,16 +31,16 @@ public class TestCorpusAdministration
 {
 
   @Mock
-  private SpringAnnisAdministrationDao administrationDao;
-  private AnnoTableCorpusAdministration administration;
-  private  AbstractDatabaseLayout dbLayout = new AnnoPoolLayout();
+  private DefaultAdministrationDao administrationDao;
+  private APCorpusAdministration administration;
+  private  DatabaseLayout dbLayout = new AnnoPoolLayout();
 
   @Before
   public void setup()
   {
     initMocks(this);
 
-    administration = new AnnoTableCorpusAdministration();
+    administration = new APCorpusAdministration();
     administration.setAdministrationDao(administrationDao);
     administration.setDbLayout(dbLayout);
   }
@@ -101,7 +101,7 @@ public class TestCorpusAdministration
   }
 
   // a correct import requires this order
-  private void verifyImport(InOrder inOrder, String path, AbstractDatabaseLayout dbLayout)
+  private void verifyImport(InOrder inOrder, String path, DatabaseLayout dbLayout)
   {
     // create the staging area
     inOrder.verify(administrationDao).createStagingArea(true);

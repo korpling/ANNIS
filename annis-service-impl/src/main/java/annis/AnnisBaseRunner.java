@@ -29,12 +29,13 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.LinkedList;
 import java.util.List;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 public abstract class AnnisBaseRunner
 {
@@ -60,7 +61,7 @@ public abstract class AnnisBaseRunner
     checkForAnnisHome();
     setupLogging(logToConsole);
 
-    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(contextLocations);
+    AbstractXmlApplicationContext ctx = new FileSystemXmlApplicationContext(contextLocations);
     return (AnnisBaseRunner) ctx.getBean(beanName);
   }
 

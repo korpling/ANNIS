@@ -34,7 +34,7 @@ import org.springframework.dao.DataAccessException;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
-import annis.sqlgen.dblayout.AbstractDatabaseLayout;
+import annis.sqlgen.dblayout.DatabaseLayout;
 import annis.sqlgen.dblayout.AnnoPoolLayout;
 import annis.sqlgen.dblayout.FullFactsLayout;
 
@@ -157,7 +157,7 @@ public class TestAnnotateSqlGenerator
     shouldGenerateSelectClause(new FullFactsLayout());
   }
     
-  private void shouldGenerateSelectClause(AbstractDatabaseLayout dbLayout)
+  private void shouldGenerateSelectClause(DatabaseLayout dbLayout)
   {
     generator.setDbLayout(dbLayout);
     
@@ -265,7 +265,7 @@ public class TestAnnotateSqlGenerator
   public void shouldGenerateSelectClauseWithIsTokenColumn()
   {
     // given
-    AbstractDatabaseLayout dbLayout = new FullFactsLayout();
+    DatabaseLayout dbLayout = new FullFactsLayout();
     generator.setDbLayout(dbLayout);
     generator.setIncludeIsTokenColumn(true);
     int offset = uniqueInt(10);

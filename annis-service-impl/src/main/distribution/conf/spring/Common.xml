@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util/spring-util-2.5.xsd"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+          http://www.springframework.org/schema/util/spring-util-2.5.xsd http://www.springframework.org/schema/util/spring-util-2.5.xsd/spring-spring-util-2.5.xsd-3.0.xsd
+">
+  
+  	<!-- Properties configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>file:${annis.home}/conf/annis-service.properties</value>
+        <value>file:${annis.home}/conf/database.properties</value>
+      </list>
+    </property>
+  </bean>
+  
+  	<!-- AnnisDao -->
+  <import resource="file:${annis.home}/conf/spring/${annis.mode}/Dao.xml"/>
+  <import resource="file:${annis.home}/conf/spring/${annis.mode}/SqlGenerator.xml" />
+ 
+</beans>
