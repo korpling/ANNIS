@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -31,8 +30,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
@@ -85,8 +82,9 @@ public abstract class AnnisBaseRunner
     {
       log.error("Could not load conf/annis-service.properties", ex);
     }
-
+    
     ctx.load(contextLocations);
+    ctx.refresh();
     return (AnnisBaseRunner) ctx.getBean(beanName);
   }
 
