@@ -15,9 +15,9 @@
  */
 package annis.service.internal;
 
-import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisResult;
 import java.rmi.RemoteException;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -39,7 +39,9 @@ import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
+import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSetImpl;
@@ -47,7 +49,6 @@ import annis.service.objects.AnnisResultImpl;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.util.LinkedList;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -56,6 +57,7 @@ public class AnnisServiceImpl implements AnnisService
 
   private static final long serialVersionUID = 1970615866336637980L;
   private Logger log = Logger.getLogger(this.getClass());
+  private static Logger queryLog = Logger.getLogger("QueryLog");
   private AnnisDao annisDao;
   private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
@@ -87,11 +89,47 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public int getCount(List<Long> corpusList, String annisQuery) throws
-    RemoteException, AnnisQLSemanticsException
+  public int getCount(List<Long> corpusList, String annisQuery)
+      throws RemoteException, AnnisQLSemanticsException
   {
+    long start = new Date().getTime();
     QueryData queryData = analyzeQuery(annisQuery, corpusList);
-    return annisDao.count(queryData);
+    int count = annisDao.count(queryData);
+    long end = new Date().getTime();
+    logQuery("COUNT", annisQuery, corpusList, end - start);
+
+    return count;
+  }
+
+  private void logQuery(String queryFunction, String annisQuery,
+      List<Long> corpusList, long runtime)
+  {
+    logQuery(queryFunction, annisQuery, corpusList, runtime, null);
+  }
+
+  private void logQuery(String queryFunction, String annisQuery,
+      List<Long> corpusList, long runtime, String options)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("function: ");
+    sb.append(queryFunction);
+    sb.append(", ");
+    sb.append("query: ");
+    sb.append(annisQuery);
+    sb.append(", ");
+    sb.append("corpus: ");
+    sb.append(annisDao.mapCorpusIdsToNames(corpusList));
+    sb.append(", ");
+    sb.append("runtime: ");
+    sb.append(runtime);
+    sb.append(" ms");
+    if (options != null && !options.isEmpty())
+    {
+      sb.append(", ");
+      sb.append(options);
+    }
+    String message = sb.toString();
+    queryLog.info(message);
   }
 
   @Override
@@ -104,11 +142,21 @@ public class AnnisServiceImpl implements AnnisService
     contextLeft = Math.min(maxContext, contextLeft);
     contextRight = Math.min(maxContext, contextRight);
 
+    StringBuilder sb = new StringBuilder();
+    sb.append("left: ");
+    sb.append(contextLeft);
+    sb.append(", ");
+    sb.append("right: ");
+    sb.append(contextRight);
+
+    long start = new Date().getTime();
     QueryData queryData = analyzeQuery(annisQL, corpusList);
     queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft,
       contextRight));
     SaltProject p = annisDao.annotate(queryData);
-
+    long end = new Date().getTime();
+    logQuery("ANNOTATE", annisQL, corpusList, end - start, sb.toString());
+    
     return LegacyGraphConverter.convertToResultSet(p);
 
   }
@@ -198,8 +246,12 @@ public class AnnisServiceImpl implements AnnisService
     RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
     AnnisCorpusAccessException
   {
+    long start = new Date().getTime();
     QueryData queryData = analyzeQuery(annisQL, corpusList);
     List<AnnotatedMatch> matches = annisDao.matrix(queryData);
+    long end = new Date().getTime();
+    logQuery("MATRIX", annisQL, corpusList, end - start);
+
     if (matches.isEmpty())
     {
       return "(empty)";
