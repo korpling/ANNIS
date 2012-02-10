@@ -23,7 +23,14 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -42,12 +49,12 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
-import annis.sqlgen.AomAnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.AomAnnotateSqlGenerator;
+import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
-import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.MatrixSqlGenerator;
@@ -70,6 +77,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
   private int timeout;
+
+  // fn: corpus id -> corpus name
+  private Map<Long, String> corpusNamesById;
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
@@ -152,6 +162,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     parseCorpusConfiguration();
   }
 
+  public List<String> mapCorpusIdsToNames(List<Long> ids)
+  {
+    List<String> names = new ArrayList<String>();
+    if (corpusNamesById == null)
+    {
+      corpusNamesById = new TreeMap<Long, String>();
+      List<AnnisCorpus> corpora = listCorpora();
+      for (AnnisCorpus corpus : corpora)
+      {
+        corpusNamesById.put(corpus.getId(), corpus.getName());
+      }
+    }
+    for (Long id : ids)
+    {
+      names.add(corpusNamesById.get(id));
+    }
+    return names;
+  }
+  
   // query functions
   @Transactional
   @Override
