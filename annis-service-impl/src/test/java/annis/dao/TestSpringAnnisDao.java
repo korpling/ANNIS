@@ -68,11 +68,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations =
-{
-  "SpringAnnisDao-context.xml",
-  "classpath:annis/sqlgen/SqlGenerator-context.xml"
-})
+// TODO
+//@ContextConfiguration(locations =
+//{
+//  "SpringAnnisDao-context.xml",
+//  "classpath:annis/sqlgen/SqlGenerator-context.xml"
+//})
 public class TestSpringAnnisDao
 {
 

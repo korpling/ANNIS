@@ -67,15 +67,6 @@ public abstract class AnnisBaseRunner
     try
     {
       sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
-        "conf/database.properties").getAbsolutePath()));
-    }
-    catch (IOException ex)
-    {
-      log.error("Could not load conf/database.properties", ex);
-    }
-    try
-    {
-      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
         "conf/annis-service.properties").getAbsolutePath()));
     }
     catch (IOException ex)

@@ -43,11 +43,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
  * @author thomas
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations =
-{
-  "classpath:annis/AnnisCommon-context.xml",
-  "classpath:annis/sqlgen/SqlGenerator-context.xml"
-})
+// TODO
+//@ContextConfiguration(locations =
+//{
+//  "classpath:annis/sqlgen/SqlGenerator-context.xml"
+//})
 public class LegacyGraphConverterTest
 {
 

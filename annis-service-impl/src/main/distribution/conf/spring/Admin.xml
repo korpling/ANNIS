@@ -39,9 +39,7 @@
 	</bean>
 	
 	<!-- Public API for corpus administration -->
-	<bean id="corpusAdministration" 
-    factory-bean="annisSpringFactory" factory-method="createCorpusAdministration">
-      <constructor-arg value="${annis.table-layout}" />
+	<bean id="corpusAdministration">
       <property name="administrationDao" ref="administrationDao"/>
    </bean>
 
