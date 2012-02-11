@@ -66,11 +66,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersCovered;
   private Button btEntry;
   private KWICPanel kwicPanel;
+  private boolean mediaVisIsTriggered;
   public CustomLayout customLayout;
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout)
+    Map<String, String> markersCovered, CustomLayout costumLayout,
+    boolean mediaVisIsTriggered)
   {
     this.result = result;
     this.ps = ps;
@@ -78,6 +80,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
     this.customLayout = costumLayout;
+    this.mediaVisIsTriggered = mediaVisIsTriggered;
 
     setContent(this.customLayout);
 
@@ -109,7 +112,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     String template = Helper.getContext(getApplication())
       + "/Resource/" + entry.getVisType() + "/%s";
     input.setResourcePathTemplate(template);
-
+    input.setMediaVisTriggered(mediaVisIsTriggered);
     return input;
   }
 

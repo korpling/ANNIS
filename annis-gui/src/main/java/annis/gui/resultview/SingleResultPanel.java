@@ -81,6 +81,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
+  private AnnisService service;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -135,7 +136,7 @@ public class SingleResultPanel extends VerticalLayout implements
   @Override
   public void attach()
   {
-    AnnisService service = Helper.getService(getApplication(), getWindow());
+    service = Helper.getService(getApplication(), getWindow());
     if (service != null && resolverProvider != null)
     {
       try
@@ -154,7 +155,7 @@ public class SingleResultPanel extends VerticalLayout implements
           CustomLayout customLayout = this.customLayout(id);
 
           VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap, customLayout);
+            markedCoveredMap, customLayout, checkIfMediaVisIsTriggerd());
 
           if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
           {
@@ -304,7 +305,7 @@ public class SingleResultPanel extends VerticalLayout implements
       this.matchedAndCovered = initialMatches;
 
       currentMatchPos = 1;
-      if(initialMatches.size() > 0)
+      if (initialMatches.size() > 0)
       {
         graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
@@ -370,5 +371,17 @@ public class SingleResultPanel extends VerticalLayout implements
         log(Level.SEVERE, null, ex);
     }
     return null;
+  }
+
+  private boolean checkIfMediaVisIsTriggerd() throws RemoteException
+  {
+    for (ResolverEntry e : resolverProvider.getResolverEntries(result, service))
+    {
+      if ("audio".equals(e.getVisType()) || "video".equals(e.getVisType()))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 }

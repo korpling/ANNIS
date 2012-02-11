@@ -51,6 +51,7 @@ public class VisualizerInput
   private AnnisResult result;
   private Properties mappings;
   private String resourcePathTemplate = "%s";
+  private boolean mediaVisTriggered;
 
   /**
    * Get the URL which is configured for the Annis installation.
@@ -295,4 +296,19 @@ public class VisualizerInput
   {
     return String.format(resourcePathTemplate, resource);
   }
+  
+  /**
+   * This should set to true, when the resolver table holds a media visualizer
+   * @param isMediaVisTriggered set 
+   */
+  public void setMediaVisTriggered (boolean mediaVisTriggered)
+  {
+    this.mediaVisTriggered = mediaVisTriggered;
+  }
+  
+  public boolean getMediaVisTriggered()
+  {
+    return mediaVisTriggered;
+  }
+
 }

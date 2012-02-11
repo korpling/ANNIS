@@ -405,5 +405,5 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     return false;
-  }
+  }  
 }
