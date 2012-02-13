@@ -44,7 +44,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 	private static Logger log = Logger.getLogger(AnnisAdminRunner.class);
 
 	// API for corpus administration
-	@Autowired private CorpusAdministration corpusAdministration;
+	private CorpusAdministration corpusAdministration;
 	
 	public static void main(String[] args) {
 		// get Runner from Spring

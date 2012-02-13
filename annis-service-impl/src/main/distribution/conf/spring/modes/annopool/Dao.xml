@@ -141,6 +141,7 @@
         <property name="dataSource" ref="dataSource"/>
       </bean>
     </property>
+    <property name="temporaryStagingArea" value="true" />
   </bean>
 
   <!-- END EXPORTS -->

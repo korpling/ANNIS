@@ -204,8 +204,6 @@ limitations under the License.
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
 
-
-	<!-- new -->
   <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
          parent="tableAccessStrategyFactory">
 

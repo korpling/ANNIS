@@ -2,9 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
 	
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -13,43 +13,29 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
 	">
      
-   <import resource="Common.xml" />
+  <import resource="Common.xml" />
 
 	<!-- Enable bean autowiring -->
-	<context:annotation-config/>
-   
-	<!-- Datasource for database access, configured in database.properties -->
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${datasource.driver}"/>
-		<property name="url" value="${datasource.url}"/>
-		<property name="username" value="${datasource.username}"/>
-		<property name="password" value="${datasource.password}"/>
-	</bean>
-	
-	<!-- Transaction management -->
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
-  
-	<!-- AnnisAdminRunner -->
-	<bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
-		<property name="keepStagingArea" value="${annis.import.keep-staging-area}"/>
-	</bean>
+  <context:annotation-config/>
 	
 	<!-- Public API for corpus administration -->
-	<bean id="corpusAdministration">
-      <property name="administrationDao" ref="administrationDao"/>
-   </bean>
+  <bean id="corpusAdministration" class="annis.administration.CorpusAdministration">
+    <property name="administrationDao" ref="administrationDao"/>
+  </bean>
 	
 	<!-- Helper object for managing external files -->
-	<bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
-		<property name="externalDataFolder" value="${annis.external-data-path}"/>
-	</bean>
+  <bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
+    <property name="externalDataFolder" value="${annis.external-data-path}"/>
+  </bean>
 	
 	<!-- Helper objects for managing external files (database access) -->
-	<bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
+  <bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+   
+      <!-- AnnisAdminRunner -->
+  <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
+    <property name="corpusAdministration" ref="corpusAdministration" />
+  </bean>
 	
 </beans>
