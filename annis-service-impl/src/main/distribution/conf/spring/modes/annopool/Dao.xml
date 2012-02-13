@@ -143,6 +143,7 @@
     </property>
     <property name="temporaryStagingArea" value="true" />
     <property name="dbLayout" value="${annis.mode}" />
+    <property name="dataSource" ref="dataSource" />
   </bean>
 
   <!-- END EXPORTS -->

@@ -852,7 +852,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   ///// Getter / Setter
-  @Autowired
   @Override
   public void setDataSource(DataSource dataSource)
   {
