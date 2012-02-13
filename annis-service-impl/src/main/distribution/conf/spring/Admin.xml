@@ -14,7 +14,6 @@
 	">
      
    <import resource="Common.xml" />
-   <import resource="${annis.mode}/AdminDao.xml" />
 
 	<!-- Enable bean autowiring -->
 	<context:annotation-config/>
@@ -42,17 +41,6 @@
 	<bean id="corpusAdministration">
       <property name="administrationDao" ref="administrationDao"/>
    </bean>
-
-	<!-- Database API for administration tasks -->
-	<bean id="administrationDao" class="annis.administration.SpringAnnisAdministrationDao">
-		<property name="scriptPath" value="${annis.script-path}"/>
-		<property name="externalFilesPath" value="${annis.external-data-path}"/>
-		<property name="externalFileMgrDao">
-			<bean class="annis.externalFiles.ExternalFileMgrDAO">
-				<property name="dataSource" ref="dataSource"/>
-			</bean>
-		</property>
-	</bean>
 	
 	<!-- Helper object for managing external files -->
 	<bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">

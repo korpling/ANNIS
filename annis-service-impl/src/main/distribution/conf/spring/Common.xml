@@ -13,7 +13,7 @@
 	<context:annotation-config/>
    
   	<!-- AnnisDao -->
-  <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/Dao.xml"/>
   <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/SqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/Dao.xml"/>
  
 </beans>

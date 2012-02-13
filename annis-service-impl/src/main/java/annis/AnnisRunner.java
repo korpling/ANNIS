@@ -160,6 +160,7 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("left to 5");
     doSet("right to 5");
     doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
+    doCount("cat=\"S\" & \"das\" & #1 >* #2");
   }
 
   public void doProposedIndex(String ignore)
@@ -750,8 +751,6 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
     SaltProject result = annisDao.annotate(queryData);
-
-    List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
 
     URI uri = URI.createFileURI("/tmp/annissalt");
     result.saveSaltProject_DOT(uri);

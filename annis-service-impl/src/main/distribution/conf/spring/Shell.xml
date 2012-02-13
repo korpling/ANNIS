@@ -19,9 +19,9 @@ limitations under the License.
 <beans xmlns="http://www.springframework.org/schema/beans"
 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
 	
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -30,26 +30,25 @@ limitations under the License.
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
 	">
 
-   <import resource="file:${annis.home}/conf/spring/Common.xml" />
+  <import resource="file:${annis.home}/conf/spring/Common.xml" />
  
 	<!-- DddQueryMapper -->
-	<import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
+  <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 
-	<bean id="annisRunner" class="annis.AnnisRunner">
-		<property name="findSqlGenerator" ref="findSqlGenerator"/>
-		<property name="countSqlGenerator" ref="countSqlGenerator"/>
-		<property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
-		<property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
+  <bean id="annisRunner" class="annis.AnnisRunner">
+    <property name="findSqlGenerator" ref="findSqlGenerator"/>
+    <property name="countSqlGenerator" ref="countSqlGenerator"/>
+    <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+    <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
 		
-		<!-- VR: before port -->
-	    <property name="annisDao" ref="springAnnisDao"/>
-		<property name="annisParser" ref="annisParser"/>
-		<property name="dddQueryMapper" ref="dddQueryMapper"/>
-		<property name="helloMessage" value="Annis Interactive Shell 2.2.0"/>
-		<property name="prompt" value="Annis"/>
-	    <property name="aqlAnalysis" ref="aqlAnalysis" />
-	    <property name="metaDataFilter" ref="metaDataFilter" />
-	    <property name="matchLimit" value="10"/>
-	</bean>
+    <property name="annisDao" ref="annisDao"/>
+    <property name="annisParser" ref="annisParser"/>
+    <property name="dddQueryMapper" ref="dddQueryMapper"/>
+    <property name="helloMessage" value="Annis Interactive Shell 2.2.0"/>
+    <property name="prompt" value="Annis"/>
+    <property name="aqlAnalysis" ref="aqlAnalysis" />
+    <property name="metaDataFilter" ref="metaDataFilter" />
+    <property name="matchLimit" value="10"/>
+  </bean>
 
 </beans>

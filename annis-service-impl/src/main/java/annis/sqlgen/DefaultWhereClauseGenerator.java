@@ -54,7 +54,6 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import java.util.LinkedList;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
@@ -75,6 +74,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
+  
+  private AnnotationConditionProvider annoCondition;
   
   
   private void addComponentPredicates(List<String> conditions, QueryNode node,
@@ -199,7 +200,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData)
   {
-    // TODO
+    annoCondition.addAnnotationConditions(conditions, node, index, annotation,
+      table, queryData, tables(node));
   }
 
   @Override
@@ -611,5 +613,15 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       useComponentRefPredicateInCommonAncestorSubquery;
   }
 
+  public AnnotationConditionProvider getAnnoCondition()
+  {
+    return annoCondition;
+  }
+
+  public void setAnnoCondition(AnnotationConditionProvider annoCondition)
+  {
+    this.annoCondition = annoCondition;
+  }
+  
   
 }
