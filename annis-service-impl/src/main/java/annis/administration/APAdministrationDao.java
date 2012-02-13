@@ -15,7 +15,7 @@
  */
 package annis.administration;
 
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -24,14 +24,16 @@ import java.util.logging.Logger;
 public class APAdministrationDao extends DefaultAdministrationDao
 {
 
-  private static final Logger log = Logger.getLogger(APAdministrationDao.class .getName());
+  private static final Logger log = Logger.getLogger(APAdministrationDao.class);
+
   @Override
-  public void setupDatabase()
+  public void populateSchema()
   {
-    super.setupDatabase();
-    
+    super.populateSchema();
+
     log.info(
       "creating immutable functions for getting annotations from the annotation pool");
     executeSqlFromScript("functions_annopool_get.sql");
   }
+
 }
