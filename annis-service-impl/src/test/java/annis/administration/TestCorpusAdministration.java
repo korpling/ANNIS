@@ -99,58 +99,59 @@ public class TestCorpusAdministration
   // a correct import requires this order
   private void verifyImport(InOrder inOrder, String path)
   {
-    // create the staging area
-    inOrder.verify(administrationDao).createStagingArea(true);
-
-    // bulk import the data
-    inOrder.verify(administrationDao).bulkImport(path);
-
-    // compute and verify top-level corpus
-    inOrder.verify(administrationDao).computeTopLevelCorpus();
-
-    // update IDs in staging area
-    long corpusID = inOrder.verify(administrationDao).updateIds();
-
-    // import binaries
-    inOrder.verify(administrationDao).importBinaryData(path);
-
-    inOrder.verify(administrationDao).createStagingAreaIndexes();
-    inOrder.verify(administrationDao).analyzeStagingTables();
-
-
-    // post-process the data to speed up queries
-    inOrder.verify(administrationDao).computeLeftTokenRightToken();
-    inOrder.verify(administrationDao).computeRealRoot();
-    inOrder.verify(administrationDao).computeLevel();
-
-    // gather statistics about this corpus
-    inOrder.verify(administrationDao).computeCorpusStatistics();
-
-    inOrder.verify(administrationDao).updateCorpusStatsId(corpusID);
-
-    // apply constraints to ensure data integrity
-    inOrder.verify(administrationDao).applyConstraints();
-
-    inOrder.verify(administrationDao).analyzeStagingTables();
-
-    // insert the corpus from the staging area to the main db
-    inOrder.verify(administrationDao).insertCorpus();
-
-    inOrder.verify(administrationDao).computeCorpusPath(corpusID);
-
-    inOrder.verify(administrationDao).createAnnotations(corpusID);
-
-    // the facts child table must be created
-
-    inOrder.verify(administrationDao).createFacts(corpusID);
-
-    inOrder.verify(administrationDao).updateCorpusStatistic();
-
-    // drop the staging area is not necessary, because we have no staging area in this test
-    inOrder.verify(administrationDao).dropStagingArea();
-
-    // analyze facts table
-    inOrder.verify(administrationDao).analyzeFacts(corpusID);
+    inOrder.verify(administrationDao).importCorpus(path);
+//    // create the staging area
+//    inOrder.verify(administrationDao).createStagingArea(true);
+//
+//    // bulk import the data
+//    inOrder.verify(administrationDao).bulkImport(path);
+//
+//    // compute and verify top-level corpus
+//    inOrder.verify(administrationDao).computeTopLevelCorpus();
+//
+//    // update IDs in staging area
+//    long corpusID = inOrder.verify(administrationDao).updateIds();
+//
+//    // import binaries
+//    inOrder.verify(administrationDao).importBinaryData(path);
+//
+//    inOrder.verify(administrationDao).createStagingAreaIndexes();
+//    inOrder.verify(administrationDao).analyzeStagingTables();
+//
+//
+//    // post-process the data to speed up queries
+//    inOrder.verify(administrationDao).computeLeftTokenRightToken();
+//    inOrder.verify(administrationDao).computeRealRoot();
+//    inOrder.verify(administrationDao).computeLevel();
+//
+//    // gather statistics about this corpus
+//    inOrder.verify(administrationDao).computeCorpusStatistics();
+//
+//    inOrder.verify(administrationDao).updateCorpusStatsId(corpusID);
+//
+//    // apply constraints to ensure data integrity
+//    inOrder.verify(administrationDao).applyConstraints();
+//
+//    inOrder.verify(administrationDao).analyzeStagingTables();
+//
+//    // insert the corpus from the staging area to the main db
+//    inOrder.verify(administrationDao).insertCorpus();
+//
+//    inOrder.verify(administrationDao).computeCorpusPath(corpusID);
+//
+//    inOrder.verify(administrationDao).createAnnotations(corpusID);
+//
+//    // the facts child table must be created
+//
+//    inOrder.verify(administrationDao).createFacts(corpusID);
+//
+//    inOrder.verify(administrationDao).updateCorpusStatistic();
+//
+//    // drop the staging area is not necessary, because we have no staging area in this test
+//    inOrder.verify(administrationDao).dropStagingArea();
+//
+//    // analyze facts table
+//    inOrder.verify(administrationDao).analyzeFacts(corpusID);
 
   }
 }
