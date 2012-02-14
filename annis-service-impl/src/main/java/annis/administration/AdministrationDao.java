@@ -39,6 +39,7 @@ public interface AdministrationDao
   
   public void createSchema();
   public void populateSchema();
+  public void createSchemaIndexes();
   
   public void importCorpus(String path);
   

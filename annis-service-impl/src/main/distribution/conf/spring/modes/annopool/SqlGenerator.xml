@@ -257,6 +257,16 @@ limitations under the License.
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
   </bean>
   
+  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
+  </bean>
+
+  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
+  </bean>
+  
   <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.APAnnotateSqlGenerator"
         parent="tableAccessStrategyFactory">
 		
@@ -285,16 +295,7 @@ limitations under the License.
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-  </bean>
-  
-  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-  </bean>
-
-  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
-    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
+    <property name="resultExtractor" ref="saltAnnotateExtractor" />
   </bean>
 
   <util:list id="defaultFromClauseGenerators">

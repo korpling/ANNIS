@@ -59,6 +59,19 @@ public class TestAnnotateSqlGenerator
     {
       throw new NotImplementedException();
     }
+
+    @Override
+    public String getTextQuery(long textID)
+    {
+      throw new NotImplementedException();
+    }
+
+    @Override
+    public String getDocumentQuery(String toplevelCorpusName,
+      String documentName)
+    {
+      throw new NotImplementedException();
+    }
   };
   
   // class under test

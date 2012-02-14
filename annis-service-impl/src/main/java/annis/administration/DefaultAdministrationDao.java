@@ -36,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -50,7 +49,6 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import annis.externalFiles.ExternalFileMgrDAO;
 import javax.activation.MimetypesFileTypeMap;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 
 /**
  * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
@@ -179,6 +177,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("creating Annis database schema (" + dbLayout + ")");
     executeSqlFromScript("schema_" + dbLayout + ".sql");
+  }
+  
+  @Override
+  public void createSchemaIndexes()
+  {
+    log.info("creating Annis database schema indexes (" + dbLayout + ")");
+    executeSqlFromScript("schemaindex_" + dbLayout + ".sql");
   }
 
   @Override
@@ -720,10 +725,18 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void executeSqlFromScript(String script, MapSqlParameterSource args)
   {
-    Resource resource = new FileSystemResource(new File(scriptPath, script));
-    log.debug("executing SQL script: " + resource.getFilename());
-    String sql = readSqlFromResource(resource, args);
-    jdbcOperations.execute(sql);
+    File fScript = new File(scriptPath, script);
+    if(fScript.canRead() && fScript.isFile())
+    {
+      Resource resource = new FileSystemResource(fScript);
+      log.debug("executing SQL script: " + resource.getFilename());
+      String sql = readSqlFromResource(resource, args);
+      jdbcOperations.execute(sql);
+    }
+    else
+    {
+      log.debug("SQL script " +  fScript.getName() +  " does not exist");
+    }
   }
 
   // bulk-loads a table from a resource

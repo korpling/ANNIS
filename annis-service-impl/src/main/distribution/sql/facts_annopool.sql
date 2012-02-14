@@ -21,16 +21,6 @@ INSERT INTO annotation_pool_:id(toplevel_corpus, namespace, "name", val, "type",
   GROUP BY namespace, "name", "value"
 );
 
--- indexes on node annotations
-CREATE INDEX idx__node_annotation_pool_name__:id ON annotation_pool_:id (
-  "name" varchar_pattern_ops, val varchar_pattern_ops
-) WHERE "type" = 'node';
-CREATE INDEX idx__node_annotation_pool_namespace__:id ON annotation_pool_:id (
-  namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
-) WHERE "type" = 'node';
-CREATE INDEX idx__node_annotation_pool_occurences__:id ON annotation_pool_:id (occurences) 
-  WHERE "type" = 'node';
-
 ---------------
 -- EDGE_ANNO --
 ---------------
@@ -42,6 +32,22 @@ INSERT INTO annotation_pool_:id(toplevel_corpus, namespace, "name", val, "type",
   FROM  _edge_annotation
   GROUP BY namespace, "name", "value"
 );
+
+------------------
+-- ANNO INDEXES --
+------------------
+
+
+-- indexes on node annotations
+CREATE INDEX idx__node_annotation_pool_name__:id ON annotation_pool_:id (
+  "name" varchar_pattern_ops, val varchar_pattern_ops
+) WHERE "type" = 'node';
+CREATE INDEX idx__node_annotation_pool_namespace__:id ON annotation_pool_:id (
+  namespace varchar_pattern_ops, "name" varchar_pattern_ops, val varchar_pattern_ops
+) WHERE "type" = 'node';
+CREATE INDEX idx__node_annotation_pool_occurences__:id ON annotation_pool_:id (occurences) 
+  WHERE "type" = 'node';
+
 
 -- indexes on edge annotations
 CREATE INDEX idx__edge_annotation_pool_name__:id ON annotation_pool_:id (

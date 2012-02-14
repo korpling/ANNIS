@@ -55,11 +55,13 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
     sb.append("\n");
     indent(sb, indent + TABSTOP);
-    sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)");
+    sb.append(
+      "LEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)");
     sb.append("\n");
     indent(sb, indent + TABSTOP);
-    sb.append("LEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id)");
-    
+    sb.append(
+      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id)");
+
     sb.append(",\n");
 
     indent(sb, indent + TABSTOP);
@@ -78,8 +80,7 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     sb.append("DISTINCT\n");
     TableAccessStrategy tas = createTableAccessStrategy();
     List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.
-      size());
+      key.generateOuterQueryColumns(tas, alternative.size());
     for (String keyColumn : keyColumns)
     {
       indent(sb, indent + TABSTOP);
@@ -121,14 +122,14 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-    
+
     fields.add("node_anno.\"namespace\" AS node_annotation_namespace");
     fields.add("node_anno.\"name\" AS node_annotation_name");
     fields.add("node_anno.\"val\" AS node_annotation_value");
     fields.add("edge_anno.\"namespace\" AS edge_annotation_namespace");
     fields.add("edge_anno.\"name\" AS edge_annotation_name");
     fields.add("edge_anno.\"val\" AS edge_annotation_value");
-    
+
     sb.append(indent).append(TABSTOP);
     sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
     sb.append(",\n").append(indent).append(TABSTOP);
@@ -144,6 +145,38 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     }
     return sb.toString();
   }
-  
-  
+
+  @Override
+  public String getTextQuery(long textID)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public String getDocumentQuery(String toplevelCorpusName, String documentName)
+  {
+    String template = "SELECT DISTINCT \n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name, "
+      + "node_anno.namespace AS node_annotation_namespace, "
+      + "node_anno.\"name\" AS node_annotation_name, "
+      + "node_anno.val AS node_annotation_value,\n"
+      + "edge_anno.namespace AS edge_annotation_namespace, "
+      + "edge_anno.\"name\" AS edge_annotation_name, "
+      + "edge_anno.val AS edge_annotation_value\n"
+      + "FROM\n"
+      + "\tfacts AS facts\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id),\n"
+      + "\tcorpus as c, corpus as toplevel\n"
+      + "WHERE\n"
+      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
+      + "\tAND toplevel.top_level IS TRUE\n"
+      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
+      + "\tAND node_anno.toplevel_corpus = toplevel.id\n"
+      + "\tAND edge_anno.toplevel_corpus = toplevel.id\n"
+      + "ORDER BY facts.pre";
+    String sql = template.replace(":toplevel_name", String.valueOf(
+      toplevelCorpusName)).replace(":document_name", documentName);
+    return sql;
+  }
 }

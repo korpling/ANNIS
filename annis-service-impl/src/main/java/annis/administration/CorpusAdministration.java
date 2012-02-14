@@ -104,6 +104,7 @@ public class CorpusAdministration
       user, password));
 
     administrationDao.createSchema();
+    administrationDao.createSchemaIndexes();
     administrationDao.populateSchema();
 
     // write database information to property file

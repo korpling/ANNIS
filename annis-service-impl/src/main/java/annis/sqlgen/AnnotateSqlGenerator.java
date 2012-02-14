@@ -205,17 +205,9 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Deprecated
-  public String getTextQuery(long textID)
-  {
-    // TODO
-    return "TODO";
-  }
+  public abstract String getTextQuery(long textID);
 
-  public String getDocumentQuery(String toplevelCorpusName, String documentName)
-  {
-    // TODO
-    return "TODO";
-  }
+  public abstract String getDocumentQuery(String toplevelCorpusName, String documentName);
 
   public String getMatchedNodesViewName()
   {
