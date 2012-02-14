@@ -30,7 +30,7 @@ import org.apache.commons.lang.Validate;
 
 /**
  *
- * @author thomas
+ *  @author thomas
  */
 public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {
@@ -149,7 +149,26 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   @Override
   public String getTextQuery(long textID)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    String template = "SELECT DISTINCT \n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name,"
+      + "node_anno.namespace AS node_annotation_namespace, "
+      + "node_anno.\"name\" AS node_annotation_name, "
+      + "node_anno.val AS node_annotation_value,\n"
+      + "edge_anno.namespace AS edge_annotation_namespace, "
+      + "edge_anno.\"name\" AS edge_annotation_name, "
+      + "edge_anno.val AS edge_annotation_value\n"
+      + "FROM\n"
+      + "\tfacts AS facts\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id),\n"
+      + "\tcorpus AS c\n"
+      + "WHERE\n"
+      + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
+      + "\tAND node_anno.toplevel_corpus = facts.toplevel_corpus\n"
+      + "\tAND edge_anno.toplevel_corpus = facts.toplevel_corpus\n"
+      + "ORDER BY facts.pre";
+    String sql = template.replace(":text_id", String.valueOf(textID));
+    return sql;
   }
 
   @Override
