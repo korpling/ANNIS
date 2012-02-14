@@ -148,10 +148,6 @@ limitations under the License.
     </entry>
   </util:map>
 
-  <util:map id="emptyTableAliases" />
-
-  <util:map id="emptyColumnAliases" />
-
   <util:map id="annotateOuterQueryColumnAliases">
     <entry key="node">
       <util:map>
@@ -192,10 +188,8 @@ limitations under the License.
 
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
         scope="prototype">
-
     <property name="tableAliases" ref="factsTableAliases" />
     <property name="columnAliases" ref="factsColumnAliases" />
-
   </bean>
 
   <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
@@ -226,16 +220,7 @@ limitations under the License.
 
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor"/>
 
-  <bean id="csvCorpusPathExtractor" class="annis.sqlgen.CsvCorpusPathExtractor"/>
-
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
-    <property name="idColumnName" value="${annis.node-id-column-name}"/>
-    <property name="keyColumnName" value="key"/>
-  </bean>
-
-  <bean id="nodeNameAndIdPostgreSqlAndIdSolutionKey" class="annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey" scope="prototype"/>
-
-  <bean id="multipleColumnsSolutionKey" class="annis.sqlgen.MultipleColumnsSolutionKey" scope="prototype">
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
@@ -257,10 +242,6 @@ limitations under the License.
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
   </bean>
   
-  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-  </bean>
-
   <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />

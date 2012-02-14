@@ -35,6 +35,9 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.io.support.ResourcePropertySource;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -135,18 +138,30 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
 
     // create beans
-    AbstractXmlApplicationContext cxt = new FileSystemXmlApplicationContext(
-      "file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
+    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
+    try
+    {
+      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
+        "conf/annis-service.properties").getAbsolutePath()));
+    }
+    catch (IOException ex)
+    {
+      log.error("Could not load conf/annis-service.properties", ex);
+    }
+    ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
+    ctx.refresh();
+    
+    
     ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
-      cxt);
+      ctx);
 
-    int port = cxt.getBean(AnnisWebService.class).getPort();
+    int port = ctx.getBean(AnnisWebService.class).getPort();
     URI baseURI = UriBuilder.fromUri("http://localhost").port(port).build();
     try
     {
-      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);
-      
+      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);      
     }
     catch (IOException ex)
     {
