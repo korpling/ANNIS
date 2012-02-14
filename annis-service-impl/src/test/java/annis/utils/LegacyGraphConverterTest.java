@@ -37,17 +37,23 @@ import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TestAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  *
  * @author thomas
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-// TODO
-//@ContextConfiguration(locations =
-//{
-//  "classpath:annis/sqlgen/SqlGenerator-context.xml"
-//})
+// TODO: do not text context only for annopool
+@ContextConfiguration(locations =
+{
+  "file:src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/modes/annopool/Dao.xml"
+})
+@PropertySource(value =
+{
+  "file:src/main/distribution/conf/annis-service.properties"
+})
 public class LegacyGraphConverterTest
 {
 

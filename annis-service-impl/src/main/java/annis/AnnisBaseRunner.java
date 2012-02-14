@@ -55,8 +55,14 @@ public abstract class AnnisBaseRunner
   {
     return getInstance(beanName, true, contextLocations);
   }
-
+  
   public static AnnisBaseRunner getInstance(String beanName,
+    boolean logToConsole, String... contextLocations)
+  {
+    return (AnnisBaseRunner) getBean(beanName, logToConsole, contextLocations);
+  }
+
+  public static Object getBean(String beanName,
     boolean logToConsole, String... contextLocations)
   {
     checkForAnnisHome();
@@ -76,7 +82,7 @@ public abstract class AnnisBaseRunner
     
     ctx.load(contextLocations);
     ctx.refresh();
-    return (AnnisBaseRunner) ctx.getBean(beanName);
+    return ctx.getBean(beanName);
   }
 
   public void run(String[] args)
