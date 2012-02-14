@@ -159,13 +159,11 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
       + "\tfacts AS facts\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id),\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id AND facts.toplevel_corpus = node_anno.toplevel_corpus)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id AND facts.toplevel_corpus = edge_anno.toplevel_corpus),\n"
       + "\tcorpus AS c\n"
       + "WHERE\n"
       + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-      + "\tAND node_anno.toplevel_corpus = facts.toplevel_corpus\n"
-      + "\tAND edge_anno.toplevel_corpus = facts.toplevel_corpus\n"
       + "ORDER BY facts.pre";
     String sql = template.replace(":text_id", String.valueOf(textID));
     return sql;
@@ -184,15 +182,13 @@ public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
       + "\tfacts AS facts\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id),\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id AND facts.toplevel_corpus = node_anno.toplevel_corpus)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id AND facts.toplevel_corpus = edge_anno.toplevel_corpus),\n"
       + "\tcorpus as c, corpus as toplevel\n"
       + "WHERE\n"
       + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
       + "\tAND toplevel.top_level IS TRUE\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-      + "\tAND node_anno.toplevel_corpus = toplevel.id\n"
-      + "\tAND edge_anno.toplevel_corpus = toplevel.id\n"
       + "ORDER BY facts.pre";
     String sql = template.replace(":toplevel_name", String.valueOf(
       toplevelCorpusName)).replace(":document_name", documentName);
