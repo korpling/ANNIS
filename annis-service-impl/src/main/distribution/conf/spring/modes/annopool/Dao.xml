@@ -99,8 +99,8 @@
     <property name="timeout" value="${annis.sql-timeout}"/>
 
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
-    <property name="aomAnnotateSqlGenerator" ref="aomAnnotateSqlGenerator"/>
-    <property name="saltAnnotateSqlGenerator" ref="saltAnnotateSqlGenerator"/>
+    <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+    <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
 
     <property name="dataSource" ref="dataSource"/>

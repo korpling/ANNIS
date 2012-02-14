@@ -27,7 +27,7 @@ public class AomAnnotateSqlGeneratorTest
 {
 
   // object under test
-  private AomAnnotateSqlGenerator generator;
+  private AomAnnotateExtractor generator;
 
   // dependencies
   @Mock
@@ -66,14 +66,7 @@ public class AomAnnotateSqlGeneratorTest
   public void setup()
   {
     initMocks(this);
-    generator = new AomAnnotateSqlGenerator()
-    {
-      @Override
-      protected TableAccessStrategy createTableAccessStrategy()
-      {
-        return tableAccessStrategy;
-      }
-    };
+    generator = new AomAnnotateExtractor();
   }
 
   @Test

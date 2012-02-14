@@ -28,11 +28,11 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.sqlgen.AomAnnotateSqlGenerator;
+import annis.sqlgen.AomAnnotateExtractor;
 import annis.sqlgen.ArrayCorpusPathExtractor;
 import annis.sqlgen.CorpusPathExtractor;
 import annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey;
-import annis.sqlgen.SaltAnnotateSqlGenerator;
+import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TestAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
@@ -52,7 +52,7 @@ public class LegacyGraphConverterTest
 {
 
   @Autowired
-  AomAnnotateSqlGenerator aomSqlGen;
+  AomAnnotateExtractor aomSqlGen;
 
   public LegacyGraphConverterTest()
   {
@@ -85,7 +85,7 @@ public class LegacyGraphConverterTest
   public void testConvertToAOM() throws SQLException
   {
 
-    SaltAnnotateSqlGenerator saltSqlGen = new SaltAnnotateSqlGenerator() {
+    SaltAnnotateExtractor saltExtractor = new SaltAnnotateExtractor() {
       @Override
       protected SolutionKey<?> createSolutionKey()
       {
@@ -93,16 +93,16 @@ public class LegacyGraphConverterTest
       }
     };
     CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
-    saltSqlGen.setCorpusPathExtractor(corpusPathExtractor);
+    saltExtractor.setCorpusPathExtractor(corpusPathExtractor);
 
-    TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltSqlGen);
+    TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltExtractor);
     
     SaltProject p =
-      saltSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
+      saltExtractor.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
 
     List<AnnotationGraph> expected =
-      aomSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateSqlGeneratorTest.class.
+      aomSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
 
     List<AnnotationGraph> result = LegacyGraphConverter.convertToAOM(p);

@@ -205,7 +205,7 @@ limitations under the License.
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
 
   <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
     <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
@@ -241,7 +241,7 @@ limitations under the License.
   </bean>
 
   <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
@@ -253,8 +253,12 @@ limitations under the License.
     <property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
   </bean>
 
+  <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy">
+    <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
+  </bean>
+  
   <bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
-         parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
 		
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
@@ -280,19 +284,17 @@ limitations under the License.
     </property>
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
-    <property name="outerQueryTableAccessStrategy">
-      <bean class="annis.sqlgen.TableAccessStrategy">
-        <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
-      </bean>
-    </property>
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>
 
-  <bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
-         parent="annotateSqlGenerator">
+  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>
 
-  <bean id="saltAnnotateSqlGenerator" class="annis.sqlgen.SaltAnnotateSqlGenerator"
-        parent="annotateSqlGenerator">
+  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
+    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
 
   <util:list id="defaultFromClauseGenerators">

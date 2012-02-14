@@ -74,7 +74,7 @@ public class TestAnnotateSqlGenerator
     setupOuterQueryFactsTableColumnAliases(generator);
   }
   
-  public static void setupOuterQueryFactsTableColumnAliases(AnnotateSqlGenerator<?> generator) {
+  public static void setupOuterQueryFactsTableColumnAliases(AnnotateExtractor<?> generator) {
     Map<String, String> nodeColumns = new HashMap<String, String>();
     nodeColumns.put("namespace", "node_namespace");
     nodeColumns.put("name", "node_name");

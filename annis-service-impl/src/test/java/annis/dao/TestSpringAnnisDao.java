@@ -63,7 +63,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
-import annis.sqlgen.SaltAnnotateSqlGenerator;
+import annis.sqlgen.SaltAnnotateExtractor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 
@@ -92,7 +92,9 @@ public class TestSpringAnnisDao
   private DefaultQueryExecutor defaultQueryExecutor;
   
   @Mock
-  private SaltAnnotateSqlGenerator saltAnnotateSqlGenerator;
+  private AnnotateSqlGenerator annotateSqlGenerator;
+  @Mock
+  private SaltAnnotateExtractor saltAnnotateExtractor;
   @Mock
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   @Mock
@@ -122,7 +124,8 @@ public class TestSpringAnnisDao
     annisDao = new SpringAnnisDao();
     annisDao.setAqlParser(annisParser);
     annisDao.setSqlGenerator(sqlGenerator);
-    annisDao.setSaltAnnotateSqlGenerator(saltAnnotateSqlGenerator);
+    annisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
+    annisDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
     annisDao.setPlanRowMapper(planRowMapper);
     annisDao.setJdbcTemplate(jdbcTemplate);
     annisDao.setListCorpusSqlHelper(listCorpusHelper);
@@ -172,7 +175,7 @@ public class TestSpringAnnisDao
     // stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
     final SaltProject GRAPH = mock(SaltProject.class);
 
-    when(saltAnnotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
+    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
       anyLong())).thenReturn(GRAPH);
 
     // call and test

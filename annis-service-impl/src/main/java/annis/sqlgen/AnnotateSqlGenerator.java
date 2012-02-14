@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.model.AnnotationGraph;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
@@ -35,6 +36,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
@@ -46,7 +51,8 @@ public abstract class AnnotateSqlGenerator<T>
   extends AbstractSqlGenerator<T>
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
-  WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
+  WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>,
+  AnnotateExtractor<T>
 {
 
   // include document name in SELECT clause
@@ -57,9 +63,11 @@ public abstract class AnnotateSqlGenerator<T>
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy outerQueryTableAccessStrategy;
   private boolean optimizeOverlap;
+  private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
 
+  
   public static class AnnotateQueryData
   {
 
@@ -229,7 +237,6 @@ public abstract class AnnotateSqlGenerator<T>
     this.defaultIslandsPolicy = defaultIslandsPolicy;
   }
 
-// new
   @Override
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
@@ -508,6 +515,13 @@ public abstract class AnnotateSqlGenerator<T>
 
     return sb.toString();
   }
+  
+  @Override
+  public T extractData(ResultSet resultSet)
+    throws SQLException, DataAccessException
+  {
+    return resultExtractor.extractData(resultSet);
+  }
 
   public AnnotateInnerQuerySqlGenerator getInnerQuerySqlGenerator()
   {
@@ -582,4 +596,16 @@ public abstract class AnnotateSqlGenerator<T>
   {
     this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
   }
+
+  public ResultSetExtractor<T> getResultExtractor()
+  {
+    return resultExtractor;
+  }
+
+  public void setResultExtractor(ResultSetExtractor<T> resultExtractor)
+  {
+    this.resultExtractor = resultExtractor;
+  }
+  
+  
 }
