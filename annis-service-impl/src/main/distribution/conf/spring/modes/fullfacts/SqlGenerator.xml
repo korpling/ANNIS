@@ -67,7 +67,7 @@ limitations under the License.
     <property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
     <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
     <property name="annoCondition">
-      <bean class="annis.sqlgen.annopool.APAnnotationConditionProvider" />
+      <bean class="annis.sqlgen.fullfacts.FFAnnotateConditionProvider" />
     </property>
   </bean>
 
@@ -224,11 +224,6 @@ limitations under the License.
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
-  
-  <!-- autowired by LegacyGraphConverterTest -->
-  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-  </bean>
 
   <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
         parent="tableAccessStrategyFactory">
@@ -253,7 +248,7 @@ limitations under the License.
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
   
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.APAnnotateSqlGenerator"
+  <bean id="annotateSqlGenerator" class="annis.sqlgen.fullfacts.FFAnnotateSqlGenerator"
         parent="tableAccessStrategyFactory">
 		
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>

@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author thomas
  */
-public class APAnnotationContitionProvider implements
+public class APAnnotationConditionProvider implements
   AnnotationConditionProvider
 {
 
