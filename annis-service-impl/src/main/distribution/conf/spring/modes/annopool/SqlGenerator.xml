@@ -283,7 +283,7 @@ limitations under the License.
       </util:list>
     </property>
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
-    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>
   
@@ -293,7 +293,7 @@ limitations under the License.
 
   <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-    <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
 

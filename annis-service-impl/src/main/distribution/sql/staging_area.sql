@@ -1,4 +1,5 @@
 -- cleanup in the proper order
+DROP TABLE IF EXISTS _media_files;
 DROP TABLE IF EXISTS _resolver_vis_map;
 DROP TABLE IF EXISTS _corpus_stats;
 DROP TABLE IF EXISTS _corpus_annotation;
@@ -9,7 +10,6 @@ DROP TABLE IF EXISTS _node_annotation;
 DROP TABLE IF EXISTS _node;
 DROP TABLE IF EXISTS _corpus;
 DROP TABLE IF EXISTS _text;
-DROP TABLE IF EXISTS _media_files;
 
 
 -- corpora

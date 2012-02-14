@@ -15,6 +15,7 @@
  */
 package annis.service.internal;
 
+import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.externalFiles.ExternalFileMgr;
@@ -23,9 +24,8 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,6 +35,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,8 +48,8 @@ import org.springframework.stereotype.Component;
 public class AnnisWebService
 {
 
-  private final static Logger log = Logger.getLogger(AnnisWebService.class.
-    getName());
+  private final static Logger log = Logger.getLogger(AnnisWebService.class);
+  private static Logger queryLog = Logger.getLogger("QueryLog");
   private AnnisDao annisDao;
   private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
@@ -98,7 +100,10 @@ public class AnnisWebService
         build();
     }
     QueryData data = annisDao.parseAQL(query, corpusIDs);
+    long start = new Date().getTime();
     int count = annisDao.count(data);
+    long end = new Date().getTime();
+    logQuery("COUNT", query, corpusNames, end - start);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
 
   }
@@ -143,10 +148,17 @@ public class AnnisWebService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
+    
+    String logParameters = createAnnotateLogParameters(left, right, offset,
+        limit);
+    
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.addExtension(new AnnotateQueryData(offset, limit, left,
       right));
+    long start = new Date().getTime();
     SaltProject p = annisDao.annotate(data);
+    long end = new Date().getTime();
+    logQuery("ANNOTATE", query, corpusNames, end - start, logParameters);
     return p;
 
   }
@@ -159,16 +171,79 @@ public class AnnisWebService
   {
     try
     {
+      long start = new Date().getTime();
       SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
         documentName);
+      long end = new Date().getTime();
+      logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
       return p;
     }
     catch (Exception ex)
     {
-      log.log(Level.SEVERE, "error when accessing graph " + toplevelCorpusName
-        + "/" + documentName, ex);
+      log.error("error when accessing graph " + toplevelCorpusName + "/"
+          + documentName, ex);
       throw new WebApplicationException(ex);
     }
+  }
+
+  private String createAnnotateLogParameters(int left, int right, int offset,
+      int limit)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("left: ");
+    sb.append(left);
+    sb.append(", ");
+    sb.append("right: ");
+    sb.append(right);
+    sb.append(", ");
+    sb.append("offset: ");
+    sb.append(offset);
+    sb.append(", ");
+    sb.append("limit: ");
+    sb.append(limit);
+    String logParameters = sb.toString();
+    return logParameters;
+  }
+
+  private void logQuery(String queryFunction, String toplevelCorpus,
+      String documentName, long runtime)
+  {
+    logQuery(queryFunction, null, asList(toplevelCorpus), runtime, "document: "
+        + documentName);
+  }
+
+  private void logQuery(String queryFunction, String annisQuery,
+      List<String> corpusNames, long runtime)
+  {
+    logQuery(queryFunction, annisQuery, corpusNames, runtime, null);
+  }
+
+  private void logQuery(String queryFunction, String annisQuery,
+      List<String> corpusNames, long runtime, String options)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("function: ");
+    sb.append(queryFunction);
+    sb.append(", ");
+    if (annisQuery != null && ! annisQuery.isEmpty())
+    {
+      sb.append("query: ");
+      sb.append(annisQuery);
+      sb.append(", ");
+    }
+    sb.append("corpus: ");
+    sb.append(corpusNames);
+    sb.append(", ");
+    sb.append("runtime: ");
+    sb.append(runtime);
+    sb.append(" ms");
+    if (options != null && !options.isEmpty())
+    {
+      sb.append(", ");
+      sb.append(options);
+    }
+    String message = sb.toString();
+    queryLog.info(message);
   }
 
   public AnnisDao getAnnisDao()

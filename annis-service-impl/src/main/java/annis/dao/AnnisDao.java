@@ -83,4 +83,6 @@ public interface AnnisDao
   void setTimeout(int milliseconds);
 
   int getTimeout();
+  
+  public List<String> mapCorpusIdsToNames(List<Long> ids);
 }
