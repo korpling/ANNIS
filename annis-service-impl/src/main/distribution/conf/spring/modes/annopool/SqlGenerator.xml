@@ -257,7 +257,7 @@ limitations under the License.
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
   </bean>
   
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
+  <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.APAnnotateSqlGenerator"
         parent="tableAccessStrategyFactory">
 		
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
@@ -286,7 +286,7 @@ limitations under the License.
     <property name="corpusPathExtractor" ref="csvCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>
-
+  
   <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>

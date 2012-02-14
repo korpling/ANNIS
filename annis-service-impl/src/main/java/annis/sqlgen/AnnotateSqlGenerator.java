@@ -238,76 +238,10 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Override
-  public String selectClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
-  {
-    StringBuilder sb = new StringBuilder();
-    SolutionKey<?> key = createSolutionKey();
+  public abstract String selectClause(QueryData queryData,
+    List<QueryNode> alternative, String indent);
 
-    sb.append("DISTINCT\n");
-    TableAccessStrategy tas = createTableAccessStrategy();
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.
-      size());
-    for (String keyColumn : keyColumns)
-    {
-      indent(sb, indent + TABSTOP);
-      sb.append(keyColumn);
-      sb.append(",\n");
-    }
-    indent(sb, indent + TABSTOP);
-    List<AnnotateQueryData> extension =
-      queryData.getExtensions(AnnotateQueryData.class);
-    Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
-
-    List<String> fields = new ArrayList<String>();
-    // facts.fid is never evaluated in the result set
-    // addSelectClauseAttribute(fields, FACTS_TABLE, "fid");
-    addSelectClauseAttribute(fields, NODE_TABLE, "id");
-    addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
-    addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
-    addSelectClauseAttribute(fields, NODE_TABLE, "toplevel_corpus");
-    addSelectClauseAttribute(fields, NODE_TABLE, "namespace");
-    addSelectClauseAttribute(fields, NODE_TABLE, "name");
-    addSelectClauseAttribute(fields, NODE_TABLE, "left");
-    addSelectClauseAttribute(fields, NODE_TABLE, "right");
-    addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
-    if (includeIsTokenColumn)
-    {
-      addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
-    }
-    addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
-    addSelectClauseAttribute(fields, NODE_TABLE, "span");
-    addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
-    addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
-    addSelectClauseAttribute(fields, RANK_TABLE, "pre");
-    addSelectClauseAttribute(fields, RANK_TABLE, "post");
-    addSelectClauseAttribute(fields, RANK_TABLE, "parent");
-    addSelectClauseAttribute(fields, RANK_TABLE, "root");
-    addSelectClauseAttribute(fields, RANK_TABLE, "level");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "id");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-
-    sb.append(indent).append(TABSTOP);
-    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-    sb.append(",\n").append(indent).append(TABSTOP);
-
-    // corpus.path_name
-    sb.append("corpus.path_name AS path");
-
-    if (includeDocumentNameInAnnotateQuery)
-    {
-      sb.append(",\n");
-      indent(sb, indent + TABSTOP);
-      sb.append("corpus.path_name[1] AS document_name");
-    }
-    return sb.toString();
-  }
-
-  private void addSelectClauseAttribute(List<String> fields,
+  protected void addSelectClauseAttribute(List<String> fields,
     String table, String column)
   {
     TableAccessStrategy tas = tables(null);
@@ -491,30 +425,8 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Override
-  public String fromClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
-  {
-    StringBuffer sb = new StringBuffer();
-
-    indent(sb, indent);
-    sb.append("(\n");
-    indent(sb, indent);
-    int indentBy = indent.length() / 2 + 2;
-    sb.append(innerQuerySqlGenerator.toSql(queryData, indentBy));
-    indent(sb, indent + TABSTOP);
-    sb.append(") AS solutions,\n");
-
-    indent(sb, indent + TABSTOP);
-    // really ugly
-    sb.append(
-      tableJoinsInFromClauseSqlGenerator.fromClauseForNode(null, true));
-    sb.append(",\n");
-
-    indent(sb, indent + TABSTOP);
-    sb.append(TableAccessStrategy.CORPUS_TABLE);
-
-    return sb.toString();
-  }
+  public abstract String fromClause(QueryData queryData,
+    List<QueryNode> alternative, String indent);
   
   @Override
   public T extractData(ResultSet resultSet)

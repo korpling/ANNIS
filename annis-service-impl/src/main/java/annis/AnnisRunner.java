@@ -156,9 +156,10 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doCorpus("tiger2");
     doSet("limit to 10");
-    doSet("offset to 100");
+    doSet("offset to 0");
     doSet("left to 5");
     doSet("right to 5");
+    doSql("annotate cat=\"S\" & \"das\" & #1 >* #2");
     doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
     doCount("cat=\"S\" & \"das\" & #1 >* #2");
   }
