@@ -69,7 +69,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
     Map<String, String> markersCovered, CustomLayout costumLayout,
-    List<String> mediaIDS)
+    List<String> mediaIDs)
   {
     this.result = result;
     this.ps = ps;
