@@ -143,23 +143,22 @@ public class SingleResultPanel extends VerticalLayout implements
       {
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
-        List<String> mediaIDs = new LinkedList<String>();
+        List<String> mediaIDs = mediaVisIds(entries);
         List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
         List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
 
 
-        int counter = 0;
-        for (ResolverEntry e : entries)
+        for (int i = 0; i < entries.length; i++)
         {
-          String id = "resolver-" + resultNumber + "-" + counter++;
+          String id = "resolver-" + resultNumber + "-" + i;
           CustomLayout customLayout = this.customLayout(id);
 
-          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap, customLayout, checkIfMediaVisIsTriggerd());
+          VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
+            markedExactMap, markedCoveredMap, customLayout, mediaIDs);
 
-          if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
+          if ("video".equals(entries[i].getVisType())
+            || "audio".equals(entries[i].getVisType()))
           {
-            mediaIDs.add(id);
             mediaVisualizer.add(p);
           }
 
@@ -373,15 +372,19 @@ public class SingleResultPanel extends VerticalLayout implements
     return null;
   }
 
-  private boolean checkIfMediaVisIsTriggerd() throws RemoteException
+  private List<String> mediaVisIds(ResolverEntry[] entries) throws
+    RemoteException
   {
-    for (ResolverEntry e : resolverProvider.getResolverEntries(result, service))
+    List<String> mediaIds = new ArrayList<String>();
+    int counter = 0;
+    for (ResolverEntry e : entries)
     {
+      String id = "resolver-" + resultNumber + "-" + counter++;
       if ("audio".equals(e.getVisType()) || "video".equals(e.getVisType()))
       {
-        return true;
+        mediaIds.add(id);
       }
     }
-    return false;
+    return mediaIds;
   }
 }
