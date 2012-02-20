@@ -57,15 +57,13 @@ public class PartiturVisualizer extends WriterVisualizer
     return "grid";
   }
 
-  
-  
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {
     try
     {
       // get partitur
-      PartiturParser partitur = new PartiturParser(input.getResult().getGraph(), 
+      PartiturParser partitur = new PartiturParser(input.getResult().getGraph(),
         input.getNamespace());
 
       // check right to left
@@ -74,13 +72,24 @@ public class PartiturVisualizer extends WriterVisualizer
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
 
-      writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
-      writer.append("<link href=\"" + input.getResourcePath("jbar.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + input.getResourcePath("jquery.tooltip.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<link href=\"" + input.getResourcePath("partitur.css") + "\" rel=\"stylesheet\" type=\"text/css\" >");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery.jbar.js") + "\"></script>");
-      writer.append("<script type=\"text/javascript\" src=\"" + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
+      writer.append("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append("<link href=\"" + input.getResourcePath("jbar.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\""
+        + input.getResourcePath("jquery.tooltip.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\"" + input.getResourcePath("partitur.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<script src=\"" + input.getResourcePath(
+        "jquery-1.6.2.min.js") + "\"></script>");
+      writer.append("<script src=\"" + input.getResourcePath("jquery.jbar.js")
+        + "\"></script>");
+      writer.append("<script src=\"" + input.getResourcePath(
+        "jquery.tooltip.min.js") + "\"></script>");
+      writer.append("<script src=\"" + input.getResourcePath(
+        "jquery.tooltip.min.js") + "\"></script>");
+      writer.append("<script src=\"" + input.getResourcePath("callMediaplayer")
+        + "\"></script>");
 
       writer.append("<script>\nvar levelNames = [");
       int i = 0;
@@ -89,7 +98,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
       }
       writer.append("];\n</script>");
-      writer.append("<script type=\"text/javascript\" src=\"" 
+      writer.append("<script type=\"text/javascript\" src=\""
         + input.getResourcePath("PartiturVisualizer.js")
         + "\"></script>");
 
@@ -105,12 +114,12 @@ public class PartiturVisualizer extends WriterVisualizer
       }
       else
       {
-        writer.append("<table class=\"partitur_table\" >\n");
+        writer.append("<table class=\"partitur_table\">\n");
       }
 
       LinkedHashSet<String> keys = new LinkedHashSet<String>();
       String mapping = input.getMappings().getProperty("annos");
-      if(mapping == null)
+      if (mapping == null)
       {
         // default to the alphabetical order
         keys.addAll(partitur.getNameslist());
@@ -118,10 +127,10 @@ public class PartiturVisualizer extends WriterVisualizer
       else
       {
         String[] splitted = mapping.split(",");
-        for(int k=0; k < splitted.length; k++)
+        for (int k = 0; k < splitted.length; k++)
         {
           String s = splitted[k].trim();
-          if(partitur.getNameslist().contains(s))
+          if (partitur.getNameslist().contains(s))
           {
             keys.add(s);
           }
@@ -149,19 +158,22 @@ public class PartiturVisualizer extends WriterVisualizer
         { //Create Rows until all Annotations fit in
           List<String> currentdontuselist = new LinkedList<String>(); //Lists all Annotations that should not be added to the current row
           writer.append("<tr class=\"level_" + tier + "\"><th>" + tier + "</th>"); //new row
-          
+
           currentarray = new String[partitur.getResultlist().size()];
-          for (int iterator3 = 0; iterator3 < partitur.getResultlist().size(); iterator3++)
+          for (int iterator3 = 0; iterator3 < partitur.getResultlist().size();
+            iterator3++)
           {
             currentarray[iterator3] = null;
-          } 
-          
+          }
+
           int spanCounter = 0;
-          for (List<PartiturParser.ResultElement> span : partitur.getResultlist())
+          for (List<PartiturParser.ResultElement> span :
+            partitur.getResultlist())
           { //for each Token
             for (PartiturParser.ResultElement annotationelement : span)
             { // for each Annotation annotationelement of that Token
-              if (indexlist.contains(annotationelement.getId()) && !currentdontuselist.contains(annotationelement.getId()))
+              if (indexlist.contains(annotationelement.getId())
+                && !currentdontuselist.contains(annotationelement.getId()))
               {
                 boolean neu = false; //Should the Annotation be added?
                 if (currentarray[spanCounter] == null)
@@ -172,7 +184,8 @@ public class PartiturVisualizer extends WriterVisualizer
                 }
                 //get all other annotationelement.id (earlier Ids => dontuselist)
                 int span2Counter = 0;
-                for (List<PartiturParser.ResultElement> span2 : partitur.getResultlist())
+                for (List<PartiturParser.ResultElement> span2 : partitur.
+                  getResultlist())
                 {
                   for (PartiturParser.ResultElement strr2 : span2)
                   {
@@ -183,7 +196,8 @@ public class PartiturVisualizer extends WriterVisualizer
                         currentarray[span2Counter] = annotationelement.getId();
                       }
                     }
-                    if (span2Counter <= spanCounter && !currentdontuselist.contains(strr2.getId()))
+                    if (span2Counter <= spanCounter && !currentdontuselist.
+                      contains(strr2.getId()))
                     {
                       currentdontuselist.add(strr2.getId());
                     }
@@ -199,7 +213,8 @@ public class PartiturVisualizer extends WriterVisualizer
 
           //Write Row
           int length = 1;
-          for (int iterator5 = 0; iterator5 < currentarray.length; iterator5 += length)
+          for (int iterator5 = 0; iterator5 < currentarray.length; iterator5 +=
+              length)
           {
             StringBuffer tokenIdsArray = new StringBuffer();
             StringBuffer eventIdsArray = new StringBuffer();
@@ -215,7 +230,8 @@ public class PartiturVisualizer extends WriterVisualizer
               HashSet<Integer> common = new HashSet<Integer>();
               boolean found = false;
               int outputSpanCounter = 0;
-              for (List<PartiturParser.ResultElement> outputSpan : partitur.getResultlist())
+              for (List<PartiturParser.ResultElement> outputSpan : partitur.
+                getResultlist())
               {
                 for (PartiturParser.ResultElement strr : outputSpan)
                 {
@@ -232,20 +248,25 @@ public class PartiturVisualizer extends WriterVisualizer
                     found = true;
                     if (unused)
                     {
-                      tokenIdsArray.append("" + strr.getId() + "_" + outputSpanCounter);
-                      eventIdsArray.append(tier + "_" + strr.getId() + "_" + outputSpanCounter);
+                      tokenIdsArray.append("" + strr.getId() + "_"
+                        + outputSpanCounter);
+                      eventIdsArray.append(tier + "_" + strr.getId() + "_"
+                        + outputSpanCounter);
                       unused = false;
                     }
                     else
                     {
-                      tokenIdsArray.append("," + strr.getId() + "_" + outputSpanCounter);
-                      eventIdsArray.append("," + tier + "_" + strr.getId() + "_" + outputSpanCounter);
+                      tokenIdsArray.append("," + strr.getId() + "_"
+                        + outputSpanCounter);
+                      eventIdsArray.append("," + tier + "_" + strr.getId() + "_"
+                        + outputSpanCounter);
                     }
                   }
                 }
                 outputSpanCounter++;
               }
-              for (int iterator7 = iterator5 + 1; iterator7 < currentarray.length; iterator7++)
+              for (int iterator7 = iterator5 + 1; iterator7
+                < currentarray.length; iterator7++)
               {
                 if (common.contains(iterator7))
                 {
@@ -257,11 +278,13 @@ public class PartiturVisualizer extends WriterVisualizer
                 }
               }
 
-              for (int iterator8 = 0; iterator8 < currentarray.length; iterator8++)
+              for (int iterator8 = 0; iterator8 < currentarray.length;
+                iterator8++)
               {
                 if (common.contains(iterator8))
                 {
-                  Long id = ((PartiturParser.Token) partitur.getToken().toArray()[iterator8]).getId();
+                  Long id = ((PartiturParser.Token) partitur.getToken().toArray()[iterator8]).
+                    getId();
                   if (unused)
                   {
                     tokenIdsArray.append("" + id);
@@ -277,19 +300,24 @@ public class PartiturVisualizer extends WriterVisualizer
               }
 
               String color = "black";
-              if (input.getMarkableExactMap().containsKey("" + element.getNodeId()))
+              if (input.getMarkableExactMap().containsKey(""
+                + element.getNodeId()))
               {
-                color = input.getMarkableExactMap().get("" + element.getNodeId());
+                color =
+                  input.getMarkableExactMap().get("" + element.getNodeId());
               }
               if (found)
               {
                 writer.append("<td class=\"single_event\" "
-                  + "id=\"event_" + tier + "_" + element.getId() + "_" + iterator5 + "\" "
+                  + "id=\"event_" + tier + "_" + element.getId() + "_"
+                  + iterator5 + "\" "
                   + "style=\"color:" + color + ";\" "
                   + "colspan=" + length + " "
                   + "annis:tokenIds=\"" + tokenIdsArray + "\" "
                   + "annis:eventIds=\"" + eventIdsArray + "\" "
-                  + "title=\"" + partitur.namespaceForTier(tier) + ":" + tier + " = " + StringEscapeUtils.escapeXml(element.getValue()) + "\"  " //tier =tier, event.getValue()= element.name
+                  + "title=\"" + partitur.namespaceForTier(tier) + ":" + tier
+                  + " = " + StringEscapeUtils.escapeXml(element.getValue())
+                  + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\""
                   + ">" + element.getValue() + "</td>");
@@ -330,14 +358,16 @@ public class PartiturVisualizer extends WriterVisualizer
     }
     catch (Exception ex)
     {
-      Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE,
+        null, ex);
       try
       {
         writer.append("<html><body>Error occured</body></html>");
       }
       catch (IOException ex1)
       {
-        Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE, null, ex1);
+        Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE,
+          null, ex1);
       }
     }
   }
@@ -398,12 +428,12 @@ public class PartiturVisualizer extends WriterVisualizer
     {
       AnnisToken tok = itToken.next();
       String tokText = tok.getText();
-      if(CommonHelper.containsRTLText(tokText))
+      if (CommonHelper.containsRTLText(tokText))
       {
         return true;
       }
     }
 
     return false;
-  }  
+  }
 }
