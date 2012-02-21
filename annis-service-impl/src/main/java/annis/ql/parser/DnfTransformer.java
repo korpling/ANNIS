@@ -37,14 +37,19 @@ public class DnfTransformer extends DepthFirstAdapter
 
   private Logger log = Logger.getLogger(this.getClass());
   private SearchExpressionCounter counter;
+  private DnfNodeRelNumberUpdater relNumberUpdater;
 
   @Override
   public void caseStart(Start node)
   {
     counter = new SearchExpressionCounter();
+    
     node.apply(counter);
-    PExpr inDnf = normalize(node.getPExpr());
+    PExpr inDnf = normalize(node.getPExpr());   
     node.setPExpr(inDnf);
+    
+    relNumberUpdater = new DnfNodeRelNumberUpdater(counter);
+    node.apply(relNumberUpdater);
 
     log.debug("dnf is: " + AnnisParser.dumpTree(node));
   }
