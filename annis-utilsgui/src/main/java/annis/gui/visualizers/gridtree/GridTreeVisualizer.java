@@ -50,7 +50,8 @@ public class GridTreeVisualizer extends WriterVisualizer
      * left and right should be initiate with null, when root is not a token.
      * 
      * @param root
-     * @param r
+     * @param offset the tokenIndex of the first element in token
+     * @param length the length of token
      *          must be a sorted List of the result
      */
     public Span(AnnisNode root, long offset, int length, String anno)
@@ -65,7 +66,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     @Override
     /**
-     * this function assumes the spans doesn't have conflicts which, means
+     * this function assumes the spans doesn't have conflicts which means
      * that: <br />
      * sp.height == this.height => [sp.left, sp.right] &cap; [this.left,
      * sp.right] == &empty;

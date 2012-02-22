@@ -79,4 +79,21 @@ function toggleAnnotation(element, isOver) {
       }
     });
   }
+
+  /**
+   *  iterate over all media vis and call seekAndPlay()-function. The ids of the media vis are saved in a
+   *  global array mediaIDs.
+   *
+   */
+  $("td[time]").one("click", function ()
+  {
+    for(var i = 0; i < mediaIDs.length; i++)
+    {
+      var  time = $(this).attr("time");
+      var iframe = window.parent.document.getElementById(mediaIDs[i]).
+      getElementsByTagName("iframe")[0].contentWindow;
+      
+      iframe.seekAndPlay(time.split("-")[0],  time.split("-")[time.length-1]);
+    }    
+  });
 }

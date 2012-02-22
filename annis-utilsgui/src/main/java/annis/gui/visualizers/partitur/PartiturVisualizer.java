@@ -18,6 +18,8 @@ package annis.gui.visualizers.partitur;
 import annis.CommonHelper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
@@ -41,6 +43,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class PartiturVisualizer extends WriterVisualizer
 {
 
+  private List<AnnisNode> nodes;
+  private List<AnnisNode> token;
+
   public enum ElementType
   {
 
@@ -62,6 +67,10 @@ public class PartiturVisualizer extends WriterVisualizer
   {
     try
     {
+
+      nodes = input.getResult().getGraph().getNodes();
+      token = input.getResult().getGraph().getTokens();
+
       // get partitur
       PartiturParser partitur = new PartiturParser(input.getResult().getGraph(),
         input.getNamespace());
@@ -72,7 +81,8 @@ public class PartiturVisualizer extends WriterVisualizer
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
 
-      writer.append("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append(
+        "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
       writer.append("<link href=\"" + input.getResourcePath("jbar.css")
         + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\""
@@ -88,10 +98,9 @@ public class PartiturVisualizer extends WriterVisualizer
         "jquery.tooltip.min.js") + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath(
         "jquery.tooltip.min.js") + "\"></script>");
-      writer.append("<script src=\"" + input.getResourcePath("callMediaplayer")
-        + "\"></script>");
-
-      writer.append("<script>\nvar levelNames = [");
+      writer.append("<script>");
+      writer.append(convertToJavacSriptArray(input.getMediaIDs()));
+      writer.append("\nvar levelNames = [");
       int i = 0;
       for (String levelName : tierNames)
       {
@@ -114,7 +123,7 @@ public class PartiturVisualizer extends WriterVisualizer
       }
       else
       {
-        writer.append("<table class=\"partitur_table\">\n");
+        writer.append("<table class=\"partitur_table\")\">\n");
       }
 
       LinkedHashSet<String> keys = new LinkedHashSet<String>();
@@ -319,7 +328,8 @@ public class PartiturVisualizer extends WriterVisualizer
                   + " = " + StringEscapeUtils.escapeXml(element.getValue())
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
-                  + "onMouseOut=\"toggleAnnotation(this, false);\""
+                  + "onMouseOut=\"toggleAnnotation(this, false);\" "
+                  + "time=\"" + getTimeAnnotation(element.getNodeId()) + "\""
                   + ">" + element.getValue() + "</td>");
               }
               else
@@ -435,5 +445,78 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     return false;
+  }
+
+  private String convertToJavacSriptArray(List<String> mediaIDs)
+  {
+    // in case there is no media visualizer do not build an array
+    if (mediaIDs == null)
+    {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder("\nvar mediaIDs = [ ");
+    int size = mediaIDs.size();
+    for (int i = 0; i < size; i++)
+    {
+      sb.append("\"");
+      sb.append(mediaIDs.get(i));
+      sb.append("\"");
+      if (!(size - 1 - i == 0))
+      {
+        sb.append(", ");
+      }
+    }
+    return sb.append(" ];\n").toString();
+  }
+
+  private String getTimeAnnotation(long nodeId)
+  {
+    AnnisNode root = null;
+    for (AnnisNode n : nodes)
+    {
+      if (n.getId() == nodeId)
+      {
+        root = n;
+        break;
+      }
+    }
+
+    long offset = token.get(0).getTokenIndex();
+    int length = token.size() - 1;
+    long left = (root.getLeftToken() < offset) ? offset : root.getLeftToken();
+    long right = (root.getRightToken() > offset + length) ? offset + length
+      : root.getRightToken();
+
+    AnnisNode leftNode = token.get((int) left);
+    AnnisNode rightNode = token.get((int) right);
+    String startTime = getTimePosition(getTimeAnnotation(leftNode), true);
+    String endTime = getTimePosition(getTimeAnnotation(rightNode), false);
+    return startTime + "-" + endTime;
+  }
+
+  private String getTimeAnnotation(AnnisNode node)
+  {
+    for (Annotation anno : node.getNodeAnnotations())
+    {
+      if (anno.getName().equals("time"))
+      {
+        return anno.getValue();
+      }
+    }
+    return null;
+  }
+
+  private String getTimePosition(String time, boolean first)
+  {
+    String[] splittedTimeAnno = time.split("-");
+    if (splittedTimeAnno.length > 1)
+    {
+      if (first)
+      {
+        return splittedTimeAnno[0];
+      }
+      return splittedTimeAnno[1];
+    }
+    return splittedTimeAnno[0];
   }
 }

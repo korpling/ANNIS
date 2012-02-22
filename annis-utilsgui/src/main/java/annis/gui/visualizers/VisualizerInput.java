@@ -300,7 +300,7 @@ public class VisualizerInput
     return String.format(resourcePathTemplate, resource);
   }
 
-  /**
+  /**mediaVisIds
    * This sets the id of possible media visualizer. We use this to resolve the javascript api in the html
    * frontend. The List could be null, which means, that there was no media visualizer triggered
    * in the resovler entries
