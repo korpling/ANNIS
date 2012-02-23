@@ -80,6 +80,8 @@ function toggleAnnotation(element, isOver) {
     });
   }
 
+  $("td[time]").bind("hover").css("cursor", "pointer");
+
   /**
    *  iterate over all media vis and call seekAndPlay()-function. The ids of the media vis are saved in a
    *  global array mediaIDs.
