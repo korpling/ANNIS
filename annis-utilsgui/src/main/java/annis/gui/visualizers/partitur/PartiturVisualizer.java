@@ -98,9 +98,9 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<script src=\"" + input.getResourcePath("jquery.jbar.js")
         + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath(
-        "jquery.tooltip.min.js") + "\"></script>");     
+        "jquery.tooltip.min.js") + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath(
-        "jquery.noty.js") + "\"></script>");      
+        "jquery.noty.js") + "\"></script>");
       writer.append("<script>");
       writer.append(convertToJavacSriptArray(input.getMediaIDs()));
       writer.append("\nvar levelNames = [");
@@ -332,7 +332,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\" "
-                  + "time=\"" + addTimeAttribute(element.getNodeId()) + "\""
+                  + addTimeAttribute(element.getNodeId()) + "\""
                   + ">" + element.getValue() + "</td>");
               }
               else
@@ -484,17 +484,32 @@ public class PartiturVisualizer extends WriterVisualizer
       }
     }
 
-    long offset = token.get(0).getTokenIndex();
-    int length = token.size() - 1;
-    long left = (root.getLeftToken() < offset) ? offset : root.getLeftToken();
-    long right = (root.getRightToken() > offset + length) ? offset + length
-      : root.getRightToken();
+    // some calculations for index shifting
+    long leftOffset = token.get(0).getTokenIndex();
+    long rightOffset = token.get(token.size() - 1).getTokenIndex();
+    long left = root.getLeftToken() < leftOffset ? leftOffset : root.
+      getLeftToken();
+    long right = root.getRightToken() > rightOffset ? rightOffset : root.
+      getRightToken();
 
-    AnnisNode leftNode = token.get((int) left);
-    AnnisNode rightNode = token.get((int) right);
+    AnnisNode leftNode = token.get((int) (left - leftOffset));
+    AnnisNode rightNode = token.get((int) (right - leftOffset));
     String startTime = getTimePosition(getTimeAnnotation(leftNode), true);
     String endTime = getTimePosition(getTimeAnnotation(rightNode), false);
-    return startTime + "-" + endTime;
+
+    // if there is no start time, we do not add the time attribute
+    if (startTime.equals(""))
+    {
+      return "";
+    }
+
+    // if there only the start time is annotated, return start time
+    if (endTime.equals(""))
+    {
+      return "time=\"" + startTime + "\"";
+    }
+
+    return "time=\"" + startTime + "-" + endTime + "\"";
   }
 
   private String getTimeAnnotation(AnnisNode node)
@@ -506,9 +521,17 @@ public class PartiturVisualizer extends WriterVisualizer
         return anno.getValue();
       }
     }
-    return null;
+    return "";
   }
 
+  /**
+   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, we return the first
+   * value, otherwise we did try to return the second. The endtime don't have to be annotated, in this
+   * case it returns an empty string.
+   * @param time
+   * @param first
+   * @return
+   */
   private String getTimePosition(String time, boolean first)
   {
     String[] splittedTimeAnno = time.split("-");
@@ -520,6 +543,12 @@ public class PartiturVisualizer extends WriterVisualizer
       }
       return splittedTimeAnno[1];
     }
-    return splittedTimeAnno[0];
+
+    if (first)
+    {
+      return splittedTimeAnno[0];
+    }
+    // if we want the end time, return nothing.
+    return "";
   }
 }
