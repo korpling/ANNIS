@@ -92,7 +92,7 @@
 					// is Modal? 
 					if (notification.options.modal) {
 						$('<div />').addClass('noty_modal').prependTo($('body')).css(notification.options.modalCss).fadeIn('fast');
-					}z
+					}
 					
 					// Prepend noty to container
 					base.$notyContainer.prepend($noty);
