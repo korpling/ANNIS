@@ -332,7 +332,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\" "
-                  + "time=\"" + getTimeAnnotation(element.getNodeId()) + "\""
+                  + "time=\"" + addTimeAttribute(element.getNodeId()) + "\""
                   + ">" + element.getValue() + "</td>");
               }
               else
@@ -472,7 +472,7 @@ public class PartiturVisualizer extends WriterVisualizer
     return sb.append(" ];\n").toString();
   }
 
-  private String getTimeAnnotation(long nodeId)
+  private String addTimeAttribute(long nodeId)
   {
     AnnisNode root = null;
     for (AnnisNode n : nodes)
