@@ -88,6 +88,9 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<link href=\""
         + input.getResourcePath("jquery.tooltip.css")
         + "\" rel=\"stylesheet\" type=\"text/css\" >");
+      writer.append("<link href=\""
+        + input.getResourcePath("jquery.noty.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getResourcePath("partitur.css")
         + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<script src=\"" + input.getResourcePath(
@@ -95,9 +98,9 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<script src=\"" + input.getResourcePath("jquery.jbar.js")
         + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath(
-        "jquery.tooltip.min.js") + "\"></script>");
+        "jquery.tooltip.min.js") + "\"></script>");     
       writer.append("<script src=\"" + input.getResourcePath(
-        "jquery.tooltip.min.js") + "\"></script>");
+        "jquery.noty.js") + "\"></script>");      
       writer.append("<script>");
       writer.append(convertToJavacSriptArray(input.getMediaIDs()));
       writer.append("\nvar levelNames = [");

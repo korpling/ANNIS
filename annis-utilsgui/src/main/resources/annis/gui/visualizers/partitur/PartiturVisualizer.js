@@ -87,12 +87,44 @@ function toggleAnnotation(element, isOver) {
    */
   $("td[time]").one("click", function ()
   {
-    for(var i = 0; i < mediaIDs.length; i++)
+
+    // check if one media vis is loaded
+    var isLoaded = false;
+    for(i = 0; i < mediaIDs.length; i++)
+    {
+      if (window.parent.document.getElementById(mediaIDs[i]).getElementsByTagName("iframe").length > 0)
+      {
+        isLoaded = true;
+        break;
+      }
+    }
+
+    if (!isLoaded)
+    {
+      noty({
+        "text":"Please open a media visualizer",
+        "layout":"center",
+        "type":"error",
+        "textAlign":"center",
+        "easing":"swing",
+        "animateOpen":{
+          "height":"toggle"
+        },
+        "animateClose":{
+          "height":"toggle"
+        },
+        "speed":"500",
+        "timeout":"5000",
+        "closable":true,
+        "closeOnSelfClick":true
+      });
+    }
+
+    for(i = 0; i < mediaIDs.length; i++)
     {
       var  time = $(this).attr("time");
       var iframe = window.parent.document.getElementById(mediaIDs[i]).
       getElementsByTagName("iframe")[0].contentWindow;
-      
       iframe.seekAndPlay(time.split("-")[0],  time.split("-")[time.length-1]);
     }    
   });
