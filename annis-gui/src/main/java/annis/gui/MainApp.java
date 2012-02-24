@@ -17,7 +17,6 @@ package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.CorefVisualizer;
-import annis.gui.visualizers.ExternalFileVisualizer;
 import annis.gui.visualizers.OldPartiturVisualizer;
 import annis.gui.visualizers.PaulaTextVisualizer;
 import annis.gui.visualizers.PaulaVisualizer;
@@ -225,7 +224,6 @@ public class MainApp extends Application implements PluginSystem,
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ExternalFileVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(OldPartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
