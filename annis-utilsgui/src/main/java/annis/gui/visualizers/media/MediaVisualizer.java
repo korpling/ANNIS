@@ -13,7 +13,7 @@ import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class VideoVisualizer extends WriterVisualizer
+public class MediaVisualizer extends WriterVisualizer
 {
 
   @Override
@@ -36,12 +36,12 @@ public class VideoVisualizer extends WriterVisualizer
       writer.append("\"></script>");      
       writer.append("</head>");
       writer.append("<body>");      
-      writer.append("<video controls preload=\"metadata\" style=\"padding-top:70px;\">");
+      writer.append("<media controls preload=\"metadata\" style=\"padding-top:70px;\">");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);
       writer.append("\" type=\"audio/ogg\">");
       writer.append("[Browser zu antik]");
-      writer.append("</video>");
+      writer.append("</media>");
       writer.append("</body></html>");
     }
     catch (IOException e)
@@ -84,6 +84,6 @@ public class VideoVisualizer extends WriterVisualizer
   @Override
   public String getShortName()
   {
-    return "video";
+    return "media";
   }
 }
