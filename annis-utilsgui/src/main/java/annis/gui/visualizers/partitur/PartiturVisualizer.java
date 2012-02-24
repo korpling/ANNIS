@@ -94,7 +94,7 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<link href=\"" + input.getResourcePath("partitur.css")
         + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<script src=\"" + input.getResourcePath(
-        "jquery-1.6.2.min.js") + "\"></script>");
+        "jquery-1.7.1.min.js") + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath("jquery.jbar.js")
         + "\"></script>");
       writer.append("<script src=\"" + input.getResourcePath(
