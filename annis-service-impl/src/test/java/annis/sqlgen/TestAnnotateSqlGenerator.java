@@ -159,28 +159,30 @@ public class TestAnnotateSqlGenerator
     generator.createSolutionKey();
   }
 
-//  /**
-//   * The SELECT clause consists of the key columns, columns required to 
-//   * generate an Annis node and columns that contain the document hierarchy 
-//   * of the node.
-//   */
-//  @Test
-//  public void shouldGenerateSelectClauseAnnoPool()
-//  {
+  /**
+   * The SELECT clause consists of the key columns, columns required to 
+   * generate an Annis node and columns that contain the document hierarchy 
+   * of the node.
+   */
+  @Test
+  @Ignore
+  public void shouldGenerateSelectClauseAnnoPool()
+  {
 //    shouldGenerateSelectClause(new AnnoPoolLayout());
-//  }
-//  
-//  /**
-//   * The SELECT clause consists of the key columns, columns required to 
-//   * generate an Annis node and columns that contain the document hierarchy 
-//   * of the node.
-//   */
-//  @Test
-//  public void shouldGenerateSelectClauseFullFacts()
-//  {
+  }
+  
+  /**
+   * The SELECT clause consists of the key columns, columns required to 
+   * generate an Annis node and columns that contain the document hierarchy 
+   * of the node.
+   */
+  @Test
+  @Ignore
+  public void shouldGenerateSelectClauseFullFacts()
+  {
 //    shouldGenerateSelectClause(new FullFactsLayout());
-//  }
-//    
+  }
+    
 //  private void shouldGenerateSelectClause(DatabaseLayout dbLayout)
 //  {
 //    generator.setDbLayout(dbLayout);
