@@ -14,6 +14,16 @@ var seekAndPlay = function (start, end)
   endTime = end;
 };
 
+
+/**
+ * this is function is invoked by the KWICPanel, when a media visualizer
+ * is collapsing
+ */
+var stop = function ()
+{
+  $("video")[0].pause();
+}
+
 $(document).ready(function()
 {	  
   var video = $('video');

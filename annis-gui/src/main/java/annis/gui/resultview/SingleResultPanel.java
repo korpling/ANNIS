@@ -154,7 +154,7 @@ public class SingleResultPanel extends VerticalLayout implements
           CustomLayout customLayout = this.customLayout(id);
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-            markedExactMap, markedCoveredMap, customLayout, mediaIDs);
+            markedExactMap, markedCoveredMap, customLayout, mediaIDs, id);
 
           if ("media".equals(entries[i].getVisType())
             || "video".equals(entries[i].getVisType())

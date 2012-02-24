@@ -64,12 +64,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Button btEntry;
   private KWICPanel kwicPanel;
   private List<String> mediaIDs;
+  private String htmlID;
   public CustomLayout customLayout;
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
     Map<String, String> markersCovered, CustomLayout costumLayout,
-    List<String> mediaIDs)
+    List<String> mediaIDs, String htmlID)
   {
     this.result = result;
     this.ps = ps;
@@ -78,6 +79,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markersCovered = markersCovered;
     this.customLayout = costumLayout;
     this.mediaIDs = mediaIDs;
+    this.htmlID = htmlID;
 
     setContent(this.customLayout);
 
@@ -226,6 +228,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       if (iframe != null)
       {
         iframe.setVisible(false);
+        stopMediaVisualizers();
       }
       btEntry.setIcon(ICON_EXPAND);
     }
@@ -241,7 +244,17 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     if (kwicPanel != null)
     {
       kwicPanel.startMediaVisualizers();
+      // set back to null, otherwise the movie will stop
       kwicPanel = null;
     }
+  }
+
+  private void stopMediaVisualizers()
+  {
+    String stopCommand = ""
+      + "document.getElementById(\"" + this.htmlID + "\")"
+      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
+    getWindow().executeJavaScript(stopCommand);
+
   }
 }
