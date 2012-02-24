@@ -45,6 +45,7 @@ $(document).ready(function()
     if (endTime !== null && video[0].currentTime >= endTime)
     {
       video[0].pause();
+      endTime = null;
     }
   });
 });
