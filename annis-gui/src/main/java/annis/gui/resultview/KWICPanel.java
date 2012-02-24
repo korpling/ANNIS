@@ -50,7 +50,7 @@ import org.eclipse.emf.common.util.EList;
  */
 public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 {
-  
+
   private SDocument result;
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
@@ -66,7 +66,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   {
     "time"
   };
-  
+
   public KWICPanel(SDocument result, Set<String> tokenAnnos,
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
     List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent)
@@ -81,28 +81,28 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     this.addStyleName("kwic");
     setSizeFull();
     setHeight("-1px");
-    
+
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
+
     containerAnnos = new BeanItemContainer<String>(String.class);
-    
+
     containerAnnos.addItem("tok");
-    
+
     setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
     addStyleName(ChameleonTheme.TABLE_BORDERLESS);
     setWidth("100%");
     setHeight("-1px");
     setPageLength(0);
-    
+
     if (CommonHelper.containsRTLText(text.getSText()))
     {
       addStyleName("rtl");
     }
-    
+
     List<SToken> token = result.getSDocumentGraph().getSortedSTokenByText();
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
-    
+
     for (SToken t : token)
     {
       STextualDS tokenText = null;
@@ -116,7 +116,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           break;
         }
       }
-      
+
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_TOKENINDEX);
       if (tokenText == text)
@@ -137,18 +137,18 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         addGeneratedColumn(t, new TokenColumnGenerator(t));
         setColumnExpandRatio(t, 0.0f);
         visible.add(t);
-        
-        
+
+
         if (featTokenIndex != null)
         {
           lastTokenIndex = featTokenIndex.getSValueSNUMERIC();
         }
       }
     }
-    
+
     addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
     {
-      
+
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
@@ -160,12 +160,12 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
     visible.add(DUMMY_COLUMN);
     containerAnnos.addAll(tokenAnnos);
-    
+
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
-    
+
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if (containerAnnos != null)
@@ -175,16 +175,16 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       containerAnnos.addAll(annos);
     }
   }
-  
+
   public interface KWICComponentGenerator extends Table.ColumnGenerator
   {
-    
+
     public Object generateCell(String layer);
   }
-  
+
   public static class GapColumnGenerator implements KWICComponentGenerator
   {
-    
+
     @Override
     public Object generateCell(String layer)
     {
@@ -199,23 +199,23 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         l.setValue("");
         l.addStyleName("kwic-anno");
       }
-      
+
       return l;
     }
-    
+
     @Override
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       return generateCell((String) itemId);
     }
   }
-  
+
   public class TokenColumnGenerator implements KWICComponentGenerator
   {
-    
+
     private Map<String, SAnnotation> annotationsByQName;
     private SToken token;
-    
+
     public TokenColumnGenerator(SToken token)
     {
       this.token = token;
@@ -225,24 +225,24 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         annotationsByQName.put(a.getQName(), a);
       }
     }
-    
+
     @Override
     public Object generateCell(String layer)
     {
-      
+
       BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
       textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
       SDocumentGraph docGraph = result.getSDocumentGraph();
-      
+
       Label l = new Label("");
       l.setSizeUndefined();
-      
+
       if ("tok".equals(layer))
       {
-        
+
         SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
           textualRelation).get(0);
-        
+
         l.setValue(((String) seq.getSSequentialDS().getSData()).substring(seq.
           getSStart(), seq.getSEnd()));
         if (markedAndCovered.containsKey(token))
@@ -261,26 +261,26 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           l.setValue(a.getValue());
           l.setDescription(a.getQName());
           l.addStyleName("kwic-anno");
-          
+
           for (String media_anno : media_annotations)
           {
             if (media_anno.equals(a.getName()))
             {
               l.addStyleName("clickable");
-            }            
+            }
           }
-        }        
+        }
       }
       return l;
     }
-    
+
     @Override
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       return generateCell((String) itemId);
     }
   }
-  
+
   private boolean checkRTL(List<AnnisNode> tokenList)
   {
     for (AnnisNode tok : tokenList)
@@ -291,51 +291,49 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   @Override
   public void itemClick(ItemClickEvent event)
   {
-    if (event.isDoubleClick())
+
+    SToken token = (SToken) event.getPropertyId();
+    String time = null;
+
+    for (VisualizerPanel vis : mediaVisualizer)
     {
-      SToken token = (SToken) event.getPropertyId();
-      String time = null;
-      
-      for (VisualizerPanel vis : mediaVisualizer)
-      {
-        vis.openVisualizer(false);
-      }
-      
-      for (SAnnotation anno : token.getSAnnotations())
-      {
-        for (String media_anno : media_annotations)
-        {
-          if (media_anno.equals(anno.getName()))
-          {
-            time = anno.getValueString();
-          }
-        }
-        
-      }
-      
-      time = (time == null) ? "no time given" : time;
-      startTime = getStartTime(time);
-      endTime = getEndTime(time);
-      for (VisualizerPanel vp : mediaVisualizer)
-      {
-        vp.setKwicPanel(this);
-      }
-      startMediaVisualizers();
+      vis.openVisualizer(false);
     }
+
+    for (SAnnotation anno : token.getSAnnotations())
+    {
+      for (String media_anno : media_annotations)
+      {
+        if (media_anno.equals(anno.getName()))
+        {
+          time = anno.getValueString();
+        }
+      }
+
+    }
+
+    time = (time == null) ? "no time given" : time;
+    startTime = getStartTime(time);
+    endTime = getEndTime(time);
+    for (VisualizerPanel vp : mediaVisualizer)
+    {
+      vp.setKwicPanel(this);
+    }
+    startMediaVisualizers();
   }
-  
+
   private String getStartTime(String time)
   {
     return time.split("-")[0];
   }
-  
+
   private String getEndTime(String time)
   {
     String[] split = time.split("-");
@@ -345,7 +343,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     }
     return time.split("-")[1];
   }
-  
+
   public void startMediaVisualizers()
   {
     for (String id : mediaIDs)
