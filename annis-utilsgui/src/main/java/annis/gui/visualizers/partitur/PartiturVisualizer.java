@@ -502,13 +502,7 @@ public class PartiturVisualizer extends WriterVisualizer
     {
       return "";
     }
-
-    // if there only the start time is annotated, return start time
-    if (endTime.equals(""))
-    {
-      return "time=\"" + startTime + "\"";
-    }
-
+    
     return "time=\"" + startTime + "-" + endTime + "\"";
   }
 
@@ -548,7 +542,7 @@ public class PartiturVisualizer extends WriterVisualizer
     {
       return splittedTimeAnno[0];
     }
-    // if we want the end time, return nothing.
-    return "";
+    // if we want the end time, return undefined.
+    return "undefined";
   }
 }

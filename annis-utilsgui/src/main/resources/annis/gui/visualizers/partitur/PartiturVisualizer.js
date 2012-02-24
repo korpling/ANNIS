@@ -78,7 +78,7 @@ $(document).ready(function(){
       var iframe = window.parent.document.getElementById(mediaIDs[i]).
       getElementsByTagName("iframe")[0];
       if (iframe) // check if loaded
-        iframe.contentWindow.seekAndPlay(time.split("-")[0], time.split("-")[time.length-1]);
+        iframe.contentWindow.seekAndPlay(time.split("-")[0], time.split("-")[1]);
     }    
   }
 

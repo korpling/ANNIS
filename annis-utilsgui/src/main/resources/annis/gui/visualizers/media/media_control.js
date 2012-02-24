@@ -1,5 +1,5 @@
 var startTime;
-var endTime;
+var endTime = null;
 
 /**
  * this function is the interface for the KWIC-Visualizer, which search for 
@@ -32,7 +32,7 @@ $(document).ready(function()
   
   video.on("timeupdate", function()
   {
-    if (endTime !== null && video[0].currentTime >= endTime) 
+    if (endTime !== null && video[0].currentTime >= endTime)
     {
       video[0].pause();
     }
