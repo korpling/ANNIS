@@ -32,7 +32,7 @@ import org.apache.commons.lang.Validate;
  *
  *  @author thomas
  */
-public class APAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
+public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {
 
   @Override

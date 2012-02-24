@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author thomas
  */
-public class FFAnnotateConditionProvider implements
+public class FfAnnotateConditionProvider implements
   AnnotationConditionProvider
 {
 

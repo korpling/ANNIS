@@ -67,7 +67,7 @@ limitations under the License.
     <property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
     <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
     <property name="annoCondition">
-      <bean class="annis.sqlgen.fullfacts.FFAnnotateConditionProvider" />
+      <bean class="annis.sqlgen.fullfacts.FfAnnotateConditionProvider" />
     </property>
   </bean>
 
@@ -248,7 +248,7 @@ limitations under the License.
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
   
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.fullfacts.FFAnnotateSqlGenerator"
+  <bean id="annotateSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator"
         parent="tableAccessStrategyFactory">
 		
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>

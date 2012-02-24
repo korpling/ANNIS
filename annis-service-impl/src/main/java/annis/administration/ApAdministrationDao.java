@@ -21,10 +21,10 @@ import org.apache.log4j.Logger;
  *
  * @author thomas
  */
-public class APAdministrationDao extends DefaultAdministrationDao
+public class ApAdministrationDao extends DefaultAdministrationDao
 {
 
-  private static final Logger log = Logger.getLogger(APAdministrationDao.class);
+  private static final Logger log = Logger.getLogger(ApAdministrationDao.class);
 
   @Override
   public void populateSchema()

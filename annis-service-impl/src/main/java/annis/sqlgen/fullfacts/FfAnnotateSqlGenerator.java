@@ -35,7 +35,7 @@ import org.apache.commons.lang.Validate;
  *
  * @author thomas
  */
-public class FFAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
+public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {
 
   @Override

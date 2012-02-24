@@ -83,7 +83,7 @@
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
     <property name="scriptFile" value="modify_session.sql"/>
     <property name="administrationDao">
-      <bean class="annis.administration.APAdministrationDao">
+      <bean class="annis.administration.ApAdministrationDao">
         <property name="scriptPath" value="${annis.script-path}"/>
         <property name="dataSource" ref="dataSource"/>
       </bean>
@@ -133,7 +133,7 @@
 
 
 	<!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.APAdministrationDao">
+  <bean id="administrationDao" class="annis.administration.ApAdministrationDao">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="externalFileMgrDao">
@@ -141,7 +141,7 @@
         <property name="dataSource" ref="dataSource"/>
       </bean>
     </property>
-    <property name="temporaryStagingArea" value="true" />
+    <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
     <property name="dbLayout" value="${annis.mode}" />
     <property name="dataSource" ref="dataSource" />
   </bean>
