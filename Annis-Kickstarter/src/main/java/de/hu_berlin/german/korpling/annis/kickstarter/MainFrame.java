@@ -15,23 +15,22 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.AnnisBaseRunner;
 import annis.administration.CorpusAdministration;
+import annis.service.internal.AnnisServiceRunner;
+import annis.utils.Utils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.SystemTray;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -134,11 +133,10 @@ public class MainFrame extends javax.swing.JFrame
     
     // init corpusAdministration
     System.setProperty("annis.home", ".");
-    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-      "annis/administration/AnnisAdminRunner-context.xml");
-    this.corpusAdministration = (CorpusAdministration) ctx.getBean(
-      "corpusAdministration");
-
+    this.corpusAdministration = 
+      (CorpusAdministration) AnnisBaseRunner.getBean("corpusAdministration", true, "file:" 
+      + Utils.getAnnisFile("conf/spring/Admin.xml").getAbsolutePath());
+    
     try
     {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -384,8 +382,8 @@ public class MainFrame extends javax.swing.JFrame
   {
 
     // starts RMI service at bean creation
-    new ClassPathXmlApplicationContext(
-      "annis/service/internal/AnnisServiceRunner-context.xml");
+    AnnisServiceRunner runner = new AnnisServiceRunner();
+    runner.createWebServer();
   }
 
   private void startJetty() throws Exception

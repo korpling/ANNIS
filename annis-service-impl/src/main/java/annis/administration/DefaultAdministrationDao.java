@@ -58,7 +58,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class DefaultAdministrationDao implements AdministrationDao
 {
 
-  private Logger log = Logger.getLogger(this.getClass());
+  private Logger log = Logger.getLogger(AdministrationDao.class);
   // helper object to store external files
   private ExternalFileMgrDAO externalFileMgrDao;
   // external files path

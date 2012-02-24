@@ -134,7 +134,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     });
   }
 
-  protected void createWebServer()
+  public void createWebServer()
   {
 
     // create beans
