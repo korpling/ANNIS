@@ -156,7 +156,8 @@ public class SingleResultPanel extends VerticalLayout implements
           VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
             markedExactMap, markedCoveredMap, customLayout, mediaIDs);
 
-          if ("video".equals(entries[i].getVisType())
+          if ("media".equals(entries[i].getVisType())
+            || "video".equals(entries[i].getVisType())
             || "audio".equals(entries[i].getVisType()))
           {
             mediaVisualizer.add(p);
@@ -380,7 +381,9 @@ public class SingleResultPanel extends VerticalLayout implements
     for (ResolverEntry e : entries)
     {
       String id = "resolver-" + resultNumber + "-" + counter++;
-      if ("audio".equals(e.getVisType()) || "video".equals(e.getVisType()))
+      if ("media".equals(e.getVisType())
+        || "audio".equals(e.getVisType())
+        || "video".equals(e.getVisType()))
       {
         mediaIds.add(id);
       }

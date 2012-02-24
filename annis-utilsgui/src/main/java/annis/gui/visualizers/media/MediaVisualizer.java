@@ -1,4 +1,4 @@
-package annis.gui.visualizers.media.video;
+package annis.gui.visualizers.media;
 
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
