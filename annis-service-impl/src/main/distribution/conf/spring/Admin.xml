@@ -22,17 +22,7 @@
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration">
     <property name="administrationDao" ref="administrationDao"/>
   </bean>
-	
-	<!-- Helper object for managing external files -->
-  <bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
-    <property name="externalDataFolder" value="${annis.external-data-path}"/>
-  </bean>
-	
-	<!-- Helper objects for managing external files (database access) -->
-  <bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-   
+
       <!-- AnnisAdminRunner -->
   <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
     <property name="corpusAdministration" ref="corpusAdministration" />

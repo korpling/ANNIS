@@ -24,7 +24,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import annis.externalFiles.ExternalFileMgrImpl;
 import annis.service.AnnisService;
 import annis.test.TestHelper;
 
@@ -44,13 +43,5 @@ public class TestAnnisServiceImpl
 
 
     assertThat(annisServiceImpl.getAnnisDao(), is(not(nullValue())));
-    assertThat(annisServiceImpl.getExternalFileMgr(), is(not(nullValue())));
-
-    // dependencies for ExternalFileManager
-    ExternalFileMgrImpl externalFileMgrImpl =
-      (ExternalFileMgrImpl) annisServiceImpl.getExternalFileMgr();
-    assertThat(externalFileMgrImpl.getExternalFileMgrDao(), is(not(nullValue())));
-    assertThat(externalFileMgrImpl.getExternalDataFolder(), is(not(nullValue())));
-    System.out.println(externalFileMgrImpl.getExternalDataFolder());
   }
 }

@@ -111,7 +111,6 @@ public class CorpusAdministration
     writeDatabasePropertiesFile(host, port, database, user, password);
   }
 
-  @Transactional(readOnly = false)
   public void importCorpora(List<String> paths)
   {
 

@@ -18,7 +18,6 @@ package annis.service.internal;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
-import annis.externalFiles.ExternalFileMgr;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -51,7 +50,6 @@ public class AnnisWebService
   private final static Logger log = Logger.getLogger(AnnisWebService.class);
   private static Logger queryLog = Logger.getLogger("QueryLog");
   private AnnisDao annisDao;
-  private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
   private int maxContext = 10;
   private int port = 5711;
@@ -254,16 +252,6 @@ public class AnnisWebService
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
-  }
-
-  public ExternalFileMgr getExternalFileMgr()
-  {
-    return externalFileMgr;
-  }
-
-  public void setExternalFileMgr(ExternalFileMgr externalFileMgr)
-  {
-    this.externalFileMgr = externalFileMgr;
   }
 
   public int getMaxContext()

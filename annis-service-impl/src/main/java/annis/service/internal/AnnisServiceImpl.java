@@ -29,7 +29,6 @@ import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.externalFiles.ExternalFileMgr;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
@@ -59,7 +58,6 @@ public class AnnisServiceImpl implements AnnisService
   private Logger log = Logger.getLogger(this.getClass());
   private static Logger queryLog = Logger.getLogger("QueryLog");
   private AnnisDao annisDao;
-  private ExternalFileMgr externalFileMgr;
   private WekaHelper wekaHelper;
   private int maxContext = 10;
 
@@ -206,20 +204,6 @@ public class AnnisServiceImpl implements AnnisService
     return true;
   }
 
-  public AnnisBinary getBinary(Long id) throws AnnisBinaryNotFoundException
-  {
-    log.debug("Retrieving binary file with id = " + id);
-
-    try
-    {
-      return externalFileMgr.getBinary(id);
-    }
-    catch (Exception e)
-    {
-      throw new AnnisBinaryNotFoundException(e.getMessage());
-    }
-  }
-
   @Override
   public List<Annotation> getMetadata(long corpusId) throws RemoteException,
     AnnisServiceException
@@ -260,17 +244,6 @@ public class AnnisServiceImpl implements AnnisService
     {
       return wekaHelper.exportAsArff(matches);
     }
-  }
-
-  ///// Getter / Setter
-  public ExternalFileMgr getExternalFileMgr()
-  {
-    return externalFileMgr;
-  }
-
-  public void setExternalFileMgr(ExternalFileMgr externalFileMgr)
-  {
-    this.externalFileMgr = externalFileMgr;
   }
 
   public AnnisDao getAnnisDao()
@@ -314,12 +287,5 @@ public class AnnisServiceImpl implements AnnisService
   public AnnisBinaryMetaData getBinaryMeta(String corpusName)
   {
     return annisDao.getBinary(corpusName, 1, 1);
-  }
-
-  @Override
-  public AnnisBinary getBinary(long id) throws RemoteException,
-    AnnisBinaryNotFoundException
-  {
-    throw new UnsupportedOperationException("Not supported yet.");
   }
 }

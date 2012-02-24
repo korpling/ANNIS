@@ -11,20 +11,10 @@
 	<!-- DddQueryMapper -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 	
-	<!-- External File Manager -->
-  <bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-	
-  <bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
-    <property name="externalFileMgrDao" ref="externalFileManagerDao"/>
-    <property name="externalDataFolder" value="${annis.external-data-path}"/>
-  </bean>
 
 	<!-- AnnisService -->
   <bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
     <property name="annisDao" ref="annisDao"/>
-    <property name="externalFileMgr" ref="externalFileManager"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />
   </bean>
@@ -32,7 +22,6 @@
    <!-- AnnisWebService -->
   <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="sayHello">
     <property name="annisDao" ref="annisDao"/>
-    <property name="externalFileMgr" ref="externalFileManager"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />
     <property name="port" value="${annis.webservice-port}" />

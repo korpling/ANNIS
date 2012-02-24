@@ -143,16 +143,6 @@ public interface AnnisService extends Remote
     RemoteException;
 
   /**
-   * @deprecated for External-File Servlet
-   * 
-   * @param id
-   * @return
-   * @throws RemoteException 
-   */
-  public AnnisBinary getBinary(long id) throws RemoteException,
-    AnnisBinaryNotFoundException;
-
-  /**
    * 
    * Ping remote Service. For internal purposes.
    * 

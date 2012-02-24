@@ -33,7 +33,8 @@ CREATE TABLE text
 (
   id    bigint PRIMARY KEY,
   name  varchar(1000),
-  text  text
+  text  text,
+  toplevel_corpus bigint REFERENCES corpus(id)
 );
 COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
@@ -96,19 +97,6 @@ COMMENT ON COLUMN facts.parent IS 'foreign key to rank.pre of the parent node, o
 COMMENT ON COLUMN facts.edge_annotation_namespace IS 'optional namespace of annotation key';
 COMMENT ON COLUMN facts.edge_annotation_name IS 'annotation key';
 COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
-
--- external data
-CREATE TABLE extData
-(
-  id      serial PRIMARY KEY,
-  filename  varchar(500) NOT NULL,
-  orig_name  varchar(100) NOT NULL,
-  branch    varchar(100) NOT NULL,
-  mime    varchar(100) NOT NULL,
-  comment    varchar(1500) NOT NULL,
-  UNIQUE (filename, branch)
-   
-);
 
 CREATE TABLE media_files
 (

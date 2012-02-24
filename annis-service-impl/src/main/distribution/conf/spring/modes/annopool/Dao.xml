@@ -136,11 +136,6 @@
   <bean id="administrationDao" class="annis.administration.ApAdministrationDao">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
-    <property name="externalFileMgrDao">
-      <bean class="annis.externalFiles.ExternalFileMgrDAO">
-        <property name="dataSource" ref="dataSource"/>
-      </bean>
-    </property>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
     <property name="dbLayout" value="${annis.mode}" />
     <property name="dataSource" ref="dataSource" />
