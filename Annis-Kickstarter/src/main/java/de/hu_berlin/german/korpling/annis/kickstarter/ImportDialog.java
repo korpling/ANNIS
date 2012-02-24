@@ -15,8 +15,9 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
-import annis.administration.SpringAnnisAdministrationDao;
+import annis.administration.DefaultAdministrationDao;
 import java.io.File;
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -42,7 +43,7 @@ public class ImportDialog extends javax.swing.JDialog
     {
       try
       {
-        corpusAdministration.importCorpora(false, txtInputDir.getText());
+        corpusAdministration.importCorpora(txtInputDir.getText());
       }
       catch(Exception ex)
       {
@@ -97,9 +98,9 @@ public class ImportDialog extends javax.swing.JDialog
     isImporting = false;
     worker = new ImportDialogWorker();
 
-    org.apache.log4j.Logger.getLogger(SpringAnnisAdministrationDao.class).addAppender(
+    org.apache.log4j.Logger.getLogger(AdministrationDao.class).addAppender(
       new AppenderSkeleton()
-      {
+      { 
 
         @Override
         protected void append(LoggingEvent event)

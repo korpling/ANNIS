@@ -18,8 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
@@ -30,17 +29,21 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
+import org.apache.log4j.Level;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
  * @author thomas
  */
-public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<AnnotationGraph>>
+public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationGraph>>
 {
-
+  
   private static final Logger log =
-    Logger.getLogger(AomAnnotateSqlGenerator.class.getName());
+    Logger.getLogger(AomAnnotateExtractor.class);
 
+  private TableAccessStrategy outerQueryTableAccessStrategy;
+  
   public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy) throws SQLException
   {
     AnnisNode annisNode = new AnnisNode(longValue(resultSet, NODE_TABLE, "id", tableAccessStrategy));
@@ -109,7 +112,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
   public List<AnnotationGraph> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    TableAccessStrategy tableAccessStrategy = getOuterQueryTableAccessStrategy();
+    TableAccessStrategy tableAccessStrategy = outerQueryTableAccessStrategy;
     
     // function result
     List<AnnotationGraph> graphs =
@@ -144,7 +147,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
 
       if (!graphByMatchGroup.containsKey(key))
       {
-        log.log(Level.FINE, "starting annotation graph for match: {0}", key);
+        log.debug("starting annotation graph for match: " + key);
         AnnotationGraph graph = new AnnotationGraph();
         graphs.add(graph);
         graphByMatchGroup.put(key, graph);
@@ -179,7 +182,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
       long id = node.getId();
       if (!nodeById.containsKey(id))
       {
-        log.log(Level.FINE, "new node: {0}", id);
+        log.debug("new node: " + id);
         nodeById.put(id, node);
         graph.addNode(node);
       }
@@ -225,7 +228,7 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
           source.addOutgoingEdge(edge);
         }
 
-        log.log(Level.FINE, "new edge: {0}", edge);
+        log.debug("new edge: " + edge);
         edgeByPre.put(pre, edge);
         graph.addEdge(edge);
       }
@@ -289,5 +292,17 @@ public class AomAnnotateSqlGenerator extends AnnotateSqlGenerator<List<Annotatio
     long destinationId = edge.getDestination().getId();
     edge.setDestination(nodeById.get(destinationId));
   }
+
+  public TableAccessStrategy getOuterQueryTableAccessStrategy()
+  {
+    return outerQueryTableAccessStrategy;
+  }
+
+  public void setOuterQueryTableAccessStrategy(TableAccessStrategy outerQueryTableAccessStrategy)
+  {
+    this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
+  }
+  
+  
 
 }

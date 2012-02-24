@@ -15,7 +15,6 @@
  */
 package annis.sqlgen;
 
-import annis.administration.SchemeType;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.SqlConstraints.isNotNull;
@@ -55,7 +54,6 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import java.util.LinkedList;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
@@ -76,8 +74,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   private boolean useToplevelCorpusPredicateInCommonAncestorSubquery;
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
-  private SchemeType tableLayout = SchemeType.ANNO_POOL;
-
+  
+  private AnnotationConditionProvider annoCondition;
+  
+  
   private void addComponentPredicates(List<String> conditions, QueryNode node,
     final String edgeType, String componentName)
   {
@@ -200,90 +200,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData)
   {
-
-    switch (tableLayout)
-    {
-      case ANNO_POOL:
-
-
-        TextMatching tm = annotation.getTextMatching();
-
-        StringBuilder sbFunc = new StringBuilder("get");
-
-        sbFunc.append("AnnoBy");
-
-        List<String> params = new LinkedList<String>();
-
-        if (annotation.getNamespace() != null)
-        {
-          params.add("'" + annotation.getNamespace() + "'");
-          sbFunc.append("Namespace");
-        }
-        if (annotation.getName() != null)
-        {
-          params.add("'" + annotation.getName() + "'");
-          sbFunc.append("Name");
-        }
-        if (annotation.getValue() != null)
-        {
-
-          sbFunc.append("Val");
-
-          if (tm == TextMatching.REGEXP_EQUAL
-            || tm == TextMatching.REGEXP_NOT_EQUAL)
-          {
-            sbFunc.append("Regex");
-            params.add("'^" + annotation.getValue() + "$'");
-          }
-          else
-          {
-            params.add("'" + annotation.getValue() + "'");
-          }
-        }
-
-        params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")
-          + "]");
-
-        params.add("'"
-          + StringUtils.removeEnd(table, "_annotation").toLowerCase() + "'");
-
-        sbFunc.append("(");
-        sbFunc.append(StringUtils.join(params, ", "));
-        sbFunc.append(")");
-
-
-        String cond =
-          tables(node).aliasedColumn(table, "anno_ref", index)
-          + "= ANY(" + sbFunc.toString() + ")";
-
-        if (tm == TextMatching.EXACT_NOT_EQUAL || tm
-          == TextMatching.REGEXP_NOT_EQUAL)
-        {
-          cond = "NOT (" + cond + ")";
-        }
-        conditions.add(cond);
-
-        break;
-      case FULLFACTS:
-        if (annotation.getNamespace() != null)
-        {
-          conditions.add(join("=",
-            tables(node).aliasedColumn(table, "namespace", index),
-            sqlString(annotation.getNamespace())));
-        }
-        conditions.add(join("=",
-          tables(node).aliasedColumn(table, "name", index),
-          sqlString(annotation.getName())));
-        if (annotation.getValue() != null)
-        {
-          TextMatching textMatching = annotation.getTextMatching();
-          conditions.add(join(textMatching.sqlOperator(), tables(node).
-            aliasedColumn(table, "value", index),
-            sqlString(annotation.getValue(), textMatching)));
-        }
-        break;
-    }
-
+    annoCondition.addAnnotationConditions(conditions, node, index, annotation,
+      table, queryData, tables(node));
   }
 
   @Override
@@ -695,18 +613,15 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       useComponentRefPredicateInCommonAncestorSubquery;
   }
 
-  public String getTableLayout()
+  public AnnotationConditionProvider getAnnoCondition()
   {
-    return tableLayout.name().toLowerCase();
+    return annoCondition;
   }
 
-  public void setTableLayout(SchemeType tableLayout)
+  public void setAnnoCondition(AnnotationConditionProvider annoCondition)
   {
-    this.tableLayout = tableLayout;
+    this.annoCondition = annoCondition;
   }
-
-  public void setTableLayout(String tableLayout)
-  {
-    this.tableLayout = SchemeType.valueOf(tableLayout.toUpperCase());
-  }
+  
+  
 }

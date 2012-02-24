@@ -21,9 +21,9 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger; 
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import annis.AnnisBaseRunner;
+import annis.utils.Utils;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -33,6 +33,11 @@ import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.io.support.ResourcePropertySource;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -129,22 +134,34 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     });
   }
 
-  protected void createWebServer()
+  public void createWebServer()
   {
 
     // create beans
-    ClassPathXmlApplicationContext cxt = new ClassPathXmlApplicationContext(
-      "annis/service/internal/AnnisServiceRunner-context.xml");
+    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
+    try
+    {
+      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
+        "conf/annis-service.properties").getAbsolutePath()));
+    }
+    catch (IOException ex)
+    {
+      log.error("Could not load conf/annis-service.properties", ex);
+    }
+    ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
+    ctx.refresh();
+    
+    
     ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
-      cxt);
+      ctx);
 
-    int port = cxt.getBean(AnnisWebService.class).getPort();
+    int port = ctx.getBean(AnnisWebService.class).getPort();
     URI baseURI = UriBuilder.fromUri("http://localhost").port(port).build();
     try
     {
-      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);
-      
+      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);      
     }
     catch (IOException ex)
     {

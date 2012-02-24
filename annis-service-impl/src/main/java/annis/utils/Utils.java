@@ -23,10 +23,25 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 public class Utils
 {
 
+  public static File getAnnisHomeLocation()
+  {
+    String annisHome = System.getProperty("annis.home");
+    Validate.notNull(annisHome);
+    File fAnnisHome = new File(annisHome);
+    return fAnnisHome;
+  }
+  
+  public static File getAnnisFile(String subpath)
+  {
+    File annisConfig = getAnnisHomeLocation();
+    return new File(annisConfig, subpath);
+  }
+  
   public static String min(List<Long> runtimeList)
   {
     long min = Long.MAX_VALUE;

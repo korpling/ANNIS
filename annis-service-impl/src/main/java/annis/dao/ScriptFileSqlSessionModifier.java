@@ -15,9 +15,9 @@
  */
 package annis.dao;
 
+import annis.administration.AdministrationDao;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import annis.administration.SpringAnnisAdministrationDao;
 import annis.ql.parser.QueryData;
 
 public class ScriptFileSqlSessionModifier implements SqlSessionModifier {
@@ -26,7 +26,7 @@ public class ScriptFileSqlSessionModifier implements SqlSessionModifier {
 	private String scriptFile;
 	
 	// dependencies
-	private SpringAnnisAdministrationDao administrationDao;
+	private AdministrationDao administrationDao;
 
 	// execute SQL from scriptFile
 	public void modifySqlSession(JdbcTemplate jdbcTemplate,
@@ -42,11 +42,11 @@ public class ScriptFileSqlSessionModifier implements SqlSessionModifier {
 		this.scriptFile = scriptFile;
 	}
 
-	public SpringAnnisAdministrationDao getAdministrationDao() {
+	public AdministrationDao getAdministrationDao() {
 		return administrationDao;
 	}
 
-	public void setAdministrationDao(SpringAnnisAdministrationDao administrationDao) {
+	public void setAdministrationDao(AdministrationDao administrationDao) {
 		this.administrationDao = administrationDao;
 	}
 

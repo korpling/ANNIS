@@ -15,38 +15,33 @@
  */
 package annis.service.internal;
 
+import annis.AnnisBaseRunner;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.externalFiles.ExternalFileMgrImpl;
 import annis.service.AnnisService;
+import annis.test.TestHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"AnnisServiceRunner-context.xml"})
-public class TestAnnisServiceImpl {
+public class TestAnnisServiceImpl
+{
 
-	@Autowired private AnnisService springManagedAnnisServiceImpl;
-	
-	@Test
-	public void springManagedInstanceHasAllDependencies() {
-    
-		AnnisServiceImpl annisServiceImpl = (AnnisServiceImpl)springManagedAnnisServiceImpl;
-		assertThat(annisServiceImpl.getAnnisDao(), is(not(nullValue())));
-		assertThat(annisServiceImpl.getExternalFileMgr(), is(not(nullValue())));
-		
-		// dependencies for ExternalFileManager
-		ExternalFileMgrImpl externalFileMgrImpl = (ExternalFileMgrImpl) annisServiceImpl.getExternalFileMgr();
-		assertThat(externalFileMgrImpl.getExternalFileMgrDao(), is(not(nullValue())));
-		assertThat(externalFileMgrImpl.getExternalDataFolder(), is(not(nullValue())));
-		System.out.println(externalFileMgrImpl.getExternalDataFolder());
-	}
-	
+  @Autowired
+  private AnnisService springManagedAnnisServiceImpl;
+
+  @Test
+  public void springManagedInstanceHasAllDependencies()
+  {
+
+    AnnisServiceImpl annisServiceImpl = (AnnisServiceImpl) AnnisBaseRunner.
+      getBean("annisService", true,
+      "file:src/main/distribution/conf/spring/Service.xml");
+
+
+    assertThat(annisServiceImpl.getAnnisDao(), is(not(nullValue())));
+  }
 }

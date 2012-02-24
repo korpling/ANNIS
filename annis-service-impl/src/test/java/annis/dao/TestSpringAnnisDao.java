@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.AnnisBaseRunner;
 import annis.executors.DefaultQueryExecutor;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -63,24 +64,32 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
-import annis.sqlgen.SaltAnnotateSqlGenerator;
+import annis.sqlgen.SaltAnnotateExtractor;
+import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
+import javax.annotation.Resource;
+import org.springframework.context.annotation.PropertySource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+// TODO: do not text context only for annopool
 @ContextConfiguration(locations =
 {
-  "SpringAnnisDao-context.xml",
-  "classpath:annis/sqlgen/SqlGenerator-context.xml"
+  "file:src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/modes/annopool/Dao.xml"
+})
+@PropertySource(value =
+{
+  "file:src/main/distribution/conf/annis-service.properties"
 })
 public class TestSpringAnnisDao
 {
 
-  // SpringAnnisDao instance that is managed by Spring
-  @Autowired
-  private AnnisDao springManagedAnnisDao;
+  @Resource(name="annisDao")
+  private AnnisDao annisDao;
+  
   // simple SpringDao instance with mocked dependencies
-  private SpringAnnisDao annisDao;
+  private SpringAnnisDao simpleAnnisDao;
   @Mock
   private AnnisParser annisParser;
   @Mock
@@ -89,9 +98,10 @@ public class TestSpringAnnisDao
   private SqlGenerator sqlGenerator;
   @Mock
   private DefaultQueryExecutor defaultQueryExecutor;
-  
   @Mock
-  private SaltAnnotateSqlGenerator saltAnnotateSqlGenerator;
+  private AnnotateSqlGenerator annotateSqlGenerator;
+  @Mock
+  private SaltAnnotateExtractor saltAnnotateExtractor;
   @Mock
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   @Mock
@@ -118,48 +128,49 @@ public class TestSpringAnnisDao
   public void setup()
   {
     initMocks(this);
-    annisDao = new SpringAnnisDao();
-    annisDao.setAqlParser(annisParser);
-    annisDao.setSqlGenerator(sqlGenerator);
-    annisDao.setSaltAnnotateSqlGenerator(saltAnnotateSqlGenerator);
-    annisDao.setPlanRowMapper(planRowMapper);
-    annisDao.setJdbcTemplate(jdbcTemplate);
-    annisDao.setListCorpusSqlHelper(listCorpusHelper);
-    annisDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
-    annisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
-    annisDao.setQueryAnalysis(queryAnalysis);
-    annisDao.setMetaDataFilter(metaDataFilter);
+    simpleAnnisDao = new SpringAnnisDao();
+    simpleAnnisDao.setAqlParser(annisParser);
+    simpleAnnisDao.setSqlGenerator(sqlGenerator);
+    simpleAnnisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
+    simpleAnnisDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
+    simpleAnnisDao.setPlanRowMapper(planRowMapper);
+    simpleAnnisDao.setJdbcTemplate(jdbcTemplate);
+    simpleAnnisDao.setListCorpusSqlHelper(listCorpusHelper);
+    simpleAnnisDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
+    simpleAnnisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
+    simpleAnnisDao.setQueryAnalysis(queryAnalysis);
+    simpleAnnisDao.setMetaDataFilter(metaDataFilter);
 
     when(annisParser.parse(anyString())).thenReturn(STATEMENT);
     when(sqlGenerator.toSql(any(QueryData.class))).thenReturn(SQL);
 
-    simpleJdbcTemplate = spy(annisDao.getSimpleJdbcTemplate());
+    simpleJdbcTemplate = spy(simpleAnnisDao.getSimpleJdbcTemplate());
   }
 
   // check dependencies
   @Test
   public void springManagedInstanceHasAllDependencies()
   {
-    SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(
-      springManagedAnnisDao);
-    assertThat(springAnnisDao.getSimpleJdbcTemplate(), is(not(nullValue())));
-    assertThat(springAnnisDao.getAqlParser(), is(not(nullValue())));
-    assertThat(springAnnisDao.getSqlGenerator(), is(not(nullValue())));
-    assertThat(springAnnisDao.getPlanRowMapper(), is(not(nullValue())));
-    assertThat(springAnnisDao.getListCorpusSqlHelper(), is(not(nullValue())));
-    assertThat(springAnnisDao.getListCorpusAnnotationsSqlHelper(),
+
+    SpringAnnisDao springManagedDao = (SpringAnnisDao) TestHelper.proxyTarget(annisDao);
+    assertThat(springManagedDao.getSimpleJdbcTemplate(), is(not(nullValue())));
+    assertThat(springManagedDao.getAqlParser(), is(not(nullValue())));
+    assertThat(springManagedDao.getSqlGenerator(), is(not(nullValue())));
+    assertThat(springManagedDao.getPlanRowMapper(), is(not(nullValue())));
+    assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
+    assertThat(springManagedDao.getListCorpusAnnotationsSqlHelper(),
       is(not(nullValue())));
-    assertThat(springAnnisDao.getListAnnotationsSqlHelper(),
+    assertThat(springManagedDao.getListAnnotationsSqlHelper(),
       is(not(nullValue())));
-    assertThat(springAnnisDao.getCountExtractor(), is(not(nullValue())));
+    assertThat(springManagedDao.getCountExtractor(), is(not(nullValue())));
 
     // new
-    assertThat(springAnnisDao.getQueryAnalysis(), is(not(nullValue())));
-    assertThat(springAnnisDao.getFindSqlGenerator(), is(not(nullValue())));
-    assertThat(springAnnisDao.getSqlSessionModifiers(), is(not(nullValue())));
-    assertThat(springAnnisDao.getListCorpusByNameDaoHelper(), is(
+    assertThat(springManagedDao.getQueryAnalysis(), is(not(nullValue())));
+    assertThat(springManagedDao.getFindSqlGenerator(), is(not(nullValue())));
+    assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
+    assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));
-    assertThat(springAnnisDao.getMetaDataFilter(), is(not(nullValue())));
+    assertThat(springManagedDao.getMetaDataFilter(), is(not(nullValue())));
   }
 
   // retrieve annotation graph for a complete text
@@ -171,11 +182,11 @@ public class TestSpringAnnisDao
     // stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
     final SaltProject GRAPH = mock(SaltProject.class);
 
-    when(saltAnnotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
+    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
       anyLong())).thenReturn(GRAPH);
 
     // call and test
-    assertThat(annisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
+    assertThat(simpleAnnisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
   }
 
   // return null if text was not found
@@ -184,7 +195,7 @@ public class TestSpringAnnisDao
   {
     when(jdbcTemplate.query(anyString(), any(AnnotateSqlGenerator.class))).
       thenReturn(new ArrayList<AnnotationGraph>());
-    assertThat(annisDao.retrieveAnnotationGraph(0), is(nullValue()));
+    assertThat(simpleAnnisDao.retrieveAnnotationGraph(0), is(nullValue()));
   }
 
   @SuppressWarnings("unchecked")
@@ -200,7 +211,7 @@ public class TestSpringAnnisDao
     when(listCorpusHelper.createSqlQuery()).thenReturn(SQL);
 
     // call and test
-    assertThat(annisDao.listCorpora(), is(CORPORA));
+    assertThat(simpleAnnisDao.listCorpora(), is(CORPORA));
     verify(jdbcTemplate).query(SQL, listCorpusHelper);
   }
 
@@ -218,7 +229,7 @@ public class TestSpringAnnisDao
     when(listCorpusAnnotationsHelper.createSqlQuery(anyLong())).thenReturn(SQL);
 
     // call and test
-    assertThat(annisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
+    assertThat(simpleAnnisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
     verify(listCorpusAnnotationsHelper).createSqlQuery(ID);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
@@ -237,7 +248,7 @@ public class TestSpringAnnisDao
       anyBoolean())).thenReturn(SQL);
 
     // call and test
-    assertThat(annisDao.listAnnotations(CORPUS_LIST, false, false), is(
+    assertThat(simpleAnnisDao.listAnnotations(CORPUS_LIST, false, false), is(
       NODE_ANNOTATIONS));
     verify(jdbcTemplate).query(SQL, listNodeAnnotationsSqlHelper);
   }
@@ -250,7 +261,7 @@ public class TestSpringAnnisDao
 
     ListCorpusByNameDaoHelper listCorpusByNameDaoHelper =
       mock(ListCorpusByNameDaoHelper.class);
-    annisDao.setListCorpusByNameDaoHelper(listCorpusByNameDaoHelper);
+    simpleAnnisDao.setListCorpusByNameDaoHelper(listCorpusByNameDaoHelper);
     when(listCorpusByNameDaoHelper.createSql(anyList())).thenReturn(SQL);
 
 //		String sql = "SELECT id FROM corpus WHERE name IN (?) AND top_level = 't'";
@@ -260,7 +271,7 @@ public class TestSpringAnnisDao
       any(ListCorpusByNameDaoHelper.class));
     when(wtf).thenReturn(CORPUS_LIST);
 
-    assertThat(annisDao.listCorpusByName(CORPUS_NAMES), is(CORPUS_LIST));
+    assertThat(simpleAnnisDao.listCorpusByName(CORPUS_NAMES), is(CORPUS_LIST));
 
     verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
     verify(simpleJdbcTemplate).query(SQL, listCorpusByNameDaoHelper);
@@ -271,10 +282,10 @@ public class TestSpringAnnisDao
   {
     // time out after 100 seconds
     int timeout = 100;
-    annisDao.setTimeout(timeout);
+    simpleAnnisDao.setTimeout(timeout);
 
     // call (query data not needed)
-    annisDao.modifySqlSession(jdbcTemplate, null);
+    simpleAnnisDao.modifySqlSession(jdbcTemplate, null);
 
     // verify correct session timeout
     verify(jdbcTemplate).update("SET statement_timeout TO " + timeout);
@@ -284,10 +295,10 @@ public class TestSpringAnnisDao
   public void noTimeout()
   {
     // 0 indicates no timeout
-    annisDao.setTimeout(0);
+    simpleAnnisDao.setTimeout(0);
 
     // call
-    annisDao.modifySqlSession(jdbcTemplate, null);
+    simpleAnnisDao.modifySqlSession(jdbcTemplate, null);
 
     // verify that nothing has happened
     verifyNoMoreInteractions(simpleJdbcTemplate);

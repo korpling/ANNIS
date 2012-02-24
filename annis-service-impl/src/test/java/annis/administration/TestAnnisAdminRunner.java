@@ -26,7 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestAnnisAdminRunner {
 	
-	@Mock private FullFactsCorpusAdministration administration;
+	@Mock private CorpusAdministration administration;
 	private AnnisAdminRunner main;
 	
 	@Before
@@ -34,6 +34,7 @@ public class TestAnnisAdminRunner {
 		initMocks(this);
 
 		main = new AnnisAdminRunner();
+      main.setCorpusAdministration(null);
 		main.setCorpusAdministration(administration);
 	}
 
@@ -42,7 +43,7 @@ public class TestAnnisAdminRunner {
 		run("import data/corpus1 data/corpus2 data/corpus3");
 
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
-		verify(administration).importCorpora(true, expected);
+		verify(administration).importCorpora(expected);
 	}
 	
 	@Test

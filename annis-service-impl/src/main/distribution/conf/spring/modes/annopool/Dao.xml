@@ -2,18 +2,18 @@
 <beans 
 
 	xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:tx="http://www.springframework.org/schema/tx"
+   xmlns:aop="http://www.springframework.org/schema/aop"
 	
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 	">
 
 	<!-- Enable bean autowiring -->
@@ -21,19 +21,19 @@
 	
 	<!-- Enable AspectJ-style AOP annotations -->
   <aop:aspectj-autoproxy/>
-
-	<!-- database connection configuration -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="location" value="file:${annis.home}/conf/database.properties"/>
-    <property name="placeholderPrefix" value="$dao{"/>
-  </bean>
 	
+   
 	<!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource"/>
   </bean>
 
+  <!-- database connection configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="file:${annis.home}/conf/database.properties"/>
+    <property name="placeholderPrefix" value="$dao{"/>
+  </bean>
 	<!-- DataSource -->
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="$dao{datasource.driver}"/>
@@ -58,13 +58,10 @@
 		
 	<!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
-		
+      
 	<!-- DddQueryParser -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
-	
-	<!-- SqlGenerator -->
-  <import resource="classpath:annis/sqlgen/SqlGenerator-context.xml"/>
 		
   <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
     <property name="requiredType" value="java.lang.Long"/>
@@ -86,29 +83,27 @@
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
     <property name="scriptFile" value="modify_session.sql"/>
     <property name="administrationDao">
-      <bean class="annis.administration.SpringAnnisAdministrationDao">
+      <bean class="annis.administration.ApAdministrationDao">
         <property name="scriptPath" value="${annis.script-path}"/>
         <property name="dataSource" ref="dataSource"/>
       </bean>
     </property>
   </bean>
 	
-	
-<!-- new -->
-
+   <!-- BEGIN EXPORTS -->
+   
 	<!-- exported bean: AnnisDao -->
-  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init">
+  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init">
 
-		<!-- configuration -->
-		<property name="timeout" value="${annis.sql-timeout}"/>
+    <!-- configuration -->
+    <property name="timeout" value="${annis.sql-timeout}"/>
 
-	<property name="countSqlGenerator" ref="countSqlGenerator"/>
-	<property name="aomAnnotateSqlGenerator" ref="aomAnnotateSqlGenerator"/>
-   <property name="saltAnnotateSqlGenerator" ref="saltAnnotateSqlGenerator"/>
-	<property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
+    <property name="countSqlGenerator" ref="countSqlGenerator"/>
+    <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+    <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
+    <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
 
-    <!-- VR: before benchmark merge -->
-	<property name="dataSource" ref="dataSource"/>
+    <property name="dataSource" ref="dataSource"/>
 
     <property name="aqlParser" ref="annisParser"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
@@ -119,15 +114,14 @@
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
 		
-		<!-- new -->
     <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
       <util:list>
-    	<ref bean="springAnnisDao"/>
-    	<ref bean="sqlScriptSessionModifier"/>
+        <ref bean="annisDao"/>
+        <ref bean="sqlScriptSessionModifier"/>
       </util:list>
-	</property>
+    </property>
     
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
     <property name="countExtractor" ref="countExtractor"/>
@@ -136,50 +130,17 @@
     <property name="byteHelper" ref="byteHelper" />
 
   </bean>
-<!-- old
 
-  <bean id="timeOutSqlSessionModifier" class="annis.dao.TimeOutSqlSessionModifier">
-    <property name="timeout" value="${annis.timeout}"/>
+
+	<!-- exported Database API for administration tasks -->
+  <bean id="administrationDao" class="annis.administration.ApAdministrationDao">
+    <property name="scriptPath" value="${annis.script-path}"/>
+    <property name="externalFilesPath" value="${annis.external-data-path}"/>
+    <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
+    <property name="dbLayout" value="${annis.mode}" />
+    <property name="dataSource" ref="dataSource" />
   </bean>
 
-  <util:list id="sqlSessionModifiers">
-    <ref bean="timeOutSqlSessionModifier"/>
-    <ref bean="sqlScriptSessionModifier"/>
-  </util:list>
-	
-  <bean id="graphExtractor" class="annis.dao.GraphExtractor">
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
-  </bean>
-
-  <bean id="springAnnisDao" class="annis.dao.SpringAnnisDao" init-method="init" >
-    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
-
-    <property name="aqlParser" ref="annisParser"/>
-    <property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="dddqueryParser" ref="dddQueryParser" />
-    <property name="dddqueryAnalysis" ref="queryAnalysis" />
-
-    <property name="defaultQueryExecutor" ref="defaultQueryExecutor" />
-    <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
-    <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
-    <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
-		
-    <property name="queryAnalysis" ref="aqlAnalysis"/>
-    <property name="findSqlGenerator" ref="findSqlGenerator"/>
-    <property name="sqlSessionModifiers" ref="sqlSessionModifiers"/>
-    <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-    <property name="countExtractor" ref="countExtractor"/>
-    <property name="matrixExtractor" ref="matrixExtractor" />
-
-    <property name="graphExtractor" ref="graphExtractor" />
-    <property name="executorList" ref="executorList" />
-
-    <property name="metaDataFilter" ref="metaDataFilter" />
-
-  </bean>
-
--->
-
+  <!-- END EXPORTS -->
 
 </beans>

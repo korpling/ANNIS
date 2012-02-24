@@ -19,19 +19,8 @@ limitations under the License.
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
-
-	<!-- Properties configuration -->
-  <bean
-    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="locations">
-      <list>
-        <value>file:${annis.home}/conf/annis-service.properties</value>
-      </list>
-    </property>
-  </bean>
-
-
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+  
 	<!-- Configure use of BETWEEN SYMMETRIC -->
   <bean
     class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
@@ -77,7 +66,9 @@ limitations under the License.
     <property name="useIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
     <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
-    <property name="tableLayout" value="${annis.table-layout}" />
+    <property name="annoCondition">
+      <bean class="annis.sqlgen.fullfacts.FfAnnotateConditionProvider" />
+    </property>
   </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
@@ -157,10 +148,6 @@ limitations under the License.
     </entry>
   </util:map>
 
-  <util:map id="emptyTableAliases" />
-
-  <util:map id="emptyColumnAliases" />
-
   <util:map id="annotateOuterQueryColumnAliases">
     <entry key="node">
       <util:map>
@@ -201,111 +188,95 @@ limitations under the License.
 
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
         scope="prototype">
-
     <property name="tableAliases" ref="factsTableAliases" />
     <property name="columnAliases" ref="factsColumnAliases" />
-
   </bean>
 
   <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
-
     <lookup-method name="createTableAccessStrategy" bean="tableAccessStrategy" />
   </bean>
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
 
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
+        parent="tableAccessStrategyFactory">
 
-	<!-- new -->
-	<bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-		parent="tableAccessStrategyFactory">
+    <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
+    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
-		<property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
-		<property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
-
-		<property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
-		<property name="fromClauseSqlGenerators">
-			<util:list>
-				<ref bean="matrixSqlGenerator" />
-			</util:list>
-		</property>
-		<property name="whereClauseSqlGenerators">
-			<util:list>
-				<ref bean="matrixSqlGenerator" />
-			</util:list>
-		</property>
-		<property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
-	</bean>
+    <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="matrixSqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="matrixSqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
+  </bean>
 
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor"/>
-
-  <bean id="csvCorpusPathExtractor" class="annis.sqlgen.CsvCorpusPathExtractor"/>
 
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
 
-  <bean id="nodeNameAndIdPostgreSqlAndIdSolutionKey" class="annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey" scope="prototype"/>
+  <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
+        parent="tableAccessStrategyFactory">
 
-  <bean id="multipleColumnsSolutionKey" class="annis.sqlgen.MultipleColumnsSolutionKey" scope="prototype">
-    <property name="idColumnName" value="${annis.node-id-column-name}"/>
-    <property name="keyColumnName" value="key"/>
-  </bean>
-
-	<bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-		parent="tableAccessStrategyFactory">
-
-		<property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
+    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
     <property name="solutionKey" ref="postgreSqlArraySolutionKey"/>
-		<property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-		<property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
-		<property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-		<property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-		<property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-	</bean>
+    <property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+    <property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+    <property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+  </bean>
 
-	<bean id="annotateSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator"
-		parent="tableAccessStrategyFactory">
-		
-		<lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-
-		<property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
-
-		<property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
-    <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
-		<property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
-
-		<property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-		<property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
-
-		<property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
-		<property name="fromClauseSqlGenerators">
-			<util:list>
-				<ref bean="annotateSqlGenerator" />
-			</util:list>
-		</property>
-		<property name="whereClauseSqlGenerators">
-			<util:list>
-				<ref bean="annotateSqlGenerator" />
-			</util:list>
-		</property>
-		<property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
-      <property name="tableLayout" value="${annis.table-layout}" />
+  <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy">
+    <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
+  </bean>
+  
+  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
-    <property name="outerQueryTableAccessStrategy">
-      <bean class="annis.sqlgen.TableAccessStrategy">
-        <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
-      </bean>
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
+  </bean>
+  
+  <bean id="annotateSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator"
+        parent="tableAccessStrategyFactory">
+		
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
+
+    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
+
+    <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
+    <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
+    <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
+
+    <property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
+    <property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
+
+    <property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="annotateSqlGenerator" />
+      </util:list>
     </property>
-  </bean>
-
-	<bean id="aomAnnotateSqlGenerator" class="annis.sqlgen.AomAnnotateSqlGenerator"
-        parent="annotateSqlGenerator">
-  </bean>
-
-  <bean id="saltAnnotateSqlGenerator" class="annis.sqlgen.SaltAnnotateSqlGenerator"
-        parent="annotateSqlGenerator">
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="annotateSqlGenerator" />
+      </util:list>
+    </property>
+    <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
+    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
+    <property name="resultExtractor" ref="saltAnnotateExtractor" />
   </bean>
 
   <util:list id="defaultFromClauseGenerators">
@@ -319,6 +290,8 @@ limitations under the License.
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />
   </util:list>
+
+  
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory">

@@ -16,52 +16,73 @@
 package annis;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.logging.Level;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.io.support.ResourcePropertySource;
 
 public abstract class AnnisBaseRunner
 {
 
-  private Logger log = Logger.getLogger(this.getClass());
+  private static Logger log = Logger.getLogger(AnnisBaseRunner.class);
   // the root of the Annis installation
   private static String annisHomePath;
   // console output for easier testing, normally set to System.out
   protected PrintStream out = System.out;
-
   ;
   // for the interactive shell
   private String helloMessage;
   private String prompt;
 
-  public static AnnisBaseRunner getInstance(String beanName, String... contextLocations)
+  public static AnnisBaseRunner getInstance(String beanName,
+    String... contextLocations)
   {
     return getInstance(beanName, true, contextLocations);
   }
+  
+  public static AnnisBaseRunner getInstance(String beanName,
+    boolean logToConsole, String... contextLocations)
+  {
+    return (AnnisBaseRunner) getBean(beanName, logToConsole, contextLocations);
+  }
 
-  public static AnnisBaseRunner getInstance(String beanName, boolean logToConsole, String... contextLocations)
+  public static Object getBean(String beanName,
+    boolean logToConsole, String... contextLocations)
   {
     checkForAnnisHome();
     setupLogging(logToConsole);
 
-    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(contextLocations);
-    return (AnnisBaseRunner) ctx.getBean(beanName);
+    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
+    try
+    {
+      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
+        "conf/annis-service.properties").getAbsolutePath()));
+    }
+    catch (IOException ex)
+    {
+      log.error("Could not load conf/annis-service.properties", ex);
+    }
+    
+    ctx.load(contextLocations);
+    ctx.refresh();
+    return ctx.getBean(beanName);
   }
 
   public void run(String[] args)
@@ -78,7 +99,7 @@ public abstract class AnnisBaseRunner
       }
       else
       {
-        for(String cmd : args)
+        for (String cmd : args)
         {
           // split into command name and arguments
           String[] split = cmd.split("\\s+", 2);
@@ -133,7 +154,8 @@ public abstract class AnnisBaseRunner
         }
         else
         {
-          String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(1, line.split(" ").length), " ");
+          String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(
+            1, line.split(" ").length), " ");
           runCommand(command, args);
         }
       }
@@ -172,7 +194,8 @@ public abstract class AnnisBaseRunner
         String commandName = m.getName().substring("do".length());
         if (commandName.length() > 1)
         {
-          commandName = commandName.substring(0, 1).toLowerCase() + commandName.substring(1);
+          commandName = commandName.substring(0, 1).toLowerCase() + commandName.
+            substring(1);
           result.add(commandName);
         }
       }
@@ -182,7 +205,8 @@ public abstract class AnnisBaseRunner
 
   protected void runCommand(String command, String args)
   {
-    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.substring(1);
+    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.
+      substring(1);
     log.debug("looking for: " + methodName);
 
     try
@@ -213,7 +237,8 @@ public abstract class AnnisBaseRunner
     catch (IllegalAccessException e)
     {
       log.error("BUG: IllegalAccessException should never be thrown", e);
-      throw new AnnisRunnerException("BUG: can't access method: " + methodName, e);
+      throw new AnnisRunnerException("BUG: can't access method: " + methodName,
+        e);
     }
     catch (SecurityException e)
     {
@@ -232,13 +257,15 @@ public abstract class AnnisBaseRunner
     annisHomePath = System.getProperty("annis.home");
     if (annisHomePath == null)
     {
-      System.out.println("Please set the annis.home property to the Annis distribution directory.");
+      System.out.println(
+        "Please set the annis.home property to the Annis distribution directory.");
       System.exit(1);
     }
     File file = new File(annisHomePath);
     if (!file.exists() || !file.isDirectory())
     {
-      System.out.println("The directory '" + annisHomePath + "' does not exist or is not a directory.");
+      System.out.println("The directory '" + annisHomePath
+        + "' does not exist or is not a directory.");
       System.exit(2);
     }
   }
@@ -250,7 +277,8 @@ public abstract class AnnisBaseRunner
 
     if (console)
     {
-      Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
+      Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout(
+        "%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
     }
   }
 

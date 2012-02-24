@@ -28,6 +28,7 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface AnnisDao
 {
@@ -69,6 +70,8 @@ public interface AnnisDao
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGenerator<QueryData, T> generator, final ResultSetExtractor<T> extractor);
 
   // needed in AnnisRunner
   public HashMap<Long, Properties> getCorpusConfiguration();

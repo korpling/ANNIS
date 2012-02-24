@@ -46,7 +46,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SaltAnnotateSqlGeneratorTest
+public class SaltAnnotateExtractorTest
 {
 
   // class under test
@@ -68,7 +68,7 @@ public class SaltAnnotateSqlGeneratorTest
 
     ResultSet resultSet = resultSetProvider.getResultSet();
 
-    SaltAnnotateSqlGenerator instance = new SaltAnnotateSqlGenerator() {
+    SaltAnnotateExtractor instance = new SaltAnnotateExtractor() {
       protected SolutionKey<?> createSolutionKey() {
         return solutionKey;
       }

@@ -63,15 +63,19 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.LinkedList;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
+public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 {
-
-  public SaltAnnotateSqlGenerator()
+  private TableAccessStrategy outerQueryTableAccessStrategy;
+  private CorpusPathExtractor corpusPathExtractor;
+  
+  
+  public SaltAnnotateExtractor()
   {
   }
 
@@ -136,7 +140,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         document = SaltFactory.eINSTANCE.createSDocument();
 
 
-        List<String> path = getCorpusPathExtractor().extractCorpusPath(resultSet,
+        List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
           "path");
 
         SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
@@ -273,7 +277,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
 
       Object nodeId = key.getNodeId(resultSet,
-        getOuterQueryTableAccessStrategy());
+        outerQueryTableAccessStrategy);
       Integer matchedNode = key.getMatchedNodeIndex(nodeId);
       if (matchedNode != null)
       {
@@ -531,7 +535,7 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
         }
         catch (SaltException ex)
         {
-          Logger.getLogger(SaltAnnotateSqlGenerator.class.getName()).log(
+          Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
             Level.WARNING, "invalid edge detected", ex);
         }
       } // end if no existing relation
@@ -560,6 +564,12 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
     }
     return rel;
   }
+  
+  protected SolutionKey<?> createSolutionKey()
+  {
+    throw new NotImplementedException(
+      "BUG: This method needs to be overwritten by ancestors or through Spring");
+  }
 
   protected void newline(StringBuilder sb, int indentBy)
   {
@@ -575,14 +585,36 @@ public class SaltAnnotateSqlGenerator extends AnnotateSqlGenerator<SaltProject>
   protected long longValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getLong(getOuterQueryTableAccessStrategy().columnName(table,
+    return resultSet.getLong(outerQueryTableAccessStrategy.columnName(table,
       column));
   }
 
   protected String stringValue(ResultSet resultSet, String table, String column)
     throws SQLException
   {
-    return resultSet.getString(getOuterQueryTableAccessStrategy().columnName(
+    return resultSet.getString(outerQueryTableAccessStrategy.columnName(
       table, column));
   }
+
+  public CorpusPathExtractor getCorpusPathExtractor()
+  {
+    return corpusPathExtractor;
+  }
+
+  public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
+  {
+    this.corpusPathExtractor = corpusPathExtractor;
+  }
+
+  public TableAccessStrategy getOuterQueryTableAccessStrategy()
+  {
+    return outerQueryTableAccessStrategy;
+  }
+
+  @Override
+  public void setOuterQueryTableAccessStrategy(TableAccessStrategy outerQueryTableAccessStrategy)
+  {
+    this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
+  }
+  
 }

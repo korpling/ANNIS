@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright 2009-2011 Collaborative Research Centre SFB 632 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,13 +50,21 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.LegacyGraphConverter;
+import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.*;
+import java.util.logging.Level;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -67,7 +75,7 @@ public class AnnisRunner extends AnnisBaseRunner
   // SQL generators for query functions
   private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
-  private SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator;
+  private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
   // dependencies
   private AnnisDao annisDao;
@@ -122,8 +130,9 @@ public class AnnisRunner extends AnnisBaseRunner
   public static void main(String[] args)
   {
     // get runner from Spring
-    AnnisBaseRunner.getInstance("annisRunner", "annis/AnnisRunner-context.xml").
-      run(args);
+    String path = Utils.getAnnisFile(
+      "conf/spring/Shell.xml").getAbsolutePath();
+    AnnisBaseRunner.getInstance("annisRunner", "file:" + path).run(args);
   }
 
   public AnnisRunner()
@@ -154,10 +163,12 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doCorpus("tiger2");
     doSet("limit to 10");
-    doSet("offset to 100");
+    doSet("offset to 0");
     doSet("left to 5");
     doSet("right to 5");
+    doSql("annotate cat=\"S\" & \"das\" & #1 >* #2");
     doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
+    doCount("cat=\"S\" & \"das\" & #1 >* #2");
   }
 
   public void doProposedIndex(String ignore)
@@ -247,7 +258,6 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData = analyzeQuery(annisQuery, null);
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
-
     out.println(generator.toSql(queryData));
   }
 
@@ -286,18 +296,19 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = countSqlGenerator;
     }
-    if ("find".equals(function))
+    else if ("find".equals(function))
     {
       generator = findSqlGenerator;
     }
-    if ("annotate".equals(function))
+    else if ("annotate".equals(function))
     {
       generator = annotateSqlGenerator;
     }
-    if ("matrix".equals(function))
+    else if ("matrix".equals(function))
     {
       generator = matrixSqlGenerator;
     }
+
     Validate.notNull(generator, "don't now query function: " + function);
 
     return generator;
@@ -400,7 +411,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       resetCaches(currentOS);
     }
-    
+
     // shuffle the benchmark queries
     Collections.shuffle(session);
     out.println();
@@ -749,15 +760,9 @@ public class AnnisRunner extends AnnisBaseRunner
       + limit + "; offset = " + offset);
     SaltProject result = annisDao.annotate(queryData);
 
-    List<AnnotationGraph> asAOM = LegacyGraphConverter.convertToAOM(result);
-
     URI uri = URI.createFileURI("/tmp/annissalt");
     result.saveSaltProject_DOT(uri);
-
-
-    //		out.println("Returned " + graphs.size() + " annotations graphs.");
-    // FIXME: annotations graphen visualisieren
-//    printAsTable(graphs, "nodes", "edges");
+    System.out.println("graph as dot written to /tmp/annissalt");
   }
 
   public void doCorpus(String list)
@@ -811,12 +816,36 @@ public class AnnisRunner extends AnnisBaseRunner
     printAsTable(corpusAnnotations, "namespace", "name", "value");
   }
 
+  public void doSqlText(String textID)
+  {
+    long l = Long.parseLong(textID);
+    System.out.println(annotateSqlGenerator.getTextQuery(l));
+  }
+  
   public void doText(String textID)
   {
-    List<SaltProject> result = new LinkedList<SaltProject>();
+    long l = Long.parseLong(textID);
     SaltProject p = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
-    result.add(p);
-    printAsTable(result, "nodes", "edges");
+    System.out.println(printSaltAsXMI(p));
+  }
+
+  public void doSqlDoc(String docCall)
+  {
+    String[] splitted = docCall.split("( )+");
+
+    Validate.isTrue(splitted.length > 1,
+      "must have to arguments (toplevel corpus name and document name");
+    System.out.println(annotateSqlGenerator.getDocumentQuery(splitted[0], splitted[1]));
+  }
+  
+  public void doDoc(String docCall)
+  {
+    String[] splitted = docCall.split("( )+");
+
+    Validate.isTrue(splitted.length > 1,
+      "must have to arguments (toplevel corpus name and document name");
+    SaltProject p = annisDao.retrieveAnnotationGraph(splitted[0], splitted[1]);
+    System.out.println(printSaltAsXMI(p));
   }
 
   public void doQuit(String dummy)
@@ -916,6 +945,37 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       return annisDao.parseAQL(input, getCorpusList());
     }
+  }
+
+  private String printSaltAsXMI(SaltProject project)
+  {
+    try
+    {
+      Resource resource = new XMIResourceImpl();
+      // add the project itself
+      resource.getContents().add(project);
+
+      // add all SDocumentGraph elements
+      for (SCorpusGraph corpusGraph : project.getSCorpusGraphs())
+      {
+        for (SDocument doc : corpusGraph.getSDocuments())
+        {
+          if (doc.getSDocumentGraph() != null)
+          {
+            resource.getContents().add(doc.getSDocumentGraph());
+          }
+        }
+      }
+      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+      resource.save(outStream, null);
+      return new String(outStream.toByteArray());
+
+    }
+    catch (IOException ex)
+    {
+      log.error(ex);
+    }
+    return "";
   }
 
   ///// Getter / Setter
@@ -1020,13 +1080,13 @@ public class AnnisRunner extends AnnisBaseRunner
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public SqlGenerator<QueryData, List<AnnotationGraph>> getAnnotateSqlGenerator()
+  public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
   {
     return annotateSqlGenerator;
   }
 
   public void setAnnotateSqlGenerator(
-    SqlGenerator<QueryData, List<AnnotationGraph>> annotateSqlGenerator)
+    AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
   {
     this.annotateSqlGenerator = annotateSqlGenerator;
   }

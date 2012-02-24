@@ -15,11 +15,9 @@
  */
 package annis.sqlgen;
 
-import annis.administration.SchemeType;
+import annis.model.AnnotationGraph;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
@@ -38,6 +36,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
@@ -49,23 +51,22 @@ public abstract class AnnotateSqlGenerator<T>
   extends AbstractSqlGenerator<T>
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
-  WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
+  WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>,
+  AnnotateExtractor<T>
 {
 
   // include document name in SELECT clause
   private boolean includeDocumentNameInAnnotateQuery;
-  
   // include is_token column in SELECT clause
   private boolean includeIsTokenColumn;
-  
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy outerQueryTableAccessStrategy;
   private boolean optimizeOverlap;
-  private SchemeType tableLayout = SchemeType.ANNO_POOL;
-
+  private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
+
   
   public static class AnnotateQueryData
   {
@@ -150,12 +151,13 @@ public abstract class AnnotateSqlGenerator<T>
   /**
    * Create a solution key to be used inside a single call to
    * {@code extractData}.
-   * 
+   *
    * This method must be overridden in child classes or by Spring.
    */
   protected SolutionKey<?> createSolutionKey()
   {
-    throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
+    throw new NotImplementedException(
+      "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
   /**
@@ -203,80 +205,9 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Deprecated
-  public String getTextQuery(long textID)
-  {
-    if (tableLayout == SchemeType.ANNO_POOL)
-    {
-      String template = "SELECT DISTINCT \n"
-        + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name,"
-        + "node_anno.namespace AS node_annotation_namespace, "
-        + "node_anno.\"name\" AS node_annotation_name, "
-        + "node_anno.val AS node_annotation_value,\n"
-        + "edge_anno.namespace AS edge_annotation_namespace, "
-        + "edge_anno.\"name\" AS edge_annotation_name, "
-        + "edge_anno.val AS edge_annotation_value\n"
-        + "FROM\n"
-        + "\tfacts AS facts, corpus as c, annotation_pool as node_anno, annotation_pool as edge_anno\n"
-        + "WHERE\n"
-        + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-        + "\tAND node_anno.id = facts.node_anno_ref\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref\n"
-        + "ORDER BY facts.pre";
-      String sql = template.replace(":text_id", String.valueOf(textID));
-      return sql;
-    }
-    else
-    {
-      String template = "SELECT DISTINCT \n"
-          + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
-          + "FROM\n"
-          + "\tfacts AS facts, corpus as c\n" + "WHERE\n"
-          + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-          + "ORDER BY facts.pre";
-        String sql = template.replace(":text_id", String.valueOf(textID));
-        return sql;
-    }
-  }
+  public abstract String getTextQuery(long textID);
 
-  public String getDocumentQuery(String toplevelCorpusName, String documentName)
-  {
-    if (tableLayout == SchemeType.ANNO_POOL)
-    {
-      String template = "SELECT DISTINCT \n"
-        + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name, "
-        + "node_anno.namespace AS node_annotation_namespace, "
-        + "node_anno.\"name\" AS node_annotation_name, "
-        + "node_anno.val AS node_annotation_value,\n"
-        + "edge_anno.namespace AS edge_annotation_namespace, "
-        + "edge_anno.\"name\" AS edge_annotation_name, "
-        + "edge_anno.val AS edge_annotation_value\n"
-        + "FROM\n"
-        + "\tfacts AS facts, corpus as c, corpus as toplevel, \n"
-        + "\tannotation_pool as node_anno, annotation_pool as edge_anno\n"
-        + "WHERE\n"
-        + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
-        + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-        + "\tAND node_anno.id = facts.node_anno_ref AND node_anno.toplevel_corpus = toplevel.id\n"
-        + "\tAND edge_anno.id = facts.edge_anno_ref AND edge_anno.toplevel_corpus = toplevel.id\n"
-        + "ORDER BY facts.pre";
-      String sql = template.replace(":toplevel_name", String.valueOf(
-        toplevelCorpusName)).replace(":document_name", documentName);
-      return sql;
-    }
-    else
-    {
-      String template = "SELECT DISTINCT \n"
-          + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
-          + "FROM\n"
-          + "\tfacts AS facts, corpus as c, corpus as toplevel\n" + "WHERE\n"
-          + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
-          + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-          + "ORDER BY facts.pre";
-        String sql = template.replace(":toplevel_name", String.valueOf(
-          toplevelCorpusName)).replace(":document_name", documentName);
-        return sql;
-    }
-  }
+  public abstract String getDocumentQuery(String toplevelCorpusName, String documentName);
 
   public String getMatchedNodesViewName()
   {
@@ -298,97 +229,11 @@ public abstract class AnnotateSqlGenerator<T>
     this.defaultIslandsPolicy = defaultIslandsPolicy;
   }
 
-// new
   @Override
-  public String selectClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
-  {
-    StringBuilder sb = new StringBuilder();
-    SolutionKey<?> key = createSolutionKey();
-    
-    sb.append("DISTINCT\n");
-    List<String> keyColumns = key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.size());
-    for (String keyColumn : keyColumns) {
-      indent(sb, indent + TABSTOP);
-      sb.append(keyColumn);
-      sb.append(",\n");
-    }
-    indent(sb, indent + TABSTOP);
-    List<AnnotateQueryData> extension =
-      queryData.getExtensions(AnnotateQueryData.class);
-    Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
+  public abstract String selectClause(QueryData queryData,
+    List<QueryNode> alternative, String indent);
 
-    List<String> fields = new ArrayList<String>();
-    // facts.fid is never evaluated in the result set
-    // addSelectClauseAttribute(fields, FACTS_TABLE, "fid");
-    addSelectClauseAttribute(fields, NODE_TABLE, "id");
-    addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
-    addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
-    addSelectClauseAttribute(fields, NODE_TABLE, "toplevel_corpus");
-    addSelectClauseAttribute(fields, NODE_TABLE, "namespace");
-    addSelectClauseAttribute(fields, NODE_TABLE, "name");
-    addSelectClauseAttribute(fields, NODE_TABLE, "left");
-    addSelectClauseAttribute(fields, NODE_TABLE, "right");
-    addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
-    if (includeIsTokenColumn) {
-      addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
-    }
-    addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
-    addSelectClauseAttribute(fields, NODE_TABLE, "span");
-    addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
-    addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
-    addSelectClauseAttribute(fields, RANK_TABLE, "pre");
-    addSelectClauseAttribute(fields, RANK_TABLE, "post");
-    addSelectClauseAttribute(fields, RANK_TABLE, "parent");
-    addSelectClauseAttribute(fields, RANK_TABLE, "root");
-    addSelectClauseAttribute(fields, RANK_TABLE, "level");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "id");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
-    addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
-    if (tableLayout == SchemeType.FULLFACTS)
-    {
-      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "namespace");
-      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "name");
-      addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "value");
-      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "namespace");
-      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
-      addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
-    }
-
-    sb.append(indent).append(TABSTOP);
-    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-    sb.append(",\n").append(indent).append(TABSTOP);
-
-    if (tableLayout == SchemeType.ANNO_POOL)
-    {
-      sb.append("node_anno.namespace AS \"node_annotation_namespace\",\n").append(
-        indent).append(TABSTOP);
-      sb.append("node_anno.\"name\" AS \"node_annotation_name\",\n").append(indent).
-        append(TABSTOP);
-      sb.append("node_anno.\"val\" AS \"node_annotation_value\",\n").append(indent).
-        append(TABSTOP);
-      sb.append("edge_anno.namespace AS \"edge_annotation_namespace\",\n").append(
-        indent).append(TABSTOP);
-      sb.append("edge_anno.\"name\" AS \"edge_annotation_name\",\n").append(indent).
-        append(TABSTOP);
-      sb.append("edge_anno.\"val\" AS \"edge_annotation_value\",\n");
-      sb.append(indent).append(TABSTOP);
-    }
-
-    // corpus.path_name
-    sb.append("corpus.path_name AS path");
-    
-    if (includeDocumentNameInAnnotateQuery) {
-      sb.append(",\n");
-      indent(sb, indent +TABSTOP);
-      sb.append("corpus.path_name[1] AS document_name");
-    }
-    return sb.toString();
-  }
-
-  private void addSelectClauseAttribute(List<String> fields,
+  protected void addSelectClauseAttribute(List<String> fields,
     String table, String column)
   {
     TableAccessStrategy tas = tables(null);
@@ -496,42 +341,11 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(" = ");
     sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
-    HashSet<String> conditions = new HashSet<String>();
+    HashSet<String> result = new HashSet<String>();
 
-    if (tableLayout == SchemeType.ANNO_POOL)
-    {
+    result.add(sb.toString());
 
-      // join with node annotations
-      sb.append(" AND\n");
-      indent(sb, indent + TABSTOP);
-      sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"));
-      sb.append(" = node_anno.id");
-      sb.append(" AND\n");
-      indent(sb, indent + TABSTOP);
-      sb.append(" node_anno.\"type\" = 'node'");
-      sb.append(" AND\n");
-      // join with edge annotations
-      indent(sb, indent + TABSTOP);
-      sb.append(tables.aliasedColumn(EDGE_ANNOTATION_TABLE, "anno_ref"));
-      sb.append(" = edge_anno.id AND\n");
-      indent(sb, indent + TABSTOP);
-      sb.append(" edge_anno.\"type\" = 'edge'");
-      sb.append(" AND\n");
-      
-      // restrict toplevel corpus
-      indent(sb, indent + TABSTOP);
-      sb.append("node_anno.toplevel_corpus IN (");
-      sb.append(StringUtils.join(corpusList, ", "));
-      sb.append(") AND \n");
-      indent(sb, indent + TABSTOP);
-      sb.append("edge_anno.toplevel_corpus IN (");
-      sb.append(StringUtils.join(corpusList, ", "));
-      sb.append(")\n");
-    }
-
-    conditions.add(sb.toString());
-
-    return conditions;
+    return result;
   }
 
   private String overlapForOneRange(String indent,
@@ -591,7 +405,8 @@ public abstract class AnnotateSqlGenerator<T>
     int size = alternative.size();
     List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
-    for (String keyColumn : keyColumns) {
+    for (String keyColumn : keyColumns)
+    {
       sb.append(keyColumn);
       sb.append(", ");
     }
@@ -602,40 +417,14 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Override
-  public String fromClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
+  public abstract String fromClause(QueryData queryData,
+    List<QueryNode> alternative, String indent);
+  
+  @Override
+  public T extractData(ResultSet resultSet)
+    throws SQLException, DataAccessException
   {
-    StringBuffer sb = new StringBuffer();
-
-    indent(sb, indent);
-    sb.append("(\n");
-    indent(sb, indent);
-    int indentBy = indent.length() / 2 + 2;
-    sb.append(innerQuerySqlGenerator.toSql(queryData, indentBy));
-    indent(sb, indent + TABSTOP);
-    sb.append(") AS solutions,\n");
-
-    indent(sb, indent + TABSTOP);
-    // really ugly
-    sb.append(
-      tableJoinsInFromClauseSqlGenerator.fromClauseForNode(null, true));
-    sb.append(",\n");
-
-    indent(sb, indent + TABSTOP);
-    sb.append(TableAccessStrategy.CORPUS_TABLE);
-
-    if (tableLayout == SchemeType.ANNO_POOL)
-    {
-      sb.append(", \n");
-      indent(sb, indent + TABSTOP);
-      sb.append(TableAccessStrategy.ANNOTATION_POOL_TABLE);
-      sb.append(" AS node_anno, \n");
-      indent(sb, indent + TABSTOP);
-      sb.append(TableAccessStrategy.ANNOTATION_POOL_TABLE);
-      sb.append(" AS edge_anno");
-    }
-
-    return sb.toString();
+    return resultExtractor.extractData(resultSet);
   }
 
   public AnnotateInnerQuerySqlGenerator getInnerQuerySqlGenerator()
@@ -675,24 +464,13 @@ public abstract class AnnotateSqlGenerator<T>
     return outerQueryTableAccessStrategy;
   }
 
-
-  public String getTableLayout()
-  {
-    return tableLayout.name().toLowerCase();
-  }
-  
-
-  public void setTableLayout(String tableLayout)
-  {
-    this.tableLayout = SchemeType.valueOf(tableLayout.toUpperCase());
-  }
   public boolean isIncludeDocumentNameInAnnotateQuery()
   {
     return includeDocumentNameInAnnotateQuery;
   }
 
   public void setIncludeDocumentNameInAnnotateQuery(
-      boolean includeDocumentNameInAnnotateQuery)
+    boolean includeDocumentNameInAnnotateQuery)
   {
     this.includeDocumentNameInAnnotateQuery = includeDocumentNameInAnnotateQuery;
   }
@@ -718,9 +496,20 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   public void setOuterQueryTableAccessStrategy(
-      TableAccessStrategy outerQueryTableAccessStrategy)
+    TableAccessStrategy outerQueryTableAccessStrategy)
   {
     this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
   }
 
+  public ResultSetExtractor<T> getResultExtractor()
+  {
+    return resultExtractor;
+  }
+
+  public void setResultExtractor(ResultSetExtractor<T> resultExtractor)
+  {
+    this.resultExtractor = resultExtractor;
+  }
+  
+  
 }

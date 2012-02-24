@@ -54,6 +54,7 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.annopool.ApAnnotationConditionProvider;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -134,9 +135,11 @@ public class TestDefaultWhereClauseGenerator
         return tableAccessStrategy;
       }
     };
+    generator.setAnnoCondition(new ApAnnotationConditionProvider());
 
     // simulate three annotations
     when(annotations.size()).thenReturn(3);
+   
   }
 
   // helper method to check create component predicates (name, edgeType)

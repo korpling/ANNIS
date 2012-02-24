@@ -6,43 +6,22 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
-	<!-- Properties configuration -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="locations">
-      <list>
-        <value>file:${annis.home}/conf/annis-service.properties</value>
-      </list>
-    </property>
-  </bean>
+  <import resource="Common.xml" />
 
 	<!-- DddQueryMapper -->
   <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
 	
-	<!-- AnnisDao -->
-  <import resource="classpath:annis/dao/SpringAnnisDao-context.xml"/>
-
-	<!-- External File Manager -->
-  <bean id="externalFileManagerDao" class="annis.externalFiles.ExternalFileMgrDAO">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-	
-  <bean id="externalFileManager" class="annis.externalFiles.ExternalFileMgrImpl">
-    <property name="externalFileMgrDao" ref="externalFileManagerDao"/>
-    <property name="externalDataFolder" value="${annis.external-data-path}"/>
-  </bean>
 
 	<!-- AnnisService -->
   <bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
-    <property name="annisDao" ref="springAnnisDao"/>
-    <property name="externalFileMgr" ref="externalFileManager"/>
+    <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />
   </bean>
    
    <!-- AnnisWebService -->
   <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="sayHello">
-    <property name="annisDao" ref="springAnnisDao"/>
-    <property name="externalFileMgr" ref="externalFileManager"/>
+    <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />
     <property name="port" value="${annis.webservice-port}" />

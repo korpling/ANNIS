@@ -33,12 +33,13 @@ import org.apache.log4j.Logger;
  *
  * @author thomas
  */
-public abstract class CorpusAdministration
+public class CorpusAdministration
 {
 
+  private AdministrationDao administrationDao;
   private Logger log = Logger.getLogger(this.getClass());
 
-    public CorpusAdministration()
+  public CorpusAdministration()
   {
   }
 
@@ -60,7 +61,7 @@ public abstract class CorpusAdministration
   public void deleteCorpora(List<Long> ids)
   {
     // check if corpus exists
-    List<Long> corpora = getAdministrationDao().listToplevelCorpora();
+    List<Long> corpora = administrationDao.listToplevelCorpora();
     for (long id : ids)
     {
       if (!corpora.contains(id))
@@ -70,130 +71,82 @@ public abstract class CorpusAdministration
       }
     }
     log.info("Deleting corpora: " + ids);
-    getAdministrationDao().deleteCorpora(ids);
+    administrationDao.deleteCorpora(ids);
     log.info("Finished deleting corpora: " + ids);
   }
-  
-  
+
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword)
   {
 
-    log.info("initializing database with schema "
-      + getSchemeType().getDescription());
+    log.info("initializing database");
+
 
     log.info("Creating Annis database and user.");
-
     // connect as super user to the default database to create new user and database
-    getAdministrationDao().setDataSource(createDataSource(host, port,
+    administrationDao.setDataSource(createDataSource(host, port,
       defaultDatabase, superUser, superPassword));
 
-    getAdministrationDao().dropDatabase(database);
-    getAdministrationDao().dropUser(user);
-    getAdministrationDao().createUser(user, password);
-    getAdministrationDao().createDatabase(database);
+    administrationDao.dropDatabase(database);
+    administrationDao.dropUser(user);
+    administrationDao.createUser(user, password);
+    administrationDao.createDatabase(database);
 
 
     // switch to new database, but still as super user to install stored procedure compute_rank_level
-    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+    administrationDao.setDataSource(createDataSource(host, port, database,
       superUser, superPassword));
-    getAdministrationDao().installPlPgSql();
-    getAdministrationDao().createFunctionUniqueToplevelCorpusName();
-
+    administrationDao.setupDatabase();
+ 
     // switch to new database as new user for the rest
-    getAdministrationDao().setDataSource(createDataSource(host, port, database,
+    administrationDao.setDataSource(createDataSource(host, port, database,
       user, password));
 
-    getAdministrationDao().createSchema(getSchemeType());
-    getAdministrationDao().populateSchema();
+    administrationDao.createSchema();
+    administrationDao.createSchemaIndexes();
+    administrationDao.populateSchema();
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password);
   }
 
-  @Transactional(readOnly = false)
-  public void importCorpora(boolean temporaryStagingArea,
-    List<String> paths)
+  public void importCorpora(List<String> paths)
   {
 
     // import each corpus
     for (String path : paths)
     {
       log.info("Importing corpus from: " + path);
-
-      getAdministrationDao().createStagingArea(temporaryStagingArea);
-      getAdministrationDao().bulkImport(path);
-      getAdministrationDao().computeTopLevelCorpus();
-
-      long corpusID = getAdministrationDao().updateIds();
-
-      getAdministrationDao().importBinaryData(path);
-
-      getAdministrationDao().createStagingAreaIndexes();
-      getAdministrationDao().analyzeStagingTables();
-
-      // finish transaction here to debug computation of left|right-token
-      // if (true) return;
-      getAdministrationDao().computeLeftTokenRightToken();
-//      if (true) return;
-      getAdministrationDao().computeRealRoot();
-      getAdministrationDao().computeLevel();
-      getAdministrationDao().computeCorpusStatistics();
-      getAdministrationDao().updateCorpusStatsId(corpusID);
-
-      getAdministrationDao().applyConstraints();
-      getAdministrationDao().analyzeStagingTables();
-
-      getAdministrationDao().insertCorpus();
-
-      getAdministrationDao().computeCorpusPath(corpusID);
-
-      getAdministrationDao().createAnnotations(corpusID);
-
-      // create the new facts table partition
-      getAdministrationDao().createFacts(corpusID, getSchemeType());
-      // the entries, which where here done, are possible after generating facts
-      getAdministrationDao().updateCorpusStatistic();
-
-
-      if (temporaryStagingArea)
-      {
-        getAdministrationDao().dropStagingArea();
-      }
-      getAdministrationDao().analyzeFacts(corpusID);
+      administrationDao.importCorpus(path);
       log.info("Finished import from: " + path);
     }
   }
 
-
-  public void importCorpora(boolean temporaryStagingArea, String... paths)
+  public void importCorpora(String... paths)
   {
-    importCorpora(temporaryStagingArea, Arrays.asList(paths));
+    importCorpora(Arrays.asList(paths));
   }
-
-
 
   public List<Map<String, Object>> listCorpusStats()
   {
-    return getAdministrationDao().listCorpusStats();
+    return administrationDao.listCorpusStats();
   }
 
   public List<Map<String, Object>> listTableStats()
   {
-    return getAdministrationDao().listTableStats();
+    return administrationDao.listTableStats();
   }
 
   public List<String> listUsedIndexes()
   {
-    return getAdministrationDao().listUsedIndexes();
+    return administrationDao.listUsedIndexes();
   }
 
   public List<String> listUnusedIndexes()
   {
-    return getAdministrationDao().listUnusedIndexes();
+    return administrationDao.listUnusedIndexes();
   }
-
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
@@ -220,13 +173,16 @@ public abstract class CorpusAdministration
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }
 
-
   ///// Getter / Setter
-  public abstract SpringAnnisAdministrationDao getAdministrationDao();
 
-  public abstract void setAdministrationDao(
-    SpringAnnisAdministrationDao administrationDao);
+  public AdministrationDao getAdministrationDao()
+  {
+    return administrationDao;
+  }
 
-  public abstract SchemeType getSchemeType();
-
+  public void setAdministrationDao(AdministrationDao administrationDao)
+  {
+    this.administrationDao = administrationDao;
+  }
+  
 }

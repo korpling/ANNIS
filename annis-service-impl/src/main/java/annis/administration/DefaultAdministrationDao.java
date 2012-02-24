@@ -36,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -47,31 +46,34 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-import annis.externalFiles.ExternalFileMgrDAO;
+import java.sql.Types;
 import javax.activation.MimetypesFileTypeMap;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlTypeValue;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
  * Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts
  */
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
-public class SpringAnnisAdministrationDao
+public class DefaultAdministrationDao implements AdministrationDao
 {
 
-  private Logger log = Logger.getLogger(this.getClass());
-  // helper object to store external files
-  private ExternalFileMgrDAO externalFileMgrDao;
+  private Logger log = Logger.getLogger(AdministrationDao.class);
   // external files path
   private String externalFilesPath;
   // script path
   private String scriptPath;
   // use Spring's JDBC support
-  private SimpleJdbcTemplate simpleJdbcTemplate;
-  private JdbcOperations jdbcOperations;
+  private NamedParameterJdbcTemplate jdbcTemplate;
+  //private JdbcOperations jdbcOperations;
   // save the datasource to manually retrieve connections (needed for bulk-import)
   private DataSource dataSource;
+  private boolean temporaryStagingArea;
+  
   /**
    * The name of the file and the relation containing the resolver information.
    */
@@ -99,53 +101,65 @@ public class SpringAnnisAdministrationDao
     "corpus_stats",
     "media_files"
   };
+  private String dbLayout;
 
   ///// Subtasks of creating the database
-  void dropDatabase(String database)
+  @Override
+  public void dropDatabase(String database)
   {
     String sql = "SELECT count(*) FROM pg_database WHERE datname = :database";
     SqlParameterSource args = makeArgs().addValue("database", database);
-    int count = simpleJdbcTemplate.queryForInt(sql, args);
+    int count = jdbcTemplate.queryForInt(sql, args);
     if (count != 0)
     {
       log.debug("dropping existing database");
-      jdbcOperations.execute("DROP DATABASE " + database);
+      jdbcTemplate.getJdbcOperations().execute("DROP DATABASE " + database);
     }
   }
 
-  void dropUser(String username)
+  @Override
+  public void dropUser(String username)
   {
     String sql = "SELECT count(*) FROM pg_user WHERE usename = :username";
     SqlParameterSource args = makeArgs().addValue("username", username);
-    int count = simpleJdbcTemplate.queryForInt(sql, args);
+    int count = jdbcTemplate.queryForInt(sql, args);
     if (count != 0)
     {
       log.debug("dropping existing user");
-      jdbcOperations.execute("DROP USER " + username);
+      jdbcTemplate.getJdbcOperations().execute("DROP USER " + username);
     }
   }
 
-  void createUser(String username, String password)
+  @Override
+  public void createUser(String username, String password)
   {
     log.info("creating user: " + username);
-    jdbcOperations.execute("CREATE USER " + username + " PASSWORD '" + password
+    jdbcTemplate.getJdbcOperations().execute("CREATE USER " + username + " PASSWORD '" + password
       + "'");
   }
 
-  void createDatabase(String database)
+  @Override
+  public void createDatabase(String database)
   {
     log.info("creating database: " + database
       + " ENCODING = 'UTF8' TEMPLATE template0");
-    jdbcOperations.execute("CREATE DATABASE " + database
+    jdbcTemplate.getJdbcOperations().execute("CREATE DATABASE " + database
       + " ENCODING = 'UTF8' TEMPLATE template0");
   }
 
-  void installPlPgSql()
+  @Override
+  public void setupDatabase()
+  {
+    installPlPgSql();
+    createFunctionUniqueToplevelCorpusName();
+  }
+
+  protected void installPlPgSql()
   {
     log.info("installing stored procedure language plpgsql");
     try
     {
-      jdbcOperations.execute("CREATE LANGUAGE plpgsql");
+      jdbcTemplate.getJdbcOperations().execute("CREATE LANGUAGE plpgsql");
     }
     catch (Exception ex)
     {
@@ -153,27 +167,29 @@ public class SpringAnnisAdministrationDao
     }
   }
 
-  void createFunctionUniqueToplevelCorpusName()
+  protected void createFunctionUniqueToplevelCorpusName()
   {
     log.info("creating trigger function: unique_toplevel_corpus_name");
     executeSqlFromScript("unique_toplevel_corpus_name.sql");
   }
 
 
-  void createFunctionAnnoGetter()
+  @Override
+  public void createSchema()
   {
-    log.info(
-      "creating immutable functions for getting annotations from the annotation pool");
-    executeSqlFromScript("functions_annopool_get.sql");
-  }
-
-  void createSchema(SchemeType type)
-  {
-    log.info("creating Annis database schema (" + type.getDescription() + ")");
-    executeSqlFromScript("schema_" + type.getScriptAppendix() + ".sql");
+    log.info("creating Annis database schema (" + dbLayout + ")");
+    executeSqlFromScript("schema_" + dbLayout + ".sql");
   }
   
-  void populateSchema()
+  @Override
+  public void createSchemaIndexes()
+  {
+    log.info("creating Annis database schema indexes (" + dbLayout + ")");
+    executeSqlFromScript("schemaindex_" + dbLayout + ".sql");
+  }
+
+  @Override
+  public void populateSchema()
   {
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
@@ -182,14 +198,61 @@ public class SpringAnnisAdministrationDao
     executeSqlFromScript("update_resolver_sequence.sql");
   }
 
+  @Override
+  @Transactional(readOnly = false)
+  public void importCorpus(String path)
+  {
+    createStagingArea(temporaryStagingArea);
+    bulkImport(path);
+    computeTopLevelCorpus();
+
+    long corpusID = updateIds();
+
+    importBinaryData(path);
+    extendStagingText(corpusID);
+
+    createStagingAreaIndexes();
+    analyzeStagingTables();
+
+    // finish transaction here to debug computation of left|right-token
+    // if (true) return;
+    computeLeftTokenRightToken();
+//      if (true) return;
+    computeRealRoot();
+    computeLevel();
+    computeCorpusStatistics();
+    updateCorpusStatsId(corpusID);
+
+    applyConstraints();
+    analyzeStagingTables();
+
+    insertCorpus();
+
+    computeCorpusPath(corpusID);
+
+    createAnnotations(corpusID);
+
+    // create the new facts table partition
+    createFacts(corpusID);
+    // the entries, which where here done, are possible after generating facts
+    updateCorpusStatistic();
+
+
+    if (temporaryStagingArea)
+    {
+      dropStagingArea();
+    }
+    analyzeFacts(corpusID);
+  }
+
   ///// Subtasks of importing a corpus
-  void dropIndexes()
+  protected void dropIndexes()
   {
     log.info("dropping indexes");
     for (String index : listIndexesOnTables(allTables()))
     {
       log.debug("dropping index: " + index);
-      jdbcOperations.execute("DROP INDEX " + index);
+      jdbcTemplate.getJdbcOperations().execute("DROP INDEX " + index);
     }
   }
 
@@ -243,17 +306,18 @@ public class SpringAnnisAdministrationDao
 
     // pattern marks binary data in the bulk files and corresponding regexp
     String extFilePattern = "\\[ExtFile\\]";
-    String extFileRegExp = "^" + extFilePattern + ".+$";
 
     // search for annotations that have binary data
     String selectSql =
       "SELECT DISTINCT value, corpus_ref FROM _node, _node_annotation WHERE value LIKE "
       + "'[ExtFile]%'" + " AND node_ref = id";
 
-    /* we need the value and the corpus_ref of the media_file, so the first 
-     * value of the String array is the name of the file and the second is the 
-     * corpus_ref */
-    List<String[]> list = simpleJdbcTemplate.getJdbcOperations().query(
+    /*
+     * we need the value and the corpus_ref of the media_file, so the first
+     * value of the String array is the name of the file and the second is the
+     * corpus_ref
+     */
+    List<String[]> list = jdbcTemplate.getJdbcOperations().query(
       selectSql,
       new ResultSetExtractor<List<String[]>>()
       {
@@ -286,42 +350,23 @@ public class SpringAnnisAdministrationDao
         + "/ExtData/" + filename, externalData[1]);
       String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
 
-      simpleJdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
+      jdbcTemplate.getJdbcOperations().execute(sqlScript, preStat);
 
-      /* this code is for the old ExternalFileServlet and can be deleted */
-      // copy file to extData directory
-      File file = new File(filename);
-      try
-      {
-        // XXX: equivalent to new File(parent = path, child = filename)?
-        File src = new File(path + "/ExtData/" + filename);
-        File dst = new File(externalFilesPath + "/" + filename);
-        log.debug("copying '" + src + "' to '" + dst + "'");
-        FileUtils.copyFile(src, dst);
-      }
-      catch (IOException e)
-      {
-        throw new FileAccessException(e);
-      }
-
-
-      // store reference in database
-      // XXX: mp3 mime type hard-coded
-      String name = file.getName();
-      String mimeType = new MimetypesFileTypeMap().getContentType(file);
-      String branch = file.getParent();
-      // FIXME: operates directly on the main database, can result orphaned entries in extdata when import fails
-      log.debug("externalFileMgr: " + externalFileMgrDao);
-      long id = externalFileMgrDao.putExtFile(name, branch, mimeType);
-      log.debug("external file '" + filename + "' inserted with id " + id);
-
+      
       // update annotation value, set name to audio:audioFile
       String updateValueSql =
         "UPDATE _node_annotation SET value = :id, name = 'externalFile', namespace = 'external' WHERE value = :externalData";
-      SqlParameterSource updateArgs = makeArgs().addValue("id", id).addValue(
-        "externalData", externalData[0]);
-      simpleJdbcTemplate.update(updateValueSql, updateArgs);
+      SqlParameterSource updateArgs = makeArgs().addValue("id", Types.BIGINT).addValue(
+        "externalData", externalData[0], Types.VARCHAR);
+      
+      jdbcTemplate.update(updateValueSql, updateArgs);
     }
+  }
+  
+  void extendStagingText(long toplevelID)
+  {
+    log.info("extending _text");;
+    executeSqlFromScript("extend_staging_text.sql", makeArgs().addValue(":id", toplevelID));
   }
 
   void computeLeftTokenRightToken()
@@ -370,20 +415,20 @@ public class SpringAnnisAdministrationDao
   {
     log.info("updating IDs in staging area");
 
-    int numOfEntries = jdbcOperations.queryForInt(
+    int numOfEntries = jdbcTemplate.getJdbcOperations().queryForInt(
       "SELECT COUNT(*) from corpus_stats");
 
     if (numOfEntries > 0)
     {
-      long recentCorpusId = jdbcOperations.queryForLong(
-        "SELECT max(id) FROM corpus_stats");      
+      long recentCorpusId = jdbcTemplate.getJdbcOperations().queryForLong(
+        "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
       MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
       executeSqlFromScript("update_ids.sql", args);
     }
 
     log.info("query for the new corpus ID");
-    long result = jdbcOperations.queryForLong(
+    long result = jdbcTemplate.getJdbcOperations().queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
     log.info("new corpus ID is " + result);
     return result;
@@ -392,7 +437,7 @@ public class SpringAnnisAdministrationDao
   void updateCorpusStatsId(long corpusId)
   {
     log.info("updating corpus ID in corpus_stat");
-    jdbcOperations.update("UPDATE _corpus_stats SET id = " + corpusId);
+    jdbcTemplate.getJdbcOperations().update("UPDATE _corpus_stats SET id = " + corpusId);
   }
 
   void applyConstraints()
@@ -406,7 +451,7 @@ public class SpringAnnisAdministrationDao
     log.info("moving corpus from staging area to main db");
     for (String table : tablesToCopyManually)
     {
-      int numOfEntries = jdbcOperations.queryForInt("SELECT COUNT(*) from "
+      int numOfEntries = jdbcTemplate.getJdbcOperations().queryForInt("SELECT COUNT(*) from "
         + tableInStagingArea(table));
 
 
@@ -431,7 +476,7 @@ public class SpringAnnisAdministrationDao
           sql.append(" (SELECT * FROM ");
           sql.append(tableInStagingArea(table)).append(")");
         }
-        jdbcOperations.execute(sql.toString());
+        jdbcTemplate.getJdbcOperations().execute(sql.toString());
       }
     }
   }
@@ -446,7 +491,8 @@ public class SpringAnnisAdministrationDao
 
     for (String table : tables)
     {
-      jdbcOperations.execute("DROP TABLE " + tableInStagingArea(table));
+      jdbcTemplate.getJdbcOperations()
+        .execute("DROP TABLE " + tableInStagingArea(table));
     }
 
   }
@@ -455,7 +501,7 @@ public class SpringAnnisAdministrationDao
   {
     log.info("dropping materialized tables");
 
-    jdbcOperations.execute("DROP TABLE facts");
+    jdbcTemplate.getJdbcOperations().execute("DROP TABLE facts");
 
   }
 
@@ -464,7 +510,8 @@ public class SpringAnnisAdministrationDao
     for (String t : importedTables)
     {
       log.info("analyzing " + t);
-      jdbcOperations.execute("ANALYZE " + tableInStagingArea(t));
+      jdbcTemplate.getJdbcOperations()
+        .execute("ANALYZE " + tableInStagingArea(t));
     }
   }
 
@@ -481,50 +528,51 @@ public class SpringAnnisAdministrationDao
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
-    jdbcOperations.execute("ANALYZE facts_" + corpusID);
+    jdbcTemplate.getJdbcOperations().execute("ANALYZE facts_" + corpusID);
   }
 
-  void createFacts(long corpusID, SchemeType type)
+  void createFacts(long corpusID)
   {
 
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts_" + type.getScriptAppendix() + ".sql", args);
-    
+    executeSqlFromScript("facts_" + dbLayout + ".sql", args);
+
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
     executeSqlFromScript("cluster.sql", args);
-    
+
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_" + type.getScriptAppendix() + ".sql", args);
+    executeSqlFromScript("indexes_" + dbLayout + ".sql", args);
 
   }
 
   ///// Other sub tasks
-  List<Long> listToplevelCorpora()
+  @Override
+  public List<Long> listToplevelCorpora()
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
-    return simpleJdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.
+    return jdbcTemplate.getJdbcOperations()
+      .query(sql, ParameterizedSingleColumnRowMapper.
       newInstance(Long.class));
   }
 
-  void deleteCorpora(List<Long> ids)
+  @Transactional(readOnly = false)
+  @Override
+  public void deleteCorpora(List<Long> ids)
   {
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE facts_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE facts_" + l);
       log.debug("dropping annotation_pool table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS annotation_pool_" + l);
+      jdbcTemplate.getJdbcOperations()
+        .execute("DROP TABLE IF EXISTS annotation_pool_" + l);
       log.debug("dropping annotations table for corpus " + l);
-      jdbcOperations.execute("DROP TABLE IF EXISTS annotations_" + l);
-//      log.debug("dropping node annotation table for corpus " + l);
-//      jdbcOperations.execute("DROP TABLE node_annotation_" + l);
-//      log.debug("dropping node table for corpus " + l);//			
-//      jdbcOperations.execute("DROP TABLE node_" + l);
+      jdbcTemplate.getJdbcOperations()
+        .execute("DROP TABLE IF EXISTS annotations_" + l);
     }
-
 
     log.debug("recursivly deleting corpora: " + ids);
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
@@ -532,24 +580,30 @@ public class SpringAnnisAdministrationDao
 
   }
 
-  List<Map<String, Object>> listCorpusStats()
+  @Override
+  public List<Map<String, Object>> listCorpusStats()
   {
-    return simpleJdbcTemplate.queryForList(
+    return jdbcTemplate.getJdbcOperations()
+      .queryForList(
       "SELECT * FROM corpus_info ORDER BY name");
   }
 
-  List<Map<String, Object>> listTableStats()
+  @Override
+  public List<Map<String, Object>> listTableStats()
   {
-    return simpleJdbcTemplate.queryForList("SELECT * FROM table_stats");
+    return jdbcTemplate.getJdbcOperations()
+      .queryForList("SELECT * FROM table_stats");
   }
 
-  List<String> listUsedIndexes()
+  @Override
+  public List<String> listUsedIndexes()
   {
     log.info("retrieving list of used indexes");
     return listIndexDefinitions(true);
   }
 
-  List<String> listUnusedIndexes()
+  @Override
+  public List<String> listUnusedIndexes()
   {
     log.info("retrieving list of unused indexes");
     return listIndexDefinitions(false);
@@ -638,7 +692,7 @@ public class SpringAnnisAdministrationDao
         }
         catch (IOException ex)
         {
-          java.util.logging.Logger.getLogger(SpringAnnisAdministrationDao.class.
+          java.util.logging.Logger.getLogger(DefaultAdministrationDao.class.
             getName()).log(Level.SEVERE, null, ex);
         }
       }
@@ -646,18 +700,28 @@ public class SpringAnnisAdministrationDao
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts
+  @Override
   public void executeSqlFromScript(String script)
   {
     executeSqlFromScript(script, null);
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
+  @Override
   public void executeSqlFromScript(String script, MapSqlParameterSource args)
   {
-    Resource resource = new FileSystemResource(new File(scriptPath, script));
-    log.debug("executing SQL script: " + resource.getFilename());
-    String sql = readSqlFromResource(resource, args);
-    jdbcOperations.execute(sql);
+    File fScript = new File(scriptPath, script);
+    if(fScript.canRead() && fScript.isFile())
+    {
+      Resource resource = new FileSystemResource(fScript);
+      log.debug("executing SQL script: " + resource.getFilename());
+      String sql = readSqlFromResource(resource, args);
+      jdbcTemplate.getJdbcOperations().execute(sql);
+    }
+    else
+    {
+      log.debug("SQL script " +  fScript.getName() +  " does not exist");
+    }
   }
 
   // bulk-loads a table from a resource
@@ -690,7 +754,7 @@ public class SpringAnnisAdministrationDao
     }
   }
 
-  // get a list of indexes on the imported and created tables tables which are not
+  // get a list of indexes on the imported Snd created tables tables which are not
   // auto-created by postgres (namely, primary key and unique constraints)
   // exploits the fact that the index has the same name as the constraint
   private List<String> listIndexesOnTables(List<String> tables)
@@ -703,7 +767,7 @@ public class SpringAnnisAdministrationDao
       + "AND lower(indexname) NOT IN "
       + "	(SELECT lower(conname) FROM pg_constraint WHERE contype in ('p', 'u'))";
     SqlParameterSource args = makeArgs().addValue("tables", tables);
-    return simpleJdbcTemplate.query(sql, stringRowMapper(), args);
+    return jdbcTemplate.query(sql, args, stringRowMapper());
   }
 
   private List<String> listIndexDefinitions(boolean used)
@@ -730,7 +794,7 @@ public class SpringAnnisAdministrationDao
       + "AND pg_stat_get_numscans(x.indexrelid) " + scansOp + " 0";
     SqlParameterSource args = makeArgs().addValue("indexes",
       listIndexesOnTables(tables));
-    return simpleJdbcTemplate.query(sql, stringRowMapper(), args);
+    return jdbcTemplate.query(sql, args,stringRowMapper());
   }
 
   private List<String> quotedArray(String... values)
@@ -753,7 +817,7 @@ public class SpringAnnisAdministrationDao
       + "AND i.tablename IN ( :tables )";
     String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(
       tables), ", "));
-    return simpleJdbcTemplate.query(sql,
+    return jdbcTemplate.getJdbcOperations().query(sql,
       new ParameterizedSingleColumnRowMapper<String>());
   }
 
@@ -768,7 +832,7 @@ public class SpringAnnisAdministrationDao
       + "AND pg_stat_get_numscans(x.indexrelid) != 0";
     String sql = template.replaceAll(":tables", StringUtils.join(quotedArray(
       tables), ", "));
-    return simpleJdbcTemplate.query(sql,
+    return jdbcTemplate.getJdbcOperations().query(sql,
       new ParameterizedSingleColumnRowMapper<String>());
   }
 
@@ -776,7 +840,7 @@ public class SpringAnnisAdministrationDao
   {
     try
     {
-      simpleJdbcTemplate.queryForList("SELECT pg_stat_reset()");
+      jdbcTemplate.getJdbcOperations().queryForList("SELECT pg_stat_reset()");
       return true;
     }
     catch (DataAccessException e)
@@ -786,12 +850,11 @@ public class SpringAnnisAdministrationDao
   }
 
   ///// Getter / Setter
-  @Autowired
+  @Override
   public void setDataSource(DataSource dataSource)
   {
     this.dataSource = dataSource;
-    simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
-    jdbcOperations = simpleJdbcTemplate.getJdbcOperations();
+    jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
 
   public String getScriptPath()
@@ -814,13 +877,24 @@ public class SpringAnnisAdministrationDao
     this.externalFilesPath = externalFilesPath;
   }
 
-  public ExternalFileMgrDAO getExternalFileMgrDao()
+  public String getDbLayout()
   {
-    return externalFileMgrDao;
+    return dbLayout;
   }
 
-  public void setExternalFileMgrDao(ExternalFileMgrDAO externalFileMgrDao)
+  public void setDbLayout(String dbLayout)
   {
-    this.externalFileMgrDao = externalFileMgrDao;
+    this.dbLayout = dbLayout;
   }
+
+  public boolean isTemporaryStagingArea()
+  {
+    return temporaryStagingArea;
+  }
+
+  public void setTemporaryStagingArea(boolean temporaryStagingArea)
+  {
+    this.temporaryStagingArea = temporaryStagingArea;
+  }
+  
 }

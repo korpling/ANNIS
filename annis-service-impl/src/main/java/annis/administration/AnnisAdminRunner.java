@@ -37,18 +37,18 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
+import annis.utils.Utils;
 
 public class AnnisAdminRunner extends AnnisBaseRunner {
 	
 	private static Logger log = Logger.getLogger(AnnisAdminRunner.class);
 
 	// API for corpus administration
-	@Autowired private CorpusAdministration corpusAdministration;
-	private boolean keepStagingArea;
+	private CorpusAdministration corpusAdministration;
 	
 	public static void main(String[] args) {
 		// get Runner from Spring
-		AnnisBaseRunner.getInstance("annisAdminRunner", "annis/administration/AnnisAdminRunner-context.xml").run(args);
+		AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
 	}
 
   @Override
@@ -177,7 +177,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		if (commandArgs.isEmpty())
 			throw new UsageException("Where can I find the corpus you want to import?");
 
-		corpusAdministration.importCorpora(!keepStagingArea, commandArgs);
+		corpusAdministration.importCorpora(commandArgs);
 	}
 
 	private void doDelete(List<String> commandArgs) {
@@ -307,14 +307,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
 	public void setCorpusAdministration(CorpusAdministration administration) {
 		this.corpusAdministration = administration;
-	}
-
-	public boolean isKeepStagingArea() {
-		return keepStagingArea;
-	}
-
-	public void setKeepStagingArea(boolean keepStagingArea) {
-		this.keepStagingArea = keepStagingArea;
 	}
 
 }
