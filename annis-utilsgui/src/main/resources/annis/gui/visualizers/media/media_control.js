@@ -28,7 +28,7 @@ $(document).ready(function()
 {	  
   var video = $('video');
   video[0].pause();
-  enterGlobalMediaVisArray(video[0]);
+  lookAndSwitchCurrentMediaPlayer(video[0]);
 	
   video.on("canplaythrough", function()
   {
@@ -57,31 +57,23 @@ $(document).ready(function()
 
   video.on("play", function()
   {
-    stopAllOtherPlayer(video[0]);
+    lookAndSwitchCurrentMediaPlayer(video[0]);
   });
 });
 
-function enterGlobalMediaVisArray(videoElement)
-{
-  if (! window.parent.document.mediaElement)
-  {  
-    window.parent.document.mediaElement = [videoElement];
+function lookAndSwitchCurrentMediaPlayer(videoElement)
+{  
+
+  if (!window.parent.document.mediaElement)
+  {
+    window.parent.document.mediaElement = videoElement;
+    return;
   }
-  else {
-    window.parent.document.mediaElement.push(videoElement);
-  }
-  
+
+  if(window.parent.document.mediaElement !== videoElement) {
+    window.parent.document.mediaElement.pause();
+    window.parent.document.mediaElement = videoElement;
+  }  
 }
 
-function stopAllOtherPlayer(videoElement)
-{
-  var globalPlayerList = window.parent.document.mediaElement;
-  for (i = 0; i < globalPlayerList.length; i++)
-  {
-    if (videoElement !== globalPlayerList[i])
-    {
-      globalPlayerList[i].pause();
-    }
-  }
-}
 

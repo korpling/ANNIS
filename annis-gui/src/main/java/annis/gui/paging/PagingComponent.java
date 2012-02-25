@@ -15,6 +15,7 @@
  */
 package annis.gui.paging;
 
+import com.sun.java.swing.plaf.windows.resources.windows;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -43,8 +44,10 @@ public class PagingComponent extends CustomComponent implements
   Button.ClickListener
 {
 
-  public static final ThemeResource LEFT_ARROW = new ThemeResource("left_arrow.png");
-  public static final ThemeResource RIGHT_ARROW = new ThemeResource("right_arrow.png");
+  public static final ThemeResource LEFT_ARROW = new ThemeResource(
+    "left_arrow.png");
+  public static final ThemeResource RIGHT_ARROW = new ThemeResource(
+    "right_arrow.png");
   public static final ThemeResource FIRST = new ThemeResource("first.png");
   public static final ThemeResource LAST = new ThemeResource("last.png");
   private HorizontalLayout layout;
@@ -63,23 +66,23 @@ public class PagingComponent extends CustomComponent implements
 
   public PagingComponent(int count, int pageSize)
   {
-    if(pageSize <= 0)
+    if (pageSize <= 0)
     {
       pageSize = 1;
     }
-    if(count < 0)
+    if (count < 0)
     {
       count = 0;
     }
     currentPage = 1;
     this.count = new AtomicInteger(pageSize);
     this.pageSize = pageSize;
-    
+
     setWidth("100%");
     setHeight("-1px");
 
     addStyleName("toolbar");
-    
+
     callbacks = new HashSet<PagingCallback>();
 
     layout = new HorizontalLayout();
@@ -90,14 +93,14 @@ public class PagingComponent extends CustomComponent implements
     root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     setCompositionRoot(root);
-    
-    
+
+
     lblInfo = new Label();
     lblInfo.addStyleName("right-aligned-text");
-    
+
     layout.setWidth("100%");
     layout.setHeight("-1px");
-    
+
     btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
@@ -126,7 +129,8 @@ public class PagingComponent extends CustomComponent implements
     txtPage.setDescription("current page");
     txtPage.setHeight("-1px");
     txtPage.setWidth(3.f, UNITS_EM);
-    Validator pageValidator = new AbstractStringValidator("must be an integer greater than zero")
+    Validator pageValidator = new AbstractStringValidator(
+      "must be an integer greater than zero")
     {
 
       @Override
@@ -135,7 +139,7 @@ public class PagingComponent extends CustomComponent implements
         try
         {
           int v = Integer.parseInt(value);
-          if(v > 0)
+          if (v > 0)
           {
             return true;
           }
@@ -144,7 +148,7 @@ public class PagingComponent extends CustomComponent implements
             return false;
           }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           return false;
         }
@@ -159,7 +163,7 @@ public class PagingComponent extends CustomComponent implements
 
     lblStatus = new Label();
     lblStatus.setSizeUndefined();
-    
+
     layout.addComponent(btFirst);
     layout.addComponent(btPrevious);
     layout.addComponent(txtPage);
@@ -168,39 +172,39 @@ public class PagingComponent extends CustomComponent implements
     layout.addComponent(btLast);
     layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
-    
+
     layout.setComponentAlignment(lblStatus, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblMaxPages, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(txtPage, Alignment.MIDDLE_RIGHT);
-    
-    layout.setExpandRatio(lblStatus, 1.0f);    
+
+    layout.setExpandRatio(lblStatus, 1.0f);
     layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
     layout.setExpandRatio(lblInfo, 10.0f);
-    
-    
-    
+
+
+
     update(false);
   }
-
 
   private void update(boolean informCallbacks)
   {
     int myCount = count.get();
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
-    
-    lblStatus.setValue("Displaying Results " + (getStartNumber() + 1) 
-      + " - " + Math.min(getStartNumber() + pageSize, myCount) + " of " + myCount);
+
+    lblStatus.setValue("Displaying Results " + (getStartNumber() + 1)
+      + " - " + Math.min(getStartNumber() + pageSize, myCount) + " of "
+      + myCount);
 
     btFirst.setEnabled(currentPage > 1);
     btPrevious.setEnabled(currentPage > 1);
     btLast.setEnabled(currentPage < getMaxPage());
     btNext.setEnabled(currentPage < getMaxPage());
-    
-    
-    if(informCallbacks)
+
+
+    if (informCallbacks)
     {
-      for(PagingCallback c : callbacks)
+      for (PagingCallback c : callbacks)
       {
         c.createPage(getStartNumber(), pageSize);
       }
@@ -219,10 +223,10 @@ public class PagingComponent extends CustomComponent implements
 
   public int getMaxPage()
   {
-    int mycount = Math.max(0, count.get()-1);
-    return (1 + (mycount  / pageSize));
+    int mycount = Math.max(0, count.get() - 1);
+    return (1 + (mycount / pageSize));
   }
-  
+
   public int getStartNumber()
   {
     return (currentPage - 1) * pageSize;
@@ -235,7 +239,7 @@ public class PagingComponent extends CustomComponent implements
 
   public void setCount(int count, boolean update)
   {
-    if(count < 0)
+    if (count < 0)
     {
       count = 0;
     }
@@ -250,7 +254,7 @@ public class PagingComponent extends CustomComponent implements
 
   public void setPageSize(int pageSize)
   {
-    if(pageSize <= 0)
+    if (pageSize <= 0)
     {
       pageSize = 1;
     }
@@ -261,25 +265,32 @@ public class PagingComponent extends CustomComponent implements
   @Override
   public void buttonClick(ClickEvent event)
   {
-    if(event.getButton() == btFirst)
+    if (event.getButton() == btFirst)
     {
       currentPage = 1;
     }
-    else if(event.getButton() == btLast)
+    else if (event.getButton() == btLast)
     {
       currentPage = getMaxPage();
     }
-    else if(event.getButton() == btNext)
+    else if (event.getButton() == btNext)
     {
       currentPage++;
     }
-    else if(event.getButton() == btPrevious)
+    else if (event.getButton() == btPrevious)
     {
       currentPage--;
     }
 
     // sanitize
     currentPage = sanitizePage(currentPage);
+
+    // clear list with media player
+    String clearglobalMediaList = "if (window.document.mediaElement)"
+      + "{"
+      + "window.document.mediaElement = undefined;"
+      + "}";
+    getWindow().executeJavaScript(clearglobalMediaList);
 
     update(true);
   }
@@ -291,9 +302,9 @@ public class PagingComponent extends CustomComponent implements
     return val;
   }
 
-
   public class EnterListener extends ShortcutListener
   {
+
     private Object registeredTarget;
 
     public EnterListener(Object registeredTarget)
@@ -305,7 +316,7 @@ public class PagingComponent extends CustomComponent implements
     @Override
     public void handleAction(Object sender, Object target)
     {
-      if(target != registeredTarget)
+      if (target != registeredTarget)
       {
         return;
       }
@@ -315,13 +326,14 @@ public class PagingComponent extends CustomComponent implements
         currentPage = sanitizePage(newPage);
         update(true);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        Logger.getLogger(PagingComponent.class.getName()).log(Level.FINE, null, ex);
+        Logger.getLogger(PagingComponent.class.getName()).log(Level.FINE, null,
+          ex);
       }
     }
   }
-  
+
   public void setInfo(String text)
   {
     lblInfo.setValue(text);
