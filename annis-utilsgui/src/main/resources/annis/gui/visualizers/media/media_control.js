@@ -27,13 +27,13 @@ var stop = function ()
 $(document).ready(function()
 {	  
   var video = $('video');
-  video[0].pause();   
+  video[0].pause();
+  enterGlobalMediaVisArray(video[0]);
 	
   video.on("canplaythrough", function()
   {
     video[0].currentTime = startTime;
-  });
-	
+  });	
 
   video.on("seeked", function()
   {
@@ -54,5 +54,34 @@ $(document).ready(function()
     // after stopping the video, we don't want to stop the video again, after press play again
     endTime = null;
   });
+
+  video.on("play", function()
+  {
+    stopAllOtherPlayer(video[0]);
+  });
 });
+
+function enterGlobalMediaVisArray(videoElement)
+{
+  if (! window.parent.document.mediaElement)
+  {  
+    window.parent.document.mediaElement = [videoElement];
+  }
+  else {
+    window.parent.document.mediaElement.push(videoElement);
+  }
+  
+}
+
+function stopAllOtherPlayer(videoElement)
+{
+  var globalPlayerList = window.parent.document.mediaElement;
+  for (i = 0; i < globalPlayerList.length; i++)
+  {
+    if (videoElement !== globalPlayerList[i])
+    {
+      globalPlayerList[i].pause();
+    }
+  }
+}
 
