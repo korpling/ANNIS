@@ -48,5 +48,11 @@ $(document).ready(function()
       endTime = null;
     }
   });
+
+  video.on("pause", function()
+  {
+    // after stopping the video, we don't want to stop the video again, after press play again
+    endTime = null;
+  });
 });
 
