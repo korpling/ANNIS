@@ -27,8 +27,7 @@ var stop = function ()
 $(document).ready(function()
 {	  
   var video = $('video');
-  video[0].pause();
-  lookAndSwitchCurrentMediaPlayer(video[0]);
+  video[0].pause();  
 	
   video.on("canplaythrough", function()
   {
