@@ -298,6 +298,17 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   @Override
   public void itemClick(ItemClickEvent event)
   {
+    // check if it is a time annotation
+    String buttonName = (String) event.getItemId();
+    if (buttonName == null)
+    {
+      return;
+    }
+
+    if (!buttonName.matches("(annis::)?time"))
+    {
+      return;
+    } // end check
 
     SToken token = (SToken) event.getPropertyId();
     String time = null;
@@ -316,7 +327,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           time = anno.getValueString();
         }
       }
-
     }
 
     time = (time == null) ? "no time given" : time;
