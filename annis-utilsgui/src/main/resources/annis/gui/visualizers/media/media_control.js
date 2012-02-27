@@ -8,8 +8,7 @@ var endTime = null;
  */
 var seekAndPlay = function (start, end) 
 {  
-  $("video")[0].currentTime = start;
-  $("video")[0].play();
+  $("video")[0].currentTime = start;  
   startTime = start;
   endTime = end;
 };
@@ -27,12 +26,8 @@ var stop = function ()
 $(document).ready(function()
 {	  
   var video = $('video');
-  video[0].pause();  
-	
-  video.on("canplaythrough", function()
-  {
-    video[0].currentTime = startTime;
-  });	
+  video[0].pause();	
+  
 
   video.on("seeked", function()
   {
