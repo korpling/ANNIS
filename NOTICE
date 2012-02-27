@@ -38,6 +38,7 @@ List of included software:
  * JLine
  * log4j
  * mockito
+ * noty (http://needim.github.com/noty/)
  * MP3 Player (http://flash-mp3-player.net/)
  * PostgreSQL JDBC driver
  * Raphael - JavaScript Vector Library

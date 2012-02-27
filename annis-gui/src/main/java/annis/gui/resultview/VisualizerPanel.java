@@ -22,8 +22,6 @@ import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.resolver.ResolverEntry;
 
-import annis.service.AnnisService;
-import annis.service.ifaces.AnnisResult;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ApplicationResource;
@@ -33,13 +31,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
@@ -66,11 +63,14 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersCovered;
   private Button btEntry;
   private KWICPanel kwicPanel;
+  private List<String> mediaIDs;
+  private String htmlID;
   public CustomLayout customLayout;
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
     PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout)
+    Map<String, String> markersCovered, CustomLayout costumLayout,
+    List<String> mediaIDs, String htmlID)
   {
     this.result = result;
     this.ps = ps;
@@ -78,6 +78,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
     this.customLayout = costumLayout;
+    this.mediaIDs = mediaIDs;
+    this.htmlID = htmlID;
 
     setContent(this.customLayout);
 
@@ -109,7 +111,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     String template = Helper.getContext(getApplication())
       + "/Resource/" + entry.getVisType() + "/%s";
     input.setResourcePathTemplate(template);
-
+    input.setMediaIDs(mediaIDs);
     return input;
   }
 
@@ -226,6 +228,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       if (iframe != null)
       {
         iframe.setVisible(false);
+        stopMediaVisualizers();
       }
       btEntry.setIcon(ICON_EXPAND);
     }
@@ -241,7 +244,17 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     if (kwicPanel != null)
     {
       kwicPanel.startMediaVisualizers();
+      // set back to null, otherwise the movie will stop
       kwicPanel = null;
     }
+  }
+
+  private void stopMediaVisualizers()
+  {
+    String stopCommand = ""
+      + "document.getElementById(\"" + this.htmlID + "\")"
+      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
+    getWindow().executeJavaScript(stopCommand);
+
   }
 }

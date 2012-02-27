@@ -81,6 +81,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
+  private AnnisService service;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -135,30 +136,30 @@ public class SingleResultPanel extends VerticalLayout implements
   @Override
   public void attach()
   {
-    AnnisService service = Helper.getService(getApplication(), getWindow());
+    service = Helper.getService(getApplication(), getWindow());
     if (service != null && resolverProvider != null)
     {
       try
       {
         ResolverEntry[] entries =
           resolverProvider.getResolverEntries(result, service);
-        List<String> mediaIDs = new LinkedList<String>();
+        List<String> mediaIDs = mediaVisIds(entries);
         List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
         List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
 
 
-        int counter = 0;
-        for (ResolverEntry e : entries)
+        for (int i = 0; i < entries.length; i++)
         {
-          String id = "resolver-" + resultNumber + "-" + counter++;
+          String id = "resolver-" + resultNumber + "-" + i;
           CustomLayout customLayout = this.customLayout(id);
 
-          VisualizerPanel p = new VisualizerPanel(e, result, ps, markedExactMap,
-            markedCoveredMap, customLayout);
+          VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
+            markedExactMap, markedCoveredMap, customLayout, mediaIDs, id);
 
-          if ("video".equals(e.getVisType()) || "audio".equals(e.getVisType()))
+          if ("media".equals(entries[i].getVisType())
+            || "video".equals(entries[i].getVisType())
+            || "audio".equals(entries[i].getVisType()))
           {
-            mediaIDs.add(id);
             mediaVisualizer.add(p);
           }
 
@@ -304,7 +305,7 @@ public class SingleResultPanel extends VerticalLayout implements
       this.matchedAndCovered = initialMatches;
 
       currentMatchPos = 1;
-      if(initialMatches.size() > 0)
+      if (initialMatches.size() > 0)
       {
         graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
@@ -370,5 +371,23 @@ public class SingleResultPanel extends VerticalLayout implements
         log(Level.SEVERE, null, ex);
     }
     return null;
+  }
+
+  private List<String> mediaVisIds(ResolverEntry[] entries) throws
+    RemoteException
+  {
+    List<String> mediaIds = new ArrayList<String>();
+    int counter = 0;
+    for (ResolverEntry e : entries)
+    {
+      String id = "resolver-" + resultNumber + "-" + counter++;
+      if ("media".equals(e.getVisType())
+        || "audio".equals(e.getVisType())
+        || "video".equals(e.getVisType()))
+      {
+        mediaIds.add(id);
+      }
+    }
+    return mediaIds;
   }
 }

@@ -22,6 +22,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -51,6 +52,7 @@ public class VisualizerInput
   private AnnisResult result;
   private Properties mappings;
   private String resourcePathTemplate = "%s";
+  private List<String> mediaIDs;
 
   /**
    * Get the URL which is configured for the Annis installation.
@@ -214,7 +216,7 @@ public class VisualizerInput
   @Deprecated
   public String getPaula()
   {
-    if(paula == null)
+    if (paula == null)
     {
       // construct Paula from result
       paula = getResult().getPaula();
@@ -229,15 +231,17 @@ public class VisualizerInput
   @Deprecated
   protected Document getPaulaJDOM()
   {
-    if(paulaJDOM == null)
+    if (paulaJDOM == null)
     {
       try
       {
-        paulaJDOM = new SAXBuilder().build(new InputSource(new StringReader(getPaula())));
+        paulaJDOM =
+          new SAXBuilder().build(new InputSource(new StringReader(getPaula())));
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        Logger.getLogger(VisualizerInput.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(VisualizerInput.class.getName()).log(Level.SEVERE, null,
+          ex);
 
         // never return null
         paulaJDOM = new Document();
@@ -253,12 +257,13 @@ public class VisualizerInput
     this.result = result;
   }
 
-  
   public AnnisResult getResult()
   {
-    if(result == null)
+    if (result == null)
     {
-      result = new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(document));
+      result =
+        new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(
+        document));
     }
     return result;
   }
@@ -272,7 +277,7 @@ public class VisualizerInput
   {
     this.document = document;
   }
-  
+
   public String getResourcePathTemplate()
   {
     return resourcePathTemplate;
@@ -282,8 +287,7 @@ public class VisualizerInput
   {
     this.resourcePathTemplate = resourcePathTemplate;
   }
-  
-  
+
   /**
    * Returns a valid URL/path for which a relative (from the class package) resource
    * can be accessed.
@@ -294,5 +298,27 @@ public class VisualizerInput
   public String getResourcePath(String resource)
   {
     return String.format(resourcePathTemplate, resource);
+  }
+
+  /**mediaVisIds
+   * This sets the id of possible media visualizer. We use this to resolve the javascript api in the html
+   * frontend. The List could be null, which means, that there was no media visualizer triggered
+   * in the resovler entries
+   * @param mediaVisTriggered
+   */
+  public void setMediaIDs(List<String> mediaIDs)
+  {
+    this.mediaIDs = mediaIDs;
+  }
+
+  /**
+   * returns the media visualizer ids. We insert the iframe in a div block with this id:
+   * "resolver-resultNum-numOfVis"
+   * 
+   * @return
+   */
+  public List<String> getMediaIDs()
+  {
+    return mediaIDs;
   }
 }

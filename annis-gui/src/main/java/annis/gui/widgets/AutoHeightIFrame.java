@@ -49,6 +49,7 @@ public class AutoHeightIFrame extends AbstractComponent
     if (variables.containsKey("height"))
     {
       this.setHeight("" + variables.get("height"));
+      // only has effect, when time annotation in KWIC has been clicked
       visPanel.startMediaVisFromKWIC();    
     }   
   }

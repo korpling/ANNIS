@@ -75,15 +75,12 @@ public class PartiturParser implements Serializable
 
     token = new LinkedList<Token>();
     knownTiers = new HashSet<String>();
-
     tier2ns = new HashMap<String, String>();
-
     for (AnnisNode n : graph.getTokens())
     {
       long tokenID = n.getId();
 
       Token currentToken = new Token(tokenID, new Hashtable<String, Event>(), n.getSpannedText());
-
       token.add(currentToken);
 
       // get parent annotations matching namespace

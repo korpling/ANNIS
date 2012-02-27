@@ -26,8 +26,7 @@ import annis.gui.visualizers.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.dependency.VakyarthaDependencyTree;
 import annis.gui.visualizers.graph.DotGraphVisualizer;
 import annis.gui.visualizers.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.media.audio.AudioVisualizer;
-import annis.gui.visualizers.media.video.VideoVisualizer;
+import annis.gui.visualizers.media.MediaVisualizer;
 import annis.gui.visualizers.partitur.PartiturVisualizer;
 import annis.gui.visualizers.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
@@ -234,8 +233,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(MediaVisualizer.class).toURI());    
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
