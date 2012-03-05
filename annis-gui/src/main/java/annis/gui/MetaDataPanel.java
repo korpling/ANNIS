@@ -27,9 +27,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -167,7 +167,7 @@ public class MetaDataPanel extends Panel
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
     Map<String, List<Annotation>> hashMetaData =
-      new HashMap<String, List<Annotation>>();
+      new TreeMap<String, List<Annotation>>();
 
     for (Annotation metaDatum : metadata)
     {

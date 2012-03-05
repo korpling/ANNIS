@@ -51,7 +51,7 @@ public class ListCorpusAnnotationsSqlHelper implements
       + "AND this.pre >= parent.pre \n"
       + "AND this.post <= parent.post \n"
       + "AND ca.corpus_ref = parent.id \n" 
-      + "ORDER BY parent.pre ASC";
+      + "ORDER BY parent.pre DESC";
     String sql = template.replaceAll(":docname", corpusName).
       replaceAll(":toplevelname", toplevelCorpusName);
     return sql;
