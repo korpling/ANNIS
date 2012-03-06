@@ -29,6 +29,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
   private String value;
   private String type;
   private String corpusName;
+  private int pre; // determine the order
 
   public Annotation(String namespace, String name)
   {
@@ -48,6 +49,16 @@ public class Annotation implements Comparable<Annotation>, Serializable
     this(namespace, name, value);
     this.type = type;
     this.corpusName = corpusName;
+  }
+
+  /**
+   * With the constructor we could determine the order of the pre parameter
+   */
+  public Annotation(String namespace, String name, String value, String type,
+    String corpusName, int pre)
+  {
+    this(namespace, name, value, type, corpusName);
+    this.pre = pre;
   }
 
   @Override
@@ -136,5 +147,10 @@ public class Annotation implements Comparable<Annotation>, Serializable
   public String getCorpusName()
   {
     return corpusName;
+  }
+
+  public int getPre()
+  {
+    return pre;
   }
 }

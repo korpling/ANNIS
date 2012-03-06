@@ -27,6 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -75,7 +76,7 @@ public class MetaDataPanel extends Panel
     }
     else
     {
-      Map<String, List<Annotation>> hashMData = splitListAnnotations();
+      Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
       List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
       Accordion accordion = new Accordion();
       accordion.setSizeFull();
@@ -86,7 +87,7 @@ public class MetaDataPanel extends Panel
         String corpusName = item.getIdByIndex(0).getCorpusName();
         accordion.addTab(setupTable(item),
           (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
-          : "document: "+ corpusName);
+          : "document: " + corpusName);
       }
     }
   }
@@ -163,23 +164,23 @@ public class MetaDataPanel extends Panel
     return tblMeta;
   }
 
-  private Map<String, List<Annotation>> splitListAnnotations()
+  private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
-    Map<String, List<Annotation>> hashMetaData =
-      new TreeMap<String, List<Annotation>>();
+    Map<Integer, List<Annotation>> hashMetaData =
+      new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
 
     for (Annotation metaDatum : metadata)
     {
-      String corpus = metaDatum.getCorpusName();
-      if (!hashMetaData.containsKey(corpus))
+      int pre = metaDatum.getPre();
+      if (!hashMetaData.containsKey(pre))
       {
-        hashMetaData.put(corpus, new ArrayList<Annotation>());
-        hashMetaData.get(corpus).add(metaDatum);
+        hashMetaData.put(pre, new ArrayList<Annotation>());
+        hashMetaData.get(pre).add(metaDatum);
       }
       else
       {
-        hashMetaData.get(corpus).add(metaDatum);
+        hashMetaData.get(pre).add(metaDatum);
       }
     }
 
@@ -187,7 +188,7 @@ public class MetaDataPanel extends Panel
   }
 
   private List<BeanItemContainer<Annotation>> putInBeanContainer(
-    Map<String, List<Annotation>> splittedAnnotationsList)
+    Map<Integer, List<Annotation>> splittedAnnotationsList)
   {
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
       new ArrayList<BeanItemContainer<Annotation>>();
