@@ -15,7 +15,7 @@
  */
 package annis.gui;
 
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.Application;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;

@@ -20,7 +20,7 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;

@@ -57,7 +57,7 @@ import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;

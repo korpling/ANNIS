@@ -19,7 +19,7 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.security.AnnisUser;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.themes.ChameleonTheme;

@@ -25,7 +25,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import org.springframework.jdbc.core.ResultSetExtractor;

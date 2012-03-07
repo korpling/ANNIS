@@ -20,8 +20,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
-import annis.service.ifaces.AnnisCorpus;
-import annis.service.objects.AnnisCorpusImpl;
+import annis.service.objects.AnnisCorpus;
 
 public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus> {
 
@@ -31,7 +30,7 @@ public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus> 
 	}
 	
 	public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException {
-		AnnisCorpusImpl corpus = new AnnisCorpusImpl();
+		AnnisCorpus corpus = new AnnisCorpus();
 		corpus.setId(rs.getLong("id"));
 		corpus.setName(rs.getString("name"));
 		corpus.setTextCount(rs.getInt("text"));

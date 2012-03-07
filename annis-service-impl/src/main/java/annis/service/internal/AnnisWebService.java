@@ -19,11 +19,14 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.ql.parser.QueryData;
+import annis.resolver.ResolverEntry;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -182,6 +185,25 @@ public class AnnisWebService
           + documentName, ex);
       throw new WebApplicationException(ex);
     }
+  }
+  
+  @GET
+  @Path("meta/resolver")
+  public List<ResolverEntry> resolverEntry()
+  {
+    List<ResolverEntry> test = new LinkedList<ResolverEntry>();
+    
+    test.add(new ResolverEntry(123, "test", "", "sfsdf",
+      ResolverEntry.ElementType.node, "graph", "test display", null, 0));
+    
+    return test;
+  }
+  
+  @GET
+  @Path("corpora")
+  public List<AnnisCorpus> corpora()
+  {
+    return annisDao.listCorpora();
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

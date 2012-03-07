@@ -39,11 +39,10 @@ import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
-import annis.service.objects.AnnisCorpusSetImpl;
+import annis.service.objects.AnnisCorpusSet;
 import annis.service.objects.AnnisResultImpl;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.utils.LegacyGraphConverter;
@@ -162,7 +161,7 @@ public class AnnisServiceImpl implements AnnisService
   @Override
   public AnnisCorpusSet getCorpusSet() throws RemoteException
   {
-    return new AnnisCorpusSetImpl(annisDao.listCorpora());
+    return new AnnisCorpusSet(annisDao.listCorpora());
   }
 
   @Override

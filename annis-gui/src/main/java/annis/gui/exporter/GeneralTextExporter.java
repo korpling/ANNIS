@@ -28,7 +28,7 @@ import annis.model.AnnisNode;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.utils.LegacyGraphConverter;

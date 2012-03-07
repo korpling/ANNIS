@@ -24,7 +24,7 @@ import annis.gui.PluginSystem;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;

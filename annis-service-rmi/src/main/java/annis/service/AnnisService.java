@@ -29,7 +29,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.objects.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;

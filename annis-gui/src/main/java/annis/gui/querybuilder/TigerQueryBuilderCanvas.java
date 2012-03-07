@@ -21,7 +21,7 @@ import annis.gui.widgets.SimpleCanvas;
 import annis.service.AnnisService;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptAll;
