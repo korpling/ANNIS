@@ -53,6 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -69,6 +70,7 @@ public class SingleResultPanel extends VerticalLayout implements
 {
 
   private static final String HIDE_KWIC = "hide_kwic";
+  private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
   private SDocument result;
@@ -141,6 +143,7 @@ public class SingleResultPanel extends VerticalLayout implements
 
     CorpusConfig corpusConfig = new CorpusConfig();
     corpusConfig.setConfig(new TreeMap<String, String>());
+    
     try
     {
       corpusConfig = Helper.getAnnisWebResource(getApplication()).path("corpora").
@@ -159,7 +162,6 @@ public class SingleResultPanel extends VerticalLayout implements
     List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
     List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
 
-
     for (int i = 0; i < entries.length; i++)
     {
       String id = "resolver-" + resultNumber + "-" + i;
@@ -176,8 +178,8 @@ public class SingleResultPanel extends VerticalLayout implements
       }
 
       visualizers.add(p);
-
-      if ("tiger".equals(entries[i].getNamespace()))
+      Properties mappings = entries[i].getMappings();
+      if(Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
       {
         openVisualizers.add(p);
       }
