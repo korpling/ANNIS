@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.tree;
 
+import annis.gui.visualizers.VisualizerInput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ class AnnisGraphTools
 
   public static final String PRIMEDGE_SUBTYPE = "edge";
   public static final String SECEDGE_SUBTYPE = "secedge";
+  public static VisualizerInput input;
 
   public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(AnnotationGraph ag,
     String namespace)
@@ -103,9 +105,40 @@ class AnnisGraphTools
     return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE);
   }
 
+  /**
+   * Checks if there is set an alias for PRIMEDGE_SUBTYPE OR SECEDGE_SUBTYPE in resolver_vis_map 
+   */
+  private static String getEdgeSubtype(String edgeSubtype)
+  {
+    if (input == null)
+    {
+      return edgeSubtype;
+    }
+
+    if (PRIMEDGE_SUBTYPE.equals(edgeSubtype))
+    {
+      return input.getMappings().getProperty("edge") != null
+        ? input.getMappings().getProperty("edge") : PRIMEDGE_SUBTYPE;
+    }
+
+    if (SECEDGE_SUBTYPE.equals(edgeSubtype))
+    {
+      return input.getMappings().getProperty("secedge") != null
+        ? input.getMappings().getProperty("secedge") : SECEDGE_SUBTYPE;
+    }
+
+    /* edgeSubtype is not one of the constants PRIMEDGE_SUBTYPE or
+     * SECEDGE_SUBTYPE, so return secedge as it is.
+     **/
+    return edgeSubtype;
+  }
+
   public static boolean hasEdgeSubtype(Edge e, String edgeSubtype)
   {
+
     String name = e.getName();
+    edgeSubtype = getEdgeSubtype(edgeSubtype);
+
     return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.
       equals(edgeSubtype);
   }

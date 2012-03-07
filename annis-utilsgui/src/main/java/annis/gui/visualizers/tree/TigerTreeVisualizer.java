@@ -284,7 +284,7 @@ public class TigerTreeVisualizer extends Visualizer
   @Override
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
-    this.input = input;
+    this.input = AnnisGraphTools.input = input;
     AnnisResult result = input.getResult();
     List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 
