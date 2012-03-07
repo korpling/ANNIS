@@ -145,6 +145,7 @@ public class SingleResultPanel extends VerticalLayout implements
           resolverProvider.getResolverEntries(result, service);
         List<String> mediaIDs = mediaVisIds(entries);
         List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+        List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
         List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
 
 
@@ -162,24 +163,34 @@ public class SingleResultPanel extends VerticalLayout implements
           {
             mediaVisualizer.add(p);
           }
-
+          
           visualizers.add(p);
+          
+          if("tiger".equals(entries[i].getNamespace()))
+          {
+            openVisualizers.add(p);
+          }
         }
 
-        kwicPanels = new ArrayList<KWICPanel>();
-        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-        {
-          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-            markedAndCovered, text, mediaIDs, mediaVisualizer, this);
-
-          addComponent(kwic);
-          kwicPanels.add(kwic);
-        }
+//        kwicPanels = new ArrayList<KWICPanel>();
+//        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+//        {
+//          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+//            markedAndCovered, text, mediaIDs, mediaVisualizer, this);
+//
+//          addComponent(kwic);
+//          kwicPanels.add(kwic);
+//        }
 
 
         for (VisualizerPanel p : visualizers)
         {
           addComponent(p);
+        }
+        
+        for(VisualizerPanel p : openVisualizers)
+        {
+          p.openVisualizer(false);
         }
       }
       catch (RemoteException ex)

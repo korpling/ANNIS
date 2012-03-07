@@ -170,7 +170,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     openVisualizer(true);
   }
 
-  public void openVisualizer(Boolean collapse)
+  public void openVisualizer(boolean collapse)
   {
     if (resource != null && collapse)
     {
