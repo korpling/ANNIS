@@ -35,11 +35,8 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementCreator
 {
 
-  private int requestCount;
-
-  public ResolverDaoHelper(int requestCount)
+  public ResolverDaoHelper()
   {
-    this.requestCount = requestCount;
   }
 
   @Override
@@ -104,44 +101,30 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
 
 
     StringBuilder result = new StringBuilder();
-    for(int i=0; i < requestCount; i++)
-    {
-      if(i > 0)
-      {
-        result.append(" \nUNION \n");
-      }
-      result.append(firstUnion);
-      result.append(" \nUNION \n");
-      result.append(secondUnion);
-      result.append(" \nUNION \n");
-      result.append(thirdUnion);
-      result.append(" \nUNION \n");
-      result.append(fourthUnion);
-    }
+    
+    result.append(firstUnion);
+    result.append(" \nUNION \n");
+    result.append(secondUnion);
+    result.append(" \nUNION \n");
+    result.append(thirdUnion);
+    result.append(" \nUNION \n");
+    result.append(fourthUnion);
     result.append(" \nORDER BY \"order\" ;");
 
     return cnctn.prepareStatement(result.toString());
   }
 
-  public void fillPreparedStatement(SingleResolverRequest[] resolverRequest, PreparedStatement stmt) throws SQLException
+  public void fillPreparedStatement(SingleResolverRequest resolverRequest, PreparedStatement stmt) throws SQLException
   {
-    for(int offset=0; offset < requestCount; offset++)
-    {
-      if(offset < resolverRequest.length)
-      {
-         stmt.setString((offset*8) + 1, resolverRequest[offset].getNamespace());
-         stmt.setString((offset*8) + 2, resolverRequest[offset].getType().name());
-         stmt.setString((offset*8) + 3, resolverRequest[offset].getNamespace());
-         stmt.setString((offset*8) + 4, resolverRequest[offset].getCorpusName());
-         
-         stmt.setString((offset*8) + 5, resolverRequest[offset].getNamespace());
-         stmt.setString((offset*8) + 6, resolverRequest[offset].getType().name());
-         stmt.setString((offset*8) + 7, resolverRequest[offset].getCorpusName());
-         
-         stmt.setString((offset*8) + 8, resolverRequest[offset].getCorpusName());
-         
-      }
-    }
+    stmt.setString(1, resolverRequest.getNamespace());
+    stmt.setString(2, resolverRequest.getType().name());
+    stmt.setString(3, resolverRequest.getNamespace());
+    stmt.setString(4, resolverRequest.getCorpusName());
+
+    stmt.setString(5, resolverRequest.getNamespace());
+    stmt.setString(6, resolverRequest.getType().name());
+    stmt.setString(7, resolverRequest.getCorpusName());
+    stmt.setString(8, resolverRequest.getCorpusName());
   }
 
   @Override

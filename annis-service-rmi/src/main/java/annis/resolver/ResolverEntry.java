@@ -17,11 +17,14 @@ package annis.resolver;
 
 import java.io.Serializable;
 import java.util.Properties;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class corresponds to a single entry in the resolver table
  * @author thomas
  */
+
+@XmlRootElement
 public class ResolverEntry implements Serializable
 {
   public enum ElementType
@@ -40,6 +43,10 @@ public class ResolverEntry implements Serializable
   private Properties mappings;
   private int order;
 
+  public ResolverEntry()
+  {    
+  }
+  
   public ResolverEntry(long id, String corpus, String version, String namespace, ElementType element, String visType, String displayName, Properties mappings, int order)
   {
     this.id = id;

@@ -15,7 +15,7 @@
  */
 package annis.security;
 
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;

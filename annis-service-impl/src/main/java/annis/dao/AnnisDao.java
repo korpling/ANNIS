@@ -25,9 +25,10 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface AnnisDao
@@ -49,7 +50,7 @@ public interface AnnisDao
 
   public AnnisBinary getBinary(String corpusName, int offset, int length);
 
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
@@ -85,4 +86,7 @@ public interface AnnisDao
   int getTimeout();
   
   public List<String> mapCorpusIdsToNames(List<Long> ids);
+  
+  public Map<String,String> getCorpusConfiguration(String corpusName);
+
 }

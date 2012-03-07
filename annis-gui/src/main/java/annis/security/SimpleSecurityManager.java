@@ -17,8 +17,8 @@ package annis.security;
 
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
-import annis.service.ifaces.AnnisCorpus;
-import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.AnnisCorpusSet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

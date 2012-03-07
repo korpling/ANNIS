@@ -39,11 +39,10 @@ import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
-import annis.service.objects.AnnisCorpusSetImpl;
+import annis.service.objects.AnnisCorpusSet;
 import annis.service.objects.AnnisResultImpl;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.utils.LegacyGraphConverter;
@@ -86,18 +85,6 @@ public class AnnisServiceImpl implements AnnisService
     return queryData;
   }
 
-  @Override
-  public int getCount(List<Long> corpusList, String annisQuery)
-      throws RemoteException, AnnisQLSemanticsException
-  {
-    long start = new Date().getTime();
-    QueryData queryData = analyzeQuery(annisQuery, corpusList);
-    int count = annisDao.count(queryData);
-    long end = new Date().getTime();
-    logQuery("COUNT", annisQuery, corpusList, end - start);
-
-    return count;
-  }
 
   private void logQuery(String queryFunction, String annisQuery,
       List<Long> corpusList, long runtime)
@@ -130,39 +117,11 @@ public class AnnisServiceImpl implements AnnisService
     queryLog.info(message);
   }
 
-  @Override
-  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL,
-    int limit, int offset, int contextLeft, int contextRight) throws
-    RemoteException,
-    AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException
-  {
-    contextLeft = Math.min(maxContext, contextLeft);
-    contextRight = Math.min(maxContext, contextRight);
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("left: ");
-    sb.append(contextLeft);
-    sb.append(", ");
-    sb.append("right: ");
-    sb.append(contextRight);
-
-    long start = new Date().getTime();
-    QueryData queryData = analyzeQuery(annisQL, corpusList);
-    queryData.addExtension(new AnnotateQueryData(offset, limit, contextLeft,
-      contextRight));
-    SaltProject p = annisDao.annotate(queryData);
-    long end = new Date().getTime();
-    logQuery("ANNOTATE", annisQL, corpusList, end - start, sb.toString());
-    
-    return LegacyGraphConverter.convertToResultSet(p);
-
-  }
 
   @Override
   public AnnisCorpusSet getCorpusSet() throws RemoteException
   {
-    return new AnnisCorpusSetImpl(annisDao.listCorpora());
+    return new AnnisCorpusSet(annisDao.listCorpora());
   }
 
   @Override
@@ -218,12 +177,6 @@ public class AnnisServiceImpl implements AnnisService
     return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
   }
 
-  @Override
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
-    throws RemoteException
-  {
-    return annisDao.getResolverEntries(request);
-  }
 
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws

@@ -17,6 +17,7 @@ package annis.resolver;
 
 import annis.resolver.ResolverEntry.ElementType;
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This represents a request to a resolver entry. A list of this type is a complete
@@ -24,6 +25,7 @@ import java.io.Serializable;
  * 
  * @author thomas
  */
+@XmlRootElement
 public class SingleResolverRequest implements Serializable
 {
 
@@ -31,6 +33,11 @@ public class SingleResolverRequest implements Serializable
   private String namespace;
   private ResolverEntry.ElementType type;
 
+  public SingleResolverRequest()
+  {
+    
+  }
+  
   public SingleResolverRequest(String corpusName, String namespace, ElementType type)
   {
     this.corpusName = corpusName;

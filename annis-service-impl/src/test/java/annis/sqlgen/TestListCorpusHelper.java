@@ -27,7 +27,7 @@ import java.sql.SQLException;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 
 public class TestListCorpusHelper {
 

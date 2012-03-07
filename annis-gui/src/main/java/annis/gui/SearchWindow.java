@@ -22,7 +22,7 @@ import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.resultview;
+package annis.service.objects;
 
-import annis.resolver.ResolverEntry;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author thomas
  */
-public interface ResolverProvider
+@XmlRootElement
+public class CorpusConfig
 {
-  public ResolverEntry[] getResolverEntries(SDocument result);
+  private Map<String,String> config;
+
+  @XmlElementWrapper
+  public Map<String, String> getConfig()
+  {
+    return config;
+  }
+
+  public void setConfig(Map<String, String> config)
+  {
+    this.config = config;
+  }
+  
   
 }

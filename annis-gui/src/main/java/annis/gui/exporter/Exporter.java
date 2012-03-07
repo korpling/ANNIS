@@ -16,7 +16,7 @@
 package annis.gui.exporter;
 
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Writer;
 import java.util.Map;

@@ -15,7 +15,7 @@
  */
 package annis.gui.beans;
 
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

@@ -21,9 +21,10 @@ import annis.gui.Helper;
 import annis.gui.MainApp;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
-import annis.service.AnnisService;
-import annis.service.ifaces.AnnisCorpus;
-import annis.service.ifaces.AnnisCorpusSet;
+import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
@@ -48,9 +49,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -262,20 +263,18 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     Map<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
     try
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      if(service != null)
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+
+      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>() {});
+      for(AnnisCorpus c : corpora)
       {
-        AnnisCorpusSet corpora = service.getCorpusSet();
-        for(AnnisCorpus c : corpora)
+        if(user == null || user.getCorpusNameList().contains(c.getName()))
         {
-          if(user == null || user.getCorpusNameList().contains(c.getName()))
-          {
-            result.put(c.getName(), c);
-          }
+          result.put(c.getName(), c);
         }
       }
     }
-    catch(RemoteException ex)
+    catch(UniformInterfaceException ex)
     {
       Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
         null, ex);
