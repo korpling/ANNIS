@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.tree;
 
+import annis.gui.visualizers.VisualizerInput;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -124,12 +125,16 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	private final GraphicsBackend<T> backend;
 	private final Map<AnnisNode, NodeStructureData> dataMap;
 	private final TreeElementStyler styler;
+    private final VisualizerInput input;
 	
-	public ConstituentLayouter(DirectedGraph<AnnisNode, Edge> graph_, GraphicsBackend<T> backend_, TreeElementLabeler labeler_, TreeElementStyler styler_) {
+	public ConstituentLayouter(DirectedGraph<AnnisNode, Edge> graph_, 
+      GraphicsBackend<T> backend_, TreeElementLabeler labeler_, TreeElementStyler styler_,
+      VisualizerInput input_) {
 		this.backend = backend_;
 		this.labeler = labeler_;
 		this.graph = graph_;
 		this.styler = styler_;
+        this.input = input_;
 		root = findRoot();
 		
 		dataMap = new HashMap<AnnisNode, NodeStructureData>();
@@ -414,7 +419,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	private List<Edge> getOutgoingEdges(final AnnisNode current) {
 		List<Edge> outEdges = new ArrayList<Edge>();
 		for (Edge e: graph.getOutEdges(current)) {
-			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE)) {
+			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input)) {
 				outEdges.add(e);
 			}
 		}
@@ -478,7 +483,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 	private void addSecEdges(TreeLayoutData treeLayout, LayoutOptions options) {
 		for (Edge e: graph.getEdges()) {
-			if (!AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE)) {
+			if (!AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input)) {
 				continue;
 			}
 			Rectangle2D sourceRect = treeLayout.getRect(e.getSource());

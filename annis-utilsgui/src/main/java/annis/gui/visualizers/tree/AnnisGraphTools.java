@@ -30,29 +30,33 @@ class AnnisGraphTools
 
   public static final String PRIMEDGE_SUBTYPE = "edge";
   public static final String SECEDGE_SUBTYPE = "secedge";
-  public static VisualizerInput input;
 
-  public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(AnnotationGraph ag,
-    String namespace)
+  public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(
+    VisualizerInput input)
   {
+    AnnotationGraph ag = input.getResult().getGraph();
+    String namespace = input.getMappings().getProperty("node_ns", input.
+      getNamespace());
     List<DirectedGraph<AnnisNode, Edge>> resultGraphs =
       new ArrayList<DirectedGraph<AnnisNode, Edge>>();
+
     for (AnnisNode n : ag.getNodes())
     {
-      if (isRootNode(n, namespace))
+      if (isRootNode(n, namespace, input))
       {
-        resultGraphs.add(extractGraph(ag, n));
+        resultGraphs.add(extractGraph(ag, n, input));
       }
     }
     return resultGraphs;
   }
 
-  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n)
+  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
+    VisualizerInput input)
   {
     boolean addToGraph = n.isToken();
     for (Edge e : n.getOutgoingEdges())
     {
-      if (includeEdge(e) && copyNode(graph, e.getDestination()))
+      if (includeEdge(e, input) && copyNode(graph, e.getDestination(), input))
       {
         addToGraph |= true;
         graph.addEdge(e, n, e.getDestination());
@@ -65,7 +69,8 @@ class AnnisGraphTools
     return addToGraph;
   }
 
-  private boolean isRootNode(AnnisNode n, String namespace)
+  private boolean isRootNode(AnnisNode n, String namespace,
+    VisualizerInput input)
   {
     if (!n.getNamespace().equals(namespace))
     {
@@ -73,7 +78,8 @@ class AnnisGraphTools
     }
     for (Edge e : n.getIncomingEdges())
     {
-      if (hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE) && e.getSource()
+      if (hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input) && e.
+        getSource()
         != null)
       {
         return false;
@@ -83,14 +89,14 @@ class AnnisGraphTools
   }
 
   private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n)
+    AnnisNode n, VisualizerInput input)
   {
     DirectedGraph<AnnisNode, Edge> graph =
       new DirectedSparseGraph<AnnisNode, Edge>();
-    copyNode(graph, n);
+    copyNode(graph, n, input);
     for (Edge e : ag.getEdges())
     {
-      if (hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE) && graph.
+      if (hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input) && graph.
         containsVertex(e.getDestination())
         && graph.containsVertex(e.getSource()))
       {
@@ -100,44 +106,27 @@ class AnnisGraphTools
     return graph;
   }
 
-  private boolean includeEdge(Edge e)
+  private boolean includeEdge(Edge e, VisualizerInput input)
   {
-    return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE);
+    return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input);
   }
 
-  /**
-   * Checks if there is set an alias for PRIMEDGE_SUBTYPE OR SECEDGE_SUBTYPE in resolver_vis_map 
-   */
-  private static String getEdgeSubtype(String edgeSubtype)
+  public static boolean hasEdgeSubtype(Edge e, String edgeSubtype,
+    VisualizerInput input)
   {
-    if (input == null)
-    {
-      return edgeSubtype;
-    }
+    String name = e.getName();
 
     if (PRIMEDGE_SUBTYPE.equals(edgeSubtype))
     {
-      return input.getMappings().getProperty("edge") != null
+      edgeSubtype = input.getMappings().getProperty("edge") != null
         ? input.getMappings().getProperty("edge") : PRIMEDGE_SUBTYPE;
     }
 
     if (SECEDGE_SUBTYPE.equals(edgeSubtype))
     {
-      return input.getMappings().getProperty("secedge") != null
+      edgeSubtype = input.getMappings().getProperty("secedge") != null
         ? input.getMappings().getProperty("secedge") : SECEDGE_SUBTYPE;
     }
-
-    /* edgeSubtype is not one of the constants PRIMEDGE_SUBTYPE or
-     * SECEDGE_SUBTYPE, so return secedge as it is.
-     **/
-    return edgeSubtype;
-  }
-
-  public static boolean hasEdgeSubtype(Edge e, String edgeSubtype)
-  {
-
-    String name = e.getName();
-    edgeSubtype = getEdgeSubtype(edgeSubtype);
 
     return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.
       equals(edgeSubtype);
