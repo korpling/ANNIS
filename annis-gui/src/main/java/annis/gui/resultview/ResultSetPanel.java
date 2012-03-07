@@ -15,11 +15,14 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.Application;
 import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -78,8 +81,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   }
 
   @Override
-  public ResolverEntry[] getResolverEntries(SDocument doc,
-    AnnisService service) throws RemoteException
+  public ResolverEntry[] getResolverEntries(SDocument doc) throws RemoteException
   {
     HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
 
@@ -133,6 +135,8 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     }
     else
     {
+      WebResource resAnnis = Helper.getAnnisWebResource(getApplication());
+      
       List<ResolverEntry> resolverList =
         service.getResolverEntries(resolverRequests.toArray(
         new SingleResolverRequest[0]));

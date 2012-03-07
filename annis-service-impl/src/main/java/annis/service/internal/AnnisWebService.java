@@ -20,6 +20,7 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -188,15 +189,10 @@ public class AnnisWebService
   }
   
   @GET
-  @Path("meta/resolver")
-  public List<ResolverEntry> resolverEntry()
+  @Path("resolverentry")
+  public List<ResolverEntry> resolverEntry(@QueryParam("request") List<SingleResolverRequest> request)
   {
-    List<ResolverEntry> test = new LinkedList<ResolverEntry>();
-    
-    test.add(new ResolverEntry(123, "test", "", "sfsdf",
-      ResolverEntry.ElementType.node, "graph", "test display", null, 0));
-    
-    return test;
+    return annisDao.getResolverEntries(request.toArray(new SingleResolverRequest[0]));
   }
   
   @GET
