@@ -77,7 +77,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private MatrixSqlGenerator matrixSqlGenerator;
   // configuration
   private int timeout;
-
   // fn: corpus id -> corpus name
   private Map<Long, String> corpusNamesById;
 
@@ -161,7 +160,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     parseCorpusConfiguration();
   }
-  
+
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator)
@@ -188,12 +187,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return names;
   }
-  
+
   // query functions
   @Transactional
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator, final ResultSetExtractor<T> extractor)
+    final SqlGenerator<QueryData, T> generator,
+    final ResultSetExtractor<T> extractor)
   {
 
     JdbcTemplate jdbcTemplate = getJdbcTemplate();
@@ -240,7 +240,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public SaltProject annotate(QueryData queryData)
   {
-    return executeQueryFunction(queryData, annotateSqlGenerator, saltAnnotateExtractor);
+    return executeQueryFunction(queryData, annotateSqlGenerator,
+      saltAnnotateExtractor);
   }
 
   @Transactional(readOnly = true)
@@ -350,7 +351,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return result;
   }
 
-  
   @Override
   @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request)
@@ -370,6 +370,62 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
   }
 
+  @Override
+  public Map<String, String> getCorpusConfiguration(String corpusName)
+  {
+    Map<String, String> result = new TreeMap<String, String>();
+
+    // parse from configuration folder
+    if (System.getProperty("annis.home") != null)
+    {
+      File confFolder = new File(System.getProperty("annis.home")
+        + "/conf/corpora");
+      if (confFolder.isDirectory())
+      {
+
+        File conf = null;
+        try
+        {
+          // try  hash of corpus name first
+          conf = new File(confFolder, Utils.calculateSHAHash(corpusName));
+        }
+        catch (NoSuchAlgorithmException ex)
+        {
+          log.log(Level.WARN, null, ex);
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          log.log(Level.WARN, null, ex);
+        }
+
+        if (conf == null || !conf.isFile())
+        {
+          // try corpus name next
+          conf = new File(confFolder, corpusName + ".properties");
+        }
+        // parse property file if found
+        if (conf.isFile())
+        {
+          Properties p = new Properties();
+          try
+          {
+            p.load(new FileReader(conf));
+            for (Map.Entry<Object, Object> e : p.entrySet())
+            {
+              result.put(e.getKey().toString(), e.getValue().toString());
+            }
+          }
+          catch (IOException ex)
+          {
+            log.log(Level.WARN, "could not load corpus configuration file "
+              + conf.getAbsolutePath(), ex);
+          }
+        }
+      } // end if conf is a directory
+    } // end if annis.home was set
+    return result;
+  }
+
   private void parseCorpusConfiguration()
   {
     corpusConfiguration = new HashMap<Long, Properties>();
@@ -379,59 +435,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       List<AnnisCorpus> corpora = listCorpora();
       for (AnnisCorpus c : corpora)
       {
-        // put in empty default properties
-        corpusConfiguration.put(c.getId(), new Properties());
-
-        // parse from configuration folder
-        if (System.getProperty("annis.home") != null)
+        // copy properties from map
+        Properties p = new Properties();
+        Map<String, String> map = getCorpusConfiguration(c.getName());
+        for (Map.Entry<String, String> e : map.entrySet())
         {
-          File confFolder = new File(System.getProperty("annis.home")
-            + "/conf/corpora");
-          if (confFolder.isDirectory())
-          {
-
-            // try corpus ID first
-            File conf = new File(confFolder, "" + c.getId() + ".properties");
-            if (!conf.isFile())
-            {
-              try
-              {
-                // try hash of corpus name
-                conf = new File(confFolder, Utils.calculateSHAHash(c.getName())
-                  + ".properties");
-                if (!conf.isFile())
-                {
-                  // try corpus name
-                  conf = new File(confFolder, c.getName() + ".properties");
-                }
-              }
-              catch (NoSuchAlgorithmException ex)
-              {
-                log.log(Level.WARN, null, ex);
-              }
-              catch (UnsupportedEncodingException ex)
-              {
-                log.log(Level.WARN, null, ex);
-              }
-            }
-
-            // parse property file if found
-            if (conf.isFile())
-            {
-              Properties p = corpusConfiguration.get(c.getId());
-              try
-              {
-                p.load(new FileReader(conf));
-
-              }
-              catch (IOException ex)
-              {
-                log.log(Level.WARN, "could not load corpus configuration file "
-                  + conf.getAbsolutePath(), ex);
-              }
-            }
-          }
+          p.setProperty(e.getKey(), e.getValue());
         }
+        corpusConfiguration.put(c.getId(), p);
       }
     }
     catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex)
@@ -608,7 +619,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.countSqlGenerator = countSqlGenerator;
   }
 
-
   @Override
   public HashMap<Long, Properties> getCorpusConfiguration()
   {
@@ -649,12 +659,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return saltAnnotateExtractor;
   }
 
-  public void setSaltAnnotateExtractor(SaltAnnotateExtractor saltAnnotateExtractor)
+  public void setSaltAnnotateExtractor(
+    SaltAnnotateExtractor saltAnnotateExtractor)
   {
     this.saltAnnotateExtractor = saltAnnotateExtractor;
   }
-
-  
 
   public ByteHelper getByteHelper()
   {
@@ -678,10 +687,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return annotateSqlGenerator;
   }
 
-  public void setAnnotateSqlGenerator(AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
+  public void setAnnotateSqlGenerator(
+    AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
   {
     this.annotateSqlGenerator = annotateSqlGenerator;
   }
-  
-  
 }

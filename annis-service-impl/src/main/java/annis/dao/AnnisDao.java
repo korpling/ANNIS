@@ -28,6 +28,7 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface AnnisDao
@@ -85,5 +86,7 @@ public interface AnnisDao
   int getTimeout();
   
   public List<String> mapCorpusIdsToNames(List<Long> ids);
+  
+  public Map<String,String> getCorpusConfiguration(String corpusName);
 
 }
