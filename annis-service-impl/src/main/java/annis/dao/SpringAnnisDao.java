@@ -350,13 +350,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return result;
   }
 
+  
   @Override
   @Transactional(readOnly = true)
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest request)
   {
     try
     {
-      ResolverDaoHelper helper = new ResolverDaoHelper(request.length);
+      ResolverDaoHelper helper = new ResolverDaoHelper();
       PreparedStatement stmt = helper.createPreparedStatement(getConnection());
       helper.fillPreparedStatement(request, stmt);
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
@@ -367,7 +368,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       log.error("Could not get resolver entries from database", ex);
       return new LinkedList<ResolverEntry>();
     }
-
   }
 
   private void parseCorpusConfiguration()

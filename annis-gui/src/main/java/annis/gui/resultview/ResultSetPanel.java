@@ -21,6 +21,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import com.vaadin.ui.VerticalLayout;
@@ -81,7 +82,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   }
 
   @Override
-  public ResolverEntry[] getResolverEntries(SDocument doc) throws RemoteException
+  public ResolverEntry[] getResolverEntries(SDocument doc)
   {
     HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
 
@@ -135,11 +136,18 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     }
     else
     {
-      WebResource resAnnis = Helper.getAnnisWebResource(getApplication());
+      List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
       
-      List<ResolverEntry> resolverList =
-        service.getResolverEntries(resolverRequests.toArray(
-        new SingleResolverRequest[0]));
+      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
+        .path("resolver");
+     
+      for(SingleResolverRequest r : resolverRequests)
+      {
+        List<ResolverEntry> tmp = 
+          resResolver.path(r.getCorpusName()).path(r.getNamespace()).path(r.getType().toString())
+          .get(new GenericType<List<ResolverEntry>>(){});
+        resolverList.addAll(tmp);
+      }
       visSet.addAll(resolverList);
       cacheResolver.put(resolverRequests, resolverList);
     }

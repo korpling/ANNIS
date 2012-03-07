@@ -37,19 +37,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 public interface AnnisService extends Remote
 {
 
-  /**
-   * 
-   * @param corpusList A list of corpora (identified by their id) to run the query on.
-   * @param annisQL AnnisQL query to execute
-   * @return 
-   * @throws RemoteException
-   * @throws AnnisQLSemanticsException 
-   * @throws AnnisQLSyntaxException
-   * @throws AnnisCorpusAccessException
-   */
-  public int getCount(List<Long> corpusList, String annisQL) throws
-    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException;
 
   /**
    * 
@@ -58,24 +45,6 @@ public interface AnnisService extends Remote
    */
   public AnnisCorpusSet getCorpusSet() throws RemoteException;
 
-  /**
-   * 
-   * @param corpusList
-   * @param annisQL
-   * @param limit The maximum number of items of the returned result set.
-   * @param offset The first result to output. Offset 1 will output results from 2 to n result .
-   * @param contextLeft The number of token before the first match.
-   * @param contextRight The number of token before after the last match.
-   * @return
-   * @throws RemoteException
-   * @throws AnnisQLSemanticsException
-   * @throws AnnisQLSyntaxException
-   * @throws AnnisCorpusAccessException
-   */
-  public AnnisResultSet getResultSet(List<Long> corpusList, String annisQL,
-    int limit, int offset, int contextLeft, int contextRight) throws
-    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException;
 
   /**
    * Get result in WEKA format
@@ -162,6 +131,4 @@ public interface AnnisService extends Remote
   public List<Annotation> getMetadata(String toplevelCorpusName,
     String documentName) throws RemoteException;
 
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request)
-    throws RemoteException;
 }

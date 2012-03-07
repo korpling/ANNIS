@@ -22,12 +22,12 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.AnnisCorpusSet;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -189,10 +189,15 @@ public class AnnisWebService
   }
   
   @GET
-  @Path("resolverentry")
-  public List<ResolverEntry> resolverEntry(@QueryParam("request") List<SingleResolverRequest> request)
+  @Path("resolver/{corpusName}/{namespace}/{type}")
+  public List<ResolverEntry> resolverEntry(@PathParam("corpusName") String corpusName, 
+    @PathParam("namespace") String namespace, 
+    @PathParam("type") String type)
   {
-    return annisDao.getResolverEntries(request.toArray(new SingleResolverRequest[0]));
+    ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
+    SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace,
+      enumType);
+    return annisDao.getResolverEntries(r);
   }
   
   @GET

@@ -136,41 +136,37 @@ public class SingleResultPanel extends VerticalLayout implements
   @Override
   public void attach()
   {
-    service = Helper.getService(getApplication(), getWindow());
-    if (service != null && resolverProvider != null)
+
+    ResolverEntry[] entries =
+      resolverProvider.getResolverEntries(result);
+    List<String> mediaIDs = mediaVisIds(entries);
+    List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+    List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
+    List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+
+
+    for (int i = 0; i < entries.length; i++)
     {
-      try
+      String id = "resolver-" + resultNumber + "-" + i;
+      CustomLayout customLayout = this.customLayout(id);
+
+      VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
+        markedExactMap, markedCoveredMap, customLayout, mediaIDs, id);
+
+      if ("media".equals(entries[i].getVisType())
+        || "video".equals(entries[i].getVisType())
+        || "audio".equals(entries[i].getVisType()))
       {
-        ResolverEntry[] entries =
-          resolverProvider.getResolverEntries(result, service);
-        List<String> mediaIDs = mediaVisIds(entries);
-        List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
-        List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-        List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+        mediaVisualizer.add(p);
+      }
 
+      visualizers.add(p);
 
-        for (int i = 0; i < entries.length; i++)
-        {
-          String id = "resolver-" + resultNumber + "-" + i;
-          CustomLayout customLayout = this.customLayout(id);
-
-          VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-            markedExactMap, markedCoveredMap, customLayout, mediaIDs, id);
-
-          if ("media".equals(entries[i].getVisType())
-            || "video".equals(entries[i].getVisType())
-            || "audio".equals(entries[i].getVisType()))
-          {
-            mediaVisualizer.add(p);
-          }
-          
-          visualizers.add(p);
-          
-          if("tiger".equals(entries[i].getNamespace()))
-          {
-            openVisualizers.add(p);
-          }
-        }
+      if("tiger".equals(entries[i].getNamespace()))
+      {
+        openVisualizers.add(p);
+      }
+    }
 
 //        kwicPanels = new ArrayList<KWICPanel>();
 //        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
@@ -183,24 +179,16 @@ public class SingleResultPanel extends VerticalLayout implements
 //        }
 
 
-        for (VisualizerPanel p : visualizers)
-        {
-          addComponent(p);
-        }
-        
-        for(VisualizerPanel p : openVisualizers)
-        {
-          p.openVisualizer(false);
-        }
-      }
-      catch (RemoteException ex)
-      {
-        Logger.getLogger(SingleResultPanel.class.getName()).log(Level.SEVERE,
-          "could not get resolver entries", ex);
-        getWindow().showNotification("could not get resolver entries: ", ex.
-          getLocalizedMessage(), Notification.TYPE_TRAY_NOTIFICATION);
-      }
+    for (VisualizerPanel p : visualizers)
+    {
+      addComponent(p);
     }
+
+    for(VisualizerPanel p : openVisualizers)
+    {
+      p.openVisualizer(false);
+    }
+
 
     super.attach();
   }
@@ -384,8 +372,7 @@ public class SingleResultPanel extends VerticalLayout implements
     return null;
   }
 
-  private List<String> mediaVisIds(ResolverEntry[] entries) throws
-    RemoteException
+  private List<String> mediaVisIds(ResolverEntry[] entries)
   {
     List<String> mediaIds = new ArrayList<String>();
     int counter = 0;

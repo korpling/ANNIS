@@ -49,7 +49,7 @@ public interface AnnisDao
 
   public AnnisBinary getBinary(String corpusName, int offset, int length);
 
-  public List<ResolverEntry> getResolverEntries(SingleResolverRequest[] request);
+  public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
