@@ -20,10 +20,8 @@ import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
-import annis.service.AnnisService;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
 import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -31,17 +29,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.log4j.lf5.LogLevel;
 
 /**
  *
@@ -50,7 +40,7 @@ import org.apache.log4j.lf5.LogLevel;
 public class ResultSetPanel extends VerticalLayout implements ResolverProvider
 {
 
-  private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
   public List<SingleResultPanel> resultPanelList;
@@ -59,8 +49,9 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     Set<String> visibleTokenAnnos)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
-    cacheResolver =
-      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
+    cacheResolver = 
+      Collections.synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, 
+      List<ResolverEntry>>());
 
     setWidth("100%");
     setHeight("-1px");

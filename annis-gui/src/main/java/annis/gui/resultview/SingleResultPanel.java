@@ -16,13 +16,14 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.PluginSystem;
 import annis.gui.Helper;
+import annis.gui.PluginSystem;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
-import annis.service.AnnisService;
+import annis.service.objects.CorpusConfig;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
@@ -32,7 +33,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -45,7 +45,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -68,6 +68,7 @@ public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
 
+  private static final String HIDE_KWIC = "hide_kwic";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
   private SDocument result;
@@ -81,7 +82,6 @@ public class SingleResultPanel extends VerticalLayout implements
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
-  private AnnisService service;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -137,6 +137,21 @@ public class SingleResultPanel extends VerticalLayout implements
   public void attach()
   {
 
+    // get corpus properties
+
+    CorpusConfig corpusConfig = new CorpusConfig();
+    corpusConfig.setConfig(new TreeMap<String, String>());
+    try
+    {
+      corpusConfig = Helper.getAnnisWebResource(getApplication()).path("corpora").
+        path(path.get(
+        0)).path("config").get(CorpusConfig.class);
+    }
+    catch (UniformInterfaceException ex)
+    {
+      getWindow().showNotification("could not query corpus configuration", ex.
+        getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
+    }
     ResolverEntry[] entries =
       resolverProvider.getResolverEntries(result);
     List<String> mediaIDs = mediaVisIds(entries);
@@ -162,29 +177,32 @@ public class SingleResultPanel extends VerticalLayout implements
 
       visualizers.add(p);
 
-      if("tiger".equals(entries[i].getNamespace()))
+      if ("tiger".equals(entries[i].getNamespace()))
       {
         openVisualizers.add(p);
       }
     }
 
-//        kwicPanels = new ArrayList<KWICPanel>();
-//        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-//        {
-//          KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-//            markedAndCovered, text, mediaIDs, mediaVisualizer, this);
-//
-//          addComponent(kwic);
-//          kwicPanels.add(kwic);
-//        }
+    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC) || Boolean.parseBoolean(
+      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
+    {
+      kwicPanels = new ArrayList<KWICPanel>();
+      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+      {
+        KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+          markedAndCovered, text, mediaIDs, mediaVisualizer, this);
 
+        addComponent(kwic);
+        kwicPanels.add(kwic);
+      }
+    }
 
     for (VisualizerPanel p : visualizers)
     {
       addComponent(p);
     }
 
-    for(VisualizerPanel p : openVisualizers)
+    for (VisualizerPanel p : openVisualizers)
     {
       p.openVisualizer(false);
     }
