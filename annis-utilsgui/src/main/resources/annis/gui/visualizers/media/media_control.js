@@ -8,7 +8,9 @@ var endTime = null;
  */
 var seekAndPlay = function (start, end) 
 {  
-  $("video")[0].currentTime = start;  
+  var mediaElement = $("video")[0] || $("audio")[0];
+  
+  mediaElement.currentTime = start;  
   startTime = start;
   endTime = end;
 };
@@ -20,38 +22,44 @@ var seekAndPlay = function (start, end)
  */
 var stop = function ()
 {
-  $("video")[0].pause();
+  mediaElement.pause();
 }
 
 $(document).ready(function()
 {	  
-  var video = $('video');
-  video[0].pause();	
+  var mediaElement; 
   
+  if ($("video"))
+    mediaElement = $("video"); 
+  
+  if ($("audio"))
+    mediaElement = $("audio");
+    
+  mediaElement[0].pause();	  
 
-  video.on("seeked", function()
+  mediaElement.on("seeked", function()
   {
-    video[0].play();
+    mediaElement[0].play();
   }); 
   
-  video.on("timeupdate", function()
+  mediaElement.on("timeupdate", function()
   {
-    if (endTime !== null && video[0].currentTime >= endTime)
+    if (endTime !== null && mediaElement[0].currentTime >= endTime)
     {
-      video[0].pause();
+      mediaElement[0].pause();
       endTime = null;
     }
   });
 
-  video.on("pause", function()
+  mediaElement.on("pause", function()
   {
-    // after stopping the video, we don't want to stop the video again, after press play again
+    // after stopping the mediaElement, we don't want to stop the mediaElement again, after press play again
     endTime = null;
   });
 
-  video.on("play", function()
+  mediaElement.on("play", function()
   {
-    lookAndSwitchCurrentMediaPlayer(video[0]);
+    lookAndSwitchCurrentMediaPlayer(mediaElement[0]);
   });
 });
 
