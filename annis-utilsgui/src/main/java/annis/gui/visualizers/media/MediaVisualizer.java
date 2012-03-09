@@ -36,12 +36,12 @@ public class MediaVisualizer extends WriterVisualizer
       writer.append("\"></script>");      
       writer.append("</head>");
       writer.append("<body>");      
-      writer.append("<video controls preload=\"metadata\" >");
+      writer.append("<audio controls preload=\"metadata\" >");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);
-      writer.append("\" type=\"video/ogg\">");
-      writer.append("[Browser zu antik]");
-      writer.append("</video>");
+      writer.append("\" type=\"audio/ogg\">");
+      writer.append("Please update your browser!");
+      writer.append("</audio>");
       writer.append("</body></html>");
     }
     catch (IOException e)
