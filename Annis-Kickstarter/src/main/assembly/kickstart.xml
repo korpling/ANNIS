@@ -53,7 +53,7 @@
     <!-- webapp -->
     <dependencySet>
       <includes>
-        <include>annis-web*:war</include> 
+        <include>de.hu-berlin.german.korpling.annis:annis-gui:war:*</include> 
       </includes>
       <outputDirectory>webapp/</outputDirectory>
       <unpack>true</unpack>
