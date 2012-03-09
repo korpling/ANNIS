@@ -22,7 +22,7 @@ var seekAndPlay = function (start, end)
  */
 var stop = function ()
 {
-  mediaElement.pause();
+   ($("video")[0] || $("audio")[0]).pause();
 }
 
 $(document).ready(function()
