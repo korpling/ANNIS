@@ -90,6 +90,7 @@ $(document).ready(function(){
   $("td[time]").each(function ()
   {    
     $(this).click(clickHandler);
+    $(this).addClass("speaker");
   });
 
 });
