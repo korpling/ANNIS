@@ -10,10 +10,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-@PluginImplementation
-public class MediaVisualizer extends WriterVisualizer
+public abstract class MediaVisualizer extends WriterVisualizer
 {
 
   @Override
@@ -36,12 +34,12 @@ public class MediaVisualizer extends WriterVisualizer
       writer.append("\"></script>");      
       writer.append("</head>");
       writer.append("<body>");      
-      writer.append("<audio controls preload=\"metadata\" >");
+      writer.append("<" + getTag() + " controls preload=\"metadata\" >");
       writer.append("<source src=\"");
       writer.append(binaryServletPath);
-      writer.append("\" type=\"audio/ogg\">");
+      writer.append("\" type=\"" + getMediaMime() + "\">");
       writer.append("Please update your browser!");
-      writer.append("</audio>");
+      writer.append("</" + getTag() + ">");
       writer.append("</body></html>");
     }
     catch (IOException e)
@@ -80,10 +78,8 @@ public class MediaVisualizer extends WriterVisualizer
 
     return "no time anno";
   }
-
-  @Override
-  public String getShortName()
-  {
-    return "media";
-  }
+  
+  public abstract String getTag();
+  public abstract String getMediaMime();
+  
 }
