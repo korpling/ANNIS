@@ -267,6 +267,11 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
             if (media_anno.equals(a.getName()))
             {
               l.addStyleName("clickable");
+              String startTime = getStartTime((String) a.getValue());
+              String endTime = getEndTime((String) a.getValue());
+              startTime = trimTimeAnno(startTime);
+              endTime = trimTimeAnno(endTime);
+              l.setValue(startTime + "-" + endTime);
             }
           }
         }
@@ -364,5 +369,25 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         + startTime + ", " + endTime + "); ";
       getWindow().executeJavaScript(playCommand);
     }
+  }
+
+  private String trimTimeAnno(String time)
+  {
+    
+    if ("undefined".equals(time))
+    {
+      return "";
+    }
+    
+    String[] timeArray = time.split("\\.");
+    
+    if (timeArray.length < 2)
+    {
+      return time;
+    }
+    
+    return timeArray[0] + "."
+      + timeArray[1].substring(0, (timeArray[1].length() < 3 ? timeArray[1].
+      length()-1 : 2));
   }
 }
