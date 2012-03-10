@@ -8,7 +8,7 @@ DIST_DIR=annis-service-impl/target/annis-service-impl-$ANNIS_VERSION-distributio
 
 #code
 # delete all old libraries so that they don't get into the classpath
-rm -fR $DIST_DIR/lib/
+rm -fR $ANNIS_HOME/lib/*
 # copy new files
 cp -Rf $DIST_DIR/lib/* $ANNIS_HOME/lib/
 cp -Rf $DIST_DIR/sql/* $ANNIS_HOME/sql/
