@@ -97,17 +97,17 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-client</artifactId>
-      <version>7.5.4.v20111024</version>
+      <version>7.6.1.v20120215</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>7.5.4.v20111024</version>
+      <version>7.6.1.v20120215</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>7.5.4.v20111024</version>
+      <version>7.6.1.v20120215</version>
     </dependency>
   </dependencies>
   <properties>
