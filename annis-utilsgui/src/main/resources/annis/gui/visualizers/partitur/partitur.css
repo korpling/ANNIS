@@ -91,3 +91,6 @@ td.middle_event {
   font-size: 9pt;
 }
 
+.speaker {
+  background: url("speaker.svg") no-repeat right;
+}
