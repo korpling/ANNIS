@@ -266,7 +266,10 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           {
             if (media_anno.equals(a.getName()))
             {
-              l.addStyleName("clickable");
+              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)"))
+              {
+                l.addStyleName("clickable");
+              }              
               String startTime = getStartTime((String) a.getValue());
               String endTime = getEndTime((String) a.getValue());
               startTime = trimTimeAnno(startTime);
