@@ -8,9 +8,7 @@ var endTime = null;
  */
 var seekAndPlay = function (start, end) 
 {  
-  var mediaElement = $("video")[0] || $("audio")[0];
-  
-  mediaElement.currentTime = start;  
+  ($("video")[0] || $("audio")[0]).currentTime = start;  
   startTime = start;
   endTime = end;
 };
@@ -22,59 +20,53 @@ var seekAndPlay = function (start, end)
  */
 var stop = function ()
 {
-   ($("video")[0] || $("audio")[0]).pause();
+  ($("video")[0] || $("audio")[0]).pause();
 }
 
 $(document).ready(function()
 {	  
-  var mediaElement; 
+  var media = $($("video")[0] || $("audio")[0]);
+  media[0].pause();	
   
-  if ($("video"))
-    mediaElement = $("video"); 
-  
-  if ($("audio"))
-    mediaElement = $("audio");
-    
-  mediaElement[0].pause();	  
 
-  mediaElement.on("seeked", function()
+  media.on("seeked", function()
   {
-    mediaElement[0].play();
+    media[0].play();
   }); 
   
-  mediaElement.on("timeupdate", function()
+  media.on("timeupdate", function()
   {
-    if (endTime !== null && mediaElement[0].currentTime >= endTime)
+    if (endTime !== null && media[0].currentTime >= endTime)
     {
-      mediaElement[0].pause();
+      media[0].pause();
       endTime = null;
     }
   });
 
-  mediaElement.on("pause", function()
+  media.on("pause", function()
   {
-    // after stopping the mediaElement, we don't want to stop the mediaElement again, after press play again
+    // after stopping the media, we don't want to stop the media again, after press play again
     endTime = null;
   });
 
-  mediaElement.on("play", function()
+  media.on("play", function()
   {
-    lookAndSwitchCurrentMediaPlayer(mediaElement[0]);
+    lookAndSwitchCurrentMediaPlayer(media[0]);
   });
 });
 
-function lookAndSwitchCurrentMediaPlayer(videoElement)
+function lookAndSwitchCurrentMediaPlayer(mediaElement)
 {  
 
   if (!window.parent.document.mediaElement)
   {
-    window.parent.document.mediaElement = videoElement;
+    window.parent.document.mediaElement = mediaElement;
     return;
   }
 
-  if(window.parent.document.mediaElement !== videoElement) {
+  if(window.parent.document.mediaElement !== mediaElement) {
     window.parent.document.mediaElement.pause();
-    window.parent.document.mediaElement = videoElement;
+    window.parent.document.mediaElement = mediaElement;
   }  
 }
 
