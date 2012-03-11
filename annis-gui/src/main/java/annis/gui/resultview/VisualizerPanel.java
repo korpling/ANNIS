@@ -36,6 +36,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -141,6 +142,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     SaltProject text = null;
     try
     {
+      toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
+      documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
       text = annisResource.path("graphs").path(toplevelCorpusName).path(
         documentName).get(SaltProject.class);

@@ -29,6 +29,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,9 +51,9 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     Set<String> visibleTokenAnnos)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
-    cacheResolver = 
-      Collections.synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, 
-      List<ResolverEntry>>());
+    cacheResolver =
+      Collections.synchronizedMap(
+      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setWidth("100%");
     setHeight("-1px");
@@ -99,10 +101,11 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
         {
           edgeLayers.add(layer.getSName());
         }
-        catch(NullPointerException ex)
+        catch (NullPointerException ex)
         {
           Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
-            "NullPointerException when using Salt, was trying to get layer name", ex);
+            "NullPointerException when using Salt, was trying to get layer name",
+            ex);
         }
       }
     }
@@ -128,16 +131,27 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     else
     {
       List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
-      
-      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
-        .path("resolver");
-     
-      for(SingleResolverRequest r : resolverRequests)
+
+      WebResource resResolver = Helper.getAnnisWebResource(getApplication()).
+        path("resolver");
+
+      for (SingleResolverRequest r : resolverRequests)
       {
-        List<ResolverEntry> tmp = 
-          resResolver.path(r.getCorpusName()).path(r.getNamespace()).path(r.getType().toString())
-          .get(new GenericType<List<ResolverEntry>>(){});
-        resolverList.addAll(tmp);
+        List<ResolverEntry> tmp;
+        try
+        {
+          tmp =
+            resResolver.path(URLEncoder.encode(r.getCorpusName(), "UTF-8")).path(r.
+            getNamespace()).path(r.getType().toString()).get(new GenericType<List<ResolverEntry>>()
+          {
+          });
+          resolverList.addAll(tmp);
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          Logger.getLogger(ResultSetPanel.class.getName()).
+            log(Level.SEVERE, null, ex);
+        }
       }
       visSet.addAll(resolverList);
       cacheResolver.put(resolverRequests, resolverList);

@@ -45,6 +45,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -147,8 +149,14 @@ public class SingleResultPanel extends VerticalLayout implements
     try
     {
       corpusConfig = Helper.getAnnisWebResource(getApplication()).path("corpora").
-        path(path.get(
-        0)).path("config").get(CorpusConfig.class);
+        path(
+        URLEncoder.encode(path.get(0), "UTF-8"))
+        .path("config").get(CorpusConfig.class);
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      getWindow().showNotification("could not query corpus configuration", ex.
+        getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
     }
     catch (UniformInterfaceException ex)
     {
