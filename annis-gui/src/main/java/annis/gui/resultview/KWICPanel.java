@@ -373,21 +373,21 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
   private String trimTimeAnno(String time)
   {
-    
+
     if ("undefined".equals(time))
     {
       return "";
     }
-    
+
     String[] timeArray = time.split("\\.");
-    
+
     if (timeArray.length < 2)
     {
       return time;
     }
-    
+
     return timeArray[0] + "."
       + timeArray[1].substring(0, (timeArray[1].length() < 3 ? timeArray[1].
-      length()-1 : 2));
+      length() : 2));
   }
 }
