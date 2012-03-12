@@ -375,7 +375,20 @@ public class PartiturVisualizer extends WriterVisualizer
         null, ex);
       try
       {
-        writer.append("<html><body>Error occured</body></html>");
+        String annisLine = "";
+        for(int i=0; i < ex.getStackTrace().length; i++)
+        {
+          if(ex.getStackTrace()[i].getClassName().startsWith("annis."))
+          {
+            annisLine = ex.getStackTrace()[i].toString();
+          }
+        }
+        
+        writer.append("<html><body>Error occured (" 
+          + ex.getClass().getName()
+          + "): " + ex.getLocalizedMessage() + "<br/>"
+          + annisLine
+          + "</body></html>");
       }
       catch (IOException ex1)
       {
