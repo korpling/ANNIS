@@ -266,7 +266,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           {
             if (media_anno.equals(a.getName()))
             {
-              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)"))
+              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
               {
                 l.addStyleName("clickable");
               }
@@ -334,7 +334,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
     // do not start the media player, when there is only an 
     // end time defined
-    if (time != null && time.matches("\\-[0-9]*(\\.[0-9]*)"))
+    if (time != null && time.matches("\\-[0-9]*(\\.[0-9]*)?"))
     {
       return;
     }
