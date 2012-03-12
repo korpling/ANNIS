@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION geAnnoByName("name" varchar(150), toplevel_corpus bigint[], "type" varchar) 
+CREATE OR REPLACE FUNCTION getAnnoByName("name" varchar(150), toplevel_corpus bigint[], "type" varchar) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
   SELECT id FROM annotation_pool 
