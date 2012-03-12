@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.spi.DirStateFactory.Result;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -45,6 +46,38 @@ public class PartiturVisualizer extends WriterVisualizer
 
   private List<AnnisNode> nodes;
   private List<AnnisNode> token;
+
+  private String getNextEndTime(AnnisNode rightNode)
+  {
+    long offset = token.get(0).getTokenIndex();
+    String time = null;
+
+    for (long i = rightNode.getTokenIndex() + 1 - offset; i < token.size(); i++)
+    {
+      for (Annotation anno : token.get((int) i).getNodeAnnotations())
+      {
+        if ("time".equals(anno.getName()))
+        {
+          time = anno.getValue();
+          break;
+        }
+      }
+
+      String startTime = getTimePosition(time, true);
+      String endTime = getTimePosition(time, false);
+
+      if (startTime != null && !"".equals(startTime))
+      {
+        return startTime;
+      }
+
+      if (endTime != null && !"undefined".equals(endTime))
+      {
+        return endTime;
+      }
+    }
+    return "undefined";
+  }
 
   public enum ElementType
   {
@@ -510,12 +543,18 @@ public class PartiturVisualizer extends WriterVisualizer
     String startTime = getTimePosition(getTimeAnnotation(leftNode), true);
     String endTime = getTimePosition(getTimeAnnotation(rightNode), false);
 
+    // try to find the next end time definition if this token does not have one
+    if ("undefined".equals(endTime))
+    {
+      endTime = getNextEndTime(rightNode);
+    }
+
     // if there is no start time, we do not add the time attribute
     if (startTime.equals(""))
     {
       return "";
     }
-    
+
     return "time=\"" + startTime + "-" + endTime + "\"";
   }
 
@@ -532,15 +571,22 @@ public class PartiturVisualizer extends WriterVisualizer
   }
 
   /**
-   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, we return the first
-   * value, otherwise we did try to return the second. The endtime don't have to be annotated, in this
-   * case it returns an empty string.
+   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, 
+   * we return the first value, otherwise we did try to return the second. The 
+   * end time don't have to be annotated, in this case it returns "undefined". 
+   * Without a defined start time the result is an empty String ""
    * @param time
    * @param first
-   * @return
+   * @return null, when time parameter is null
    */
   private String getTimePosition(String time, boolean first)
   {
+
+    if (time == null)
+    {
+      return null;
+    }
+
     String[] splittedTimeAnno = time.split("-");
     if (splittedTimeAnno.length > 1)
     {
