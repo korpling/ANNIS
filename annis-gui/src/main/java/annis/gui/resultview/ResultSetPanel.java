@@ -140,14 +140,17 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
         List<ResolverEntry> tmp;
         try
         {
-          tmp =
-            resResolver.path(URLEncoder.encode(r.getCorpusName(), "UTF-8")).path(r.
-            getNamespace()).path(r.getType().toString()).get(new GenericType<List<ResolverEntry>>()
+          String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
+          String namespace = r.getNamespace();
+          String type = r.getType() == null ? null : r.getType().toString();
+          if(corpusName != null && namespace != null && type != null)
           {
-          });
-          resolverList.addAll(tmp);
+            tmp = resResolver.path(corpusName).path(namespace).path(type)
+              .get(new GenericType<List<ResolverEntry>>(){});
+            resolverList.addAll(tmp);
+          }
         }
-        catch (UnsupportedEncodingException ex)
+        catch (Exception ex)
         {
           Logger.getLogger(ResultSetPanel.class.getName()).
             log(Level.SEVERE, null, ex);
