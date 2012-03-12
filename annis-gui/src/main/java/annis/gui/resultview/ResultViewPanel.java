@@ -159,47 +159,69 @@ public class ResultViewPanel extends Panel implements PagingCallback
           {
 
             AnnisUser user = null;
-            if (getApplication() != null)
+            synchronized(getApplication()) 
             {
-              user = (AnnisUser) getApplication().getUser();
+              if (getApplication() != null)
+              {
+                user = (AnnisUser) getApplication().getUser();
+              }
             }
+            
             SaltProject result = query.loadBeans(start, limit, user);
 
-            updateTokenAnnos(result);
-
-            if (resultPanel != null)
+            synchronized(getApplication()) 
             {
-              layout.removeComponent(resultPanel);
+              updateTokenAnnos(result);
+
+              if (resultPanel != null)
+              {
+                layout.removeComponent(resultPanel);
+              }
+              resultPanel = new ResultSetPanel(result, start, ps,
+                getVisibleTokenAnnos());
+
+              layout.addComponent(resultPanel);
+              resultPanel.setVisible(true);
             }
-            resultPanel = new ResultSetPanel(result, start, ps,
-              getVisibleTokenAnnos());
-
-            layout.addComponent(resultPanel);
-            resultPanel.setVisible(true);
-
+            
           }
           catch (AnnisQLSemanticsException ex)
           {
-            paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
+            synchronized(getApplication()) 
+            {
+              paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
+            }
           }
           catch (AnnisQLSyntaxException ex)
           {
-            paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
+            synchronized(getApplication()) 
+            {
+              paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
+            }
           }
           catch (AnnisCorpusAccessException ex)
           {
-            paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
+            synchronized(getApplication()) 
+            {
+              paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
+            }
           }
           catch (Exception ex)
           {
             Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE,
               "unknown exception in result view", ex);
-            paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+            synchronized(getApplication()) 
+            {
+              paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+            }
           }
           finally
           {
-            progressResult.setVisible(false);
-            progressResult.setEnabled(false);
+            synchronized(getApplication()) 
+            {
+              progressResult.setVisible(false);
+              progressResult.setEnabled(false);
+            }
           }
         }
       };

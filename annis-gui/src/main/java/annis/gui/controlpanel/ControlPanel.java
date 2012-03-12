@@ -195,7 +195,12 @@ public class ControlPanel extends Panel
     @Override
     public void run()
     {
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = null;
+      synchronized(getApplication()) 
+      {
+        res = Helper.getAnnisWebResource(getApplication());
+      }
+      
       //AnnisService service = Helper.getService(getApplication(), window);
       if (res != null)
       {
@@ -214,25 +219,30 @@ public class ControlPanel extends Panel
         }
         catch (UniformInterfaceException ex)
         {
-          if (ex.getResponse().getStatus() == 400)
+          synchronized(getApplication()) 
           {
-            window.showNotification(
-              ex.getResponse().getEntity(String.class), "parsing error",
-              Window.Notification.TYPE_ERROR_MESSAGE);
-          }
-          else
-          {
-            window.showNotification(
-              ex.getResponse().getEntity(String.class), "unknown error " + ex.
-              getResponse().getStatus(),
-              Window.Notification.TYPE_ERROR_MESSAGE);
+            if (ex.getResponse().getStatus() == 400)
+            {
+              window.showNotification(
+                ex.getResponse().getEntity(String.class), "parsing error",
+                Window.Notification.TYPE_ERROR_MESSAGE);
+            }
+            else
+            {
+              window.showNotification(
+                ex.getResponse().getEntity(String.class), "unknown error " + ex.
+                getResponse().getStatus(),
+                Window.Notification.TYPE_ERROR_MESSAGE);
+            }
           }
         }
       }
 
-      queryPanel.setStatus("" + count + " matches");
-      searchWindow.updateQueryCount(count);
-
+      synchronized(getApplication()) 
+      {
+        queryPanel.setStatus("" + count + " matches");
+        searchWindow.updateQueryCount(count);
+      }
       queryPanel.setCountIndicatorEnabled(false);
     }
 
