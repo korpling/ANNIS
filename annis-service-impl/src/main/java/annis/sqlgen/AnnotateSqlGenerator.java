@@ -401,15 +401,8 @@ public abstract class AnnotateSqlGenerator<T>
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    SolutionKey<?> key = createSolutionKey();
-    int size = alternative.size();
-    List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(keyColumn);
-      sb.append(", ");
-    }
+    sb.append("solutions.n, ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
     String orderByClause = sb.toString();
