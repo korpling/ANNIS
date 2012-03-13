@@ -38,6 +38,28 @@ public class AnnotateInnerQuerySqlGenerator
   }
 
   @Override
+  public String toSql(QueryData queryData, int indentBy)
+  {
+    StringBuilder sb = new StringBuilder();
+    
+    String indent = computeIndent(indentBy);
+    
+    indent(sb, indent);
+    sb.append("SELECT row_number() OVER () as n, inn.*");
+    indent(sb, indent);
+    sb.append("FROM (\n");
+    
+    sb.append(super.toSql(queryData, indentBy+1));
+    sb.append("\n");
+    indent(sb, indent);
+    sb.append(") AS inn\n");
+    
+    return sb.toString();
+  }
+  
+  
+
+  @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
