@@ -109,10 +109,7 @@ public class TestAnnotateInnerQuerySqlGenerator
         rightTokenAlias2  + " + " + right + " AS " + "max" + 2 + ", " +
         corpusRefAlias2 + " AS corpus2, " +
         nodeNameAlias2 + " AS name2";
-    
-    System.out.println(expected);
-    System.out.println(actual);
-    
+        
     assertThat(actual, is(expected));
   }
   

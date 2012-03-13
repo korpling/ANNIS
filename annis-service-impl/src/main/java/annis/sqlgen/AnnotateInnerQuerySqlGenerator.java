@@ -114,6 +114,7 @@ public class AnnotateInnerQuerySqlGenerator
     {
       ids.add("corpus" + i);
       ids.add("text" + i);
+      ids.add("min" + i);
       ids.add("name" + i);
     }
     return StringUtils.join(ids, ", ");
