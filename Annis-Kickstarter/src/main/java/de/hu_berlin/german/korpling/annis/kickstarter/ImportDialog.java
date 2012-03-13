@@ -94,6 +94,8 @@ public class ImportDialog extends javax.swing.JDialog
     this.corpusAdministration = corpusAdmin;
 
     initComponents();
+    
+    getRootPane().setDefaultButton(btOk);
 
     isImporting = false;
     worker = new ImportDialogWorker();

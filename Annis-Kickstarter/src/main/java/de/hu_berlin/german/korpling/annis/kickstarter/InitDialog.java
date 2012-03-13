@@ -101,6 +101,7 @@ public class InitDialog extends javax.swing.JDialog
     super(parent, modal);
     initComponents();
 
+    getRootPane().setDefaultButton(btOk);
     this.corpusAdministration = corpusAdministration;
 
     initWorker = new InitDialogWorker(this);
