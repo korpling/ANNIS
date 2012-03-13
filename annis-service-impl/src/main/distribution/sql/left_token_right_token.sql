@@ -20,7 +20,7 @@ AS
           l.left_token AS left_token, l.right_token AS right_token
     FROM _rank as r, _component as c, leftright as l
     WHERE
-      l.parent = r.pre AND c.type in ('c', 'd')
+      l.parent = r.pre AND c.type in ('c', 'd', 'p')
       AND r.component_ref = c.id
   )
   SELECT id, min(left_token) AS left_token, max(right_token) as right_token

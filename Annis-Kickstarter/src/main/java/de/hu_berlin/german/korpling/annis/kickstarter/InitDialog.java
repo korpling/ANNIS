@@ -46,8 +46,8 @@ public class InitDialog extends javax.swing.JDialog
     {
       try
       {
-        corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart",
-          "anniskickstart", "annisKickstartPassword", "postgres",
+        corpusAdministration.initializeDatabase("localhost", "5432", "anniskickstart2",
+          "anniskickstart2", "annisKickstartPassword", "postgres",
           txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()));
 
         return "";
