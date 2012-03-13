@@ -79,9 +79,17 @@ public class TestAnnotateInnerQuerySqlGenerator
     String textRefAlias2 = uniqueAlphaString();
     String leftTokenAlias2 = uniqueAlphaString();
     String rightTokenAlias2 = uniqueAlphaString();
+    String corpusRefAlias1 = uniqueAlphaString();
+    String corpusRefAlias2 = uniqueAlphaString();
+    String nodeNameAlias1 = uniqueAlphaString();
+    String nodeNameAlias2 = uniqueAlphaString();
+    
+    
     given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "text_ref")).willReturn(textRefAlias1, textRefAlias2);
     given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "left_token")).willReturn(leftTokenAlias1, leftTokenAlias2);
     given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "right_token")).willReturn(rightTokenAlias1, rightTokenAlias2);
+    given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "corpus_ref")).willReturn(corpusRefAlias1, corpusRefAlias2);
+    given(tableAccessStrategy.aliasedColumn(NODE_TABLE, "name")).willReturn(nodeNameAlias1, nodeNameAlias2);
     // when
     String actual = generator.selectClause(queryData, alternative, INDENT);
     // then
@@ -91,12 +99,20 @@ public class TestAnnotateInnerQuerySqlGenerator
         textRefAlias1  + " AS " + "text" + 1 + ", " + 
         leftTokenAlias1  + " - " + left + " AS " + "min" + 1 + ", " + 
         rightTokenAlias1  + " + " + right + " AS " + "max" + 1 + ", " + 
+        corpusRefAlias1 + " AS corpus1, " +
+        nodeNameAlias1 + " AS name1, " +
         "\n" + INDENT + TABSTOP + 
         key2Column1 + ", " +
         key2Column2 + ", " + 
         textRefAlias2  + " AS " + "text" + 2 + ", " + 
         leftTokenAlias2  + " - " + left + " AS " + "min" + 2 + ", " + 
-        rightTokenAlias2  + " + " + right + " AS " + "max" + 2;
+        rightTokenAlias2  + " + " + right + " AS " + "max" + 2 + ", " +
+        corpusRefAlias2 + " AS corpus2, " +
+        nodeNameAlias2 + " AS name2";
+    
+    System.out.println(expected);
+    System.out.println(actual);
+    
     assertThat(actual, is(expected));
   }
   
