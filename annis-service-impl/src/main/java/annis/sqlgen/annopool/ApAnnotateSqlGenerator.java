@@ -92,6 +92,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
+    sb.append(indent).append(TABSTOP + "solutions.n,\n");
 
     List<String> fields = new ArrayList<String>();
     // facts.fid is never evaluated in the result set

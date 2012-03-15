@@ -38,6 +38,28 @@ public class AnnotateInnerQuerySqlGenerator
   }
 
   @Override
+  public String toSql(QueryData queryData, int indentBy)
+  {
+    StringBuilder sb = new StringBuilder();
+    
+    String indent = computeIndent(indentBy);
+    
+    indent(sb, indent);
+    sb.append("SELECT row_number() OVER () as n, inn.*");
+    indent(sb, indent);
+    sb.append("FROM (\n");
+    
+    sb.append(super.toSql(queryData, indentBy+1));
+    sb.append("\n");
+    indent(sb, indent);
+    sb.append(") AS inn\n");
+    
+    return sb.toString();
+  }
+  
+  
+
+  @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
@@ -56,6 +78,8 @@ public class AnnotateInnerQuerySqlGenerator
         + annotateQueryData.getLeft() + " AS min" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") + " + "
         + annotateQueryData.getRight() + " AS max" + i);
+      fields.add(tables.aliasedColumn(NODE_TABLE, "corpus_ref") + " AS corpus" + i);
+      fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
       
       selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields, ", "));
       
@@ -88,7 +112,10 @@ public class AnnotateInnerQuerySqlGenerator
     List<String> ids = new ArrayList<String>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
-      ids.add("id" + i);
+      ids.add("corpus" + i);
+      ids.add("text" + i);
+      ids.add("min" + i);
+      ids.add("name" + i);
     }
     return StringUtils.join(ids, ", ");
   }

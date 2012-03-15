@@ -15,8 +15,6 @@
  */
 package annis.sqlgen;
 
-import annis.model.AnnotationGraph;
-import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
@@ -31,7 +29,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
@@ -401,15 +398,8 @@ public abstract class AnnotateSqlGenerator<T>
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    SolutionKey<?> key = createSolutionKey();
-    int size = alternative.size();
-    List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(keyColumn);
-      sb.append(", ");
-    }
+    sb.append("solutions.n, ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
     String orderByClause = sb.toString();
