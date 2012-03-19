@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.spi.DirStateFactory.Result;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -51,6 +50,7 @@ public class PartiturVisualizer extends WriterVisualizer
   {
     long offset = token.get(0).getTokenIndex();
     String time = null;
+    TimeHelper t = null;
 
     for (long i = rightNode.getTokenIndex() + 1 - offset; i < token.size(); i++)
     {
@@ -63,8 +63,8 @@ public class PartiturVisualizer extends WriterVisualizer
         }
       }
 
-      String startTime = getTimePosition(time, true);
-      String endTime = getTimePosition(time, false);
+      String startTime =t.getStartTime(time);
+      String endTime = t.getEndTime(time);
 
       if (startTime != null && !"".equals(startTime))
       {
@@ -521,6 +521,7 @@ public class PartiturVisualizer extends WriterVisualizer
   private String addTimeAttribute(long nodeId)
   {
     AnnisNode root = null;
+    TimeHelper t = new TimeHelper();
     for (AnnisNode n : nodes)
     {
       if (n.getId() == nodeId)
@@ -540,68 +541,6 @@ public class PartiturVisualizer extends WriterVisualizer
 
     AnnisNode leftNode = token.get((int) (left - leftOffset));
     AnnisNode rightNode = token.get((int) (right - leftOffset));
-    String startTime = getTimePosition(getTimeAnnotation(leftNode), true);
-    String endTime = getTimePosition(getTimeAnnotation(rightNode), false);
-
-    // try to find the next end time definition if this token does not have one
-    if ("undefined".equals(endTime))
-    {
-      endTime = getNextEndTime(rightNode);
-    }
-
-    // if there is no start time, we do not add the time attribute
-    if (startTime.equals(""))
-    {
-      return "";
-    }
-
-    return "time=\"" + startTime + "-" + endTime + "\"";
-  }
-
-  private String getTimeAnnotation(AnnisNode node)
-  {
-    for (Annotation anno : node.getNodeAnnotations())
-    {
-      if (anno.getName().equals("time"))
-      {
-        return anno.getValue();
-      }
-    }
-    return "";
-  }
-
-  /**
-   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, 
-   * we return the first value, otherwise we did try to return the second. The 
-   * end time don't have to be annotated, in this case it returns "undefined". 
-   * Without a defined start time the result is an empty String ""
-   * @param time
-   * @param first
-   * @return null, when time parameter is null
-   */
-  private String getTimePosition(String time, boolean first)
-  {
-
-    if (time == null)
-    {
-      return null;
-    }
-
-    String[] splittedTimeAnno = time.split("-");
-    if (splittedTimeAnno.length > 1)
-    {
-      if (first)
-      {
-        return splittedTimeAnno[0];
-      }
-      return splittedTimeAnno[1];
-    }
-
-    if (first)
-    {
-      return splittedTimeAnno[0];
-    }
-    // if we want the end time, return undefined.
-    return "undefined";
+    return t.getTimeAnno(leftNode, rightNode);
   }
 }
