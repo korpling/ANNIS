@@ -39,6 +39,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    List<Long> corpusList = queryData.getCorpusList();
     StringBuffer sb = new StringBuffer();
 
     indent(sb, indent);
@@ -56,11 +57,21 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     sb.append("\n");
     indent(sb, indent + TABSTOP);
     sb.append(
-      "LEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)");
+      "LEFT OUTER JOIN annotation_pool AS node_anno ON "
+      + "(facts.node_anno_ref = node_anno.id AND "
+      + "facts.toplevel_corpus = node_anno.toplevel_corpus AND "
+      + "node_anno.toplevel_corpus IN (")
+      .append(StringUtils.join(corpusList, ", "))
+      .append("))");
     sb.append("\n");
     indent(sb, indent + TABSTOP);
     sb.append(
-      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id)");
+      "LEFT OUTER JOIN annotation_pool AS edge_anno ON "
+      + "(facts.edge_anno_ref = edge_anno.id AND "
+      + "facts.toplevel_corpus = edge_anno.toplevel_corpus AND "
+      + "edge_anno.toplevel_corpus IN (")
+      .append(StringUtils.join(corpusList, ", "))
+      .append("))");
 
     sb.append(",\n");
 
