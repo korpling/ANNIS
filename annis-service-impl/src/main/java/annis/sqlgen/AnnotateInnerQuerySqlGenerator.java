@@ -112,10 +112,7 @@ public class AnnotateInnerQuerySqlGenerator
     List<String> ids = new ArrayList<String>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
-      ids.add("corpus" + i);
-      ids.add("text" + i);
-      ids.add("min" + i);
-      ids.add("name" + i);
+      ids.add("id" + i);
     }
     return StringUtils.join(ids, ", ");
   }

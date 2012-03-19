@@ -535,8 +535,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         }
         catch (SaltException ex)
         {
-          Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
-            Level.WARNING, "invalid edge detected", ex);
+          //Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
+          //  Level.WARNING, "invalid edge detected", ex);
         }
       } // end if no existing relation
 

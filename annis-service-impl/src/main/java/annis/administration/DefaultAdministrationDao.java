@@ -32,25 +32,19 @@ import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Types;
-import javax.activation.MimetypesFileTypeMap;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -206,18 +200,17 @@ public class DefaultAdministrationDao implements AdministrationDao
     bulkImport(path);
     computeTopLevelCorpus();
 
+    computeLeftTokenRightToken();
+    createStagingAreaIndexes();
+    
+//    if (true) return;
+    
+    analyzeStagingTables();
     long corpusID = updateIds();
 
     importBinaryData(path);
     extendStagingText(corpusID);
 
-    createStagingAreaIndexes();
-    analyzeStagingTables();
-
-    // finish transaction here to debug computation of left|right-token
-    // if (true) return;
-    computeLeftTokenRightToken();
-//      if (true) return;
     computeRealRoot();
     computeLevel();
     computeCorpusStatistics();
@@ -418,15 +411,18 @@ public class DefaultAdministrationDao implements AdministrationDao
     int numOfEntries = jdbcTemplate.getJdbcOperations().queryForInt(
       "SELECT COUNT(*) from corpus_stats");
 
+    long recentCorpusId = 0; 
+    
     if (numOfEntries > 0)
     {
-      long recentCorpusId = jdbcTemplate.getJdbcOperations().queryForLong(
+      recentCorpusId = jdbcTemplate.getJdbcOperations().queryForLong(
         "SELECT max(id) FROM corpus_stats");
-      log.info("the id from recently imported corpus:" + recentCorpusId);
-      MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
-      executeSqlFromScript("update_ids.sql", args);
+      log.info("the id from recently imported corpus:" + recentCorpusId);      
     }
 
+    MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
+    executeSqlFromScript("update_ids.sql", args);
+    
     log.info("query for the new corpus ID");
     long result = jdbcTemplate.getJdbcOperations().queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
