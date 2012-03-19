@@ -198,14 +198,16 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-    computeTopLevelCorpus();
-
-    computeLeftTokenRightToken();
+    
     createStagingAreaIndexes();
+    
+    computeTopLevelCorpus();
+    analyzeStagingTables();
+    
+    computeLeftTokenRightToken();
     
 //    if (true) return;
     
-    analyzeStagingTables();
     long corpusID = updateIds();
 
     importBinaryData(path);
