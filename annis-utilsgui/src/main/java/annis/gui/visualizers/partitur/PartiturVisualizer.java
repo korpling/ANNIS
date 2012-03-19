@@ -498,7 +498,7 @@ public class PartiturVisualizer extends WriterVisualizer
 
   /**
    * We need to know, in which place of DOM the media visulizer are plugged in, 
-   * so we could call the seekAndPlay() function with the help of 
+   * so we could  call the seekAndPlay() function with the help of 
    * PartiturVisualizer.js
    * 
    * @param mediaIDs
