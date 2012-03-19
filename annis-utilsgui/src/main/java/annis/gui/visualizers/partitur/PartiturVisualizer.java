@@ -63,7 +63,7 @@ public class PartiturVisualizer extends WriterVisualizer
         }
       }
 
-      String startTime =t.getStartTime(time);
+      String startTime = t.getStartTime(time);
       String endTime = t.getEndTime(time);
 
       if (startTime != null && !"".equals(startTime))
@@ -409,15 +409,15 @@ public class PartiturVisualizer extends WriterVisualizer
       try
       {
         String annisLine = "";
-        for(int i=0; i < ex.getStackTrace().length; i++)
+        for (int i = 0; i < ex.getStackTrace().length; i++)
         {
-          if(ex.getStackTrace()[i].getClassName().startsWith("annis."))
+          if (ex.getStackTrace()[i].getClassName().startsWith("annis."))
           {
             annisLine = ex.getStackTrace()[i].toString();
           }
         }
-        
-        writer.append("<html><body>Error occured (" 
+
+        writer.append("<html><body>Error occured ("
           + ex.getClass().getName()
           + "): " + ex.getLocalizedMessage() + "<br/>"
           + annisLine
@@ -496,6 +496,14 @@ public class PartiturVisualizer extends WriterVisualizer
     return false;
   }
 
+  /**
+   * We need to know, in which place of DOM the media visulizer are plugged in, 
+   * so we could call the seekAndPlay() function with the help of 
+   * PartiturVisualizer.js
+   * 
+   * @param mediaIDs
+   * @return a string which represents a javascript array
+   */
   private String convertToJavacSriptArray(List<String> mediaIDs)
   {
     // in case there is no media visualizer do not build an array
