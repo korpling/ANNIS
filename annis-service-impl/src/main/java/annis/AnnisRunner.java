@@ -43,7 +43,6 @@ import annis.dao.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
-import annis.model.AnnotationGraph;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
@@ -54,14 +53,12 @@ import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
-import annis.utils.LegacyGraphConverter;
 import annis.utils.Utils;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.*;
-import java.util.logging.Level;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
@@ -89,10 +86,10 @@ public class AnnisRunner extends AnnisBaseRunner
   private boolean isDDDQueryMode;
   private QueryAnalysis queryAnalysis;
   // settings
-  private int limit;
+  private int limit = 10;
   private int offset;
-  private int left;
-  private int right;
+  private int left = 5;
+  private int right = 5;
   private List<Long> corpusList;
   private boolean clearCaches;
 
