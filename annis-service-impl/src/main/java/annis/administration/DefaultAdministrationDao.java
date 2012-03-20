@@ -172,14 +172,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void createSchema()
   {
     log.info("creating Annis database schema (" + dbLayout + ")");
-    executeSqlFromScript("schema_" + dbLayout + ".sql");
+    executeSqlFromScript(dbLayout + "/schema.sql");
   }
   
   @Override
   public void createSchemaIndexes()
   {
     log.info("creating Annis database schema indexes (" + dbLayout + ")");
-    executeSqlFromScript("schemaindex_" + dbLayout + ".sql");
+    executeSqlFromScript(dbLayout + "/schemaindex.sql");
   }
 
   @Override
@@ -535,14 +535,14 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts_" + dbLayout + ".sql", args);
+    executeSqlFromScript(dbLayout + "/facts.sql", args);
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
     executeSqlFromScript("cluster.sql", args);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_" + dbLayout + ".sql", args);
+    executeSqlFromScript(dbLayout + "/indexes.sql", args);
 
   }
 

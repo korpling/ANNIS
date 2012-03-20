@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+
+	xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:tx="http://www.springframework.org/schema/tx"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+	
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	">
+
+	<!-- Enable bean autowiring -->
+  <context:annotation-config/>
+	
+	<!-- Enable AspectJ-style AOP annotations -->
+  <aop:aspectj-autoproxy/>
+	
+   
+	<!-- Transaction management -->
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <!-- database connection configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="file:${annis.home}/conf/database.properties"/>
+    <property name="placeholderPrefix" value="$dao{"/>
+  </bean>
+	<!-- DataSource -->
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="$dao{datasource.driver}"/>
+    <property name="url" value="$dao{datasource.url}"/>
+    <property name="username" value="$dao{datasource.username}"/>
+    <property name="password" value="$dao{datasource.password}"/>
+  </bean>
+
+
+  <bean id="countExtractor" class="annis.dao.CountExtractor">
+    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
+  </bean>
+
+	<!-- Helper for weka command -->
+  <bean id="wekaHelper" class="annis.WekaHelper"/>
+	
+	<!-- Helper for list command -->
+  <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper"/>
+		
+	<!-- Helper for nodeAnnotations command -->
+  <bean id="listAnnotationsSqlHelper" class="annis.sqlgen.ListAnnotationsSqlHelper"/>
+		
+	<!-- Helper for listCorpusAnnotations command -->
+  <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
+      
+	<!-- DddQueryParser -->
+  <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
+  <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
+		
+  <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
+    <property name="requiredType" value="java.lang.Long"/>
+  </bean>
+
+  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="fetchSize" value="0"/>
+  </bean>
+
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter">
+    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
+		<!--<property name="dataSource" ref="dataSource"/>-->
+    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
+  </bean>
+  
+  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" />
+
+  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
+    <property name="scriptFile" value="modify_session.sql"/>
+    <property name="administrationDao">
+      <bean class="annis.administration.ApAdministrationDao">
+        <property name="scriptPath" value="${annis.script-path}"/>
+        <property name="dataSource" ref="dataSource"/>
+      </bean>
+    </property>
+  </bean>
+	
+   <!-- BEGIN EXPORTS -->
+   
+	<!-- exported bean: AnnisDao -->
+  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init">
+
+    <!-- configuration -->
+    <property name="timeout" value="${annis.sql-timeout}"/>
+
+    <property name="countSqlGenerator" ref="countSqlGenerator"/>
+    <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
+    <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
+    <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
+
+    <property name="dataSource" ref="dataSource"/>
+
+    <property name="aqlParser" ref="annisParser"/>
+    <property name="sqlGenerator" ref="findSqlGenerator"/>
+    <property name="dddqueryParser" ref="dddQueryParser" />
+    <property name="dddqueryAnalysis" ref="queryAnalysis" />
+
+    <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
+    <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
+    <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
+		
+    <property name="queryAnalysis" ref="aqlAnalysis"/>
+    <property name="findSqlGenerator" ref="findSqlGenerator"/>
+    <property name="sqlSessionModifiers">
+      <util:list>
+        <ref bean="annisDao"/>
+        <ref bean="sqlScriptSessionModifier"/>
+      </util:list>
+    </property>
+    
+    <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
+    <property name="countExtractor" ref="countExtractor"/>
+
+    <property name="metaDataFilter" ref="metaDataFilter" />
+    <property name="byteHelper" ref="byteHelper" />
+
+  </bean>
+
+
+	<!-- exported Database API for administration tasks -->
+  <bean id="administrationDao" class="annis.administration.ApAdministrationDao">
+    <property name="scriptPath" value="${annis.script-path}"/>
+    <property name="externalFilesPath" value="${annis.external-data-path}"/>
+    <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
+    <property name="dbLayout" value="${annis.mode}" />
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+
+  <!-- END EXPORTS -->
+
+</beans>
