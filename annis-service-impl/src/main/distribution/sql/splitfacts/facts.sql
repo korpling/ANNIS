@@ -1,5 +1,6 @@
 --- :id is replaced by code
-DROP TABLE IF EXISTS facts_:id;
+DROP TABLE IF EXISTS facts_edge_:id;
+DROP TABLE IF EXISTS facts_node_:id;
 DROP TABLE IF EXISTS node_anno_:id;
 DROP TABLE IF EXISTS edge_anno_:id;
 
@@ -127,7 +128,7 @@ FROM
 ;
 
 -----------------
--- FACTS: node --
+-- FACTS: edge --
 -----------------
 
 CREATE TABLE facts_edge_:id
@@ -153,30 +154,15 @@ INSERT INTO facts_edge_:id
   edge_type,
   edge_namespace,
   edge_name,
-  node_anno_ref,
   edge_anno_ref,
-  n_sample,
-  n_na_sample,
-  n_r_c_ea_sample,
-  n_r_c_sample,
-  n_r_c_na_sample
+  r_c_sample
 )
 
 SELECT
   *,
-  (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
-  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample,
-  (row_number() OVER (PARTITION BY id,
+  (row_number() OVER (PARTITION BY node_ref,
                                   parent,
-                                  component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id) = 1) AS n_r_c_rownum,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_rownum
+                                  component_id) = 1) AS r_c_sample
 FROM
 (
   SELECT

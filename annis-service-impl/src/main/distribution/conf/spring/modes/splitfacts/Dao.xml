@@ -133,7 +133,7 @@
 
 
 	<!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.ApAdministrationDao">
+  <bean id="administrationDao" class="annis.administration.SfAdministrationDao">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />

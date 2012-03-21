@@ -230,7 +230,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     // create the new facts table partition
     createFacts(corpusID);
     // the entries, which where here done, are possible after generating facts
-    updateCorpusStatistic();
+    updateCorpusStatistic(corpusID);
 
 
     if (temporaryStagingArea)
@@ -388,10 +388,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("corpus_stats.sql");
   }
 
-  void updateCorpusStatistic()
+  void updateCorpusStatistic(long corpusID)
   {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     log.info("updating statistics for top-level corpus");
-    executeSqlFromScript("corpus_stats_upd.sql");
+    executeSqlFromScript("corpus_stats_upd.sql", args);
   }
 
   void computeCorpusPath(long corpusID)
@@ -537,13 +538,23 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript(dbLayout + "/facts.sql", args);
 
-    log.info("clustering materialized facts table for corpus with ID "
-      + corpusID);
-    executeSqlFromScript("cluster.sql", args);
-
+    clusterFacts(corpusID);
+    
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript(dbLayout + "/indexes.sql", args);
 
+  }
+  
+  void clusterFacts(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+
+    log.info("clustering materialized facts table for corpus with ID "
+      + corpusID);
+    if(!executeSqlFromScript(dbLayout + "/cluster.sql", args))
+    {
+      executeSqlFromScript("cluster.sql", args);
+    }
   }
 
   ///// Other sub tasks
@@ -699,14 +710,14 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
-  public void executeSqlFromScript(String script)
+  public boolean executeSqlFromScript(String script)
   {
-    executeSqlFromScript(script, null);
+    return executeSqlFromScript(script, null);
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
-  public void executeSqlFromScript(String script, MapSqlParameterSource args)
+  public boolean executeSqlFromScript(String script, MapSqlParameterSource args)
   {
     File fScript = new File(scriptPath, script);
     if(fScript.canRead() && fScript.isFile())
@@ -715,10 +726,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.debug("executing SQL script: " + resource.getFilename());
       String sql = readSqlFromResource(resource, args);
       jdbcTemplate.getJdbcOperations().execute(sql);
+      return true;
     }
     else
     {
       log.debug("SQL script " +  fScript.getName() +  " does not exist");
+      return false;
     }
   }
 
@@ -855,6 +868,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
 
+  public NamedParameterJdbcTemplate getJdbcTemplate()
+  {
+    return jdbcTemplate;
+  }
+  
   public String getScriptPath()
   {
     return scriptPath;

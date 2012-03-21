@@ -21,20 +21,19 @@ import org.apache.log4j.Logger;
  *
  * @author thomas
  */
-public class ApAdministrationDao extends DefaultAdministrationDao
+public class SfAdministrationDao extends DefaultAdministrationDao
 {
 
   private static final Logger log = Logger.getLogger(ApAdministrationDao.class);
-
+  
   @Override
-  public void populateSchema()
+  void analyzeFacts(long corpusID)
   {
-    super.populateSchema();
-
-    log.info(
-      "creating immutable functions for getting annotations from the annotation pool");
-    executeSqlFromScript(getDbLayout() + "/functions_get.sql");
+    log.info("analyzing facts_node table for corpus with ID " + corpusID);
+    getJdbcTemplate().getJdbcOperations().execute("ANALYZE facts_node_" + corpusID);
     
+    log.info("analyzing facts_edge table for corpus with ID " + corpusID);
+    getJdbcTemplate().getJdbcOperations().execute("ANALYZE facts_edge_" + corpusID);
   }
-
+  
 }
