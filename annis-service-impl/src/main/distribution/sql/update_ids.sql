@@ -19,37 +19,37 @@ FROM
 
 UPDATE _node_annotation SET node_ref = 
   (SELECT "new" FROM _nodeidmapping WHERE "old" = node_ref) 
-  + (SELECT  max_node_id FROM corpus_stats WHERE id = :id);
+  + COALESCE((SELECT  max_node_id FROM corpus_stats WHERE id = :id), 0);
     
 UPDATE _rank
 SET 
- pre = pre + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
- post = post + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
+ pre = pre + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id),0),
+ post = post + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id), 0),
  node_ref = (SELECT "new" FROM _nodeidmapping WHERE "old" = node_ref) 
-            + (SELECT max_node_id FROM corpus_stats WHERE id = :id),
- parent = parent + (SELECT max_rank_post FROM corpus_stats WHERE id = :id),
- component_ref = component_ref + (SELECT max_component_id FROM corpus_stats WHERE id = :id);
+            + COALESCE((SELECT max_node_id FROM corpus_stats WHERE id = :id), 0),
+ parent = parent + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id), 0),
+ component_ref = component_ref + COALESCE((SELECT max_component_id FROM corpus_stats WHERE id = :id),0);
 
-UPDATE _component SET id = id + (SELECT max_component_id FROM corpus_stats WHERE id = :id);
+UPDATE _component SET id = id + COALESCE((SELECT max_component_id FROM corpus_stats WHERE id = :id),0);
 
-UPDATE _edge_annotation SET rank_ref = rank_ref + (SELECT  max_rank_post FROM corpus_stats WHERE id = :id);
+UPDATE _edge_annotation SET rank_ref = rank_ref + COALESCE((SELECT  max_rank_post FROM corpus_stats WHERE id = :id), 0);
     
 UPDATE _node
 SET 
  id = (SELECT "new" FROM _nodeidmapping WHERE "old" = id) 
-      + (SELECT max_node_id FROM corpus_stats WHERE id = :id),
- text_ref = text_ref + (SELECT  max_text_id FROM corpus_stats WHERE id = :id),
- corpus_ref = corpus_ref + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id),
- toplevel_corpus = toplevel_corpus + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id);
+      + COALESCE((SELECT max_node_id FROM corpus_stats WHERE id = :id),0),
+ text_ref = text_ref + COALESCE((SELECT  max_text_id FROM corpus_stats WHERE id = :id),0),
+ corpus_ref = corpus_ref + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0),
+ toplevel_corpus = toplevel_corpus + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0);
     
-UPDATE _text SET id = id + (SELECT  max_text_id FROM corpus_stats WHERE id = :id);
+UPDATE _text SET id = id + COALESCE((SELECT  max_text_id FROM corpus_stats WHERE id = :id),0);
     
 UPDATE _corpus
 SET 
- id = id + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id),
- pre = pre + (SELECT max_corpus_post FROM corpus_stats WHERE id = :id),
- post = post + (SELECT max_corpus_post FROM corpus_stats WHERE id = :id);
+ id = id + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0),
+ pre = pre + COALESCE((SELECT max_corpus_post FROM corpus_stats WHERE id = :id),0),
+ post = post + COALESCE((SELECT max_corpus_post FROM corpus_stats WHERE id = :id),0);
 
-UPDATE _corpus_annotation SET corpus_ref = corpus_ref + (SELECT max_corpus_id FROM corpus_stats WHERE id = :id);
+UPDATE _corpus_annotation SET corpus_ref = corpus_ref + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0);
 
 DROP TABLE _nodeidmapping;
