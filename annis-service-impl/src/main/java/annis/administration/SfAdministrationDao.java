@@ -46,5 +46,11 @@ public class SfAdministrationDao extends DefaultAdministrationDao
     log.info("analyzing facts_edge table for corpus with ID " + corpusID);
     getJdbcTemplate().getJdbcOperations().execute("ANALYZE facts_edge_"
       + corpusID);
+    
+    log.info("analyzing general facts_node table");
+    getJdbcTemplate().getJdbcOperations().execute("ANALYZE facts_node");
+
+    log.info("analyzing general facts_edge table");
+    getJdbcTemplate().getJdbcOperations().execute("ANALYZE facts_edge");
   }
 }
