@@ -73,7 +73,7 @@ public class TableJoinsInFromClauseSqlGenerator
 		}
 		
 		// add node annotation table if it is required by the SELECT clause, but not materialized with node table
-		if (! tables(node).usesNodeAnnotationTable() && node.requiresTable(NODE_ANNOTATION_TABLE) && 
+		if (! tables(node).usesNodeAnnotationTable() && node.getNodeAnnotations().size() > 0 && 
 				! tables(node).isMaterialized(NODE_ANNOTATION_TABLE, NODE_TABLE)) {
 			sb.append(" ");
 			sb.append(joinDefinition(node, NODE_ANNOTATION_TABLE, "node_ref", NODE_TABLE, "id", leftJoin));
@@ -88,13 +88,7 @@ public class TableJoinsInFromClauseSqlGenerator
 				sb.append(joinDefinition(node, EDGE_ANNOTATION_TABLE, "rank_ref", RANK_TABLE, "pre", i, leftJoin));
 			}
 		}
-		
-		// text table
-		if (node != null && node.requiresTable(TEXT_TABLE)) {
-			sb.append(" ");
-			sb.append(joinDefinition(node, TEXT_TABLE, "id", NODE_TABLE, "text_ref", false));
-		}
-		
+				
 		return sb.toString(); 
 	}
 

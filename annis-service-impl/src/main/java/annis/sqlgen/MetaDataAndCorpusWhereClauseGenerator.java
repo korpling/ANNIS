@@ -17,6 +17,7 @@ package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,46 +25,54 @@ import java.util.Set;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.model.Join;
 
 /**
  *
  * @author thomas
  */
-public class MetaDataAndCorpusWhereClauseGenerator 
+public class MetaDataAndCorpusWhereClauseGenerator
   extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator<QueryData>
 {
 
-	@Override
-	public Set<String> whereConditions(QueryData queryData,
-			List<QueryNode> alternative, String indent) {
-		Set<String> conditions = new HashSet<String>();
-		List<Long> corpusList = queryData.getCorpusList();
-		List<Long> documents = queryData.getDocuments();
-		
-	    if (documents == null && corpusList == null)
-	    {
-	      return new HashSet<String>();
-	    }
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    Set<String> conditions = new HashSet<String>();
+    List<Long> corpusList = queryData.getCorpusList();
+    List<Long> documents = queryData.getDocuments();
 
-	    for (QueryNode node : alternative) {
-			// FIXME: where condition comment should be optional 
-			// conditions.add("-- select documents by metadata and toplevel corpus");
-			if (documents != null && ! documents.isEmpty() )
-			{
-				conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
-			    documents));
-			}
-			
-			if (corpusList != null && ! corpusList.isEmpty())
-			{
-				conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "toplevel_corpus"),
-			    corpusList));
-			
-			}
-		}
-		
-		return conditions;
-	}
+    if (documents == null && corpusList == null)
+    {
+      return new HashSet<String>();
+    }
 
+    for (QueryNode node : alternative)
+    {
+      // FIXME: where condition comment should be optional 
+      // conditions.add("-- select documents by metadata and toplevel corpus");
+      if (documents != null && !documents.isEmpty())
+      {
+        conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
+          documents));
+      }
+
+      if (corpusList != null && !corpusList.isEmpty())
+      {
+        conditions.add(in(tables(node).aliasedColumn(NODE_TABLE,
+          "toplevel_corpus"),
+          corpusList));
+        if(tables(node).usesRankTable() && !tables(node).isMaterialized(RANK_TABLE, NODE_TABLE))
+        {
+          conditions.add(in(tables(node).aliasedColumn(RANK_TABLE,
+            "toplevel_corpus"),
+            corpusList));
+        }
+      }
+    }
+
+    return conditions;
+  }
 }

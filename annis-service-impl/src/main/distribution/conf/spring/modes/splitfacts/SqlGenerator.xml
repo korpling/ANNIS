@@ -280,7 +280,7 @@ limitations under the License.
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
     <ref bean="defaultWhereClauseGenerator" />
-    <ref bean="subcorpusConstraintWhereClause" />
+    <!--<ref bean="subcorpusConstraintWhereClause" />-->
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />
   </util:list>
