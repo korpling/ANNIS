@@ -33,8 +33,7 @@ public class ApAdministrationDao extends DefaultAdministrationDao
 
     log.info(
       "creating immutable functions for getting annotations from the annotation pool");
-    executeSqlFromScript(getDbLayout() + "/functions_get.sql");
-    
+    executeSqlFromScript(getDbLayout() + "/functions_get.sql"); 
   }
 
 }

@@ -99,7 +99,7 @@ limitations under the License.
     <entry key="rank">
       <util:map>
         <entry key="component_ref" value="component_id" />
-        <entry key="node_ref" value="id" />
+        <entry key="node_ref" value="node_ref" />
       </util:map>
     </entry>
     <entry key="node_annotation">
