@@ -208,12 +208,16 @@ public class DefaultAdministrationDao implements AdministrationDao
     
 //    if (true) return;
     
+    adjustRankPrePost();
     long corpusID = updateIds();
 
     importBinaryData(path);
     extendStagingText(corpusID);
 
     computeRealRoot();
+
+//    if (true) return;
+    
     computeLevel();
     computeCorpusStatistics();
     updateCorpusStatsId(corpusID);
@@ -403,6 +407,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("compute_corpus_path.sql", args);
   }
 
+  protected void  adjustRankPrePost()
+  {
+    log.info("updating pre and post order in _rank");
+    executeSqlFromScript("adjustrankprepost.sql");
+  }
+  
   /**
    *
    * @return the new corpus ID
@@ -576,7 +586,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
-      jdbcTemplate.getJdbcOperations().execute("DROP TABLE facts_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_edge_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_node_" + l);
       log.debug("dropping annotation_pool table for corpus " + l);
       jdbcTemplate.getJdbcOperations()
         .execute("DROP TABLE IF EXISTS annotation_pool_" + l);
