@@ -411,6 +411,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("updating pre and post order in _rank");
     executeSqlFromScript("adjustrankprepost.sql");
+    log.info("analyzing rank");
+      jdbcTemplate.getJdbcOperations()
+        .execute("ANALYZE " + tableInStagingArea("rank"));
   }
   
   /**
