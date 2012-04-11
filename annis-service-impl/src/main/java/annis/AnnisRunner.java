@@ -54,11 +54,13 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
+import au.com.bytecode.opencsv.CSVWriter;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.*;
+import java.util.logging.Level;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
@@ -327,6 +329,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doBenchmark(String benchmarkCount)
   {
+
     int count = Integer.parseInt(benchmarkCount);
     out.println("---> executing " + benchmarks.size() + " queries " + count
       + " times");
@@ -488,6 +491,34 @@ public class AnnisRunner extends AnnisBaseRunner
         + options));
     }
     out.println();
+    
+    // CSV output
+        try
+    {
+      CSVWriter csv = new CSVWriter(new FileWriter(new File("annis_benchmark_result.csv")));
+      
+      String[] header = new String[] {"corpora", "query", "avg", "diff-best", "diff-worst"};
+      csv.writeNext(header);
+      for (AnnisRunner.Benchmark benchmark : benchmarks)
+      {
+        String[] line = new String[5];        
+        line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
+        line[1] = benchmark.functionCall;
+        line[2] = "" +  benchmark.avgTimeInMilliseconds;
+        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - benchmark.avgTimeInMilliseconds);
+        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds - benchmark.worstTimeInMilliseconds);
+        csv.writeNext(line);
+      }
+      
+      csv.close();
+      
+    }
+    catch (IOException ex)
+    {
+      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+    
   }
 
   public String benchmarkOptions(QueryData queryData)
