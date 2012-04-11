@@ -298,7 +298,9 @@ public class TestDefaultWhereClauseGenerator
         "d",
         null,
         join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
+      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
   }
 
   /**
@@ -316,7 +318,9 @@ public class TestDefaultWhereClauseGenerator
         "d",
         null,
         join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts as lrsub WHERE parent=_rank23.pre AND corpus_ref=_node42.corpus_ref AND toplevel_corpus IN(NULL))");
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
+      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
   }
 
   /**
