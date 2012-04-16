@@ -542,7 +542,6 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     // some calculations for index shifting
-
     AnnisNode leftNode = detectHoles.getLeftBorder(root);
     AnnisNode rightNode = detectHoles.getRightBorder(root);
     return t.getTimeAnno(leftNode, rightNode);    

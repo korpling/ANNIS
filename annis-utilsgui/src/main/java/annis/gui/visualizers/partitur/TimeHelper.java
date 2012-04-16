@@ -17,7 +17,6 @@ package annis.gui.visualizers.partitur;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
-import java.util.List;
 
 /**
  *
@@ -25,9 +24,6 @@ import java.util.List;
  */
 public class TimeHelper
 {
-
-  private List<AnnisNode> token;
-  private List<AnnisNode> nodes;
 
   public String getStartTime(String time)
   {
@@ -40,13 +36,12 @@ public class TimeHelper
   }
 
   /**
-   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, 
+   * Split a time annotation s.ms-(s.ms)? Whether the flag first is set to true, 
    * we return the first value, otherwise we did try to return the second. The 
    * end time don't have to be annotated, in this case it returns "undefined". 
    * Without a defined start time the result is an empty String ""
-   * @param time
-   * @param first
-   * @return null, when time parameter is null
+   * 
+   * @return "undefined", when time parameter is null
    */
   private String getTimePosition(String time, boolean first)
   {
@@ -79,7 +74,7 @@ public class TimeHelper
     // if we want the end time, return undefined.
     return "undefined";
   }
-  
+
   String getTimeAnnotation(AnnisNode node)
   {
     for (Annotation anno : node.getNodeAnnotations())
@@ -94,7 +89,15 @@ public class TimeHelper
 
   public String getTimeAnno(AnnisNode leftNode, AnnisNode rightNode)
   {
-    return (getStartTime(getTimeAnnotation(leftNode) + getEndTime(getTimeAnnotation(rightNode))));
+    String startTime = getStartTime(getTimeAnnotation(leftNode));
+    String endTime = getEndTime(getTimeAnnotation(rightNode));
+
+    // when no start time is given, we do not have to add something
+    if ("undefined".equals(startTime))
+    {
+      return "";
+    }
+
+    return ("time=" + startTime + "-" + endTime);
   }
-  
 }
