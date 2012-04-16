@@ -69,7 +69,8 @@ public class DetectHoles
         continue;
       }
 
-      if (tmp.first <= leftTokIdx)
+      // if the left bound is between two intervalls
+      if (tripel.second <= leftTokIdx && leftTokIdx < tmp.first)
       {
         tripel = tmp;
       }
@@ -82,25 +83,26 @@ public class DetectHoles
 
   public AnnisNode getRightBorder(AnnisNode n)
   {
-    Tripel tupel = null;
+    Tripel tripel = null;
     long rightTokIdx = n.getRightToken();
 
     for (Tripel tmp : intervalls)
     {
       if (tmp.first <= rightTokIdx && rightTokIdx <= tmp.second)
       {
-        tupel = tmp;
+        tripel = tmp;
         break;
       }
 
       if (rightTokIdx >= tmp.second)
       {
-        tupel = tmp;
+        tripel = tmp;
       }
     }
 
-    long rightBorder = tupel.second >= rightTokIdx ? rightTokIdx : tupel.second;
-    return token.get((int) (rightBorder - tupel.offset));
+    long rightBorder = tripel.second >= rightTokIdx ? rightTokIdx
+      : tripel.second;
+    return token.get((int) (rightBorder - tripel.offset));
   }
 
   private List<Tripel> createIntervalls(List<AnnisNode> token)

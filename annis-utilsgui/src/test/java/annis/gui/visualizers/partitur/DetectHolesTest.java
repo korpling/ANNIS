@@ -29,30 +29,31 @@ public class DetectHolesTest
 {
 
   List<AnnisNode> token;
-  AnnisNode node1 = new AnnisNode(8, 0, 0, 0, 0, "annis", "test",
+  AnnisNode node1 = new AnnisNode(1, 0, 0, 0, 0, "annis", "test",
     50, "test8", 19, 22);
-  AnnisNode node2 = new AnnisNode(8, 0, 0, 0, 0, "annis", "test",
-    50, "test8", 40, 45);
-  AnnisNode node3 = new AnnisNode(9, 0, 0, 0, 0, "annis", "test",
-    51, "test9", 12, 54);
+  AnnisNode node2 = new AnnisNode(2, 0, 0, 0, 0, "annis", "test",
+    50, "test9", 40, 45);
+  AnnisNode node3 = new AnnisNode(3, 0, 0, 0, 0, "annis", "test",
+    51, "test10", 12, 54);
+  AnnisNode node4 = new AnnisNode(4, 0, 0, 0, 0, "annis", "test",
+    52, "test11", 39, 42);
 
   private void initializeTokens()
   {
     token = new ArrayList<AnnisNode>();
-    token.add(
-      new AnnisNode(1, 0, 0, 0, 0, "annis", "test",
+    token.add(new AnnisNode(5, 0, 0, 0, 0, "annis", "test",
       20, "test1", 20, 20));
-    token.add(new AnnisNode(12, 0, 0, 0, 0, "annis", "test",
-      21, "test2", 21, 21));
-    token.add(new AnnisNode(18, 0, 0, 0, 0, "annis", "test",
-      22, "test3", 22, 22));
-    token.add(new AnnisNode(25, 0, 0, 0, 0, "annis", "test",
-      40, "test4", 40, 40));
     token.add(new AnnisNode(6, 0, 0, 0, 0, "annis", "test",
-      41, "test5", 41, 41));
+      21, "test2", 21, 21));
     token.add(new AnnisNode(7, 0, 0, 0, 0, "annis", "test",
-      42, "test6", 42, 42));
+      22, "test3", 22, 22));
     token.add(new AnnisNode(8, 0, 0, 0, 0, "annis", "test",
+      40, "test4", 40, 40));
+    token.add(new AnnisNode(9, 0, 0, 0, 0, "annis", "test",
+      41, "test5", 41, 41));
+    token.add(new AnnisNode(10, 0, 0, 0, 0, "annis", "test",
+      42, "test6", 42, 42));
+    token.add(new AnnisNode(11, 0, 0, 0, 0, "annis", "test",
       50, "test7", 50, 50));
   }
 
@@ -60,21 +61,23 @@ public class DetectHolesTest
   {
     initializeTokens();
   }
- 
+
   /**
    * Test of getLeftBorder method, of class DetectHoles.
    */
   @Test
   public void testGetLeftBorder()
   {
-    System.out.println("getLeftBorder");    
+    System.out.println("getLeftBorder");
     DetectHoles instance = new DetectHoles(token);
-    AnnisNode result = instance.getLeftBorder(node1);    
+    AnnisNode result = instance.getLeftBorder(node1);
     assertEquals(token.get(0), result);
     result = instance.getLeftBorder(node2);
     assertEquals(token.get(3), result);
     result = instance.getLeftBorder(node3);
     assertEquals(token.get(0), result);
+    result = instance.getRightBorder(node4);
+    assertEquals(token.get(5), result);
   }
 
   /**
@@ -85,12 +88,14 @@ public class DetectHolesTest
   {
     System.out.println("getRightBorder");
     AnnisNode result = null;
-    DetectHoles instance = new DetectHoles(token);   
+    DetectHoles instance = new DetectHoles(token);
     result = instance.getRightBorder(node1);
-    assertEquals(token.get(2), result);    
+    assertEquals(token.get(2), result);
     result = instance.getRightBorder(node2);
     assertEquals(token.get(5), result);
     result = instance.getRightBorder(node3);
     assertEquals(token.get(6), result);
+    result = instance.getRightBorder(node4);
+    assertEquals(token.get(5), result);
   }
 }
