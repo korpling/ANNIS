@@ -528,8 +528,10 @@ public class PartiturVisualizer extends WriterVisualizer
 
   private String addTimeAttribute(long nodeId)
   {
+    DetectHoles detectHoles = new DetectHoles(token);
     AnnisNode root = null;
     TimeHelper t = new TimeHelper();
+
     for (AnnisNode n : nodes)
     {
       if (n.getId() == nodeId)
@@ -540,15 +542,9 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     // some calculations for index shifting
-    long leftOffset = token.get(0).getTokenIndex();
-    long rightOffset = token.get(token.size() - 1).getTokenIndex();
-    long left = root.getLeftToken() < leftOffset ? leftOffset : root.
-      getLeftToken();
-    long right = root.getRightToken() > rightOffset ? rightOffset : root.
-      getRightToken();
 
-    AnnisNode leftNode = token.get((int) (left - leftOffset));
-    AnnisNode rightNode = token.get((int) (right - leftOffset));
-    return t.getTimeAnno(leftNode, rightNode);
+    AnnisNode leftNode = detectHoles.getLeftBorder(root);
+    AnnisNode rightNode = detectHoles.getRightBorder(root);
+    return t.getTimeAnno(leftNode, rightNode);    
   }
 }
