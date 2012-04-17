@@ -603,6 +603,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     n.setVariable("n" + n.getId());
     n.setMarker(n.getVariable());
     nodes.put(n.getVariable(), n);
+    
     return n;
   }
 

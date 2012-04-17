@@ -120,26 +120,10 @@ CREATE TABLE corpus_stats
 (
   name        varchar,
   id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
-  corpus        bigint,
   text        bigint,
-  node        bigint,
-  rank        bigint,
-  component      bigint,
-  corpus_annotation  bigint,
-  node_annotation    bigint,
-  edge_annotation    bigint,
   tokens        bigint,
   roots        bigint,
-  edges        bigint,
   depth        bigint,
-  c_comps        bigint,
-  c_edges        bigint,
-  d_comps        bigint,
-  d_edges        bigint,
-  p_comps        bigint,
-  p_edges        bigint,
-  u_comps        bigint,
-  u_edges        bigint,
   avg_level      real,
   avg_children    real,
   avg_duplicates  real,
@@ -147,10 +131,10 @@ CREATE TABLE corpus_stats
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
   max_text_id bigint NULL,
-  max_rank_post bigint NULL,
   max_component_id bigint NULL,
   max_node_id bigint NULL
 );
+
 
 CREATE VIEW corpus_info AS SELECT 
   name,

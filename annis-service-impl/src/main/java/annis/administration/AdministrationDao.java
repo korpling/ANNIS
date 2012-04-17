@@ -48,7 +48,7 @@ public interface AdministrationDao
   public List<String> listUsedIndexes();
   public List<String> listUnusedIndexes();
   
-  public void executeSqlFromScript(String script);
-  public void executeSqlFromScript(String script, MapSqlParameterSource args);
+  public boolean executeSqlFromScript(String script);
+  public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
   
 }

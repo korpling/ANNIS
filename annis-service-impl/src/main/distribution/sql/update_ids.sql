@@ -23,16 +23,11 @@ UPDATE _node_annotation SET node_ref =
     
 UPDATE _rank
 SET 
- pre = pre + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id),0),
- post = post + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id), 0),
  node_ref = (SELECT "new" FROM _nodeidmapping WHERE "old" = node_ref) 
             + COALESCE((SELECT max_node_id FROM corpus_stats WHERE id = :id), 0),
- parent = parent + COALESCE((SELECT max_rank_post FROM corpus_stats WHERE id = :id), 0),
  component_ref = component_ref + COALESCE((SELECT max_component_id FROM corpus_stats WHERE id = :id),0);
 
 UPDATE _component SET id = id + COALESCE((SELECT max_component_id FROM corpus_stats WHERE id = :id),0);
-
-UPDATE _edge_annotation SET rank_ref = rank_ref + COALESCE((SELECT  max_rank_post FROM corpus_stats WHERE id = :id), 0);
     
 UPDATE _node
 SET 

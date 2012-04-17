@@ -7,7 +7,7 @@ CREATE INDEX tmpidx_fk_node_annotation ON _node_annotation (node_ref);
 CREATE INDEX tmpidx_pk_component ON _component (id);
 CREATE INDEX tmpidx_fk1_rank ON _rank (node_ref);
 CREATE INDEX tmpidx_fk2_rank ON _rank (component_ref);
-CREATE INDEX tmpidx_rank_pre ON _rank (pre);
+CREATE INDEX tmpidx_rank_pre ON _rank (pre, component_ref);
 CREATE INDEX tmpidx_fk2_component_type ON _component ("type");
 CREATE INDEX tmpidx_fk_edge_annotation ON _edge_annotation (rank_ref);
 

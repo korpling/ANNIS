@@ -102,6 +102,23 @@ public class SampleWhereClause extends TableAccessStrategyFactory
         //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, false, true}));
       }
     }
+    // only apply if we have a full facts table seperated for edges and nodes
+    else if(t.isMaterialized(NODE_TABLE, NODE_ANNOTATION_TABLE)
+      && t.isMaterialized(RANK_TABLE, EDGE_ANNOTATION_TABLE)
+      && !t.isMaterialized(NODE_TABLE, RANK_TABLE))
+    {
+
+      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
+      {
+        conditions.add("-- artificial node subview");
+        conditions.add(isTrue(t.aliasedColumn(NODE_TABLE, "n_sample")));
+      }
+      else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
+      {
+        conditions.add("-- artificial node-rank-component subview");
+        conditions.add(isTrue(t.aliasedColumn(RANK_TABLE, "r_c_sample")));
+      }
+    }
     return conditions;
   }
 

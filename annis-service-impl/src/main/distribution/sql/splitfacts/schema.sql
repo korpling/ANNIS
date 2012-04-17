@@ -40,63 +40,68 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
-
-CREATE TABLE facts
-(
-  fid BIGSERIAL PRIMARY KEY,
-  id      bigint,
-  text_ref  bigint,
-  corpus_ref  bigint,
-  toplevel_corpus bigint,
-  node_namespace  varchar(100),
-  node_name    varchar(100),
-  "left"    integer,
-  "right"    integer,
-  token_index  integer,
-  is_token boolean,
-  continuous  boolean,
-  span    varchar(2000),
-  left_token  integer,
-  right_token  integer,
-
-  pre        bigint,
-  post      bigint,
-  parent    bigint,
-  root      boolean,
-  level      bigint,
-  component_id      bigint,
-  edge_type    char(1),
-  edge_namespace  varchar(255),
-  edge_name    varchar(255),
-
-  node_annotation_namespace  varchar(150),
-  node_annotation_name    varchar(150),
-  node_annotation_value    varchar(1500),
-
-  edge_annotation_namespace  varchar(150),
-  edge_annotation_name    varchar(150),
-  edge_annotation_value    varchar(1500),
-
-  n_sample boolean,
-  n_na_sample boolean,
-  n_r_c_ea_sample boolean,
-  n_r_c_sample boolean,
-  n_r_c_na_sample boolean
+CREATE TYPE annotype AS ENUM ('node', 'edge');
+-- collect all node annotations
+CREATE TABLE annotation_pool (
+  id bigserial,
+  toplevel_corpus bigint REFERENCES corpus(id),
+  namespace varchar(150),
+  "name" varchar(150),
+  val varchar(1500),
+  "type" annotype,
+  occurences bigint,
+  PRIMARY KEY(id),
+  UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
 
--- from component
-COMMENT ON COLUMN facts.component_id IS 'component id';
-COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
-COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
-COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
+CREATE TABLE facts_node (
+  fid bigserial,
+  id bigint,
+  text_ref bigint REFERENCES text(id),
+  corpus_ref bigint REFERENCES corpus(id),
+  toplevel_corpus bigint REFERENCES corpus(id),
+  node_namespace character varying(100),
+  node_name character varying(100),
+  "left" integer,
+  "right" integer,
+  token_index integer,
+  is_token boolean,
+  continuous boolean,
+  span character varying(2000),
+  left_token integer,
+  right_token integer,
+  node_anno_ref bigint REFERENCES annotation_pool(id),
+  n_sample boolean,
+  PRIMARY KEY (fid)
+);
+CREATE TABLE facts_edge (
+  fid bigserial,
+  node_ref bigint, -- node reference
+  toplevel_corpus bigint REFERENCES corpus(id),
+  pre bigint, -- pre-order value
+  post bigint, -- post-order value
+  parent bigint, -- foreign key to rank.pre of the parent node, or NULL for roots
+  root boolean,
+  "level" bigint,
+  component_id bigint, -- component id
+  edge_type character(1), -- edge type of this component
+  edge_namespace character varying(255), -- optional namespace of the edges’ names
+  edge_name character varying(255), -- name of the edges in this component
+  edge_anno_ref bigint REFERENCES annotation_pool(id),
+  r_c_sample boolean,
+  PRIMARY KEY (fid)
+);
+
 -- from rank
-COMMENT ON COLUMN facts.pre IS 'pre-order value';
-COMMENT ON COLUMN facts.post IS 'post-order value';
-COMMENT ON COLUMN facts.parent IS 'foreign key to rank.pre of the parent node, or NULL for roots';
--- from edge_annotation
-COMMENT ON COLUMN facts.edge_annotation_namespace IS 'optional namespace of annotation key';
-COMMENT ON COLUMN facts.edge_annotation_name IS 'annotation key';
-COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
+COMMENT ON COLUMN facts_edge.pre IS 'pre-order value';
+COMMENT ON COLUMN facts_edge.post IS 'post-order value';
+COMMENT ON COLUMN facts_edge.parent IS 'foreign key to rank.pre of the parent node, or NULL for roots';
+
+-- from component
+COMMENT ON COLUMN facts_edge.component_id IS 'component id';
+COMMENT ON COLUMN facts_edge.edge_type IS 'edge type of this component';
+COMMENT ON COLUMN facts_edge.edge_namespace IS 'optional namespace of the edges’ names';
+COMMENT ON COLUMN facts_edge.edge_name IS 'name of the edges in this component';
 
 CREATE TABLE media_files
 (
@@ -108,31 +113,16 @@ CREATE TABLE media_files
   UNIQUE (corpus_ref, title)
 );
 
+
 -- stats
 CREATE TABLE corpus_stats
 (
   name        varchar,
   id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
-  corpus        bigint,
   text        bigint,
-  node        bigint,
-  rank        bigint,
-  component      bigint,
-  corpus_annotation  bigint,
-  node_annotation    bigint,
-  edge_annotation    bigint,
   tokens        bigint,
   roots        bigint,
-  edges        bigint,
   depth        bigint,
-  c_comps        bigint,
-  c_edges        bigint,
-  d_comps        bigint,
-  d_edges        bigint,
-  p_comps        bigint,
-  p_edges        bigint,
-  u_comps        bigint,
-  u_edges        bigint,
   avg_level      real,
   avg_children    real,
   avg_duplicates  real,
@@ -140,7 +130,6 @@ CREATE TABLE corpus_stats
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
   max_text_id bigint NULL,
-  max_rank_post bigint NULL,
   max_component_id bigint NULL,
   max_node_id bigint NULL
 );
