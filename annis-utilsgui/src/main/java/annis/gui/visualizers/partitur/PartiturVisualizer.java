@@ -19,7 +19,6 @@ import annis.CommonHelper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
@@ -32,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.spi.DirStateFactory.Result;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -45,39 +43,7 @@ public class PartiturVisualizer extends WriterVisualizer
 {
 
   private List<AnnisNode> nodes;
-  private List<AnnisNode> token;
-
-  private String getNextEndTime(AnnisNode rightNode)
-  {
-    long offset = token.get(0).getTokenIndex();
-    String time = null;
-
-    for (long i = rightNode.getTokenIndex() + 1 - offset; i < token.size(); i++)
-    {
-      for (Annotation anno : token.get((int) i).getNodeAnnotations())
-      {
-        if ("time".equals(anno.getName()))
-        {
-          time = anno.getValue();
-          break;
-        }
-      }
-
-      String startTime = getTimePosition(time, true);
-      String endTime = getTimePosition(time, false);
-
-      if (startTime != null && !"".equals(startTime))
-      {
-        return startTime;
-      }
-
-      if (endTime != null && !"undefined".equals(endTime))
-      {
-        return endTime;
-      }
-    }
-    return "undefined";
-  }
+  private List<AnnisNode> token;  
 
   public enum ElementType
   {
@@ -409,15 +375,15 @@ public class PartiturVisualizer extends WriterVisualizer
       try
       {
         String annisLine = "";
-        for(int i=0; i < ex.getStackTrace().length; i++)
+        for (int i = 0; i < ex.getStackTrace().length; i++)
         {
-          if(ex.getStackTrace()[i].getClassName().startsWith("annis."))
+          if (ex.getStackTrace()[i].getClassName().startsWith("annis."))
           {
             annisLine = ex.getStackTrace()[i].toString();
           }
         }
-        
-        writer.append("<html><body>Error occured (" 
+
+        writer.append("<html><body>Error occured ("
           + ex.getClass().getName()
           + "): " + ex.getLocalizedMessage() + "<br/>"
           + annisLine
@@ -496,6 +462,14 @@ public class PartiturVisualizer extends WriterVisualizer
     return false;
   }
 
+  /**
+   * We need to know, in which place of DOM the media visulizer are plugged in, 
+   * so we could  call the seekAndPlay() function with the help of 
+   * PartiturVisualizer.js
+   * 
+   * @param mediaIDs
+   * @return a string which represents a javascript array
+   */
   private String convertToJavacSriptArray(List<String> mediaIDs)
   {
     // in case there is no media visualizer do not build an array
@@ -520,7 +494,10 @@ public class PartiturVisualizer extends WriterVisualizer
 
   private String addTimeAttribute(long nodeId)
   {
+    DetectHoles detectHoles = new DetectHoles(token);
     AnnisNode root = null;
+    TimeHelper t = new TimeHelper(token);
+
     for (AnnisNode n : nodes)
     {
       if (n.getId() == nodeId)
@@ -531,77 +508,8 @@ public class PartiturVisualizer extends WriterVisualizer
     }
 
     // some calculations for index shifting
-    long leftOffset = token.get(0).getTokenIndex();
-    long rightOffset = token.get(token.size() - 1).getTokenIndex();
-    long left = root.getLeftToken() < leftOffset ? leftOffset : root.
-      getLeftToken();
-    long right = root.getRightToken() > rightOffset ? rightOffset : root.
-      getRightToken();
-
-    AnnisNode leftNode = token.get((int) (left - leftOffset));
-    AnnisNode rightNode = token.get((int) (right - leftOffset));
-    String startTime = getTimePosition(getTimeAnnotation(leftNode), true);
-    String endTime = getTimePosition(getTimeAnnotation(rightNode), false);
-
-    // try to find the next end time definition if this token does not have one
-    if ("undefined".equals(endTime))
-    {
-      endTime = getNextEndTime(rightNode);
-    }
-
-    // if there is no start time, we do not add the time attribute
-    if (startTime.equals(""))
-    {
-      return "";
-    }
-
-    return "time=\"" + startTime + "-" + endTime + "\"";
-  }
-
-  private String getTimeAnnotation(AnnisNode node)
-  {
-    for (Annotation anno : node.getNodeAnnotations())
-    {
-      if (anno.getName().equals("time"))
-      {
-        return anno.getValue();
-      }
-    }
-    return "";
-  }
-
-  /**
-   * Split a time annotation s.ms-(s.ms)? in. Whether the flag first is set to true, 
-   * we return the first value, otherwise we did try to return the second. The 
-   * end time don't have to be annotated, in this case it returns "undefined". 
-   * Without a defined start time the result is an empty String ""
-   * @param time
-   * @param first
-   * @return null, when time parameter is null
-   */
-  private String getTimePosition(String time, boolean first)
-  {
-
-    if (time == null)
-    {
-      return null;
-    }
-
-    String[] splittedTimeAnno = time.split("-");
-    if (splittedTimeAnno.length > 1)
-    {
-      if (first)
-      {
-        return splittedTimeAnno[0];
-      }
-      return splittedTimeAnno[1];
-    }
-
-    if (first)
-    {
-      return splittedTimeAnno[0];
-    }
-    // if we want the end time, return undefined.
-    return "undefined";
+    AnnisNode leftNode = detectHoles.getLeftBorder(root);
+    AnnisNode rightNode = detectHoles.getRightBorder(root);
+    return t.getTimeAnno(leftNode, rightNode);    
   }
 }

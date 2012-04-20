@@ -37,15 +37,15 @@ $(document).ready(function()
   media.on("timeupdate", function()
   {
     if (endTime !== null && media[0].currentTime >= endTime)
-    {
-      media[0].pause();
-      endTime = null;
-    }
+    {       
+      media[0].pause();      
+    }    
   });
 
   media.on("pause", function()
   {
-    // after stopping the media, we don't want to stop the media again, after press play again
+    // after stopping the media, we don't want to stop the media again, after 
+    // press play again
     endTime = null;
   });
 
