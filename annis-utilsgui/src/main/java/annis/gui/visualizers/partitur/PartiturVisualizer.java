@@ -19,7 +19,6 @@ import annis.CommonHelper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
-import annis.model.Annotation;
 import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
@@ -44,40 +43,7 @@ public class PartiturVisualizer extends WriterVisualizer
 {
 
   private List<AnnisNode> nodes;
-  private List<AnnisNode> token;
-
-  private String getNextEndTime(AnnisNode rightNode)
-  {
-    long offset = token.get(0).getTokenIndex();
-    String time = null;
-    TimeHelper t = null;
-
-    for (long i = rightNode.getTokenIndex() + 1 - offset; i < token.size(); i++)
-    {
-      for (Annotation anno : token.get((int) i).getNodeAnnotations())
-      {
-        if ("time".equals(anno.getName()))
-        {
-          time = anno.getValue();
-          break;
-        }
-      }
-
-      String startTime = t.getStartTime(time);
-      String endTime = t.getEndTime(time);
-
-      if (startTime != null && !"".equals(startTime))
-      {
-        return startTime;
-      }
-
-      if (endTime != null && !"undefined".equals(endTime))
-      {
-        return endTime;
-      }
-    }
-    return "undefined";
-  }
+  private List<AnnisNode> token;  
 
   public enum ElementType
   {
@@ -530,7 +496,7 @@ public class PartiturVisualizer extends WriterVisualizer
   {
     DetectHoles detectHoles = new DetectHoles(token);
     AnnisNode root = null;
-    TimeHelper t = new TimeHelper();
+    TimeHelper t = new TimeHelper(token);
 
     for (AnnisNode n : nodes)
     {

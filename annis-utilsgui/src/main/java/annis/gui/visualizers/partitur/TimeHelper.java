@@ -17,6 +17,7 @@ package annis.gui.visualizers.partitur;
 
 import annis.model.AnnisNode;
 import annis.model.Annotation;
+import java.util.List;
 
 /**
  *
@@ -24,6 +25,18 @@ import annis.model.Annotation;
  */
 public class TimeHelper
 {
+
+  private List<AnnisNode> token;
+
+  // only for testing
+  public TimeHelper()
+  {
+  }
+
+  public TimeHelper(List<AnnisNode> token)
+  {
+    this.token = token;
+  }
 
   public String getStartTime(String time)
   {
@@ -39,9 +52,10 @@ public class TimeHelper
    * Split a time annotation s.ms-(s.ms)? Whether the flag first is set to true, 
    * we return the first value, otherwise we did try to return the second. The 
    * end time don't have to be annotated, in this case it returns "undefined". 
-   * Without a defined start time the result is an empty String ""
+   * Without a defined start time the result is an empty String "undefined". If 
+   * there is no time anno, it returns undefined
    * 
-   * @return "undefined", when time parameter is null
+   * @return "undefined", when time parameter is undefined
    */
   private String getTimePosition(String time, boolean first)
   {
@@ -98,6 +112,59 @@ public class TimeHelper
       return "";
     }
 
+    // search for an end time in the result set, so we have the chance to stop 
+    // the media    
+    if ("undefined".equals(endTime))
+    {
+      endTime = getNextEndTime(rightNode);
+    }
+
     return ("time=" + startTime + "-" + endTime);
+  }
+
+  private String getNextEndTime(AnnisNode rightNode)
+  {
+    int offset = getOffset(rightNode);
+    String time = null;
+    TimeHelper t = null;
+
+    for (long i = offset + 1; i < token.size(); i++)
+    {
+      for (Annotation anno : token.get((int) i).getNodeAnnotations())
+      {
+        if ("time".equals(anno.getName()))
+        {
+          time = anno.getValue();
+          break;
+        }
+      }
+
+      String startTime = getStartTime(time);
+      String endTime = getEndTime(time);
+
+      if (startTime != null && !"undefined".equals(startTime))
+      {
+        return startTime;
+      }
+
+      if (endTime != null && !"undefined".equals(endTime))
+      {
+        return endTime;
+      }
+    }
+    return "undefined";
+  }
+
+  private int getOffset(AnnisNode rightNode)
+  {
+    for (int i = 0; i < token.size(); i++)
+    {
+      if (rightNode == token.get(i))
+      {
+        return i;
+      }
+    }
+
+    return 0;
   }
 }

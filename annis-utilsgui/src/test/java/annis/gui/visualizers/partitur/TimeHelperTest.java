@@ -39,7 +39,7 @@ public class TimeHelperTest
   public void getStartTime()
   {
     TimeHelper t = new TimeHelper();
-    assertTrue(t.getStartTime(time1).equals("12.1231"));    
+    assertTrue(t.getStartTime(time1).equals("12.1231"));
     assertTrue(t.getStartTime(time2).equals("6"));
     assertTrue(t.getStartTime(time3).equals("45"));
     assertTrue(t.getStartTime(time4).equals("98.0"));
