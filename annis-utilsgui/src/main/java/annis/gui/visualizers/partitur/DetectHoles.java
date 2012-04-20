@@ -16,7 +16,6 @@
 package annis.gui.visualizers.partitur;
 
 import annis.model.AnnisNode;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,116 +26,47 @@ public class DetectHoles
 {
 
   private List<AnnisNode> token;
-  private List<Tripel> intervalls;
-
-  private class Tripel
-  {
-
-    long first;
-    long second;
-    long offset;
-
-    Tripel(long first, long second, long offset)
-    {
-      this.first = first;
-      this.second = second;
-      this.offset = offset;
-    }
-  }
 
   public DetectHoles(List<AnnisNode> token)
   {
     this.token = token;
-    this.intervalls = createIntervalls(token);
   }
 
   public AnnisNode getLeftBorder(AnnisNode n)
   {
-    Tripel tripel = null;
-    long leftTokIdx = n.getLeftToken();
+    AnnisNode tmp = null;
 
-    for (Tripel tmp : intervalls)
+    for (AnnisNode tok : token)
     {
-      if (tmp.first <= leftTokIdx && leftTokIdx <= tmp.second)
+      if (n.getLeftToken() == tok.getTokenIndex())
       {
-        tripel = tmp;
-        break;
+        return tok;
       }
 
-      if (tripel == null)
+      if (n.getLeftToken() <= tok.getTokenIndex() && tmp == null)
       {
-        tripel = tmp;
-        continue;
+        tmp = tok;
       }
-
-      // if the left bound is between two intervalls
-      if (tripel.second <= leftTokIdx && leftTokIdx < tmp.first)
-      {
-        tripel = tmp;
-      }
-
     }
-
-    long leftBorder = tripel.first <= leftTokIdx ? leftTokIdx : tripel.first;
-    return token.get((int) (leftBorder - tripel.offset));
+    return tmp;
   }
 
   public AnnisNode getRightBorder(AnnisNode n)
   {
-    Tripel tripel = null;
-    long rightTokIdx = n.getRightToken();
-
-    for (Tripel tmp : intervalls)
+    AnnisNode tmp = null;
+    for (AnnisNode tok : token)
     {
-      if (tmp.first <= rightTokIdx && rightTokIdx <= tmp.second)
+      if (n.getRightToken() == tok.getTokenIndex())
       {
-        tripel = tmp;
-        break;
+        return tok;
       }
 
-      if (rightTokIdx >= tmp.second)
+      if (tok.getTokenIndex() <= n.getRightToken())
       {
-        tripel = tmp;
+        tmp = tok;
       }
     }
 
-    long rightBorder = tripel.second >= rightTokIdx ? rightTokIdx
-      : tripel.second;
-    return token.get((int) (rightBorder - tripel.offset));
-  }
-
-  private List<Tripel> createIntervalls(List<AnnisNode> token)
-  {
-
-    intervalls = new LinkedList<Tripel>();
-    intervalls.add(new Tripel(-1, -1, 0));
-
-    for (int i = 0; i < token.size(); i++)
-    {
-      long tokenIdx = token.get(i).getTokenIndex();
-      Tripel tupel = intervalls.get(intervalls.size() - 1);
-
-      // initialize
-      if (tupel.first == -1)
-      {
-        tupel.first = tokenIdx;
-        tupel.second = token.get(i).getTokenIndex();
-        tupel.offset = tokenIdx - i;
-        continue;
-      }
-
-      //check for hole
-      if (tokenIdx - 1 - tupel.second == 0)
-      {
-        tupel.second = tokenIdx;
-        continue;
-      }
-      else
-      {
-        tupel = new Tripel(tokenIdx, tokenIdx, tokenIdx - i);
-        intervalls.add(tupel);
-      }
-    }
-    return intervalls;
+    return tmp;
   }
 }
