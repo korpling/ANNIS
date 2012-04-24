@@ -85,104 +85,111 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   {
     SaltProject project = SaltFactory.eINSTANCE.createSaltProject();
 
-    SCorpusGraph corpusGraph = null;
-
-    SDocumentGraph graph = null;
-
-    // fn: edge pre order value -> edge
-    Map<Long, SNode> nodeByPre = new HashMap<Long, SNode>();
-
-    TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
-    TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
-
-    // clear mapping functions for this graph
-    // assumes that the result set is sorted by key, pre
-    nodeByPre.clear();
-
-    SDocument document = null;
-
-    List<String> keyNameList = new LinkedList<String>();
-
-    int match_index = 0;
-
-    SolutionKey<?> key = createSolutionKey();
-
-    while (resultSet.next())
+    try
     {
+      
+      SCorpusGraph corpusGraph = null;
 
-      //List<String> annotationGraphKey = 
-      key.retrieveKey(resultSet);
+      SDocumentGraph graph = null;
 
-      if (key.isNewKey())
+      // fn: edge pre order value -> edge
+      Map<Long, SNode> nodeByPre = new HashMap<Long, SNode>();
+
+      TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
+      TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
+
+      // clear mapping functions for this graph
+      // assumes that the result set is sorted by key, pre
+      nodeByPre.clear();
+
+      SDocument document = null;
+
+      List<String> keyNameList = new LinkedList<String>();
+
+      int match_index = 0;
+
+      SolutionKey<?> key = createSolutionKey();
+
+      while (resultSet.next())
       {
 
-        // create the text for the last graph
-        if (graph != null && document != null)
+        //List<String> annotationGraphKey = 
+        key.retrieveKey(resultSet);
+
+        if (key.isNewKey())
         {
-          createPrimaryText(graph, tokenTexts, tokenByIndex);
-          setMatchedIDs(document, keyNameList);
-        }
 
-        // new match, reset everything        
-        nodeByPre.clear();
-        tokenTexts.clear();
-        tokenByIndex.clear();
-        keyNameList.clear();
+          // create the text for the last graph
+          if (graph != null && document != null)
+          {
+            createPrimaryText(graph, tokenTexts, tokenByIndex);
+            setMatchedIDs(document, keyNameList);
+          }
 
-
-        Integer matchstart = resultSet.getInt("matchstart");
-        corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
-        corpusGraph.setSName("match_" + (match_index + matchstart));
-
-        project.getSCorpusGraphs().add(corpusGraph);
-
-        graph = SaltFactory.eINSTANCE.createSDocumentGraph();
-        document = SaltFactory.eINSTANCE.createSDocument();
+          // new match, reset everything        
+          nodeByPre.clear();
+          tokenTexts.clear();
+          tokenByIndex.clear();
+          keyNameList.clear();
 
 
-        List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
-          "path");
+          Integer matchstart = resultSet.getInt("matchstart");
+          corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+          corpusGraph.setSName("match_" + (match_index + matchstart));
 
-        SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
-        toplevelCorpus.setSName(path.get(0));
-        corpusGraph.addSNode(toplevelCorpus);
+          project.getSCorpusGraphs().add(corpusGraph);
 
-        Validate.isTrue(path.size() >= 2,
-          "Corpus path must be have at least two members (toplevel and document)");
-        SCorpus corpus = toplevelCorpus;
+          graph = SaltFactory.eINSTANCE.createSDocumentGraph();
+          document = SaltFactory.eINSTANCE.createSDocument();
 
-        for (int i = 1; i < path.size() - 1; i++)
+
+          List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
+            "path");
+
+          SCorpus toplevelCorpus = SaltFactory.eINSTANCE.createSCorpus();
+          toplevelCorpus.setSName(path.get(0));
+          corpusGraph.addSNode(toplevelCorpus);
+
+          Validate.isTrue(path.size() >= 2,
+            "Corpus path must be have at least two members (toplevel and document)");
+          SCorpus corpus = toplevelCorpus;
+
+          for (int i = 1; i < path.size() - 1; i++)
+          {
+            SCorpus subcorpus = SaltFactory.eINSTANCE.createSCorpus();
+            subcorpus.setSName(path.get(i));
+            corpusGraph.addSSubCorpus(corpus, subcorpus);
+            corpus = subcorpus;
+          }
+          document.setSName(path.get(path.size() - 1));
+          corpusGraph.addSDocument(corpus, document);
+
+          document.setSDocumentGraph(graph);
+          match_index++;
+        } // end if new key
+
+        // get node data
+        SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
+          tokenByIndex, key, keyNameList);
+        long pre = longValue(resultSet, RANK_TABLE, "pre");
+        if (!resultSet.wasNull())
         {
-          SCorpus subcorpus = SaltFactory.eINSTANCE.createSCorpus();
-          subcorpus.setSName(path.get(i));
-          corpusGraph.addSSubCorpus(corpus, subcorpus);
-          corpus = subcorpus;
+          nodeByPre.put(pre, node);
+          createRelation(resultSet, graph, nodeByPre, node);
         }
-        document.setSName(path.get(path.size() - 1));
-        corpusGraph.addSDocument(corpus, document);
+      } // end while new result row
 
-        document.setSDocumentGraph(graph);
-        match_index++;
-      } // end if new key
-
-      // get node data
-      SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
-        tokenByIndex, key, keyNameList);
-      long pre = longValue(resultSet, RANK_TABLE, "pre");
-      if (!resultSet.wasNull())
+      // the last match needs a primary text, too
+      if (graph != null)
       {
-        nodeByPre.put(pre, node);
-        createRelation(resultSet, graph, nodeByPre, node);
+        createPrimaryText(graph, tokenTexts, tokenByIndex);
+        setMatchedIDs(document, keyNameList);
       }
-    } // end while new result row
-
-    // the last match needs a primary text, too
-    if (graph != null)
-    {
-      createPrimaryText(graph, tokenTexts, tokenByIndex);
-      setMatchedIDs(document, keyNameList);
     }
-
+    catch(Exception ex)
+    {
+      Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(Level.SEVERE, "could not map result set to SaltProject", ex);
+    }
 
     return project;
   }
@@ -520,7 +527,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
         try
         {
-          graph.addSRelation(rel);
           rel.getSLayers().add(layer);
           rel.addSType(edgeName);
 
@@ -542,6 +548,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           else
           {
             rel.setSTarget(targetNode);
+            graph.addSRelation(rel);
           }
         }
         catch (SaltException ex)

@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -86,7 +88,16 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
         }
       }
     }
-    resource.save(entityStream, null);
+    
+    try
+    {
+      resource.save(entityStream, null);
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(SaltProjectProvider.class.getName()).log(
+        Level.SEVERE, "exception when serializing SaltProject", ex);
+    }
   }
 
   @Override
