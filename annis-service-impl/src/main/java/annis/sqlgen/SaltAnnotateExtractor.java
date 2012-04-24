@@ -520,23 +520,34 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
         try
         {
-          rel.setSSource(nodeByPre.get(parent));
-          rel.setSTarget(targetNode);
+          graph.addSRelation(rel);
           rel.getSLayers().add(layer);
           rel.addSType(edgeName);
 
+          
           SFeature featInternalID = SaltFactory.eINSTANCE.createSFeature();
           featInternalID.setSNS(ANNIS_NS);
           featInternalID.setSName(FEAT_INTERNALID);
           featInternalID.setSValue(Long.valueOf(pre));
           rel.addSFeature(featInternalID);
-
-          graph.addSRelation(rel);
+          
+          rel.setSSource(nodeByPre.get(parent));
+          if("c".equals(type) && !(targetNode instanceof SToken))
+          {
+            Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
+              Level.WARNING, "invalid edge detected: target node ({0}) "
+              + "of a coverage relation (from: {1}, internal id {2}) was not a token", 
+              new Object[] {targetNode.getSName(), sourceNode.getSName(), "" + pre});
+          }
+          else
+          {
+            rel.setSTarget(targetNode);
+          }
         }
         catch (SaltException ex)
-        {
-          //Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
-          //  Level.WARNING, "invalid edge detected", ex);
+        {          
+          Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
+            Level.WARNING, "invalid edge detected", ex);
         }
       } // end if no existing relation
 
