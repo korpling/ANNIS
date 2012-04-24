@@ -181,20 +181,28 @@ public abstract class AnnotateSqlGenerator<T>
   private IslandPolicies getMostRestrictivePolicy(
     List<Long> corpora, Map<Long, Properties> props)
   {
+    if(corpora.isEmpty())
+    {
+      return IslandPolicies.valueOf(defaultIslandsPolicy);
+    }
+    
     IslandPolicies[] all = IslandPolicies.values();
     IslandPolicies result = all[all.length - 1];
-
+    
     for (Long l : corpora)
     {
+      IslandPolicies newPolicy = IslandPolicies.valueOf(defaultIslandsPolicy);
+      
       if (props.get(l) != null)
       {
-        IslandPolicies newPolicy =
+        newPolicy =
           IslandPolicies.valueOf(props.get(l).getProperty("islands-policy",
           defaultIslandsPolicy));
-        if (newPolicy.ordinal() < result.ordinal())
-        {
-          result = newPolicy;
-        }
+      }
+      
+      if (newPolicy.ordinal() < result.ordinal())
+      {
+        result = newPolicy;
       }
     }
     return result;
