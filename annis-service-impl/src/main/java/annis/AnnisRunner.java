@@ -454,8 +454,8 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("---> benchmark complete");
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
-      benchmark.avgTimeInMilliseconds = Math.round(benchmark.avgTimeInMilliseconds
-        / benchmark.runs);
+      benchmark.avgTimeInMilliseconds = Math.round((double) benchmark.avgTimeInMilliseconds
+        / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.avgTimeInMilliseconds + " ms (avg for "
         + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
