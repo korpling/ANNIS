@@ -202,6 +202,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     // oder nur an annotate-Queries?
 
     queryData.setCorpusConfiguration(corpusConfiguration);
+    
+    // filter by meta data
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
     // execute session modifiers if any
     for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers)

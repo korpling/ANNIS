@@ -160,14 +160,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("tiger2");
-    doSet("limit to 10");
-    doSet("offset to 0");
-    doSet("left to 5");
-    doSet("right to 5");
-    doSql("annotate cat=\"S\" & \"das\" & #1 >* #2");
-    doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
-    doCount("cat=\"S\" & \"das\" & #1 >* #2");
+    doCorpus("pcc2");
+    doCount("tok & meta::Genre=\"Sport\"");
   }
 
   public void doProposedIndex(String ignore)
