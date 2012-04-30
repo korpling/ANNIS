@@ -25,7 +25,7 @@ import java.util.Set;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.model.Join;
+import java.util.LinkedList;
 
 /**
  *
@@ -53,10 +53,13 @@ public class MetaDataAndCorpusWhereClauseGenerator
     {
       // FIXME: where condition comment should be optional 
       // conditions.add("-- select documents by metadata and toplevel corpus");
-      if (documents != null && !documents.isEmpty())
+      if (documents != null)
       {
+        List<String> emptyList = new LinkedList<String>();
+        emptyList.add("NULL");
+        
         conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
-          documents));
+          documents.isEmpty() ? emptyList : documents));
       }
 
       if (corpusList != null && !corpusList.isEmpty())
