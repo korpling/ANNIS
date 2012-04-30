@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
 
 public class SubQueryCorpusSelectionStrategy {
 
@@ -57,7 +58,15 @@ public class SubQueryCorpusSelectionStrategy {
 				conditions.add("corpus_annotation" + i + ".namespace = '" + annotation.getNamespace() + "'");
 			conditions.add("corpus_annotation" + i + ".name = '" + annotation.getName() + "'");
 			if (annotation.getValue() != null)
-				conditions.add("corpus_annotation" + i + ".value " + annotation.getTextMatching().sqlOperator() + " '" + annotation.getValue() + "'");
+         {
+           String value = annotation.getValue();
+           if(annotation.getTextMatching() == QueryNode.TextMatching.REGEXP_EQUAL 
+             || annotation.getTextMatching() == QueryNode.TextMatching.REGEXP_NOT_EQUAL)
+           {
+             value = "^" + value + "$";
+           }
+				conditions.add("corpus_annotation" + i + ".value " + annotation.getTextMatching().sqlOperator() + " '" + value + "'");
+         }
 			conditions.add("corpus_annotation" + i + ".corpus_ref = c1.id");
 		}
 		

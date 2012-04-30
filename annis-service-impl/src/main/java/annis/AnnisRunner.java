@@ -22,17 +22,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -51,7 +43,6 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
-import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -82,7 +73,6 @@ public class AnnisRunner extends AnnisBaseRunner
   // map Annis queries to DDDquery
   private DddQueryMapper dddQueryMapper;
   private QueryAnalysis aqlAnalysis;
-  private MetaDataFilter metaDataFilter;
   private int context;
   private int matchLimit;
   private boolean isDDDQueryMode;
@@ -160,69 +150,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("tiger2");
-    doSet("limit to 10");
-    doSet("offset to 0");
-    doSet("left to 5");
-    doSet("right to 5");
-    doSql("annotate cat=\"S\" & \"das\" & #1 >* #2");
-    doAnnotate("cat=\"S\" & \"das\" & #1 >* #2");
-    doCount("cat=\"S\" & \"das\" & #1 >* #2");
-  }
-
-  public void doProposedIndex(String ignore)
-  {
-    File fInput = new File("queries.txt");
-
-    Map<String, List<String>> output = new HashMap<String, List<String>>();
-
-    if (fInput.exists())
-    {
-      try
-      {
-        String[] content = FileUtils.readFileToString(fInput).split("\n");
-
-        for (String query : content)
-        {
-          if (query.trim().length() > 0)
-          {
-            Map<String, Set<String>> map = proposedIndexHelper(query.trim());
-            for (Map.Entry<String, Set<String>> t : map.entrySet())
-            {
-              String table = t.getKey();
-              Set<String> l = t.getValue();
-
-              if (!output.containsKey(table))
-              {
-                output.put(table, new LinkedList<String>());
-              }
-
-              if (l.size() > 0)
-              {
-                output.get(table).add(StringUtils.join(l, ","));
-              }
-              out.println(query + "/" + table + ": " + l);
-            }
-          }
-        }
-
-        for (Entry<String, List<String>> entry : output.entrySet())
-        {
-          File fOutput = new File(entry.getKey() + "_attributes.csv");
-          FileUtils.writeLines(fOutput, entry.getValue());
-        }
-
-      }
-      catch (IOException ex)
-      {
-        log.warn("Problem reading queries.txt", ex);
-      }
-
-    }
-    else
-    {
-      out.println("Could not find queries.txt");
-    }
+    doCorpus("pcc2");
+    doCount("tok & meta::Genre=\"Sport\"");
   }
 
   public void doDddquery(String annisQuery)
@@ -233,19 +162,6 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doParse(String annisQuery)
   {
     out.println(annisParser.dumpTree(annisQuery));
-  }
-
-  @Deprecated
-  public void doSqlOld(String annisQuery)
-  {
-    // sql query
-    QueryData queryData = parse(annisQuery);
-    queryData.setCorpusList(corpusList);
-    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
-
-    String sql = findSqlGenerator.toSql(queryData);
-
-    out.println(sql);
   }
 
   // FIXME: missing tests
@@ -723,22 +639,6 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("?" + setting);
   }
 
-  public void doSqlMatrix(String annisQuery)
-  {
-    // sql query
-    QueryData queryData = parse(annisQuery);
-    queryData.setCorpusList(corpusList);
-    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
-
-    String sql = findSqlGenerator.toSql(queryData);
-
-    out.println("CREATE OR REPLACE TEMPORARY VIEW matched_nodes AS " + sql + ";");
-
-    MatrixSqlGenerator me = new MatrixSqlGenerator();
-    me.setMatchedNodesViewName("matched_nodes");
-    out.println(me.getMatrixQuery(corpusList, queryData.getMaxWidth())
-      + ";");
-  }
 
   private QueryData analyzeQuery(String annisQuery, String queryFunction)
   {
@@ -911,53 +811,6 @@ public class AnnisRunner extends AnnisBaseRunner
     return dddQueryMapper.translate(annisQuery);
   }
 
-  public Map<String, Set<String>> proposedIndexHelper(String aql)
-  {
-    Map<String, Set<String>> result = new HashMap<String, Set<String>>();
-    result.put("facts", new TreeSet<String>());
-    result.put("node", new TreeSet<String>());
-    result.put("node_annotation", new TreeSet<String>());
-
-    // sql query
-    QueryData queryData = parse(aql);
-    queryData.setCorpusList(corpusList);
-    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
-
-    String sql = findSqlGenerator.toSql(queryData);
-
-    // extract WHERE clause
-
-    Matcher mWhere = Pattern.compile("WHERE\n").matcher(sql);
-    if (mWhere.find())
-    {
-      String whereClause = sql.substring(mWhere.end());
-      //out.println("WHERE clause:\n" + whereClause);
-
-      for (String table : result.keySet())
-      {
-        Set<String> attr = result.get(table);
-        Matcher mFacts = Pattern.compile(table + "[0-9]+\\.([a-zA-Z0-9_]+)").
-          matcher(whereClause);
-        while (mFacts.find())
-        {
-          attr.add(mFacts.group(1).trim());
-        }
-      }
-
-      // print result
-      //out.println("facts: " + StringUtils.join(factsAttributes, ", "));
-      //out.println("node: " + StringUtils.join(nodeAttributes, ", "));
-      //out.println("suggested index: ");
-      //out.println("CREATE INDEX idx__facts__noname ON facts (" + StringUtils.join(factsAttributes, ", ") + ");");
-      //out.println("CREATE INDEX idx__node__noname ON node (" + StringUtils.join(nodeAttributes, ", ") + ");");
-    }
-    else
-    {
-      out.println("Could not find the WHERE clause");
-    }
-    return result;
-  }
-
   private void printAsTable(List<? extends Object> list, String... fields)
   {
     out.println(new TableFormatter().formatAsTable(list, fields));
@@ -1057,15 +910,6 @@ public class AnnisRunner extends AnnisBaseRunner
     this.corpusList = corpusList;
   }
 
-  public MetaDataFilter getMetaDataFilter()
-  {
-    return metaDataFilter;
-  }
-
-  public void setMetaDataFilter(MetaDataFilter metaDataFilter)
-  {
-    this.metaDataFilter = metaDataFilter;
-  }
 
   public int getContext()
   {
