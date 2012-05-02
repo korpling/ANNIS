@@ -38,6 +38,30 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
 
+  public static class FindQueryData
+  {
+    private int offset;
+    private int limit;
+
+    public FindQueryData(int offset, int limit)
+    {
+      this.offset = offset;
+      this.limit = limit;
+    }
+
+    
+    public int getLimit()
+    {
+      return limit;
+    }
+
+    public int getOffset()
+    {
+      return offset;
+    }
+
+  }
+  
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
       String indent)
@@ -113,6 +137,24 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
     return match;
+  }
+  
+  private FindQueryData getFindQueryData(QueryData queryData)
+  {
+    // find required information, assume defaults if necessary
+    FindQueryData findQueryData = null;
+    for (Object o : queryData.getExtensions())
+    {
+      if (o instanceof FindQueryData)
+      {
+        findQueryData = (FindQueryData) o;
+      }
+    }
+    if (findQueryData == null)
+    {
+      findQueryData = new FindQueryData(0, -1);
+    }
+    return findQueryData;
   }
 
   public boolean isOptimizeDistinct()

@@ -66,7 +66,6 @@ public abstract class AnnotateSqlGenerator<T>
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
-
   
   public static class AnnotateQueryData
   {
