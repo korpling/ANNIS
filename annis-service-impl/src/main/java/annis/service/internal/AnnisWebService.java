@@ -21,16 +21,6 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.Match;
 import annis.ql.parser.QueryData;
-<<<<<<< TREE
-import annis.sqlgen.AnnotateSqlGenerator;
-=======
-
->>>>>>> MERGE-SOURCE
-<<<<<<< TREE
-=======
-
-
->>>>>>> MERGE-SOURCE
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.FindSqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
