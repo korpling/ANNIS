@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;

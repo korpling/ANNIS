@@ -240,8 +240,11 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-    <property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-  </bean>
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+  </bean>  
+  
+  <bean id="commonLimitGenerator" class="annis.sqlgen.CommonLimitSqlGenerator" />
+    
 
   <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy">
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
@@ -308,6 +311,8 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
   </bean>
+  
+  <bean id="commonLimitOffsetGenerator" class="annis.sqlgen.CommonLimitOffsetGenerator" />
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
         parent="tableAccessStrategyFactory">

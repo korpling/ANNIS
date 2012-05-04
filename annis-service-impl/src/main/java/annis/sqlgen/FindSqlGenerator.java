@@ -137,26 +137,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
     return match;
-  }
+  }  
   
-  private FindQueryData getFindQueryData(QueryData queryData)
-  {
-    // find required information, assume defaults if necessary
-    FindQueryData findQueryData = null;
-    for (Object o : queryData.getExtensions())
-    {
-      if (o instanceof FindQueryData)
-      {
-        findQueryData = (FindQueryData) o;
-      }
-    }
-    if (findQueryData == null)
-    {
-      findQueryData = new FindQueryData(0, -1);
-    }
-    return findQueryData;
-  }
-
   public boolean isOptimizeDistinct()
   {
     return optimizeDistinct;

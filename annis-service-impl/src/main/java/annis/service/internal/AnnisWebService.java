@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2012 SFB 632.
  *
@@ -20,8 +21,18 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.Match;
 import annis.ql.parser.QueryData;
+<<<<<<< TREE
 import annis.sqlgen.AnnotateSqlGenerator;
+=======
+
+>>>>>>> MERGE-SOURCE
+<<<<<<< TREE
+=======
+
+
+>>>>>>> MERGE-SOURCE
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.FindSqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
@@ -201,7 +212,7 @@ public class AnnisWebService
     
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    data.addExtension(new AnnotateSqlGenerator.FindQueryData(offset, limit));
+    data.addExtension(new FindSqlGenerator.FindQueryData(offset, limit));
     return annisDao.find(data);
   }
 
@@ -215,7 +226,7 @@ public class AnnisWebService
     {
       long start = new Date().getTime();
       SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
-        documentName);
+        documentName); 
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
       return p;

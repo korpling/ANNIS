@@ -16,19 +16,16 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
-public class AnnotateInnerQuerySqlGenerator
-  extends AbstractUnionSqlGenerator<Object>
+public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Object> 
   implements SelectClauseSqlGenerator<QueryData>,
-  OrderByClauseSqlGenerator<QueryData>,
-  LimitOffsetClauseSqlGenerator<QueryData>
+  OrderByClauseSqlGenerator<QueryData>
 {
 
   // sort solutions
   private boolean sortSolutions;
-
   // annotation graph key generation
   private SolutionKey<?> solutionKey;
-  
+
   @Override
   public Object extractData(ResultSet rs) throws SQLException,
     DataAccessException
@@ -56,9 +53,9 @@ public class AnnotateInnerQuerySqlGenerator
         + annotateQueryData.getLeft() + " AS min" + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") + " + "
         + annotateQueryData.getRight() + " AS max" + i);
-      
-      selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields, ", "));
-      
+
+      selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields,
+        ", "));
     }
 
     return "DISTINCT" + StringUtils.join(selectClauseForNode, ", ");
@@ -91,21 +88,6 @@ public class AnnotateInnerQuerySqlGenerator
       ids.add("id" + i);
     }
     return StringUtils.join(ids, ", ");
-  }
-
-  @Override
-  public String limitOffsetClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
-  {
-    AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
-
-    StringBuilder sb = new StringBuilder();
-    if (annotateQueryData.isPaged())
-    {
-      sb.append("LIMIT ").append(annotateQueryData.getLimit());
-      sb.append(" OFFSET ").append(annotateQueryData.getOffset());
-    }
-    return sb.toString();
   }
 
   private AnnotateQueryData getAnnotateQueryData(QueryData queryData)
@@ -145,5 +127,4 @@ public class AnnotateInnerQuerySqlGenerator
   {
     this.solutionKey = solutionKey;
   }
-	
 }
