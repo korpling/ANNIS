@@ -14,7 +14,6 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
 public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Object> 
   implements SelectClauseSqlGenerator<QueryData>,
