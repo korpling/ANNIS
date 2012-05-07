@@ -60,9 +60,18 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   {
     List<AnnotateQueryData> extensions =
       queryData.getExtensions(AnnotateQueryData.class);
-    Validate.isTrue(extensions.size() > 0);
-    AnnotateQueryData annotateQueryData = extensions.get(0);    
-    
+    AnnotateQueryData annotateQueryData = null;
+
+    if (extensions.isEmpty())
+    {
+      annotateQueryData = new AnnotateQueryData(5, 5);
+    }
+    else
+    {
+
+      annotateQueryData = extensions.get(0);
+    }
+
     List<String> selectClauseForNode = new ArrayList<String>();
     for (int i = 1; i <= alternative.size(); ++i)
     {
@@ -118,7 +127,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
       ids.add("id" + i);
     }
     return StringUtils.join(ids, ", ");
-  }  
+  }
 
   public boolean isSortSolutions()
   {
