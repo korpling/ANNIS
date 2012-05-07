@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.FindSqlGenerator.FindQueryData;
+import annis.sqlgen.LimitOffsetQueryData;
 import java.util.List;
 
 /**
@@ -32,15 +32,15 @@ public class CommonLimitOffsetGenerator implements
   public String limitOffsetClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    FindQueryData findQueryData = getFindQueryData(queryData);
+    LimitOffsetQueryData LimitOffsetQueryData = getLimitOffsetQueryData(queryData);
     StringBuilder sb = new StringBuilder();
     Integer limit = null;
     Integer offset = null;
     
-    if (findQueryData != null)
+    if (LimitOffsetQueryData != null)
     {
-      limit = findQueryData.getLimit();
-      offset = findQueryData.getOffset();
+      limit = LimitOffsetQueryData.getLimit();
+      offset = LimitOffsetQueryData.getOffset();
     }
     
     if (limit != null)
@@ -55,13 +55,13 @@ public class CommonLimitOffsetGenerator implements
     return sb.toString();
   }
   
-  private FindQueryData getFindQueryData(QueryData queryData)
+  private LimitOffsetQueryData getLimitOffsetQueryData(QueryData queryData)
   {
     for (Object o : queryData.getExtensions())
     {
-      if (o instanceof FindQueryData)
+      if (o instanceof LimitOffsetQueryData)
       {
-        return (FindQueryData) o;
+        return (LimitOffsetQueryData) o;
       }
     }
     return null;

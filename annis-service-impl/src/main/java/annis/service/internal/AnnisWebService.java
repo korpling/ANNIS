@@ -27,6 +27,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
@@ -208,7 +209,7 @@ public class AnnisWebService
     
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    data.addExtension(new FindSqlGenerator.FindQueryData(offset, limit));
+    data.addExtension(new LimitOffsetQueryData(offset, limit));
     return annisDao.find(data);
   }
 
