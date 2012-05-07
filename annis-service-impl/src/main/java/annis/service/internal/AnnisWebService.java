@@ -25,8 +25,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
-import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
@@ -43,7 +42,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -160,8 +158,8 @@ public class AnnisWebService
       limit);
 
     QueryData data = annisDao.parseAQL(query, corpusIDs);
-    data.addExtension(new AnnotateQueryData(offset, limit, left,
-      right));
+    data.addExtension(new LimitOffsetQueryData(offset, limit));
+    data.addExtension(new AnnotateQueryData(left, right));
     long start = new Date().getTime();
     SaltProject p = annisDao.annotate(data);
     long end = new Date().getTime();
@@ -206,7 +204,7 @@ public class AnnisWebService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
-    
+
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
@@ -223,7 +221,7 @@ public class AnnisWebService
     {
       long start = new Date().getTime();
       SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
-        documentName); 
+        documentName);
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
       return p;
@@ -235,11 +233,11 @@ public class AnnisWebService
       throw new WebApplicationException(ex);
     }
   }
-  
+
   @GET
   @Path("resolver/{corpusName}/{namespace}/{type}")
-  public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName, 
-    @PathParam("namespace") String namespace, 
+  public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName,
+    @PathParam("namespace") String namespace,
     @PathParam("type") String type)
   {
     ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
@@ -247,14 +245,14 @@ public class AnnisWebService
       enumType);
     return annisDao.getResolverEntries(r);
   }
-  
+
   @GET
   @Path("corpora")
   public List<AnnisCorpus> corpora()
   {
     return annisDao.listCorpora();
   }
-  
+
   @GET
   @Path("corpora/{top}/config")
   public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)

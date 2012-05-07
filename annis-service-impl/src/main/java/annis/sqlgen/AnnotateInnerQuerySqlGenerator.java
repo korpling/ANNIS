@@ -130,7 +130,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
     }
     if (annotateQueryData == null)
     {
-      annotateQueryData = new AnnotateQueryData(0, 0, 5, 5);
+      annotateQueryData = new AnnotateQueryData(5, 5);
     }
     return annotateQueryData;
   }

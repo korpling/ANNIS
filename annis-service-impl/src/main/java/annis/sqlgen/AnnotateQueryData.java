@@ -29,8 +29,7 @@ public class AnnotateQueryData
   private int left;
   private int right;
 
-  public AnnotateQueryData(int offset, int limit, int left,
-    int right)
+  public AnnotateQueryData(int left, int right)
   {
     super();
     this.left = left;
@@ -45,13 +44,13 @@ public class AnnotateQueryData
   public int getRight()
   {
     return right;
-  }  
+  }
 
   @Override
   public String toString()
   {
     List<String> fields = new ArrayList<String>();
-  
+
     if (left > 0)
     {
       fields.add("left = " + left);
