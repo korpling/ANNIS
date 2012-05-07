@@ -266,7 +266,15 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           {
             if (media_anno.equals(a.getName()))
             {
-              l.addStyleName("clickable");
+              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
+              {
+                l.addStyleName("clickable");
+              }
+              String startTime = getStartTime((String) a.getValue());
+              String endTime = getEndTime((String) a.getValue());
+              startTime = trimTimeAnno(startTime);
+              endTime = trimTimeAnno(endTime);
+              l.setValue(startTime + "-" + endTime);
             }
           }
         }
@@ -300,6 +308,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   {
     // check if it is a time annotation
     String buttonName = (String) event.getItemId();
+
     if (buttonName == null)
     {
       return;
@@ -310,14 +319,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       return;
     } // end check
 
-    SToken token = (SToken) event.getPropertyId();
     String time = null;
-
-    for (VisualizerPanel vis : mediaVisualizer)
-    {
-      vis.openVisualizer(false);
-    }
-
+    SToken token = (SToken) event.getPropertyId();
     for (SAnnotation anno : token.getSAnnotations())
     {
       for (String media_anno : media_annotations)
@@ -327,6 +330,18 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           time = anno.getValueString();
         }
       }
+    }
+
+    // do not start the media player, when there is only an 
+    // end time defined
+    if (time != null && time.matches("\\-[0-9]*(\\.[0-9]*)?"))
+    {
+      return;
+    }
+
+    for (VisualizerPanel vis : mediaVisualizer)
+    {
+      vis.openVisualizer(false);
     }
 
     time = (time == null) ? "no time given" : time;
@@ -364,5 +379,25 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         + startTime + ", " + endTime + "); ";
       getWindow().executeJavaScript(playCommand);
     }
+  }
+
+  private String trimTimeAnno(String time)
+  {
+
+    if ("undefined".equals(time))
+    {
+      return "";
+    }
+
+    String[] timeArray = time.split("\\.");
+
+    if (timeArray.length < 2)
+    {
+      return time;
+    }
+
+    return timeArray[0] + "."
+      + timeArray[1].substring(0, (timeArray[1].length() < 3 ? timeArray[1].
+      length() : 2));
   }
 }

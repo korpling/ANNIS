@@ -144,7 +144,7 @@ public class TigerTreeVisualizer extends Visualizer
     @Override
     public Shape getShape(Edge e)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE))
+      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
         return new Shape.Rectangle(getEdgeColor(e), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
       }
@@ -182,7 +182,7 @@ public class TigerTreeVisualizer extends Visualizer
     @Override
     public Color getEdgeColor(Edge e)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE))
+      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
         return new Color(0.5f, 0.5f, 0.8f, 0.7f);
       }
@@ -207,7 +207,7 @@ public class TigerTreeVisualizer extends Visualizer
     @Override
     public Stroke getStroke(Edge e)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE))
+      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
         return new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]
           {
@@ -291,11 +291,10 @@ public class TigerTreeVisualizer extends Visualizer
     double width = 0;
     double maxheight = 0;
 
-    for(DirectedGraph<AnnisNode, Edge> g : graphtools.getSyntaxGraphs(result.getGraph(),
-      input.getMappings().getProperty("node_ns", input.getNamespace())))
+    for(DirectedGraph<AnnisNode, Edge> g : graphtools.getSyntaxGraphs(input))
     {
       ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
-        g, backend, labeler, styler);
+        g, backend, labeler, styler, input);
 
       AbstractImageGraphicsItem item = cl.createLayout(
         new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.detectLayoutDirection(result.getGraph())));

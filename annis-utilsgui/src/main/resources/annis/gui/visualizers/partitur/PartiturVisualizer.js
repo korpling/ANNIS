@@ -36,7 +36,8 @@ $(document).ready(function(){
   });
 
   $("#toolbar").jbar();
-    //  bind cursor pointer to table cells, which has the time attribute
+  
+  //  bind cursor pointer to table cells, which has the time attribute
   $("td[time]").bind("hover").css("cursor", "pointer");
   function clickHandler(event)
   {
@@ -90,6 +91,7 @@ $(document).ready(function(){
   $("td[time]").each(function ()
   {    
     $(this).click(clickHandler);
+    $(this).addClass("speaker");
   });
 
 });

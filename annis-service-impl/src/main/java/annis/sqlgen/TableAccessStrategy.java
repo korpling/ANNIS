@@ -78,8 +78,7 @@ public class TableAccessStrategy {
 	public String aliasedTable(String table, int count) {
 		if (node != null) {
 			// sanity checks
-			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size() && 
-					(count > 1 || !node.requiresTable(NODE_ANNOTATION_TABLE)))
+			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
 				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
 			if (table.equals(EDGE_ANNOTATION_TABLE) && count > node.getEdgeAnnotations().size())
 				throw new IllegalArgumentException("access to edge annotation table out of range: " + count);
@@ -133,7 +132,7 @@ public class TableAccessStrategy {
 		}
 		
 		tables.add(tableName(NODE_ANNOTATION_TABLE), node.getNodeAnnotations().size());
-		if (node.getNodeAnnotations().isEmpty() && node.requiresTable(NODE_ANNOTATION_TABLE))
+		if (node.getNodeAnnotations().isEmpty() && node.getNodeAnnotations().size() > 0)
 			tables.add(tableName(NODE_ANNOTATION_TABLE));
 		
 		tables.add(tableName(EDGE_ANNOTATION_TABLE), node.getEdgeAnnotations().size());
@@ -146,9 +145,6 @@ public class TableAccessStrategy {
 		if (tables.getCount(tableName(NODE_TABLE)) == 0)
 			tables.add(tableName(NODE_TABLE));
 		
-		if (node.requiresTable(TEXT_TABLE))
-			tables.add(tableName(TEXT_TABLE));
-
 		return tables;
 	}
 	

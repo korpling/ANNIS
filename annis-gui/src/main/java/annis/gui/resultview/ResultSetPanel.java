@@ -15,11 +15,13 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
-import annis.service.AnnisService;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -27,17 +29,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.log4j.lf5.LogLevel;
 
 /**
  *
@@ -46,7 +42,7 @@ import org.apache.log4j.lf5.LogLevel;
 public class ResultSetPanel extends VerticalLayout implements ResolverProvider
 {
 
-  private HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
   public List<SingleResultPanel> resultPanelList;
@@ -56,7 +52,8 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
-      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>();
+      Collections.synchronizedMap(
+      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setWidth("100%");
     setHeight("-1px");
@@ -78,8 +75,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   }
 
   @Override
-  public ResolverEntry[] getResolverEntries(SDocument doc,
-    AnnisService service) throws RemoteException
+  public ResolverEntry[] getResolverEntries(SDocument doc)
   {
     HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
 
@@ -105,10 +101,11 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
         {
           edgeLayers.add(layer.getSName());
         }
-        catch(NullPointerException ex)
+        catch (NullPointerException ex)
         {
           Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
-            "NullPointerException when using Salt, was trying to get layer name", ex);
+            "NullPointerException when using Salt, was trying to get layer name",
+            ex);
         }
       }
     }
@@ -133,9 +130,32 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     }
     else
     {
-      List<ResolverEntry> resolverList =
-        service.getResolverEntries(resolverRequests.toArray(
-        new SingleResolverRequest[0]));
+      List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
+
+      WebResource resResolver = Helper.getAnnisWebResource(getApplication()).
+        path("resolver");
+
+      for (SingleResolverRequest r : resolverRequests)
+      {
+        List<ResolverEntry> tmp;
+        try
+        {
+          String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
+          String namespace = r.getNamespace();
+          String type = r.getType() == null ? null : r.getType().toString();
+          if(corpusName != null && namespace != null && type != null)
+          {
+            tmp = resResolver.path(corpusName).path(namespace).path(type)
+              .get(new GenericType<List<ResolverEntry>>(){});
+            resolverList.addAll(tmp);
+          }
+        }
+        catch (Exception ex)
+        {
+          Logger.getLogger(ResultSetPanel.class.getName()).
+            log(Level.SEVERE, null, ex);
+        }
+      }
       visSet.addAll(resolverList);
       cacheResolver.put(resolverRequests, resolverList);
     }

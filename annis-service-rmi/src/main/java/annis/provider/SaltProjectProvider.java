@@ -20,13 +20,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackag
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -88,7 +88,16 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
         }
       }
     }
-    resource.save(entityStream, null);
+    
+    try
+    {
+      resource.save(entityStream, null);
+    }
+    catch(Exception ex)
+    {
+      Logger.getLogger(SaltProjectProvider.class.getName()).log(
+        Level.SEVERE, "exception when serializing SaltProject", ex);
+    }
   }
 
   @Override

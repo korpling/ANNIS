@@ -19,7 +19,7 @@ import annis.exceptions.AnnisServiceFactoryException;
 import annis.provider.SaltProjectProvider;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;

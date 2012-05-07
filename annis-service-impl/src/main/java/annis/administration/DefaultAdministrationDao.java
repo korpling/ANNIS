@@ -32,25 +32,19 @@ import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Types;
-import javax.activation.MimetypesFileTypeMap;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,14 +172,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void createSchema()
   {
     log.info("creating Annis database schema (" + dbLayout + ")");
-    executeSqlFromScript("schema_" + dbLayout + ".sql");
+    executeSqlFromScript(dbLayout + "/schema.sql");
   }
   
   @Override
   public void createSchemaIndexes()
   {
     log.info("creating Annis database schema indexes (" + dbLayout + ")");
-    executeSqlFromScript("schemaindex_" + dbLayout + ".sql");
+    executeSqlFromScript(dbLayout + "/schemaindex.sql");
   }
 
   @Override
@@ -204,21 +198,26 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
+    
+    createStagingAreaIndexes();
+    
     computeTopLevelCorpus();
-
+    analyzeStagingTables();
+    
+    computeLeftTokenRightToken();
+    
+//    if (true) return;
+    
+    adjustRankPrePost();
     long corpusID = updateIds();
 
     importBinaryData(path);
     extendStagingText(corpusID);
 
-    createStagingAreaIndexes();
-    analyzeStagingTables();
-
-    // finish transaction here to debug computation of left|right-token
-    // if (true) return;
-    computeLeftTokenRightToken();
-//      if (true) return;
     computeRealRoot();
+
+//    if (true) return;
+    
     computeLevel();
     computeCorpusStatistics();
     updateCorpusStatsId(corpusID);
@@ -235,7 +234,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     // create the new facts table partition
     createFacts(corpusID);
     // the entries, which where here done, are possible after generating facts
-    updateCorpusStatistic();
+    updateCorpusStatistic(corpusID);
 
 
     if (temporaryStagingArea)
@@ -393,10 +392,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("corpus_stats.sql");
   }
 
-  void updateCorpusStatistic()
+  void updateCorpusStatistic(long corpusID)
   {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     log.info("updating statistics for top-level corpus");
-    executeSqlFromScript("corpus_stats_upd.sql");
+    executeSqlFromScript("corpus_stats_upd.sql", args);
   }
 
   void computeCorpusPath(long corpusID)
@@ -407,6 +407,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("compute_corpus_path.sql", args);
   }
 
+  protected void  adjustRankPrePost()
+  {
+    log.info("updating pre and post order in _rank");
+    executeSqlFromScript("adjustrankprepost.sql");
+    log.info("analyzing rank");
+      jdbcTemplate.getJdbcOperations()
+        .execute("ANALYZE " + tableInStagingArea("rank"));
+  }
+  
   /**
    *
    * @return the new corpus ID
@@ -418,15 +427,18 @@ public class DefaultAdministrationDao implements AdministrationDao
     int numOfEntries = jdbcTemplate.getJdbcOperations().queryForInt(
       "SELECT COUNT(*) from corpus_stats");
 
+    long recentCorpusId = 0; 
+    
     if (numOfEntries > 0)
     {
-      long recentCorpusId = jdbcTemplate.getJdbcOperations().queryForLong(
+      recentCorpusId = jdbcTemplate.getJdbcOperations().queryForLong(
         "SELECT max(id) FROM corpus_stats");
-      log.info("the id from recently imported corpus:" + recentCorpusId);
-      MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
-      executeSqlFromScript("update_ids.sql", args);
+      log.info("the id from recently imported corpus:" + recentCorpusId);      
     }
 
+    MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
+    executeSqlFromScript("update_ids.sql", args);
+    
     log.info("query for the new corpus ID");
     long result = jdbcTemplate.getJdbcOperations().queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
@@ -529,6 +541,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
     jdbcTemplate.getJdbcOperations().execute("ANALYZE facts_" + corpusID);
+    log.info("analyzing general facts table");
+    jdbcTemplate.getJdbcOperations().execute("ANALYZE facts");
   }
 
   void createFacts(long corpusID)
@@ -537,15 +551,25 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts_" + dbLayout + ".sql", args);
+    executeSqlFromScript(dbLayout + "/facts.sql", args);
+
+    clusterFacts(corpusID);
+    
+    log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
+    executeSqlFromScript(dbLayout + "/indexes.sql", args);
+
+  }
+  
+  void clusterFacts(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    executeSqlFromScript("cluster.sql", args);
-
-    log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript("indexes_" + dbLayout + ".sql", args);
-
+    if(!executeSqlFromScript(dbLayout + "/cluster.sql", args))
+    {
+      executeSqlFromScript("cluster.sql", args);
+    }
   }
 
   ///// Other sub tasks
@@ -565,7 +589,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     for (long l : ids)
     {
       log.debug("dropping facts table for corpus " + l);
-      jdbcTemplate.getJdbcOperations().execute("DROP TABLE facts_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_edge_" + l);
+      jdbcTemplate.getJdbcOperations().execute("DROP TABLE IF EXISTS facts_node_" + l);
       log.debug("dropping annotation_pool table for corpus " + l);
       jdbcTemplate.getJdbcOperations()
         .execute("DROP TABLE IF EXISTS annotation_pool_" + l);
@@ -701,14 +727,14 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
-  public void executeSqlFromScript(String script)
+  public boolean executeSqlFromScript(String script)
   {
-    executeSqlFromScript(script, null);
+    return executeSqlFromScript(script, null);
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
-  public void executeSqlFromScript(String script, MapSqlParameterSource args)
+  public boolean executeSqlFromScript(String script, MapSqlParameterSource args)
   {
     File fScript = new File(scriptPath, script);
     if(fScript.canRead() && fScript.isFile())
@@ -717,10 +743,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.debug("executing SQL script: " + resource.getFilename());
       String sql = readSqlFromResource(resource, args);
       jdbcTemplate.getJdbcOperations().execute(sql);
+      return true;
     }
     else
     {
       log.debug("SQL script " +  fScript.getName() +  " does not exist");
+      return false;
     }
   }
 
@@ -857,6 +885,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
 
+  public NamedParameterJdbcTemplate getJdbcTemplate()
+  {
+    return jdbcTemplate;
+  }
+  
   public String getScriptPath()
   {
     return scriptPath;

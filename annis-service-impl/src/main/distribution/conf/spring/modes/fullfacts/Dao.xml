@@ -83,7 +83,7 @@
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier">
     <property name="scriptFile" value="modify_session.sql"/>
     <property name="administrationDao">
-      <bean class="annis.administration.APAdministrationDao">
+      <bean class="annis.administration.DefaultAdministrationDao">
         <property name="scriptPath" value="${annis.script-path}"/>
         <property name="dataSource" ref="dataSource"/>
       </bean>

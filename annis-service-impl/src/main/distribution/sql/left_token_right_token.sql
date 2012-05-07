@@ -18,9 +18,11 @@ AS
 
     SELECT r.node_ref AS id, r.parent AS parent, r.pre AS pre,
           l.left_token AS left_token, l.right_token AS right_token
-    FROM _rank as r, _component as c, leftright as l
+    FROM _rank AS r, _component AS c, leftright AS l, _node AS n
     WHERE
-      l.parent = r.pre AND c.type in ('c', 'd')
+      l.parent = r.pre AND c.type in ('c', 'd', 'p')
+      AND r.node_ref = n.id
+      AND n.token_index IS NULL
       AND r.component_ref = c.id
   )
   SELECT id, min(left_token) AS left_token, max(right_token) as right_token

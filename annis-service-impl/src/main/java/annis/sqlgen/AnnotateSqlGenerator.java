@@ -63,7 +63,7 @@ public abstract class AnnotateSqlGenerator<T>
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
-  
+
   public static class AnnotateQueryData
   {
 
@@ -181,20 +181,28 @@ public abstract class AnnotateSqlGenerator<T>
   private IslandPolicies getMostRestrictivePolicy(
     List<Long> corpora, Map<Long, Properties> props)
   {
+    if(corpora.isEmpty())
+    {
+      return IslandPolicies.valueOf(defaultIslandsPolicy);
+    }
+    
     IslandPolicies[] all = IslandPolicies.values();
     IslandPolicies result = all[all.length - 1];
-
+    
     for (Long l : corpora)
     {
+      IslandPolicies newPolicy = IslandPolicies.valueOf(defaultIslandsPolicy);
+      
       if (props.get(l) != null)
       {
-        IslandPolicies newPolicy =
+        newPolicy =
           IslandPolicies.valueOf(props.get(l).getProperty("islands-policy",
           defaultIslandsPolicy));
-        if (newPolicy.ordinal() < result.ordinal())
-        {
-          result = newPolicy;
-        }
+      }
+      
+      if (newPolicy.ordinal() < result.ordinal())
+      {
+        result = newPolicy;
       }
     }
     return result;
@@ -203,7 +211,8 @@ public abstract class AnnotateSqlGenerator<T>
   @Deprecated
   public abstract String getTextQuery(long textID);
 
-  public abstract String getDocumentQuery(String toplevelCorpusName, String documentName);
+  public abstract String getDocumentQuery(String toplevelCorpusName,
+    String documentName);
 
   public String getMatchedNodesViewName()
   {
@@ -255,6 +264,16 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append(" IN (");
       sb.append(StringUtils.join(corpusList, ", "));
       sb.append(") AND\n");
+
+      if (!tables.isMaterialized(RANK_TABLE, NODE_TABLE))
+      {
+        indent(sb, indent);
+        sb.append(tables.aliasedColumn(RANK_TABLE, "toplevel_corpus"));
+        sb.append(" IN (");
+        sb.append(StringUtils.join(corpusList, ", "));
+        sb.append(") AND\n");
+      }
+
     }
 
     // island policies
@@ -397,15 +416,8 @@ public abstract class AnnotateSqlGenerator<T>
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    SolutionKey<?> key = createSolutionKey();
-    int size = alternative.size();
-    List<String> keyColumns = key.getKeyColumns(size);
     StringBuilder sb = new StringBuilder();
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(keyColumn);
-      sb.append(", ");
-    }
+    sb.append("solutions.n, ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
     String orderByClause = sb.toString();
@@ -415,7 +427,7 @@ public abstract class AnnotateSqlGenerator<T>
   @Override
   public abstract String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent);
-  
+
   @Override
   public T extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
@@ -506,6 +518,4 @@ public abstract class AnnotateSqlGenerator<T>
   {
     this.resultExtractor = resultExtractor;
   }
-  
-  
 }

@@ -15,8 +15,6 @@
  */
 package annis.dao;
 
-import annis.AnnisBaseRunner;
-import annis.executors.DefaultQueryExecutor;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -41,7 +39,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -57,7 +54,7 @@ import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisCorpus;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -65,7 +62,6 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
 import annis.sqlgen.SaltAnnotateExtractor;
-import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import javax.annotation.Resource;
@@ -96,8 +92,6 @@ public class TestSpringAnnisDao
   private MetaDataFilter metaDataFilter;
   @Mock
   private SqlGenerator sqlGenerator;
-  @Mock
-  private DefaultQueryExecutor defaultQueryExecutor;
   @Mock
   private AnnotateSqlGenerator annotateSqlGenerator;
   @Mock

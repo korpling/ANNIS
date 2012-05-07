@@ -39,8 +39,10 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    TableAccessStrategy tas = createTableAccessStrategy();
+    List<Long> corpusList = queryData.getCorpusList();
     StringBuffer sb = new StringBuffer();
-
+    
     indent(sb, indent);
     sb.append("(\n");
     indent(sb, indent);
@@ -55,12 +57,25 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
     sb.append("\n");
     indent(sb, indent + TABSTOP);
-    sb.append(
-      "LEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id)");
+    sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (")
+      .append(tas.aliasedColumn(NODE_TABLE, "node_anno_ref")).append(
+      " = node_anno.id AND ")
+      .append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus"))
+      .append(" = node_anno.toplevel_corpus AND node_anno.toplevel_corpus IN (")
+      .append(StringUtils.join(corpusList, ", "))
+      .append("))");
+    
     sb.append("\n");
     indent(sb, indent + TABSTOP);
     sb.append(
-      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id)");
+      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (")
+      .append(tas.aliasedColumn(RANK_TABLE, "edge_anno_ref"))
+      .append(" = edge_anno.id AND ")
+      .append(tas.aliasedColumn(RANK_TABLE, "toplevel_corpus"))
+      .append(" = edge_anno.toplevel_corpus AND "
+      + "edge_anno.toplevel_corpus IN (")
+      .append(StringUtils.join(corpusList, ", "))
+      .append("))");
 
     sb.append(",\n");
 
@@ -92,10 +107,30 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       queryData.getExtensions(AnnotateQueryData.class);
     Validate.isTrue(extension.size() > 0);
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
+    sb.append(indent).append(TABSTOP + "solutions.n,\n");
 
+    List<String> fields = getSelectFields();
+
+    sb.append(indent).append(TABSTOP);
+    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
+    sb.append(",\n").append(indent).append(TABSTOP);
+
+    // corpus.path_name
+    sb.append("corpus.path_name AS path");
+
+    if (isIncludeDocumentNameInAnnotateQuery())
+    {
+      sb.append(",\n");
+      indent(sb, indent + TABSTOP);
+      sb.append("corpus.path_name[1] AS document_name");
+    }
+    return sb.toString();
+  }
+  
+  protected List<String> getSelectFields()
+  {
     List<String> fields = new ArrayList<String>();
-    // facts.fid is never evaluated in the result set
-    // addSelectClauseAttribute(fields, FACTS_TABLE, "fid");
+    
     addSelectClauseAttribute(fields, NODE_TABLE, "id");
     addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
     addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
@@ -129,28 +164,20 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     fields.add("edge_anno.\"namespace\" AS edge_annotation_namespace");
     fields.add("edge_anno.\"name\" AS edge_annotation_name");
     fields.add("edge_anno.\"val\" AS edge_annotation_value");
-
-    sb.append(indent).append(TABSTOP);
-    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-    sb.append(",\n").append(indent).append(TABSTOP);
-
-    // corpus.path_name
-    sb.append("corpus.path_name AS path");
-
-    if (isIncludeDocumentNameInAnnotateQuery())
-    {
-      sb.append(",\n");
-      indent(sb, indent + TABSTOP);
-      sb.append("corpus.path_name[1] AS document_name");
-    }
-    return sb.toString();
+    
+    return fields;
   }
 
   @Override
   public String getTextQuery(long textID)
   {
+    TableAccessStrategy tas = createTableAccessStrategy();    
+    List<String> fields = getSelectFields();
+    
     String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name,"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, " 
+      +  StringUtils.join(fields, ", ") +", "
+      + "c.path_name as path, c.path_name[1] as document_name,"
       + "node_anno.namespace AS node_annotation_namespace, "
       + "node_anno.\"name\" AS node_annotation_name, "
       + "node_anno.val AS node_annotation_value,\n"
@@ -158,13 +185,16 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.\"name\" AS edge_annotation_name, "
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
-      + "\tfacts AS facts\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id AND facts.toplevel_corpus = node_anno.toplevel_corpus)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id AND facts.toplevel_corpus = edge_anno.toplevel_corpus),\n"
+      // really ugly
+      + "\t" + getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true) + "\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
+        + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")
+        + " = edge_anno.id AND " + tas.aliasedColumn(RANK_TABLE, "toplevel_corpus") + " = edge_anno.toplevel_corpus),\n"
       + "\tcorpus AS c\n"
       + "WHERE\n"
-      + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-      + "ORDER BY facts.pre";
+      + "\t" + tas.aliasedColumn(NODE_TABLE, "text_ref") + " = :text_id AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "ORDER BY " + tas.aliasedColumn(RANK_TABLE, "pre");
     String sql = template.replace(":text_id", String.valueOf(textID));
     return sql;
   }
@@ -172,8 +202,13 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   @Override
   public String getDocumentQuery(String toplevelCorpusName, String documentName)
   {
+    TableAccessStrategy tas = createTableAccessStrategy();
+    List<String> fields = getSelectFields();
+    
     String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name, "
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, "
+      +  StringUtils.join(fields, ", ") +", "
+      + "c.path_name as path, c.path_name[1] as document_name, "
       + "node_anno.namespace AS node_annotation_namespace, "
       + "node_anno.\"name\" AS node_annotation_name, "
       + "node_anno.val AS node_annotation_value,\n"
@@ -181,15 +216,18 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.\"name\" AS edge_annotation_name, "
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
-      + "\tfacts AS facts\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (facts.node_anno_ref = node_anno.id AND facts.toplevel_corpus = node_anno.toplevel_corpus)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id AND facts.toplevel_corpus = edge_anno.toplevel_corpus),\n"
+      // really ugly
+      + "\t" + getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true) + "\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
+        + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
+      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")
+        + " = edge_anno.id AND " + tas.aliasedColumn(RANK_TABLE, "toplevel_corpus") + " = edge_anno.toplevel_corpus),\n"
       + "\tcorpus as c, corpus as toplevel\n"
       + "WHERE\n"
-      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
+      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
       + "\tAND toplevel.top_level IS TRUE\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-      + "ORDER BY facts.pre";
+      + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
     String sql = template.replace(":toplevel_name", String.valueOf(
       toplevelCorpusName)).replace(":document_name", documentName);
     return sql;

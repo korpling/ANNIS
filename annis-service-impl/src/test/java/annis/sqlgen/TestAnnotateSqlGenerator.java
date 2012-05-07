@@ -394,13 +394,10 @@ public class TestAnnotateSqlGenerator
   {
     // given
     String preAlias = createColumnAlias(RANK_TABLE, "pre");
-    String keyAlias1 = uniqueString(3);
-    String keyAlias2 = uniqueString(3);
-    given(solutionKey.getKeyColumns(anyInt())).willReturn(asList(keyAlias1, keyAlias2));
     // when
     String actual = generator.orderByClause(queryData, alternative, INDENT);
     // then
-    String expected = keyAlias1 + ", " + keyAlias2 + ", " + preAlias;
+    String expected = "solutions.n, " + preAlias;
     assertThat(actual, is(expected));
   }
 

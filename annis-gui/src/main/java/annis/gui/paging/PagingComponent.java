@@ -15,7 +15,6 @@
  */
 package annis.gui.paging;
 
-import com.sun.java.swing.plaf.windows.resources.windows;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;

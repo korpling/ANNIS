@@ -21,6 +21,10 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.Match;
 import annis.ql.parser.QueryData;
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.FindSqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -28,6 +32,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,6 +42,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -227,6 +233,35 @@ public class AnnisWebService
         + documentName, ex);
       throw new WebApplicationException(ex);
     }
+  }
+  
+  @GET
+  @Path("resolver/{corpusName}/{namespace}/{type}")
+  public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName, 
+    @PathParam("namespace") String namespace, 
+    @PathParam("type") String type)
+  {
+    ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
+    SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace,
+      enumType);
+    return annisDao.getResolverEntries(r);
+  }
+  
+  @GET
+  @Path("corpora")
+  public List<AnnisCorpus> corpora()
+  {
+    return annisDao.listCorpora();
+  }
+  
+  @GET
+  @Path("corpora/{top}/config")
+  public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
+  {
+    Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
+    CorpusConfig result = new CorpusConfig();
+    result.setConfig(tmp);
+    return result;
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

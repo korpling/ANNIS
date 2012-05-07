@@ -55,20 +55,28 @@ public class VAutoHeightIFrame extends Widget implements Paintable
         if(!iframe.getSrc().endsWith("empty.html"))
         {
           //VConsole.log("loadhandler: survived first check");
-          Document doc = null;
           try
           {
-            doc = iframe.getContentDocument();
+            final Document doc = iframe.getContentDocument();
+            if(doc != null)
+            {
+              Timer t = new Timer() {
+
+                @Override
+                public void run()
+                { 
+                  checkIFrameLoaded(doc);
+                }
+              }; 
+              t.schedule(100);
+            }
           }
           catch(JavaScriptException ex)
           {
             VConsole.log("trying to access iframe source from different domain which is forbidden");
           }
 
-          if(doc != null)
-          {
-            checkIFrameLoaded(doc);
-          }
+
 
         }
       }
@@ -94,11 +102,26 @@ public class VAutoHeightIFrame extends Widget implements Paintable
         newHeight = img.getPropertyInt("naturalHeight");
       }
     }
-    else if(doc.getBody().getScrollHeight() > 20)
+    else
     {
-      // real html page or fallback if content type is unknown (e.g. in chrome)
-      newHeight = doc.getBody().getScrollHeight() + additionalHeight;
+      VConsole.log("body height defined?: " + doc.getBody().hasAttribute("scrollHeight"));
+      VConsole.log("document height defined?: " + doc.getDocumentElement().hasAttribute("scrollHeight"));
+      int bodyHeight = doc.getBody().getScrollHeight();
+      int documentHeight = doc.getDocumentElement().getScrollHeight();
+      int maxHeight = Math.max(bodyHeight, documentHeight);
+      
+      VConsole.log("body scrollHeight: " + bodyHeight + " document scrollHeight: " + documentHeight);
+
+      
+      if(maxHeight > 20)
+      {
+        // real html page or fallback if content type is unknown (e.g. in chrome)
+        newHeight = maxHeight + additionalHeight;
+      }
     }
+    
+    
+    VConsole.log("newheight: " + newHeight);
 
     if(newHeight > -1)
     {
@@ -137,8 +160,11 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     // Save the client side identifier (paintable id) for the widget
     paintableId = uidl.getId();
 
-    additionalHeight = uidl.getIntAttribute("additional_height");
-
+    if(uidl.hasAttribute("additional_height"))
+    {
+      additionalHeight = uidl.getIntAttribute("additional_height");
+    }
+    
     final Style style = iframe.getStyle();
 
     style.setWidth(

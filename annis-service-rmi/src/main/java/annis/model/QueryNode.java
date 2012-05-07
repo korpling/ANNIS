@@ -62,8 +62,6 @@ public class QueryNode implements Serializable
   // for sql generation
   private String marker;
   private Long matchedNodeInQuery;
-  // required tables in SELECT clause
-  private Set<String> requiredTables;
 
   public enum TextMatching
   {
@@ -142,7 +140,6 @@ public class QueryNode implements Serializable
     nodeAnnotations = new TreeSet<QueryAnnotation>();
     edgeAnnotations = new TreeSet<QueryAnnotation>();
     joins = new ArrayList<Join>();
-    requiredTables = new HashSet<String>();
   }
 
   public QueryNode(long id)
@@ -163,7 +160,7 @@ public class QueryNode implements Serializable
     this.right = right;
     this.leftToken = leftToken;
     this.rightToken = rightToken;
-
+    
     setNamespace(namespace);
     setName(name);
     setTokenIndex(tokenIndex);
@@ -299,11 +296,6 @@ public class QueryNode implements Serializable
   public String getQualifiedName()
   {
     return qName(namespace, name);
-  }
-
-  public boolean requiresTable(String table)
-  {
-    return requiredTables.contains(table);
   }
 
   @Override
@@ -662,13 +654,4 @@ public class QueryNode implements Serializable
     this.matchedNodeInQuery = matchedNodeInQuery;
   }
 
-  public Set<String> getRequiredTables()
-  {
-    return requiredTables;
-  }
-
-  public void addRequiredTable(String table)
-  {
-    requiredTables.add(table);
-  }
 }

@@ -24,6 +24,7 @@
       <outputDirectory>lib/</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
+      <fileMode>0644</fileMode>
     </dependencySet>
   </dependencySets>
 </assembly>

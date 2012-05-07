@@ -141,7 +141,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   // FIXME: why not in addSingleEdgeConditions() ?
-  void addLeftOrRightDominance(List<String> conditions, QueryNode node,
+  protected void addLeftOrRightDominance(List<String> conditions, QueryNode node,
     QueryNode target, QueryData queryData, RankTableJoin join,
     String aggregationFunction, String tokenBoarder)
   {
@@ -149,26 +149,57 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentName = rankTableJoin.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
 
+    TableAccessStrategy tas = tables(null);
+
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
     List<Long> corpusList = queryData.getCorpusList();
-    conditions.add(in(
-      tables(target).aliasedColumn(NODE_TABLE, tokenBoarder),
-      "SELECT "
+    
+    
+    boolean doJoin = !tas.isMaterialized(NODE_TABLE, RANK_TABLE);
+    
+    String innerSelect = 
+       "SELECT "
       + aggregationFunction
       + "(lrsub."
       + tokenBoarder
-      + ") FROM "
-      + FACTS_TABLE
-      + " as lrsub "
-      + "WHERE parent="
+      + ") FROM ";
+    if(doJoin)
+    {
+      innerSelect +=
+          tas.tableName(NODE_TABLE) + " AS lrsub, "
+        + tas.tableName(RANK_TABLE) + " AS lrsub_rank ";
+    }
+    else
+    {
+      innerSelect += 
+        tas.tableName(RANK_TABLE)
+        + " as lrsub ";
+    }
+    
+    innerSelect +=
+        "WHERE parent="
       + tables(node).aliasedColumn(RANK_TABLE, "pre")
+      + " AND component_id = " + tables(node).aliasedColumn(RANK_TABLE,
+        "component_id")
       + " AND corpus_ref="
       + tables(target).aliasedColumn(NODE_TABLE, "corpus_ref")
-      + " AND toplevel_corpus IN("
+      + " AND lrsub.toplevel_corpus IN("
       + (corpusList == null || corpusList.isEmpty() ? "NULL"
-      : StringUtils.join(corpusList, ",")) + ")"));
+      : StringUtils.join(corpusList, ",")) + ")";
+    
+    if(doJoin)
+    {
+      innerSelect +=
+        " AND lrsub_rank.toplevel_corpus IN("
+        + (corpusList == null || corpusList.isEmpty() ? "NULL"
+        : StringUtils.join(corpusList, ",")) + ")"
+        + " AND lrsub_rank.node_ref = lrsub.id";
+    }
+    
+    conditions.add(in(
+      tables(target).aliasedColumn(NODE_TABLE, tokenBoarder), innerSelect));
   }
 
   void joinOnNode(List<String> conditions, QueryNode node, QueryNode target,

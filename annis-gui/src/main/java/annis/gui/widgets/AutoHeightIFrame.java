@@ -5,8 +5,10 @@ import annis.gui.widgets.gwt.client.VAutoHeightIFrame;
 
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.Window;
 import java.util.Map;
 
 /**
@@ -48,7 +50,9 @@ public class AutoHeightIFrame extends AbstractComponent
   {
     if (variables.containsKey("height"))
     {
-      this.setHeight("" + variables.get("height"));
+      int height = (Integer) variables.get("height");
+//      getWindow().showNotification("new height: " + height, Window.Notification.TYPE_TRAY_NOTIFICATION);
+      this.setHeight((float) height, Sizeable.UNITS_PIXELS);
       // only has effect, when time annotation in KWIC has been clicked
       visPanel.startMediaVisFromKWIC();    
     }   

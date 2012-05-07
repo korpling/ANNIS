@@ -40,7 +40,7 @@ public class ListCorpusAnnotationsSqlHelper implements
 
   public String createSqlQuery(String toplevelCorpusName, String corpusName)
   {
-    String template = "SELECT parent.type, parent.name AS parent_name, "
+    String template = "SELECT parent.type, parent.name AS parent_name, parent.pre AS parent_pre, "
       + "toplevel.name AS toplevel_name, ca.name, ca.value, ca.namespace "
       + "FROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
       + "WHERE this.name = ':docname' \n"
@@ -50,8 +50,8 @@ public class ListCorpusAnnotationsSqlHelper implements
       + "AND parent.post <= toplevel.post \n"
       + "AND this.pre >= parent.pre \n"
       + "AND this.post <= parent.post \n"
-      + "AND ca.corpus_ref = parent.id \n" 
-      + "ORDER BY parent.pre ASC";
+      + "AND ca.corpus_ref = parent.id \n"
+      + "ORDER BY parent_pre ASC";
     String sql = template.replaceAll(":docname", corpusName).
       replaceAll(":toplevelname", toplevelCorpusName);
     return sql;
@@ -66,6 +66,7 @@ public class ListCorpusAnnotationsSqlHelper implements
     String value = rs.getString("value");
     String type = rs.getString("type");
     String corpusName = rs.getString("parent_name");
-    return new Annotation(namespace, name, value, type, corpusName);
+    int pre = rs.getInt("parent_pre");
+    return new Annotation(namespace, name, value, type, corpusName, pre);
   }
 }
