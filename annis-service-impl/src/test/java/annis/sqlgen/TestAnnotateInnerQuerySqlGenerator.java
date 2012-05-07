@@ -22,7 +22,6 @@ import org.mockito.Mock;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 
 public class TestAnnotateInnerQuerySqlGenerator
 {
