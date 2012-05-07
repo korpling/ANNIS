@@ -14,6 +14,7 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import org.apache.commons.lang.Validate;
 
 public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Object> 
   implements SelectClauseSqlGenerator<QueryData>,
@@ -94,8 +95,11 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
       return;
     }
     // don't use ORDER BY clause if there's no LIMIT clause; saves a sort
-    AnnotateQueryData annotateQueryData = getAnnotateQueryData(queryData);
-    if (annotateQueryData.isPaged())
+    List<LimitOffsetQueryData> extensions =
+      queryData.getExtensions(LimitOffsetQueryData.class);
+    Validate.isTrue(extensions.size() > 0);
+    
+    if (extensions.get(0).isPaged())
     {
       super.appendOrderByClause(sb, queryData, alternative, indent);
     }
