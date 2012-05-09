@@ -84,6 +84,8 @@ public class AnnisRunner extends AnnisBaseRunner
   private int right = 5;
   private List<Long> corpusList;
   private boolean clearCaches;
+  private MetaDataFilter metaDataFilter;
+  
 
   public enum OS
   {
@@ -151,7 +153,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doDebug(String ignore)
   {
     doCorpus("pcc2");
-    doCount("tok & meta::Genre=\"Sport\"");
+    doSql("annotate tok");
   }
 
   public void doDddquery(String annisQuery)
@@ -645,12 +647,19 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
+    
+    // filter by meta data
+    queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
+    
     if (annisQuery != null)
     {
       benchmarks.add(new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
         queryData));
     }
     out.println("NOTICE: corpus = " + queryData.getCorpusList());
+    
+    
+    
     return queryData;
   }
 
@@ -984,4 +993,16 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.matrixSqlGenerator = matrixSqlGenerator;
   }
+
+  public MetaDataFilter getMetaDataFilter()
+  {
+    return metaDataFilter;
+  }
+
+  public void setMetaDataFilter(MetaDataFilter metaDataFilter)
+  {
+    this.metaDataFilter = metaDataFilter;
+  }
+  
+  
 }
