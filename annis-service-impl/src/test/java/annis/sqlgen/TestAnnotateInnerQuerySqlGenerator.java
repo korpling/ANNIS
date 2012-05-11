@@ -63,9 +63,15 @@ public class TestAnnotateInnerQuerySqlGenerator
     alternative = Collections.nCopies(2, new QueryNode());
     int left = uniqueInt(10);
     int right = uniqueInt(20);
+    
+    List extensions = new ArrayList<AnnotateQueryData>();
+    extensions.add(annotateQueryData);
+
     given(annotateQueryData.getLeft()).willReturn(left);
     given(annotateQueryData.getRight()).willReturn(right);
-    given(queryData.getExtensions()).willReturn(newSet((Object) annotateQueryData));
+    given(queryData.getExtensions(AnnotateQueryData.class)).willReturn(
+      extensions);    
+    
     String key1Column1 = uniqueAlphaString();
     String key1Column2 = uniqueAlphaString();
     String key2Column1 = uniqueAlphaString();
