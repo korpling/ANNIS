@@ -54,13 +54,6 @@ public interface SolutionKey<KeyType>
    *         (starting with 1) or {@code null} if the node is not a match.
    */
   public abstract Integer getMatchedNodeIndex(Object id);
-
-  /**
-   * Returns the String representation of the key that can be used
-   * in the Salt model for the
-   * {@link annis.model.AnnisConstants.FEAT_MACHTEDIDS} property.
-   */
-  public abstract String getCurrentKeyAsString();
   
   /**
    * Returns the name of the key columns.
@@ -72,4 +65,14 @@ public interface SolutionKey<KeyType>
    * Returns the node ID of the current row in a result set.
    */
   public abstract Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy);
+  
+  public abstract int getKeySize();
+ 
+  /**
+   * Returns the String representation of the key that can be used
+   * in the Salt model for the
+   * {@link annis.model.AnnisConstants.FEAT_MACHTEDIDS} property.
+   */
+  public abstract String getCurrentKeyAsString();
+  
 }

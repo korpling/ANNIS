@@ -157,6 +157,8 @@ public class LegacyGraphConverter
 
         aNode.setCorpus(sNode.getSFeature(ANNIS_NS, FEAT_CORPUSREF).
           getSValueSNUMERIC());
+        aNode.setTextId(sNode.getSFeature(ANNIS_NS, FEAT_TEXTREF)
+          .getSValueSNUMERIC());
         aNode.setLeft(sNode.getSFeature(ANNIS_NS, FEAT_LEFT).getSValueSNUMERIC());
         aNode.setLeftToken(sNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
           getSValueSNUMERIC());
@@ -166,8 +168,7 @@ public class LegacyGraphConverter
           getSValueSNUMERIC());
         if (matchSet.contains(aNode.getName()))
         {
-          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getName())
-            + 1);
+          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getName()) + 1);
           annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else
@@ -183,6 +184,7 @@ public class LegacyGraphConverter
     for (SRelation rel : docGraph.getSRelations())
     {
       SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+      SFeature featComponentID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
 
       if (featPre != null)
       {
@@ -192,6 +194,7 @@ public class LegacyGraphConverter
 
         aEdge.setEdgeType(EdgeType.UNKNOWN);
         aEdge.setPre(featPre.getSValueSNUMERIC());
+        aEdge.setComponentID(featComponentID.getSValueSNUMERIC());
 
         aEdge.setNamespace(rel.getSLayers().get(0).getSName());
         aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)

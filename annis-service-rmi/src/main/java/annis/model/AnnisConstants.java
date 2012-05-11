@@ -15,6 +15,8 @@ public class AnnisConstants
   public static final String FEAT_MATCHEDNODE = "matchednode";
   public static final String FEAT_INTERNALID = "internalid";
   public static final String FEAT_CORPUSREF = "corpusref";
+  public static final String FEAT_TEXTREF = "textref";
+  public static final String FEAT_COMPONENTID = "componentid";
   public static final String FEAT_LEFT = "left";
   public static final String FEAT_LEFTTOKEN = "lefttoken";
   public static final String FEAT_RIGHT = "right";

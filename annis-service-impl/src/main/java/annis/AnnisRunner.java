@@ -154,6 +154,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doCorpus("pcc2");
     doSql("annotate tok");
+    doAnnotate("tok");
   }
 
   public void doDddquery(String annisQuery)

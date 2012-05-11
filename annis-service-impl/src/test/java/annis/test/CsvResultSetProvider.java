@@ -178,7 +178,7 @@ public class CsvResultSetProvider
       public Object answer(InvocationOnMock invocation) throws Throwable
       {
         int idx = (Integer) invocation.getArguments()[0];
-        return getStringValue(idx-1);
+        return getObjectValue(idx-1);
       }
     });
 
@@ -255,7 +255,7 @@ public class CsvResultSetProvider
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable
       {
-        return getStringValue(getColumnByName(
+        return getObjectValue(getColumnByName(
           (String) invocation.getArguments()[0]));
       }
     });
@@ -269,6 +269,21 @@ public class CsvResultSetProvider
       return header.get(name);
     }
     return -1;
+  }
+  
+  public Object getObjectValue(int column)
+  {
+    String rawString = getStringValue(column);
+    try
+    {
+      return Long.parseLong(rawString);
+    }
+    catch(NumberFormatException ex)
+    {
+      // ignore
+    }
+    
+    return rawString;
   }
 
   public String getStringValue(int column)

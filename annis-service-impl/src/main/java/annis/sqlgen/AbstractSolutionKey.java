@@ -16,27 +16,25 @@ public class AbstractSolutionKey<BaseType>
 
   // logging with log4j
   private static Logger log = Logger.getLogger(AbstractSolutionKey.class);
-  
   // name of the column identifying a node
   private String idColumnName;
-
   // the last key
   private List<BaseType> lastKey;
-  
   // the current key
   private List<BaseType> currentKey;
-  
-  public List<String> generateInnerQueryColumns(TableAccessStrategy tableAccessStrategy, int index)
+
+  public List<String> generateInnerQueryColumns(
+    TableAccessStrategy tableAccessStrategy, int index)
   {
     List<String> columns = new ArrayList<String>();
     columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumnName)
-        + " AS " + idColumnName + index);
+      + " AS " + idColumnName + index);
     return columns;
   }
 
   public boolean isNewKey()
   {
-    return currentKey == null || ! currentKey.equals(lastKey);
+    return currentKey == null || !currentKey.equals(lastKey);
   }
 
   public Integer getMatchedNodeIndex(Object id)
@@ -50,15 +48,17 @@ public class AbstractSolutionKey<BaseType>
     return StringUtils.join(getCurrentKey(), ",");
   }
 
-  public Object getNodeId(ResultSet resultSet, TableAccessStrategy tableAccessStrategy)
+  public Object getNodeId(ResultSet resultSet,
+    TableAccessStrategy tableAccessStrategy)
   {
-    try 
+    try
     {
-      String idAlias = tableAccessStrategy.columnName(NODE_TABLE, getIdColumnName());
+      String idAlias = tableAccessStrategy.columnName(NODE_TABLE,
+        getIdColumnName());
       int idAliasIdx = resultSet.findColumn(idAlias);
-      if(resultSet.getMetaData() != null)
+      if (resultSet.getMetaData() != null)
       {
-        switch(resultSet.getMetaData().getColumnType(idAliasIdx))
+        switch (resultSet.getMetaData().getColumnType(idAliasIdx))
         {
           case Types.VARCHAR:
             return resultSet.getString(idAliasIdx);
@@ -75,10 +75,10 @@ public class AbstractSolutionKey<BaseType>
     {
       log.error("Exception thrown while retrieving node ID", e);
       throw new IllegalStateException(
-          "Could not retrieve node ID from JDBC results set", e);
+        "Could not retrieve node ID from JDBC results set", e);
     }
   }
-  
+
   public String getIdColumnName()
   {
     return idColumnName;
@@ -107,5 +107,10 @@ public class AbstractSolutionKey<BaseType>
   protected void setCurrentKey(List<BaseType> currentKey)
   {
     this.currentKey = currentKey;
+  }
+
+  public int getKeySize()
+  {
+    return currentKey.size();
   }
 }
