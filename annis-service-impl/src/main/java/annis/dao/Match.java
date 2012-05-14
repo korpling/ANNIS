@@ -17,25 +17,21 @@ package annis.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Properties;
-
+import javax.xml.bind.annotation.XmlRootElement;
 
 @SuppressWarnings("serial")
+@XmlRootElement
 public class Match extends ArrayList<Long>
 {
-  
+
   private long toplevelCorpusId;
-  private HashMap<Long, Properties> corpusConfiguration;
-  
+
   public Match()
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
   }
 
   public Match(List<Long> nodes)
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
     addAll(nodes);
   }
 
@@ -48,15 +44,4 @@ public class Match extends ArrayList<Long>
   {
     this.toplevelCorpusId = toplevelCorpusId;
   }
-
-  public HashMap<Long, Properties> getCorpusConfiguration()
-  {
-    return corpusConfiguration;
-  }
-
-  public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration)
-  {
-    this.corpusConfiguration = corpusConfiguration;
-  }
-  
 }
