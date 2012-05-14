@@ -46,7 +46,6 @@ import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
-import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -70,13 +69,10 @@ public class AnnisRunner extends AnnisBaseRunner
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
-  // map Annis queries to DDDquery
-  private DddQueryMapper dddQueryMapper;
   private QueryAnalysis aqlAnalysis;
   private int context;
   private int matchLimit;
-  private boolean isDDDQueryMode;
-  private QueryAnalysis queryAnalysis;
+    private QueryAnalysis queryAnalysis;
   // settings
   private int limit = 10;
   private int offset;
@@ -130,23 +126,6 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     corpusList = new LinkedList<Long>();
     benchmarks = new ArrayList<AnnisRunner.Benchmark>();
-    isDDDQueryMode = false;
-  }
-
-  // switch between AQL as input mode and DDDQuery
-  public void doLanguage(String newLanguage)
-  {
-    if ("ddd".equalsIgnoreCase(newLanguage) || "dddquery".equalsIgnoreCase(
-      newLanguage))
-    {
-      isDDDQueryMode = true;
-      System.out.println("new input language is DDDQuery");
-    }
-    else
-    {
-      isDDDQueryMode = false;
-      System.out.println("new input language is AQL");
-    }
   }
 
   ///// Commands
@@ -155,11 +134,6 @@ public class AnnisRunner extends AnnisBaseRunner
     doCorpus("pcc2");
     doSql("annotate tok");
     doAnnotate("tok");
-  }
-
-  public void doDddquery(String annisQuery)
-  {
-    out.println(translate(annisQuery));
   }
 
   public void doParse(String annisQuery)
@@ -792,34 +766,6 @@ public class AnnisRunner extends AnnisBaseRunner
     System.exit(0);
   }
 
-  public void doCompareParser(String query)
-  {
-    QueryData qdAQL = annisDao.parseAQL(query, null);
-    QueryData qdDDD = annisDao.parseDDDQuery(translate(query), null);
-
-    String strAQL = qdAQL.toString();
-    String strDDD = qdDDD.toString();
-
-    if (strAQL.equals(strDDD))
-    {
-      System.out.println(strAQL);
-      System.out.println("both are equal");
-    }
-    else
-    {
-      System.out.println("AQL:");
-      System.out.println(strAQL);
-      System.out.println("DDD:");
-      System.out.println(strDDD);
-      System.out.println("NOT EQUAL");
-    }
-  }
-
-  ///// Delegates for convenience
-  private String translate(String annisQuery)
-  {
-    return dddQueryMapper.translate(annisQuery);
-  }
 
   private void printAsTable(List<? extends Object> list, String... fields)
   {
@@ -828,14 +774,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private QueryData parse(String input)
   {
-    if (isDDDQueryMode)
-    {
-      return annisDao.parseDDDQuery(input, getCorpusList());
-    }
-    else
-    {
-      return annisDao.parseAQL(input, getCorpusList());
-    }
+
+    return annisDao.parseAQL(input, getCorpusList());
+
   }
 
   private String printSaltAsXMI(SaltProject project)
@@ -867,17 +808,6 @@ public class AnnisRunner extends AnnisBaseRunner
       log.error(ex);
     }
     return "";
-  }
-
-  ///// Getter / Setter
-  public DddQueryMapper getDddQueryMapper()
-  {
-    return dddQueryMapper;
-  }
-
-  public void setDddQueryMapper(DddQueryMapper dddQueryMapper)
-  {
-    this.dddQueryMapper = dddQueryMapper;
   }
 
   public AnnisParser getAnnisParser()

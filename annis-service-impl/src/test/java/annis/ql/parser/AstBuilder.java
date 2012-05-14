@@ -18,9 +18,6 @@ package annis.ql.parser;
 import java.util.Arrays;
 import java.util.List;
 
-import de.deutschdiachrondigital.dddquery.node.ACommonAncestorAxis;
-import de.deutschdiachrondigital.dddquery.node.ASiblingAxis;
-
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
@@ -321,14 +318,5 @@ public class AstBuilder {
 		return n;
 	}
 
-	public static ASiblingAxis newSiblingAxis() {
-		ASiblingAxis n = new ASiblingAxis();
-		return n;
-	}
-	
-	public static ACommonAncestorAxis newCommonAncestorAxis() {
-		ACommonAncestorAxis n = new ACommonAncestorAxis();
-		return n;
-	}
 	
 }

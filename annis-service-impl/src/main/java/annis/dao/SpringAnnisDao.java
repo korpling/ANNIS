@@ -60,7 +60,6 @@ import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
-import de.deutschdiachrondigital.dddquery.parser.DddQueryParser;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -145,8 +144,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private MetaDataFilter metaDataFilter;
   private QueryAnalysis queryAnalysis;
   private AnnisParser aqlParser;
-  private DddQueryParser dddqueryParser;
-  private de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis;
   private HashMap<Long, Properties> corpusConfiguration;
   private ByteHelper byteHelper;
 
@@ -271,14 +268,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     Start statement = aqlParser.parse(aql);
     // analyze it
     return queryAnalysis.analyzeQuery(statement, corpusList);
-  }
-
-  @Override
-  public QueryData parseDDDQuery(String dddquery, List<Long> corpusList)
-  {
-    de.deutschdiachrondigital.dddquery.node.Start statement = dddqueryParser.
-      parse(dddquery);
-    return dddqueryAnalysis.analyzeQuery(statement, corpusList);
   }
 
   @Override
@@ -589,27 +578,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public void setMetaDataFilter(MetaDataFilter metaDataFilter)
   {
     this.metaDataFilter = metaDataFilter;
-  }
-
-  public de.deutschdiachrondigital.dddquery.parser.QueryAnalysis getDddqueryAnalysis()
-  {
-    return dddqueryAnalysis;
-  }
-
-  public void setDddqueryAnalysis(
-    de.deutschdiachrondigital.dddquery.parser.QueryAnalysis dddqueryAnalysis)
-  {
-    this.dddqueryAnalysis = dddqueryAnalysis;
-  }
-
-  public DddQueryParser getDddqueryParser()
-  {
-    return dddqueryParser;
-  }
-
-  public void setDddqueryParser(DddQueryParser dddqueryParser)
-  {
-    this.dddqueryParser = dddqueryParser;
   }
 
   public CountSqlGenerator getCountSqlGenerator()

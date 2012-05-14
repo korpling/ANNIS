@@ -157,7 +157,7 @@ Productions
 		| {overlap}		op_overlap { -> New ling_op.overlap() }
 		| {right_overlap}	op_right_overlap { -> New ling_op.right_overlap() }
 		| {left_overlap}	op_left_overlap { -> New ling_op.left_overlap() }
-		| {precedence_direct}	op_precedence { -> New ling_op.precedence(New precedence_spec.direct()) } 
+		| {precedence_direct}	op_precedence { -> New ling_op.precedence(New precedence_spec.direct(Null)) } 
 		| {precedence}	op_precedence precedence_spec { -> New ling_op.precedence(precedence_spec) } 
 		| {dominance}	op_dominance dominance_spec { -> New ling_op.dominance(dominance_spec) }
 		| {sibling}	op_sibling sibling_spec { -> New ling_op.sibling(sibling_spec) }
@@ -178,8 +178,8 @@ Productions
 		;
 	
 	precedence_spec { -> precedence_spec } =
-		  {range}	range_spec { -> New precedence_spec.range(range_spec) } 
-		| {indirect}	star { -> New precedence_spec.indirect() }
+		  {range}	range_spec { -> New precedence_spec.range(Null, range_spec) } 
+		| {indirect}	star { -> New precedence_spec.indirect(Null) }
 		;
 
 	dominance_spec { -> dominance_spec } = 
@@ -263,9 +263,9 @@ Abstract Syntax Tree
 	range_spec = [min]:digits [max]:digits? ;
 		
 	precedence_spec = 
-		  {direct}
-		| {indirect}
-		| {range} range_spec
+		  {direct} [name]:id?
+		| {indirect} [name]:id?
+		| {range}  [name]:id? range_spec
 		;
 		
 	dominance_spec = 

@@ -54,9 +54,6 @@ public interface AnnisDao
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
-  @Deprecated
-  public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
-
 // new 
   int count(QueryData queryData);
 
