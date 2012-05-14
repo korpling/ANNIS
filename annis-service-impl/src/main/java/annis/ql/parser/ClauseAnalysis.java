@@ -247,7 +247,16 @@ public class ClauseAnalysis extends DepthFirstAdapter
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
 
-    left.addJoin(new Precedence(right, 1));
+    String name = token(node.getName());
+    
+    if(name == null)
+    {
+      left.addJoin(new Precedence(right, 1));
+    }
+    else
+    {
+      left.addJoin(new Precedence(right, 1, 1, name));
+    }
   }
 
   @Override
@@ -260,13 +269,29 @@ public class ClauseAnalysis extends DepthFirstAdapter
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
 
+    String name = token(node.getName());
+    
     if (precedenceBound > 0)
     {
-      left.addJoin(new Precedence(right, 1, precedenceBound));
+      if(name == null)
+      {
+        left.addJoin(new Precedence(right, 1, precedenceBound));
+      }
+      else
+      {
+        left.addJoin(new Precedence(right, 1, precedenceBound, name));
+      }
     }
     else
     {
-      left.addJoin(new Precedence(right));
+      if(name == null)
+      {
+        left.addJoin(new Precedence(right));
+      }
+      else
+      {
+        left.addJoin(new Precedence(right, name));
+      }
     }
   }
 

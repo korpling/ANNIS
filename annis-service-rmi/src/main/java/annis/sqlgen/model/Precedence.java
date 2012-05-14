@@ -17,23 +17,53 @@ package annis.sqlgen.model;
 
 import annis.model.QueryNode;
 
-public class Precedence extends RangedJoin {
+public class Precedence extends RangedJoin
+{
 
-	public Precedence(QueryNode target) {
-		this(target, 0, 0);
-	}
+  private String segmentationName;
+  
+  public Precedence(QueryNode target)
+  {
+    this(target, 0, 0);
+  }
+  
+  public Precedence(QueryNode target, String segmentationName)
+  {
+    this(target, 0, 0, segmentationName);
+  }
 
-	public Precedence(QueryNode target, int distance) {
-		this(target, distance, distance);
-	}
-	
-	public Precedence(QueryNode target, int minDistance, int maxDistance) {
-		super(target, minDistance, maxDistance);
-	}
+  public Precedence(QueryNode target, int distance)
+  {
+    this(target, distance, distance);
+  }
+  
+  public Precedence(QueryNode target, int minDistance, int maxDistance)
+  {
+    this(target, minDistance, maxDistance, "tok");
+  }
+  
+  public Precedence(QueryNode target, int minDistance, int maxDistance, String segmentationName)
+  {
+    super(target, minDistance, maxDistance);
+    this.segmentationName = segmentationName;
+  }
 
-	@Override
-	public String toString() {
-		return "precedes node " + target.getId() + " (" + minDistance + ", " + maxDistance + ")";
-	}
+  public String getSegmentationName()
+  {
+    return segmentationName;
+  }
 
+  public void setSegmentationName(String segmentationName)
+  {
+    this.segmentationName = segmentationName;
+  }
+  
+  
+  @Override
+  public String toString()
+  {
+    return "precedes node " + target.getId() + " (" +  segmentationName + " " 
+      + minDistance + ", "
+      + maxDistance + ")";
+  }
 }

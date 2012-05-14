@@ -241,9 +241,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
 
-    RangedJoin precedence = (RangedJoin) join;
-    int min = precedence.getMinDistance();
-    int max = precedence.getMaxDistance();
+    int min = join.getMinDistance();
+    int max = join.getMaxDistance();
 
     // indirect
     if (min == 0 && max == 0)
@@ -271,12 +270,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     {
       betweenJoinOnNode(conditions, node, target, "right_token", "left_token",
         -min, -max);
-      // conditions.add(numberJoin("<=",
-      // tables(node).aliasedColumn(NODE_TABLE, "right_token"),
-      // tables(target).aliasedColumn(NODE_TABLE, "left_token"), -min));
-      // conditions.add(numberJoin(">=",
-      // tables(node).aliasedColumn(NODE_TABLE, "right_token"),
-      // tables(target).aliasedColumn(NODE_TABLE, "left_token"), -max));
     }
   }
 
