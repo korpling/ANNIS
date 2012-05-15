@@ -39,7 +39,7 @@ public class Precedence extends RangedJoin
   
   public Precedence(QueryNode target, int minDistance, int maxDistance)
   {
-    this(target, minDistance, maxDistance, "tok");
+    this(target, minDistance, maxDistance, null);
   }
   
   public Precedence(QueryNode target, int minDistance, int maxDistance, String segmentationName)

@@ -244,31 +244,43 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     int min = join.getMinDistance();
     int max = join.getMaxDistance();
 
+    String left = join.getSegmentationName() == null ? "left_token" : "seg_left";
+    String right = join.getSegmentationName() == null ? "right_token" : "seg_right";
+    
+    // we are using a special segmentation
+    if(join.getSegmentationName() != null)
+    {
+      conditions.add(join("=",  
+        tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
+        join.getSegmentationName()));
+    }
+    
+    
     // indirect
     if (min == 0 && max == 0)
     {
       if (optimizeIndirectPrecedence)
       {
-        numberJoinOnNode(conditions, node, target, "<=", "right_token",
-          "left_token", -1);
+        numberJoinOnNode(conditions, node, target, "<=", right,
+          left, -1);
       }
       else
       {
-        joinOnNode(conditions, node, target, "<", "right_token", "left_token");
+        joinOnNode(conditions, node, target, "<", right, left);
       }
 
     }
     // exact distance
     else if (min == max)
     {
-      numberJoinOnNode(conditions, node, target, "=", "right_token",
-        "left_token", -min);
+      numberJoinOnNode(conditions, node, target, "=", right,
+        left, -min);
 
     }
     // ranged distance
     else
     {
-      betweenJoinOnNode(conditions, node, target, "right_token", "left_token",
+      betweenJoinOnNode(conditions, node, target, right, left,
         -min, -max);
     }
   }
