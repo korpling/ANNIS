@@ -273,25 +273,11 @@ public class ClauseAnalysis extends DepthFirstAdapter
     
     if (precedenceBound > 0)
     {
-      if(name == null)
-      {
-        left.addJoin(new Precedence(right, 1, precedenceBound));
-      }
-      else
-      {
-        left.addJoin(new Precedence(right, 1, precedenceBound, name));
-      }
+      left.addJoin(new Precedence(right, 1, precedenceBound, name));
     }
     else
     {
-      if(name == null)
-      {
-        left.addJoin(new Precedence(right));
-      }
-      else
-      {
-        left.addJoin(new Precedence(right, name));
-      }
+      left.addJoin(new Precedence(right, name));
     }
   }
 
@@ -304,6 +290,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     Validate.notNull(left, errorLHS(Precedence.class.getSimpleName()));
     Validate.notNull(right, errorRHS(Precedence.class.getSimpleName()));
+    
+    String name = token(node.getName());
 
     ARangeSpec spec = (ARangeSpec) node.getRangeSpec();
     int min = number(spec.getMin());
@@ -313,7 +301,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
     if (spec.getMax() == null)
     {
-      left.addJoin(new Precedence(right, min));
+      left.addJoin(new Precedence(right, min, name));
     }
     else
     {
@@ -322,7 +310,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
       {
         throw new AnnisQLSyntaxException("Distance can't be 0");
       }
-      left.addJoin(new Precedence(right, min, max));
+      left.addJoin(new Precedence(right, min, max, name));
     }
   }
 

@@ -252,7 +252,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     {
       conditions.add(join("=",  
         tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
-        join.getSegmentationName()));
+        "'" + join.getSegmentationName() +  "'"));
     }
     
     
