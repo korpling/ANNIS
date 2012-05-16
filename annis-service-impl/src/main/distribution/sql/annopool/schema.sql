@@ -70,6 +70,9 @@ CREATE TABLE facts (
   span character varying(2000),
   left_token integer,
   right_token integer,
+  seg_name varchar(100),
+  seg_left integer,
+  seg_right integer,
   pre bigint, -- pre-order value
   post bigint, -- post-order value
   parent bigint, -- foreign key to rank.pre of the parent node, or NULL for roots
