@@ -306,6 +306,11 @@ limitations under the License.
     <ref bean="sampleWhereClause" />
   </util:list>
   
+  <!-- 
+  This is the same list as defaultWhereClauseGenerators, but extended with one
+  generator for query the corpus path, but the util:list do not support a kind 
+  of heredity for lists of beans.
+  -->  
   <util:list id="findWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
     <ref bean="defaultWhereClauseGenerator" />
@@ -322,6 +327,7 @@ limitations under the License.
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
 
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
 
     <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />

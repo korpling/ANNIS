@@ -38,6 +38,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
+  private CorpusPathExtractor corpusPathExtractor;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -59,7 +60,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
         + " AS node_name" + i);
-      ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name") + " AS path_name" + i);
+      ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
+        + " AS path_name" + i);
 
       if (tblAccessStr.usesRankTable())
       {
@@ -100,6 +102,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     ResultSetMetaData metaData = rs.getMetaData();
     int columnCount = metaData.getColumnCount();
 
+    // the order of columns is not determined and I have to combined two 
+    // values, so save them here and combine later
+    String node_name = null;
+    List<String> corpus_path = null;
+
     // one match per column
     for (int column = 1; column <= columnCount; ++column)
     {
@@ -114,11 +121,12 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
       else if (metaData.getColumnName(column).startsWith("node_name"))
       {
-        match.setSaltId(rs.getString(column));
+        node_name = rs.getString(column);
       }
       else if (metaData.getColumnName(column).startsWith("path_name"))
       {
-        match.setSaltId(rs.getString(column));
+        corpus_path = corpusPathExtractor.extractCorpusPath(rs,
+          metaData.getColumnName(column));
       }
 
       // no more matches in this row if an id was NULL
@@ -129,6 +137,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     }
 
+    match.setSaltId(buildSaltId(corpus_path, node_name));
     return match;
   }
 
@@ -140,5 +149,28 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setOptimizeDistinct(boolean optimizeDistinct)
   {
     this.optimizeDistinct = optimizeDistinct;
+  }
+
+  private String buildSaltId(List<String> path, String node_name)
+  {
+    StringBuilder sb = new StringBuilder("salt://");
+
+    for (String dir : path)
+    {
+      sb.append(dir).append("/");
+    }
+
+
+    return sb.append(node_name).toString();
+  }
+
+  public CorpusPathExtractor getCorpusPathExtractor()
+  {
+    return corpusPathExtractor;
+  }
+
+  public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
+  {
+    this.corpusPathExtractor = corpusPathExtractor;
   }
 }
