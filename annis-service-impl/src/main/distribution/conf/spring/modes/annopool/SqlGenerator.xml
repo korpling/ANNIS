@@ -297,7 +297,6 @@ limitations under the License.
   </util:list>
   
   <bean id="corpusPathWhereClauseGenerator" class="annis.sqlgen.CorpusPathWhereClauseGenerator"   parent="tableAccessStrategyFactory"/>
-   
 
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
@@ -306,8 +305,16 @@ limitations under the License.
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />
   </util:list>
-
   
+  <util:list id="findWhereClauseGenerators">
+    <ref bean="tableJoinsInWhereClauseGenerator" />
+    <ref bean="defaultWhereClauseGenerator" />
+    <ref bean="subcorpusConstraintWhereClause" />
+    <ref bean="metaDataAndCorpusWhereClauseGenerator" />
+    <ref bean="sampleWhereClause" />
+    <ref bean="corpusPathWhereClauseGenerator" />
+  </util:list>
+    
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory">
@@ -317,7 +324,7 @@ limitations under the License.
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
 
     <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
   </bean> 
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"

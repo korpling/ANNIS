@@ -118,7 +118,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
       else if (metaData.getColumnName(column).startsWith("path_name"))
       {
-        //TODO
+        match.setSaltId(rs.getString(column));
       }
 
       // no more matches in this row if an id was NULL

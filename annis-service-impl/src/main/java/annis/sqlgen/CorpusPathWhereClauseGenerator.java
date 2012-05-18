@@ -16,13 +16,16 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.join;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -48,5 +51,21 @@ public class CorpusPathWhereClauseGenerator extends AbstractFromClauseGenerator
       tables.add("Corpus" + " AS Corpus" + (i + 1));
     }
     return StringUtils.join(tables, ", " + indent + TABSTOP);
+  }
+
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    Set<String> conditions = new HashSet<String>();
+    
+    for (int i = 1; i <= alternative.size(); i++)
+    {
+      
+      conditions.add(
+        join("=", "facts" + i + ".corpus_ref", "Corpus" + i + ".id"));
+    }
+
+    return conditions;
   }
 }
