@@ -58,12 +58,15 @@ public class CorpusPathWhereClauseGenerator extends AbstractFromClauseGenerator
     List<QueryNode> alternative, String indent)
   {
     Set<String> conditions = new HashSet<String>();
-    
-    for (int i = 1; i <= alternative.size(); i++)
+    int i = 0;
+
+    for (QueryNode n : alternative)
     {
-      
-      conditions.add(
-        join("=", "facts" + i + ".corpus_ref", "Corpus" + i + ".id"));
+      i++;
+      String factTable = tables(n).aliasedTable("facts", i) + ".corpus_ref";
+      String corpusTable = tables(n).aliasedTable("Corpus", i) + ".id";
+
+      conditions.add(join("=", factTable, corpusTable));
     }
 
     return conditions;
