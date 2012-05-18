@@ -40,7 +40,7 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
-CREATE TYPE annotype AS ENUM ('node', 'edge');
+CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 -- collect all node annotations
 CREATE TABLE annotation_pool (
   id bigserial,

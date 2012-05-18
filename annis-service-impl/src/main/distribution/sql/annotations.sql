@@ -38,6 +38,16 @@ FROM _edge_annotation as e, _rank as r, _component as c
 WHERE e.rank_ref = r.id AND r.component_ref = c.id
       AND e.name is not null and c.name is not null
 GROUP BY e.namespace, e.name, e.value, c.type, c.namespace, c.name
+
+UNION ALL
+
+SELECT DISTINCT :id, NULL as node_namespace, n.seg_name, NULL AS VALUE, count(n.seg_name) AS occurences,
+  'segmentation', NULL AS sub_type, NULL AS edge_namespace, NULL AS edge_name
+FROM _node AS n
+WHERE n.seg_name IS NOT NULL
+GROUP BY(n.seg_name)
 ;
+
+
 
 SET enable_hashagg = true;
