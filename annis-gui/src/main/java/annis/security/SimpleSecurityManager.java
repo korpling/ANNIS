@@ -15,10 +15,10 @@
  */
 package annis.security;
 
-import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
+import annis.gui.Helper;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.AnnisCorpusSet;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -195,10 +196,11 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
     TreeMap<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
     try
     {
-      String url = properties.getProperty("AnnisRemoteService.URL", "rmi://localhost:4711/AnnisService");
-      AnnisService service = AnnisServiceFactory.getClient(url);
-      AnnisCorpusSet corpusSet = service.getCorpusSet();
-      for(AnnisCorpus corpus : corpusSet)
+      String url = properties.getProperty("AnnisWebService.URL", "http://localhost:5711/annis");
+      WebResource res = Helper.getAnnisWebResource(url);
+      
+      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>(){});
+      for(AnnisCorpus corpus : corpora)
       {
         result.put(corpus.getName(), corpus);
       }
