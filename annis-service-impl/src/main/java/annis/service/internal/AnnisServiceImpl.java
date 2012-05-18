@@ -25,26 +25,21 @@ import org.apache.log4j.Logger;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.exceptions.AnnisBinaryNotFoundException;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSet;
 import annis.service.objects.AnnisResultImpl;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
@@ -115,13 +110,6 @@ public class AnnisServiceImpl implements AnnisService
     }
     String message = sb.toString();
     queryLog.info(message);
-  }
-
-
-  @Override
-  public AnnisCorpusSet getCorpusSet() throws RemoteException
-  {
-    return new AnnisCorpusSet(annisDao.listCorpora());
   }
 
   @Override
