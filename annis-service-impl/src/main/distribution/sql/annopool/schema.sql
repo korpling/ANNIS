@@ -182,7 +182,7 @@ CREATE TABLE annotations
   "name" varchar(150),
   "value" varchar(1500),
   occurences bigint,
-  "type" varchar(10),
+  "type" varchar,
   "subtype" char(1),
   edge_namespace varchar(150),
   edge_name varchar(150),
