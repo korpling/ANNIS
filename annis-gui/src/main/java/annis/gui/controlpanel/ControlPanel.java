@@ -186,6 +186,11 @@ public class ControlPanel extends Panel
   {
     return history;
   }
+  
+  public void corpusSelectionChanged()
+  {
+    searchOptions.updateSegmentationList(corpusList.getSelectedCorpora().keySet());
+  }
 
   private class CountThread extends Thread
   {
