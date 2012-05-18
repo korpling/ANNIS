@@ -16,6 +16,7 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -32,47 +33,55 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
-    implements SelectClauseSqlGenerator<QueryData>
+  implements SelectClauseSqlGenerator<QueryData>
 {
 
   // optimize DISTINCT operation in SELECT clause
-  private boolean optimizeDistinct;  
-  
+  private boolean optimizeDistinct;
+
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
-      String indent)
+    String indent)
   {
     int maxWidth = queryData.getMaxWidth();
     Validate.isTrue(alternative.size() <= maxWidth,
-        "BUG: nodes.size() > maxWidth");
+      "BUG: nodes.size() > maxWidth");
 
     boolean isDistinct = false || !optimizeDistinct;
     List<String> ids = new ArrayList<String>();
     int i = 0;
+
     for (QueryNode node : alternative)
     {
       ++i;
-      ids.add(tables(node).aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      if (tables(node).usesRankTable())
+
+      TableAccessStrategy tblAccessStr = tables(node);
+      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+        + " AS node_name" + i);
+      ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name") + " AS path_name" + i);
+
+      if (tblAccessStr.usesRankTable())
       {
         isDistinct = true;
       }
     }
+
     for (i = alternative.size(); i < maxWidth; ++i)
     {
       ids.add("NULL");
     }
 
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-        "toplevel_corpus"));
+      "toplevel_corpus"));
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
-        + StringUtils.join(ids, ", ");
+      + StringUtils.join(ids, ", ");
   }
 
   @Override
   public List<Match> extractData(ResultSet rs) throws SQLException,
-      DataAccessException
+    DataAccessException
   {
     List<Match> matches = new ArrayList<Match>();
     int rowNum = 0;
@@ -94,14 +103,22 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     // one match per column
     for (int column = 1; column <= columnCount; ++column)
     {
-      long id = rs.getLong((column));
 
       if (metaData.getColumnName(column).startsWith("id"))
       {
-        match.add(id);
-      } else if (metaData.getColumnName(column).startsWith("toplevel_corpus"))
+        match.add(rs.getLong((column)));
+      }
+      else if (metaData.getColumnName(column).startsWith("toplevel_corpus"))
       {
-        match.setToplevelCorpusId(id);
+        match.setToplevelCorpusId(rs.getLong((column)));
+      }
+      else if (metaData.getColumnName(column).startsWith("node_name"))
+      {
+        match.setSaltId(rs.getString(column));
+      }
+      else if (metaData.getColumnName(column).startsWith("path_name"))
+      {
+        //TODO
       }
 
       // no more matches in this row if an id was NULL
@@ -113,8 +130,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
     return match;
-  }  
-  
+  }
+
   public boolean isOptimizeDistinct()
   {
     return optimizeDistinct;

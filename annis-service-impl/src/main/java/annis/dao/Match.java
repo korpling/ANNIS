@@ -25,6 +25,7 @@ public class Match extends ArrayList<Long>
 {
 
   private long toplevelCorpusId;
+  private String saltID;
 
   public Match()
   {
@@ -43,5 +44,15 @@ public class Match extends ArrayList<Long>
   public void setToplevelCorpusId(long toplevelCorpusId)
   {
     this.toplevelCorpusId = toplevelCorpusId;
+  }
+
+  public void setSaltId(String id)
+  {
+    saltID = id;
+  }
+
+  public String getSaltId()
+  {
+    return saltID;
   }
 }

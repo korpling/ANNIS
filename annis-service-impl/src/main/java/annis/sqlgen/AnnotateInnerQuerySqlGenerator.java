@@ -1,4 +1,4 @@
-package annis.sqlgen;
+  package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
