@@ -24,7 +24,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import annis.service.ifaces.AnnisAttribute;
 
-public class AnnisAttributeImpl implements AnnisAttribute, Serializable
+public class AnnisAttributeImpl implements AnnisAttribute
 {
 
   
@@ -87,31 +87,6 @@ public class AnnisAttributeImpl implements AnnisAttribute, Serializable
   public void setSubtype(SubType subtype)
   {
     this.subtype = subtype;
-  }
-  
-  @Override
-  public String getJSON()
-  {
-    StringBuffer sBuffer = new StringBuffer();
-    sBuffer.append("\"name\": \"").append(this.getName()).append("\",\n");
-    if(this.getEdgeName() != null)
-    {
-      sBuffer.append("\"edge_name\": \"").append(this.getEdgeName()).append("\",\n");
-    }
-    sBuffer.append("\"type\" : \"").append(getType().name()).append("\",\n")
-      .append("\"subtype\" : \"").append(getSubtype().name()).append("\",\n")
-      .append("\"values\": [");
-    int vCount = 0;
-    for (String value : this.getValueSet())
-    {
-      if (vCount++ > 0)
-      {
-        sBuffer.append(", ");
-      }
-      sBuffer.append("\"").append(value).append("\"");
-    }
-    sBuffer.append("]");
-    return "{" + sBuffer + "}";
   }
 
   @Override

@@ -20,8 +20,10 @@ import java.util.HashSet;
 
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.ifaces.AnnisAttributeSet;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public class AnnisAttributeSetImpl extends HashSet<AnnisAttribute> implements AnnisAttributeSet {
+public class AnnisAttributeSetImpl extends HashSet<AnnisAttribute> implements AnnisAttributeSet 
+{
 	
 
 	public AnnisAttributeSetImpl() {
@@ -30,15 +32,5 @@ public class AnnisAttributeSetImpl extends HashSet<AnnisAttribute> implements An
 
 	public AnnisAttributeSetImpl(Collection<? extends AnnisAttribute> c) {
 		super(c);
-	}
-
-	public String getJSON() {
-		StringBuffer sBuffer = new StringBuffer();
-		for(AnnisAttribute a : this) {
-			if(sBuffer.length() > 0)
-				sBuffer.append(", \n");
-			sBuffer.append(a.getJSON());
-		}
-		return "[" + sBuffer + "]\n";
 	}
 }

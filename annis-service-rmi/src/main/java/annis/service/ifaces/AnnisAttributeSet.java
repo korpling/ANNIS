@@ -17,6 +17,7 @@ package annis.service.ifaces;
 
 import java.io.Serializable;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * A set container for AnnisAttribute.
@@ -24,6 +25,7 @@ import java.util.Set;
  * @author k.huetter
  *
  */
-public interface AnnisAttributeSet extends Set<AnnisAttribute>, Serializable, JSONAble {
+@XmlRootElement
+public interface AnnisAttributeSet extends Set<AnnisAttribute>, Serializable {
 
 }

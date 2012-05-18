@@ -17,6 +17,7 @@ package annis.service.ifaces;
 
 import java.io.Serializable;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Represents an attribute available in a corpus.
@@ -25,13 +26,15 @@ import java.util.Set;
  * @author k.huetter
  *
  */
-public interface AnnisAttribute extends JSONAble, Serializable
+@XmlRootElement
+public interface AnnisAttribute extends Serializable
 {
 
   public enum Type
   {
     node,
     edge,
+    segmentation,
     unknown
   };
 

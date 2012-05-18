@@ -51,6 +51,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.*;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
@@ -718,7 +725,21 @@ public class AnnisRunner extends AnnisBaseRunner
     List<AnnisAttribute> annotations =
       annisDao.listAnnotations(getCorpusList(), listValues, true);
     AnnisAttributeSetImpl set = new AnnisAttributeSetImpl(annotations);
-    System.out.println(set.getJSON());
+    try
+    {
+      ObjectMapper om = new ObjectMapper();
+      AnnotationIntrospector ai = new JaxbAnnotationIntrospector();
+      om.getDeserializationConfig().withAnnotationIntrospector(ai);
+      om.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
+      
+      System.out.println(om.writeValueAsString(set));
+    }
+    catch(IOException ex)
+    {
+      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+        log(Level.SEVERE, null, ex);      
+    }
+    
   }
 
   public void doMeta(String corpusId)
