@@ -45,7 +45,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, occurences, :value AS value\n"
       + "    FROM annotations\n"
       + "    WHERE\n"
-      + "    value <> '--'\n"
+      + "    (value IS NULL OR value <> '--')\n"
       + (
         corpusList.isEmpty() ?
           "\n" : "    AND toplevel_corpus IN (:corpora)\n"
