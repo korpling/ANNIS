@@ -23,7 +23,7 @@ import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.ifaces.AnnisAttribute;
+import annis.service.objects.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;

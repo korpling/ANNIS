@@ -15,17 +15,38 @@
  */
 package annis.service.objects;
 
-import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import annis.service.ifaces.AnnisAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public class AnnisAttributeImpl implements AnnisAttribute
+@XmlRootElement
+public class AnnisAttribute
 {
+
+  public enum Type
+  {
+    node,
+    edge,
+    segmentation,
+    unknown
+  };
+
+  public enum SubType
+  {
+    n,
+    d,
+    p,
+    c,
+    unknown
+  };
 
   
   private String name = "";
@@ -34,68 +55,66 @@ public class AnnisAttributeImpl implements AnnisAttribute
   private Type type;
   private SubType subtype;
 
-  @Override
-  public Set<String> getValueSet()
+  
+  @XmlElementWrapper(name="value-set")
+  @XmlElement(name="value")
+  public List<String> getValueSet()
   {
-    return this.distinctValues;
+    return new LinkedList<String>(this.distinctValues);
+  }
+  
+  public void setValueSet(List<String> values)
+  {
+    this.distinctValues.clear();
+    this.distinctValues.addAll(values);
   }
 
-  @Override
   public String getName()
   {
     return this.name;
   }
 
-  @Override
   public void setName(String name)
   {
     this.name = name;
   }
 
-  @Override
   public String getEdgeName()
   {
     return edgeName;
   }
 
-  @Override
   public void setEdgeName(String edgeName)
   {
     this.edgeName = edgeName;
   }
 
 
-  @Override
   public Type getType()
   {
     return type;
   }
 
-  @Override
   public void setType(Type type)
   {
     this.type = type;
   }
 
-  @Override
   public SubType getSubtype()
   {
     return subtype;
   }
 
-  @Override
   public void setSubtype(SubType subtype)
   {
     this.subtype = subtype;
   }
 
-  @Override
   public void addValue(String value)
   {
     this.distinctValues.add(value);
   }
 
-  @Override
   public boolean hasValue(String value)
   {
     return this.distinctValues.contains(value);
@@ -110,12 +129,12 @@ public class AnnisAttributeImpl implements AnnisAttribute
   @Override
   public boolean equals(Object obj)
   {
-    if (obj == null || !(obj instanceof AnnisAttributeImpl))
+    if (obj == null || !(obj instanceof AnnisAttribute))
     {
       return false;
     }
 
-    AnnisAttributeImpl other = (AnnisAttributeImpl) obj;
+    AnnisAttribute other = (AnnisAttribute) obj;
 
     return new EqualsBuilder().append(this.name, other.name).append(this.distinctValues, other.distinctValues).isEquals();
   }

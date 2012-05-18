@@ -26,12 +26,12 @@ import java.util.logging.Logger;
 
 import annis.model.AnnisNode;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.utils.LegacyGraphConverter;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -62,10 +62,18 @@ public class GeneralTextExporter implements Exporter, Serializable
       {
         // auto set
         keys.add("tok");
-        LinkedList<Long> corpusIDs = new LinkedList<Long>(
-          Helper.calculateID2Corpus(corpora).keySet());
-        AnnisAttributeSet attributes =
-          service.getAttributeSet(corpusIDs, false, false);
+        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+        
+        for(String corpus : corpora.keySet())
+        {
+          attributes.addAll(
+            annisResource.path("corpora").path(corpus).path("annotations")
+              .queryParam("fetchvalues", "false")
+              .queryParam("onlymostfrequentvalues", "false")
+              .get(new GenericType<List<AnnisAttribute>>() {})
+          );
+        }
+        
         for (AnnisAttribute a : attributes)
         {
           if (a.getName() != null)

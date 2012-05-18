@@ -21,6 +21,7 @@ import annis.dao.AnnisDao;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
@@ -28,6 +29,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.DefaultValue;
@@ -217,6 +219,34 @@ public class AnnisWebService
     CorpusConfig result = new CorpusConfig();
     result.setConfig(tmp);
     return result;
+  }
+  
+  @GET
+  @Path("corpora/{top}/annotations")
+  @Produces("application/xml")
+  public List<AnnisAttribute> annotations(
+    @PathParam("top") String toplevelCorpus, 
+    @QueryParam("fetchvalues") String fetchValues,
+    @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues
+  )
+  {
+    List<String> list = new LinkedList<String>();
+    list.add(toplevelCorpus);
+    List<Long> corpusList = annisDao.listCorpusByName(list);
+
+    
+    if(fetchValues == null)
+    {
+      fetchValues = "false";
+    }
+    if(onlyMostFrequentValues == null)
+    {
+      onlyMostFrequentValues = "false";
+    }
+    
+    return annisDao.listAnnotations(corpusList,
+      Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
+    );
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

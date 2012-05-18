@@ -38,9 +38,8 @@ import annis.model.QueryAnnotation;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
-import annis.service.ifaces.AnnisAttribute;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.AnnisAttributeSetImpl;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import annis.sqlgen.SqlGenerator;
@@ -724,7 +723,6 @@ public class AnnisRunner extends AnnisBaseRunner
     boolean listValues = "values".equals(doListValues);
     List<AnnisAttribute> annotations =
       annisDao.listAnnotations(getCorpusList(), listValues, true);
-    AnnisAttributeSetImpl set = new AnnisAttributeSetImpl(annotations);
     try
     {
       ObjectMapper om = new ObjectMapper();
@@ -732,7 +730,7 @@ public class AnnisRunner extends AnnisBaseRunner
       om.getDeserializationConfig().withAnnotationIntrospector(ai);
       om.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
       
-      System.out.println(om.writeValueAsString(set));
+      System.out.println(om.writeValueAsString(annotations));
     }
     catch(IOException ex)
     {
