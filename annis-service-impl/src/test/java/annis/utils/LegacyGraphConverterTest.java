@@ -28,13 +28,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.sqlgen.AomAnnotateExtractor;
-import annis.sqlgen.ArrayCorpusPathExtractor;
-import annis.sqlgen.CorpusPathExtractor;
-import annis.sqlgen.NodeNameAndIdPostgreSqlArraySolutionKey;
-import annis.sqlgen.SaltAnnotateExtractor;
-import annis.sqlgen.SolutionKey;
-import annis.sqlgen.TestAnnotateSqlGenerator;
+import annis.sqlgen.*;
 import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import org.springframework.context.annotation.PropertySource;
@@ -95,7 +89,10 @@ public class LegacyGraphConverterTest
       @Override
       protected SolutionKey<?> createSolutionKey()
       {
-        return new NodeNameAndIdPostgreSqlArraySolutionKey();
+        PostgreSqlArraySolutionKey<Long> key = new PostgreSqlArraySolutionKey<Long>();
+        key.setKeyColumnName("key");
+        key.setIdColumnName("id");
+        return key;
       }
     };
     CorpusPathExtractor corpusPathExtractor = new ArrayCorpusPathExtractor();
@@ -204,7 +201,7 @@ public class LegacyGraphConverterTest
       assertTrue(in2.contains(e1));
       for (Edge e2 : in2)
       {
-        if (e1.getPre() == e2.getPre())
+        if (e1.getPre() == e2.getPre() && e1.getComponentID() == e2.getComponentID())
         {
           checkAnnisEdgeEqual(e1, e2);
           break;

@@ -48,6 +48,7 @@ limitations under the License.
     <property name="prompt" value="Annis"/>
     <property name="aqlAnalysis" ref="aqlAnalysis" />
     <property name="matchLimit" value="10"/>
+    <property name="metaDataFilter" ref="metaDataFilter" />
   </bean>
 
 </beans>

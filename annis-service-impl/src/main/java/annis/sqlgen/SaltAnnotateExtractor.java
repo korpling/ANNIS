@@ -4,16 +4,7 @@
  */
 package annis.sqlgen;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_CORPUSREF;
-import static annis.model.AnnisConstants.FEAT_INTERNALID;
-import static annis.model.AnnisConstants.FEAT_LEFT;
-import static annis.model.AnnisConstants.FEAT_LEFTTOKEN;
-import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RIGHT;
-import static annis.model.AnnisConstants.FEAT_RIGHTTOKEN;
-import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
+import static annis.model.AnnisConstants.*;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -62,7 +53,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.util.LinkedList;
+import java.util.*;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
@@ -93,7 +84,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SDocumentGraph graph = null;
 
       // fn: edge pre order value -> edge
-      Map<Long, SNode> nodeByPre = new HashMap<Long, SNode>();
+      Map<RankID, SNode> nodeByPre = new HashMap<RankID, SNode>();
 
       TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
       TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
@@ -104,7 +95,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       SDocument document = null;
 
-      List<String> keyNameList = new LinkedList<String>();
+      String[] keyNameList = new String[0];
 
       int match_index = 0;
 
@@ -130,7 +121,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           nodeByPre.clear();
           tokenTexts.clear();
           tokenByIndex.clear();
-          keyNameList.clear();
+          keyNameList = new String[key.getKeySize()];
 
 
           Integer matchstart = resultSet.getInt("matchstart");
@@ -172,9 +163,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
           tokenByIndex, key, keyNameList);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
+        long componentID = longValue(resultSet, RANK_TABLE, "component_id");
         if (!resultSet.wasNull())
         {
-          nodeByPre.put(pre, node);
+          nodeByPre.put(new RankID(componentID, pre), node);
           createRelation(resultSet, graph, nodeByPre, node);
         }
       } // end while new result row
@@ -194,7 +186,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     return project;
   }
 
-  private void setMatchedIDs(SDocument document, List<String> keyNameList)
+  private void setMatchedIDs(SDocument document, String[] keyNameList)
   {
     // set the matched keys
     SFeature feature = SaltFactory.eINSTANCE.createSFeature();
@@ -242,7 +234,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private SNode createOrFindNewNode(ResultSet resultSet,
     SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, SolutionKey<?> key,
-    List<String> keyNameList) throws SQLException
+    String[] keyNameList) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
@@ -277,6 +269,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       addLongSFeature(node, FEAT_INTERNALID, internalID);
       addLongSFeature(node, resultSet, FEAT_CORPUSREF, "node", "corpus_ref");
+      addLongSFeature(node, resultSet, FEAT_TEXTREF, "node", "text_ref");
       addLongSFeature(node, resultSet, FEAT_LEFT, "node", "left");
       addLongSFeature(node, resultSet, FEAT_LEFTTOKEN, "node", "left_token");
       addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
@@ -289,7 +282,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList.add(node.getSName());
+        keyNameList[matchedNode-1] = node.getSName();
       }
 
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
@@ -426,7 +419,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
 
   private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
-    Map<Long, SNode> nodeByPre, SNode targetNode) throws
+    Map<RankID, SNode> nodeByPre, SNode targetNode) throws
     SQLException
   {
     long parent = longValue(resultSet, RANK_TABLE, "parent");
@@ -436,12 +429,14 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     long pre = longValue(resultSet, RANK_TABLE, "pre");
+    long componentID = longValue(resultSet, RANK_TABLE, "component_id");
     String edgeNamespace = stringValue(resultSet, COMPONENT_TABLE, "namespace");
     String edgeName = stringValue(resultSet, COMPONENT_TABLE, "name");
 
     String type = stringValue(resultSet, COMPONENT_TABLE, "type");
 
-    SStructuredNode sourceNode = (SStructuredNode) nodeByPre.get(parent);
+    SStructuredNode sourceNode = 
+      (SStructuredNode) nodeByPre.get(new RankID(componentID, parent));
 
     if (sourceNode == null)
     {
@@ -503,7 +498,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           if (sourceNode != null && !(sourceNode instanceof SStructure))
           {
             sourceNode = recreateNode(SStructure.class, sourceNode);
-            nodeByPre.put(parent, sourceNode);
+            nodeByPre.put(new RankID(componentID, parent), sourceNode);
           }
         }
         else if ("c".equals(type))
@@ -515,7 +510,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           if (sourceNode != null && !(sourceNode instanceof SSpan))
           {
             sourceNode = recreateNode(SSpan.class, sourceNode);
-            nodeByPre.put(parent, sourceNode);
+            nodeByPre.put(new RankID(componentID, parent), sourceNode);
           }
         }
         else if ("p".equals(type))
@@ -537,7 +532,13 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           featInternalID.setSValue(Long.valueOf(pre));
           rel.addSFeature(featInternalID);
           
-          rel.setSSource(nodeByPre.get(parent));
+          SFeature featComponentID = SaltFactory.eINSTANCE.createSFeature();
+          featComponentID.setSNS(ANNIS_NS);
+          featComponentID.setSName(FEAT_COMPONENTID);
+          featComponentID.setSValue(Long.valueOf(componentID));
+          rel.addSFeature(featComponentID);
+          
+          rel.setSSource(nodeByPre.get(new RankID(componentID,parent)));
           if("c".equals(type) && !(targetNode instanceof SToken))
           {
             Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
@@ -634,5 +635,62 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   {
     this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
   }
+  
+  public static class RankID
+  {
+    private long componentID;
+    private long pre;
+
+    public RankID(long componentID, long pre)
+    {
+      this.componentID = componentID;
+      this.pre = pre;
+    }
+
+    public long getComponentID()
+    {
+      return componentID;
+    }
+
+    public long getPre()
+    {
+      return pre;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (obj == null)
+      {
+        return false;
+      }
+      if (getClass() != obj.getClass())
+      {
+        return false;
+      }
+      final RankID other = (RankID) obj;
+      if (this.componentID != other.componentID)
+      {
+        return false;
+      }
+      if (this.pre != other.pre)
+      {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 5;
+      hash = 29 * hash + (int) (this.componentID ^ (this.componentID >>> 32));
+      hash = 29 * hash + (int) (this.pre ^ (this.pre >>> 32));
+      return hash;
+    }
+    
+    
+  }
+  
   
 }

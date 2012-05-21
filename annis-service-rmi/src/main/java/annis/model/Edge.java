@@ -77,6 +77,7 @@ public class Edge implements Serializable
   private AnnisNode source;
   private AnnisNode destination;
   private long pre;
+  private long componentID;
   private EdgeType edgeType;
   private String namespace;
   private String name;
@@ -134,6 +135,10 @@ public class Edge implements Serializable
     {
       return false;
     }
+    if (this.componentID != other.componentID)
+    {
+      return false;
+    }
     if (this.edgeType != other.edgeType)
     {
       return false;
@@ -154,16 +159,18 @@ public class Edge implements Serializable
   @Override
   public int hashCode()
   {
-    int hash = 3;
-    hash = 67 * hash + (this.source != null ? this.source.hashCode() : 0);
+    int hash = 5;
+    hash = 17 * hash + (this.source != null ? this.source.hashCode() : 0);
     hash =
-      67 * hash + (this.destination != null ? this.destination.hashCode() : 0);
-    hash = 67 * hash + (int) (this.pre ^ (this.pre >>> 32));
-    hash = 67 * hash + (this.edgeType != null ? this.edgeType.hashCode() : 0);
-    hash = 67 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
-    hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
+      17 * hash + (this.destination != null ? this.destination.hashCode() : 0);
+    hash = 17 * hash + (int) (this.pre ^ (this.pre >>> 32));
+    hash = 17 * hash + (int) (this.componentID ^ (this.componentID >>> 32));
+    hash = 17 * hash + (this.edgeType != null ? this.edgeType.hashCode() : 0);
+    hash = 17 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+    hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
     return hash;
   }
+
 
   ///// Getters / Setters
   public long getPre()
@@ -176,6 +183,17 @@ public class Edge implements Serializable
     this.pre = pre;
   }
 
+  public long getComponentID()
+  {
+    return componentID;
+  }
+
+  public void setComponentID(long componentID)
+  {
+    this.componentID = componentID;
+  }
+  
+  
   public EdgeType getEdgeType()
   {
     return edgeType;

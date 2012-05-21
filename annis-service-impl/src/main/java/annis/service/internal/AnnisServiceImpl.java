@@ -112,13 +112,6 @@ public class AnnisServiceImpl implements AnnisService
     queryLog.info(message);
   }
 
-
-  @Override
-  public AnnisCorpusSet getCorpusSet() throws RemoteException
-  {
-    return new AnnisCorpusSet(annisDao.listCorpora());
-  }
-
   @Override
   public AnnisAttributeSet getAttributeSet(List<Long> corpusList,
     boolean fetchValues, boolean onlyMostFrequentValues) throws RemoteException

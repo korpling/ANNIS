@@ -53,7 +53,7 @@ public class SaltAnnotateExtractorTest
   private CsvResultSetProvider resultSetProvider;
   
   // dependencies
-  private SolutionKey<?> solutionKey = new NodeNameAndIdPostgreSqlArraySolutionKey();
+  private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<String>();
   
   // test data
   private SaltProject project;
@@ -62,6 +62,8 @@ public class SaltAnnotateExtractorTest
   public void setUp() throws SQLException
   {
     initMocks(this);
+    
+    solutionKey.setKeyColumnName("key");
 
     resultSetProvider = new CsvResultSetProvider(getClass().getResourceAsStream(
       "SampleAnnotateResult.csv"));
@@ -91,7 +93,7 @@ public class SaltAnnotateExtractorTest
     SCorpusGraph corpusGraph = project.getSCorpusGraphs().get(0);
 
     assertEquals(1, corpusGraph.getSCorpora().size());
-    assertEquals("pcc2_plus", corpusGraph.getSCorpora().get(0).getSName());
+    assertEquals("pcc2", corpusGraph.getSCorpora().get(0).getSName());
 
     assertEquals(1, corpusGraph.getSDocuments().size());
     assertEquals("4282", corpusGraph.getSDocuments().get(0).getSName());

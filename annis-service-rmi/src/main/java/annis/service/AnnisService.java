@@ -15,7 +15,6 @@
  */
 package annis.service;
 
-import annis.exceptions.AnnisBinaryNotFoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -24,26 +23,13 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
 import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.objects.AnnisCorpusSet;
 import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
 public interface AnnisService extends Remote
 {
-
-
-  /**
-   * 
-   * @return A set object that contains all available corpora.
-   * @throws RemoteException
-   */
-  public AnnisCorpusSet getCorpusSet() throws RemoteException;
 
 
   /**

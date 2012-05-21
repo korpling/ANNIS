@@ -45,12 +45,17 @@ import org.apache.commons.lang.StringUtils;
  */
 public class Helper
 {
-
-  public static WebResource getAnnisWebResource(Application app)
+  
+  public static WebResource getAnnisWebResource(String uri)
   {
     ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
     Client c = Client.create(rc);
-    return c.resource(app.getProperty("AnnisWebService.URL"));
+    return c.resource(uri);
+  }
+
+  public static WebResource getAnnisWebResource(Application app)
+  {
+    return getAnnisWebResource(app.getProperty("AnnisWebService.URL"));
   }
 
   public static AnnisService getService(Application app, Window window)
