@@ -31,7 +31,14 @@ import org.springframework.dao.DataAccessException;
 import annis.dao.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.internal.AnnisWebService;
 
+/**
+ * Generates identifers for salt which are needed for the  
+ * {@link AnnisWebService#find(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}
+ * 
+ * @author Benjamin Weißenfels
+ */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   implements SelectClauseSqlGenerator<QueryData>
 {
@@ -57,7 +64,6 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       ++i;
 
       TableAccessStrategy tblAccessStr = tables(node);
-      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
         + " AS node_name" + i);
       ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
@@ -111,15 +117,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     for (int column = 1; column <= columnCount; ++column)
     {
 
-      if (metaData.getColumnName(column).startsWith("id"))
-      {
-        match.add(rs.getLong((column)));
-      }
-      else if (metaData.getColumnName(column).startsWith("toplevel_corpus"))
-      {
-        match.setToplevelCorpusId(rs.getLong((column)));
-      }
-      else if (metaData.getColumnName(column).startsWith("node_name"))
+      if (metaData.getColumnName(column).startsWith("node_name"))
       {
         node_name = rs.getString(column);
       }
@@ -161,7 +159,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
 
 
-    return sb.append(node_name).toString();
+    return sb.append("#").append(node_name).toString();
   }
 
   public CorpusPathExtractor getCorpusPathExtractor()
