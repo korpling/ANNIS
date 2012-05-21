@@ -113,6 +113,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     String node_name = null;
     List<String> corpus_path = null;
 
+    //get path
+    for (int column = 1; column <= columnCount; ++column)
+    {
+      if (metaData.getColumnName(column).startsWith("path_name"))
+      {
+        corpus_path = corpusPathExtractor.extractCorpusPath(rs,
+          metaData.getColumnName(column));
+      }
+    }
+
     // one match per column
     for (int column = 1; column <= columnCount; ++column)
     {
@@ -121,21 +131,20 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       {
         node_name = rs.getString(column);
       }
-      else if (metaData.getColumnName(column).startsWith("path_name"))
-      {
-        corpus_path = corpusPathExtractor.extractCorpusPath(rs,
-          metaData.getColumnName(column));
-      }
-
-      // no more matches in this row if an id was NULL
+      else // no more matches in this row if an id was NULL
       if (rs.wasNull())
       {
         break;
       }
 
+      if (node_name != null)
+      {
+        match.setSaltId(buildSaltId(corpus_path, node_name));
+        node_name = null;
+      }
     }
 
-    match.setSaltId(buildSaltId(corpus_path, node_name));
+
     return match;
   }
 

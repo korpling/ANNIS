@@ -17,32 +17,30 @@ package annis.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @SuppressWarnings("serial")
 @XmlRootElement
-public class Match extends ArrayList<Long>
+public class Match
 {
-  
-  private String saltID;
+  @XmlElementWrapper(name="salt-ids")
+  @XmlElement(name="id")
+  private List<String> saltIDs;
 
   public Match()
   {
+    saltIDs = new ArrayList<String>();
   }
 
-  public Match(List<Long> nodes)
-  {
-    addAll(nodes);
-  }
-
- 
   public void setSaltId(String id)
   {
-    saltID = id;
+    saltIDs.add(id);
   }
 
-  public String getSaltId()
+  public String getSaltId(int i)
   {
-    return saltID;
+    return saltIDs.get(i);
   }
 }
