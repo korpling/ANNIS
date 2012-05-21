@@ -328,7 +328,7 @@ limitations under the License.
 
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
-
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
     <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
   </bean> 

@@ -17,7 +17,6 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.LimitOffsetQueryData;
 import java.util.List;
 
 /**

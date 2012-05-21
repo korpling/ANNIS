@@ -46,6 +46,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
   private CorpusPathExtractor corpusPathExtractor;
+  private LimitOffsetClauseSqlGenerator limitOffsetClauseSqlGenerator;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -179,5 +180,5 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
   {
     this.corpusPathExtractor = corpusPathExtractor;
-  }
+  }  
 }
