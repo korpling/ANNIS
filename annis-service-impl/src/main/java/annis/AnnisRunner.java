@@ -15,10 +15,6 @@
  */
 package annis;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -41,8 +37,9 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
+import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
+import annis.sqlgen.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -410,34 +407,40 @@ public class AnnisRunner extends AnnisBaseRunner
         + options));
     }
     out.println();
-    
+
     // CSV output
-        try
+    try
     {
-      CSVWriter csv = new CSVWriter(new FileWriter(new File("annis_benchmark_result.csv")));
-      
-      String[] header = new String[] {"corpora", "query", "avg", "diff-best", "diff-worst"};
+      CSVWriter csv = new CSVWriter(new FileWriter(new File(
+        "annis_benchmark_result.csv")));
+
+      String[] header = new String[]
+      {
+        "corpora", "query", "avg", "diff-best", "diff-worst"
+      };
       csv.writeNext(header);
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
-        String[] line = new String[5];        
+        String[] line = new String[5];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
-        line[2] = "" +  benchmark.avgTimeInMilliseconds;
-        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - benchmark.avgTimeInMilliseconds);
-        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds - benchmark.worstTimeInMilliseconds);
+        line[2] = "" + benchmark.avgTimeInMilliseconds;
+        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds
+          - benchmark.avgTimeInMilliseconds);
+        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds
+          - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-      
+
       csv.close();
-      
+
     }
     catch (IOException ex)
     {
       java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
         log(Level.SEVERE, null, ex);
     }
-    
+
   }
 
   public String benchmarkOptions(QueryData queryData)
@@ -642,16 +645,18 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("?" + setting);
   }
 
-
   private QueryData analyzeQuery(String annisQuery, String queryFunction)
   {
     QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    queryData.addExtension(new AnnotateQueryData(offset, limit, left, right));
     
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
     
+
+    queryData.addExtension(new LimitOffsetQueryData(offset, limit));
+    queryData.addExtension(new AnnotateQueryData(left, right));
+
     if (annisQuery != null)
     {
       benchmarks.add(new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
@@ -759,7 +764,7 @@ public class AnnisRunner extends AnnisBaseRunner
     long l = Long.parseLong(textID);
     System.out.println(annotateSqlGenerator.getTextQuery(l));
   }
-  
+
   public void doText(String textID)
   {
     long l = Long.parseLong(textID);
@@ -773,9 +778,10 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(splitted.length > 1,
       "must have to arguments (toplevel corpus name and document name");
-    System.out.println(annotateSqlGenerator.getDocumentQuery(splitted[0], splitted[1]));
+    System.out.println(annotateSqlGenerator.getDocumentQuery(splitted[0],
+      splitted[1]));
   }
-  
+
   public void doDoc(String docCall)
   {
     String[] splitted = docCall.split("( )+");
@@ -919,7 +925,6 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.corpusList = corpusList;
   }
-
 
   public int getContext()
   {

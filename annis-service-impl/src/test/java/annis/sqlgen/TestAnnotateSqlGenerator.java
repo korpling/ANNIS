@@ -9,7 +9,6 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.test.TestUtils.uniqueAlphaString;
 import static annis.test.TestUtils.uniqueInt;
-import static annis.test.TestUtils.uniqueString;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -33,7 +32,6 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.AnnotateSqlGenerator.AnnotateQueryData;
 import org.junit.Ignore;
 public class TestAnnotateSqlGenerator
 {
@@ -91,6 +89,7 @@ public class TestAnnotateSqlGenerator
   // test data
   @Mock private QueryData queryData;
   @Mock private AnnotateQueryData annotateQueryData;
+  @Mock private LimitOffsetQueryData limitOffsetQueryData;
   private List<QueryNode> alternative = new ArrayList<QueryNode>(); 
   private static final String INDENT = TABSTOP;
   
@@ -294,7 +293,7 @@ public class TestAnnotateSqlGenerator
     // given
     generator.setIncludeIsTokenColumn(true);
     int offset = uniqueInt(10);
-    given(annotateQueryData.getOffset()).willReturn(offset);
+    given(limitOffsetQueryData.getOffset()).willReturn(offset);
     String keyColumn1 = uniqueAlphaString();
     String keyColumn2 = uniqueAlphaString();
     given(solutionKey.generateOuterQueryColumns(eq(tableAccessStrategy), anyInt())).willReturn(asList(keyColumn1, keyColumn2));
@@ -375,7 +374,7 @@ public class TestAnnotateSqlGenerator
 //            + INDENT + TABSTOP + "node_anno.\"name\" AS \"node_annotation_name\",\n"
 //            + INDENT + TABSTOP + "node_anno.\"val\" AS \"node_annotation_value\",\n"
 //            + INDENT + TABSTOP + "edge_anno.namespace AS \"edge_annotation_namespace\",\n"
-//            + INDENT + TABSTOP + "edge_anno.\"name\" AS \"edge_annotation_name\",\n"
+//            + INDENT + TABSTOP + "edge_anno.\"name\" AS \"edge_annotation_name\",\n"  
 //            + INDENT + TABSTOP + "edge_anno.\"val\" AS \"edge_annotation_value\",\n";
 //        }
         expected = expected + INDENT + TABSTOP + pathNameAlias + " AS " + "path";

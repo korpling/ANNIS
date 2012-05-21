@@ -17,46 +17,30 @@ package annis.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Properties;
-
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @SuppressWarnings("serial")
-public class Match extends ArrayList<Long>
+@XmlRootElement
+public class Match
 {
-  
-  private long toplevelCorpusId;
-  private HashMap<Long, Properties> corpusConfiguration;
-  
+  @XmlElementWrapper(name="salt-ids")
+  @XmlElement(name="id")
+  private List<String> saltIDs;
+
   public Match()
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
+    saltIDs = new ArrayList<String>();
   }
 
-  public Match(List<Long> nodes)
+  public void setSaltId(String id)
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
-    addAll(nodes);
+    saltIDs.add(id);
   }
 
-  public long getToplevelCorpusId()
+  public String getSaltId(int i)
   {
-    return toplevelCorpusId;
+    return saltIDs.get(i);
   }
-
-  public void setToplevelCorpusId(long toplevelCorpusId)
-  {
-    this.toplevelCorpusId = toplevelCorpusId;
-  }
-
-  public HashMap<Long, Properties> getCorpusConfiguration()
-  {
-    return corpusConfiguration;
-  }
-
-  public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration)
-  {
-    this.corpusConfiguration = corpusConfiguration;
-  }
-  
 }

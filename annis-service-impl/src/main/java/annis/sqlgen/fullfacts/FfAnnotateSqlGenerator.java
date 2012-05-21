@@ -24,6 +24,7 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.LimitOffsetQueryData;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;
@@ -84,8 +85,8 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       sb.append(",\n");
     }
     indent(sb, indent + TABSTOP);
-    List<AnnotateQueryData> extension =
-      queryData.getExtensions(AnnotateQueryData.class);
+    List<LimitOffsetQueryData> extension =
+      queryData.getExtensions(LimitOffsetQueryData.class);
     Validate.isTrue(extension.size() > 0);
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
     sb.append(indent).append(TABSTOP + "solutions.n,\n");
