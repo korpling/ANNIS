@@ -16,6 +16,7 @@
  */
 package annis.service.internal;
 
+import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
@@ -29,10 +30,12 @@ import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -48,7 +51,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author thomas
+ * @author thomas, Benjamin Weißenfels
  */
 @Component
 @Path("/annis")
@@ -110,7 +113,6 @@ public class AnnisWebService
     long end = new Date().getTime();
     logQuery("COUNT", query, corpusNames, end - start);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
-
   }
 
   @GET
@@ -209,6 +211,50 @@ public class AnnisWebService
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
     return annisDao.find(data);
+  }
+
+  @GET
+  @Path("subgraphs/")
+  @Produces("application/xml")
+  public SaltProject subgraph(@QueryParam("q") String saltIDs)
+  {
+
+    // some robustness stuff
+    if (saltIDs == null)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'salt identifier'").build());
+    }
+
+
+    String[] ids = saltIDs.split(":");
+
+    // check if this is a valid URI
+    for (String id : ids)
+    {
+      try
+      {
+        URI saltID = new URI(id);
+        
+        if (!saltID.getScheme().equals("salt"))
+        {
+          throw new WebApplicationException(
+            Response.status(Response.Status.BAD_REQUEST).type(
+            MediaType.TEXT_PLAIN).entity(
+            "the scheme is not the salt identifier scheme").build());
+        }
+      }
+      catch (URISyntaxException ex)
+      {
+        String msg = id + "is not a valid salt scheme";
+        java.util.logging.Logger.getLogger(AnnisWebService.class.getName()).
+          log(Level.SEVERE, msg, ex);
+      }      
+    }
+
+    return null;
   }
 
   @GET
