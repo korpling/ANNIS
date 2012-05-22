@@ -214,7 +214,7 @@ public class AnnisWebService
   }
 
   @GET
-  @Path("subgraphs/")
+  @Path("subgraphs")
   @Produces("application/xml")
   public SaltProject subgraph(@QueryParam("q") String saltIDs)
   {
@@ -225,20 +225,20 @@ public class AnnisWebService
       throw new WebApplicationException(
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'salt identifier'").build());
+        "missing required parameter 'q'").build());
     }
 
 
-    String[] ids = saltIDs.split(":");
+    String[] ids = saltIDs.split("\\s");
 
     // check if this is a valid URI
     for (String id : ids)
     {
       try
       {
-        URI saltID = new URI(id);
-        
-        if (!saltID.getScheme().equals("salt"))
+        URI saltID = new URI(id);        
+
+        if (saltID.getScheme() == null || !saltID.getScheme().equals("salt"))
         {
           throw new WebApplicationException(
             Response.status(Response.Status.BAD_REQUEST).type(
@@ -251,7 +251,7 @@ public class AnnisWebService
         String msg = id + "is not a valid salt scheme";
         java.util.logging.Logger.getLogger(AnnisWebService.class.getName()).
           log(Level.SEVERE, msg, ex);
-      }      
+      }
     }
 
     return null;
