@@ -71,6 +71,7 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    String innerIndent = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
     SolutionKey<?> key = createSolutionKey();
 
@@ -80,15 +81,12 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       size());
     for (String keyColumn : keyColumns)
     {
-      indent(sb, indent + TABSTOP);
-      sb.append(keyColumn);
-      sb.append(",\n");
+      sb.append(innerIndent).append(keyColumn).append(",\n");
     }
-    indent(sb, indent + TABSTOP);
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
     Validate.isTrue(extension.size() > 0);
-    sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
+    sb.append(innerIndent).append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
     sb.append(indent).append(TABSTOP + "solutions.n,\n");
 
     List<String> fields = new ArrayList<String>();
@@ -127,18 +125,17 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "name");
     addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "value");
 
-    sb.append(indent).append(TABSTOP);
-    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-    sb.append(",\n").append(indent).append(TABSTOP);
+    sb.append(innerIndent).append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
+    sb.append(",\n");
+
 
     // corpus.path_name
-    sb.append("corpus.path_name AS path");
+    sb.append(innerIndent).append("corpus.path_name AS path");
 
     if (isIncludeDocumentNameInAnnotateQuery())
     {
       sb.append(",\n");
-      indent(sb, indent + TABSTOP);
-      sb.append("corpus.path_name[1] AS document_name");
+      sb.append(innerIndent).append("corpus.path_name[1] AS document_name");
     }
     return sb.toString();
   }
@@ -149,23 +146,16 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     StringBuffer sb = new StringBuffer();
 
-    indent(sb, indent);
-    sb.append("(\n");
-    indent(sb, indent);
-    int indentBy = indent.length() / 2 + 2;
-    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indentBy));
-    indent(sb, indent + TABSTOP);
-    sb.append(") AS solutions,\n");
+    sb.append(indent).append("(\n");
+    
+    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indent +  TABSTOP));
+    sb.append(indent).append(TABSTOP).append(") AS solutions,\n");
 
-    indent(sb, indent + TABSTOP);
     // really ugly
-    sb.append(
+    sb.append(indent).append(TABSTOP).append(
       getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
     sb.append(",\n");
-
-    indent(sb, indent + TABSTOP);
-    sb.append(TableAccessStrategy.CORPUS_TABLE);
-
+    sb.append(indent).append(TABSTOP).append(TableAccessStrategy.CORPUS_TABLE);
 
     return sb.toString();
   }

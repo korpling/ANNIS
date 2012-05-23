@@ -123,7 +123,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
 
     @Override
-    public String toSql(QueryData queryData, int indentBy)
+    public String toSql(QueryData queryData, String indent)
     {
       // dont indent
       return toSql(queryData);

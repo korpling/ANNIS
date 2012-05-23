@@ -57,19 +57,18 @@ public abstract class AbstractSqlGenerator<T>
 
 	@Override
 	public String toSql(QueryData queryData) {
-		return toSql(queryData, 0);
+		return toSql(queryData, "");
 	}
 	
   @Override
-	public String toSql(QueryData queryData, int indentBy) {
+	public String toSql(QueryData queryData, String indent) {
 		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 		
 		// push alternative down
 		List<QueryNode> alternative = queryData.getAlternatives().get(0);
 
-		String indent = computeIndent(indentBy);
 		StringBuffer sb = new StringBuffer();
-		indent(sb, indent);
+		sb.append(indent);
 		sb.append(createSqlForAlternative(queryData, alternative, indent));
 		appendOrderByClause(sb, queryData, alternative, indent);
 		appendLimitOffsetClause(sb, queryData, alternative, indent);
@@ -93,14 +92,6 @@ public abstract class AbstractSqlGenerator<T>
 		}
 		return sb.toString();
 	}
-	
-	protected void indent(StringBuffer sb, String indent) {
-		sb.append(indent);
-	}
-
-	protected void indent(StringBuilder sb, String indent) {
-		sb.append(indent);
-	}
 
 	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		sb.append("SELECT ");
@@ -109,14 +100,14 @@ public abstract class AbstractSqlGenerator<T>
 	}
 
 	private void appendFromClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		indent(sb, indent);
+		sb.append(indent);
 		sb.append("FROM");
 		List<String> fromTables = new ArrayList<String>();
 		for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators) {
 			fromTables.add(generator.fromClause(queryData, alternative, indent));
 		}
 		sb.append("\n");
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append(StringUtils.join(fromTables, ",\n" + indent + TABSTOP));
 		sb.append("\n");
 	}
@@ -152,17 +143,17 @@ public abstract class AbstractSqlGenerator<T>
 			return;
 		
 		// append WHERE clause to query
-		indent(sb, indent);
+		sb.append(indent);
 		sb.append("WHERE");
 		sb.append("\n");
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append(StringUtils.join(conditions, " AND\n" + indent + TABSTOP));
 		sb.append("\n");
 	}
 
 	private void appendGroupByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (groupByClauseSqlGenerator != null) {
-			indent(sb, indent);
+			sb.append(indent);
 			sb.append("GROUP BY ");
 			sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData, alternative));
 			sb.append("\n");
@@ -171,7 +162,7 @@ public abstract class AbstractSqlGenerator<T>
 
 	protected void appendOrderByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (orderByClauseSqlGenerator != null) {
-			indent(sb, indent);
+			sb.append(indent);
 			sb.append("ORDER BY ");
 			sb.append(orderByClauseSqlGenerator.orderByClause(queryData, alternative, indent));
 			sb.append("\n");
@@ -180,7 +171,7 @@ public abstract class AbstractSqlGenerator<T>
 
 	protected void appendLimitOffsetClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		if (limitOffsetClauseSqlGenerator != null) {
-			indent(sb, indent);
+			sb.append(indent);
 			sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData, alternative, indent));
 			sb.append("\n");
 		}
