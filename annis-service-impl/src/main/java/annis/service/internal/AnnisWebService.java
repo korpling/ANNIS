@@ -31,6 +31,7 @@ import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -218,6 +219,8 @@ public class AnnisWebService
   @Produces("application/xml")
   public SaltProject subgraph(@QueryParam("q") String saltIDs)
   {
+    String[] ids = null;
+    List<URI> saltURI = new ArrayList<URI>();
 
     // some robustness stuff
     if (saltIDs == null)
@@ -228,15 +231,14 @@ public class AnnisWebService
         "missing required parameter 'q'").build());
     }
 
-
-    String[] ids = saltIDs.split("\\s");
-
     // check if this is a valid URI
+    ids = saltIDs.split("\\s");
     for (String id : ids)
     {
       try
       {
-        URI saltID = new URI(id);        
+        URI saltID = new URI(id);
+        saltURI.add(saltID);
 
         if (saltID.getScheme() == null || !saltID.getScheme().equals("salt"))
         {
@@ -254,7 +256,7 @@ public class AnnisWebService
       }
     }
 
-    return null;
+    return annisDao.graph(saltURI);
   }
 
   @GET

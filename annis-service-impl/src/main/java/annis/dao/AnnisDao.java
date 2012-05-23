@@ -28,6 +28,7 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.net.URI;
 import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -35,7 +36,9 @@ public interface AnnisDao
 {
 
   public SaltProject retrieveAnnotationGraph(long textId);
-  public SaltProject retrieveAnnotationGraph(String toplevelCorpusName, String documentName);
+
+  public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
+    String documentName);
 
   public List<AnnisCorpus> listCorpora();
 
@@ -45,6 +48,7 @@ public interface AnnisDao
     boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(long id);
+
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName);
 
@@ -57,10 +61,19 @@ public interface AnnisDao
   @Deprecated
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
-// new 
+  // new 
   int count(QueryData queryData);
 
   List<Match> find(QueryData queryData);
+
+  /**
+   * Returns a part of a salt document according the saltIDs, we get with
+   * {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * 
+   * @param saltIDs
+   * @return a salt graph
+   */
+  SaltProject graph(List<URI> saltIDs);
 
   SaltProject annotate(QueryData queryData);
 
@@ -71,8 +84,10 @@ public interface AnnisDao
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
+
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator, final ResultSetExtractor<T> extractor);
+    final SqlGenerator<QueryData, T> generator,
+    final ResultSetExtractor<T> extractor);
 
   // needed in AnnisRunner
   public HashMap<Long, Properties> getCorpusConfiguration();
@@ -84,9 +99,8 @@ public interface AnnisDao
   void setTimeout(int milliseconds);
 
   int getTimeout();
-  
-  public List<String> mapCorpusIdsToNames(List<Long> ids);
-  
-  public Map<String,String> getCorpusConfiguration(String corpusName);
 
+  public List<String> mapCorpusIdsToNames(List<Long> ids);
+
+  public Map<String, String> getCorpusConfiguration(String corpusName);
 }

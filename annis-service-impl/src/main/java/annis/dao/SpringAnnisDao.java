@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -79,6 +80,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private int timeout;
   // fn: corpus id -> corpus name
   private Map<Long, String> corpusNamesById;
+
+  @Override
+  public SaltProject graph(List<URI> saltIDs)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
