@@ -35,6 +35,8 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -49,6 +51,7 @@ public abstract class AnnotateSqlGenerator<T>
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
   WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>,
+  WithClauseSqlGenerator<QueryData>,
   AnnotateExtractor<T>
 {
 
@@ -63,6 +66,7 @@ public abstract class AnnotateSqlGenerator<T>
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
+
 
   // old
   public enum IslandPolicies
@@ -179,6 +183,46 @@ public abstract class AnnotateSqlGenerator<T>
       + outerQueryTableAccessStrategy.columnName(table, column)
       + "\"");
   }
+
+  @Override
+  public List<String> withClauses(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    List<String> result = new LinkedList<String>();
+    
+    List<AnnotateQueryData> ext = queryData.getExtensions(AnnotateQueryData.class);
+    if(!ext.isEmpty())
+    {
+      AnnotateQueryData annoQueryData = ext.get(0);
+      
+      if(annoQueryData.getSegmentationLayer() == null)
+      {
+        // token index based method 
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(indent).append("WITH solution AS\n");
+        sb.append(indent).append("(\n");
+
+        sb.append(indent).append(TABSTOP).append("SELECT ");
+        
+        // TODO
+        
+        sb.append("\n)\n");
+        
+        result.add(sb.toString());
+      }
+      else
+      {
+        // segmentation layer based method
+        
+        // TODO
+      }
+    }
+    
+    return result;
+  }
+  
+  
 
   @Override
   public Set<String> whereConditions(QueryData queryData,
