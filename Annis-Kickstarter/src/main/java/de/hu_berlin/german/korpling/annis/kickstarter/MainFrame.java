@@ -113,7 +113,7 @@ public class MainFrame extends javax.swing.JFrame
   {
     Integer[] sizes = new Integer[]
     {
-      14, 16, 32, 48, 64, 128, 192
+      192, 128, 64, 48, 32, 16, 14
     };
     List<Image> allImages = new LinkedList<Image>();
 
