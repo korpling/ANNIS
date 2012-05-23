@@ -170,14 +170,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void createSchema()
   {
-    log.info("creating Annis database schema (" + dbLayout + ")");
+    log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
   }
   
   @Override
   public void createSchemaIndexes()
   {
-    log.info("creating Annis database schema indexes (" + dbLayout + ")");
+    log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schemaindex.sql");
   }
 

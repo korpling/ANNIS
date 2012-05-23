@@ -40,8 +40,8 @@ limitations under the License.
 		
     <property name="annisDao" ref="annisDao"/>
     <property name="annisParser" ref="annisParser"/>
-    <property name="helloMessage" value="Annis Interactive Shell 3.0.0"/>
-    <property name="prompt" value="Annis"/>
+    <property name="helloMessage" value="ANNIS Interactive Shell 3.0.0"/>
+    <property name="prompt" value="ANNIS"/>
     <property name="aqlAnalysis" ref="aqlAnalysis" />
     <property name="matchLimit" value="10"/>
     <property name="metaDataFilter" ref="metaDataFilter" />

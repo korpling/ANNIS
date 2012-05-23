@@ -130,8 +130,7 @@ public class MatrixSqlGenerator
 	  	sb.append("\n");
 
 	  	// key
-	  	indent(sb, indent + TABSTOP);
-	  	sb.append("ARRAY[");
+	  	sb.append(indent).append(TABSTOP).append("ARRAY[");
 	  	List<String> ids = new ArrayList<String>();
 	  	for (int i = 1; i <= alternative.size(); ++i) {
 	  		ids.add("solutions.id" + String.valueOf(i));
@@ -141,11 +140,10 @@ public class MatrixSqlGenerator
 	
 	  	// fields
 		TableAccessStrategy tables = tables(null);
-		indent(sb, indent + TABSTOP);
-		sb.append(tables.aliasedColumn(NODE_TABLE, "id"));
+		sb.append(indent).append(TABSTOP).append(tables.aliasedColumn(NODE_TABLE, "id"));
 		sb.append(" AS id,\n");
 		
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append("min(substr(");
 		sb.append(tables.aliasedColumn(TEXT_TABLE, "text"));
 		sb.append(", ");
@@ -156,7 +154,7 @@ public class MatrixSqlGenerator
 		sb.append(tables.aliasedColumn(NODE_TABLE, "left"));
 		sb.append(")) AS span,\n");
 
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append("array_agg(DISTINCT coalesce(");
 		sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace"));
 		sb.append(" || ':', '') || ");
@@ -165,7 +163,7 @@ public class MatrixSqlGenerator
 		sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "value"));
 		sb.append("::bytea, 'base64')) AS annotations,\n");
 
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append("array_agg(DISTINCT coalesce(");
 		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "namespace"));
 		sb.append(" || ':', '') || ");
@@ -183,15 +181,13 @@ public class MatrixSqlGenerator
 			List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
 		
-		indent(sb, indent);
-		sb.append("(\n");
-		indent(sb, indent);
-		int indentBy = indent.length() / 2 + 2;
-		sb.append(innerQuerySqlGenerator.toSql(queryData, indentBy));
-		indent(sb, indent + TABSTOP);
-		sb.append(") AS solutions,\n");
+		sb.append(indent).append("(\n");
+    sb.append(indent);
+    
+		sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(indent).append(") AS solutions,\n");
 		
-		indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
 		// really ugly
 		sb.append(
 				tableJoinsInFromClauseGenerator
@@ -200,8 +196,9 @@ public class MatrixSqlGenerator
 		sb.append("\n");
 
 		TableAccessStrategy tables = tables(null);
-		indent(sb, indent + TABSTOP);
-		sb.append("LEFT OUTER JOIN ");
+		
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ");
 		sb.append(CORPUS_ANNOTATION_TABLE);
 		sb.append(" ON (");
 		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
@@ -209,7 +206,7 @@ public class MatrixSqlGenerator
 		sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 		sb.append("),\n");
 		
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append(TEXT_TABLE);
 		
 		return sb.toString();
@@ -243,7 +240,8 @@ public class MatrixSqlGenerator
 		// nodes selected by id
 		sb.setLength(0);
 		sb.append("(\n");
-		indent(sb, indent + TABSTOP + TABSTOP);
+    
+    sb.append(indent).append(TABSTOP).append(TABSTOP);
 		List<String> ors = new ArrayList<String>();
 		for (int i = 1; i <= queryData.getMaxWidth(); ++i) {
 			ors.add(
@@ -252,7 +250,7 @@ public class MatrixSqlGenerator
 		}
 		sb.append(StringUtils.join(ors, " OR\n" + indent + TABSTOP + TABSTOP));
 		sb.append("\n");
-		indent(sb, indent + TABSTOP);
+		sb.append(indent).append(TABSTOP);
 		sb.append(")");
 		conditions.add(sb.toString());		
 		

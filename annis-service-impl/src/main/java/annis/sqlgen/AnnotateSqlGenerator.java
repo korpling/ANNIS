@@ -64,73 +64,6 @@ public abstract class AnnotateSqlGenerator<T>
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
 
-  public static class AnnotateQueryData
-  {
-
-    private int offset;
-    private int limit;
-    private int left;
-    private int right;
-
-    public AnnotateQueryData(int offset, int limit, int left,
-      int right)
-    {
-      super();
-      this.offset = offset;
-      this.limit = limit;
-      this.left = left;
-      this.right = right;
-    }
-
-    public int getOffset()
-    {
-      return offset;
-    }
-
-    public int getLimit()
-    {
-      return limit;
-    }
-
-    public int getLeft()
-    {
-      return left;
-    }
-
-    public int getRight()
-    {
-      return right;
-    }
-
-    public boolean isPaged()
-    {
-      return offset != 0 || limit != 0;
-    }
-
-    @Override
-    public String toString()
-    {
-      List<String> fields = new ArrayList<String>();
-      if (limit > 0)
-      {
-        fields.add("limit = " + limit);
-      }
-      if (offset > 0)
-      {
-        fields.add("offset = " + offset);
-      }
-      if (left > 0)
-      {
-        fields.add("left = " + left);
-      }
-      if (right > 0)
-      {
-        fields.add("right = " + right);
-      }
-      return StringUtils.join(fields, ", ");
-    }
-  }
-
   // old
   public enum IslandPolicies
   {
@@ -259,7 +192,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<Long> corpusList = queryData.getCorpusList();
     if (corpusList != null && !corpusList.isEmpty())
     {
-      indent(sb, indent);
+      sb.append(indent);
       sb.append(tables.aliasedColumn(NODE_TABLE, "toplevel_corpus"));
       sb.append(" IN (");
       sb.append(StringUtils.join(corpusList, ", "));
@@ -267,7 +200,7 @@ public abstract class AnnotateSqlGenerator<T>
 
       if (!tables.isMaterialized(RANK_TABLE, NODE_TABLE))
       {
-        indent(sb, indent);
+        sb.append(indent);
         sb.append(tables.aliasedColumn(RANK_TABLE, "toplevel_corpus"));
         sb.append(" IN (");
         sb.append(StringUtils.join(corpusList, ", "));
@@ -283,9 +216,9 @@ public abstract class AnnotateSqlGenerator<T>
       getMostRestrictivePolicy(corpusList, corpusProperties);
     if (islandsPolicy == IslandPolicies.context)
     {
-      indent(sb, indent);
-      sb.append("(\n");
-      indent(sb, indent + TABSTOP + TABSTOP);
+      sb.append(indent).append("(\n");
+      
+      sb.append(indent).append(TABSTOP).append(TABSTOP);
       List<String> overlapForOneSpan = new ArrayList<String>();
       for (int i = 1; i <= alternative.size(); ++i)
       {
@@ -293,11 +226,11 @@ public abstract class AnnotateSqlGenerator<T>
         StringBuffer sb2 = new StringBuffer();
 
         sb2.append("(\n");
-        indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
-
+        sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
+        
         sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")).
           append(" = solutions.text").append(i).append(" AND\n");
-        indent(sb2, indent + TABSTOP + TABSTOP + TABSTOP);
+        sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
 
         String rangeMin = "solutions.min" + i;
         String rangeMax = "solutions.max" + i;
@@ -305,19 +238,19 @@ public abstract class AnnotateSqlGenerator<T>
         sb2.append(overlapForOneRange(indent + TABSTOP + TABSTOP,
           rangeMin, rangeMax, tables));
         sb2.append("\n");
-        indent(sb2, indent + TABSTOP + TABSTOP);
+        sb.append(indent).append(TABSTOP).append(TABSTOP);
         sb2.append(")");
         overlapForOneSpan.add(sb2.toString());
       }
       sb.append(StringUtils.join(overlapForOneSpan,
         " OR "));
       sb.append("\n");
-      indent(sb, indent + TABSTOP);
+      sb.append(indent).append(TABSTOP);
       sb.append(")");
     }
     else
     {
-      indent(sb, indent);
+      sb.append(indent);
       sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
       sb.append(" IN (");
       List<String> solutionTexts = new ArrayList<String>();
@@ -327,7 +260,7 @@ public abstract class AnnotateSqlGenerator<T>
       }
       sb.append(StringUtils.join(solutionTexts, ", "));
       sb.append(") AND\n");
-      indent(sb, indent + TABSTOP);
+      sb.append(indent).append(TABSTOP);
 
       StringBuilder minSb = new StringBuilder();
       StringBuilder maxSb = new StringBuilder();
@@ -351,7 +284,7 @@ public abstract class AnnotateSqlGenerator<T>
 
     // corpus constriction
     sb.append(" AND\n");
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append(tables.aliasedColumn(CORPUS_TABLE, "id"));
     sb.append(" = ");
     sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
@@ -369,7 +302,7 @@ public abstract class AnnotateSqlGenerator<T>
     StringBuffer sb = new StringBuffer();
 
     sb.append("(\n");
-    indent(sb, indent + TABSTOP + TABSTOP);
+    sb.append(indent).append(TABSTOP).append(TABSTOP);
     if (optimizeOverlap)
     {
       sb.append("(");
@@ -379,7 +312,7 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append(tables.aliasedColumn(
         NODE_TABLE, "right_token")).append(" <= ").append(rangeMax);
       sb.append(") OR\n");
-      indent(sb, indent + TABSTOP + TABSTOP);
+      sb.append(indent).append(TABSTOP).append(TABSTOP);
       sb.append("(");
       sb.append(tables.aliasedColumn(
         NODE_TABLE, "left_token")).append(" <= ").append(rangeMin);
@@ -387,7 +320,7 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append(rangeMin).append(" <= ").append(tables.aliasedColumn(NODE_TABLE,
         "right_token"));
       sb.append(") OR\n");
-      indent(sb, indent + TABSTOP + TABSTOP);
+      sb.append(indent).append(TABSTOP).append(TABSTOP);
       sb.append("(");
       sb.append(tables.aliasedColumn(
         NODE_TABLE, "left_token")).append(" <= ").append(rangeMax);
@@ -405,7 +338,7 @@ public abstract class AnnotateSqlGenerator<T>
         NODE_TABLE, "right_token")).append(" >= ").append(rangeMin);
     }
     sb.append("\n");
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append(")");
 
     String overlapForOneRange = sb.toString();

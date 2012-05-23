@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +15,34 @@
  */
 package annis.sqlgen;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
+/**
+ *
+ * @author benjamin
+ */
+public class LimitOffsetQueryData
+{
 
-import annis.ql.parser.QueryData;
+  private int offset;
+  private int limit;
 
+  public LimitOffsetQueryData(int offset, int limit)
+  {
+    this.offset = offset;
+    this.limit = limit;
+  }
 
-public interface SqlGenerator<QueryType, ResultType> extends ResultSetExtractor<ResultType> {
+  public int getLimit()
+  {
+    return limit;
+  }
 
-	String toSql(QueryType queryData);
-	
-	String toSql(QueryType queryData, String indent);
-
+  public int getOffset()
+  {
+    return offset;
+  }
+  
+  public boolean isPaged()
+  {
+    return offset != 0 || limit != 0;
+  }
 }

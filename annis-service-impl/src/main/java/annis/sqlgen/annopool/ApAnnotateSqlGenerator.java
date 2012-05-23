@@ -21,6 +21,7 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.LimitOffsetQueryData;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;
@@ -43,20 +44,17 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     List<Long> corpusList = queryData.getCorpusList();
     StringBuffer sb = new StringBuffer();
     
-    indent(sb, indent);
-    sb.append("(\n");
-    indent(sb, indent);
-    int indentBy = indent.length() / 2 + 2;
-    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indentBy));
-    indent(sb, indent + TABSTOP);
-    sb.append(") AS solutions,\n");
+    sb.append(indent).append("(\n");
+    
+    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+    sb.append(indent).append(TABSTOP).append(") AS solutions,\n");
 
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     // really ugly
     sb.append(
       getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
     sb.append("\n");
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (")
       .append(tas.aliasedColumn(NODE_TABLE, "node_anno_ref")).append(
       " = node_anno.id AND ")
@@ -66,7 +64,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       .append("))");
     
     sb.append("\n");
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append(
       "LEFT OUTER JOIN annotation_pool AS edge_anno ON (")
       .append(tas.aliasedColumn(RANK_TABLE, "edge_anno_ref"))
@@ -79,7 +77,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 
     sb.append(",\n");
 
-    indent(sb, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append(TableAccessStrategy.CORPUS_TABLE);
 
     return sb.toString();
@@ -89,6 +87,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    String innerIndent = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
     SolutionKey<?> key = createSolutionKey();
 
@@ -98,31 +97,27 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       key.generateOuterQueryColumns(tas, alternative.size());
     for (String keyColumn : keyColumns)
     {
-      indent(sb, indent + TABSTOP);
-      sb.append(keyColumn);
-      sb.append(",\n");
+      sb.append(innerIndent).append(keyColumn).append(",\n");
     }
-    indent(sb, indent + TABSTOP);
-    List<AnnotateQueryData> extension =
-      queryData.getExtensions(AnnotateQueryData.class);
+    sb.append(innerIndent);
+    List<LimitOffsetQueryData> extension =
+      queryData.getExtensions(LimitOffsetQueryData.class);
     Validate.isTrue(extension.size() > 0);
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
-    sb.append(indent).append(TABSTOP + "solutions.n,\n");
+    sb.append(innerIndent).append("solutions.n,\n");
 
     List<String> fields = getSelectFields();
 
-    sb.append(indent).append(TABSTOP);
-    sb.append(StringUtils.join(fields, ",\n" + indent + TABSTOP));
-    sb.append(",\n").append(indent).append(TABSTOP);
+    sb.append(innerIndent).append(StringUtils.join(fields, ",\n"));
+    sb.append(innerIndent).append(",\n");
 
     // corpus.path_name
-    sb.append("corpus.path_name AS path");
+    sb.append(innerIndent).append("corpus.path_name AS path");
 
     if (isIncludeDocumentNameInAnnotateQuery())
     {
       sb.append(",\n");
-      indent(sb, indent + TABSTOP);
-      sb.append("corpus.path_name[1] AS document_name");
+      sb.append(innerIndent).append("corpus.path_name[1] AS document_name");
     }
     return sb.toString();
   }

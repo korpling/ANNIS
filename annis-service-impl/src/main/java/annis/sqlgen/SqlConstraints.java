@@ -170,7 +170,7 @@ public class SqlConstraints
     if (textMatching == TextMatching.REGEXP_EQUAL
       || textMatching == TextMatching.REGEXP_NOT_EQUAL)
     {
-      string = "^" + string + "$";
+      string = "^(" + string + ")$";
     }
     return sqlString(string);
   }
