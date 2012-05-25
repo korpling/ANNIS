@@ -44,7 +44,7 @@ public abstract class AbstractSqlGenerator<T>
 	implements SqlGenerator<QueryData, T> {
 
 	// generators for different SQL statement clauses
-	private WithClauseSqlGenerator withClauseSqlGenerator;
+	private WithClauseSqlGenerator<QueryData> withClauseSqlGenerator;
 	private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators;
 	private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators;
@@ -69,7 +69,7 @@ public abstract class AbstractSqlGenerator<T>
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(indent);
-		sb.append(createSqlForAlternative(queryData, alternative, indent));
+    sb.append(createSqlForAlternative(queryData, alternative, indent));
 		appendOrderByClause(sb, queryData, alternative, indent);
 		appendLimitOffsetClause(sb, queryData, alternative, indent);
 		return sb.toString();
@@ -78,6 +78,7 @@ public abstract class AbstractSqlGenerator<T>
 	protected String createSqlForAlternative(QueryData queryData,
 			List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
+    appendWithClause(sb, queryData, alternative, indent);
 		appendSelectClause(sb, queryData, alternative, indent);
 		appendFromClause(sb, queryData, alternative, indent);
 		appendWhereClause(sb, queryData, alternative, indent);
@@ -92,6 +93,22 @@ public abstract class AbstractSqlGenerator<T>
 		}
 		return sb.toString();
 	}
+  
+  private void appendWithClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent)
+  {
+    if(withClauseSqlGenerator != null)
+    {
+      List<String> clauses = withClauseSqlGenerator.withClauses(queryData,
+        alternative, indent);
+
+      if(!clauses.isEmpty())
+      {
+        sb.append(indent).append("WITH\n");
+        sb.append(StringUtils.join(clauses, ",\n"));
+        sb.append("\n");
+      }
+    }
+  }
 
 	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
 		sb.append("SELECT ");

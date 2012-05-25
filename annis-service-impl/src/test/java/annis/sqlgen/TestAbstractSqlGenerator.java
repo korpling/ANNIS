@@ -18,10 +18,7 @@ package annis.sqlgen;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static annis.test.TestUtils.emptySetOf;
 import static annis.test.TestUtils.newSet;
@@ -42,12 +39,14 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.LinkedList;
 
 
 public class TestAbstractSqlGenerator {
 
 	// class under test and dependencies
 	@InjectMocks private AbstractSqlGenerator<?> generator;
+  @Mock private WithClauseSqlGenerator<QueryData> withClauseSqlGenerator;
 	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
 	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<FromClauseSqlGenerator<QueryData>>();
@@ -77,6 +76,7 @@ public class TestAbstractSqlGenerator {
 		generator.setSelectClauseSqlGenerator(selectClauseSqlGenerator);
 		generator.setFromClauseSqlGenerators(fromClauseSqlGenerators);
 		generator.setWhereClauseSqlGenerators(whereClauseSqlGenerators);
+    generator.setWithClauseSqlGenerator(withClauseSqlGenerator);
 
 		// wire up query data: 1 alternative with 1 node
 		alternative.add(annisNode);
@@ -111,7 +111,7 @@ public class TestAbstractSqlGenerator {
 		String expected = createMinimalSqlStatement(selectClause, fromClause);
 		assertThat(sql, is(expected));
 	}
-	
+  
 	/**
 	 * FROM clauses from multiple FromClauseSqlGenrators are separated by ",".
 	 */
@@ -136,6 +136,30 @@ public class TestAbstractSqlGenerator {
 			    "  " + fromClause2 + "\n";
 		assertThat(sql, is(expected));
 	}
+  
+  @Test
+  public void shouldAppendWithClause() 
+  {
+    LinkedList<String> clauses = new LinkedList<String>();
+    clauses.add("A as (SELECT 1)");
+    clauses.add("B as (SELECT 2)");
+    clauses.add("C as (SELECT 3)");
+    
+    when(withClauseSqlGenerator
+      .withClauses(any(QueryData.class), anyListOf(QueryNode.class), anyString()))
+      .thenReturn(clauses);
+    
+    String sql = generator.toSql(queryData);
+    
+    String expected = "WITH\n"
+      + "A as (SELECT 1),\n"
+      + "B as (SELECT 2),\n"
+      + "C as (SELECT 3)\n"
+      + "SELECT null\nFROM\n  \n";
+    
+    assertThat(sql, is(expected));
+    
+  }
 	
 	/**
 	 * WHERE conditions from one WhereClauseSqlGenerator are ANDed.
