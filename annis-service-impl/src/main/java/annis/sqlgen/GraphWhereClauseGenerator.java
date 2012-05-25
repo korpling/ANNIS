@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +15,23 @@
  */
 package annis.sqlgen;
 
-// FIXME: Wird der WithClauseSqlGenerator noch benötigt
-
 import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import java.util.List;
+import java.util.Set;
 
-// Korpus-Selektion mit WITH-Clause hat nicht funktioniert
-public interface WithClauseSqlGenerator<T>
+/**
+ *
+ *  @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ */
+public class GraphWhereClauseGenerator implements
+  WhereClauseSqlGenerator<QueryData>
 {
 
-  public List<String> withClauses(T queryData, List<QueryNode> alternative,
-    String indent);
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }
