@@ -24,6 +24,6 @@ public interface SqlGenerator<QueryType, ResultType> extends ResultSetExtractor<
 
 	String toSql(QueryType queryData);
 	
-	String toSql(QueryType queryData, int indentBy);
+	String toSql(QueryType queryData, String indent);
 
 }

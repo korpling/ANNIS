@@ -48,13 +48,11 @@ public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
 		StringBuffer sb = new StringBuffer();
 		
-		indent(sb, indent);
-		sb.append("(\n");
-		indent(sb, indent);
-		int indentBy = indent.length() / 2 + 2;
-		sb.append(findSqlGenerator.toSql(queryData, indentBy));
-		indent(sb, indent + TABSTOP);
-		sb.append(") AS solutions");
+		sb.append(indent).append("(\n");
+    
+		sb.append(indent).append(TABSTOP);
+		sb.append(findSqlGenerator.toSql(queryData, indent + TABSTOP));
+		sb.append(indent).append(TABSTOP).append(") AS solutions");
 		
 		return sb.toString();
 	}

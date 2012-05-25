@@ -79,7 +79,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   
   public SearchWindow(PluginSystem ps)
   {
-    super("Annis² Corpus Search");
+    super("ANNIS Corpus Search");
     this.ps = ps;
     setName("search");
 
@@ -96,7 +96,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     addComponent(panelToolbar);
     panelToolbar.addStyleName("toolbar");
 
-    Button btAboutAnnis = new Button("About Annis");
+    Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
     btAboutAnnis.addListener(new Button.ClickListener()
     {
@@ -104,7 +104,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About Annis", new AboutPanel(getApplication()));
+        Window w = new Window("About ANNIS", new AboutPanel(getApplication()));
         w.setModal(true);
         w.setResizable(false);
         addWindow(w);

@@ -55,7 +55,7 @@ public class AboutPanel extends Panel
     logo.setType(Embedded.TYPE_IMAGE);
         
     addComponent(logo);
-    addComponent(new Label("Annis is a project of the "
+    addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     addComponent(new Label("Homepage: "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/d1/annis/\">"

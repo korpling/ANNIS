@@ -44,13 +44,13 @@ public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<
 {
 
 	// corpusList, documents
-	public String toSql(QueryData queryData, int indentBy) {
+  @Override
+	public String toSql(QueryData queryData, String indent) {
 		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 		
-		String indent = computeIndent(indentBy);
 		StringBuffer sb = new StringBuffer();
 		
-		indent(sb, indent);
+		sb.append(indent);
 		List<String> alternatives = new ArrayList<String>();
 		for (List<QueryNode> alternative : queryData.getAlternatives()) {
 			alternatives.add(createSqlForAlternative(queryData, alternative, indent));

@@ -64,7 +64,7 @@ public class ApAnnotationConditionProvider implements
         || tm == TextMatching.REGEXP_NOT_EQUAL)
       {
         sbFunc.append("Regex");
-        params.add("'^" + annotation.getValue() + "$'");
+        params.add("'^(" + annotation.getValue() + ")$'");
       }
       else
       {

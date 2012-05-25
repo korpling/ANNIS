@@ -522,7 +522,7 @@ public class DddQueryMapper {
 	private InternalMapper internalMapper;
 
 	public String translate(String annisQuery) throws AnnisQLSemanticsException {
-		log.debug("translating Annis QL query: " + annisQuery);
+		log.debug("translating ANNIS QL query: " + annisQuery);
 
 		Start statement = getAnnisParser().parse(annisQuery);
 		

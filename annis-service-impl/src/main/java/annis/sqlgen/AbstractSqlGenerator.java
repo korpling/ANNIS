@@ -30,225 +30,283 @@ import annis.ql.parser.QueryData;
 /**
  * Abstract base class for a complete SQL statement.
  *
- * A SQL statement consists of a mandatory SELECT and FROM clauses
- * and optional WHERE, GROUP BY, ORDER BY and LIMIT/OFFSET clauses.
- * The individual clauses are generated using helper classes which
- * are specified by properties.
+ * A SQL statement consists of a mandatory SELECT and FROM clauses and optional
+ * WHERE, GROUP BY, ORDER BY and LIMIT/OFFSET clauses. The individual clauses
+ * are generated using helper classes which are specified by properties.
  *
  * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
 public abstract class AbstractSqlGenerator<T>
-	extends TableAccessStrategyFactory
-	implements SqlGenerator<QueryData, T> {
+  extends TableAccessStrategyFactory
+  implements SqlGenerator<QueryData, T>
+{
 
-	// generators for different SQL statement clauses
-	private WithClauseSqlGenerator withClauseSqlGenerator;
-	private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
-	private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators;
-	private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators;
-	private GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator;
-	private OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator;
-	private LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator;
-
-	// controls indentation
-	public final static String TABSTOP = "  ";
-
-	@Override
-	public String toSql(QueryData queryData) {
-		return toSql(queryData, 0);
-	}
+  // generators for different SQL statement clauses
+  private WithClauseSqlGenerator<QueryData> withClauseSqlGenerator;
+  private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
+  private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators;
+  private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators;
+  private GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator;
+  private OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator;
+  private LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator;
+  // controls indentation
+  public final static String TABSTOP = "  ";
 
   @Override
-	public String toSql(QueryData queryData, int indentBy) {
-		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
+  public String toSql(QueryData queryData)
+  {
+    return toSql(queryData, "");
+  }
 
-		// push alternative down
-		List<QueryNode> alternative = queryData.getAlternatives().get(0);
+  @Override
+  public String toSql(QueryData queryData, String indent)
+  {
+    Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 
-		String indent = computeIndent(indentBy);
-		StringBuffer sb = new StringBuffer();
-		indent(sb, indent);
-		sb.append(createSqlForAlternative(queryData, alternative, indent));
-		appendOrderByClause(sb, queryData, alternative, indent);
-		appendLimitOffsetClause(sb, queryData, alternative, indent);
-		return sb.toString();
-	}
+    // push alternative down
+    List<QueryNode> alternative = queryData.getAlternatives().get(0);
 
-	protected String createSqlForAlternative(QueryData queryData,
-			List<QueryNode> alternative, String indent) {
-		StringBuffer sb = new StringBuffer();
-		appendSelectClause(sb, queryData, alternative, indent);
-		appendFromClause(sb, queryData, alternative, indent);
-		appendWhereClause(sb, queryData, alternative, indent);
-		appendGroupByClause(sb, queryData, alternative, indent);
-		return sb.toString();
-	}
+    StringBuffer sb = new StringBuffer();
+    sb.append(indent);
+    sb.append(createSqlForAlternative(queryData, alternative, indent));
+    appendOrderByClause(sb, queryData, alternative, indent);
+    appendLimitOffsetClause(sb, queryData, alternative, indent);
+    return sb.toString();
+  }
 
-	protected String computeIndent(int indentBy) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < indentBy; ++i) {
-			sb.append(TABSTOP);
-		}
-		return sb.toString();
-	}
+  protected String createSqlForAlternative(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    StringBuffer sb = new StringBuffer();
+    appendWithClause(sb, queryData, alternative, indent);
+    appendSelectClause(sb, queryData, alternative, indent);
+    appendFromClause(sb, queryData, alternative, indent);
+    appendWhereClause(sb, queryData, alternative, indent);
+    appendGroupByClause(sb, queryData, alternative, indent);
+    return sb.toString();
+  }
 
-	protected void indent(StringBuffer sb, String indent) {
-		sb.append(indent);
-	}
+  protected String computeIndent(int indentBy)
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < indentBy; ++i)
+    {
+      sb.append(TABSTOP);
+    }
+    return sb.toString();
+  }
 
-	protected void indent(StringBuilder sb, String indent) {
-		sb.append(indent);
-	}
+  private void appendWithClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    if (withClauseSqlGenerator != null)
+    {
+      List<String> clauses = withClauseSqlGenerator.withClauses(queryData,
+        alternative, indent);
 
-	private void appendSelectClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		sb.append("SELECT ");
-		sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative, indent));
-		sb.append("\n");
-	}
+      if (!clauses.isEmpty())
+      {
+        sb.append(indent).append("WITH\n");
+        sb.append(StringUtils.join(clauses, ",\n"));
+        sb.append("\n");
+      }
+    }
+  }
 
-	private void appendFromClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		indent(sb, indent);
-		sb.append("FROM");
-		List<String> fromTables = new ArrayList<String>();
-		for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators) {
-			fromTables.add(generator.fromClause(queryData, alternative, indent));
-		}
-		sb.append("\n");
-		indent(sb, indent + TABSTOP);
-		sb.append(StringUtils.join(fromTables, ",\n" + indent + TABSTOP));
-		sb.append("\n");
-	}
+  private void appendSelectClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    sb.append("SELECT ");
+    sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative,
+      indent));
+    sb.append("\n");
+  }
 
-	private void appendWhereClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
+  private void appendFromClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    sb.append(indent);
+    sb.append("FROM");
+    List<String> fromTables = new ArrayList<String>();
+    for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators)
+    {
+      fromTables.add(generator.fromClause(queryData, alternative, indent));
+    }
+    sb.append("\n");
+    sb.append(indent).append(TABSTOP);
+    sb.append(StringUtils.join(fromTables, ",\n" + indent + TABSTOP));
+    sb.append("\n");
+  }
 
-		// treat each condition as mutable string to remove last AND
-		List<StringBuffer> conditions = new ArrayList<StringBuffer>();
-		for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators) {
-			Set<String> whereConditions = generator.whereConditions(queryData, alternative, indent);
-			for (String constraint : whereConditions)
-				conditions.add(new StringBuffer(constraint));
-		}
+  private void appendWhereClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
 
-		// sort conditions, group by accessed table alias
-		Collections.sort(conditions, new Comparator<StringBuffer>() {
+    // treat each condition as mutable string to remove last AND
+    List<StringBuffer> conditions = new ArrayList<StringBuffer>();
+    for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators)
+    {
+      Set<String> whereConditions = generator.whereConditions(queryData,
+        alternative, indent);
+      for (String constraint : whereConditions)
+      {
+        conditions.add(new StringBuffer(constraint));
+      }
+    }
 
-			@Override
-			public int compare(StringBuffer o1, StringBuffer o2) {
-				if (o1 == null && o2 == null)
-					return 0;
-				if (o1 == null && o2 != null)
-					return -1;
-				if (o1 != null && o2 == null)
-					return 1;
-				return o1.toString().compareTo(o2.toString());
-			}
+    // sort conditions, group by accessed table alias
+    Collections.sort(conditions, new Comparator<StringBuffer>()
+    {
 
-		});
+      @Override
+      public int compare(StringBuffer o1, StringBuffer o2)
+      {
+        if (o1 == null && o2 == null)
+        {
+          return 0;
+        }
+        if (o1 == null && o2 != null)
+        {
+          return -1;
+        }
+        if (o1 != null && o2 == null)
+        {
+          return 1;
+        }
+        return o1.toString().compareTo(o2.toString());
+      }
+    });
 
-		// no conditions in WHERE clause? break out
-		if (conditions.isEmpty())
-			return;
+    // no conditions in WHERE clause? break out
+    if (conditions.isEmpty())
+    {
+      return;
+    }
 
-		// append WHERE clause to query
-		indent(sb, indent);
-		sb.append("WHERE");
-		sb.append("\n");
-		indent(sb, indent + TABSTOP);
-		sb.append(StringUtils.join(conditions, " AND\n" + indent + TABSTOP));
-		sb.append("\n");
-	}
+    // append WHERE clause to query
+    sb.append(indent);
+    sb.append("WHERE");
+    sb.append("\n");
+    sb.append(indent).append(TABSTOP);
+    sb.append(StringUtils.join(conditions, " AND\n" + indent + TABSTOP));
+    sb.append("\n");
+  }
 
-	private void appendGroupByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		if (groupByClauseSqlGenerator != null) {
-			indent(sb, indent);
-			sb.append("GROUP BY ");
-			sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData, alternative));
-			sb.append("\n");
-		}
-	}
+  private void appendGroupByClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    if (groupByClauseSqlGenerator != null)
+    {
+      sb.append(indent);
+      sb.append("GROUP BY ");
+      sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData,
+        alternative));
+      sb.append("\n");
+    }
+  }
 
-	protected void appendOrderByClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		if (orderByClauseSqlGenerator != null) {
-			indent(sb, indent);
-			sb.append("ORDER BY ");
-			sb.append(orderByClauseSqlGenerator.orderByClause(queryData, alternative, indent));
-			sb.append("\n");
-		}
-	}
+  protected void appendOrderByClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    if (orderByClauseSqlGenerator != null)
+    {
+      sb.append(indent);
+      sb.append("ORDER BY ");
+      sb.append(orderByClauseSqlGenerator.orderByClause(queryData, alternative,
+        indent));
+      sb.append("\n");
+    }
+  }
 
-	protected void appendLimitOffsetClause(StringBuffer sb, QueryData queryData, List<QueryNode> alternative, String indent) {
-		if (limitOffsetClauseSqlGenerator != null) {
-			indent(sb, indent);
-			sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData, alternative, indent));
-			sb.append("\n");
-		}
-	}
+  protected void appendLimitOffsetClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    if (limitOffsetClauseSqlGenerator != null)
+    {
+      sb.append(indent);
+      sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData,
+        alternative, indent));
+      sb.append("\n");
+    }
+  }
 
-	///// Getter / Setter
+  ///// Getter / Setter
+  public List<FromClauseSqlGenerator<QueryData>> getFromClauseSqlGenerators()
+  {
+    return fromClauseSqlGenerators;
+  }
 
-	public List<FromClauseSqlGenerator<QueryData>> getFromClauseSqlGenerators() {
-		return fromClauseSqlGenerators;
-	}
+  public void setFromClauseSqlGenerators(
+    List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators)
+  {
+    this.fromClauseSqlGenerators = fromClauseSqlGenerators;
+  }
 
-	public void setFromClauseSqlGenerators(
-			List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators) {
-		this.fromClauseSqlGenerators = fromClauseSqlGenerators;
-	}
+  public List<WhereClauseSqlGenerator<QueryData>> getWhereClauseSqlGenerators()
+  {
+    return whereClauseSqlGenerators;
+  }
 
-	public List<WhereClauseSqlGenerator<QueryData>> getWhereClauseSqlGenerators() {
-		return whereClauseSqlGenerators;
-	}
+  public void setWhereClauseSqlGenerators(
+    List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators)
+  {
+    this.whereClauseSqlGenerators = whereClauseSqlGenerators;
+  }
 
-	public void setWhereClauseSqlGenerators(
-			List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators) {
-		this.whereClauseSqlGenerators = whereClauseSqlGenerators;
-	}
+  public GroupByClauseSqlGenerator<QueryData> getGroupByClauseSqlGenerator()
+  {
+    return groupByClauseSqlGenerator;
+  }
 
-	public GroupByClauseSqlGenerator<QueryData> getGroupByClauseSqlGenerator() {
-		return groupByClauseSqlGenerator;
-	}
+  public void setGroupByClauseSqlGenerator(
+    GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator)
+  {
+    this.groupByClauseSqlGenerator = groupByClauseSqlGenerator;
+  }
 
-	public void setGroupByClauseSqlGenerator(
-			GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator) {
-		this.groupByClauseSqlGenerator = groupByClauseSqlGenerator;
-	}
+  public WithClauseSqlGenerator getWithClauseSqlGenerator()
+  {
+    return withClauseSqlGenerator;
+  }
 
-	public WithClauseSqlGenerator getWithClauseSqlGenerator() {
-		return withClauseSqlGenerator;
-	}
+  public void setWithClauseSqlGenerator(
+    WithClauseSqlGenerator withClauseSqlGenerator)
+  {
+    this.withClauseSqlGenerator = withClauseSqlGenerator;
+  }
 
-	public void setWithClauseSqlGenerator(
-			WithClauseSqlGenerator withClauseSqlGenerator) {
-		this.withClauseSqlGenerator = withClauseSqlGenerator;
-	}
+  public SelectClauseSqlGenerator<QueryData> getSelectClauseSqlGenerator()
+  {
+    return selectClauseSqlGenerator;
+  }
 
-	public SelectClauseSqlGenerator<QueryData> getSelectClauseSqlGenerator() {
-		return selectClauseSqlGenerator;
-	}
+  public void setSelectClauseSqlGenerator(
+    SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator)
+  {
+    this.selectClauseSqlGenerator = selectClauseSqlGenerator;
+  }
 
-	public void setSelectClauseSqlGenerator(
-			SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator) {
-		this.selectClauseSqlGenerator = selectClauseSqlGenerator;
-	}
+  public OrderByClauseSqlGenerator<QueryData> getOrderByClauseSqlGenerator()
+  {
+    return orderByClauseSqlGenerator;
+  }
 
-	public OrderByClauseSqlGenerator<QueryData> getOrderByClauseSqlGenerator() {
-		return orderByClauseSqlGenerator;
-	}
+  public void setOrderByClauseSqlGenerator(
+    OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator)
+  {
+    this.orderByClauseSqlGenerator = orderByClauseSqlGenerator;
+  }
 
-	public void setOrderByClauseSqlGenerator(
-			OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator) {
-		this.orderByClauseSqlGenerator = orderByClauseSqlGenerator;
-	}
+  public LimitOffsetClauseSqlGenerator<QueryData> getLimitOffsetClauseSqlGenerator()
+  {
+    return limitOffsetClauseSqlGenerator;
+  }
 
-	public LimitOffsetClauseSqlGenerator<QueryData> getLimitOffsetClauseSqlGenerator() {
-		return limitOffsetClauseSqlGenerator;
-	}
-
-	public void setLimitOffsetClauseSqlGenerator(
-			LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator) {
-		this.limitOffsetClauseSqlGenerator = limitOffsetClauseSqlGenerator;
-	}
-
+  public void setLimitOffsetClauseSqlGenerator(
+    LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator)
+  {
+    this.limitOffsetClauseSqlGenerator = limitOffsetClauseSqlGenerator;
+  }
 }

@@ -35,21 +35,15 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   }
 
   @Override
-  public String toSql(QueryData queryData, int indentBy)
+  public String toSql(QueryData queryData, String indent)
   {
     StringBuilder sb = new StringBuilder();
 
-    String indent = computeIndent(indentBy);
+    sb.append(indent).append("SELECT row_number() OVER () as n, inn.*\n");
+    sb.append(indent).append("FROM (\n");
 
-    indent(sb, indent);
-    sb.append("SELECT row_number() OVER () as n, inn.*");
-    indent(sb, indent);
-    sb.append("FROM (\n");
-
-    sb.append(super.toSql(queryData, indentBy + 1));
-    sb.append("\n");
-    indent(sb, indent);
-    sb.append(") AS inn\n");
+    sb.append(super.toSql(queryData, indent + TABSTOP)).append("\n");
+    sb.append(indent).append(") AS inn\n");
 
     return sb.toString();
   }

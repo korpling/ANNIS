@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
  */
 package annis.sqlgen;
 
-// FIXME: Wird der WithClauseSqlGenerator noch benötigt
-
 import annis.model.QueryNode;
 import java.util.List;
 
-// Korpus-Selektion mit WITH-Clause hat nicht funktioniert
 public interface WithClauseSqlGenerator<T>
 {
 
