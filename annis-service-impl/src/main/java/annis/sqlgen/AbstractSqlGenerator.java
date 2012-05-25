@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,18 @@ import annis.ql.parser.QueryData;
 
 /**
  * Abstract base class for a complete SQL statement.
- * 
- * A SQL statement consists of a mandatory SELECT and FROM clauses 
- * and optional WHERE, GROUP BY, ORDER BY and LIMIT/OFFSET clauses. 
- * The individual clauses are generated using helper classes which 
+ *
+ * A SQL statement consists of a mandatory SELECT and FROM clauses
+ * and optional WHERE, GROUP BY, ORDER BY and LIMIT/OFFSET clauses.
+ * The individual clauses are generated using helper classes which
  * are specified by properties.
- * 
+ *
  * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
 public abstract class AbstractSqlGenerator<T>
-	extends TableAccessStrategyFactory 
+	extends TableAccessStrategyFactory
 	implements SqlGenerator<QueryData, T> {
 
 	// generators for different SQL statement clauses
@@ -59,11 +59,11 @@ public abstract class AbstractSqlGenerator<T>
 	public String toSql(QueryData queryData) {
 		return toSql(queryData, 0);
 	}
-	
+
   @Override
 	public String toSql(QueryData queryData, int indentBy) {
 		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
-		
+
 		// push alternative down
 		List<QueryNode> alternative = queryData.getAlternatives().get(0);
 
@@ -93,7 +93,7 @@ public abstract class AbstractSqlGenerator<T>
 		}
 		return sb.toString();
 	}
-	
+
 	protected void indent(StringBuffer sb, String indent) {
 		sb.append(indent);
 	}
@@ -150,7 +150,7 @@ public abstract class AbstractSqlGenerator<T>
 		// no conditions in WHERE clause? break out
 		if (conditions.isEmpty())
 			return;
-		
+
 		// append WHERE clause to query
 		indent(sb, indent);
 		sb.append("WHERE");

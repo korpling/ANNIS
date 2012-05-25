@@ -23,11 +23,12 @@ import java.util.List;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class GraphFromSqlGenerator implements FromClauseSqlGenerator<QueryData>
+public class GraphWithClauseGenerator implements
+  WithClauseSqlGenerator<QueryData>
 {
 
   @Override
-  public String fromClause(QueryData queryData,
+  public List<String> withClauses(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
     throw new UnsupportedOperationException("Not supported yet.");
