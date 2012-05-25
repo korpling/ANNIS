@@ -200,14 +200,10 @@ public abstract class AnnotateSqlGenerator<T>
         // token index based method 
         StringBuilder sb = new StringBuilder();
         
-        sb.append(indent).append("solution AS\n");
+        sb.append(indent).append("solutions AS\n");
         sb.append(indent).append("(\n");
-
-        sb.append(indent).append(TABSTOP).append("SELECT ");
-        
-        // TODO
-        
-        sb.append("\n)\n");
+        sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+        sb.append("\n").append(indent).append(")\n");
         
         result.add(sb.toString());
       }
@@ -216,6 +212,7 @@ public abstract class AnnotateSqlGenerator<T>
         // segmentation layer based method
         
         // TODO
+        throw new NotImplementedException("Sorry, segmentation layers are not supported yet as context");
       }
     }
     
@@ -230,7 +227,7 @@ public abstract class AnnotateSqlGenerator<T>
   {
     TableAccessStrategy tables = tables(null);
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     // restrict node table to corpus list
     List<Long> corpusList = queryData.getCorpusList();

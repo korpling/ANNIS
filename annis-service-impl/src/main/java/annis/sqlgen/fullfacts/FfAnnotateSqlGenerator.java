@@ -146,10 +146,7 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     StringBuffer sb = new StringBuffer();
 
-    sb.append(indent).append("(\n");
-    
-    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indent +  TABSTOP));
-    sb.append(indent).append(TABSTOP).append(") AS solutions,\n");
+    sb.append(indent).append("solutions,\n");
 
     // really ugly
     sb.append(indent).append(TABSTOP).append(
