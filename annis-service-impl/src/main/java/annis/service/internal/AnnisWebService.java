@@ -217,10 +217,16 @@ public class AnnisWebService
   @GET
   @Path("subgraphs")
   @Produces("application/xml")
-  public SaltProject subgraph(@QueryParam("q") String saltIDs)
+  public SaltProject subgraph(@QueryParam("q") String saltIDs,
+    @DefaultValue("5") @QueryParam("left") String leftRaw,
+    @DefaultValue("5") @QueryParam("right") String rightRaw)
   {
     String[] ids = null;
     List<URI> saltURI = new ArrayList<URI>();
+    QueryData data = new QueryData();
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+    data.addExtension(new AnnotateQueryData(left, right));
 
     // some robustness stuff
     if (saltIDs == null)
@@ -256,7 +262,8 @@ public class AnnisWebService
       }
     }
 
-    return annisDao.graph(saltURI);
+    data.addExtension(saltURI);
+    return annisDao.graph(data);
   }
 
   @GET

@@ -69,11 +69,12 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with
    * {@link AnnisDao#find(annis.ql.parser.QueryData)
-   * 
-   * @param saltIDs
+   *
+   * @param queryData should include an extensions with a {@code List<URI>}
+   * object
    * @return a salt graph
    */
-  SaltProject graph(List<URI> saltIDs);
+  SaltProject graph(QueryData queryData);
 
   SaltProject annotate(QueryData queryData);
 

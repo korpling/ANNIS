@@ -82,7 +82,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private Map<Long, String> corpusNamesById;
 
   @Override
-  public SaltProject graph(List<URI> saltIDs)
+  public SaltProject graph(QueryData data)
   {
     throw new UnsupportedOperationException("Not supported yet.");
   }
@@ -209,7 +209,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     // oder nur an annotate-Queries?
 
     queryData.setCorpusConfiguration(corpusConfiguration);
-    
+
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
