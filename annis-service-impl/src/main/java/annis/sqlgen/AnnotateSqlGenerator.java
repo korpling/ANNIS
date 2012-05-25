@@ -200,7 +200,7 @@ public abstract class AnnotateSqlGenerator<T>
         // token index based method 
         StringBuilder sb = new StringBuilder();
         
-        sb.append(indent).append("WITH solution AS\n");
+        sb.append(indent).append("solution AS\n");
         sb.append(indent).append("(\n");
 
         sb.append(indent).append(TABSTOP).append("SELECT ");
