@@ -15,8 +15,11 @@
  */
 package annis.sqlgen;
 
-// FIXME: Wird der WithClauseSqlGenerator noch benötigt
-// Korpus-Selektion mit WITH-Clause hat nicht funktioniert
-public interface WithClauseSqlGenerator {
+import annis.model.QueryNode;
+import java.util.List;
 
+public interface WithClauseSqlGenerator<T> 
+{
+  
+  public List<String> withClauses(T queryData, List<QueryNode> alternative, String indent);
 }

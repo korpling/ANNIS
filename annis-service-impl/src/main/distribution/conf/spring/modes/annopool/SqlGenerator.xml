@@ -281,6 +281,7 @@ limitations under the License.
         <ref bean="annotateSqlGenerator" />
       </util:list>
     </property>
+    
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
