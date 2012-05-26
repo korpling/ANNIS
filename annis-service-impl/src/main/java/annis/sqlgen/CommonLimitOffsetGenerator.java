@@ -44,7 +44,7 @@ public class CommonLimitOffsetGenerator implements
     
     if (limit != null)
     {
-      sb.append("LIMIT ").append(limit);
+      sb.append("LIMIT ").append(limit).append(" ");
     }
     
     if (offset != null){

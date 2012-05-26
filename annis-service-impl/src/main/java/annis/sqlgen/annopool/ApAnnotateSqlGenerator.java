@@ -44,7 +44,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     List<Long> corpusList = queryData.getCorpusList();
     StringBuffer sb = new StringBuffer();
     
-    sb.append(indent).append(TABSTOP).append("solutions,\n");
+    sb.append(indent).append("solutions,\n");
 
     sb.append(indent).append(TABSTOP);
     // really ugly

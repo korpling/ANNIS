@@ -263,7 +263,6 @@ limitations under the License.
 
     <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
-    <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 

@@ -62,7 +62,6 @@ public abstract class AnnotateSqlGenerator<T>
   private AnnotateInnerQuerySqlGenerator innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy outerQueryTableAccessStrategy;
-  private boolean optimizeOverlap;
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
@@ -203,13 +202,43 @@ public abstract class AnnotateSqlGenerator<T>
         sb.append(indent).append("solutions AS\n");
         sb.append(indent).append("(\n");
         sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
-        sb.append("\n").append(indent).append(")\n");
+        sb.append("\n").append(indent).append(")");
         
         result.add(sb.toString());
       }
       else
       {
         // segmentation layer based method
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(indent).append("matchednode AS\n");
+        sb.append(indent).append("(\n");
+        sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+        sb.append("\n").append(indent).append(")\n");
+        result.add(sb.toString());
+        
+        String indent2 = indent + TABSTOP;
+        String indent3 = indent2 + TABSTOP;
+        
+        sb = new StringBuilder();
+        sb.append(indent).append("coveredseg AS\n");
+        sb.append(indent).append("(\n");
+       
+        sb.append(indent2)
+          .append("SELECT m.key, m.n, f.seg_left - ")
+          .append(annoQueryData.getLeft())
+          .append(" AS min, f.seg_right + ")
+          .append(annoQueryData.getRight())
+          .append(" AS max, f.text_ref AS text_ref\n");
+        
+        sb.append(indent2).append("FROM facts as f, solutions AS m\n");
+        sb.append(indent2).append("WHERE\n");
+        sb.append(indent3).append("f.toplevel_corpus IN (")
+          .append(StringUtils.join(queryData.getCorpusList(), ","))
+          .append(") AND");
+        
+        sb.append(indent).append(")\n");
         
         // TODO
         throw new NotImplementedException("Sorry, segmentation layers are not supported yet as context");
@@ -257,34 +286,21 @@ public abstract class AnnotateSqlGenerator<T>
       getMostRestrictivePolicy(corpusList, corpusProperties);
     if (islandsPolicy == IslandPolicies.context)
     {
-      sb.append(indent).append("(\n");
+      sb.append(indent).append(TABSTOP).append("(\n");
       
-      sb.append(indent).append(TABSTOP).append(TABSTOP);
       List<String> overlapForOneSpan = new ArrayList<String>();
       for (int i = 1; i <= alternative.size(); ++i)
       {
 
-        StringBuffer sb2 = new StringBuffer();
-
-        sb2.append("(\n");
-        sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
-        
-        sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")).
-          append(" = solutions.text").append(i).append(" AND\n");
-        sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
-
         String rangeMin = "solutions.min" + i;
         String rangeMax = "solutions.max" + i;
 
-        sb2.append(overlapForOneRange(indent + TABSTOP + TABSTOP,
-          rangeMin, rangeMax, tables));
-        sb2.append("\n");
-        sb.append(indent).append(TABSTOP).append(TABSTOP);
-        sb2.append(")");
-        overlapForOneSpan.add(sb2.toString());
+        overlapForOneSpan.add(overlapForOneRange(indent + TABSTOP + TABSTOP,
+          rangeMin, rangeMax, "solutions.text" + i, 
+          tables));
       }
       sb.append(StringUtils.join(overlapForOneSpan,
-        " OR "));
+        "\n" + indent + TABSTOP + TABSTOP + "OR\n"));
       sb.append("\n");
       sb.append(indent).append(TABSTOP);
       sb.append(")");
@@ -292,16 +308,6 @@ public abstract class AnnotateSqlGenerator<T>
     else
     {
       sb.append(indent);
-      sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
-      sb.append(" IN (");
-      List<String> solutionTexts = new ArrayList<String>();
-      for (int i = 1; i <= alternative.size(); ++i)
-      {
-        solutionTexts.add("solutions.text" + i);
-      }
-      sb.append(StringUtils.join(solutionTexts, ", "));
-      sb.append(") AND\n");
-      sb.append(indent).append(TABSTOP);
 
       StringBuilder minSb = new StringBuilder();
       StringBuilder maxSb = new StringBuilder();
@@ -309,10 +315,12 @@ public abstract class AnnotateSqlGenerator<T>
       maxSb.append("ANY(ARRAY[");
       List<String> mins = new ArrayList<String>();
       List<String> maxs = new ArrayList<String>();
+      List<String> solutionTexts = new ArrayList<String>();
       for (int i = 1; i <= alternative.size(); ++i)
       {
         mins.add("solutions.min" + i);
         maxs.add("solutions.max" + i);
+        solutionTexts.add("solutions.text"+i);
       }
       minSb.append(StringUtils.join(mins, ", "));
       maxSb.append(StringUtils.join(maxs, ", "));
@@ -320,7 +328,8 @@ public abstract class AnnotateSqlGenerator<T>
       maxSb.append("])");
       String rangeMin = minSb.toString();
       String rangeMax = maxSb.toString();
-      sb.append(overlapForOneRange(indent, rangeMin, rangeMax, tables));
+      sb.append(overlapForOneRange(indent + TABSTOP, rangeMin, rangeMax,
+        "ANY(ARRAY[" + StringUtils.join(solutionTexts, ",") + "])", tables));
     }
 
     // corpus constriction
@@ -338,52 +347,24 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   private String overlapForOneRange(String indent,
-    String rangeMin, String rangeMax, TableAccessStrategy tables)
+    String rangeMin, String rangeMax, String textRef, TableAccessStrategy tables)
   {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
-    sb.append("(\n");
-    sb.append(indent).append(TABSTOP).append(TABSTOP);
-    if (optimizeOverlap)
-    {
-      sb.append("(");
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "left_token")).append(" >= ").append(rangeMin);
-      sb.append(" AND ");
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "right_token")).append(" <= ").append(rangeMax);
-      sb.append(") OR\n");
-      sb.append(indent).append(TABSTOP).append(TABSTOP);
-      sb.append("(");
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "left_token")).append(" <= ").append(rangeMin);
-      sb.append(" AND ");
-      sb.append(rangeMin).append(" <= ").append(tables.aliasedColumn(NODE_TABLE,
-        "right_token"));
-      sb.append(") OR\n");
-      sb.append(indent).append(TABSTOP).append(TABSTOP);
-      sb.append("(");
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "left_token")).append(" <= ").append(rangeMax);
-      sb.append(" AND ");
-      sb.append(rangeMax).append(" <= ").append(tables.aliasedColumn(NODE_TABLE,
-        "right_token"));
-      sb.append(")");
-    }
-    else
-    {
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "left_token")).append(" <= ").append(rangeMax);
-      sb.append(" AND ");
-      sb.append(tables.aliasedColumn(
-        NODE_TABLE, "right_token")).append(" >= ").append(rangeMin);
-    }
-    sb.append("\n");
-    sb.append(indent).append(TABSTOP);
+    sb.append(indent).append("(");
+
+    sb.append(tables.aliasedColumn(NODE_TABLE, "left_token"))
+      .append(" <= ").append(rangeMax).append(" AND ")
+      .append(tables.aliasedColumn(NODE_TABLE, "right_token"))
+      .append(" >= ").append(rangeMin)
+      .append(" AND ")
+      .append(tables.aliasedColumn(NODE_TABLE, "text_ref"))
+      .append(" = ").append(textRef)
+     ;
+
     sb.append(")");
 
-    String overlapForOneRange = sb.toString();
-    return overlapForOneRange;
+    return sb.toString();
   }
 
   @Override
@@ -431,16 +412,6 @@ public abstract class AnnotateSqlGenerator<T>
     this.tableJoinsInFromClauseSqlGenerator = tableJoinsInFromClauseSqlGenerator;
   }
 
-  public boolean isOptimizeOverlap()
-  {
-    return optimizeOverlap;
-  }
-
-  public void setOptimizeOverlap(boolean optimizeOverlap)
-  {
-    this.optimizeOverlap = optimizeOverlap;
-  }
-
   public TableAccessStrategy getOuterQueryTableAccessStrategy()
   {
     return outerQueryTableAccessStrategy;
@@ -477,6 +448,7 @@ public abstract class AnnotateSqlGenerator<T>
     this.corpusPathExtractor = corpusPathExtractor;
   }
 
+  @Override
   public void setOuterQueryTableAccessStrategy(
     TableAccessStrategy outerQueryTableAccessStrategy)
   {

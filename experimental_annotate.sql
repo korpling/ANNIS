@@ -31,13 +31,9 @@ coveredseg AS
 	WHERE 
     f.toplevel_corpus IN (3) AND
 		(
-			((f.right_token BETWEEN m.left_token1 AND m.right_token1) AND f.text_ref = m.text1)
-			OR
-			((f.left_token BETWEEN m.left_token1 AND m.right_token1) AND f.text_ref = m.text1)
-			OR
-      ((f.right_token BETWEEN m.left_token2 AND m.right_token2) AND f.text_ref = m.text2)
-			OR
-			((f.left_token BETWEEN m.left_token2 AND m.right_token2) AND f.text_ref = m.text2)
+      (f.left_token <= m.right_token1 AND f.right_token >= m.left_token1 AND f.text_ref = m.text1)
+      OR
+      (f.left_token <= m.right_token2 AND f.right_token >= m.left_token2 AND f.text_ref = m.text2)
 		) AND
 		f.seg_name = 'norm' AND
 		f.n_sample IS true
