@@ -19,7 +19,6 @@ import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -187,6 +185,12 @@ public abstract class AnnotateSqlGenerator<T>
   public List<String> withClauses(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    List<Long> corpusList = queryData.getCorpusList();
+    HashMap<Long, Properties> corpusProperties =
+      queryData.getCorpusConfiguration();
+    IslandPolicies islandsPolicy =
+      getMostRestrictivePolicy(corpusList, corpusProperties);
+    
     List<String> result = new LinkedList<String>();
     
     List<AnnotateQueryData> ext = queryData.getExtensions(AnnotateQueryData.class);
@@ -197,14 +201,17 @@ public abstract class AnnotateSqlGenerator<T>
       if(annoQueryData.getSegmentationLayer() == null)
       {
         // token index based method 
-        StringBuilder sb = new StringBuilder();
         
-        sb.append(indent).append("solutions AS\n");
-        sb.append(indent).append("(\n");
-        sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
-        sb.append("\n").append(indent).append(")");
         
-        result.add(sb.toString());
+        // first get the raw matches
+        result.add(getMatchesWithClause(queryData, indent));
+        
+
+        // break the columns down in a way that every matched node has it's own
+        // row
+        result.add(getSingleEntryWithClause(queryData, islandsPolicy, 
+          alternative, "matches", indent + TABSTOP));
+
       }
       else
       {
@@ -228,9 +235,9 @@ public abstract class AnnotateSqlGenerator<T>
         sb.append(indent2)
           .append("SELECT m.key, m.n, f.seg_left - ")
           .append(annoQueryData.getLeft())
-          .append(" AS min, f.seg_right + ")
+          .append(" AS \"min\", f.seg_right + ")
           .append(annoQueryData.getRight())
-          .append(" AS max, f.text_ref AS text_ref\n");
+          .append(" AS \"max\", f.text_ref AS text_ref\n");
         
         sb.append(indent2).append("FROM facts as f, solutions AS m\n");
         sb.append(indent2).append("WHERE\n");
@@ -246,6 +253,81 @@ public abstract class AnnotateSqlGenerator<T>
     }
     
     return result;
+  }
+  
+  protected String getMatchesWithClause(QueryData queryData, String indent)
+  {
+    StringBuilder sb = new StringBuilder();        
+    sb.append(indent).append("matches AS\n");
+    sb.append(indent).append("(\n");
+    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+    sb.append("\n").append(indent).append(")");
+    
+    return sb.toString();
+  }
+  
+  protected String getSingleEntryWithClause(QueryData queryData, 
+    IslandPolicies islandPolicies,
+    List<QueryNode> alternative, String matchesName, 
+    String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent).append("solutions AS\n");
+    sb.append(indent).append("(\n");
+    
+    String innerIndent = indent + TABSTOP;
+    
+    if(islandPolicies == IslandPolicies.none)
+    {
+      innerIndent = indent + TABSTOP + TABSTOP;
+      sb.append(indent).append("SELECT \"key\", n, id, text, "
+        + "min(\"min\") AS \"min\", "
+        + "max(\"max\") AS \"max\", corpus, name FROM (\n");
+    }
+
+    SolutionKey<?> key = createSolutionKey();
+    TableAccessStrategy tas = createTableAccessStrategy();
+    tas.getTableAliases().put("solutions", matchesName);
+    List<String> keyColumns =
+      key.generateOuterQueryColumns(tas, alternative.size());
+    
+   
+    for(int i=1; i <= alternative.size(); i++)
+    {
+      if(i >= 2)
+      {
+        sb.append(innerIndent)
+          .append("UNION ALL\n");
+      }
+      sb.append(innerIndent)
+      .append("SELECT ")
+      .append(StringUtils.join(keyColumns, ", "))
+      .append(", n, id")
+      .append(i).append(" AS id, text")
+      .append(i).append(" AS text, min")
+      .append(i).append(" AS \"min\", max")
+      .append(i).append(" AS \"max\", corpus")
+      .append(i).append(" AS corpus, name")
+      .append(i).append(" AS \"name\"")
+      .append("FROM ")
+      .append(matchesName)
+      .append("\n");
+
+    } // end for all nodes in query
+    
+    if(islandPolicies == IslandPolicies.none)
+    {
+      sb.append(indent).append(") AS innersolution\n");
+    }
+        
+    if(islandPolicies == IslandPolicies.none)
+    {
+      sb.append(indent).append("GROUP BY id, text, \"key\", n, corpus, name\n");
+    }
+    
+    sb.append(indent).append(")");
+
+    return sb.toString();
   }
   
   
@@ -279,58 +361,13 @@ public abstract class AnnotateSqlGenerator<T>
 
     }
 
-    // island policies
-    HashMap<Long, Properties> corpusProperties =
-      queryData.getCorpusConfiguration();
-    IslandPolicies islandsPolicy =
-      getMostRestrictivePolicy(corpusList, corpusProperties);
-    if (islandsPolicy == IslandPolicies.context)
-    {
-      sb.append(indent).append(TABSTOP).append("(\n");
-      
-      List<String> overlapForOneSpan = new ArrayList<String>();
-      for (int i = 1; i <= alternative.size(); ++i)
-      {
 
-        String rangeMin = "solutions.min" + i;
-        String rangeMax = "solutions.max" + i;
-
-        overlapForOneSpan.add(overlapForOneRange(indent + TABSTOP + TABSTOP,
-          rangeMin, rangeMax, "solutions.text" + i, 
-          tables));
-      }
-      sb.append(StringUtils.join(overlapForOneSpan,
-        "\n" + indent + TABSTOP + TABSTOP + "OR\n"));
-      sb.append("\n");
-      sb.append(indent).append(TABSTOP);
-      sb.append(")");
-    }
-    else
-    {
-      sb.append(indent);
-
-      StringBuilder minSb = new StringBuilder();
-      StringBuilder maxSb = new StringBuilder();
-      minSb.append("ANY(ARRAY[");
-      maxSb.append("ANY(ARRAY[");
-      List<String> mins = new ArrayList<String>();
-      List<String> maxs = new ArrayList<String>();
-      List<String> solutionTexts = new ArrayList<String>();
-      for (int i = 1; i <= alternative.size(); ++i)
-      {
-        mins.add("solutions.min" + i);
-        maxs.add("solutions.max" + i);
-        solutionTexts.add("solutions.text"+i);
-      }
-      minSb.append(StringUtils.join(mins, ", "));
-      maxSb.append(StringUtils.join(maxs, ", "));
-      minSb.append("])");
-      maxSb.append("])");
-      String rangeMin = minSb.toString();
-      String rangeMax = maxSb.toString();
-      sb.append(overlapForOneRange(indent + TABSTOP, rangeMin, rangeMax,
-        "ANY(ARRAY[" + StringUtils.join(solutionTexts, ",") + "])", tables));
-    }
+    String overlap = overlapForOneRange(indent + TABSTOP,
+      "solutions.\"min\"", "solutions.\"max\"", "solutions.text", 
+      tables);
+    sb.append(overlap);
+    sb.append("\n");
+    
 
     // corpus constriction
     sb.append(" AND\n");

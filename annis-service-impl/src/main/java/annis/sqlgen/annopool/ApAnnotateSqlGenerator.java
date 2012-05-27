@@ -42,7 +42,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     TableAccessStrategy tas = createTableAccessStrategy();
     List<Long> corpusList = queryData.getCorpusList();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     
     sb.append(indent).append("solutions,\n");
 
@@ -86,16 +86,10 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     String innerIndent = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
-    SolutionKey<?> key = createSolutionKey();
 
     sb.append("DISTINCT\n");
-    TableAccessStrategy tas = createTableAccessStrategy();
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.size());
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(innerIndent).append(keyColumn).append(",\n");
-    }
+    
+    sb.append(innerIndent).append("\"key\",\n");
     sb.append(innerIndent);
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
@@ -105,7 +99,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 
     List<String> fields = getSelectFields();
 
-    sb.append(innerIndent).append(StringUtils.join(fields, ",\n"));
+    sb.append(innerIndent).append(StringUtils.join(fields, ",\n" + innerIndent));
     sb.append(innerIndent).append(",\n");
 
     // corpus.path_name
