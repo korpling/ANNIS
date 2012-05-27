@@ -280,9 +280,9 @@ public abstract class AnnotateSqlGenerator<T>
     if(islandPolicies == IslandPolicies.none)
     {
       innerIndent = indent + TABSTOP + TABSTOP;
-      sb.append(indent).append("SELECT \"key\", n, id, text, "
+      sb.append(indent).append("SELECT \"key\", n, text, "
         + "min(\"min\") AS \"min\", "
-        + "max(\"max\") AS \"max\", corpus, name FROM (\n");
+        + "max(\"max\") AS \"max\", corpus FROM (\n");
     }
 
     SolutionKey<?> key = createSolutionKey();
@@ -302,13 +302,11 @@ public abstract class AnnotateSqlGenerator<T>
       sb.append(innerIndent)
       .append("SELECT ")
       .append(StringUtils.join(keyColumns, ", "))
-      .append(", n, id")
-      .append(i).append(" AS id, text")
+      .append(", n,  text")
       .append(i).append(" AS text, min")
       .append(i).append(" AS \"min\", max")
       .append(i).append(" AS \"max\", corpus")
-      .append(i).append(" AS corpus, name")
-      .append(i).append(" AS \"name\"")
+      .append(i).append(" AS corpus ")
       .append("FROM ")
       .append(matchesName)
       .append("\n");
@@ -322,7 +320,7 @@ public abstract class AnnotateSqlGenerator<T>
         
     if(islandPolicies == IslandPolicies.none)
     {
-      sb.append(indent).append("GROUP BY id, text, \"key\", n, corpus, name\n");
+      sb.append(indent).append("GROUP BY text, \"key\", n, corpus\n");
     }
     
     sb.append(indent).append(")");

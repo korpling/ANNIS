@@ -89,7 +89,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 
     sb.append("DISTINCT\n");
     
-    sb.append(innerIndent).append("\"key\",\n");
+    sb.append(innerIndent).append("solutions.\"key\",\n");
     sb.append(innerIndent);
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
