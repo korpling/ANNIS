@@ -218,8 +218,8 @@ public abstract class AnnotateSqlGenerator<T>
         result.add(getMatchesWithClause(queryData, indent));
         result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
-        result.add(geSolutionFromCoveredSegWithClause(queryData, annoQueryData,
-          alternative, "coveredseg", indent));
+        result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
+          alternative, islandsPolicy, "coveredseg", indent));
                 
         
         // TODO
@@ -263,9 +263,9 @@ public abstract class AnnotateSqlGenerator<T>
     if(islandPolicies == IslandPolicies.none)
     {
       innerIndent = indent + TABSTOP + TABSTOP;
-      sb.append(indent).append("SELECT \"key\", n, text, "
+      sb.append(indent).append("SELECT min(\"key\") AS key, n, text, "
         + "min(\"min\") AS \"min\", "
-        + "max(\"max\") AS \"max\", corpus FROM (\n");
+        + "max(\"max\") AS \"max\", min(corpus) AS corpus FROM (\n");
     }
 
     SolutionKey<?> key = createSolutionKey();
@@ -303,7 +303,7 @@ public abstract class AnnotateSqlGenerator<T>
         
     if(islandPolicies == IslandPolicies.none)
     {
-      sb.append(indent).append("GROUP BY text, \"key\", n, corpus\n");
+      sb.append(indent).append("GROUP BY text, n\n");
     }
     
     sb.append(indent).append(")");
@@ -321,8 +321,6 @@ public abstract class AnnotateSqlGenerator<T>
     String indent2 = indent + TABSTOP;
     String indent3 = indent2 + TABSTOP;
     String indent4 = indent3 + TABSTOP;
-    
-     // TODO: support "none" island strategy
     
     SolutionKey<?> key = createSolutionKey();
     TableAccessStrategy tas = createTableAccessStrategy();
@@ -378,9 +376,9 @@ public abstract class AnnotateSqlGenerator<T>
   /**
    *  
    */
-  protected String geSolutionFromCoveredSegWithClause(
+  protected String getSolutionFromCoveredSegWithClause(
     QueryData queryData, AnnotateQueryData annoQueryData, 
-    List<QueryNode> alternative, String coveredName, String indent)
+    List<QueryNode> alternative, IslandPolicies islandsPolicy, String coveredName, String indent)
   {
     
     String indent2 = indent + TABSTOP;
@@ -396,11 +394,32 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(indent).append("(\n");
     
     sb.append(indent2)
-      .append("SELECT ").append(coveredName).append(".key AS key, ")
-      .append(coveredName).append(".n AS n, ")
-      .append("facts.left_token AS \"min\", ")
-      .append("facts.right_token AS \"max\", ")
-      .append("facts.text_ref AS \"text\"\n");
+      .append("SELECT ");
+    
+    if(islandsPolicy == IslandPolicies.none)
+    {
+      sb.append("min(")
+        .append(coveredName)
+        .append(".key) AS key, ")
+        .append(coveredName)
+        .append(".n AS n, ")
+        .append("min(facts.left_token) AS \"min\", ")
+        .append("max(facts.right_token) AS \"max\", ")
+        .append("facts.text_ref AS \"text\"\n");
+    }
+    else if(islandsPolicy == IslandPolicies.context)
+    {
+      sb.append(coveredName).append(".key AS key, ")
+        .append(coveredName).append(".n AS n, ")
+        .append("facts.left_token AS \"min\", ")
+        .append("facts.right_token AS \"max\", ")
+        .append("facts.text_ref AS \"text\"\n");
+    }
+    else
+    {
+      throw new NotImplementedException("No implementation for island policy " 
+        + islandsPolicy.toString());
+    }
     
     sb.append(indent2)
       .append("FROM ").append(coveredName).append(", facts\n");
@@ -431,6 +450,12 @@ public abstract class AnnotateSqlGenerator<T>
       .append("facts.seg_right >= ")
       .append(coveredName)
       .append(".\"min\"\n");
+    
+    if(islandsPolicy == IslandPolicies.none)
+    {
+      sb.append(indent2)
+        .append("GROUP BY facts.text_ref, n\n");
+    }
     
     sb.append(indent).append(")\n");
     
