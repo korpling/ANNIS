@@ -186,4 +186,9 @@ public class SearchOptionsPanel extends Panel
 
     return Math.max(0, result);
   }
+  
+  public String getSegmentationLayer()
+  {
+    return (String) cbSegmentation.getValue();
+  }
 }

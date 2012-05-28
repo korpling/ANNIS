@@ -41,14 +41,16 @@ public class AnnisResultQuery implements Serializable
   private String aql;
   private Application app;
   private int contextLeft, contextRight;
+  private String segmentationLayer;
 
   public AnnisResultQuery(Set<String> corpora, String aql, int contextLeft,
-    int contextRight, Application app)
+    int contextRight, String segmentationLayer, Application app)
   {
     this.corpora = corpora;
     this.aql = aql;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
+    this.segmentationLayer = segmentationLayer;
     this.app = app;
   }
 
@@ -74,13 +76,19 @@ public class AnnisResultQuery implements Serializable
       WebResource annisResource = Helper.getAnnisWebResource(app);
       try
       {
-        result = annisResource.path("search").path("annotate")
+        annisResource = annisResource.path("search").path("annotate")
           .queryParam("q", aql)
           .queryParam("limit", "" + count)
           .queryParam("offset", "" + startIndex)
           .queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight)
-          .queryParam("corpora", StringUtils.join(corpora, ","))
-          .get(SaltProject.class);
+          .queryParam("corpora", StringUtils.join(corpora, ","));
+       if(segmentationLayer != null)
+       {
+         annisResource = annisResource.queryParam("seglayer", segmentationLayer);
+         
+       }
+       
+       result = annisResource.get(SaltProject.class);
       }
       catch (UniformInterfaceException ex)
       {

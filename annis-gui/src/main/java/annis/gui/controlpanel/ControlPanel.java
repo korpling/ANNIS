@@ -176,6 +176,7 @@ public class ControlPanel extends Panel
 
       searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
         searchOptions.getLeftContext(), searchOptions.getRightContext(),
+        searchOptions.getSegmentationLayer(),
         searchOptions.getResultsPerPage());
 
 

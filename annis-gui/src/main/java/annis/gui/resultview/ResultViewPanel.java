@@ -55,6 +55,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private String aql;
   private Map<String, AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
+  private String segmentationLayer;
   private AnnisResultQuery query;
   private VerticalLayout layout;
   private Panel scrollPanel;
@@ -64,7 +65,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private TreeMap<String, Boolean> tokenAnnoVisible;
 
   public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
-    int contextLeft, int contextRight, int pageSize,
+    int contextLeft, int contextRight, String segmentationLayer, int pageSize,
     PluginSystem ps)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
@@ -72,6 +73,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.corpora = corpora;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
+    this.segmentationLayer = segmentationLayer;
     this.pageSize = pageSize;
     this.ps = ps;
 
@@ -125,7 +127,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void attach()
   {
     query = new AnnisResultQuery(corpora.keySet(), aql,
-      contextLeft, contextRight, getApplication());
+      contextLeft, contextRight, segmentationLayer, getApplication());
     createPage(0, pageSize);
 
     super.attach();

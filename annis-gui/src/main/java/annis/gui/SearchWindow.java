@@ -337,7 +337,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   }
 
   public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora, int contextLeft,
-    int contextRight, int pageSize)
+    int contextRight, String segmentationLayer, int pageSize)
   {
     // remove old result from view
     if(resultView != null)
@@ -345,7 +345,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       mainTab.removeComponent(resultView);
     }
     resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
-      pageSize, ps);
+      segmentationLayer, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
   }
