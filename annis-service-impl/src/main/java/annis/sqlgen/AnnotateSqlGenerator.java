@@ -202,14 +202,12 @@ public abstract class AnnotateSqlGenerator<T>
       {
         // token index based method 
         
-        
         // first get the raw matches
         result.add(getMatchesWithClause(queryData, indent));
         
-
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSingleEntryWithClause(queryData, islandsPolicy, 
+        result.add(getSolutionFromMatchesWithClause(queryData, islandsPolicy, 
           alternative, "matches", indent + TABSTOP));
 
       }
@@ -217,44 +215,25 @@ public abstract class AnnotateSqlGenerator<T>
       {
         // segmentation layer based method
         
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(indent).append("matchednode AS\n");
-        sb.append(indent).append("(\n");
-        sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
-        sb.append("\n").append(indent).append(")\n");
-        result.add(sb.toString());
-        
-        String indent2 = indent + TABSTOP;
-        String indent3 = indent2 + TABSTOP;
-        
-        sb = new StringBuilder();
-        sb.append(indent).append("coveredseg AS\n");
-        sb.append(indent).append("(\n");
-       
-        sb.append(indent2)
-          .append("SELECT m.key, m.n, f.seg_left - ")
-          .append(annoQueryData.getLeft())
-          .append(" AS \"min\", f.seg_right + ")
-          .append(annoQueryData.getRight())
-          .append(" AS \"max\", f.text_ref AS text_ref\n");
-        
-        sb.append(indent2).append("FROM facts as f, solutions AS m\n");
-        sb.append(indent2).append("WHERE\n");
-        sb.append(indent3).append("f.toplevel_corpus IN (")
-          .append(StringUtils.join(queryData.getCorpusList(), ","))
-          .append(") AND");
-        
-        sb.append(indent).append(")\n");
+        result.add(getMatchesWithClause(queryData, indent));
+        result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
+          "matches", indent));
+        result.add(geSolutionFromCoveredSegWithClause(queryData, annoQueryData,
+          alternative, "coveredseg", indent));
+                
         
         // TODO
-        throw new NotImplementedException("Sorry, segmentation layers are not supported yet as context");
+//        throw new NotImplementedException("Sorry, segmentation layers are not supported yet as context");
       }
     }
     
     return result;
   }
-  
+
+  /** 
+   * Uses the inner SQL generator and provides an ordered and limited view on 
+   * the matches with a match number. 
+   */
   protected String getMatchesWithClause(QueryData queryData, String indent)
   {
     StringBuilder sb = new StringBuilder();        
@@ -266,7 +245,11 @@ public abstract class AnnotateSqlGenerator<T>
     return sb.toString();
   }
   
-  protected String getSingleEntryWithClause(QueryData queryData, 
+  /**
+   * Breaks down the matches table, so that each node of each match has
+   * it's own row.
+   */
+  protected String getSolutionFromMatchesWithClause(QueryData queryData, 
     IslandPolicies islandPolicies,
     List<QueryNode> alternative, String matchesName, 
     String indent)
@@ -328,6 +311,131 @@ public abstract class AnnotateSqlGenerator<T>
     return sb.toString();
   }
   
+  /**
+   * Get with clause for all covered spans of the segmentation layer.
+   */
+  protected String getCoveredSeqWithClause(
+    QueryData queryData, AnnotateQueryData annoQueryData, 
+    List<QueryNode> alternative, String matchesName, String indent)
+  {
+    String indent2 = indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+    String indent4 = indent3 + TABSTOP;
+    
+     // TODO: support "none" island strategy
+    
+    SolutionKey<?> key = createSolutionKey();
+    TableAccessStrategy tas = createTableAccessStrategy();
+    tas.getTableAliases().put("solutions", matchesName);
+    List<String> keyColumns =
+      key.generateOuterQueryColumns(tas, alternative.size());
+    
+    TableAccessStrategy tables = tables(null);
+    
+    StringBuilder sb = new StringBuilder();
+        sb.append(indent).append("coveredseg AS\n");
+    sb.append(indent).append("(\n");
+
+    sb.append(indent2).append("SELECT ");
+    for(String k : keyColumns)
+    {
+      sb.append(k);
+    }
+    sb.append(", matches.n, facts.seg_left - ").append(annoQueryData.
+      getLeft()).append(" AS \"min\", facts.seg_right + ").append(annoQueryData.
+      getRight()).append(" AS \"max\", facts.text_ref AS \"text\"\n");
+
+    sb.append(indent2).append("FROM facts, matches\n");
+    sb.append(indent2).append("WHERE\n");
+    sb.append(indent3).append("facts.toplevel_corpus IN (").append(StringUtils.join(queryData.
+      getCorpusList(), ",")).append(") AND\n");
+    sb.append(indent3).append("seg_name = '")
+      .append(annoQueryData.getSegmentationLayer())
+      .append("' AND\n");
+    
+    sb.append(indent3).append("(\n");
+    
+    for(int i=1; i <= alternative.size(); i++)
+    {
+      if(i >= 2)
+      {
+        sb.append(indent4).append("OR\n");
+      }
+      
+      sb.append(overlapForOneRange(indent4, 
+        "matches.min" + i, "matches.max"+i, 
+        "matches.text" + i, tables));
+      sb.append("\n");
+    }
+    sb.append(indent3).append(")\n"); // end of or
+
+
+    sb.append(indent).append(")\n");
+
+    return sb.toString();
+  }
+  
+  /**
+   *  
+   */
+  protected String geSolutionFromCoveredSegWithClause(
+    QueryData queryData, AnnotateQueryData annoQueryData, 
+    List<QueryNode> alternative, String coveredName, String indent)
+  {
+    
+    String indent2 = indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+    
+    List<Long> corpusList = queryData.getCorpusList();
+    
+    StringBuilder sb = new StringBuilder();
+    
+    // TODO: Table alias for facts
+    
+    sb.append(indent).append("solutions AS\n");
+    sb.append(indent).append("(\n");
+    
+    sb.append(indent2)
+      .append("SELECT ").append(coveredName).append(".key AS key, ")
+      .append(coveredName).append(".n AS n, ")
+      .append("facts.left_token AS \"min\", ")
+      .append("facts.right_token AS \"max\", ")
+      .append("facts.text_ref AS \"text\"\n");
+    
+    sb.append(indent2)
+      .append("FROM ").append(coveredName).append(", facts\n");
+    
+    sb.append(indent2)
+      .append("WHERE\n");
+    
+    sb.append(indent3)
+      .append("facts.toplevel_corpus IN (")
+      .append(StringUtils.join(corpusList, ","))
+      .append(") AND\n");
+    
+    sb.append(indent3)
+      .append("facts.seg_name = '")
+      .append(annoQueryData.getSegmentationLayer())
+      .append("' AND\n");
+    
+    sb.append(indent3)
+      .append("facts.text_ref = ")
+      .append(coveredName)
+      .append(".\"text\" AND\n");
+    
+    sb.append(indent3)
+      .append("facts.seg_left <= ")
+      .append(coveredName)
+      .append(".\"max\" AND\n");
+    sb.append(indent3)
+      .append("facts.seg_right >= ")
+      .append(coveredName)
+      .append(".\"min\"\n");
+    
+    sb.append(indent).append(")\n");
+    
+    return sb.toString();
+  }
   
 
   @Override

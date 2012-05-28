@@ -81,6 +81,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private int offset;
   private int left = 5;
   private int right = 5;
+  private String segmentationLayer = null;
   private List<Long> corpusList;
   private boolean clearCaches;
   private MetaDataFilter metaDataFilter;
@@ -134,8 +135,11 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doSql("annotate tok");
+    doCorpus("ridgessegtest");
+    
+    doSet("seg to clean");
+    
+    doSql("annotate tok & tok & #1 .clean,20 #2");
     doAnnotate("tok");
   }
 
@@ -612,6 +616,18 @@ public class AnnisRunner extends AnnisBaseRunner
         }
       }
     }
+    else if("seg".equals(setting))
+    {
+      
+      if(show)
+      {
+        value = segmentationLayer;
+      }
+      else
+      {
+        segmentationLayer = value;
+      }
+    }
     else
     {
       out.println("ERROR: unknown option: " + setting);
@@ -635,7 +651,7 @@ public class AnnisRunner extends AnnisBaseRunner
     
 
     queryData.addExtension(new LimitOffsetQueryData(offset, limit));
-    queryData.addExtension(new AnnotateQueryData(left, right));
+    queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
 
     if (annisQuery != null)
     {
