@@ -27,20 +27,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
@@ -71,6 +62,9 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
     List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent)
   {
+    String segName = "clean";
+    
+    
     this.result = result;
     this.markedAndCovered = markedAndCovered;
     this.text = text;
@@ -99,14 +93,14 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       addStyleName("rtl");
     }
 
-    List<SToken> token = result.getSDocumentGraph().getSortedSTokenByText();
+    List<SNode> token = getSegmentationNodes(segName, result.getSDocumentGraph());
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
-    for (SToken t : token)
+    for (SNode t : token)
     {
       STextualDS tokenText = null;
-      EList<Edge> edges = t.getSDocumentGraph().getOutEdges(t.getSId());
+      EList<Edge> edges = result.getSDocumentGraph().getOutEdges(t.getSId());
       for (Edge e : edges)
       {
         if (e instanceof STextualRelation)
@@ -119,7 +113,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_TOKENINDEX);
-      if (tokenText == text)
+      if (true || tokenText == text)
       {
         // TODO: howto nativly detect gaps in Salt?
         if (lastTokenIndex != null && featTokenIndex != null
@@ -134,7 +128,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         }
 
         // add a column for each token
-        addGeneratedColumn(t, new TokenColumnGenerator(t));
+        addGeneratedColumn(t, new TokenColumnGenerator(t, segName));
         setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 
@@ -164,6 +158,64 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
 
+  }
+  
+  private List<SNode> getSegmentationNodes(String segName, SDocumentGraph graph)
+  {
+    List<SNode> token = new ArrayList<SNode>();
+    
+    if(segName == null)
+    {
+      token.addAll(graph.getSortedSTokenByText());
+    }
+    else
+    {
+      SNode startNode = null;
+      Map<SNode, SOrderRelation> outRelationForNode = 
+        new HashMap<SNode, SOrderRelation>();
+      for(SOrderRelation rel : graph.getSOrderRelations())
+      {
+        if(rel.getSTypes().contains(segName))
+        {
+          SNode node = rel.getSSource();
+          outRelationForNode.put(node, rel);
+
+          EList<Edge> inEdgesForSource = 
+            graph.getInEdges(node.getSId());
+          boolean hasInOrderEdge = false;
+          for(Edge e : inEdgesForSource)
+          {
+            if(e instanceof SOrderRelation)
+            {
+              hasInOrderEdge = true;
+              break;
+            }
+          } // for each ingoing edge
+
+          if(!hasInOrderEdge)
+          {
+            startNode = rel.getSSource();
+          }
+        } // end if type is segName
+      } // end for all order relations of graph
+      
+
+      SNode current = startNode;
+      while(current != null)
+      {
+        token.add(current);
+        if(outRelationForNode.containsKey(current))
+        {
+          current = outRelationForNode.get(current).getSTarget();
+        }
+        else
+        {
+          current = null; 
+        }
+      }
+    }
+    
+    return token;
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
@@ -214,15 +266,22 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   {
 
     private Map<String, SAnnotation> annotationsByQName;
-    private SToken token;
+    private SNode token;
+    private String segmentationName;
 
-    public TokenColumnGenerator(SToken token)
+    public TokenColumnGenerator(SNode token, String segmentationName)
     {
       this.token = token;
+      this.segmentationName = segmentationName;
       annotationsByQName = new HashMap<String, SAnnotation>();
       for (SAnnotation a : token.getSAnnotations())
       {
         annotationsByQName.put(a.getQName(), a);
+        // also add non-qualified name if we are working on a segmentation path
+        if(a.getSName().equals(segmentationName))
+        {
+          annotationsByQName.put(a.getSName(), a);
+        }
       }
     }
 
@@ -239,18 +298,29 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
       if ("tok".equals(layer))
       {
-
-        SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
-          textualRelation).get(0);
-
-        l.setValue(((String) seq.getSSequentialDS().getSData()).substring(seq.
-          getSStart(), seq.getSEnd()));
-        if (markedAndCovered.containsKey(token))
+        if(segmentationName == null)
         {
-          // add color
-          String styleName =
-            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
-          l.addStyleName(styleName);
+          SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
+            textualRelation).get(0);
+
+          l.setValue(((String) seq.getSSequentialDS().getSData()).substring(seq.
+            getSStart(), seq.getSEnd()));
+          if (markedAndCovered.containsKey(token))
+          {
+            // add color
+            String styleName =
+              MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
+            l.addStyleName(styleName);
+          }
+        }
+        else
+        {
+          SAnnotation a = annotationsByQName.get(segmentationName);
+          if(a != null)
+          {
+            l.setValue(a.getValueString());
+            // TODO: add matched node colors
+          }
         }
       }
       else
@@ -258,7 +328,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         SAnnotation a = annotationsByQName.get(layer);
         if (a != null)
         {
-          l.setValue(a.getValue());
+          l.setValue(a.getValueString());
           l.setDescription(a.getQName());
           l.addStyleName("kwic-anno");
 
