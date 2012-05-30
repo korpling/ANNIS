@@ -15,9 +15,7 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import static annis.sqlgen.TableAccessStrategy.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -541,6 +539,7 @@ public abstract class AnnotateSqlGenerator<T>
   {
     StringBuilder sb = new StringBuilder();
     sb.append("solutions.n, ");
+    sb.append(tables(null).aliasedColumn(COMPONENT_TABLE, "id")).append(", ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
     String orderByClause = sb.toString();

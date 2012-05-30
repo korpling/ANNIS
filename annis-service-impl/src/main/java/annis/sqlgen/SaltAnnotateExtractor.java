@@ -35,16 +35,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltE
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructuredNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
@@ -88,6 +79,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
       TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
+      TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath =
+        new TreeMap<String, TreeMap<Long, String>>();
 
       // clear mapping functions for this graph
       // assumes that the result set is sorted by key, pre
@@ -115,6 +108,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           {
             createPrimaryText(graph, tokenTexts, tokenByIndex);
             setMatchedIDs(document, keyNameList);
+            addOrderingRelations(graph, nodeBySegmentationPath);
           }
 
           // new match, reset everything        
@@ -161,7 +155,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
         // get node data
         SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
-          tokenByIndex, key, keyNameList);
+          tokenByIndex, nodeBySegmentationPath, key, keyNameList);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long componentID = longValue(resultSet, RANK_TABLE, "component_id");
         if (!resultSet.wasNull())
@@ -176,6 +170,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       {
         createPrimaryText(graph, tokenTexts, tokenByIndex);
         setMatchedIDs(document, keyNameList);
+        addOrderingRelations(graph, nodeBySegmentationPath);
       }
     }
     catch(Exception ex)
@@ -184,6 +179,31 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     return project;
+  }
+  
+  private void addOrderingRelations(SDocumentGraph graph,
+    TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath)
+  {
+    for(Map.Entry<String, TreeMap<Long, String>> e : nodeBySegmentationPath.entrySet())
+    {
+      TreeMap<Long, String> nodeBySegIndex = e.getValue();
+      
+      SNode lastNode = null;
+      for(String nodeID : nodeBySegIndex.values())
+      {
+        SNode n = graph.getSNode(nodeID);
+        
+        if(lastNode != null && n != null)
+        {
+          SOrderRelation orderRel = SaltFactory.eINSTANCE.createSOrderRelation();
+          orderRel.setSSource(lastNode);
+          orderRel.setSTarget(n);
+          orderRel.addSType(e.getKey());
+          graph.addSRelation(orderRel);
+        }
+        lastNode = n;
+      }
+    }
   }
 
   private void setMatchedIDs(SDocument document, String[] keyNameList)
@@ -233,7 +253,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
   private SNode createOrFindNewNode(ResultSet resultSet,
     SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
-    TreeMap<Long, SToken> tokenByIndex, SolutionKey<?> key,
+    TreeMap<Long, SToken> tokenByIndex, 
+    TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
+    SolutionKey<?> key,
     String[] keyNameList) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
@@ -275,7 +297,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
-
+      
       Object nodeId = key.getNodeId(resultSet,
         outerQueryTableAccessStrategy);
       Integer matchedNode = key.getMatchedNodeIndex(nodeId);
@@ -318,6 +340,25 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       }
     }
 
+    // prepare SOrderingRelation if the node is part of a segmentation path
+    String segName = stringValue(resultSet, "node", "seg_name");
+    if(segName != null)
+    {
+      long left = longValue(resultSet, "node", "seg_left");
+      long right = longValue(resultSet, "node", "seg_right");
+      // only nodes that might be valid leafs
+      // since we are sorting everything by preorder the real leafs will be the
+      // last ones
+      if(left == right)
+      {
+        if(!nodeBySegmentationPath.containsKey(segName))
+        {
+          nodeBySegmentationPath.put(segName, new TreeMap<Long, String>());
+        }
+        nodeBySegmentationPath.get(segName).put(left, node.getSId());
+      } // end if       
+    }
+    
     // TODO: what more do we have to do?
     return node;
   }
