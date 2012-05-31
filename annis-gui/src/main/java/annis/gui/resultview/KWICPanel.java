@@ -89,28 +89,38 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
       addStyleName("rtl");
     }
+    
+    SDocumentGraph graph = result.getSDocumentGraph();
 
-    List<SNode> token = getSegmentationNodes(segmentationName, result.getSDocumentGraph());
+    List<SNode> token = getSegmentationNodes(segmentationName, graph);
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
     for (SNode t : token)
     {
       STextualDS tokenText = null;
-      EList<Edge> edges = result.getSDocumentGraph().getOutEdges(t.getSId());
-      for (Edge e : edges)
+      EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
+      types.add(STYPE_NAME.STEXTUAL_RELATION);
+      types.add(STYPE_NAME.SDOMINANCE_RELATION);
+      types.add(STYPE_NAME.SSPANNING_RELATION);
+      types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+     
+      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(t, types);
+      if(dataSources != null)
       {
-        if (e instanceof STextualRelation)
+        for(SDataSourceSequence seq : dataSources)
         {
-          STextualRelation textRel = (STextualRelation) e;
-          tokenText = textRel.getSTextualDS();
-          break;
+          if(seq.getSSequentialDS() instanceof STextualDS)
+          {
+            tokenText = (STextualDS) seq.getSSequentialDS();
+            break;
+          }
         }
       }
-
+      
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_TOKENINDEX);
-      if (true || tokenText == text)
+      if (tokenText == text)
       {
         // TODO: howto nativly detect gaps in Salt?
         if (lastTokenIndex != null && featTokenIndex != null
