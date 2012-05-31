@@ -227,7 +227,8 @@ public class SingleResultPanel extends VerticalLayout implements
         KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
           markedAndCovered, text, mediaIDs, mediaVisualizer, this, segmentationName);
 
-        addComponent(kwic, 0);
+        // add after the info bar component
+        addComponent(kwic, 1);
         kwicPanels.add(kwic);
       }
     }
