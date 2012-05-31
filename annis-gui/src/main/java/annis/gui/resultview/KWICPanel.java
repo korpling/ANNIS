@@ -60,11 +60,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
   public KWICPanel(SDocument result, Set<String> tokenAnnos,
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent)
-  {
-    String segName = "clean";
-    
-    
+    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent, String segmentationName)
+  {    
     this.result = result;
     this.markedAndCovered = markedAndCovered;
     this.text = text;
@@ -93,7 +90,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       addStyleName("rtl");
     }
 
-    List<SNode> token = getSegmentationNodes(segName, result.getSDocumentGraph());
+    List<SNode> token = getSegmentationNodes(segmentationName, result.getSDocumentGraph());
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
@@ -128,7 +125,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         }
 
         // add a column for each token
-        addGeneratedColumn(t, new TokenColumnGenerator(t, segName));
+        addGeneratedColumn(t, new TokenColumnGenerator(t, segmentationName));
         setColumnExpandRatio(t, 0.0f);
         visible.add(t);
 

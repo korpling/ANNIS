@@ -82,20 +82,26 @@ public class SingleResultPanel extends VerticalLayout implements
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
   private List<KWICPanel> kwicPanels;
+  private List<VisualizerPanel> mediaVisualizer;
+  private List<String> mediaIDs;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
+  private String segmentationName;
+  private CorpusConfig corpusConfig; 
+  
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos)
+    Set<String> visibleTokenAnnos, String segmentationName)
   {
     this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
     this.visibleTokenAnnos = visibleTokenAnnos;
+    this.segmentationName = segmentationName;
 
     calculateHelperVariables();
 
@@ -143,7 +149,7 @@ public class SingleResultPanel extends VerticalLayout implements
 
     // get corpus properties
 
-    CorpusConfig corpusConfig = new CorpusConfig();
+    corpusConfig = new CorpusConfig();
     corpusConfig.setConfig(new TreeMap<String, String>());
     
     try
@@ -165,10 +171,10 @@ public class SingleResultPanel extends VerticalLayout implements
     }
     ResolverEntry[] entries =
       resolverProvider.getResolverEntries(result);
-    List<String> mediaIDs = mediaVisIds(entries);
+    mediaIDs = mediaVisIds(entries);
     List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
     List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-    List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+    mediaVisualizer = new ArrayList<VisualizerPanel>();
 
     for (int i = 0; i < entries.length; i++)
     {
@@ -192,20 +198,9 @@ public class SingleResultPanel extends VerticalLayout implements
         openVisualizers.add(p);
       }
     }
-
-    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC) || Boolean.parseBoolean(
-      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
-    {
-      kwicPanels = new ArrayList<KWICPanel>();
-      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-      {
-        KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-          markedAndCovered, text, mediaIDs, mediaVisualizer, this);
-
-        addComponent(kwic);
-        kwicPanels.add(kwic);
-      }
-    }
+    
+    kwicPanels = new ArrayList<KWICPanel>();
+    addKWICPanels();
 
     for (VisualizerPanel p : visualizers)
     {
@@ -220,7 +215,39 @@ public class SingleResultPanel extends VerticalLayout implements
 
     super.attach();
   }
+  
+  private void addKWICPanels()
+  {
+    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC) || Boolean.parseBoolean(
+      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
+    {
+      kwicPanels.clear();
+      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+      {
+        KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+          markedAndCovered, text, mediaIDs, mediaVisualizer, this, segmentationName);
 
+        addComponent(kwic, 0);
+        kwicPanels.add(kwic);
+      }
+    }
+  }
+
+  public void setSegmentationLayer(String segmentationName)
+  {
+    this.segmentationName = segmentationName;
+    if(kwicPanels != null)
+    {
+      for(KWICPanel kwic : kwicPanels)
+      {
+        removeComponent(kwic);
+      }
+      
+      kwicPanels.clear();
+      addKWICPanels();
+    }
+  }
+  
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if (kwicPanels != null)

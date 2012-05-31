@@ -22,6 +22,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
@@ -73,19 +74,35 @@ public class CommonHelper
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        for (SNode n : g.getSNodes())
+        for (SToken n : g.getSTokens())
         {
-          if (n instanceof SToken)
+          for (SAnnotation anno : n.getSAnnotations())
           {
-            for (SAnnotation anno : n.getSAnnotations())
-            {
-              result.add(anno.getQName());
-            }
+            result.add(anno.getQName());
           }
         }
       }
     }
 
+    return result;
+  }
+  
+  public static Set<String> getOrderingTypes(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+    
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        for (SOrderRelation rel : g.getSOrderRelations())
+        {
+          result.addAll(rel.getSTypes());
+        }
+      }
+    }
+    
     return result;
   }
 

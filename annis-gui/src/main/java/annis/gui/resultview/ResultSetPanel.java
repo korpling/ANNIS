@@ -48,7 +48,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   public List<SingleResultPanel> resultPanelList;
 
   public ResultSetPanel(SaltProject p, int start, PluginSystem ps,
-    Set<String> visibleTokenAnnos)
+    Set<String> visibleTokenAnnos, String segmentationName)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -66,7 +66,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       for (SDocument doc : corpusGraph.getSDocuments())
       {
         SingleResultPanel panel = new SingleResultPanel(doc, i, this, ps,
-          visibleTokenAnnos);
+          visibleTokenAnnos, segmentationName);
         addComponent(panel);
         resultPanelList.add(panel);
         i++;
@@ -182,6 +182,14 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       }
     });
     return visArray;
+  }
+  
+  public void setSegmentationLayer(String segmentationLayer)
+  {
+    for(SingleResultPanel p : resultPanelList)
+    {
+      p.setSegmentationLayer(segmentationLayer);
+    }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
