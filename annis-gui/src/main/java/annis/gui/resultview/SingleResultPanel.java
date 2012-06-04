@@ -20,7 +20,7 @@ import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -35,10 +35,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -62,6 +59,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -90,6 +88,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private CorpusConfig corpusConfig; 
+  private List<SNode> token;
   
 
   public SingleResultPanel(final SDocument result, int resultNumber,
@@ -224,7 +223,13 @@ public class SingleResultPanel extends VerticalLayout implements
       kwicPanels.clear();
       for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
       {
-        KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
+        token = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+          result.getSDocumentGraph());
+
+        markedAndCovered = calculateMarkedAndCoveredIDs(result);
+
+        
+        KWICPanel kwic = new KWICPanel(result, token, visibleTokenAnnos,
           markedAndCovered, text, mediaIDs, mediaVisualizer, this, segmentationName);
 
         // add after the info bar component
@@ -268,16 +273,14 @@ public class SingleResultPanel extends VerticalLayout implements
     for (SNode n : result.getSDocumentGraph().getSNodes())
     {
 
-      SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_MATCHEDNODE);
+      SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
       Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
 
       if (match != null)
       {
         int color = Math.max(0, Math.min((int) match.longValue() - 1,
           MatchedNodeColors.values().length - 1));
-        SFeature feat = n.getSFeature(AnnisConstants.ANNIS_NS,
-          AnnisConstants.FEAT_INTERNALID);
+        SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
         if (feat != null)
         {
           markedExactMap.put("" + feat.getSValueSNUMERIC(),
@@ -294,8 +297,8 @@ public class SingleResultPanel extends VerticalLayout implements
       int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
         - 1,
         MatchedNodeColors.values().length - 1));
-      SFeature feat = markedEntry.getKey().getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_INTERNALID);
+      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS,
+        FEAT_INTERNALID);
       if (feat != null)
       {
         markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
@@ -313,8 +316,8 @@ public class SingleResultPanel extends VerticalLayout implements
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
-      SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_MATCHEDNODE);
+      SFeature featMatched = n.getSFeature(ANNIS_NS,
+        FEAT_MATCHEDNODE);
       Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
 
       if (match != null)
@@ -324,10 +327,53 @@ public class SingleResultPanel extends VerticalLayout implements
       }
     }
 
+    // calculate covered nodes
     CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.
       getSDocumentGraph(), initialCovered);
+    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
+    
 
-    return cmc.getMatchedAndCovered();
+    if(segmentationName != null)
+    {
+      // filter token
+      Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
+      for(Map.Entry<SNode, Long> e : covered.entrySet())
+      {
+        if(e.getKey() instanceof SToken)
+        {
+          coveredToken.put((SToken) e.getKey(), e.getValue());
+        }
+      }
+
+      
+      List<SNode> segNodes = CommonHelper
+        .getSortedSegmentationNodes(segmentationName, doc.getSDocumentGraph());
+      for(SNode segNode : segNodes)
+      {
+        if(segNode != null && !covered.containsKey(segNode))
+        {
+          long leftTok = 
+            segNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
+          long rightTok = 
+            segNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
+
+          // check for each covered token if this segment is covering it
+          for(Map.Entry<SToken, Long> e : coveredToken.entrySet())
+          {
+            long entryTokenIndex =  e.getKey()
+              .getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+            if(entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
+            {
+              // add this segmentation node to the covered set
+              covered.put(segNode, e.getValue());
+              break;
+            }
+          } // end for each covered token
+        } // end if not already contained
+      } // end for each segmentation node
+    }
+    
+    return covered;
   }
 
   @Override
@@ -348,6 +394,7 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
+  
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
 

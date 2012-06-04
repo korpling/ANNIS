@@ -18,14 +18,12 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
 import annis.model.AnnisConstants;
-import annis.model.AnnisNode;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -46,10 +44,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
   private Map<SNode, Long> markedAndCovered;
-  private STextualDS text;
   private List<String> mediaIDs;
   private List<VisualizerPanel> mediaVisualizer;
-  private SingleResultPanel parent;
   // only used for media files  
   private String startTime;
   private String endTime;
@@ -58,16 +54,14 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     "time"
   };
 
-  public KWICPanel(SDocument result, Set<String> tokenAnnos,
+  public KWICPanel(SDocument result, List<SNode> token, Set<String> tokenAnnos,
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
     List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent, String segmentationName)
   {    
     this.result = result;
     this.markedAndCovered = markedAndCovered;
-    this.text = text;
     this.mediaIDs = mediaIDs;
     this.mediaVisualizer = mediaVisualizer;
-    this.parent = parent;
     this.addListener((ItemClickEvent.ItemClickListener) this);
     this.addStyleName("kwic");
     setSizeFull();
@@ -92,7 +86,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     
     SDocumentGraph graph = result.getSDocumentGraph();
 
-    List<SNode> token = getSegmentationNodes(segmentationName, graph);
     ArrayList<Object> visible = new ArrayList<Object>(10);
     Long lastTokenIndex = null;
 
@@ -100,9 +93,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
       STextualDS tokenText = null;
       EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
-      types.add(STYPE_NAME.STEXTUAL_RELATION);
-      types.add(STYPE_NAME.SDOMINANCE_RELATION);
-      types.add(STYPE_NAME.SSPANNING_RELATION);
       types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
      
       EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(t, types);
@@ -167,63 +157,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
   }
   
-  private List<SNode> getSegmentationNodes(String segName, SDocumentGraph graph)
-  {
-    List<SNode> token = new ArrayList<SNode>();
-    
-    if(segName == null)
-    {
-      token.addAll(graph.getSortedSTokenByText());
-    }
-    else
-    {
-      SNode startNode = null;
-      Map<SNode, SOrderRelation> outRelationForNode = 
-        new HashMap<SNode, SOrderRelation>();
-      for(SOrderRelation rel : graph.getSOrderRelations())
-      {
-        if(rel.getSTypes().contains(segName))
-        {
-          SNode node = rel.getSSource();
-          outRelationForNode.put(node, rel);
-
-          EList<Edge> inEdgesForSource = 
-            graph.getInEdges(node.getSId());
-          boolean hasInOrderEdge = false;
-          for(Edge e : inEdgesForSource)
-          {
-            if(e instanceof SOrderRelation)
-            {
-              hasInOrderEdge = true;
-              break;
-            }
-          } // for each ingoing edge
-
-          if(!hasInOrderEdge)
-          {
-            startNode = rel.getSSource();
-          }
-        } // end if type is segName
-      } // end for all order relations of graph
-      
-
-      SNode current = startNode;
-      while(current != null)
-      {
-        token.add(current);
-        if(outRelationForNode.containsKey(current))
-        {
-          current = outRelationForNode.get(current).getSTarget();
-        }
-        else
-        {
-          current = null; 
-        }
-      }
-    }
-    
-    return token;
-  }
+  
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -309,16 +243,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         {
           SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
             textualRelation).get(0);
-
           l.setValue(((String) seq.getSSequentialDS().getSData()).substring(seq.
-            getSStart(), seq.getSEnd()));
-          if (markedAndCovered.containsKey(token))
-          {
-            // add color
-            String styleName =
-              MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
-            l.addStyleName(styleName);
-          }
+            getSStart(), seq.getSEnd())); 
         }
         else
         {
@@ -326,9 +252,17 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
           if(a != null)
           {
             l.setValue(a.getValueString());
-            // TODO: add matched node colors
           }
         }
+        
+        if (markedAndCovered.containsKey(token))
+        {
+          // add color
+          String styleName =
+            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
+          l.addStyleName(styleName);
+        }
+        
       }
       else
       {
@@ -364,20 +298,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
       return generateCell((String) itemId);
     }
-  }
-
-  private boolean checkRTL(List<AnnisNode> tokenList)
-  {
-    for (AnnisNode tok : tokenList)
-    {
-      String tokText = tok.getSpannedText();
-      if (CommonHelper.containsRTLText(tokText))
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   @Override

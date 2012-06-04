@@ -15,6 +15,7 @@
  */
 package annis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -28,11 +29,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -63,6 +62,67 @@ public class CommonHelper
       }
     }
     return false;
+  }
+  
+  public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph)
+  {
+    List<SNode> token = new ArrayList<SNode>();
+    
+    if(segName == null)
+    {
+      // if no segmentation is given just return the sorted token list
+      token.addAll(graph.getSortedSTokenByText());
+    }
+    else
+    {
+      // get the very first node of the order relation chain
+      SNode startNode = null;
+      Map<SNode, SOrderRelation> outRelationForNode = 
+        new HashMap<SNode, SOrderRelation>();
+      for(SOrderRelation rel : graph.getSOrderRelations())
+      {
+        if(rel.getSTypes().contains(segName))
+        {
+          SNode node = rel.getSSource();
+          outRelationForNode.put(node, rel);
+
+          EList<Edge> inEdgesForSource = 
+            graph.getInEdges(node.getSId());
+          boolean hasInOrderEdge = false;
+          for(Edge e : inEdgesForSource)
+          {
+            if(e instanceof SOrderRelation)
+            {
+              hasInOrderEdge = true;
+              break;
+            }
+          } // for each ingoing edge
+
+          if(!hasInOrderEdge)
+          {
+            startNode = rel.getSSource();
+          }
+        } // end if type is segName
+      } // end for all order relations of graph
+      
+
+      // add all nodes on the order relation chain beginning from the start node
+      SNode current = startNode;
+      while(current != null)
+      {
+        token.add(current);
+        if(outRelationForNode.containsKey(current))
+        {
+          current = outRelationForNode.get(current).getSTarget();
+        }
+        else
+        {
+          current = null; 
+        }
+      }
+    }
+    
+    return token;
   }
 
   public static Set<String> getTokenAnnotationLevelSet(SaltProject p)
