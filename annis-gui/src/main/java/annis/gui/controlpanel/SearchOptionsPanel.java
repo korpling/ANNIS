@@ -17,6 +17,7 @@ package annis.gui.controlpanel;
 
 import annis.gui.Helper;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.IntegerValidator;
@@ -34,6 +35,8 @@ import java.util.Set;
 public class SearchOptionsPanel extends Panel
 {
 
+  public static final String DEFAULT_SEGMENTATION = "default-segmentation";
+  
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
   private ComboBox cbResultsPerPage;
@@ -119,6 +122,13 @@ public class SearchOptionsPanel extends Panel
           get(new GenericType<List<AnnisAttribute>>()
         {
         }));
+        
+        CorpusConfig config = Helper.getCorpusConfig(corpus, getApplication(), getWindow());
+        
+        if(config.getConfig().containsKey(DEFAULT_SEGMENTATION))
+        {
+          lastSelection = config.getConfig().get(DEFAULT_SEGMENTATION);
+        }
       }
 
 
@@ -132,6 +142,7 @@ public class SearchOptionsPanel extends Panel
       }
       
       cbSegmentation.setValue(lastSelection);
+      
     }
   }
 

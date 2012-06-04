@@ -148,26 +148,9 @@ public class SingleResultPanel extends VerticalLayout implements
 
     // get corpus properties
 
-    corpusConfig = new CorpusConfig();
-    corpusConfig.setConfig(new TreeMap<String, String>());
+    corpusConfig = 
+      Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
     
-    try
-    {
-      corpusConfig = Helper.getAnnisWebResource(getApplication()).path("corpora").
-        path(
-        URLEncoder.encode(path.get(0), "UTF-8"))
-        .path("config").get(CorpusConfig.class);
-    }
-    catch(UnsupportedEncodingException ex)
-    {
-      getWindow().showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      getWindow().showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
-    }
     ResolverEntry[] entries =
       resolverProvider.getResolverEntries(result);
     mediaIDs = mediaVisIds(entries);
