@@ -25,6 +25,7 @@ import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
@@ -97,7 +98,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     panelToolbar.addStyleName("toolbar");
 
     Button btAboutAnnis = new Button("About ANNIS");
-    btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
+    btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
     btAboutAnnis.addListener(new Button.ClickListener()
     {
 
@@ -139,6 +141,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     });
     btLoginLogout.setSizeUndefined();
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(lblUserName);
