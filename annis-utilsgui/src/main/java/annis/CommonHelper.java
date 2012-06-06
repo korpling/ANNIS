@@ -75,7 +75,7 @@ public class CommonHelper
     else
     {
       // get the very first node of the order relation chain
-      Set<SNode> startNodes = new HashSet<SNode>();
+      Set<SNode> startNodes = new LinkedHashSet<SNode>();
       
       Map<SNode, SOrderRelation> outRelationForNode = 
         new HashMap<SNode, SOrderRelation>();

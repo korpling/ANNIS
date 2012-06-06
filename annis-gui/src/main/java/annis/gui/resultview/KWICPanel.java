@@ -109,7 +109,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       }
       
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_TOKENINDEX);
+        segmentationName == null ?
+        AnnisConstants.FEAT_TOKENINDEX : AnnisConstants.FEAT_SEGLEFT);
       if (tokenText == text)
       {
         // TODO: howto nativly detect gaps in Salt?
