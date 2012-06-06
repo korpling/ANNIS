@@ -35,25 +35,25 @@ public class CommonLimitOffsetGenerator implements
     StringBuilder sb = new StringBuilder();
     Integer limit = null;
     Integer offset = null;
-    
+
     if (LimitOffsetQueryData != null)
     {
       limit = LimitOffsetQueryData.getLimit();
       offset = LimitOffsetQueryData.getOffset();
     }
-    
+
     if (limit != null)
     {
-      sb.append("LIMIT ").append(limit);
+      sb.append("LIMIT ").append(limit).append("\n");
     }
-    
+
     if (offset != null){
       sb.append("OFFSET ").append(offset);
     }
-    
+
     return sb.toString();
   }
-  
+
   private LimitOffsetQueryData getLimitOffsetQueryData(QueryData queryData)
   {
     for (Object o : queryData.getExtensions())
