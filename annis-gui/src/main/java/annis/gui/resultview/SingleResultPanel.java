@@ -87,9 +87,8 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<String> path;
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
-  private CorpusConfig corpusConfig; 
+  private CorpusConfig corpusConfig;
   private List<SNode> token;
-  
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -148,9 +147,9 @@ public class SingleResultPanel extends VerticalLayout implements
 
     // get corpus properties
 
-    corpusConfig = 
+    corpusConfig =
       Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
-    
+
     ResolverEntry[] entries =
       resolverProvider.getResolverEntries(result);
     mediaIDs = mediaVisIds(entries);
@@ -175,12 +174,12 @@ public class SingleResultPanel extends VerticalLayout implements
 
       visualizers.add(p);
       Properties mappings = entries[i].getMappings();
-      if(Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+      if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
       {
         openVisualizers.add(p);
       }
     }
-    
+
     kwicPanels = new ArrayList<KWICPanel>();
     addKWICPanels();
 
@@ -197,23 +196,26 @@ public class SingleResultPanel extends VerticalLayout implements
 
     super.attach();
   }
-  
+
   private void addKWICPanels()
   {
-    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC) || Boolean.parseBoolean(
+    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC)
+      || Boolean.parseBoolean(
       corpusConfig.getConfig().get(HIDE_KWIC)) == false)
     {
       kwicPanels.clear();
       for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
       {
-        token = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
           result.getSDocumentGraph());
 
-        markedAndCovered = calculateMarkedAndCoveredIDs(result);
+        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+        calulcateColorsForMarkedAndCoverd();
 
-        
+
         KWICPanel kwic = new KWICPanel(result, token, visibleTokenAnnos,
-          markedAndCovered, text, mediaIDs, mediaVisualizer, this, segmentationName);
+          markedAndCovered, text, mediaIDs, mediaVisualizer, this,
+          segmentationName);
 
         // add after the info bar component
         addComponent(kwic, 1);
@@ -225,18 +227,18 @@ public class SingleResultPanel extends VerticalLayout implements
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
-    if(kwicPanels != null)
+    if (kwicPanels != null)
     {
-      for(KWICPanel kwic : kwicPanels)
+      for (KWICPanel kwic : kwicPanels)
       {
         removeComponent(kwic);
       }
-      
+
       kwicPanels.clear();
       addKWICPanels();
     }
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if (kwicPanels != null)
@@ -272,9 +274,10 @@ public class SingleResultPanel extends VerticalLayout implements
       }
 
     }
+  }
 
-    markedAndCovered = calculateMarkedAndCoveredIDs(result);
-
+  private void calulcateColorsForMarkedAndCoverd()
+  {
     for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
     {
       int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
@@ -291,7 +294,7 @@ public class SingleResultPanel extends VerticalLayout implements
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
-    SDocument doc)
+    SDocument doc, List<SNode> segNodes)
   {
     Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
@@ -314,38 +317,35 @@ public class SingleResultPanel extends VerticalLayout implements
     CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.
       getSDocumentGraph(), initialCovered);
     Map<SNode, Long> covered = cmc.getMatchedAndCovered();
-    
 
-    if(segmentationName != null)
+
+    if (segmentationName != null)
     {
       // filter token
       Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
-      for(Map.Entry<SNode, Long> e : covered.entrySet())
+      for (Map.Entry<SNode, Long> e : covered.entrySet())
       {
-        if(e.getKey() instanceof SToken)
+        if (e.getKey() instanceof SToken)
         {
           coveredToken.put((SToken) e.getKey(), e.getValue());
         }
       }
 
-      
-      List<SNode> segNodes = CommonHelper
-        .getSortedSegmentationNodes(segmentationName, doc.getSDocumentGraph());
-      for(SNode segNode : segNodes)
+      for (SNode segNode : segNodes)
       {
-        if(segNode != null && !covered.containsKey(segNode))
+        if (segNode != null && !covered.containsKey(segNode))
         {
-          long leftTok = 
+          long leftTok =
             segNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
-          long rightTok = 
+          long rightTok =
             segNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
 
           // check for each covered token if this segment is covering it
-          for(Map.Entry<SToken, Long> e : coveredToken.entrySet())
+          for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
           {
-            long entryTokenIndex =  e.getKey()
-              .getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-            if(entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
+            long entryTokenIndex = e.getKey().getSFeature(ANNIS_NS,
+              FEAT_TOKENINDEX).getSValueSNUMERIC();
+            if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
               covered.put(segNode, e.getValue());
@@ -355,7 +355,7 @@ public class SingleResultPanel extends VerticalLayout implements
         } // end if not already contained
       } // end for each segmentation node
     }
-    
+
     return covered;
   }
 
@@ -377,7 +377,6 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
 

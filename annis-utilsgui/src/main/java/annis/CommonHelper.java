@@ -15,10 +15,8 @@
  */
 package annis;
 
-import annis.service.objects.CorpusConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -30,8 +28,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -79,7 +75,8 @@ public class CommonHelper
     else
     {
       // get the very first node of the order relation chain
-      SNode startNode = null;
+      Set<SNode> startNodes = new HashSet<SNode>();
+      
       Map<SNode, SOrderRelation> outRelationForNode = 
         new HashMap<SNode, SOrderRelation>();
       for(SOrderRelation rel : graph.getSOrderRelations())
@@ -103,24 +100,27 @@ public class CommonHelper
 
           if(!hasInOrderEdge)
           {
-            startNode = rel.getSSource();
+            startNodes.add(rel.getSSource());
           }
         } // end if type is segName
       } // end for all order relations of graph
       
 
       // add all nodes on the order relation chain beginning from the start node
-      SNode current = startNode;
-      while(current != null)
+      for(SNode s : startNodes)
       {
-        token.add(current);
-        if(outRelationForNode.containsKey(current))
+        SNode current = s;
+        while(current != null)
         {
-          current = outRelationForNode.get(current).getSTarget();
-        }
-        else
-        {
-          current = null; 
+          token.add(current);
+          if(outRelationForNode.containsKey(current))
+          {
+            current = outRelationForNode.get(current).getSTarget();
+          }
+          else
+          {
+            current = null; 
+          }
         }
       }
     }
