@@ -22,4 +22,7 @@ public class AnnisConstants
   public static final String FEAT_RIGHT = "right";
   public static final String FEAT_RIGHTTOKEN = "righttoken";
   public static final String FEAT_TOKENINDEX = "tokenindex";
+  public static final String FEAT_SEGLEFT = "segleft";
+  public static final String FEAT_SEGRIGHT = "segright";
+  public static final String FEAT_SEGNAME = "segname";
 }

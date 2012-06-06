@@ -297,6 +297,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
+      addLongSFeature(node, resultSet, FEAT_SEGLEFT, "node", "seg_left");
+      addLongSFeature(node, resultSet, FEAT_SEGRIGHT, "node", "seg_right");
+      addStringSFeature(node, resultSet, FEAT_SEGNAME, "node", "seg_name");
+     
       
       Object nodeId = key.getNodeId(resultSet,
         outerQueryTableAccessStrategy);
@@ -363,18 +367,18 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     return node;
   }
 
-  /*
-   * private void addLongSProcessing(SNode node, String name, long value) throws
-   * SQLException { SProcessingAnnotation proc = SaltFactory.eINSTANCE.
-   * createSProcessingAnnotation(); proc.setSNS(ANNIS_NS); proc.setSName(name);
-   * proc.setSValue(value); node.addSProcessingAnnotation(proc); }
-   *
-   * private void addLongSProcessing(SNode node, ResultSet resultSet, String
-   * name, String table, String tupleName) throws SQLException {
-   * addLongSProcessing(node, name, longValue(resultSet, table, tupleName)); }
-   */
   private void addLongSFeature(SNode node, String name,
     long value) throws SQLException
+  {
+    SFeature feat = SaltFactory.eINSTANCE.createSFeature();
+    feat.setSNS(ANNIS_NS);
+    feat.setSName(name);
+    feat.setSValue(value);
+    node.addSFeature(feat);
+  }
+  
+  private void addStringSFeature(SNode node, String name,
+    String value) throws SQLException
   {
     SFeature feat = SaltFactory.eINSTANCE.createSFeature();
     feat.setSNS(ANNIS_NS);
@@ -387,6 +391,12 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     String table, String tupleName) throws SQLException
   {
     addLongSFeature(node, name, longValue(resultSet, table, tupleName));
+  }
+  
+  private void addStringSFeature(SNode node, ResultSet resultSet, String name,
+    String table, String tupleName) throws SQLException
+  {
+    addStringSFeature(node, name, stringValue(resultSet, table, tupleName));
   }
 
   private SStructuredNode recreateNode(Class<? extends SStructuredNode> clazz,
