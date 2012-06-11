@@ -115,11 +115,6 @@ CREATE TABLE corpus_stats
   id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
   text        bigint,
   tokens        bigint,
-  roots        bigint,
-  depth        bigint,
-  avg_level      real,
-  avg_children    real,
-  avg_duplicates  real,
   max_corpus_id bigint  NULL,
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
@@ -132,12 +127,8 @@ CREATE TABLE corpus_stats
 CREATE VIEW corpus_info AS SELECT 
   name,
   id, 
-  tokens,
-  roots,
-  depth,
-  to_char(avg_level, '990.99') as avg_level,
-  to_char(avg_children, '990.99') as avg_children,
-  to_char(avg_duplicates, '990.99') as avg_duplicates
+  text,
+  tokens
 FROM 
   corpus_stats;
   
