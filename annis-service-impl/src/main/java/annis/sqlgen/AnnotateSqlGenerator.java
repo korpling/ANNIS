@@ -219,9 +219,6 @@ public abstract class AnnotateSqlGenerator<T>
         result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
           alternative, islandsPolicy, "coveredseg", indent));
                 
-        
-        // TODO
-//        throw new NotImplementedException("Sorry, segmentation layers are not supported yet as context");
       }
     }
     
@@ -343,8 +340,14 @@ public abstract class AnnotateSqlGenerator<T>
 
     sb.append(indent2).append("FROM facts, matches\n");
     sb.append(indent2).append("WHERE\n");
-    sb.append(indent3).append("facts.toplevel_corpus IN (").append(StringUtils.join(queryData.
-      getCorpusList(), ",")).append(") AND\n");
+    
+    sb.append(indent3).append("facts.toplevel_corpus IN (")
+      .append(StringUtils.join(queryData.getCorpusList(), ","))
+      .append(") AND\n");
+    
+   sb.append(indent3)
+    .append("facts.n_sample IS TRUE AND\n");
+    
     sb.append(indent3).append("seg_name = '")
       .append(annoQueryData.getSegmentationLayer())
       .append("' AND\n");
@@ -392,7 +395,7 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(indent).append("(\n");
     
     sb.append(indent2)
-      .append("SELECT ");
+      .append("SELECT DISTINCT ");
     
     if(islandsPolicy == IslandPolicies.none)
     {
@@ -429,6 +432,9 @@ public abstract class AnnotateSqlGenerator<T>
       .append("facts.toplevel_corpus IN (")
       .append(StringUtils.join(corpusList, ","))
       .append(") AND\n");
+    
+    sb.append(indent3)
+      .append("facts.n_sample IS TRUE AND\n");
     
     sb.append(indent3)
       .append("facts.seg_name = '")
