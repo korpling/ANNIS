@@ -239,6 +239,7 @@ public class AnnisWebService
 
   @GET
   @Path("resolver/{corpusName}/{namespace}/{type}")
+  @Produces("application/xml")
   public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName,
     @PathParam("namespace") String namespace,
     @PathParam("type") String type)

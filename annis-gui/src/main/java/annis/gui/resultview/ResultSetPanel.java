@@ -145,15 +145,24 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
           String type = r.getType() == null ? null : r.getType().toString();
           if(corpusName != null && namespace != null && type != null)
           {
-            tmp = resResolver.path(corpusName).path(namespace).path(type)
-              .get(new GenericType<List<ResolverEntry>>(){});
-            resolverList.addAll(tmp);
+            WebResource res = resResolver.path(corpusName).path(namespace).path(type);
+            try
+            {
+              tmp = res.get(new GenericType<List<ResolverEntry>>(){});
+              resolverList.addAll(tmp);
+            }
+            catch(Exception ex)
+            {
+               Logger.getLogger(ResultSetPanel.class.getName())
+            .log(Level.SEVERE, "could not query resolver entries: " 
+                 + res.toString(), ex);
+            }
           }
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).
-            log(Level.SEVERE, null, ex);
+          Logger.getLogger(ResultSetPanel.class.getName())
+            .log(Level.SEVERE, null, ex);
         }
       }
       visSet.addAll(resolverList);
