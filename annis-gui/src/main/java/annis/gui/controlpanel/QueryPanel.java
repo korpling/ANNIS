@@ -46,6 +46,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.vaadin.hene.splitbutton.SplitButton;
 import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
+import org.vaadin.codemirror2.CodeMirror;
+import org.vaadin.codemirror2.client.ui.CodeMode;
 
 /**
  *
@@ -57,7 +59,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
   
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
-  private TextField txtQuery;
+  private CodeMirror txtQuery;
   private Label lblStatus;
   private Button btShowResult;
   private SplitButton btHistory;
@@ -92,7 +94,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     mainLayout.setColumnExpandRatio(0, 0.2f);
     mainLayout.setColumnExpandRatio(1, 0.8f);
 
-    txtQuery = new TextField();
+    txtQuery = new CodeMirror("", CodeMode.LUA);
     txtQuery.setSizeFull();
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addListener((TextChangeListener) this);
