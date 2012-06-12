@@ -79,6 +79,27 @@ public class PartiturVisualizer extends WriterVisualizer
 
       List<String> tierNames = new LinkedList<String>(partitur.getKnownTiers());
       Collections.sort(tierNames);
+      
+      // get keys that are allowed to select
+      LinkedHashSet<String> keys = new LinkedHashSet<String>();
+      String mapping = input.getMappings().getProperty("annos");
+      if (mapping == null)
+      {
+        // default to the alphabetical order
+        keys.addAll(partitur.getNameslist());
+      }
+      else
+      {
+        String[] splitted = mapping.split(",");
+        for (int k = 0; k < splitted.length; k++)
+        {
+          String s = splitted[k].trim();
+          if (partitur.getNameslist().contains(s))
+          {
+            keys.add(s);
+          }
+        }
+      }
 
       writer.append(
         "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
@@ -106,7 +127,10 @@ public class PartiturVisualizer extends WriterVisualizer
       int i = 0;
       for (String levelName : tierNames)
       {
-        writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
+        if(keys.contains(levelName))
+        {
+          writer.append((i++ > 0 ? ", " : "") + "\"" + levelName + "\"");
+        }
       }
       writer.append("];\n</script>");
       writer.append("<script type=\"text/javascript\" src=\""
@@ -128,25 +152,7 @@ public class PartiturVisualizer extends WriterVisualizer
         writer.append("<table class=\"partitur_table\")\">\n");
       }
 
-      LinkedHashSet<String> keys = new LinkedHashSet<String>();
-      String mapping = input.getMappings().getProperty("annos");
-      if (mapping == null)
-      {
-        // default to the alphabetical order
-        keys.addAll(partitur.getNameslist());
-      }
-      else
-      {
-        String[] splitted = mapping.split(",");
-        for (int k = 0; k < splitted.length; k++)
-        {
-          String s = splitted[k].trim();
-          if (partitur.getNameslist().contains(s))
-          {
-            keys.add(s);
-          }
-        }
-      }
+      
 
       for (String tier : keys)
       {
