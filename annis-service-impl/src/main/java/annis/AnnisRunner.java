@@ -82,6 +82,22 @@ public class AnnisRunner extends AnnisBaseRunner
   private boolean clearCaches;
   private MetaDataFilter metaDataFilter;
 
+  /**
+   * @return the graphSqlGenerator
+   */
+  public GraphSqlGenerator getGraphSqlGenerator()
+  {
+    return graphSqlGenerator;
+  }
+
+  /**
+   * @param graphSqlGenerator the graphSqlGenerator to set
+   */
+  public void setGraphSqlGenerator(GraphSqlGenerator graphSqlGenerator)
+  {
+    this.graphSqlGenerator = graphSqlGenerator;
+  }
+
   public enum OS
   {
 
@@ -223,7 +239,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     else if ("subgraph".equals(function))
     {
-      generator = graphSqlGenerator;
+      generator = getGraphSqlGenerator();
     }
 
     Validate.notNull(generator, "don't now query function: " + function);
