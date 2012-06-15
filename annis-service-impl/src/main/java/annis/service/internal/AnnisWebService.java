@@ -214,6 +214,15 @@ public class AnnisWebService
     return annisDao.find(data);
   }
 
+  /**
+   * Get a graph as {@link SaltProject} of a set of Salt IDs.
+   *
+   * @param saltIDs saltIDs must have at least one saltId, more than one id are
+   * separated by + or space
+   * @param leftRaw left context parameter
+   * @param rightRaw right context parameter
+   * @return the graph of this hit.
+   */
   @GET
   @Path("subgraphs")
   @Produces("application/xml")
