@@ -76,7 +76,7 @@ public class GraphWithClauseGenerator implements
     sb.append(
       "node_ids.min - 5 <= facts.token_index AND facts.token_index <= node_ids.max + 5\n");
     sb.append("AND corpus_ref = node_ids.id\n");
-
+    sb.append("ORDER BY facts.token_index");
 
     withClauseList.add(sb.toString());
     return withClauseList;
