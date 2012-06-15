@@ -280,7 +280,7 @@ limitations under the License.
         <ref bean="annotateSqlGenerator" />
       </util:list>
     </property>
-    
+
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
@@ -347,8 +347,6 @@ limitations under the License.
 
   <bean id="graphSqlGenerator" class="annis.sqlgen.GraphSqlGenerator" parent="tableAccessStrategyFactory">
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
-    <property name="fromClauseSqlGenerators" ref="graphFromClauseSqlGenerators" />
-    <property name="whereClauseSqlGenerators" ref="graphWhereClauseSqlGenerator" />
   </bean>
 
 
