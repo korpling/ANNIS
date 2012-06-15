@@ -54,6 +54,7 @@ import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.GraphSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -76,15 +77,34 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SaltAnnotateExtractor saltAnnotateExtractor;
   private MatrixSqlGenerator matrixSqlGenerator;
+  private GraphSqlGenerator<SaltProject> graphSqlGenerator;
   // configuration
   private int timeout;
   // fn: corpus id -> corpus name
   private Map<Long, String> corpusNamesById;
 
   @Override
+  @Transactional
   public SaltProject graph(QueryData data)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    return executeQueryFunction(data, sqlGenerator,
+      saltAnnotateExtractor);
+  }
+
+  /**
+   * @return the graphSqlGenerator
+   */
+  public GraphSqlGenerator getGraphSqlGenerator()
+  {
+    return graphSqlGenerator;
+  }
+
+  /**
+   * @param graphSqlGenerator the graphSqlGenerator to set
+   */
+  public void setGraphSqlGenerator(GraphSqlGenerator graphSqlGenerator)
+  {
+    this.graphSqlGenerator = graphSqlGenerator;
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;

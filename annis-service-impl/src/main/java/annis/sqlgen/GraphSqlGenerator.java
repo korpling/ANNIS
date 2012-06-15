@@ -26,7 +26,7 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class GraphSqlGenerator extends AbstractUnionSqlGenerator<QueryData>
+public class GraphSqlGenerator<T> extends AbstractUnionSqlGenerator<QueryData>
   implements FromClauseSqlGenerator<QueryData>,
   SelectClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {

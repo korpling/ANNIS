@@ -1,5 +1,5 @@
-/* 
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+/*
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,7 @@ import annis.ql.parser.QueryData;
 import annis.service.ifaces.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.AnnisAttributeSetImpl;
-import annis.sqlgen.AnnotateQueryData;
-import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
-import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.*;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.deutschdiachrondigital.dddquery.DddQueryMapper;
@@ -48,6 +45,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -64,6 +62,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
+  private GraphSqlGenerator graphSqlGenerator;
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -82,7 +81,6 @@ public class AnnisRunner extends AnnisBaseRunner
   private List<Long> corpusList;
   private boolean clearCaches;
   private MetaDataFilter metaDataFilter;
-  
 
   public enum OS
   {
@@ -223,6 +221,10 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = matrixSqlGenerator;
     }
+    else if ("subgraph".equals(function))
+    {
+      generator = graphSqlGenerator;
+    }
 
     Validate.notNull(generator, "don't now query function: " + function);
 
@@ -321,7 +323,7 @@ public class AnnisRunner extends AnnisBaseRunner
       session.addAll(Collections.nCopies(count, benchmark));
     }
 
-    // clear cache again in order to treat the last query in the list equal to 
+    // clear cache again in order to treat the last query in the list equal to
     // the others
     if (clearCaches)
     {
@@ -649,10 +651,10 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    
+
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
-    
+
 
     queryData.addExtension(new LimitOffsetQueryData(offset, limit));
     queryData.addExtension(new AnnotateQueryData(left, right));
@@ -663,9 +665,9 @@ public class AnnisRunner extends AnnisBaseRunner
         queryData));
     }
     out.println("NOTICE: corpus = " + queryData.getCorpusList());
-    
-    
-    
+
+
+
     return queryData;
   }
 
@@ -694,6 +696,44 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
     printAsTable(matches);
+  }
+
+  public void doSubgraph(String[] saltIds)
+  {
+    QueryData queryData = new QueryData();
+    queryData.addExtension(new AnnotateQueryData(left, right));
+    List<java.net.URI> uris = new ArrayList<java.net.URI>();
+    java.net.URI uri;
+
+    for (String id : saltIds)
+    {
+      uri = null;
+      try
+      {
+        uri = new java.net.URI(id);
+      }
+      catch (URISyntaxException ex)
+      {
+        out.println(id + " is not a valid URI");
+        java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+          log(Level.SEVERE, null, ex);
+      }
+
+      uris.add(uri);
+    }
+
+    queryData.addExtension(uris);
+
+    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
+      + limit + "; offset = " + offset);
+
+    SaltProject result = annisDao.graph(queryData);
+
+    // write result to File
+    URI path = URI.createFileURI("/tmp/annissalt");
+    result.saveSaltProject_DOT(path);
+    System.out.println("graph as dot written to /tmp/annissalt");
+
   }
 
   public void doAnnotate(String annisQuery)
@@ -1009,6 +1049,4 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.metaDataFilter = metaDataFilter;
   }
-  
-  
 }
