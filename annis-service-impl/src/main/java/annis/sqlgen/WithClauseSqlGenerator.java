@@ -18,6 +18,12 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import java.util.List;
 
+/**
+ * Interface for generating WITH clauses.
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @param <T> The transporter for a possible query and additional information
+ */
 public interface WithClauseSqlGenerator<T>
 {
 

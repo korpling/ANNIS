@@ -17,9 +17,13 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Generates a WITH clause sql statement for a list of salt ids.
+ *
+ * Salt ids are simple URI and are defined like this: salt:/corp1/corp2/doc1 *
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -31,6 +35,50 @@ public class GraphWithClauseGenerator implements
   public List<String> withClauses(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    List<String> withClauseList = new ArrayList<String>();
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("node_ids AS (\n");
+
+    sb.append(
+      "SELECT min(facts.token_index) as min, max(facts.token_index) as max, corpus_id as id\n");
+    sb.append("FROM corpus, facts\n");
+
+    /**
+     * WHERE Clause for WITH clause, TODO: read this path from query object
+     */
+    sb.append("WHERE path_name ='{11299, pcc}'\n");
+
+    sb.append("AND facts.corpus_ref = corpus.id\n");
+
+    /**
+     * TODO: read this token names from query object
+     */
+    sb.append("AND (facts.node_name = 'tok_14'\n");
+    sb.append("OR facts.node_name = 'const_5')\n");
+
+    /**
+     * probably not needed
+     */
+    sb.append("GROUP BY corpus.id\n), ");
+
+    sb.append("matching_nodes AS (\n");
+    sb.append(
+      "SELECT DISTINCT facts.id, facts.node_name, facts.token_index, facts.span, facts.node_anno_ref, facts.edge_anno_ref, facts.pre\n");
+
+    sb.append("FROM node_ids, facts\n");
+
+    sb.append("WHERE ");
+
+    /**
+     * TODO island policy
+     */
+    sb.append(
+      "node_ids.min - 5 <= facts.token_index AND facts.token_index <= node_ids.max + 5\n");
+    sb.append("AND corpus_ref = node_ids.id\n");
+
+
+    withClauseList.add(sb.toString());
+    return withClauseList;
   }
 }
