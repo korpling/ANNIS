@@ -47,6 +47,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
@@ -711,10 +713,36 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doFind(String annisQuery)
   {
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
-    printAsTable(matches);
+    JAXBContext jc = null;
+    try
+    {
+      jc = JAXBContext.newInstance(annis.dao.Match.class);
+    }
+    catch (JAXBException ex)
+    {
+      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+
+
+    for (int i = 0; i < matches.size(); i++)
+    {
+
+      try
+      {
+
+        jc.createMarshaller().marshal(matches.get(i), out);
+      }
+      catch (JAXBException ex)
+      {
+        java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+          log(Level.SEVERE, null, ex);
+      }
+
+    }
   }
 
-  public void doSubgraph(String[] saltIds)
+  public void doSubGraph(String[] saltIds)
   {
     QueryData queryData = new QueryData();
     queryData.addExtension(new AnnotateQueryData(left, right));
