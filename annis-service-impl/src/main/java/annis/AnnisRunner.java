@@ -181,15 +181,18 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   // FIXME: missing tests
-  public void doSql(String functionCall)
+  public void doSql(String funcCall)
   {
-    SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
-      functionCall);
-    String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-    QueryData queryData = analyzeQuery(annisQuery, null);
-    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
+    String doSqlFunctionName = "sql_" + funcCall.split("\\s", 2)[0];
+    SqlGenerator<QueryData, ?> gen = getGeneratorForQueryFunction(funcCall);
+    String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
+    QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
+
+    out.println("NOTICE: left = "
+      + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
-    out.println(generator.toSql(queryData));
+
+    out.println(gen.toSql(queryData));
   }
 
   public void doExplain(String functionCall, boolean analyze)
@@ -665,9 +668,35 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("?" + setting);
   }
 
+  /**
+   * Does the setup for the QueryData object.
+   *
+   * If the query function is "subgraph" or "sql_subgraph" the annisQuery string
+   * should contain space separated salt ids. In this case the annisQuery is not
+   * parsed and the {@link QueryData#getAlternatives()} method should return an
+   * empty List.
+   *
+   * @param annisQuery should include a valid annis query
+   * @param queryFunction should include a method name of {@link AnnisRunner}
+   * which starts with do.
+   * @return {@link QueryData} object, which contains a parsed annis query, the
+   * default context {@link AnnisRunner#left} and {@link AnnisRunner#left}
+   * values and the default {@link AnnisRunner#limit} and
+   * {@link AnnisRunner#offset} values
+   */
   private QueryData analyzeQuery(String annisQuery, String queryFunction)
   {
-    QueryData queryData = annisDao.parseAQL(annisQuery, corpusList);
+
+    QueryData queryData;
+    if (queryFunction != null && !queryFunction.matches("(sql_)?subgraph"))
+    {
+      queryData = annisDao.parseAQL(annisQuery, corpusList);
+    }
+    else
+    {
+      queryData = new QueryData();
+    }
+
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
 
     // filter by meta data
@@ -683,9 +712,7 @@ public class AnnisRunner extends AnnisBaseRunner
         queryData));
     }
     out.println("NOTICE: corpus = " + queryData.getCorpusList());
-
-
-
+    
     return queryData;
   }
 
@@ -743,14 +770,14 @@ public class AnnisRunner extends AnnisBaseRunner
     }
   }
 
-  public void doSubGraph(String[] saltIds)
+  public void doSubgraph(String saltIds)
   {
     QueryData queryData = new QueryData();
     queryData.addExtension(new AnnotateQueryData(left, right));
     List<java.net.URI> uris = new ArrayList<java.net.URI>();
     java.net.URI uri;
 
-    for (String id : saltIds)
+    for (String id : saltIds.split("\\s"))
     {
       uri = null;
       try
