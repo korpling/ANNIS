@@ -739,6 +739,7 @@ public class AnnisRunner extends AnnisBaseRunner
           log(Level.SEVERE, null, ex);
       }
 
+      out.println();
     }
   }
 
