@@ -26,16 +26,20 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class GraphSqlGenerator<T> extends AbstractUnionSqlGenerator<QueryData>
+public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   implements FromClauseSqlGenerator<QueryData>,
   SelectClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
 {
 
   @Override
-  public QueryData extractData(ResultSet rs) throws SQLException,
-    DataAccessException
+  public String toSql(QueryData queryData, String indent)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    StringBuffer sb = new StringBuffer();
+    sb.append(indent);
+    sb.append(createSqlForAlternative(queryData, null, indent));
+    appendOrderByClause(sb, queryData, null, indent);
+    appendLimitOffsetClause(sb, queryData, null, indent);
+    return sb.toString();
   }
 
   @Override
@@ -65,5 +69,11 @@ public class GraphSqlGenerator<T> extends AbstractUnionSqlGenerator<QueryData>
     List<QueryNode> alternative, String indent)
   {
     return "ORDER BY token_index, matching_nodes.pre";
+  }
+
+  @Override
+  public T extractData(ResultSet rs) throws SQLException, DataAccessException
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 }

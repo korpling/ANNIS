@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ import annis.ql.parser.QueryData;
 import annis.service.internal.AnnisWebService;
 
 /**
- * Generates identifers for salt which are needed for the  
- * {@link AnnisWebService#find(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}
- * 
+ * Generates identifers for salt which are needed for the
+ * {@link AnnisWebService#subgraph(java.lang.String, java.lang.String, java.lang.String)}
+ *
  * @author Benjamin Weißenfels
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
@@ -45,7 +45,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
-  private CorpusPathExtractor corpusPathExtractor;  
+  private CorpusPathExtractor corpusPathExtractor;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -108,7 +108,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     ResultSetMetaData metaData = rs.getMetaData();
     int columnCount = metaData.getColumnCount();
 
-    // the order of columns is not determined and I have to combined two 
+    // the order of columns is not determined and I have to combined two
     // values, so save them here and combine later
     String node_name = null;
     List<String> corpus_path = null;
@@ -179,5 +179,5 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
   {
     this.corpusPathExtractor = corpusPathExtractor;
-  }  
+  }
 }

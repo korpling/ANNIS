@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@ package annis.sqlgen;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import annis.ql.parser.QueryData;
 
 
 public interface SqlGenerator<QueryType, ResultType> extends ResultSetExtractor<ResultType> {
 
 	String toSql(QueryType queryData);
-	
+
 	String toSql(QueryType queryData, String indent);
 
 }

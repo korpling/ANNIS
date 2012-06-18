@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.net.URI;
 import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -61,7 +60,7 @@ public interface AnnisDao
   @Deprecated
   public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
-  // new 
+  // new
   int count(QueryData queryData);
 
   List<Match> find(QueryData queryData);

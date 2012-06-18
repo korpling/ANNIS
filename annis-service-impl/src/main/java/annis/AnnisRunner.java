@@ -188,8 +188,7 @@ public class AnnisRunner extends AnnisBaseRunner
     String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
     QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
 
-    out.println("NOTICE: left = "
-      + left + "; right = " + right + "; limit = "
+    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
     out.println(gen.toSql(queryData));
@@ -218,9 +217,9 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   private SqlGenerator<QueryData, ?> getGeneratorForQueryFunction(
-    String functionCall)
+    String funcCall)
   {
-    String[] split = functionCall.split(" ", 2);
+    String[] split = funcCall.split(" ", 2);
 
     Validate.isTrue(split.length == 2, "bad call to plan");
     String function = split[0];
@@ -712,7 +711,7 @@ public class AnnisRunner extends AnnisBaseRunner
         queryData));
     }
     out.println("NOTICE: corpus = " + queryData.getCorpusList());
-    
+
     return queryData;
   }
 

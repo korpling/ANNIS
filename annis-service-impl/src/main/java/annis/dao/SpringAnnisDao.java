@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional
   public SaltProject graph(QueryData data)
   {
-    return executeQueryFunction(data, sqlGenerator,
-      saltAnnotateExtractor);
+    return executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
   }
 
   /**

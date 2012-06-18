@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.util.Assert;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import org.springframework.util.Assert;
 
 /**
  * Abstract base class for a complete SQL statement.
@@ -144,8 +144,15 @@ public abstract class AbstractSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
 
+    // check if the WHERE clause generators are really used
+    if (whereClauseSqlGenerators == null || whereClauseSqlGenerators.isEmpty())
+    {
+      return;
+    }
+
     // treat each condition as mutable string to remove last AND
     List<StringBuffer> conditions = new ArrayList<StringBuffer>();
+
     for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators)
     {
       Set<String> whereConditions = generator.whereConditions(queryData,

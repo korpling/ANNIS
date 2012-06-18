@@ -347,6 +347,8 @@ limitations under the License.
 
   <bean id="graphSqlGenerator" class="annis.sqlgen.GraphSqlGenerator" parent="tableAccessStrategyFactory">
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
+    <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
+    <property name="fromClauseSqlGenerators" ref="graphSqlGenerator" />
   </bean>
 
 
