@@ -41,7 +41,7 @@ public class GraphWithClauseGenerator implements
     sb.append("node_ids AS (\n");
 
     sb.append(
-      "SELECT min(facts.token_index) as min, max(facts.token_index) as max, corpus_id as id\n");
+      "SELECT min(facts.token_index) as min, max(facts.token_index) as max, corpus.id as id\n");
     sb.append("FROM corpus, facts\n");
 
     /**
@@ -76,7 +76,7 @@ public class GraphWithClauseGenerator implements
     sb.append(
       "node_ids.min - 5 <= facts.token_index AND facts.token_index <= node_ids.max + 5\n");
     sb.append("AND corpus_ref = node_ids.id\n");
-    sb.append("ORDER BY facts.token_index");
+    sb.append("ORDER BY facts.token_index)");
 
     withClauseList.add(sb.toString());
     return withClauseList;
