@@ -255,7 +255,9 @@ public class AnnisWebService
         URI saltID = new URI(id);
         saltURI.add(saltID);
 
-        if (saltID.getScheme() == null || !saltID.getScheme().equals("salt"))
+        if (saltID.getScheme() == null
+          || !saltID.getScheme().equals("salt")
+          || saltID.getFragment() == null)
         {
           throw new WebApplicationException(
             Response.status(Response.Status.BAD_REQUEST).type(

@@ -1113,7 +1113,7 @@ public class AnnisRunner extends AnnisBaseRunner
       {
         uri = new java.net.URI(id);
 
-        if (!"salt".equals(uri.getScheme()))
+        if (!"salt".equals(uri.getScheme())  || uri.getFragment() == null)
         {
           throw new URISyntaxException("not a salt id", uri.toString());
         }

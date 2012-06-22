@@ -51,18 +51,9 @@ public class GraphWithClauseGenerator implements
       "SELECT min(facts.left_token) as min, max(facts.right_token) as max, corpus.id as id\n");
     sb.append("FROM corpus, facts\n");
 
-    /**
-     * WHERE Clause for WITH clause, TODO: read this path from query object
-     */
     getCorpusPath(sb, queryData);
-
     sb.append("AND facts.corpus_ref = corpus.id\n");
-
-    /**
-     * TODO: read this token names from query object
-     */
-    sb.append("AND (facts.node_name = 'const_52'\n");
-    sb.append("OR facts.node_name = 'const_54')\n");
+    getTokenNames(sb, queryData);
 
     /**
      * probably not needed
@@ -92,8 +83,6 @@ public class GraphWithClauseGenerator implements
   private String getCorpusPath(StringBuilder sb, QueryData queryData)
   {
     List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
-
-    log.debug(listOfSaltURIs.size());
 
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
@@ -125,5 +114,32 @@ public class GraphWithClauseGenerator implements
     }
 
     return sb.toString();
+  }
+
+  private StringBuilder getTokenNames(StringBuilder sb, QueryData queryData)
+  {
+    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+    SaltURIs saltURIs = listOfSaltURIs.get(0);
+
+    sb.append("AND(\n");
+    for (int i = 0; i < saltURIs.size(); i++)
+    {
+      URI uri = saltURIs.get(i);
+      sb.append("facts.node_name='").append(uri.getFragment()).append("'");
+      sb.append("\n");
+
+      // concate conditions
+      if (i < saltURIs.size() -1)
+      {
+        sb.append("OR\n");
+      }
+    }
+
+    sb.append(")\n");
+
+    return sb;
   }
 }
