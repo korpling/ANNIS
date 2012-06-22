@@ -28,6 +28,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
@@ -230,7 +231,7 @@ public class AnnisWebService
     @DefaultValue("5") @QueryParam("right") String rightRaw)
   {
     String[] ids;
-    List<URI> saltURI = new ArrayList<URI>();
+    List<URI> saltURI = new SaltURIs();
     QueryData data = new QueryData();
     int left = Integer.parseInt(leftRaw);
     int right = Integer.parseInt(rightRaw);

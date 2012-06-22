@@ -17,19 +17,26 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
  *
  * Salt ids are simple URI and are defined like this: salt:/corp1/corp2/doc1 *
  *
+ * TODO support table access strategy
+ *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class GraphWithClauseGenerator implements
   WithClauseSqlGenerator<QueryData>
 {
+
+  private Logger log = Logger.getLogger(GraphWithClauseGenerator.class);
 
   @Override
   public List<String> withClauses(QueryData queryData,
@@ -41,21 +48,21 @@ public class GraphWithClauseGenerator implements
     sb.append("node_ids AS (\n");
 
     sb.append(
-      "SELECT min(facts.token_index) as min, max(facts.token_index) as max, corpus.id as id\n");
+      "SELECT min(facts.left_token) as min, max(facts.right_token) as max, corpus.id as id\n");
     sb.append("FROM corpus, facts\n");
 
     /**
      * WHERE Clause for WITH clause, TODO: read this path from query object
      */
-    sb.append("WHERE path_name ='{11299, pcc}'\n");
+    getCorpusPath(sb, queryData);
 
     sb.append("AND facts.corpus_ref = corpus.id\n");
 
     /**
      * TODO: read this token names from query object
      */
-    sb.append("AND (facts.node_name = 'tok_14'\n");
-    sb.append("OR facts.node_name = 'const_5')\n");
+    sb.append("AND (facts.node_name = 'const_52'\n");
+    sb.append("OR facts.node_name = 'const_54')\n");
 
     /**
      * probably not needed
@@ -80,5 +87,31 @@ public class GraphWithClauseGenerator implements
 
     withClauseList.add(sb.toString());
     return withClauseList;
+  }
+
+  private String getCorpusPath(StringBuilder sb, QueryData queryData)
+  {
+    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+
+    log.debug(listOfSaltURIs.size());
+
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+    SaltURIs saltURIs = listOfSaltURIs.get(0);
+    sb.append("WHERE ");
+
+    for (int i = 0; i < saltURIs.size(); i++)
+    {
+      URI uri = saltURIs.get(i);
+      sb.append("path_name = '{").append(uri.getRawPath()).append("}'\n");
+
+      // concate conditions
+      if (i < saltURIs.size() - 1)
+      {
+        sb.append("OR\n");
+      }
+    }
+
+    return sb.toString();
   }
 }

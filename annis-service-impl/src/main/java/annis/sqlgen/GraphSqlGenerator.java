@@ -48,7 +48,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   {
     StringBuilder sb = new StringBuilder();
 
-    sb.append("FROM matching_nodes \n");
+    sb.append("matching_nodes \n");
     sb.append(
       "LEFT OUTER JOIN annotation_pool as anno_node ON(matching_nodes.node_anno_ref = anno_node.id)\n");
     sb.append(
@@ -61,14 +61,14 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    return "SELECT ARRAY[matching_nodes.id] AS key, * \n";
+    return "ARRAY[matching_nodes.id] AS key, * \n";
   }
 
   @Override
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    return "ORDER BY token_index, matching_nodes.pre";
+    return "ORDER BY token_index, matching_nodes.pre\n";
   }
 
   @Override

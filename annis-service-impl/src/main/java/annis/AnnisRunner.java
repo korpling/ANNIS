@@ -673,7 +673,8 @@ public class AnnisRunner extends AnnisBaseRunner
    * If the query function is "subgraph" or "sql_subgraph" the annisQuery string
    * should contain space separated salt ids. In this case the annisQuery is not
    * parsed and the {@link QueryData#getAlternatives()} method should return an
-   * empty List.
+   * empty List. Instead of parsing the annisQuery it extracts the saltIds and
+   * put it into the extension's of {@link QueryData}.
    *
    * @param annisQuery should include a valid annis query
    * @param queryFunction should include a method name of {@link AnnisRunner}
@@ -687,13 +688,14 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 
     QueryData queryData;
+
     if (queryFunction != null && !queryFunction.matches("(sql_)?subgraph"))
     {
       queryData = annisDao.parseAQL(annisQuery, corpusList);
     }
     else
     {
-      queryData = new QueryData();
+      queryData = extractSaltIds(annisQuery);
     }
 
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
@@ -771,29 +773,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doSubgraph(String saltIds)
   {
-    QueryData queryData = new QueryData();
-    queryData.addExtension(new AnnotateQueryData(left, right));
-    List<java.net.URI> uris = new ArrayList<java.net.URI>();
-    java.net.URI uri;
+    QueryData queryData = analyzeQuery(saltIds, "subgraph");
 
-    for (String id : saltIds.split("\\s"))
-    {
-      uri = null;
-      try
-      {
-        uri = new java.net.URI(id);
-      }
-      catch (URISyntaxException ex)
-      {
-        out.println(id + " is not a valid URI");
-        java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
-          log(Level.SEVERE, null, ex);
-      }
 
-      uris.add(uri);
-    }
-
-    queryData.addExtension(uris);
 
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
@@ -804,7 +786,6 @@ public class AnnisRunner extends AnnisBaseRunner
     URI path = URI.createFileURI("/tmp/annissalt");
     result.saveSaltProject_DOT(path);
     System.out.println("graph as dot written to /tmp/annissalt");
-
   }
 
   public void doAnnotate(String annisQuery)
@@ -1119,5 +1100,35 @@ public class AnnisRunner extends AnnisBaseRunner
   public void setMetaDataFilter(MetaDataFilter metaDataFilter)
   {
     this.metaDataFilter = metaDataFilter;
+  }
+
+  private QueryData extractSaltIds(String saltIds)
+  {
+    QueryData queryData = new QueryData();
+    SaltURIs uris = new SaltURIs();
+    for (String id : saltIds.split("\\s"))
+    {
+      java.net.URI uri;
+      try
+      {
+        uri = new java.net.URI(id);
+
+        if (!"salt".equals(uri.getScheme()))
+        {
+          throw new URISyntaxException("not a salt id", uri.toString());
+        }
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error(ex);
+        continue;
+      }
+
+      uris.add(uri);
+    }
+
+    log.debug(uris);
+    queryData.addExtension(uris);
+    return queryData;
   }
 }
