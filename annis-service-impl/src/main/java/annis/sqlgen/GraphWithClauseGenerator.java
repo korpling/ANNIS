@@ -100,10 +100,22 @@ public class GraphWithClauseGenerator implements
     SaltURIs saltURIs = listOfSaltURIs.get(0);
     sb.append("WHERE ");
 
+
     for (int i = 0; i < saltURIs.size(); i++)
     {
       URI uri = saltURIs.get(i);
-      sb.append("path_name = '{").append(uri.getRawPath()).append("}'\n");
+      String[] path = uri.getPath().split("/");
+
+      // the path is reversed in relAnnis saved
+      sb.append("path_name = '{");
+      for (int j = path.length - 1; j > 0; j--)
+      {
+        sb.append(path[j]);
+        sb.append(", ");
+      }
+
+      sb.append(uri.getHost());
+      sb.append("}'\n");
 
       // concate conditions
       if (i < saltURIs.size() - 1)
