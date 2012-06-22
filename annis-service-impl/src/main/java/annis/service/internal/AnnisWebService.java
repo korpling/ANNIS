@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -230,7 +229,7 @@ public class AnnisWebService
     @DefaultValue("5") @QueryParam("left") String leftRaw,
     @DefaultValue("5") @QueryParam("right") String rightRaw)
   {
-    String[] ids = null;
+    String[] ids;
     List<URI> saltURI = new ArrayList<URI>();
     QueryData data = new QueryData();
     int left = Integer.parseInt(leftRaw);
@@ -266,8 +265,7 @@ public class AnnisWebService
       catch (URISyntaxException ex)
       {
         String msg = id + "is not a valid salt scheme";
-        java.util.logging.Logger.getLogger(AnnisWebService.class.getName()).
-          log(Level.SEVERE, msg, ex);
+        log.error(msg, ex);
       }
     }
 
