@@ -17,9 +17,11 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -75,5 +77,29 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   public T extractData(ResultSet rs) throws SQLException, DataAccessException
   {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  private String generateSolutionKey(QueryData queryData)
+  {
+    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+    StringBuilder sb = new StringBuilder();
+
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+    SaltURIs saltURIs = listOfSaltURIs.get(0);
+
+    sb.append(" ARRAY[");
+    for (int i = 0; i < saltURIs.size(); i++)
+    {
+      sb.append("matching_nodes.id").append(i + 1);
+      if (i < saltURIs.size()-1)
+      {
+        sb.append(", ");
+      }
+    }
+
+    sb.append("] AS key,\n");
+
+    return sb.toString();
   }
 }

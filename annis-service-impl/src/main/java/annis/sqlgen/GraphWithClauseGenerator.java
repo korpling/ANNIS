@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
  * Salt ids are simple URI and are defined like this: salt:/corp1/corp2/doc1 *
  *
  * TODO support table access strategy
+ * TODO read corpusconfiguration
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
