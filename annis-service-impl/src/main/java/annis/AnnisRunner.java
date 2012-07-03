@@ -153,8 +153,9 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
       functionCall);
+    String function = getAnnisFunctionyFromFunctionCall(functionCall);
     String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-    QueryData queryData = analyzeQuery(annisQuery, null);
+    QueryData queryData = analyzeQuery(annisQuery, function);
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
     out.println(generator.toSql(queryData));
@@ -164,8 +165,9 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
       functionCall);
+    String function = getAnnisQueryFromFunctionCall(functionCall);
     String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-    QueryData queryData = analyzeQuery(annisQuery, null);
+    QueryData queryData = analyzeQuery(annisQuery, function);
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
@@ -219,6 +221,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(split.length == 2, "bad call to plan");
     return split[1];
+  }
+  
+  private String getAnnisFunctionyFromFunctionCall(String functionCall)
+  {
+    String[] split = functionCall.split(" ", 2);
+
+    Validate.isTrue(split.length == 2, "bad call to plan");
+    return split[0];
   }
 
   public void doRecord(String dummy)
@@ -649,9 +659,15 @@ public class AnnisRunner extends AnnisBaseRunner
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
     
-
-    queryData.addExtension(new LimitOffsetQueryData(offset, limit));
-    queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+    if("annotate".equals(queryFunction))
+    {      
+      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+      queryData.addExtension(new LimitOffsetQueryData(offset, limit)); 
+    }
+    else if("find".equals(queryFunction))
+    {
+      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+    }
 
     if (annisQuery != null)
     {
@@ -695,6 +711,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doAnnotate(String annisQuery)
   {
     QueryData queryData = analyzeQuery(annisQuery, "annotate");
+    
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
     SaltProject result = annisDao.annotate(queryData);

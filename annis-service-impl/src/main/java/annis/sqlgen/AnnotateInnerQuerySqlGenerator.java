@@ -115,7 +115,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
     // don't use ORDER BY clause if there's no LIMIT clause; saves a sort
     List<LimitOffsetQueryData> extensions =
       queryData.getExtensions(LimitOffsetQueryData.class);
-    Validate.isTrue(extensions.size() > 0);
+    Validate.isTrue(extensions.size() > 0, "in annotate queries you have to provide a LimitOffsetQueryData extension");
 
     if (extensions.get(0).isPaged())
     {

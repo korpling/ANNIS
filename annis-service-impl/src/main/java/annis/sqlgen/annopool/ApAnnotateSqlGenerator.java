@@ -93,7 +93,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     sb.append(innerIndent);
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
-    Validate.isTrue(extension.size() > 0);
+    Validate.isTrue(extension.size() > 0, "annotate query needs LimitOffsetQueryData extension");
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
     sb.append(innerIndent).append("solutions.n,\n");
 
