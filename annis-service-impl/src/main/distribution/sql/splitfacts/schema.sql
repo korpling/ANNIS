@@ -40,7 +40,7 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
-CREATE TYPE annotype AS ENUM ('node', 'edge');
+CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 -- collect all node annotations
 CREATE TABLE annotation_pool (
   id bigserial,
@@ -70,6 +70,9 @@ CREATE TABLE facts_node (
   span character varying(2000),
   left_token integer,
   right_token integer,
+  seg_name varchar(100),
+  seg_left integer,
+  seg_right integer,
   node_anno_ref bigint REFERENCES annotation_pool(id),
   n_sample boolean,
   PRIMARY KEY (fid)
@@ -121,11 +124,6 @@ CREATE TABLE corpus_stats
   id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
   text        bigint,
   tokens        bigint,
-  roots        bigint,
-  depth        bigint,
-  avg_level      real,
-  avg_children    real,
-  avg_duplicates  real,
   max_corpus_id bigint  NULL,
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
@@ -134,15 +132,12 @@ CREATE TABLE corpus_stats
   max_node_id bigint NULL
 );
 
+
 CREATE VIEW corpus_info AS SELECT 
   name,
   id, 
-  tokens,
-  roots,
-  depth,
-  to_char(avg_level, '990.99') as avg_level,
-  to_char(avg_children, '990.99') as avg_children,
-  to_char(avg_duplicates, '990.99') as avg_duplicates
+  text,
+  tokens
 FROM 
   corpus_stats;
   
@@ -177,7 +172,7 @@ CREATE TABLE annotations
   "name" varchar(150),
   "value" varchar(1500),
   occurences bigint,
-  "type" varchar(10),
+  "type" varchar,
   "subtype" char(1),
   edge_namespace varchar(150),
   edge_name varchar(150),

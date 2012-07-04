@@ -26,8 +26,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 import annis.model.AnnisNode;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.objects.AnnisAttributeImpl;
+import annis.service.objects.AnnisAttribute;
 import org.apache.commons.lang.StringUtils;
 
 public class ListAnnotationsSqlHelper implements ResultSetExtractor
@@ -45,7 +44,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, occurences, :value AS value\n"
       + "    FROM annotations\n"
       + "    WHERE\n"
-      + "    value <> '--'\n"
+      + "    (value IS NULL OR value <> '--')\n"
       + (
         corpusList.isEmpty() ?
           "\n" : "    AND toplevel_corpus IN (:corpora)\n"
@@ -89,7 +88,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       }
       if (!attributesByName.containsKey(key))
       {
-        attributesByName.put(key, new AnnisAttributeImpl());
+        attributesByName.put(key, new AnnisAttribute());
       }
 
       AnnisAttribute attribute = attributesByName.get(key);

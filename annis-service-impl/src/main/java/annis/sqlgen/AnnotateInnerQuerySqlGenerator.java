@@ -75,11 +75,23 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
       List<String> fields = new ArrayList<String>();
       fields.addAll(solutionKey.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
-      fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") + " - "
-        + annotateQueryData.getLeft() + " AS min" + i);
-      fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") + " + "
-        + annotateQueryData.getRight() + " AS max" + i);
-
+      
+      // only set the context directly if we are doing a context search on the 
+      // token but not any of the other segmentation layers
+      if(annotateQueryData.getSegmentationLayer() == null)
+      {
+        fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") + " - "
+          + annotateQueryData.getLeft() + " AS min" + i);
+        fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") + " + "
+          + annotateQueryData.getRight() + " AS max" + i);
+      }
+      else
+      {
+        fields.add(tables.aliasedColumn(NODE_TABLE, "left_token") 
+          + " AS min" + i);
+        fields.add(tables.aliasedColumn(NODE_TABLE, "right_token") 
+          + " AS max" + i);
+      }
       fields.add(tables.aliasedColumn(NODE_TABLE, "corpus_ref") + " AS corpus"
         + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
@@ -103,7 +115,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
     // don't use ORDER BY clause if there's no LIMIT clause; saves a sort
     List<LimitOffsetQueryData> extensions =
       queryData.getExtensions(LimitOffsetQueryData.class);
-    Validate.isTrue(extensions.size() > 0);
+    Validate.isTrue(extensions.size() > 0, "in annotate queries you have to provide a LimitOffsetQueryData extension");
 
     if (extensions.get(0).isPaged())
     {

@@ -23,7 +23,7 @@ import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.ifaces.AnnisAttribute;
+import annis.service.objects.AnnisAttribute;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
@@ -53,9 +53,6 @@ public interface AnnisDao
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
-
-  @Deprecated
-  public QueryData parseDDDQuery(String dddquery, List<Long> corpusList);
 
 // new 
   int count(QueryData queryData);

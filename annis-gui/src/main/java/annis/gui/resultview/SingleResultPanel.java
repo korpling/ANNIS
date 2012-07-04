@@ -20,7 +20,7 @@ import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -35,10 +35,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -62,6 +59,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -82,20 +80,26 @@ public class SingleResultPanel extends VerticalLayout implements
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
   private List<KWICPanel> kwicPanels;
+  private List<VisualizerPanel> mediaVisualizer;
+  private List<String> mediaIDs;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
+  private String segmentationName;
+  private CorpusConfig corpusConfig;
+  private List<SNode> token;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos)
+    Set<String> visibleTokenAnnos, String segmentationName)
   {
     this.ps = ps;
     this.result = result;
     this.resolverProvider = resolverProvider;
     this.resultNumber = resultNumber;
     this.visibleTokenAnnos = visibleTokenAnnos;
+    this.segmentationName = segmentationName;
 
     calculateHelperVariables();
 
@@ -143,32 +147,15 @@ public class SingleResultPanel extends VerticalLayout implements
 
     // get corpus properties
 
-    CorpusConfig corpusConfig = new CorpusConfig();
-    corpusConfig.setConfig(new TreeMap<String, String>());
-    
-    try
-    {
-      corpusConfig = Helper.getAnnisWebResource(getApplication()).path("corpora").
-        path(
-        URLEncoder.encode(path.get(0), "UTF-8"))
-        .path("config").get(CorpusConfig.class);
-    }
-    catch(UnsupportedEncodingException ex)
-    {
-      getWindow().showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      getWindow().showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
-    }
+    corpusConfig =
+      Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
+
     ResolverEntry[] entries =
       resolverProvider.getResolverEntries(result);
-    List<String> mediaIDs = mediaVisIds(entries);
+    mediaIDs = mediaVisIds(entries);
     List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
     List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-    List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
+    mediaVisualizer = new ArrayList<VisualizerPanel>();
 
     for (int i = 0; i < entries.length; i++)
     {
@@ -187,25 +174,14 @@ public class SingleResultPanel extends VerticalLayout implements
 
       visualizers.add(p);
       Properties mappings = entries[i].getMappings();
-      if(Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+      if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
       {
         openVisualizers.add(p);
       }
     }
 
-    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC) || Boolean.parseBoolean(
-      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
-    {
-      kwicPanels = new ArrayList<KWICPanel>();
-      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-      {
-        KWICPanel kwic = new KWICPanel(result, visibleTokenAnnos,
-          markedAndCovered, text, mediaIDs, mediaVisualizer, this);
-
-        addComponent(kwic);
-        kwicPanels.add(kwic);
-      }
-    }
+    kwicPanels = new ArrayList<KWICPanel>();
+    addKWICPanels();
 
     for (VisualizerPanel p : visualizers)
     {
@@ -219,6 +195,48 @@ public class SingleResultPanel extends VerticalLayout implements
 
 
     super.attach();
+  }
+
+  private void addKWICPanels()
+  {
+    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC)
+      || Boolean.parseBoolean(
+      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
+    {
+      kwicPanels.clear();
+      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+      {
+        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
+          result.getSDocumentGraph());
+
+        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+        calulcateColorsForMarkedAndCoverd();
+
+
+        KWICPanel kwic = new KWICPanel(result, token, visibleTokenAnnos,
+          markedAndCovered, text, mediaIDs, mediaVisualizer, this,
+          segmentationName);
+
+        // add after the info bar component
+        addComponent(kwic, 1);
+        kwicPanels.add(kwic);
+      }
+    }
+  }
+
+  public void setSegmentationLayer(String segmentationName)
+  {
+    this.segmentationName = segmentationName;
+    if (kwicPanels != null)
+    {
+      for (KWICPanel kwic : kwicPanels)
+      {
+        removeComponent(kwic);
+      }
+
+      kwicPanels.clear();
+      addKWICPanels();
+    }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
@@ -237,37 +255,40 @@ public class SingleResultPanel extends VerticalLayout implements
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
 
-    for (SNode n : result.getSDocumentGraph().getSNodes())
+    SDocumentGraph g = result.getSDocumentGraph();
+    if(g != null)
     {
-
-      SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_MATCHEDNODE);
-      Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
-
-      if (match != null)
+      for (SNode n : result.getSDocumentGraph().getSNodes())
       {
-        int color = Math.max(0, Math.min((int) match.longValue() - 1,
-          MatchedNodeColors.values().length - 1));
-        SFeature feat = n.getSFeature(AnnisConstants.ANNIS_NS,
-          AnnisConstants.FEAT_INTERNALID);
-        if (feat != null)
+
+        SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
+
+        if (match != null)
         {
-          markedExactMap.put("" + feat.getSValueSNUMERIC(),
-            MatchedNodeColors.values()[color].name());
+          int color = Math.max(0, Math.min((int) match.longValue() - 1,
+            MatchedNodeColors.values().length - 1));
+          SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+          if (feat != null)
+          {
+            markedExactMap.put("" + feat.getSValueSNUMERIC(),
+              MatchedNodeColors.values()[color].name());
+          }
         }
+
       }
-
     }
+  }
 
-    markedAndCovered = calculateMarkedAndCoveredIDs(result);
-
+  private void calulcateColorsForMarkedAndCoverd()
+  {
     for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
     {
       int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
         - 1,
         MatchedNodeColors.values().length - 1));
-      SFeature feat = markedEntry.getKey().getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_INTERNALID);
+      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS,
+        FEAT_INTERNALID);
       if (feat != null)
       {
         markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
@@ -277,7 +298,7 @@ public class SingleResultPanel extends VerticalLayout implements
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
-    SDocument doc)
+    SDocument doc, List<SNode> segNodes)
   {
     Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
@@ -285,8 +306,8 @@ public class SingleResultPanel extends VerticalLayout implements
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
-      SFeature featMatched = n.getSFeature(AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_MATCHEDNODE);
+      SFeature featMatched = n.getSFeature(ANNIS_NS,
+        FEAT_MATCHEDNODE);
       Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
 
       if (match != null)
@@ -296,10 +317,50 @@ public class SingleResultPanel extends VerticalLayout implements
       }
     }
 
+    // calculate covered nodes
     CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.
       getSDocumentGraph(), initialCovered);
+    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
-    return cmc.getMatchedAndCovered();
+
+    if (segmentationName != null)
+    {
+      // filter token
+      Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
+      for (Map.Entry<SNode, Long> e : covered.entrySet())
+      {
+        if (e.getKey() instanceof SToken)
+        {
+          coveredToken.put((SToken) e.getKey(), e.getValue());
+        }
+      }
+
+      for (SNode segNode : segNodes)
+      {
+        if (segNode != null && !covered.containsKey(segNode))
+        {
+          long leftTok =
+            segNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
+          long rightTok =
+            segNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
+
+          // check for each covered token if this segment is covering it
+          for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
+          {
+            long entryTokenIndex = e.getKey().getSFeature(ANNIS_NS,
+              FEAT_TOKENINDEX).getSValueSNUMERIC();
+            if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
+            {
+              // add this segmentation node to the covered set
+              covered.put(segNode, e.getValue());
+              break;
+            }
+          } // end for each covered token
+        } // end if not already contained
+      } // end for each segmentation node
+    }
+
+    return covered;
   }
 
   @Override

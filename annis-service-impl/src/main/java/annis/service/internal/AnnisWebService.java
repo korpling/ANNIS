@@ -23,6 +23,7 @@ import annis.dao.Match;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
@@ -31,6 +32,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.DefaultValue;
@@ -121,7 +123,8 @@ public class AnnisWebService
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("10") @QueryParam("limit") String limitRaw,
     @DefaultValue("5") @QueryParam("left") String leftRaw,
-    @DefaultValue("5") @QueryParam("right") String rightRaw) throws IOException
+    @DefaultValue("5") @QueryParam("right") String rightRaw,
+    @QueryParam("seglayer") String segmentationLayer) throws IOException
   {
     if (query == null)
     {
@@ -159,7 +162,7 @@ public class AnnisWebService
 
     QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-    data.addExtension(new AnnotateQueryData(left, right));
+    data.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
     long start = new Date().getTime();
     SaltProject p = annisDao.annotate(data);
     long end = new Date().getTime();
@@ -236,6 +239,7 @@ public class AnnisWebService
 
   @GET
   @Path("resolver/{corpusName}/{namespace}/{type}")
+  @Produces("application/xml")
   public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName,
     @PathParam("namespace") String namespace,
     @PathParam("type") String type)
@@ -261,6 +265,24 @@ public class AnnisWebService
     CorpusConfig result = new CorpusConfig();
     result.setConfig(tmp);
     return result;
+  }
+  
+  @GET
+  @Path("corpora/{top}/annotations")
+  @Produces("application/xml")
+  public List<AnnisAttribute> annotations(
+    @PathParam("top") String toplevelCorpus, 
+    @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
+    @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues
+  )
+  {
+    List<String> list = new LinkedList<String>();
+    list.add(toplevelCorpus);
+    List<Long> corpusList = annisDao.listCorpusByName(list);
+    
+    return annisDao.listAnnotations(corpusList,
+      Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
+    );
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

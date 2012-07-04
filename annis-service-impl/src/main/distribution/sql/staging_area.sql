@@ -61,6 +61,9 @@ CREATE :tmp TABLE _node
 	"left" 			integer NOT NULL,		-- start of covered substring in _text.text (inclusive)
 	"right" 		integer NOT NULL,		-- end of covered substring in _text.text (inclusive)
 	token_index		integer,				-- token number in _text.text, NULL if node is not a token
+	seg_name    varchar(100),      -- segmentation name
+	seg_left     integer,        -- most left segmentation index of covered token 
+	seg_right    integer,        -- most right segmentation index of covered token
 	continuous		boolean,				-- true if spanned text in _text.text is continuous (not used)
 	span			varchar(2000)			-- for tokens: substring in _text.text (indexed for text search), else: NULL
 );

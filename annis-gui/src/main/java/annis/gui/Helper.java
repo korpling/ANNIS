@@ -20,7 +20,9 @@ import annis.provider.SaltProjectProvider;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceFactory;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -30,8 +32,10 @@ import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -138,5 +142,32 @@ public class Helper
       result.put(c.getId(), c);
     }
     return result;
+  }
+  
+  
+  
+  public static CorpusConfig getCorpusConfig(String corpus, 
+    Application app, Window window)
+  {
+    CorpusConfig corpusConfig = new CorpusConfig();
+    corpusConfig.setConfig(new TreeMap<String, String>());
+    
+    try
+    {
+      corpusConfig = Helper.getAnnisWebResource(app).path("corpora").
+        path(URLEncoder.encode(corpus, "UTF-8"))
+        .path("config").get(CorpusConfig.class);
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      window.showNotification("could not query corpus configuration", ex.
+        getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
+    }
+    catch (UniformInterfaceException ex)
+    {
+      window.showNotification("could not query corpus configuration", ex.
+        getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
+    }
+    return corpusConfig;
   }
 }

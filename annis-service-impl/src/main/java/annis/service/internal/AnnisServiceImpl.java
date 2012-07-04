@@ -33,11 +33,9 @@ import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import annis.service.AnnisService;
 import annis.service.AnnisServiceException;
-import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisResult;
-import annis.service.objects.AnnisAttributeSetImpl;
 import annis.service.objects.AnnisCorpusSet;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;
@@ -110,14 +108,6 @@ public class AnnisServiceImpl implements AnnisService
     }
     String message = sb.toString();
     queryLog.info(message);
-  }
-
-  @Override
-  public AnnisAttributeSet getAttributeSet(List<Long> corpusList,
-    boolean fetchValues, boolean onlyMostFrequentValues) throws RemoteException
-  {
-    return new AnnisAttributeSetImpl(annisDao.listAnnotations(corpusList,
-      fetchValues, onlyMostFrequentValues));
   }
 
   @Override

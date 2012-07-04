@@ -1,0 +1,9 @@
+div.CodeMirror {
+	border: 1px solid #aaa;
+	background-color: white;
+	padding-right: 1px;
+}
+
+textarea.v-codemirror {
+	display:none;
+}

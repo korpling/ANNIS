@@ -389,14 +389,15 @@ public class TestAnnotateSqlGenerator
    * The result should be ordered by the solution key and the pre value of the node
    */
   @Test
-  public void shouldOrderByKeyAndPreValue()
+  public void shouldOrderByKeyComponentAndPreValue()
   {
     // given
     String preAlias = createColumnAlias(RANK_TABLE, "pre");
+    String idAlias = createColumnAlias(COMPONENT_TABLE, "id");
     // when
     String actual = generator.orderByClause(queryData, alternative, INDENT);
     // then
-    String expected = "solutions.n, " + preAlias;
+    String expected = "solutions.n, " + idAlias + ", " + preAlias;
     assertThat(actual, is(expected));
   }
 

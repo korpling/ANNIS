@@ -42,12 +42,9 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     TableAccessStrategy tas = createTableAccessStrategy();
     List<Long> corpusList = queryData.getCorpusList();
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     
-    sb.append(indent).append("(\n");
-    
-    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
-    sb.append(indent).append(TABSTOP).append(") AS solutions,\n");
+    sb.append(indent).append("solutions,\n");
 
     sb.append(indent).append(TABSTOP);
     // really ugly
@@ -89,26 +86,20 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     String innerIndent = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
-    SolutionKey<?> key = createSolutionKey();
 
     sb.append("DISTINCT\n");
-    TableAccessStrategy tas = createTableAccessStrategy();
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.size());
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(innerIndent).append(keyColumn).append(",\n");
-    }
+    
+    sb.append(innerIndent).append("solutions.\"key\",\n");
     sb.append(innerIndent);
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
-    Validate.isTrue(extension.size() > 0);
+    Validate.isTrue(extension.size() > 0, "annotate query needs LimitOffsetQueryData extension");
     sb.append(extension.get(0).getOffset()).append(" AS \"matchstart\",\n");
     sb.append(innerIndent).append("solutions.n,\n");
 
     List<String> fields = getSelectFields();
 
-    sb.append(innerIndent).append(StringUtils.join(fields, ",\n"));
+    sb.append(innerIndent).append(StringUtils.join(fields, ",\n" + innerIndent));
     sb.append(innerIndent).append(",\n");
 
     // corpus.path_name
@@ -143,6 +134,9 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "span");
     addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
     addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_name");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_left");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_right");
     addSelectClauseAttribute(fields, RANK_TABLE, "pre");
     addSelectClauseAttribute(fields, RANK_TABLE, "post");
     addSelectClauseAttribute(fields, RANK_TABLE, "parent");

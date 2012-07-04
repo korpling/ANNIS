@@ -176,6 +176,7 @@ public class ControlPanel extends Panel
 
       searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
         searchOptions.getLeftContext(), searchOptions.getRightContext(),
+        searchOptions.getSegmentationLayer(),
         searchOptions.getResultsPerPage());
 
 
@@ -185,6 +186,11 @@ public class ControlPanel extends Panel
   public Set<HistoryEntry> getHistory()
   {
     return history;
+  }
+  
+  public void corpusSelectionChanged()
+  {
+    searchOptions.updateSegmentationList(corpusList.getSelectedCorpora().keySet());
   }
 
   private class CountThread extends Thread

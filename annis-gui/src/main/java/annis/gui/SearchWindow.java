@@ -25,6 +25,7 @@ import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
@@ -97,7 +98,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     panelToolbar.addStyleName("toolbar");
 
     Button btAboutAnnis = new Button("About ANNIS");
-    btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
+    btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
     btAboutAnnis.addListener(new Button.ClickListener()
     {
 
@@ -139,6 +141,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     });
     btLoginLogout.setSizeUndefined();
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(lblUserName);
@@ -337,7 +340,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   }
 
   public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora, int contextLeft,
-    int contextRight, int pageSize)
+    int contextRight, String segmentationLayer, int pageSize)
   {
     // remove old result from view
     if(resultView != null)
@@ -345,7 +348,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       mainTab.removeComponent(resultView);
     }
     resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
-      pageSize, ps);
+      segmentationLayer, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
   }

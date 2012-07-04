@@ -26,6 +26,7 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -48,7 +49,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
   public List<SingleResultPanel> resultPanelList;
 
   public ResultSetPanel(SaltProject p, int start, PluginSystem ps,
-    Set<String> visibleTokenAnnos)
+    Set<String> visibleTokenAnnos, String segmentationName)
   {
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -66,7 +67,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       for (SDocument doc : corpusGraph.getSDocuments())
       {
         SingleResultPanel panel = new SingleResultPanel(doc, i, this, ps,
-          visibleTokenAnnos);
+          visibleTokenAnnos, segmentationName);
         addComponent(panel);
         resultPanelList.add(panel);
         i++;
@@ -84,6 +85,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       new HashSet<SingleResolverRequest>();
 
     Set<String> nodeLayers = new HashSet<String>();
+    
     for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
       for (SLayer layer : n.getSLayers())
@@ -145,15 +147,24 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
           String type = r.getType() == null ? null : r.getType().toString();
           if(corpusName != null && namespace != null && type != null)
           {
-            tmp = resResolver.path(corpusName).path(namespace).path(type)
-              .get(new GenericType<List<ResolverEntry>>(){});
-            resolverList.addAll(tmp);
+            WebResource res = resResolver.path(corpusName).path(namespace).path(type);
+            try
+            {
+              tmp = res.get(new GenericType<List<ResolverEntry>>(){});
+              resolverList.addAll(tmp);
+            }
+            catch(Exception ex)
+            {
+               Logger.getLogger(ResultSetPanel.class.getName())
+            .log(Level.SEVERE, "could not query resolver entries: " 
+                 + res.toString(), ex);
+            }
           }
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).
-            log(Level.SEVERE, null, ex);
+          Logger.getLogger(ResultSetPanel.class.getName())
+            .log(Level.SEVERE, null, ex);
         }
       }
       visSet.addAll(resolverList);
@@ -182,6 +193,14 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       }
     });
     return visArray;
+  }
+  
+  public void setSegmentationLayer(String segmentationLayer)
+  {
+    for(SingleResultPanel p : resultPanelList)
+    {
+      p.setSegmentationLayer(segmentationLayer);
+    }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)

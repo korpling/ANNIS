@@ -15,10 +15,7 @@
  */
 package annis.administration;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,6 +41,8 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Types;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Priority;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -279,11 +278,78 @@ public class DefaultAdministrationDao implements AdministrationDao
         {
         }
       }
+      else if(table.equalsIgnoreCase("node"))
+      {
+        bulkImportNode(path);
+      }
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
           new FileSystemResource(new File(path, table + ".tab")));
       }
+    }
+  }
+  
+  private void bulkImportNode(String path)
+  {
+    try
+    {
+      // check column number by reading first line
+      File nodeTabFile = new File(path, "node.tab");
+      BufferedReader reader = 
+        new BufferedReader(new FileReader(nodeTabFile));
+      String firstLine = reader.readLine();
+      
+      int columnNumber = firstLine.split("\t").length;
+      if(columnNumber == 13)
+      {
+        // new node table with segmentations
+        // no special handling needed
+        bulkloadTableFromResource(tableInStagingArea("node"), 
+          new FileSystemResource(nodeTabFile));
+      }
+      else if(columnNumber == 10)
+      {
+        // old node table without segmentations
+        // create temporary table for  bulk import
+        jdbcTemplate.getJdbcOperations().execute(
+          "CREATE TEMPORARY TABLE _tmpnode"
+          + "\n(\n"
+          + "id bigint,\n"
+          + "text_ref bigint,\n"
+          + "corpus_ref bigint,\n"
+          + "namespace varchar(100),\n"
+          + "name varchar(100),\n"
+          + "\"left\" integer,\n"
+          + "\"right\" integer,\n"
+          + "token_index integer,\n"
+          + "continuous boolean,\n"
+          + "span varchar(2000)\n"
+          + ");");
+        
+        bulkloadTableFromResource("_tmpnode", 
+          new FileSystemResource(nodeTabFile));
+        
+        log.info("copying nodes from temporary helper table into staging area");
+        jdbcTemplate.getJdbcOperations().execute(
+          "INSERT INTO " + tableInStagingArea("node") + "\n"
+          + "  SELECT id, text_ref, corpus_ref, namespace, name, \"left\", "
+          + "\"right\", token_index, "
+          + "NULL AS seg_name, NULL AS seg_left, NULL AS seg_right, "
+          + "continuous, span\n"
+          + "FROM _tmpnode");
+        
+      }
+      else
+      {
+        throw new RuntimeException("Illegal number of columns in node.tab, "
+          + "should be 13 or 10 but was " + columnNumber);
+      }
+    }
+    catch (IOException ex)
+    {
+      java.util.logging.Logger.getLogger(DefaultAdministrationDao.class.getName()).
+        log(Level.SEVERE, null, ex);
     }
   }
 
@@ -382,8 +448,11 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   void computeLevel()
   {
-    log.info("computing values for rank.level");
+    log.info("computing values for rank.level (dominance and precedence)");
     executeSqlFromScript("level.sql");
+    
+    log.info("computing values for rank.level (coverage)");
+    executeSqlFromScript("level_coverage.sql");
   }
 
   void computeCorpusStatistics()

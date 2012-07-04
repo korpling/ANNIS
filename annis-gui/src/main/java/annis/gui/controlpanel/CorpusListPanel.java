@@ -29,6 +29,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.data.Container;
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.PropertySetChangeEvent;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -86,7 +89,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   public CorpusListPanel(ControlPanel controlPanel)
   {
     this.controlPanel = controlPanel;
-
+    final CorpusListPanel finalThis = this;
+    
     setSizeFull();
 
     VerticalLayout layout = (VerticalLayout) getContent();
@@ -126,6 +130,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
+
     tblCorpora.setContainerDataSource(corpusContainer);
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
@@ -147,7 +152,16 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addActionHandler((Action.Handler) this);
-
+    tblCorpora.setImmediate(true);
+    tblCorpora.addListener(new ValueChangeListener() 
+    {
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      { 
+        finalThis.controlPanel.corpusSelectionChanged();
+      }
+    });
+    
     layout.setExpandRatio(tblCorpora, 1.0f);
 
   }

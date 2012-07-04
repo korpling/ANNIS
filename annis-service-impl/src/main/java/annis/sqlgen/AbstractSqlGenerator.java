@@ -99,7 +99,7 @@ public abstract class AbstractSqlGenerator<T>
     if(withClauseSqlGenerator != null)
     {
       List<String> clauses = withClauseSqlGenerator.withClauses(queryData,
-        alternative, indent);
+        alternative, indent + TABSTOP);
 
       if(!clauses.isEmpty())
       {

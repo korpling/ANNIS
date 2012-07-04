@@ -23,7 +23,6 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.Annotation;
-import annis.service.ifaces.AnnisAttributeSet;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
 import annis.service.ifaces.AnnisResult;
@@ -45,18 +44,6 @@ public interface AnnisService extends Remote
   public String getWeka(List<Long> corpusList, String annisQL) throws
     RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
     AnnisCorpusAccessException;
-
-  /**
-   * 
-   * @param corpusList
-   * @param fetchValues Set to true if distinct values for the attributes should be retrieved as well. Attention: This may cause performance penalties.
-   * @param onlyMostFrequent if true and fetchValues is also true only the most frequent values are queried
-   * @return
-   * @throws RemoteException
-   */
-  public AnnisAttributeSet getAttributeSet(
-    List<Long> corpusList, boolean fetchValues, boolean onlyMostFrequent) throws
-    RemoteException;
 
   /**
    * 
