@@ -135,11 +135,11 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("ridgessegtest");
+    doCorpus("exmaralda");
     
     doSet("seg to clean");
     
-    doSql("annotate tok & tok & #1 .clean,20 #2");
+    doSql("count tok & tok & #1 .clean,20 #2");
     doAnnotate("tok");
   }
 

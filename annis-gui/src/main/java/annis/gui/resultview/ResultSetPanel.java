@@ -26,6 +26,7 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -84,6 +85,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
       new HashSet<SingleResolverRequest>();
 
     Set<String> nodeLayers = new HashSet<String>();
+    
     for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
       for (SLayer layer : n.getSLayers())

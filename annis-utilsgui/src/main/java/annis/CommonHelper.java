@@ -137,11 +137,14 @@ public class CommonHelper
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        for (SToken n : g.getSTokens())
+        if(g != null)
         {
-          for (SAnnotation anno : n.getSAnnotations())
+          for (SToken n : g.getSTokens())
           {
-            result.add(anno.getQName());
+            for (SAnnotation anno : n.getSAnnotations())
+            {
+              result.add(anno.getQName());
+            }
           }
         }
       }
@@ -159,9 +162,16 @@ public class CommonHelper
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        for (SOrderRelation rel : g.getSOrderRelations())
+        if(g != null)
         {
-          result.addAll(rel.getSTypes());
+          EList<SOrderRelation> orderRelations = g.getSOrderRelations();
+          if(orderRelations != null)
+          {
+            for (SOrderRelation rel : orderRelations)
+            {
+              result.addAll(rel.getSTypes());
+            }
+          }
         }
       }
     }

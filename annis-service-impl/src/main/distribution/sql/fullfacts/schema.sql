@@ -58,6 +58,9 @@ CREATE TABLE facts
   span    varchar(2000),
   left_token  integer,
   right_token  integer,
+  seg_name varchar(100),
+  seg_left integer,
+  seg_right integer,
 
   pre        bigint,
   post      bigint,
@@ -163,7 +166,7 @@ CREATE TABLE annotations
   "name" varchar(150),
   "value" varchar(1500),
   occurences bigint,
-  "type" varchar(10),
+  "type" varchar,
   "subtype" char(1),
   edge_namespace varchar(150),
   edge_name varchar(150),

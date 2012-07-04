@@ -255,24 +255,28 @@ public class SingleResultPanel extends VerticalLayout implements
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
 
-    for (SNode n : result.getSDocumentGraph().getSNodes())
+    SDocumentGraph g = result.getSDocumentGraph();
+    if(g != null)
     {
-
-      SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-      Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
-
-      if (match != null)
+      for (SNode n : result.getSDocumentGraph().getSNodes())
       {
-        int color = Math.max(0, Math.min((int) match.longValue() - 1,
-          MatchedNodeColors.values().length - 1));
-        SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-        if (feat != null)
-        {
-          markedExactMap.put("" + feat.getSValueSNUMERIC(),
-            MatchedNodeColors.values()[color].name());
-        }
-      }
 
+        SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
+
+        if (match != null)
+        {
+          int color = Math.max(0, Math.min((int) match.longValue() - 1,
+            MatchedNodeColors.values().length - 1));
+          SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+          if (feat != null)
+          {
+            markedExactMap.put("" + feat.getSValueSNUMERIC(),
+              MatchedNodeColors.values()[color].name());
+          }
+        }
+
+      }
     }
   }
 
