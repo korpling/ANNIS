@@ -17,7 +17,6 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -49,8 +48,8 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     StringBuilder sb = new StringBuilder();
-
-    sb.append("matching_nodes \n");
+    sb.append("\n").append(TABSTOP);
+    sb.append("node_ids, matching_nodes \n");
     sb.append(
       "LEFT OUTER JOIN annotation_pool as anno_node ON(matching_nodes.node_anno_ref = anno_node.id)\n");
     sb.append(
@@ -63,7 +62,38 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    return "ARRAY[matching_nodes.id] AS key, * \n";
+    StringBuilder sb = new StringBuilder();
+    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+    SaltURIs saltURIs = listOfSaltURIs.get(0);
+
+    sb.append("ARRAY[");
+    for (int i = 1; i <= saltURIs.size(); i++)
+    {
+      sb.append("node_ids.id").append(i);
+
+      if (i < saltURIs.size())
+      {
+        sb.append(", ");
+      }
+    }
+
+    sb.append("] AS key,\n").append(TABSTOP);
+    sb.append("0 AS matchstart,\n").append(TABSTOP);
+    sb.append("1 AS n,\n").append(TABSTOP);
+
+    sb.append("matching_nodes.id, ");
+    sb.append("matching_nodes.text_ref, ");
+    sb.append("matching_nodes.corpus_ref, ");
+    sb.append("matching_nodes.toplevel_corpus, ");
+    sb.append("matching_nodes.namespace, ");
+    sb.append("matching_nodes.name, ");
+    sb.append("matching_nodes.left, ");
+    sb.append("matching_nodes.right, ");
+    sb.append("matching_nodes.token_index");
+
+    return sb.toString();
   }
 
   @Override
@@ -92,7 +122,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     for (int i = 0; i < saltURIs.size(); i++)
     {
       sb.append("matching_nodes.id").append(i + 1);
-      if (i < saltURIs.size()-1)
+      if (i < saltURIs.size() - 1)
       {
         sb.append(", ");
       }
