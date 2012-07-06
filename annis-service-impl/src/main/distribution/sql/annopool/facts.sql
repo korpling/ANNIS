@@ -175,7 +175,7 @@ FROM
     JOIN _rank ON (_rank.node_ref = _node.id)
     JOIN _component ON (_rank.component_ref = _component.id)
     LEFT JOIN _node_annotation ON (_node_annotation.node_ref = _node.id)
-    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.pre)
+    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
   WHERE
     _node.toplevel_corpus = :id
 ) as tmp
