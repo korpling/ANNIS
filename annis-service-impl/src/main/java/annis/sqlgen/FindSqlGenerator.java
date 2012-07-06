@@ -160,7 +160,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
   private String buildSaltId(List<String> path, String node_name)
   {
-    StringBuilder sb = new StringBuilder("salt://");
+    StringBuilder sb = new StringBuilder("salt:/");
 
     for (String dir : path)
     {

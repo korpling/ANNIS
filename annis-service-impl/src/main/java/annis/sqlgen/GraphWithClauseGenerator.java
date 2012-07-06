@@ -27,11 +27,15 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
  *
- * Salt ids are simple URI and are defined like this: salt:/corp1/corp2/doc1 *
+ * Salt ids are simple URI and are defined like this:
  *
- * TODO support table access strategy
- * TODO read corpusconfiguration
- * TODO support island policy
+ * <p>{@code salt:/corp1/corp2/doc1}</p>.
+ *
+ * The leading / of the URI is a must, // would cause an error, because
+ * authorities are currently not supported.
+ *
+ * TODO support table access strategy TODO read corpusconfiguration TODO support
+ * island policy
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -78,9 +82,8 @@ public class GraphWithClauseGenerator implements
     for (int i = 1; i <= saltURIs.size(); i++)
     {
       URI uri = saltURIs.get(i - 1);
-      String[] path = uri.getPath().split("/");
 
-      sb.append("path_name = ").append(generatePathName(path, uri));
+      sb.append("path_name = ").append(generatePathName(uri));
 
       sb.append("\nAND\n").append(TABSTOP);
 
@@ -124,10 +127,9 @@ public class GraphWithClauseGenerator implements
     for (int i = 0; i < saltURIs.size(); i++)
     {
       URI uri = saltURIs.get(i);
-      String[] path = uri.getPath().split("/");
 
       // the path is reversed in relAnnis saved
-      sb.append("path_name = ").append(generatePathName(path, uri));
+      sb.append("path_name = ").append(generatePathName(uri));
 
       sb.append("\nAND\n").append(TABSTOP);
 
@@ -203,20 +205,23 @@ public class GraphWithClauseGenerator implements
     return withClauseList;
   }
 
-  private String generatePathName(String[] path, URI uri)
+  private String generatePathName(URI uri)
   {
     StringBuilder sb = new StringBuilder();
+    String[] path = uri.getPath().split("/");
 
     sb.append("'{");
     for (int j = path.length - 1; j > 0; j--)
     {
       sb.append(path[j]);
-      sb.append(", ");
+
+      if (j > 1)
+      {
+        sb.append(", ");
+      }
     }
 
-    sb.append(uri.getHost());
     sb.append("}'");
-
     return sb.toString();
   }
 
