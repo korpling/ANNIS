@@ -29,7 +29,9 @@ import org.apache.commons.lang.StringUtils;
  *
  * Salt ids are simple URI and are defined like this: salt:/corp1/corp2/doc1 *
  *
- * TODO support table access strategy TODO read corpusconfiguration
+ * TODO support table access strategy
+ * TODO read corpusconfiguration
+ * TODO support island policy
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -188,9 +190,9 @@ public class GraphWithClauseGenerator implements
     /**
      * TODO island policy
      */
-    sb.append("min_max.min - 5 <= facts.token_index");
+    sb.append("min_max.min - 5 <= facts.left_token  ");
     sb.append("\nAND\n").append(TABSTOP);
-    sb.append("facts.token_index <= min_max.max + 5");
+    sb.append("facts.right_token <= min_max.max + 5");
     sb.append("\nAND\n").append(TABSTOP);
     sb.append("corpus_ref = min_max.id");
 

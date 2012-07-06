@@ -20,7 +20,9 @@ import annis.ql.parser.QueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
@@ -31,7 +33,8 @@ import org.springframework.dao.DataAccessException;
  */
 public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   implements FromClauseSqlGenerator<QueryData>,
-  SelectClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>
+  SelectClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>,
+  WhereClauseSqlGenerator<QueryData>
 {
 
   @Override
@@ -51,7 +54,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   {
     StringBuilder sb = new StringBuilder();
     sb.append("\n").append(TABSTOP);
-    sb.append("node_ids, matching_nodes \n");
+    sb.append("node_ids, corpus, matching_nodes \n");
     sb.append(
       "LEFT OUTER JOIN annotation_pool as node_anno ON(matching_nodes.node_anno_ref = node_anno.id)\n");
     sb.append(
@@ -88,7 +91,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     fields.add("0 AS matchstart");
     fields.add("1 AS n");
 
-
+    fields.add("matching_nodes.id AS id");
     fields.add("matching_nodes.text_ref AS text_ref");
     fields.add("matching_nodes.corpus_ref AS corpus_ref");
     fields.add("matching_nodes.toplevel_corpus AS toplevel_corpus");
@@ -117,6 +120,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     fields.add("edge_anno.namespace AS edge_annotation_namespace");
     fields.add("edge_anno.name AS edge_annotation_name");
     fields.add("edge_anno.val AS edge_annotation_value");
+    fields.add("corpus.path_name AS path");
 
     appendField(sb, fields);
     return sb.toString();
@@ -126,7 +130,7 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   public String orderByClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    return "ORDER BY token_index, matching_nodes.pre\n";
+    return "matching_nodes.pre\n";
   }
 
   @Override
@@ -162,5 +166,15 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
   private void appendField(StringBuilder sb, ArrayList<String> fields)
   {
     sb.append(StringUtils.join(fields, ",\n" + TABSTOP));
+  }
+
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    Set<String> conditions = new HashSet<String>();
+
+    conditions.add("matching_nodes.corpus_ref = corpus.id");
+    return conditions;
   }
 }

@@ -349,6 +349,8 @@ limitations under the License.
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
     <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
     <property name="fromClauseSqlGenerators" ref="graphSqlGenerator" />
+    <property name="whereClauseSqlGenerators" ref="graphSqlGenerator" />
+    <property name="orderByClauseSqlGenerator" ref="graphSqlGenerator" />
   </bean>
 
 
