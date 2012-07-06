@@ -152,9 +152,10 @@ public class GraphWithClauseGenerator implements
     sb.append("matching_nodes AS (\n");
     sb.append("SELECT DISTINCT\n").append(TABSTOP);
     ArrayList<String> fields = new ArrayList<String>();
+
+    fields.add("facts.id");
     fields.add("facts.node_anno_ref");
     fields.add("facts.edge_anno_ref");
-    fields.add("facts.corpus_ref");
     fields.add("facts.text_ref");
     fields.add("facts.corpus_ref");
     fields.add("facts.toplevel_corpus");
@@ -219,6 +220,6 @@ public class GraphWithClauseGenerator implements
 
   private void appendField(StringBuilder sb, ArrayList<String> fields)
   {
-    sb.append(StringUtils.join(fields, ",\n"+TABSTOP));
+    sb.append(StringUtils.join(fields, ",\n" + TABSTOP));
   }
 }

@@ -19,7 +19,9 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
@@ -51,9 +53,9 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     sb.append("\n").append(TABSTOP);
     sb.append("node_ids, matching_nodes \n");
     sb.append(
-      "LEFT OUTER JOIN annotation_pool as anno_node ON(matching_nodes.node_anno_ref = anno_node.id)\n");
+      "LEFT OUTER JOIN annotation_pool as node_anno ON(matching_nodes.node_anno_ref = node_anno.id)\n");
     sb.append(
-      "LEFT OUTER JOIN annotation_pool as anno_edge ON(matching_nodes.edge_anno_ref = anno_edge.id)\n");
+      "LEFT OUTER JOIN annotation_pool as edge_anno ON(matching_nodes.edge_anno_ref = edge_anno.id)\n");
 
     return sb.toString();
   }
@@ -80,19 +82,43 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     }
 
     sb.append("] AS key,\n").append(TABSTOP);
-    sb.append("0 AS matchstart,\n").append(TABSTOP);
-    sb.append("1 AS n,\n").append(TABSTOP);
 
-    sb.append("matching_nodes.id, ");
-    sb.append("matching_nodes.text_ref, ");
-    sb.append("matching_nodes.corpus_ref, ");
-    sb.append("matching_nodes.toplevel_corpus, ");
-    sb.append("matching_nodes.namespace, ");
-    sb.append("matching_nodes.name, ");
-    sb.append("matching_nodes.left, ");
-    sb.append("matching_nodes.right, ");
-    sb.append("matching_nodes.token_index");
+    ArrayList<String> fields = new ArrayList<String>();
 
+    fields.add("0 AS matchstart");
+    fields.add("1 AS n");
+
+
+    fields.add("matching_nodes.text_ref AS text_ref");
+    fields.add("matching_nodes.corpus_ref AS corpus_ref");
+    fields.add("matching_nodes.toplevel_corpus AS toplevel_corpus");
+    fields.add("matching_nodes.node_namespace AS node_namespace");
+    fields.add("matching_nodes.node_name AS node_name");
+    fields.add("matching_nodes.left AS left");
+    fields.add("matching_nodes.right AS right");
+    fields.add("matching_nodes.token_index AS token_index");
+    fields.add("matching_nodes.is_token AS is_token");
+    fields.add("matching_nodes.continuous AS continuous");
+    fields.add("matching_nodes.span AS span");
+    fields.add("matching_nodes.left_token AS left_token");
+    fields.add("matching_nodes.right_token AS right_token");
+    fields.add("matching_nodes.pre AS pre");
+    fields.add("matching_nodes.post AS post");
+    fields.add("matching_nodes.parent AS parent");
+    fields.add("matching_nodes.root AS root");
+    fields.add("matching_nodes.level AS level");
+    fields.add("matching_nodes.component_id AS component_id");
+    fields.add("matching_nodes.edge_type AS edge_type");
+    fields.add("matching_nodes.edge_name AS edge_name");
+    fields.add("matching_nodes.edge_namespace AS edge_namespace");
+    fields.add("node_anno.namespace AS node_annotation_namespace");
+    fields.add("node_anno.name AS node_annotation_name");
+    fields.add("node_anno.val AS node_annotation_value");
+    fields.add("edge_anno.namespace AS edge_annotation_namespace");
+    fields.add("edge_anno.name AS edge_annotation_name");
+    fields.add("edge_anno.val AS edge_annotation_value");
+
+    appendField(sb, fields);
     return sb.toString();
   }
 
@@ -131,5 +157,10 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     sb.append("] AS key,\n");
 
     return sb.toString();
+  }
+
+  private void appendField(StringBuilder sb, ArrayList<String> fields)
+  {
+    sb.append(StringUtils.join(fields, ",\n" + TABSTOP));
   }
 }
