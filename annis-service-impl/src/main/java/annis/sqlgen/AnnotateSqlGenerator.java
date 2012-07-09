@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,6 +32,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.IslandsPolicy;
+import annis.sqlgen.IslandsPolicy.IslandPolicies;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.dao.DataAccessException;
@@ -63,15 +64,8 @@ public abstract class AnnotateSqlGenerator<T>
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
-
-  // old
-  public enum IslandPolicies
-  {
-
-    context, none
-  }
   private String matchedNodesViewName;
-  private String defaultIslandsPolicy;
+  private IslandsPolicy islandsPolicy;
 
   public AnnotateSqlGenerator()
   {
@@ -111,36 +105,6 @@ public abstract class AnnotateSqlGenerator<T>
       documentName), this);
   }
 
-  private IslandPolicies getMostRestrictivePolicy(
-    List<Long> corpora, Map<Long, Properties> props)
-  {
-    if(corpora.isEmpty())
-    {
-      return IslandPolicies.valueOf(defaultIslandsPolicy);
-    }
-    
-    IslandPolicies[] all = IslandPolicies.values();
-    IslandPolicies result = all[all.length - 1];
-    
-    for (Long l : corpora)
-    {
-      IslandPolicies newPolicy = IslandPolicies.valueOf(defaultIslandsPolicy);
-      
-      if (props.get(l) != null)
-      {
-        newPolicy =
-          IslandPolicies.valueOf(props.get(l).getProperty("islands-policy",
-          defaultIslandsPolicy));
-      }
-      
-      if (newPolicy.ordinal() < result.ordinal())
-      {
-        result = newPolicy;
-      }
-    }
-    return result;
-  }
-
   @Deprecated
   public abstract String getTextQuery(long textID);
 
@@ -155,16 +119,6 @@ public abstract class AnnotateSqlGenerator<T>
   public void setMatchedNodesViewName(String matchedNodesViewName)
   {
     this.matchedNodesViewName = matchedNodesViewName;
-  }
-
-  public String getDefaultIslandsPolicy()
-  {
-    return defaultIslandsPolicy;
-  }
-
-  public void setDefaultIslandsPolicy(String defaultIslandsPolicy)
-  {
-    this.defaultIslandsPolicy = defaultIslandsPolicy;
   }
 
   @Override
@@ -212,12 +166,14 @@ public abstract class AnnotateSqlGenerator<T>
     // island policies
     HashMap<Long, Properties> corpusProperties =
       queryData.getCorpusConfiguration();
-    IslandPolicies islandsPolicy =
-      getMostRestrictivePolicy(corpusList, corpusProperties);
-    if (islandsPolicy == IslandPolicies.context)
+
+    IslandPolicies islandPolicy = islandsPolicy.getMostRestrictivePolicy(
+      corpusList, corpusProperties);
+
+    if (islandPolicy == IslandPolicies.context)
     {
       sb.append(indent).append("(\n");
-      
+
       sb.append(indent).append(TABSTOP).append(TABSTOP);
       List<String> overlapForOneSpan = new ArrayList<String>();
       for (int i = 1; i <= alternative.size(); ++i)
@@ -227,7 +183,7 @@ public abstract class AnnotateSqlGenerator<T>
 
         sb2.append("(\n");
         sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
-        
+
         sb2.append(tables.aliasedColumn(NODE_TABLE, "text_ref")).
           append(" = solutions.text").append(i).append(" AND\n");
         sb.append(indent).append(TABSTOP).append(TABSTOP).append(TABSTOP);
@@ -450,5 +406,21 @@ public abstract class AnnotateSqlGenerator<T>
   public void setResultExtractor(ResultSetExtractor<T> resultExtractor)
   {
     this.resultExtractor = resultExtractor;
+  }
+
+  /**
+   * @return the islandsPolicy
+   */
+  public IslandsPolicy getIslandsPolicy()
+  {
+    return islandsPolicy;
+  }
+
+  /**
+   * @param islandsPolicy the islandsPolicy to set
+   */
+  public void setIslandsPolicy(IslandsPolicy islandsPolicy)
+  {
+    this.islandsPolicy = islandsPolicy;
   }
 }

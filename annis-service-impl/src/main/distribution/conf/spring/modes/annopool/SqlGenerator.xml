@@ -255,12 +255,16 @@ limitations under the License.
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
 
+  <bean id="islandsPolicy" class="annis.sqlgen.IslandsPolicy" >
+    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
+  </bean>
+
   <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator"
         parent="tableAccessStrategyFactory">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
-    <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
+    <property name="islandsPolicy" ref="islandsPolicy" />
 
     <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
