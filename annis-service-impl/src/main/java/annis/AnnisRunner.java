@@ -673,7 +673,7 @@ public class AnnisRunner extends AnnisBaseRunner
    * If the query function is "subgraph" or "sql_subgraph" the annisQuery string
    * should contain space separated salt ids. In this case the annisQuery is not
    * parsed and the {@link QueryData#getAlternatives()} method should return an
-   * empty List. Instead of parsing the annisQuery it extracts the saltIds and
+   * empty List. Instead of parsing the annisQuery it extracts the salt ids and
    * put it into the extension's of {@link QueryData}.
    *
    * @param annisQuery should include a valid annis query

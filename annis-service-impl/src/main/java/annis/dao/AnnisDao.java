@@ -89,7 +89,11 @@ public interface AnnisDao
     final SqlGenerator<QueryData, T> generator,
     final ResultSetExtractor<T> extractor);
 
-  // needed in AnnisRunner
+  /**
+   * Gets the corpus configuration from all imported corpora.
+   *
+   * @return The return value is the Key of corpus table entry.
+   */
   public HashMap<Long, Properties> getCorpusConfiguration();
 
   public void setCorpusConfiguration(
@@ -102,5 +106,11 @@ public interface AnnisDao
 
   public List<String> mapCorpusIdsToNames(List<Long> ids);
 
+  /**
+   * Get a specific configuration of a corpus from directory
+   * {@code <annis.home>/conf/corpora/<corpus.name>}.
+   *
+   * @return The corpus configuration is represented as Key-Value-Pairs.
+   */
   public Map<String, String> getCorpusConfiguration(String corpusName);
 }

@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
+
 public class GraphWithClauseGenerator implements
   WithClauseSqlGenerator<QueryData>
 {
