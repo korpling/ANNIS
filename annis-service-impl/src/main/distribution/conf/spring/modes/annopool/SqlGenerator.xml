@@ -337,7 +337,10 @@ limitations under the License.
     <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
   </bean>
 
-  <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator" />
+  <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator">
+    <property name="islandsPolicy" ref="islandsPolicy" />
+  </bean>
+  
   <bean id="graphFromClauseSqlGenerator" class="annis.sqlgen.GraphFromSqlGenerator" />
   <bean id="graphWhereClauseSqlGenerator" class="annis.sqlgen.GraphWhereClauseGenerator" />
 

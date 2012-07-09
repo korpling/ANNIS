@@ -15,11 +15,14 @@
  */
 package annis.sqlgen;
 
+import annis.dao.AnnisDao;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -34,18 +37,18 @@ import org.apache.commons.lang.StringUtils;
  * The leading / of the URI is a must, // would cause an error, because
  * authorities are currently not supported.
  *
- * TODO support table access strategy TODO read corpusconfiguration TODO support
- * island policy
+ * TODO support table access strategy
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-
 public class GraphWithClauseGenerator implements
   WithClauseSqlGenerator<QueryData>
 {
 
   private Logger log = Logger.getLogger(GraphWithClauseGenerator.class);
+  private AnnisDao annisDao;
   private static final String TABSTOP = "    ";
+  private IslandsPolicy islandsPolicy;
 
   @Override
   public List<String> withClauses(QueryData queryData,
@@ -54,9 +57,18 @@ public class GraphWithClauseGenerator implements
     List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
+
     SaltURIs saltURIs = listOfSaltURIs.get(0);
     List<String> withClauseList = new ArrayList<String>();
     StringBuilder sb = new StringBuilder();
+    List<Long> corpusList = getCorpusList(saltURIs);
+
+    // island policies
+    HashMap<Long, Properties> corpusProperties =
+      queryData.getCorpusConfiguration();
+    IslandsPolicy.IslandPolicies islandPolicy = islandsPolicy.
+      getMostRestrictivePolicy(
+      corpusList, corpusProperties);
 
     sb.append("node_ids AS (\n");
     sb.append("SELECT DISTINCT\n").append(TABSTOP);
@@ -190,9 +202,7 @@ public class GraphWithClauseGenerator implements
     sb.append("\nFROM min_max, facts\n");
 
     sb.append("WHERE\n").append(TABSTOP);
-    /**
-     * TODO island policy
-     */
+
     sb.append("min_max.min - 5 <= facts.left_token  ");
     sb.append("\nAND\n").append(TABSTOP);
     sb.append("facts.right_token <= min_max.max + 5");
@@ -229,5 +239,33 @@ public class GraphWithClauseGenerator implements
   private void appendField(StringBuilder sb, ArrayList<String> fields)
   {
     sb.append(StringUtils.join(fields, ",\n" + TABSTOP));
+  }
+
+  /**
+   * @return the islandsPolicy
+   */
+  public IslandsPolicy getIslandsPolicy()
+  {
+    return islandsPolicy;
+  }
+
+  /**
+   * @param islandsPolicy the islandsPolicy to set
+   */
+  public void setIslandsPolicy(IslandsPolicy islandsPolicy)
+  {
+    this.islandsPolicy = islandsPolicy;
+  }
+
+  private List<Long> getCorpusList(SaltURIs saltURIs)
+  {
+    List<String> corpusIds = new ArrayList<String>();
+
+    for (URI uri : saltURIs)
+    {
+      corpusIds.add(uri.getPath().split("/")[0]);
+
+    }
+    return annisDao.listCorpusByName(corpusIds);
   }
 }
