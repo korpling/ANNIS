@@ -167,7 +167,8 @@ public abstract class AnnotateSqlGenerator<T>
     HashMap<Long, Properties> corpusProperties =
       queryData.getCorpusConfiguration();
 
-    IslandPolicies islandPolicy = islandsPolicy.getMostRestrictivePolicy(
+    IslandsPolicy.IslandPolicies islandPolicy = islandsPolicy.
+      getMostRestrictivePolicy(
       corpusList, corpusProperties);
 
     if (islandPolicy == IslandPolicies.context)

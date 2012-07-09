@@ -117,100 +117,179 @@ public class GraphWithClauseGenerator implements
     }
 
     sb.append("\n), ");
-
     sb.append("min_max AS (\n");
     sb.append("SELECT\n").append(TABSTOP);
-    sb.append("min(facts.left_token) as min,\n").append(TABSTOP);
-    sb.append("max(facts.right_token) as max,\n").append(TABSTOP);
-
-    for (int i = 1; i <= saltURIs.size(); i++)
+    /**
+     * If the island policy is set to context, the generated sql is bit more
+     * complex. We need to generate an extra column for every match.
+     */
+    if (islandPolicy == IslandsPolicy.IslandPolicies.context)
     {
-      sb.append("min(facts.id) AS min_id").append(i).append(",\n");
-      sb.append(TABSTOP);
-      sb.append("max(facts.id) AS max_id").append(i).append(",\n");
-      sb.append(TABSTOP);
-    }
-    sb.append("corpus.id as id\n");
-
-    sb.append("FROM\n").append(TABSTOP);
-    sb.append("corpus, facts\n");
-
-
-    sb.append("WHERE \n").append(TABSTOP);
-    for (int i = 0; i < saltURIs.size(); i++)
-    {
-      URI uri = saltURIs.get(i);
-
-      // the path is reversed in relAnnis saved
-      sb.append("path_name = ").append(generatePathName(uri));
-
-      sb.append("\nAND\n").append(TABSTOP);
-
-      sb.append("facts.corpus_ref");
-      sb.append(" = ");
-      sb.append("corpus.id");
-
-      sb.append("\nAND\n").append(TABSTOP);
-
-      sb.append("facts.node_name");
-      sb.append(" = ");
-      sb.append("'").append(uri.getFragment()).append("'");
-
-      // concate conditions
-      if (i < saltURIs.size() - 1)
+      for (int i = 1; i <= saltURIs.size(); i++)
       {
-        sb.append("\nOR\n").append(TABSTOP);
+        sb.append("min(facts").append(i);
+        sb.append(".left_token) as min").append(i);
+        sb.append(",\n").append(TABSTOP);
+
+        sb.append("max(facts").append(i);
+        sb.append(".right_token) as max").append(i);
+        sb.append(",\n").append(TABSTOP);
+
+        sb.append("corpus").append(i).append(".id AS id").append(i);
+
+        if (i < saltURIs.size())
+        {
+          sb.append(",\n").append(TABSTOP);
+        }
       }
+
+
+      sb.append("\nFROM\n").append(TABSTOP);
+      for (int i = 1; i <= saltURIs.size(); i++)
+      {
+        sb.append("corpus AS corpus").append(i).append(", ");
+
+        sb.append("facts AS facts").append(i);
+        if (i < saltURIs.size())
+        {
+          sb.append(", ");
+        }
+      }
+      sb.append("\n");
+      sb.append("WHERE \n").append(TABSTOP);
+      for (int i = 0; i < saltURIs.size(); i++)
+      {
+        URI uri = saltURIs.get(i);
+
+        // the path is reversed in relAnnis saved
+        sb.append("corpus").append(i + 1);
+        sb.append(".path_name = ").append(generatePathName(uri));
+
+        sb.append("\nAND\n").append(TABSTOP);
+
+        sb.append("facts").append(i + 1).append(".corpus_ref");
+        sb.append(" = ");
+        sb.append("corpus").append(i + 1).append(".id");
+
+        sb.append("\nAND\n").append(TABSTOP);
+
+        sb.append("facts").append(i + 1).append(".node_name");
+        sb.append(" = ");
+        sb.append("'").append(uri.getFragment()).append("'");
+
+        // concate conditions
+        if (i < saltURIs.size() - 1)
+        {
+          sb.append("\nOR\n").append(TABSTOP);
+        }
+      }
+
+      sb.append("\nGROUP BY\n").append(TABSTOP);
+      for (int i = 1; i <= saltURIs.size(); i++)
+      {
+        sb.append("corpus").append(i).append(".id");
+
+        if (i < saltURIs.size())
+        {
+          sb.append(", ");
+        }
+      }
+      sb.append("\n), ");
+
+      sb.append("matching_nodes AS (\n");
+      sb.append("SELECT DISTINCT\n").append(TABSTOP);
+
+      appendSelectedColumns(sb);
+
+      sb.append("\nFROM min_max, facts\n");
+
+      sb.append("WHERE\n").append(TABSTOP);
+      for (int i = 1; i <= saltURIs.size(); i++)
+      {
+        sb.append("min_max.min").append(i).append(" - 5 <= facts.left_token  ");
+        sb.append("\nAND\n").append(TABSTOP);
+        sb.append("facts.right_token <= min_max.max").append(i).append(" + 5");
+        sb.append("\nAND\n").append(TABSTOP);
+        sb.append("corpus_ref = min_max.id").append(i);
+
+        if (i < saltURIs.size())
+        {
+          sb.append("\nAND\n").append(TABSTOP);
+        }
+      }
+
+      sb.append("\nORDER BY facts.token_index");
+      sb.append("\n)"); //
+
     }
-
-    sb.append("\nGROUP BY corpus.id");
-    sb.append("\n), ");
-
-    sb.append("matching_nodes AS (\n");
-    sb.append("SELECT DISTINCT\n").append(TABSTOP);
-    ArrayList<String> fields = new ArrayList<String>();
-
-    fields.add("facts.id");
-    fields.add("facts.node_anno_ref");
-    fields.add("facts.edge_anno_ref");
-    fields.add("facts.text_ref");
-    fields.add("facts.corpus_ref");
-    fields.add("facts.toplevel_corpus");
-    fields.add("facts.node_namespace");
-    fields.add("facts.node_name");
-    fields.add("facts.left");
-    fields.add("facts.right");
-    fields.add("facts.token_index");
-    fields.add("facts.is_token");
-    fields.add("facts.continuous");
-    fields.add("facts.span");
-    fields.add("facts.left_token");
-    fields.add("facts.right_token");
-    fields.add("facts.pre");
-    fields.add("facts.post");
-    fields.add("facts.parent");
-    fields.add("facts.root");
-    fields.add("facts.level");
-    fields.add("facts.component_id");
-    fields.add("facts.edge_type");
-    fields.add("facts.edge_name");
-    fields.add("facts.edge_namespace");
+    else
+    {
 
 
-    appendField(sb, fields);
+      sb.append("min(facts.left_token) as min,\n").append(TABSTOP);
+      sb.append("max(facts.right_token) as max,\n").append(TABSTOP);
 
-    sb.append("\nFROM min_max, facts\n");
+      for (int i = 1; i <= saltURIs.size(); i++)
+      {
+        sb.append("min(facts.id) AS min_id").append(i).append(",\n");
+        sb.append(TABSTOP);
+        sb.append("max(facts.id) AS max_id").append(i).append(",\n");
+        sb.append(TABSTOP);
+      }
+      sb.append("corpus.id as id\n");
 
-    sb.append("WHERE\n").append(TABSTOP);
+      sb.append("FROM\n").append(TABSTOP);
+      sb.append("corpus, facts\n");
 
-    sb.append("min_max.min - 5 <= facts.left_token  ");
-    sb.append("\nAND\n").append(TABSTOP);
-    sb.append("facts.right_token <= min_max.max + 5");
-    sb.append("\nAND\n").append(TABSTOP);
-    sb.append("corpus_ref = min_max.id");
 
-    sb.append("\nORDER BY facts.token_index");
-    sb.append("\n)"); //
+      sb.append("WHERE \n").append(TABSTOP);
+      for (int i = 0; i < saltURIs.size(); i++)
+      {
+        URI uri = saltURIs.get(i);
+
+        // the path is reversed in relAnnis saved
+        sb.append("path_name = ").append(generatePathName(uri));
+
+        sb.append("\nAND\n").append(TABSTOP);
+
+        sb.append("facts.corpus_ref");
+        sb.append(" = ");
+        sb.append("corpus.id");
+
+        sb.append("\nAND\n").append(TABSTOP);
+
+        sb.append("facts.node_name");
+        sb.append(" = ");
+        sb.append("'").append(uri.getFragment()).append("'");
+
+        // concate conditions
+        if (i < saltURIs.size() - 1)
+        {
+          sb.append("\nOR\n").append(TABSTOP);
+        }
+      }
+
+      sb.append("\nGROUP BY corpus.id");
+      sb.append("\n), ");
+
+      sb.append("matching_nodes AS (\n");
+      sb.append("SELECT DISTINCT\n").append(TABSTOP);
+
+      appendSelectedColumns(sb);
+
+      sb.append("\nFROM min_max, facts\n");
+
+      sb.append("WHERE\n").append(TABSTOP);
+
+      sb.append("min_max.min - 5 <= facts.left_token  ");
+      sb.append("\nAND\n").append(TABSTOP);
+      sb.append("facts.right_token <= min_max.max + 5");
+      sb.append("\nAND\n").append(TABSTOP);
+      sb.append("corpus_ref = min_max.id");
+
+      sb.append("\nORDER BY facts.token_index");
+      sb.append("\n)"); //
+    }
 
     withClauseList.add(sb.toString());
     return withClauseList;
@@ -266,6 +345,56 @@ public class GraphWithClauseGenerator implements
       corpusIds.add(uri.getPath().split("/")[0]);
 
     }
-    return annisDao.listCorpusByName(corpusIds);
+    return getAnnisDao().listCorpusByName(corpusIds);
+  }
+
+  /**
+   * @return the annisDao
+   */
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  /**
+   * @param annisDao the annisDao to set
+   */
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+
+  private void appendSelectedColumns(StringBuilder sb)
+  {
+    ArrayList<String> fields = new ArrayList<String>();
+
+    fields.add("facts.id");
+    fields.add("facts.node_anno_ref");
+    fields.add("facts.edge_anno_ref");
+    fields.add("facts.text_ref");
+    fields.add("facts.corpus_ref");
+    fields.add("facts.toplevel_corpus");
+    fields.add("facts.node_namespace");
+    fields.add("facts.node_name");
+    fields.add("facts.left");
+    fields.add("facts.right");
+    fields.add("facts.token_index");
+    fields.add("facts.is_token");
+    fields.add("facts.continuous");
+    fields.add("facts.span");
+    fields.add("facts.left_token");
+    fields.add("facts.right_token");
+    fields.add("facts.pre");
+    fields.add("facts.post");
+    fields.add("facts.parent");
+    fields.add("facts.root");
+    fields.add("facts.level");
+    fields.add("facts.component_id");
+    fields.add("facts.edge_type");
+    fields.add("facts.edge_name");
+    fields.add("facts.edge_namespace");
+
+
+    appendField(sb, fields);
   }
 }

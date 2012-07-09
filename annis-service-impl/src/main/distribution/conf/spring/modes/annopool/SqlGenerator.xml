@@ -339,8 +339,9 @@ limitations under the License.
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator">
     <property name="islandsPolicy" ref="islandsPolicy" />
+    <property name="annisDao" ref="annisDao" />
   </bean>
-  
+
   <bean id="graphFromClauseSqlGenerator" class="annis.sqlgen.GraphFromSqlGenerator" />
   <bean id="graphWhereClauseSqlGenerator" class="annis.sqlgen.GraphWhereClauseGenerator" />
 
