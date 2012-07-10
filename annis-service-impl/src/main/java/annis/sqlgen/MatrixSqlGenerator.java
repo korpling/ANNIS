@@ -45,75 +45,87 @@ import annis.dao.AnnotatedSpan;
 import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
+import java.util.LinkedList;
+import org.apache.commons.lang.NotImplementedException;
 
 /**
  *
  * @author thomas
  */
-public class MatrixSqlGenerator 
-	extends AbstractSqlGenerator<List<AnnotatedMatch>>
-	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>,
-	WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>
+public class MatrixSqlGenerator
+  extends AbstractSqlGenerator<List<AnnotatedMatch>>
+  implements SelectClauseSqlGenerator<QueryData>,
+  FromClauseSqlGenerator<QueryData>,
+  WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>
 {
 
-	@Deprecated
+  @Deprecated
   private String matchedNodesViewName;
+  private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
+  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
 
-	private SqlGenerator<QueryData,?> innerQuerySqlGenerator;
-	private TableJoinsInFromClauseSqlGenerator 
-		tableJoinsInFromClauseGenerator;
+  /**
+   * Create a solution key to be used inside a single call to
+   * {@code extractData}.
+   *
+   * This method must be overridden in child classes or by Spring.
+   */
+  protected SolutionKey<?> createSolutionKey()
+  {
+    throw new NotImplementedException(
+      "BUG: This method needs to be overwritten by ancestors or through Spring");
+  }
 
-	
   @Override
-  public List<AnnotatedMatch> extractData(ResultSet resultSet) 
-		  throws SQLException, DataAccessException
+  public List<AnnotatedMatch> extractData(ResultSet resultSet)
+    throws SQLException, DataAccessException
   {
     List<AnnotatedMatch> matches = new ArrayList<AnnotatedMatch>();
 
-    Map<List<Long>, AnnotatedSpan[]> matchesByGroup = 
-    		new HashMap<List<Long>, AnnotatedSpan[]>();
+    Map<List<Long>, AnnotatedSpan[]> matchesByGroup =
+      new HashMap<List<Long>, AnnotatedSpan[]>();
 
     while (resultSet.next())
     {
       long id = resultSet.getLong("id");
       String coveredText = resultSet.getString("span");
-      
+
       Array arrayAnnotation = resultSet.getArray("annotations");
       Array arrayMeta = resultSet.getArray("metadata");
-      
-      List<Annotation> annotations =  extractAnnotations(arrayAnnotation);
+
+      List<Annotation> annotations = extractAnnotations(arrayAnnotation);
       List<Annotation> metaData = extractAnnotations(arrayMeta);
 
       // create key
       Array sqlKey = resultSet.getArray("key");
-      Validate.isTrue(!resultSet.wasNull(), 
-    		  "Match group identifier must not be null");
+      Validate.isTrue(!resultSet.wasNull(),
+        "Match group identifier must not be null");
       Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-        "Key in database must be from the type \"bigint\" but was \"" + 
-      sqlKey.getBaseTypeName() + "\"");
+        "Key in database must be from the type \"bigint\" but was \"" + sqlKey.
+        getBaseTypeName() + "\"");
 
       Long[] keyArray = (Long[]) sqlKey.getArray();
       int matchWidth = keyArray.length;
       List<Long> key = Arrays.asList(keyArray);
-      
+
       if (!matchesByGroup.containsKey(key))
       {
         matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
       }
-      
+
       // set annotation spans for *all* positions of the id
       // (node could have matched several times)
-      for(int posInMatch=0; posInMatch < key.size(); posInMatch++)
+      for (int posInMatch = 0; posInMatch < key.size(); posInMatch++)
       {
-        if(key.get(posInMatch) == id)
+        if (key.get(posInMatch) == id)
         {
-          matchesByGroup.get(key)[posInMatch] = 
-        		  new AnnotatedSpan(id, coveredText, annotations, metaData);
+          matchesByGroup.get(key)[posInMatch] =
+            new AnnotatedSpan(id, coveredText, annotations, metaData);
         }
       }
     }
 
-    for(AnnotatedSpan[] match : matchesByGroup.values())
+    for (AnnotatedSpan[] match : matchesByGroup.values())
     {
       matches.add(new AnnotatedMatch(Arrays.asList(match)));
     }
@@ -123,244 +135,205 @@ public class MatrixSqlGenerator
   }
 
   @Override
-	public String selectClause(QueryData queryData,
-			List<QueryNode> alternative, String indent) {
-
-	  	StringBuilder sb = new StringBuilder();
-	  	sb.append("\n");
-
-	  	// key
-	  	sb.append(indent).append(TABSTOP).append("ARRAY[");
-	  	List<String> ids = new ArrayList<String>();
-	  	for (int i = 1; i <= alternative.size(); ++i) {
-	  		ids.add("solutions.id" + String.valueOf(i));
-	  	}
-	  	sb.append(StringUtils.join(ids, ", "));
-	  	sb.append("] AS key,\n");
-	
-	  	// fields
-		TableAccessStrategy tables = tables(null);
-		sb.append(indent).append(TABSTOP).append(tables.aliasedColumn(NODE_TABLE, "id"));
-		sb.append(" AS id,\n");
-		
-		sb.append(indent).append(TABSTOP);
-		sb.append("min(substr(");
-		sb.append(tables.aliasedColumn(TEXT_TABLE, "text"));
-		sb.append(", ");
-		sb.append(tables.aliasedColumn(NODE_TABLE, "left"));
-		sb.append(" + 1, ");
-		sb.append(tables.aliasedColumn(NODE_TABLE, "right"));
-		sb.append(" - ");
-		sb.append(tables.aliasedColumn(NODE_TABLE, "left"));
-		sb.append(")) AS span,\n");
-
-		sb.append(indent).append(TABSTOP);
-		sb.append("array_agg(DISTINCT coalesce(");
-		sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace"));
-		sb.append(" || ':', '') || ");
-		sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "name"));
-		sb.append(" || ':' || encode(");
-		sb.append(tables.aliasedColumn(NODE_ANNOTATION_TABLE, "value"));
-		sb.append("::bytea, 'base64')) AS annotations,\n");
-
-		sb.append(indent).append(TABSTOP);
-		sb.append("array_agg(DISTINCT coalesce(");
-		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "namespace"));
-		sb.append(" || ':', '') || ");
-		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "name"));
-		sb.append(" || ':' || encode(");
-		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "value"));
-		sb.append("::bytea, 'base64')) AS metadata");
-		
-	  	return sb.toString();
-	}
-  
-  
-	@Override
-	public String fromClause(QueryData queryData, 
-			List<QueryNode> alternative, String indent) {
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append(indent).append("(\n");
-    sb.append(indent);
-    
-		sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
-    sb.append(indent).append(") AS solutions,\n");
-		
-    sb.append(indent).append(TABSTOP);
-		// really ugly
-		sb.append(
-				tableJoinsInFromClauseGenerator
-				.fromClauseForNode(null, true));
-
-		sb.append("\n");
-
-		TableAccessStrategy tables = tables(null);
-		
-    sb.append(indent).append(TABSTOP);
-    sb.append("LEFT OUTER JOIN ");
-		sb.append(CORPUS_ANNOTATION_TABLE);
-		sb.append(" ON (");
-		sb.append(tables.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
-		sb.append(" = ");
-		sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
-		sb.append("),\n");
-		
-		sb.append(indent).append(TABSTOP);
-		sb.append(TEXT_TABLE);
-		
-		return sb.toString();
-	}
-
-	@Override
-	public Set<String> whereConditions(QueryData queryData,
-			List<QueryNode> alternative, String indent) {
-		
-		Set<String> conditions = new HashSet<String>();
-		StringBuilder sb = new StringBuilder();
-		TableAccessStrategy tables = tables(null);
-		
-		// corpus selection
-		List<Long> corpusList = queryData.getCorpusList();
-		if (corpusList != null && ! corpusList.isEmpty() ) {
-			sb.append(tables.aliasedColumn(NODE_TABLE, "toplevel_corpus"));
-			sb.append(" IN (");
-			sb.append(StringUtils.join(corpusList, ", "));
-			sb.append(")");
-			conditions.add(sb.toString());
-		}
-		
-		// text table table joining (FIXME: why not in from clause)
-		sb.setLength(0);
-		sb.append(tables.aliasedColumn(TEXT_TABLE, "id"));
-		sb.append(" = ");
-		sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
-		conditions.add(sb.toString());
-		
-		// nodes selected by id
-		sb.setLength(0);
-		sb.append("(\n");
-    
-    sb.append(indent).append(TABSTOP).append(TABSTOP);
-		List<String> ors = new ArrayList<String>();
-		for (int i = 1; i <= queryData.getMaxWidth(); ++i) {
-			ors.add(
-					tables.aliasedColumn(NODE_TABLE, "id") +
-					" = solutions.id" + String.valueOf(i));
-		}
-		sb.append(StringUtils.join(ors, " OR\n" + indent + TABSTOP + TABSTOP));
-		sb.append("\n");
-		sb.append(indent).append(TABSTOP);
-		sb.append(")");
-		conditions.add(sb.toString());		
-		
-		return conditions;
-		
-	}
-	
-	@Override
-	public String groupByAttributes(QueryData queryData,
-			List<QueryNode> alternative) {
-		return "key, " + tables(null).aliasedColumn(NODE_TABLE, "id") + ", span";
-	}
-	
-	@Deprecated
-  public String getMatrixQuery(List<Long> corpusList, int maxWidth)
+  public String selectClause(QueryData queryData,
+    List<QueryNode> alternative, String indent)
   {
-    StringBuilder keySb = new StringBuilder();
-    keySb.append("ARRAY[matches.id1");
-    for (int i = 2; i <= maxWidth; ++i)
-    {
-      keySb.append(",");
-      keySb.append("matches.id");
-      keySb.append(i);
-    }
-    keySb.append("] AS key");
-    String key = keySb.toString();
 
     StringBuilder sb = new StringBuilder();
+    sb.append("\n");
 
-    sb.append("SELECT \n");
-    sb.append("\t");
-    sb.append(key);
-    sb.append(",\nfacts.id AS id,\n");
-    sb.append("min(substr(text.text, facts.left+1,facts.right-facts.left)) " +
-    		"AS span,\n");
-    sb.append("array_agg(DISTINCT coalesce(facts.node_annotation_namespace " +
-    		"|| ':', '') "
-      + "|| facts.node_annotation_name || ':' "
-      + "|| encode(facts.node_annotation_value::bytea, 'base64')) " +
-      "AS annotations,\n");
-    sb.append("array_agg(DISTINCT coalesce(ca.namespace || ':', '') "
-      + "|| ca.name || ':' "
-      + "|| encode(ca.value::bytea, 'base64')) AS metadata\n");
     
-    sb.append("FROM\n");
-    sb.append("\t");
-    sb.append(matchedNodesViewName);
-    sb.append(" AS matches,\n");
-
-    sb.append("\t\"text\" AS \"text\",\n");
+    TableAccessStrategy tables = tables(null);
     
-    sb.append("\t");
-    sb.append(FACTS_TABLE);
-    sb.append(" AS facts\n");
-    sb.append("\t LEFT OUTER JOIN corpus_annotation AS ca " +
-    		"ON (ca.corpus_ref = facts.corpus_ref)\n");
+    SolutionKey<?> key = createSolutionKey();
+//    TableAccessStrategy tas = createTableAccessStrategy();
+    List<String> keyColumns =
+      key.generateOuterQueryColumns(tables, alternative.size());
 
-    sb.append("WHERE\n");
+    // key
+    sb.append(indent).append(TABSTOP);
+    sb.append(StringUtils.join(keyColumns, ", "));
+    sb.append(",\n");
 
-    if (corpusList != null)
-    {
-      sb.append("facts.toplevel_corpus IN (");
-      sb.append(corpusList.isEmpty() 
-    		  ? "NULL" : StringUtils.join(corpusList, ","));
-      sb.append(") AND\n");
-    }
-    sb.append("facts.text_ref = text.id AND \n");
-
-    sb.append("(");
-    for (int i = 1; i <= maxWidth; i++)
-    {
-      sb.append("facts.id = matches.id").append(i);
-      if (i < maxWidth)
-      {
-        sb.append(" OR ");
-      }
-    }
-    sb.append(")\n");
-    sb.append("GROUP BY key, facts.id, span");
-
-    Logger.getLogger(MatrixSqlGenerator.class)
-    	.debug("generated SQL for matrix:\n" + sb.toString());
+    // fields
+    
+    sb.append(indent).append(TABSTOP);
+    sb.append(StringUtils.join(getSelectFields(tables), ",\n" + indent + TABSTOP));
+    sb.append("\n");
 
     return sb.toString();
   }
   
+  protected List<String> getSelectFields(TableAccessStrategy tas)
+  {
+    List<String> result = new LinkedList<String>();
+    
+    result.add(selectIdString(tas));    
+    result.add(selectSpanString(tas));
+    result.add(selectAnnotationsString(tas));
+    result.add(selectMetadataString(tas));
+    
+    return result;
+  }
+  
+  protected String selectIdString(TableAccessStrategy tas)
+  {
+    return tas.aliasedColumn(NODE_TABLE,"id") + " AS id";
+  }
+  
+  protected String selectSpanString(TableAccessStrategy tas)
+  {
+    return "min(substr(" + tas.aliasedColumn(TEXT_TABLE, "text") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "left") + " + 1, "
+      + tas.aliasedColumn(NODE_TABLE, "right") + " - " 
+      + tas.aliasedColumn(NODE_TABLE, "left") + ")) AS span";
+  }
+  
+  protected String selectAnnotationsString(TableAccessStrategy tas)
+  {
+    return "array_agg(DISTINCT coalesce(" 
+      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace")
+      + " || ':', '') || "
+      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "name")
+      + " || ':' || encode("
+      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "value")
+      + "::bytea, 'base64')) AS annotations";
+  }
+  
+  protected String selectMetadataString(TableAccessStrategy tas)
+  {
+    return "array_agg(DISTINCT coalesce("
+      + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "namespace")
+      + " || ':', '') || "
+      + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "name")
+      + " || ':' || encode("
+      + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "value")
+      + "::bytea, 'base64')) AS metadata";
+  }
+
+  @Override
+  public String fromClause(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(indent).append("(\n");
+    sb.append(indent);
+
+    sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(indent).append(") AS solutions,\n");
+
+    sb.append(indent).append(TABSTOP);
+    // really ugly
+    sb.append(
+      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
+
+    sb.append("\n");
+
+    TableAccessStrategy tables = tables(null);
+
+    addFromOuterJoins(sb, queryData, tables, indent);
+    sb.append(",\n");
+
+    sb.append(indent).append(TABSTOP);
+    sb.append(TEXT_TABLE);
+
+    return sb.toString();
+  }
+  
+  protected void addFromOuterJoins(StringBuilder sb, QueryData queryData, 
+    TableAccessStrategy tas, String indent)
+  {
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ");
+    sb.append(CORPUS_ANNOTATION_TABLE);
+    sb.append(" ON (");
+    sb.append(tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
+    sb.append(" = ");
+    sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
+    sb.append(")");
+  }
+
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+
+    Set<String> conditions = new HashSet<String>();
+    StringBuilder sb = new StringBuilder();
+    TableAccessStrategy tables = tables(null);
+
+    // corpus selection
+    List<Long> corpusList = queryData.getCorpusList();
+    if (corpusList != null && !corpusList.isEmpty())
+    {
+      sb.append(tables.aliasedColumn(NODE_TABLE, "toplevel_corpus"));
+      sb.append(" IN (");
+      sb.append(StringUtils.join(corpusList, ", "));
+      sb.append(")");
+      conditions.add(sb.toString());
+    }
+
+    // text table table joining (FIXME: why not in from clause)
+    sb.setLength(0);
+    sb.append(tables.aliasedColumn(TEXT_TABLE, "id"));
+    sb.append(" = ");
+    sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
+    conditions.add(sb.toString());
+
+    // nodes selected by id
+    sb.setLength(0);
+    sb.append("(\n");
+
+    sb.append(indent).append(TABSTOP).append(TABSTOP);
+    List<String> ors = new ArrayList<String>();
+    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    {
+      ors.add(
+        tables.aliasedColumn(NODE_TABLE, "id") + " = solutions.id" + String.
+        valueOf(i));
+    }
+    sb.append(StringUtils.join(ors, " OR\n" + indent + TABSTOP + TABSTOP));
+    sb.append("\n");
+    sb.append(indent).append(TABSTOP);
+    sb.append(")");
+    conditions.add(sb.toString());
+
+    return conditions;
+
+  }
+
+  @Override
+  public String groupByAttributes(QueryData queryData,
+    List<QueryNode> alternative)
+  {
+    return "key, " + tables(null).aliasedColumn(NODE_TABLE, "id") + ", span";
+  }
+
   private List<Annotation> extractAnnotations(Array array) throws SQLException
   {
     List<Annotation> result = new ArrayList<Annotation>();
-    
-    if(array != null)
+
+    if (array != null)
     {
       String[] arrayLines = (String[]) array.getArray();
-      
-      for(String line : arrayLines)
+
+      for (String line : arrayLines)
       {
-        if(line != null)
+        if (line != null)
         {
           String namespace = null;
           String name = null;
           String value = null;
 
           String[] split = line.split(":");
-          if(split.length > 2)
+          if (split.length > 2)
           {
             namespace = split[0];
             name = split[1];
             value = split[2];
           }
-          else if(split.length > 1)
+          else if (split.length > 1)
           {
             name = split[0];
             value = split[1];
@@ -370,7 +343,7 @@ public class MatrixSqlGenerator
             name = split[0];
           }
 
-          if(value != null)
+          if (value != null)
           {
             value = new String(Base64.decodeBase64(value));
           }
@@ -379,15 +352,8 @@ public class MatrixSqlGenerator
         } // if line not null
       }
     }
-    
-    return result;
-  }
 
-  public List<AnnotatedMatch> queryMatrix(JdbcTemplate jdbcTemplate, 
-		  List<Long> corpusList, int maxWidth)
-  {
-    return (List<AnnotatedMatch>) 
-    		jdbcTemplate.query(getMatrixQuery(corpusList, maxWidth), this);
+    return result;
   }
 
   public String getMatchedNodesViewName()
@@ -400,21 +366,25 @@ public class MatrixSqlGenerator
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator() {
-	return innerQuerySqlGenerator;
-}
+  public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
+  {
+    return innerQuerySqlGenerator;
+  }
 
-public void setInnerQuerySqlGenerator(
-		SqlGenerator<QueryData, ?> innerQuerySqlGenerator) {
-	this.innerQuerySqlGenerator = innerQuerySqlGenerator;
-}
+  public void setInnerQuerySqlGenerator(
+    SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
+  {
+    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+  }
 
-public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator() {
-	return tableJoinsInFromClauseGenerator;
-}
+  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
+  {
+    return tableJoinsInFromClauseGenerator;
+  }
 
-public void setTableJoinsInFromClauseGenerator(
-		TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator) {
-	this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
-}
+  public void setTableJoinsInFromClauseGenerator(
+    TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
+  {
+    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
+  }
 }
