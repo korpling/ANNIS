@@ -8,7 +8,7 @@
   </context-param>
   <servlet>
     <servlet-name>MainApp</servlet-name>
-    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+    <servlet-class>annis.gui.AnnisApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>annis.gui.MainApp</param-value>
@@ -39,6 +39,11 @@
       </description>
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
+    </init-param>
+    <init-param>
+      <description>E-Mail address for sending bug reports. Must be set to have the "Report Bug" button visible.</description>
+      <param-name>bug-e-mail</param-name>        	
+      <param-value>thomas.krause@alumni.hu-berlin.de</param-value>
     </init-param>
   </servlet>
   <servlet>
