@@ -15,23 +15,22 @@
  */
 package annis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -63,6 +62,71 @@ public class CommonHelper
     }
     return false;
   }
+  
+  public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph)
+  {
+    List<SNode> token = new ArrayList<SNode>();
+    
+    if(segName == null)
+    {
+      // if no segmentation is given just return the sorted token list
+      token.addAll(graph.getSortedSTokenByText());
+    }
+    else
+    {
+      // get the very first node of the order relation chain
+      Set<SNode> startNodes = new LinkedHashSet<SNode>();
+      
+      Map<SNode, SOrderRelation> outRelationForNode = 
+        new HashMap<SNode, SOrderRelation>();
+      for(SOrderRelation rel : graph.getSOrderRelations())
+      {
+        if(rel.getSTypes().contains(segName))
+        {
+          SNode node = rel.getSSource();
+          outRelationForNode.put(node, rel);
+
+          EList<Edge> inEdgesForSource = 
+            graph.getInEdges(node.getSId());
+          boolean hasInOrderEdge = false;
+          for(Edge e : inEdgesForSource)
+          {
+            if(e instanceof SOrderRelation)
+            {
+              hasInOrderEdge = true;
+              break;
+            }
+          } // for each ingoing edge
+
+          if(!hasInOrderEdge)
+          {
+            startNodes.add(rel.getSSource());
+          }
+        } // end if type is segName
+      } // end for all order relations of graph
+      
+
+      // add all nodes on the order relation chain beginning from the start node
+      for(SNode s : startNodes)
+      {
+        SNode current = s;
+        while(current != null)
+        {
+          token.add(current);
+          if(outRelationForNode.containsKey(current))
+          {
+            current = outRelationForNode.get(current).getSTarget();
+          }
+          else
+          {
+            current = null; 
+          }
+        }
+      }
+    }
+    
+    return token;
+  }
 
   public static Set<String> getTokenAnnotationLevelSet(SaltProject p)
   {
@@ -73,9 +137,9 @@ public class CommonHelper
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        for (SNode n : g.getSNodes())
+        if(g != null)
         {
-          if (n instanceof SToken)
+          for (SToken n : g.getSTokens())
           {
             for (SAnnotation anno : n.getSAnnotations())
             {
@@ -86,6 +150,32 @@ public class CommonHelper
       }
     }
 
+    return result;
+  }
+  
+  public static Set<String> getOrderingTypes(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+    
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        if(g != null)
+        {
+          EList<SOrderRelation> orderRelations = g.getSOrderRelations();
+          if(orderRelations != null)
+          {
+            for (SOrderRelation rel : orderRelations)
+            {
+              result.addAll(rel.getSTypes());
+            }
+          }
+        }
+      }
+    }
+    
     return result;
   }
 

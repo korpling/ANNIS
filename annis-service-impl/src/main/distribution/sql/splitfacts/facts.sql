@@ -91,6 +91,9 @@ INSERT INTO facts_node_:id
   span,
   left_token,
   right_token,
+  seg_name,
+  seg_left,
+  seg_right,
   node_anno_ref,
   n_sample
 )
@@ -115,6 +118,9 @@ FROM
     _node.span AS span,
     _node.left_token AS left_token,
     _node.right_token AS right_token,
+    _node.seg_name AS seg_name,
+    _node.seg_left AS seg_left,
+    _node.seg_right AS seg_right,
     (SELECT id FROM annotation_pool_:id AS na 
       WHERE na.namespace = _node_annotation.namespace
         AND na."name" = _node_annotation."name"
@@ -189,6 +195,6 @@ FROM
   FROM
     _rank
     JOIN _component ON (_rank.component_ref = _component.id)
-    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.pre)
+    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
 ) as tmp
 ;

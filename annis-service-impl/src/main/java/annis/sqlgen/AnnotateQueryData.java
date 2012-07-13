@@ -28,12 +28,19 @@ public class AnnotateQueryData
 
   private int left;
   private int right;
+  private String segmentationLayer;
 
   public AnnotateQueryData(int left, int right)
+  {
+    this(left, right, null);
+  }
+  
+  public AnnotateQueryData(int left, int right, String segmentationLayer)
   {
     super();
     this.left = left;
     this.right = right;
+    this.segmentationLayer = segmentationLayer;
   }
 
   public int getLeft()
@@ -45,6 +52,13 @@ public class AnnotateQueryData
   {
     return right;
   }
+
+  public String getSegmentationLayer()
+  {
+    return segmentationLayer;
+  }
+  
+  
 
   @Override
   public String toString()
@@ -58,6 +72,10 @@ public class AnnotateQueryData
     if (right > 0)
     {
       fields.add("right = " + right);
+    }
+    if(segmentationLayer != null)
+    {
+      fields.add("segLayer = " + segmentationLayer);
     }
     return StringUtils.join(fields, ", ");
   }

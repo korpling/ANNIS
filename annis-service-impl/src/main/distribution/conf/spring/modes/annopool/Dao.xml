@@ -59,8 +59,7 @@
 	<!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
 
-	<!-- DddQueryParser -->
-  <import resource="classpath:de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml"/>
+  <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
 
   <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
@@ -108,8 +107,6 @@
 
     <property name="aqlParser" ref="annisParser"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
-    <property name="dddqueryParser" ref="dddQueryParser" />
-    <property name="dddqueryAnalysis" ref="queryAnalysis" />
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>

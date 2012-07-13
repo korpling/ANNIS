@@ -49,7 +49,6 @@ import java.util.logging.Logger;
  */
 public class ResultViewPanel extends Panel implements PagingCallback
 {
-
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
@@ -61,10 +60,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
+  private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
+  private String currentSegmentationLayer;
 
   public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
-    int contextLeft, int contextRight, int pageSize,
+    int contextLeft, int contextRight, String segmentationLayer, int pageSize,
     PluginSystem ps)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
@@ -74,6 +75,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.contextRight = contextRight;
     this.pageSize = pageSize;
     this.ps = ps;
+    
+    this.currentSegmentationLayer = segmentationLayer;
 
     setSizeFull();
 
@@ -83,6 +86,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
+    
+    miSegmentation = mbResult.addItem("Segmentation layer", null);
+    
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
     mbResult.addItem("Show Citation URL", new MenuBar.Command()
@@ -125,7 +131,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void attach()
   {
     query = new AnnisResultQuery(corpora.keySet(), aql,
-      contextLeft, contextRight, getApplication());
+      contextLeft, contextRight, currentSegmentationLayer, getApplication());
     createPage(0, pageSize);
 
     super.attach();
@@ -171,6 +177,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
             synchronized(getApplication()) 
             {
+              updateSegmentationLayer(result);
               updateTokenAnnos(result);
 
               if (resultPanel != null)
@@ -178,7 +185,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
                 layout.removeComponent(resultPanel);
               }
               resultPanel = new ResultSetPanel(result, start, ps,
-                getVisibleTokenAnnos());
+                getVisibleTokenAnnos(), currentSegmentationLayer);
 
               layout.addComponent(resultPanel);
               resultPanel.setVisible(true);
@@ -255,6 +262,40 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     getWindow().addWindow(w);
     w.center();
+  }
+  
+  private void updateSegmentationLayer(SaltProject p)
+  {
+    miSegmentation.removeChildren();
+    
+    Set<String> segLayers = CommonHelper.getOrderingTypes(p);
+    
+    segLayers.add("");
+    
+    for(String s : segLayers)
+    {
+      MenuItem miSingleSegLayer = miSegmentation.addItem("".equals(s) ? "<default>" : s, 
+        new MenuBar.Command() 
+      {
+
+        @Override
+        public void menuSelected(MenuItem selectedItem)
+        {
+          currentSegmentationLayer = selectedItem.getText();
+          for(MenuItem mi : miSegmentation.getChildren())
+          {
+            mi.setChecked(mi == selectedItem);
+          }
+          
+          resultPanel.setSegmentationLayer(currentSegmentationLayer);
+        }
+      });
+     
+      miSingleSegLayer.setCheckable(true);
+      miSingleSegLayer.setChecked(
+        (currentSegmentationLayer == null && "".equals(s)) 
+        || s.equals(currentSegmentationLayer));
+    }
   }
 
   private void updateTokenAnnos(SaltProject p)

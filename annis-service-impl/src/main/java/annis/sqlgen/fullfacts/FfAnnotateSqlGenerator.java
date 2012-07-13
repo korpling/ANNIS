@@ -73,16 +73,11 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     String innerIndent = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
-    SolutionKey<?> key = createSolutionKey();
-
+    
     sb.append("DISTINCT\n");
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(createTableAccessStrategy(), alternative.
-      size());
-    for (String keyColumn : keyColumns)
-    {
-      sb.append(innerIndent).append(keyColumn).append(",\n");
-    }
+    sb.append(innerIndent).append("solutions.\"key\",\n");
+    sb.append(innerIndent);
+    
     List<LimitOffsetQueryData> extension =
       queryData.getExtensions(LimitOffsetQueryData.class);
     Validate.isTrue(extension.size() > 0);
@@ -109,6 +104,9 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "span");
     addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
     addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_name");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_left");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_right");
     addSelectClauseAttribute(fields, RANK_TABLE, "pre");
     addSelectClauseAttribute(fields, RANK_TABLE, "post");
     addSelectClauseAttribute(fields, RANK_TABLE, "parent");
@@ -146,10 +144,7 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   {
     StringBuffer sb = new StringBuffer();
 
-    sb.append(indent).append("(\n");
-    
-    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indent +  TABSTOP));
-    sb.append(indent).append(TABSTOP).append(") AS solutions,\n");
+    sb.append(indent).append("solutions,\n");
 
     // really ugly
     sb.append(indent).append(TABSTOP).append(

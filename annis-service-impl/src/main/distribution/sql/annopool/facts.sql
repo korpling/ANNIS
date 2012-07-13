@@ -90,6 +90,9 @@ INSERT INTO facts_:id
   span,
   left_token,
   right_token,
+  seg_name,
+  seg_left,
+  seg_right,
   pre,
   post,
   parent,
@@ -140,6 +143,9 @@ FROM
     _node.span AS span,
     _node.left_token AS left_token,
     _node.right_token AS right_token,
+    _node.seg_name AS seg_name,
+    _node.seg_left AS seg_left,
+    _node.seg_right AS seg_right,
 
     _rank.pre AS pre,
     _rank.post AS post,
@@ -169,7 +175,7 @@ FROM
     JOIN _rank ON (_rank.node_ref = _node.id)
     JOIN _component ON (_rank.component_ref = _component.id)
     LEFT JOIN _node_annotation ON (_node_annotation.node_ref = _node.id)
-    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.pre)
+    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
   WHERE
     _node.toplevel_corpus = :id
 ) as tmp

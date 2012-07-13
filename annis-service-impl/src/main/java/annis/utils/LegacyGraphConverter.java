@@ -221,7 +221,10 @@ public class LegacyGraphConverter
 
         annoGraph.addEdge(aEdge);
         aEdge.getDestination().addIncomingEdge(aEdge);
-        aEdge.getSource().addOutgoingEdge(aEdge);
+        if(aEdge.getSource() != null)
+        {
+          aEdge.getSource().addOutgoingEdge(aEdge);
+        }
       }
     }
 

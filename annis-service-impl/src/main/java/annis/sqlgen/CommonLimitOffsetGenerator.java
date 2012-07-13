@@ -26,12 +26,13 @@ import java.util.List;
 public class CommonLimitOffsetGenerator implements
   LimitOffsetClauseSqlGenerator<QueryData>
 {
-  
+
   @Override
   public String limitOffsetClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    LimitOffsetQueryData LimitOffsetQueryData = getLimitOffsetQueryData(queryData);
+    LimitOffsetQueryData LimitOffsetQueryData = getLimitOffsetQueryData(
+      queryData);
     StringBuilder sb = new StringBuilder();
     Integer limit = null;
     Integer offset = null;
@@ -47,7 +48,8 @@ public class CommonLimitOffsetGenerator implements
       sb.append("LIMIT ").append(limit).append("\n");
     }
 
-    if (offset != null){
+    if (offset != null)
+    {
       sb.append("OFFSET ").append(offset);
     }
 

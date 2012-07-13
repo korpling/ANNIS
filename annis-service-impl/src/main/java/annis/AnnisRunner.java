@@ -34,13 +34,18 @@ import annis.model.QueryAnnotation;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
-import annis.service.ifaces.AnnisAttribute;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.AnnisAttributeSetImpl;
+
 import annis.sqlgen.*;
+
+import annis.sqlgen.AnnotateQueryData;
+import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.SqlGenerator;
+
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
-import de.deutschdiachrondigital.dddquery.DddQueryMapper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -49,6 +54,12 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
@@ -68,18 +79,16 @@ public class AnnisRunner extends AnnisBaseRunner
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
-  // map Annis queries to DDDquery
-  private DddQueryMapper dddQueryMapper;
   private QueryAnalysis aqlAnalysis;
   private int context;
   private int matchLimit;
-  private boolean isDDDQueryMode;
-  private QueryAnalysis queryAnalysis;
+    private QueryAnalysis queryAnalysis;
   // settings
   private int limit = 10;
   private int offset;
   private int left = 5;
   private int right = 5;
+  private String segmentationLayer = null;
   private List<Long> corpusList;
   private boolean clearCaches;
   private MetaDataFilter metaDataFilter;
@@ -143,36 +152,17 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     corpusList = new LinkedList<Long>();
     benchmarks = new ArrayList<AnnisRunner.Benchmark>();
-    isDDDQueryMode = false;
-  }
-
-  // switch between AQL as input mode and DDDQuery
-  public void doLanguage(String newLanguage)
-  {
-    if ("ddd".equalsIgnoreCase(newLanguage) || "dddquery".equalsIgnoreCase(
-      newLanguage))
-    {
-      isDDDQueryMode = true;
-      System.out.println("new input language is DDDQuery");
-    }
-    else
-    {
-      isDDDQueryMode = false;
-      System.out.println("new input language is AQL");
-    }
   }
 
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doSql("annotate tok");
-    doAnnotate("tok");
-  }
+    doCorpus("exmaralda");
 
-  public void doDddquery(String annisQuery)
-  {
-    out.println(translate(annisQuery));
+    doSet("seg to clean");
+
+    doSql("count tok & tok & #1 .clean,20 #2");
+    doAnnotate("tok");
   }
 
   public void doParse(String annisQuery)
@@ -183,10 +173,12 @@ public class AnnisRunner extends AnnisBaseRunner
   // FIXME: missing tests
   public void doSql(String funcCall)
   {
+
     String doSqlFunctionName = "sql_" + funcCall.split("\\s", 2)[0];
     SqlGenerator<QueryData, ?> gen = getGeneratorForQueryFunction(funcCall);
     String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
     QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
+
 
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
@@ -198,8 +190,9 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
       functionCall);
+    String function = getAnnisQueryFromFunctionCall(functionCall);
     String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-    QueryData queryData = analyzeQuery(annisQuery, null);
+    QueryData queryData = analyzeQuery(annisQuery, function);
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
@@ -257,6 +250,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(split.length == 2, "bad call to plan");
     return split[1];
+  }
+
+  private String getAnnisFunctionyFromFunctionCall(String functionCall)
+  {
+    String[] split = functionCall.split(" ", 2);
+
+    Validate.isTrue(split.length == 2, "bad call to plan");
+    return split[0];
   }
 
   public void doRecord(String dummy)
@@ -654,6 +655,18 @@ public class AnnisRunner extends AnnisBaseRunner
         }
       }
     }
+    else if("seg".equals(setting))
+    {
+
+      if(show)
+      {
+        value = segmentationLayer;
+      }
+      else
+      {
+        segmentationLayer = value;
+      }
+    }
     else
     {
       out.println("ERROR: unknown option: " + setting);
@@ -704,8 +717,16 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
 
-    queryData.addExtension(new LimitOffsetQueryData(offset, limit));
-    queryData.addExtension(new AnnotateQueryData(left, right));
+    if("annotate".equals(queryFunction))
+    {
+      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+      queryData.addExtension(new LimitOffsetQueryData(offset, limit));
+    }
+    else if("find".equals(queryFunction))
+    {
+      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+    }
+
 
     if (annisQuery != null)
     {
@@ -791,6 +812,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doAnnotate(String annisQuery)
   {
     QueryData queryData = analyzeQuery(annisQuery, "annotate");
+
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
     SaltProject result = annisDao.annotate(queryData);
@@ -840,8 +862,21 @@ public class AnnisRunner extends AnnisBaseRunner
     boolean listValues = "values".equals(doListValues);
     List<AnnisAttribute> annotations =
       annisDao.listAnnotations(getCorpusList(), listValues, true);
-    AnnisAttributeSetImpl set = new AnnisAttributeSetImpl(annotations);
-    System.out.println(set.getJSON());
+    try
+    {
+      ObjectMapper om = new ObjectMapper();
+      AnnotationIntrospector ai = new JaxbAnnotationIntrospector();
+      om.getDeserializationConfig().withAnnotationIntrospector(ai);
+      om.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
+
+      System.out.println(om.writeValueAsString(annotations));
+    }
+    catch(IOException ex)
+    {
+      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
+        log(Level.SEVERE, null, ex);
+    }
+
   }
 
   public void doMeta(String corpusId)
@@ -890,34 +925,6 @@ public class AnnisRunner extends AnnisBaseRunner
     System.exit(0);
   }
 
-  public void doCompareParser(String query)
-  {
-    QueryData qdAQL = annisDao.parseAQL(query, null);
-    QueryData qdDDD = annisDao.parseDDDQuery(translate(query), null);
-
-    String strAQL = qdAQL.toString();
-    String strDDD = qdDDD.toString();
-
-    if (strAQL.equals(strDDD))
-    {
-      System.out.println(strAQL);
-      System.out.println("both are equal");
-    }
-    else
-    {
-      System.out.println("AQL:");
-      System.out.println(strAQL);
-      System.out.println("DDD:");
-      System.out.println(strDDD);
-      System.out.println("NOT EQUAL");
-    }
-  }
-
-  ///// Delegates for convenience
-  private String translate(String annisQuery)
-  {
-    return dddQueryMapper.translate(annisQuery);
-  }
 
   private void printAsTable(List<? extends Object> list, String... fields)
   {
@@ -926,14 +933,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private QueryData parse(String input)
   {
-    if (isDDDQueryMode)
-    {
-      return annisDao.parseDDDQuery(input, getCorpusList());
-    }
-    else
-    {
-      return annisDao.parseAQL(input, getCorpusList());
-    }
+
+    return annisDao.parseAQL(input, getCorpusList());
+
   }
 
   private String printSaltAsXMI(SaltProject project)
@@ -965,17 +967,6 @@ public class AnnisRunner extends AnnisBaseRunner
       log.error(ex);
     }
     return "";
-  }
-
-  ///// Getter / Setter
-  public DddQueryMapper getDddQueryMapper()
-  {
-    return dddQueryMapper;
-  }
-
-  public void setDddQueryMapper(DddQueryMapper dddQueryMapper)
-  {
-    this.dddQueryMapper = dddQueryMapper;
   }
 
   public AnnisParser getAnnisParser()

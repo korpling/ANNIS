@@ -187,9 +187,10 @@ limitations under the License.
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
 
-  <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.annopool.ApMatrixSqlGenerator"
         parent="tableAccessStrategyFactory">
 
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
     <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
@@ -229,8 +230,10 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-    <property name="limitOffsetClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
-  </bean>
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+  </bean> 
+  
+  <bean id="commonLimitOffsetGenerator" class="annis.sqlgen.CommonLimitOffsetGenerator" />
 
   <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy">
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
@@ -249,7 +252,6 @@ limitations under the License.
 
     <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
 
-    <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
@@ -267,6 +269,9 @@ limitations under the License.
         <ref bean="annotateSqlGenerator" />
       </util:list>
     </property>
+    
+    <property name="withClauseSqlGenerator" ref="annotateSqlGenerator" />
+    
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
@@ -276,6 +281,13 @@ limitations under the License.
   <util:list id="defaultFromClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
   </util:list>
+  
+  <util:list id="findPathFromClauseGenerators">
+    <ref bean="tableJoinsInWhereClauseGenerator" />
+    <ref bean="corpusPathWhereClauseGenerator" />
+  </util:list>
+  
+  <bean id="corpusPathWhereClauseGenerator" class="annis.sqlgen.CorpusPathWhereClauseGenerator"   parent="tableAccessStrategyFactory"/>
 
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
@@ -285,6 +297,19 @@ limitations under the License.
     <ref bean="sampleWhereClause" />
   </util:list>
 
+<!-- 
+  This is the same list as defaultWhereClauseGenerators, but extended with one
+  generator for query the corpus path, but the util:list do not support a kind 
+  of heredity for lists of beans.
+  -->  
+  <util:list id="findWhereClauseGenerators">
+    <ref bean="tableJoinsInWhereClauseGenerator" />
+    <ref bean="defaultWhereClauseGenerator" />
+   <!-- <ref bean="subcorpusConstraintWhereClause" /> -->
+    <ref bean="metaDataAndCorpusWhereClauseGenerator" />
+    <ref bean="sampleWhereClause" />
+    <ref bean="corpusPathWhereClauseGenerator" />
+  </util:list>
   
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
@@ -293,11 +318,12 @@ limitations under the License.
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
 
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
-
-    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-  </bean>
-
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+    <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
+  </bean> 
+  
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
         parent="tableAccessStrategyFactory">
 

@@ -65,6 +65,10 @@ textarea.citation {
   font-family: monospace;
 }
 
+textarea.query {
+  font-family: monospace;
+}
+
 /* matched node colors by match index*/
 .match_1 {
   color: rgb(255,0,0);

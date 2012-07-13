@@ -130,6 +130,21 @@ CREATE INDEX idx__facts_root__:id
   USING btree
   (root, corpus_ref);
 
+CREATE INDEX idx__facts_seg_name_index__:id
+  ON facts_:id
+  USING btree
+  (seg_name);
+
+CREATE INDEX idx__facts_seg_left_index__:id
+  ON facts_:id
+  USING btree
+  (seg_left);
+
+CREATE INDEX idx__facts_seg_right_index__:id
+  ON facts_:id
+  USING btree
+  (seg_right);
+
 CREATE INDEX idx__facts_span__:id
   ON facts_:id
   USING btree

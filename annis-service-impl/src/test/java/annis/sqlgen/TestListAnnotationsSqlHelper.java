@@ -29,8 +29,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.objects.AnnisAttributeImpl;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisAttribute;
 
 public class TestListAnnotationsSqlHelper {
 
@@ -110,7 +110,7 @@ public class TestListAnnotationsSqlHelper {
 	///// private helper
 	
 	private AnnisAttribute newNamedAnnisAttribute(String name, String... values) {
-		AnnisAttribute attribute = new AnnisAttributeImpl();
+		AnnisAttribute attribute = new AnnisAttribute();
 		
 		attribute.setName(name);
 		for (String value : values)

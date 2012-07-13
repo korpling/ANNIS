@@ -25,6 +25,7 @@ import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.Alignment;
@@ -39,7 +40,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,21 +53,25 @@ import java.util.regex.Pattern;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
+import org.netomi.vaadin.screenshot.Screenshot;
 
 /**
  *
  * @author thomas
  */
-public class SearchWindow extends Window implements LoginForm.LoginListener
+public class SearchWindow extends Window
+  implements LoginForm.LoginListener, Screenshot.ScreenshotListener
 {
 
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
-    Pattern.compile("AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
+    Pattern.compile(
+    "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
     Pattern.MULTILINE | Pattern.DOTALL);
   private Label lblUserName;
   private Button btLoginLogout;
+  private Button btBugReport;
   private ControlPanel control;
   private TutorialPanel tutorial;
   private TabSheet mainTab;
@@ -76,11 +80,14 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   private AnnisSecurityManager securityManager;
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
-  
+  private String bugEMailAddress;
+
   public SearchWindow(PluginSystem ps)
   {
     super("ANNIS Corpus Search");
+
     this.ps = ps;
+    
     setName("search");
 
     getContent().setSizeFull();
@@ -97,7 +104,8 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     panelToolbar.addStyleName("toolbar");
 
     Button btAboutAnnis = new Button("About ANNIS");
-    btAboutAnnis.addStyleName(BaseTheme.BUTTON_LINK);
+    btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
     btAboutAnnis.addListener(new Button.ClickListener()
     {
 
@@ -112,6 +120,27 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       }
     });
 
+    final SearchWindow finalThis = this;
+    final Screenshot screenShot = new Screenshot();
+    screenShot.addListener(finalThis);
+
+    addComponent(screenShot);
+
+    btBugReport = new Button("Report Bug");
+    btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
+    btBugReport.addListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+
+        // make screenshot
+        screenShot.makeScreenshot(finalThis);
+
+      }
+    });
 
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
@@ -124,7 +153,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       @Override
       public void buttonClick(ClickEvent event)
       {
-        if(isLoggedIn())
+        if (isLoggedIn())
         {
           // logout
           getApplication().setUser(null);
@@ -139,8 +168,11 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     });
     btLoginLogout.setSizeUndefined();
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     layoutToolbar.addComponent(btAboutAnnis);
+    
+    layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(lblUserName);
     layoutToolbar.addComponent(btLoginLogout);
 
@@ -202,12 +234,13 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       @Override
       public void handleParameters(Map<String, String[]> parameters)
       {
-        if(parameters.containsKey("citation"))
+        if (parameters.containsKey("citation"))
         {
           HttpSession session =
-            ((WebApplicationContext) getApplication().getContext()).getHttpSession();
+            ((WebApplicationContext) getApplication().getContext()).
+            getHttpSession();
           String citation = (String) session.getAttribute("citation");
-          if(citation != null)
+          if (citation != null)
           {
             citation = StringUtils.removeStart(citation,
               Helper.getContext(getApplication()) + "/Cite/");
@@ -226,6 +259,13 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   {
     super.attach();
 
+    this.bugEMailAddress = getApplication().getProperty("bug-e-mail");
+    if("".equals(this.bugEMailAddress))
+    {
+      this.bugEMailAddress = null;
+    }
+    btBugReport.setVisible(this.bugEMailAddress != null);
+    
     initSecurityManager();
     updateUserInformation();
 
@@ -235,7 +275,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   {
 
     AnnisUser user = (AnnisUser) getApplication().getUser();
-    if(user == null)
+    if (user == null)
     {
       return;
     }
@@ -243,24 +283,25 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     Map<String, AnnisCorpus> userCorpora = user.getCorpusList();
 
     Matcher m = citationPattern.matcher(relativeUri);
-    if(m.matches())
+    if (m.matches())
     {
       // AQL
       String aql = "";
-      if(m.group(1) != null)
+      if (m.group(1) != null)
       {
         aql = m.group(1);
       }
 
       // CIDS      
-      HashMap<String, AnnisCorpus> selectedCorpora = new HashMap<String, AnnisCorpus>();
-      if(m.group(2) != null)
+      HashMap<String, AnnisCorpus> selectedCorpora =
+        new HashMap<String, AnnisCorpus>();
+      if (m.group(2) != null)
       {
         String[] cids = m.group(2).split(",");
-        for(String name : cids)
+        for (String name : cids)
         {
           AnnisCorpus c = userCorpora.get(name);
-          if(c != null)
+          if (c != null)
           {
             selectedCorpora.put(c.getName(), c);
           }
@@ -268,7 +309,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
       }
 
       // CLEFT and CRIGHT
-      if(m.group(4) != null && m.group(6) != null)
+      if (m.group(4) != null && m.group(6) != null)
       {
         int cleft = 0;
         int cright = 0;
@@ -277,7 +318,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
           cleft = Integer.parseInt(m.group(4));
           cright = Integer.parseInt(m.group(6));
         }
-        catch(NumberFormatException ex)
+        catch (NumberFormatException ex)
         {
           Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE,
             "could not parse context value", ex);
@@ -291,7 +332,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
 
       // remove all currently openend sub-windows
       Set<Window> all = new HashSet<Window>(getChildWindows());
-      for(Window w : all)
+      for (Window w : all)
       {
         removeWindow(w);
       }
@@ -308,7 +349,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
 
     Enumeration<?> parameterNames = getApplication().getPropertyNames();
     Properties properties = new Properties();
-    while(parameterNames.hasMoreElements())
+    while (parameterNames.hasMoreElements())
     {
       String name = (String) parameterNames.nextElement();
       properties.put(name, getApplication().getProperty(name));
@@ -320,11 +361,11 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   public void updateUserInformation()
   {
     AnnisUser user = (AnnisUser) getApplication().getUser();
-    if(btLoginLogout == null || lblUserName == null || user == null)
+    if (btLoginLogout == null || lblUserName == null || user == null)
     {
       return;
     }
-    if(isLoggedIn())
+    if (isLoggedIn())
     {
       lblUserName.setValue("logged in as \"" + user.getUserName() + "\"");
       btLoginLogout.setCaption("Logout");
@@ -336,23 +377,24 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
     }
   }
 
-  public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora, int contextLeft,
-    int contextRight, int pageSize)
+  public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora,
+    int contextLeft,
+    int contextRight, String segmentationLayer, int pageSize)
   {
     // remove old result from view
-    if(resultView != null)
+    if (resultView != null)
     {
       mainTab.removeComponent(resultView);
     }
     resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
-      pageSize, ps);
+      segmentationLayer, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
   }
 
   public void updateQueryCount(int count)
   {
-    if(resultView != null && count >= 0)
+    if (resultView != null && count >= 0)
     {
       resultView.setCount(count);
     }
@@ -361,7 +403,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   private void showLoginWindow()
   {
 
-    if(windowLogin == null)
+    if (windowLogin == null)
     {
       LoginForm login = new LoginForm();
       login.addListener((LoginForm.LoginListener) this);
@@ -382,18 +424,19 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   {
     try
     {
-      AnnisUser newUser = securityManager.login(event.getLoginParameter("username"),
+      AnnisUser newUser = securityManager.login(event.getLoginParameter(
+        "username"),
         event.getLoginParameter("password"), true);
       getApplication().setUser(newUser);
       showNotification("Logged in as \"" + newUser.getUserName() + "\"",
         Window.Notification.TYPE_TRAY_NOTIFICATION);
     }
-    catch(AuthenticationException ex)
+    catch (AuthenticationException ex)
     {
       showNotification("Authentification error: " + ex.getMessage(),
         Window.Notification.TYPE_ERROR_MESSAGE);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -411,7 +454,7 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   public boolean isLoggedIn()
   {
     AnnisUser u = (AnnisUser) getApplication().getUser();
-    if(u == null || AnnisSecurityManager.FALLBACK_USER.equals(u.getUserName()))
+    if (u == null || AnnisSecurityManager.FALLBACK_USER.equals(u.getUserName()))
     {
       return false;
     }
@@ -435,5 +478,23 @@ public class SearchWindow extends Window implements LoginForm.LoginListener
   public ControlPanel getControl()
   {
     return control;
+  }
+
+  @Override
+  public void screenshotReceived(byte[] imageData)
+  {
+    if(bugEMailAddress != null)
+    {
+      ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
+        bugEMailAddress, imageData);
+
+      // show bug report window
+
+      Window w = new Window("Report Bug", reportBugPanel);
+      w.setModal(true);
+      w.setResizable(true);
+      addWindow(w);
+      w.center();
+    }
   }
 }

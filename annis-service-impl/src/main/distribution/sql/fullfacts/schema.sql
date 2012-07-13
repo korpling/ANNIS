@@ -58,6 +58,9 @@ CREATE TABLE facts
   span    varchar(2000),
   left_token  integer,
   right_token  integer,
+  seg_name varchar(100),
+  seg_left integer,
+  seg_right integer,
 
   pre        bigint,
   post      bigint,
@@ -115,11 +118,6 @@ CREATE TABLE corpus_stats
   id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
   text        bigint,
   tokens        bigint,
-  roots        bigint,
-  depth        bigint,
-  avg_level      real,
-  avg_children    real,
-  avg_duplicates  real,
   max_corpus_id bigint  NULL,
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
@@ -132,12 +130,8 @@ CREATE TABLE corpus_stats
 CREATE VIEW corpus_info AS SELECT 
   name,
   id, 
-  tokens,
-  roots,
-  depth,
-  to_char(avg_level, '990.99') as avg_level,
-  to_char(avg_children, '990.99') as avg_children,
-  to_char(avg_duplicates, '990.99') as avg_duplicates
+  text,
+  tokens
 FROM 
   corpus_stats;
   
@@ -172,7 +166,7 @@ CREATE TABLE annotations
   "name" varchar(150),
   "value" varchar(1500),
   occurences bigint,
-  "type" varchar(10),
+  "type" varchar,
   "subtype" char(1),
   edge_namespace varchar(150),
   edge_name varchar(150),

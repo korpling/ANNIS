@@ -18,9 +18,10 @@ package annis.gui;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.controlpanel.ControlPanel;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisAttribute;
-import annis.service.ifaces.AnnisAttributeSet;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -118,7 +119,7 @@ public class CorpusBrowserPanel extends Panel
     HashSet<String> fullEdgeNames = new HashSet<String>();
     boolean hasDominance = false;
 
-    List<AnnisAttribute> attributes = fetchAnnos(corpus.getId());
+    List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
     
     // do some preparations first
     for(AnnisAttribute a : attributes)
@@ -233,23 +234,21 @@ public class CorpusBrowserPanel extends Panel
     super.attach();
   }
 
-  private List<AnnisAttribute> fetchAnnos(long corpusId)
+  private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
   {
     List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
     try
     {
-      AnnisService service = Helper.getService(getApplication(),
-        getWindow());
-      List<Long> ids = new LinkedList<Long>();
-      ids.add(corpusId);
+      WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        AnnisAttributeSet attributes = service.getAttributeSet(ids,
-          true, true);
-        result.addAll(attributes);
+        result = service.path("corpora").path(toplevelCorpus).path("annotations")
+          .queryParam("fetchvalues", "true")
+          .queryParam("onlymostfrequentvalues", "true")
+          .get(new GenericType<List<AnnisAttribute>>(){});
       }
     }
-    catch(RemoteException ex)
+    catch(Exception ex)
     {
       Logger.getLogger(CorpusBrowserPanel.class.getName()).log(
         Level.SEVERE, null, ex);
@@ -336,9 +335,9 @@ public class CorpusBrowserPanel extends Panel
     return splitted[splitted.length - 1];
   }
 
-  private String getFirst(Set<String> set)
+  private String getFirst(List<String> list)
   {
-    Iterator<String> it = set.iterator();
+    Iterator<String> it = list.iterator();
     return it.hasNext() ? it.next() : null;
   }
 }

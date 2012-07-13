@@ -8,10 +8,6 @@
 
   <import resource="Common.xml" />
 
-	<!-- DddQueryMapper -->
-  <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
-	
-
 	<!-- AnnisService -->
   <bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
     <property name="annisDao" ref="annisDao"/>

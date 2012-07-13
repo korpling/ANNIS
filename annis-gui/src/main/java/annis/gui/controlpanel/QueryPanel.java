@@ -35,7 +35,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
@@ -57,7 +57,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
   
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
-  private TextField txtQuery;
+  private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
   private SplitButton btHistory;
@@ -92,7 +92,8 @@ public class QueryPanel extends Panel implements TextChangeListener,
     mainLayout.setColumnExpandRatio(0, 0.2f);
     mainLayout.setColumnExpandRatio(1, 0.8f);
 
-    txtQuery = new TextField();
+    txtQuery = new TextArea();
+    txtQuery.addStyleName("query");
     txtQuery.setSizeFull();
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addListener((TextChangeListener) this);

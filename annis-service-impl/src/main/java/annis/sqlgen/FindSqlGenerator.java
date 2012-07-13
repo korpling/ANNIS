@@ -64,6 +64,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       ++i;
 
       TableAccessStrategy tblAccessStr = tables(node);
+      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
         + " AS node_name" + i);
       ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")

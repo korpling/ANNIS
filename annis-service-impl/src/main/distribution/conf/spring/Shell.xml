@@ -32,9 +32,6 @@ limitations under the License.
 
   <import resource="file:${annis.home}/conf/spring/Common.xml" />
 
-	<!-- DddQueryMapper -->
-  <import resource="classpath:de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml"/>
-
   <bean id="annisRunner" class="annis.AnnisRunner">
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
@@ -44,7 +41,6 @@ limitations under the License.
 
     <property name="annisDao" ref="annisDao"/>
     <property name="annisParser" ref="annisParser"/>
-    <property name="dddQueryMapper" ref="dddQueryMapper"/>
     <property name="helloMessage" value="ANNIS Interactive Shell 3.0.0"/>
     <property name="prompt" value="ANNIS"/>
     <property name="aqlAnalysis" ref="aqlAnalysis" />

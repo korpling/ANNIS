@@ -28,4 +28,16 @@
     <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
 
     <inherits name="org.vaadin.hene.splitbutton.widgetset.SplitButtonWidgetSet" />
+
+    
+
+    
+
+    <inherits name="org.vaadin.codemirror2.CodeMirror2Widgetset" />
+
+    
+
+    <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
+
+    
 </module>

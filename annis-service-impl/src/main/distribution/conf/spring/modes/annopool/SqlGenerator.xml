@@ -200,9 +200,10 @@ limitations under the License.
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
 
-  <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.annopool.ApMatrixSqlGenerator"
         parent="tableAccessStrategyFactory">
 
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
     <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
@@ -266,7 +267,6 @@ limitations under the License.
 
     <property name="islandsPolicy" ref="islandsPolicy" />
 
-    <property name="optimizeOverlap" value="${annis.annotate.optimize-overlap}" />
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
@@ -284,7 +284,6 @@ limitations under the License.
         <ref bean="annotateSqlGenerator" />
       </util:list>
     </property>
-
     <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
