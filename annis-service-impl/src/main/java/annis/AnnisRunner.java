@@ -82,7 +82,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private QueryAnalysis aqlAnalysis;
   private int context;
   private int matchLimit;
-    private QueryAnalysis queryAnalysis;
+  private QueryAnalysis queryAnalysis;
   // settings
   private int limit = 10;
   private int offset;
@@ -157,7 +157,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("exmaralda");
+    doCorpus("2032");
 
     doSet("seg to clean");
 
@@ -655,10 +655,10 @@ public class AnnisRunner extends AnnisBaseRunner
         }
       }
     }
-    else if("seg".equals(setting))
+    else if ("seg".equals(setting))
     {
 
-      if(show)
+      if (show)
       {
         value = segmentationLayer;
       }
@@ -717,14 +717,16 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
 
-    if("annotate".equals(queryFunction))
+    if ("annotate".equals(queryFunction))
     {
-      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+      queryData.addExtension(new AnnotateQueryData(left, right,
+        segmentationLayer));
       queryData.addExtension(new LimitOffsetQueryData(offset, limit));
     }
-    else if("find".equals(queryFunction))
+    else if ("find".equals(queryFunction))
     {
-      queryData.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
+      queryData.addExtension(new AnnotateQueryData(left, right,
+        segmentationLayer));
     }
 
 
@@ -769,8 +771,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     catch (JAXBException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error("Problems with writing XML", ex);
     }
 
 
@@ -784,8 +785,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       catch (JAXBException ex)
       {
-        java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
-          log(Level.SEVERE, null, ex);
+        log.error("Problems with writing XML", ex);
       }
 
       out.println();
@@ -871,10 +871,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
       System.out.println(om.writeValueAsString(annotations));
     }
-    catch(IOException ex)
+    catch (IOException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error("problems with writing result", ex);
     }
 
   }
@@ -924,7 +923,6 @@ public class AnnisRunner extends AnnisBaseRunner
     System.out.println("bye bye!");
     System.exit(0);
   }
-
 
   private void printAsTable(List<? extends Object> list, String... fields)
   {
@@ -1104,7 +1102,7 @@ public class AnnisRunner extends AnnisBaseRunner
       {
         uri = new java.net.URI(id);
 
-        if (!"salt".equals(uri.getScheme())  || uri.getFragment() == null)
+        if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
         {
           throw new URISyntaxException("not a salt id", uri.toString());
         }
