@@ -701,6 +701,8 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 
     QueryData queryData;
+    log.debug("analyze query for " + queryFunction + " function");
+
 
     if (queryFunction != null && !queryFunction.matches("(sql_)?subgraph"))
     {
@@ -717,13 +719,13 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
 
-    if ("annotate".equals(queryFunction))
+    if (queryFunction != null && queryFunction.matches("(sql_)?annotate"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer));
       queryData.addExtension(new LimitOffsetQueryData(offset, limit));
     }
-    else if ("find".equals(queryFunction))
+    else if (queryFunction != null && queryFunction.matches("(sql_)?find"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer));
