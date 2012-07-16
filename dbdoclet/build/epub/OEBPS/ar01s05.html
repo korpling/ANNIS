@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Paket annis.­service.­internal</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+  </head>
+  <body>
+    <div class='section' title='Paket annis.­service.­internal'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='package-annis.service.internal'/>Paket annis.­service.­internal</h1>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnisServiceImpl'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.service.internal.AnnisServiceImpl'/>Klasse AnnisServiceImpl</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e6621'/>
+        <a class='indexterm' id='d0e6624'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisServiceImpl</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisServiceImpl</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>getAnnisDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisResult</span> <span style='color:#111111'>getAnnisResult</span>(<span style='color:darkblue'>Long</span> <span style='color:#111111'>textId</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisBinary</span> <span style='color:#111111'>getBinary</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>offset</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>length</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisBinaryMetaData</span> <span style='color:#111111'>getBinaryMeta</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getMaxContext</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>getMetadata</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>,
+                                      <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>getMetadata</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>corpusId</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>,
+           <span style='color:#111111'>AnnisServiceException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getPaula</span>(<span style='color:darkblue'>Long</span> <span style='color:#111111'>textId</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getWeka</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>annisQL</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>,
+           <span style='color:#111111'>AnnisQLSemanticsException</span>,
+           <span style='color:#111111'>AnnisQLSyntaxException</span>,
+           <span style='color:#111111'>AnnisCorpusAccessException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>WekaHelper</span> <span style='color:#111111'>getWekaHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>isValidQuery</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>,
+           <span style='color:#111111'>AnnisQLSemanticsException</span>,
+           <span style='color:#111111'>AnnisQLSyntaxException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>ping</span>()<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>RemoteException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>sayHello</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnisDao</span>(<span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>annisDao</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMaxContext</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>maxContext</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setWekaHelper</span>(<span style='color:darkblue'>WekaHelper</span> <span style='color:#111111'>wekaHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnisServiceImpl' src='figures/annis/service/internal/AnnisServiceImpl/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+        <div class='section' title='sayHello()'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='method-annis.service.internal.AnnisServiceImpl.sayHello'/>sayHello()<a class='indexterm' id='d0e6876'/><a class='indexterm' id='d0e6879'/></h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>sayHello</span>();</pre>
+          <p>Log the successful initialization of this bean. </p>
+          <p> XXX: This should be a private method annotated with <code class='literal'>@PostConstruct</code>, but that doesn&apos;t seem to work. As a work-around, the method is called by Spring as an init-method.</p>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnisServiceRunner'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.service.internal.AnnisServiceRunner'/>Klasse AnnisServiceRunner</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e6902'/>
+        <a class='indexterm' id='d0e6905'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisServiceRunner</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisBaseRunner</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisServiceRunner</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>main</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>args</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>IOException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>shutdown</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createWebServer</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnisServiceRunner' src='figures/annis/service/internal/AnnisServiceRunner/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+        <div class='section' title='shutdown()'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='method-annis.service.internal.AnnisServiceRunner.shutdown'/>shutdown()<a class='indexterm' id='d0e6976'/><a class='indexterm' id='d0e6979'/></h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>shutdown</span>();</pre>
+          <p>shutdown the AnnisService - ensure that current work load finishes</p>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnisWebService'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.service.internal.AnnisWebService'/>Klasse AnnisWebService</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e6999'/>
+        <a class='indexterm' id='d0e7002'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisWebService</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisWebService</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>annotate</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>query</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>rawCorpusNames</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>offsetRaw</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>limitRaw</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>leftRaw</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>rightRaw</span>,
+                              <span style='color:darkblue'>String</span> <span style='color:#111111'>segmentationLayer</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>IOException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisAttribute&gt;</span> <span style='color:#111111'>annotations</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpus</span>,
+                                          <span style='color:darkblue'>String</span> <span style='color:#111111'>fetchValues</span>,
+                                          <span style='color:darkblue'>String</span> <span style='color:#111111'>onlyMostFrequentValues</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisCorpus&gt;</span> <span style='color:#111111'>corpora</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>CorpusConfig</span> <span style='color:#111111'>corpusconfig</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>Response</span> <span style='color:#111111'>count</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>query</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>rawCorpusNames</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Match&gt;</span> <span style='color:#111111'>find</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>query</span>,
+                          <span style='color:darkblue'>String</span> <span style='color:#111111'>rawCorpusNames</span>,
+                          <span style='color:darkblue'>String</span> <span style='color:#111111'>offsetRaw</span>,
+                          <span style='color:darkblue'>String</span> <span style='color:#111111'>limitRaw</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>IOException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>getAnnisDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getMaxContext</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getPort</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>WekaHelper</span> <span style='color:#111111'>getWekaHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>graph</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;ResolverEntry&gt;</span> <span style='color:#111111'>resolver</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>,
+                                      <span style='color:darkblue'>String</span> <span style='color:#111111'>namespace</span>,
+                                      <span style='color:darkblue'>String</span> <span style='color:#111111'>type</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>sayHello</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnisDao</span>(<span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>annisDao</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMaxContext</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>maxContext</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setPort</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>port</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setWekaHelper</span>(<span style='color:darkblue'>WekaHelper</span> <span style='color:#111111'>wekaHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnisWebService' src='figures/annis/service/internal/AnnisWebService/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+        <div class='section' title='sayHello()'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='method-annis.service.internal.AnnisWebService.sayHello'/>sayHello()<a class='indexterm' id='d0e7303'/><a class='indexterm' id='d0e7306'/></h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>sayHello</span>();</pre>
+          <p>Log the successful initialization of this bean. </p>
+          <p> XXX: This should be a private method annotated with <code class='literal'>@PostConstruct</code>, but that doesn&apos;t seem to work. As a work-around, the method is called by Spring as an init-method.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

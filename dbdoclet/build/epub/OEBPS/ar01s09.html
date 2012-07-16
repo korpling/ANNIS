@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Paket annis.­utils</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+  </head>
+  <body>
+    <div class='section' title='Paket annis.­utils'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='package-annis.utils'/>Paket annis.­utils</h1>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse LegacyGraphConverter'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.utils.LegacyGraphConverter'/>Klasse LegacyGraphConverter</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e14723'/>
+        <a class='indexterm' id='d0e14726'/>
+        <p>This class can convert the current Salt graph model into the legacy model AOM (Annis Object Model) and &quot;PaulaInline&quot;</p>
+        <div class='section' title='Syntax'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='d0e14733'/>Syntax</h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>LegacyGraphConverter</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>LegacyGraphConverter</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>List&lt;AnnotationGraph&gt;</span> <span style='color:#111111'>convertToAOM</span>(<span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>p</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>AnnotationGraph</span> <span style='color:#111111'>convertToAnnotationGraph</span>(<span style='color:darkblue'>SDocument</span> <span style='color:#111111'>document</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>AnnotationGraph</span> <span style='color:#111111'>convertToAnnotationGraph</span>(<span style='color:darkblue'>SDocumentGraph</span> <span style='color:#111111'>docGraph</span>,
+                                                         <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>matchedIDs</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>AnnisResultSet</span> <span style='color:#111111'>convertToResultSet</span>(<span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>p</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='variablelist'>
+            <dl>
+              <dt>
+                <span class='term'>
+                  <span class='emphasis'>
+                    <em>Autor</em>
+                  </span>
+                </span>
+              </dt>
+              <dd>
+                <p>
+                  <span class='simplelist'/>
+                </p>
+              </dd>
+            </dl>
+          </div>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Syntax' src='figures/annis/utils/LegacyGraphConverter/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse Utils'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.utils.Utils'/>Klasse Utils</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e14833'/>
+        <a class='indexterm' id='d0e14836'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>Utils</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>Utils</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>avg</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>runtimeList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>calculateSHAHash</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>s</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>NoSuchAlgorithmException</span>,
+           <span style='color:#111111'>UnsupportedEncodingException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>File</span> <span style='color:#111111'>getAnnisFile</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>subpath</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>File</span> <span style='color:#111111'>getAnnisHomeLocation</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>max</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>runtimeList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>min</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>runtimeList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>Long[]</span> <span style='color:#111111'>split2Long</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>text</span>, <span style='color:darkblue'>char</span> <span style='color:#111111'>seperator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse Utils' src='figures/annis/utils/Utils/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+        <div class='section' title='calculateSHAHash(String)'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='method-annis.utils.Utils.calculateSHAHash-java.lang.String'/>calculateSHAHash(String)<a class='indexterm' id='d0e14971'/><a class='indexterm' id='d0e14974'/></h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>calculateSHAHash</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>s</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>NoSuchAlgorithmException</span>,
+           <span style='color:#111111'>UnsupportedEncodingException</span>;</pre>
+          <p>Hashes a string using SHA-256.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

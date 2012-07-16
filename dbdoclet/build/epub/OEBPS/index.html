@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>ANNIS</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+    <meta content='' name='description'/>
+  </head>
+  <body>
+    <div class='article' title='ANNIS' xml:lang='de'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='d0e1'/>ANNIS</h1>
+          </div>
+          <div>
+            <div class='abstract' title='Zusammenfassung'>
+              <p class='title'>
+                <strong>Zusammenfassung</strong>
+              </p>
+              <p/>
+            </div>
+          </div>
+        </div>
+        <hr/>
+      </div>
+      <div class='section' title='Paket annis'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h1 class='title'><a id='package-annis'/>Paket annis</h1>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse AnnisBaseRunner'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.AnnisBaseRunner'/>Klasse AnnisBaseRunner</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e15'/>
+          <a class='indexterm' id='d0e18'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>abstract</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisBaseRunner</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisBaseRunner</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getAnnisHome</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>Object</span> <span style='color:#111111'>getBean</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>beanName</span>,
+                               <span style='color:darkblue'>boolean</span> <span style='color:#111111'>logToConsole</span>,
+                               <span style='color:darkblue'>String[]</span> <span style='color:#111111'>contextLocations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>AnnisBaseRunner</span> <span style='color:#111111'>getInstance</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>beanName</span>,
+                                            <span style='color:darkblue'>boolean</span> <span style='color:#111111'>logToConsole</span>,
+                                            <span style='color:darkblue'>String[]</span> <span style='color:#111111'>contextLocations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>AnnisBaseRunner</span> <span style='color:#111111'>getInstance</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>beanName</span>,
+                                            <span style='color:darkblue'>String[]</span> <span style='color:#111111'>contextLocations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getHelloMessage</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>PrintStream</span> <span style='color:#111111'>getOut</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getPrompt</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>run</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setHelloMessage</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>helloMessage</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setOut</span>(<span style='color:darkblue'>PrintStream</span> <span style='color:#111111'>out</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setPrompt</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>prompt</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <p><span class='bold'>
+              <strong>Direkt abgeleitete Klassen</strong>
+            </span>
+: <span class='simplelist'><a class='link' href='index.html#class-annis.AnnisRunner' title='Klasse AnnisRunner'>
+                <code class='varname'>annis.­AnnisRunner</code>
+              </a>
+, <a class='link' href='ar01s02.html#class-annis.administration.AnnisAdminRunner' title='Klasse AnnisAdminRunner'>
+                <code class='varname'>annis.­administration.­AnnisAdminRunner</code>
+              </a>
+, <a class='link' href='ar01s05.html#class-annis.service.internal.AnnisServiceRunner' title='Klasse AnnisServiceRunner'>
+                <code class='varname'>annis.­service.­internal.­AnnisServiceRunner</code>
+              </a>
+</span></p>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse AnnisBaseRunner' src='figures/annis/AnnisBaseRunner/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse AnnisRunner'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.AnnisRunner'/>Klasse AnnisRunner</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e220'/>
+          <a class='indexterm' id='d0e223'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisRunner</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisBaseRunner</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisRunner</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>main</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>benchmarkOptions</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doAnalyze</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>functionCall</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doAnnotate</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doAnnotations</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>doListValues</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doBenchmark</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>benchmarkCount</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doCorpus</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>list</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doCount</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doDebug</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>ignore</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doDoc</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>docCall</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doExplain</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>functionCall</span>, <span style='color:darkblue'>boolean</span> <span style='color:#111111'>analyze</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doFind</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doList</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>unused</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doMatrix</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doMeta</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusId</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doParse</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>annisQuery</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doPlan</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>functionCall</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doQuit</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>dummy</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doRecord</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>dummy</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doSet</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>callToSet</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doShow</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>setting</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doSql</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>functionCall</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doSqlDoc</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>docCall</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doSqlText</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>textID</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>doText</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>textID</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>getAnnisDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisParser</span> <span style='color:#111111'>getAnnisParser</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnotateSqlGenerator&lt;SaltProject&gt;</span> <span style='color:#111111'>getAnnotateSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>getAqlAnalysis</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getContext</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>getCorpusList</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SqlGenerator&lt;QueryData, Integer&gt;</span> <span style='color:#111111'>getCountSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SqlGenerator&lt;QueryData, List&lt;Match&gt;&gt;</span> <span style='color:#111111'>getFindSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getMatchLimit</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SqlGenerator&lt;QueryData, List&lt;AnnotatedMatch&gt;&gt;</span> <span style='color:#111111'>getMatrixSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>MetaDataFilter</span> <span style='color:#111111'>getMetaDataFilter</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>getQueryAnalysis</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnisDao</span>(<span style='color:darkblue'>AnnisDao</span> <span style='color:#111111'>annisDao</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnisParser</span>(<span style='color:darkblue'>AnnisParser</span> <span style='color:#111111'>annisParser</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnotateSqlGenerator</span>(<span style='color:darkblue'>AnnotateSqlGenerator&lt;SaltProject&gt;</span> <span style='color:#111111'>annotateSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAqlAnalysis</span>(<span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>aqlAnalysis</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setContext</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>context</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCorpusList</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCountSqlGenerator</span>(<span style='color:darkblue'>SqlGenerator&lt;QueryData, Integer&gt;</span> <span style='color:#111111'>countSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setFindSqlGenerator</span>(<span style='color:darkblue'>SqlGenerator&lt;QueryData, List&lt;Match&gt;&gt;</span> <span style='color:#111111'>findSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMatchLimit</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>matchLimit</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMatrixSqlGenerator</span>(<span style='color:darkblue'>SqlGenerator&lt;QueryData, List&lt;AnnotatedMatch&gt;&gt;</span> <span style='color:#111111'>matrixSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMetaDataFilter</span>(<span style='color:darkblue'>MetaDataFilter</span> <span style='color:#111111'>metaDataFilter</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setQueryAnalysis</span>(<span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>queryAnalysis</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse AnnisRunner' src='figures/annis/AnnisRunner/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse AnnisRunner.OS'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.AnnisRunner.OS'/>Klasse AnnisRunner.OS</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e807'/>
+          <a class='indexterm' id='d0e810'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='font-weight:bold; color:purple'>final</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisRunner.OS</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>Enum&lt;OS&gt;</span> {
+
+  <span style='color:darkcyan'>// Public Static Fields</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='font-weight:bold; color:purple'>final</span> <span style='color:darkblue'>OS</span> <span style='color:#111111'>linux</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='font-weight:bold; color:purple'>final</span> <span style='color:darkblue'>OS</span> <span style='color:#111111'>other</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>OS</span> <span style='color:#111111'>valueOf</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>name</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>OS[]</span> <span style='color:#111111'>values</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse AnnisRunner.OS' src='figures/annis/AnnisRunner/OS/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Ausnahme AnnisRunnerException'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.AnnisRunnerException'/>Ausnahme AnnisRunnerException</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e889'/>
+          <a class='indexterm' id='d0e892'/>
+          <p>Base class for errors that occur during the execution of an AnnisRunner.</p>
+          <div class='section' title='Syntax'>
+            <div class='titlepage'>
+              <div>
+                <div>
+                  <h3 class='title'><a id='d0e899'/>Syntax</h3>
+                </div>
+              </div>
+            </div>
+            <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisRunnerException</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>RuntimeException</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisRunnerException</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisRunnerException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisRunnerException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>, <span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisRunnerException</span>(<span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+            <p><span class='bold'>
+                <strong>Direkt abgeleitete Klassen</strong>
+              </span>
+: <span class='simplelist'><a class='link' href='index.html#class-annis.UsageException' title='Ausnahme UsageException'>
+                  <code class='varname'>annis.­UsageException</code>
+                </a>
+, <a class='link' href='ar01s02.html#class-annis.administration.DatabaseAccessException' title='Ausnahme DatabaseAccessException'>
+                  <code class='varname'>annis.­administration.­DatabaseAccessException</code>
+                </a>
+, <a class='link' href='ar01s02.html#class-annis.administration.FileAccessException' title='Ausnahme FileAccessException'>
+                  <code class='varname'>annis.­administration.­FileAccessException</code>
+                </a>
+</span></p>
+            <div class='variablelist'>
+              <dl>
+                <dt>
+                  <span class='term'>
+                    <span class='emphasis'>
+                      <em>Autor</em>
+                    </span>
+                  </span>
+                </dt>
+                <dd>
+                  <p>
+                    <span class='simplelist'/>
+                  </p>
+                </dd>
+              </dl>
+            </div>
+            <div class='informalfigure'>
+              <div class='mediaobject' style='text-align: center'>
+                <img alt='Syntax' src='figures/annis/AnnisRunnerException/ClassDiagram.png' style='text-align: middle'/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse FindHelper'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.FindHelper'/>Klasse FindHelper</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e991'/>
+          <a class='indexterm' id='d0e994'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='color:#e75480'>@Deprecated</span>
+<span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>FindHelper</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FindHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse FindHelper' src='figures/annis/FindHelper/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse MemoryUsage'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.MemoryUsage'/>Klasse MemoryUsage</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e1026'/>
+          <a class='indexterm' id='d0e1029'/>
+          <p>Utility class that prints out memory usage of the Java VM to a logfile.</p>
+          <div class='section' title='Syntax'>
+            <div class='titlepage'>
+              <div>
+                <div>
+                  <h3 class='title'><a id='d0e1036'/>Syntax</h3>
+                </div>
+              </div>
+            </div>
+            <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>MemoryUsage</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>MemoryUsage</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>logMemoryUsage</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+            <div class='variablelist'>
+              <dl>
+                <dt>
+                  <span class='term'>
+                    <span class='emphasis'>
+                      <em>Autor</em>
+                    </span>
+                  </span>
+                </dt>
+                <dd>
+                  <p>
+                    <span class='simplelist'/>
+                  </p>
+                </dd>
+              </dl>
+            </div>
+            <div class='informalfigure'>
+              <div class='mediaobject' style='text-align: center'>
+                <img alt='Syntax' src='figures/annis/MemoryUsage/ClassDiagram.png' style='text-align: middle'/>
+              </div>
+            </div>
+          </div>
+          <div class='section' title='logMemoryUsage()'>
+            <div class='titlepage'>
+              <div>
+                <div>
+                  <h3 class='title'><a id='method-annis.MemoryUsage.logMemoryUsage'/>logMemoryUsage()<a class='indexterm' id='d0e1085'/><a class='indexterm' id='d0e1088'/></h3>
+                </div>
+              </div>
+            </div>
+            <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>logMemoryUsage</span>();</pre>
+            <p>Print total, free and maximum memory of the VM to a logfile.</p>
+          </div>
+        </div>
+        <div class='section' title='Klasse TableFormatter'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.TableFormatter'/>Klasse TableFormatter</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e1108'/>
+          <a class='indexterm' id='d0e1111'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>TableFormatter</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>TableFormatter</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>formatAsTable</span>(<span style='color:darkblue'>List&lt;?&gt;</span> <span style='color:#111111'>list</span>, <span style='color:darkblue'>String[]</span> <span style='color:#111111'>fields</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse TableFormatter' src='figures/annis/TableFormatter/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Ausnahme UsageException'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.UsageException'/>Ausnahme UsageException</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e1160'/>
+          <a class='indexterm' id='d0e1163'/>
+          <p>Signifies an error by the user, usually a bad command.</p>
+          <div class='section' title='Syntax'>
+            <div class='titlepage'>
+              <div>
+                <div>
+                  <h3 class='title'><a id='d0e1170'/>Syntax</h3>
+                </div>
+              </div>
+            </div>
+            <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>UsageException</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisRunnerException</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>UsageException</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>UsageException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>UsageException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>, <span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>UsageException</span>(<span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+            <div class='variablelist'>
+              <dl>
+                <dt>
+                  <span class='term'>
+                    <span class='emphasis'>
+                      <em>Autor</em>
+                    </span>
+                  </span>
+                </dt>
+                <dd>
+                  <p>
+                    <span class='simplelist'/>
+                  </p>
+                </dd>
+              </dl>
+            </div>
+            <div class='informalfigure'>
+              <div class='mediaobject' style='text-align: center'>
+                <img alt='Syntax' src='figures/annis/UsageException/ClassDiagram.png' style='text-align: middle'/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class='section' title='Klasse WekaHelper'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h2 class='title'><a id='class-annis.WekaHelper'/>Klasse WekaHelper</h2>
+              </div>
+            </div>
+          </div>
+          <a class='indexterm' id='d0e1245'/>
+          <a class='indexterm' id='d0e1248'/>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>WekaHelper</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>WekaHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>exportAsArff</span>(<span style='color:darkblue'>List&lt;AnnotatedMatch&gt;</span> <span style='color:#111111'>annotatedMatches</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <div class='variablelist'>
+            <dl>
+              <dt>
+                <span class='term'>
+                  <span class='emphasis'>
+                    <em>Autor</em>
+                  </span>
+                </span>
+              </dt>
+              <dd>
+                <p>
+                  <span class='simplelist'>thomas</span>
+                </p>
+              </dd>
+            </dl>
+          </div>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Klasse WekaHelper' src='figures/annis/WekaHelper/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

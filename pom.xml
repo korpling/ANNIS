@@ -25,6 +25,13 @@
     </license>
   </licenses>
   
+  <distributionManagement>
+    <site>
+      <id>launchpad</id>
+      <url>https://launchpad.net/annis</url>
+    </site>
+  </distributionManagement>
+  
   <repositories>
     <repository>
       <id>korpling</id>
@@ -51,9 +58,45 @@
         <extensions>true</extensions>
       </plugin>
       
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+              </configuration>
+            </plugin>
+          </reportPlugins>
+        </configuration>
+      </plugin>
+      
+      
+      
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-maven-plugin</artifactId>
+        <version>2.0.14</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate-html</goal>
+              <goal>generate-pdf</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
   </build>
-
+  
+  
   <modules>
     <module>annis-service-rmi</module>    
     <module>annis-service-impl</module>

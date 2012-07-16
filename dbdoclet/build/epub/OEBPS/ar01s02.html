@@ -1,0 +1,325 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Paket annis.­administration</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+  </head>
+  <body>
+    <div class='section' title='Paket annis.­administration'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='package-annis.administration'/>Paket annis.­administration</h1>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Schnittstelle AdministrationDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.AdministrationDao'/>Schnittstelle AdministrationDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1305'/>
+        <a class='indexterm' id='d0e1308'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>interface</span> <span style='color:#111111'>AdministrationDao</span> {
+
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createDatabase</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>database</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createSchemaIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createUser</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>username</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>password</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>deleteCorpora</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>ids</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>dropDatabase</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>database</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>dropUser</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>username</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>executeSqlFromScript</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>script</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>executeSqlFromScript</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>script</span>, <span style='color:darkblue'>MapSqlParameterSource</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>importCorpus</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>path</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listCorpusStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listTableStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>listToplevelCorpora</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUnusedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUsedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>populateSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setDataSource</span>(<span style='color:darkblue'>DataSource</span> <span style='color:#111111'>dataSource</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setupDatabase</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Schnittstelle AdministrationDao' src='figures/annis/administration/AdministrationDao/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnisAdminRunner'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.AnnisAdminRunner'/>Klasse AnnisAdminRunner</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1532'/>
+        <a class='indexterm' id='d0e1535'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnisAdminRunner</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisBaseRunner</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnisAdminRunner</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Static Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>static</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>main</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>CorpusAdministration</span> <span style='color:#111111'>getCorpusAdministration</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>run</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCorpusAdministration</span>(<span style='color:darkblue'>CorpusAdministration</span> <span style='color:#111111'>administration</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnisAdminRunner' src='figures/annis/administration/AnnisAdminRunner/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse ApAdministrationDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.ApAdministrationDao'/>Klasse ApAdministrationDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1618'/>
+        <a class='indexterm' id='d0e1621'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>ApAdministrationDao</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>DefaultAdministrationDao</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>ApAdministrationDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>populateSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse ApAdministrationDao' src='figures/annis/administration/ApAdministrationDao/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse CorpusAdministration'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.CorpusAdministration'/>Klasse CorpusAdministration</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1674'/>
+        <a class='indexterm' id='d0e1677'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>CorpusAdministration</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>CorpusAdministration</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>deleteCorpora</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>ids</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AdministrationDao</span> <span style='color:#111111'>getAdministrationDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>importCorpora</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>paths</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>importCorpora</span>(<span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>paths</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>initializeDatabase</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>host</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>port</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>database</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>user</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>password</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>defaultDatabase</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>superUser</span>,
+                                 <span style='color:darkblue'>String</span> <span style='color:#111111'>superPassword</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listCorpusStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listTableStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUnusedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUsedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAdministrationDao</span>(<span style='color:darkblue'>AdministrationDao</span> <span style='color:#111111'>administrationDao</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse CorpusAdministration' src='figures/annis/administration/CorpusAdministration/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Ausnahme DatabaseAccessException'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.DatabaseAccessException'/>Ausnahme DatabaseAccessException</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1854'/>
+        <a class='indexterm' id='d0e1857'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>DatabaseAccessException</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisRunnerException</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DatabaseAccessException</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DatabaseAccessException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DatabaseAccessException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>, <span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DatabaseAccessException</span>(<span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Ausnahme DatabaseAccessException' src='figures/annis/administration/DatabaseAccessException/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse DefaultAdministrationDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.DefaultAdministrationDao'/>Klasse DefaultAdministrationDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e1925'/>
+        <a class='indexterm' id='d0e1928'/>
+        <p>- Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden - Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts</p>
+        <div class='section' title='Syntax'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='d0e1935'/>Syntax</h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>DefaultAdministrationDao</span><span style='font-weight:bold; color:purple'> implements </span><span style='color:#111111'>AdministrationDao</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DefaultAdministrationDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createDatabase</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>database</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createSchemaIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>createUser</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>username</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>password</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>deleteCorpora</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>ids</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>dropDatabase</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>database</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>dropUser</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>username</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>executeSqlFromScript</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>script</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>executeSqlFromScript</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>script</span>, <span style='color:darkblue'>MapSqlParameterSource</span> <span style='color:#111111'>args</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getDbLayout</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getExternalFilesPath</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>NamedParameterJdbcTemplate</span> <span style='color:#111111'>getJdbcTemplate</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getScriptPath</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>importCorpus</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>path</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>isTemporaryStagingArea</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listCorpusStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listIndexDefinitions</span>(<span style='color:darkblue'>boolean</span> <span style='color:#111111'>used</span>, <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>tables</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listIndexDefinitions</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>tables</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Map&lt;String, Object&gt;&gt;</span> <span style='color:#111111'>listTableStats</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>listToplevelCorpora</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUnusedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUsedIndexes</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>listUsedIndexes</span>(<span style='color:darkblue'>String[]</span> <span style='color:#111111'>tables</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>populateSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>resetStatistics</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setDataSource</span>(<span style='color:darkblue'>DataSource</span> <span style='color:#111111'>dataSource</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setDbLayout</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>dbLayout</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setExternalFilesPath</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>externalFilesPath</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setScriptPath</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>scriptPath</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setTemporaryStagingArea</span>(<span style='color:darkblue'>boolean</span> <span style='color:#111111'>temporaryStagingArea</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setupDatabase</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+          <p><span class='bold'>
+              <strong>Direkt abgeleitete Klassen</strong>
+            </span>
+: <span class='simplelist'><a class='link' href='ar01s02.html#class-annis.administration.ApAdministrationDao' title='Klasse ApAdministrationDao'>
+                <code class='varname'>annis.­administration.­ApAdministrationDao</code>
+              </a>
+, <a class='link' href='ar01s02.html#class-annis.administration.SfAdministrationDao' title='Klasse SfAdministrationDao'>
+                <code class='varname'>annis.­administration.­SfAdministrationDao</code>
+              </a>
+</span></p>
+          <div class='informalfigure'>
+            <div class='mediaobject' style='text-align: center'>
+              <img alt='Syntax' src='figures/annis/administration/DefaultAdministrationDao/ClassDiagram.png' style='text-align: middle'/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Ausnahme FileAccessException'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.FileAccessException'/>Ausnahme FileAccessException</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2308'/>
+        <a class='indexterm' id='d0e2311'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>FileAccessException</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnisRunnerException</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FileAccessException</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FileAccessException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FileAccessException</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>message</span>, <span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FileAccessException</span>(<span style='color:darkblue'>Throwable</span> <span style='color:#111111'>cause</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Ausnahme FileAccessException' src='figures/annis/administration/FileAccessException/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse PreparedStatementCallbackImpl'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.PreparedStatementCallbackImpl'/>Klasse PreparedStatementCallbackImpl</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2379'/>
+        <a class='indexterm' id='d0e2382'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>PreparedStatementCallbackImpl</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>PreparedStatementCallbackImpl</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>absolutePath</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>corpusRef</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>Boolean</span> <span style='color:#111111'>doInPreparedStatement</span>(<span style='color:darkblue'>PreparedStatement</span> <span style='color:#111111'>ps</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>SQLException</span>,
+           <span style='color:#111111'>DataAccessException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>benjamin</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse PreparedStatementCallbackImpl' src='figures/annis/administration/PreparedStatementCallbackImpl/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse SfAdministrationDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.administration.SfAdministrationDao'/>Klasse SfAdministrationDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2449'/>
+        <a class='indexterm' id='d0e2452'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>SfAdministrationDao</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>DefaultAdministrationDao</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>SfAdministrationDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>populateSchema</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse SfAdministrationDao' src='figures/annis/administration/SfAdministrationDao/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

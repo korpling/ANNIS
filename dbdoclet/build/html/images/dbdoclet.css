@@ -1,0 +1,64 @@
+html
+{ 
+  font-family: Georgia, Times, serif; 
+  color: black;
+  background-color: silver;
+  }
+
+body  
+{ 
+  margin: 2em 10% 2em 10%;
+  padding: 1em;
+  background-color: white;
+  -moz-box-shadow: 10px 10px 10px #333;
+  -webkit-box-shadow: 10px 10px 10px #333;
+  box-shadow: 10px 10px 10px #333;
+  filter: progid:DXImageTransform.Microsoft.DropShadow(OffX=10, OffY=10, Color='gray')
+
+}
+
+p
+{ 
+  text-indent: 2em;
+  text-align: justify;
+  margin: 0;
+}
+
+img 
+{
+  border: 0 none;
+  }
+	
+pre
+{ 
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 1em;
+  border: 1px solid #333;
+  color: black;
+  background-color: #cecece;
+  font-family: "Courier New", monospaced;
+  font-size: 0.9em;
+  }
+
+div.informaltable table,
+div.table table { 
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+div.navheader table tr td a,
+div.navfooter table tr td a
+{ 
+  font-weight: bold;
+  text-decoration: none;
+  }
+
+div.navheader table tr td a:hover,
+div.navfooter table tr td a:hover
+{ 
+  text-decoration: underline;
+  }

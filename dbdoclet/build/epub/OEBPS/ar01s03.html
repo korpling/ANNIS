@@ -1,0 +1,453 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Paket annis.­dao</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+  </head>
+  <body>
+    <div class='section' title='Paket annis.­dao'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='package-annis.dao'/>Paket annis.­dao</h1>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Schnittstelle AnnisDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.AnnisDao'/>Schnittstelle AnnisDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2508'/>
+        <a class='indexterm' id='d0e2511'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>interface</span> <span style='color:#111111'>AnnisDao</span> {
+
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>annotate</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>count</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>T</span> <span style='color:#111111'>executeQueryFunction</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                                <span style='color:darkblue'>SqlGenerator&lt;QueryData, T&gt;</span> <span style='color:#111111'>generator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>T</span> <span style='color:#111111'>executeQueryFunction</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                                <span style='color:darkblue'>SqlGenerator&lt;QueryData, T&gt;</span> <span style='color:#111111'>generator</span>,
+                                <span style='color:darkblue'>&lt;any&gt;</span> <span style='color:#111111'>extractor</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>explain</span>(<span style='color:darkblue'>SqlGenerator&lt;QueryData, ?&gt;</span> <span style='color:#111111'>generator</span>,
+                        <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                        <span style='color:darkblue'>boolean</span> <span style='color:#111111'>analyze</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Match&gt;</span> <span style='color:#111111'>find</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisBinary</span> <span style='color:#111111'>getBinary</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>offset</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>length</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>HashMap&lt;Long, Properties&gt;</span> <span style='color:#111111'>getCorpusConfiguration</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>Map&lt;String, String&gt;</span> <span style='color:#111111'>getCorpusConfiguration</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;ResolverEntry&gt;</span> <span style='color:#111111'>getResolverEntries</span>(<span style='color:darkblue'>SingleResolverRequest</span> <span style='color:#111111'>request</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getTimeout</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisAttribute&gt;</span> <span style='color:#111111'>listAnnotations</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>,
+                                              <span style='color:darkblue'>boolean</span> <span style='color:#111111'>listValues</span>,
+                                              <span style='color:darkblue'>boolean</span> <span style='color:#111111'>onlyMostFrequentValues</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisCorpus&gt;</span> <span style='color:#111111'>listCorpora</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>listCorpusAnnotations</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>,
+                                                <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>listCorpusAnnotations</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>id</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>listCorpusByName</span>(<span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>corpusNames</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>mapCorpusIdsToNames</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>ids</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnotatedMatch&gt;</span> <span style='color:#111111'>matrix</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>parseAQL</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>aql</span>, <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>retrieveAnnotationGraph</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>,
+                                             <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>retrieveAnnotationGraph</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>textId</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCorpusConfiguration</span>(<span style='color:darkblue'>HashMap&lt;Long, Properties&gt;</span> <span style='color:#111111'>corpusConfiguration</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setTimeout</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>milliseconds</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Schnittstelle AnnisDao' src='figures/annis/dao/AnnisDao/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnotatedMatch'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.AnnotatedMatch'/>Klasse AnnotatedMatch</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2859'/>
+        <a class='indexterm' id='d0e2862'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnotatedMatch</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>ArrayList&lt;AnnotatedSpan&gt;</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnotatedMatch</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnotatedMatch</span>(<span style='color:darkblue'>AnnotatedSpan[]</span> <span style='color:#111111'>spans</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnotatedMatch</span>(<span style='color:darkblue'>List&lt;AnnotatedSpan&gt;</span> <span style='color:#111111'>spans</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnotatedMatch' src='figures/annis/dao/AnnotatedMatch/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse AnnotatedSpan'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.AnnotatedSpan'/>Klasse AnnotatedSpan</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e2915'/>
+        <a class='indexterm' id='d0e2918'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>AnnotatedSpan</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnotatedSpan</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>id</span>,
+                       <span style='color:darkblue'>String</span> <span style='color:#111111'>coveredText</span>,
+                       <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>annotations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>AnnotatedSpan</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>id</span>,
+                       <span style='color:darkblue'>String</span> <span style='color:#111111'>coveredText</span>,
+                       <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>annotations</span>,
+                       <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>metadata</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>getAnnotations</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getCoveredText</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>long</span> <span style='color:#111111'>getId</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>getMetadata</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnotations</span>(<span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>annotations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCoveredText</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>coveredText</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setId</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>id</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMetadata</span>(<span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>metadata</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse AnnotatedSpan' src='figures/annis/dao/AnnotatedSpan/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Schnittstelle CorpusSelectionStrategy'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.CorpusSelectionStrategy'/>Schnittstelle CorpusSelectionStrategy</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3069'/>
+        <a class='indexterm' id='d0e3072'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>interface</span> <span style='color:#111111'>CorpusSelectionStrategy</span> {
+
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>addMetaAnnotations</span>(<span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>annotations</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>createViewSql</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>registerNodeAdapter</span>(<span style='color:darkblue'>NodeSqlAdapter</span> <span style='color:#111111'>adapter</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>boolean</span> <span style='color:#111111'>usesViews</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>viewName</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>table</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>whereClauseForNode</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>docRefColumn</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Schnittstelle CorpusSelectionStrategy' src='figures/annis/dao/CorpusSelectionStrategy/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse CountExtractor'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.CountExtractor'/>Klasse CountExtractor</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3160'/>
+        <a class='indexterm' id='d0e3163'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>CountExtractor</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>CountExtractor</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>explain</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>jdbcTemplate</span>, <span style='color:darkblue'>boolean</span> <span style='color:#111111'>analyze</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getMatchedNodesViewName</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>queryCount</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>jdbcTemplate</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMatchedNodesViewName</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>matchedNodesViewName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse CountExtractor' src='figures/annis/dao/CountExtractor/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse DocumentNameMapRow'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.DocumentNameMapRow'/>Klasse DocumentNameMapRow</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3244'/>
+        <a class='indexterm' id='d0e3247'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>DocumentNameMapRow</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>DocumentNameMapRow</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>mapRow</span>(<span style='color:darkblue'>ResultSet</span> <span style='color:#111111'>rs</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>rowNum</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>SQLException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse DocumentNameMapRow' src='figures/annis/dao/DocumentNameMapRow/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse ListCorpusByNameDaoHelper'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.ListCorpusByNameDaoHelper'/>Klasse ListCorpusByNameDaoHelper</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3298'/>
+        <a class='indexterm' id='d0e3301'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>ListCorpusByNameDaoHelper</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>&lt;any&gt;</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>ListCorpusByNameDaoHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>createSql</span>(<span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>corpusNames</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse ListCorpusByNameDaoHelper' src='figures/annis/dao/ListCorpusByNameDaoHelper/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse Match'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.Match'/>Klasse Match</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3348'/>
+        <a class='indexterm' id='d0e3351'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>Match</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>Match</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getSaltId</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>i</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setSaltId</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>id</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse Match' src='figures/annis/dao/Match/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse MetaDataFilter'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.MetaDataFilter'/>Klasse MetaDataFilter</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3407'/>
+        <a class='indexterm' id='d0e3410'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>MetaDataFilter</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>SimpleJdbcDaoSupport</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>MetaDataFilter</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>getDocumentsForMetadata</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SubQueryCorpusSelectionStrategy</span> <span style='color:#111111'>getSubQueryCorpusSelectionStrategy</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setSubQueryCorpusSelectionStrategy</span>(<span style='color:darkblue'>SubQueryCorpusSelectionStrategy</span> <span style='color:#111111'>subQueryCorpusSelectionStrategy</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse MetaDataFilter' src='figures/annis/dao/MetaDataFilter/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+        <div class='section' title='getDocumentsForMetadata(QueryData)'>
+          <div class='titlepage'>
+            <div>
+              <div>
+                <h3 class='title'><a id='method-annis.dao.MetaDataFilter.getDocumentsForMetadata-annis.ql.parser.QueryData'/>getDocumentsForMetadata(QueryData)<a class='indexterm' id='d0e3487'/><a class='indexterm' id='d0e3490'/></h3>
+              </div>
+            </div>
+          </div>
+          <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>getDocumentsForMetadata</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);</pre>
+          <p>Will query the database which documents are matching according to the given metadata</p>
+          <div class='informaltable'>
+            <table border='1'>
+              <colgroup>
+                <col class='c1' width='25%'/>
+                <col class='c2' width='75%'/>
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td colspan='2' style='text-align: left'>
+                    <p>Parameter</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p>queryData</p>
+                  </td>
+                  <td>
+                    <p> QueryData from which the meta data will be extracted</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p>
+                      <span class='emphasis'>
+                        <em>return</em>
+                      </span>
+                    </p>
+                  </td>
+                  <td>
+                    <p> The list of documents matching the meta data or null if no constraints need to be applied (all documents are matching)</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse ResolverDaoHelper'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.ResolverDaoHelper'/>Klasse ResolverDaoHelper</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3538'/>
+        <a class='indexterm' id='d0e3541'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>ResolverDaoHelper</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>ResolverDaoHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>PreparedStatement</span> <span style='color:#111111'>createPreparedStatement</span>(<span style='color:darkblue'>Connection</span> <span style='color:#111111'>cnctn</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>SQLException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;ResolverEntry&gt;</span> <span style='color:#111111'>extractData</span>(<span style='color:darkblue'>ResultSet</span> <span style='color:#111111'>rs</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>SQLException</span>,
+           <span style='color:#111111'>DataAccessException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>fillPreparedStatement</span>(<span style='color:darkblue'>SingleResolverRequest</span> <span style='color:#111111'>resolverRequest</span>,
+                                    <span style='color:darkblue'>PreparedStatement</span> <span style='color:#111111'>stmt</span>)<span style='font-weight:bold; color:purple'>
+    throws </span><span style='color:#111111'>SQLException</span>;<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse ResolverDaoHelper' src='figures/annis/dao/ResolverDaoHelper/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Schnittstelle ResultSetConverter'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.ResultSetConverter'/>Schnittstelle ResultSetConverter</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3632'/>
+        <a class='indexterm' id='d0e3635'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='color:#e75480'>@Deprecated</span>
+<span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>interface</span> <span style='color:#111111'>ResultSetConverter&lt;T&gt;</span> {
+
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>T</span> <span style='color:#111111'>convertResultSet</span>(<span style='color:darkblue'>ResultSet</span> <span style='color:#111111'>resultSet</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Schnittstelle ResultSetConverter' src='figures/annis/dao/ResultSetConverter/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse ScriptFileSqlSessionModifier'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.ScriptFileSqlSessionModifier'/>Klasse ScriptFileSqlSessionModifier</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3673'/>
+        <a class='indexterm' id='d0e3676'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>ScriptFileSqlSessionModifier</span><span style='font-weight:bold; color:purple'> implements </span><span style='color:#111111'>SqlSessionModifier</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>ScriptFileSqlSessionModifier</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AdministrationDao</span> <span style='color:#111111'>getAdministrationDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getScriptFile</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>modifySqlSession</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>jdbcTemplate</span>, <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAdministrationDao</span>(<span style='color:darkblue'>AdministrationDao</span> <span style='color:#111111'>administrationDao</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setScriptFile</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>scriptFile</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse ScriptFileSqlSessionModifier' src='figures/annis/dao/ScriptFileSqlSessionModifier/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse SpringAnnisDao'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.SpringAnnisDao'/>Klasse SpringAnnisDao</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e3768'/>
+        <a class='indexterm' id='d0e3771'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>SpringAnnisDao</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>SimpleJdbcDaoSupport</span>
+  <span style='font-weight:bold; color:purple'> implements </span><span style='color:#111111'>AnnisDao</span>,
+             <span style='color:#111111'>SqlSessionModifier</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>SpringAnnisDao</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>annotate</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>count</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>T</span> <span style='color:#111111'>executeQueryFunction</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                                <span style='color:darkblue'>SqlGenerator&lt;QueryData, T&gt;</span> <span style='color:#111111'>generator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>T</span> <span style='color:#111111'>executeQueryFunction</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                                <span style='color:darkblue'>SqlGenerator&lt;QueryData, T&gt;</span> <span style='color:#111111'>generator</span>,
+                                <span style='color:darkblue'>&lt;any&gt;</span> <span style='color:#111111'>extractor</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>explain</span>(<span style='color:darkblue'>SqlGenerator&lt;QueryData, ?&gt;</span> <span style='color:#111111'>generator</span>,
+                        <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                        <span style='color:darkblue'>boolean</span> <span style='color:#111111'>analyze</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Match&gt;</span> <span style='color:#111111'>find</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnotateSqlGenerator&lt;SaltProject&gt;</span> <span style='color:#111111'>getAnnotateSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisParser</span> <span style='color:#111111'>getAqlParser</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnisBinary</span> <span style='color:#111111'>getBinary</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>offset</span>, <span style='color:darkblue'>int</span> <span style='color:#111111'>length</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>ByteHelper</span> <span style='color:#111111'>getByteHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>HashMap&lt;Long, Properties&gt;</span> <span style='color:#111111'>getCorpusConfiguration</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>Map&lt;String, String&gt;</span> <span style='color:#111111'>getCorpusConfiguration</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>corpusName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>CountExtractor</span> <span style='color:#111111'>getCountExtractor</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>CountSqlGenerator</span> <span style='color:#111111'>getCountSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>FindSqlGenerator</span> <span style='color:#111111'>getFindSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>AnnotateSqlGenerator</span> <span style='color:#111111'>getGraphExtractor</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>ListAnnotationsSqlHelper</span> <span style='color:#111111'>getListAnnotationsSqlHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>ListCorpusAnnotationsSqlHelper</span> <span style='color:#111111'>getListCorpusAnnotationsSqlHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>ListCorpusByNameDaoHelper</span> <span style='color:#111111'>getListCorpusByNameDaoHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>ListCorpusSqlHelper</span> <span style='color:#111111'>getListCorpusSqlHelper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>MatrixSqlGenerator</span> <span style='color:#111111'>getMatrixSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>MetaDataFilter</span> <span style='color:#111111'>getMetaDataFilter</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>&lt;any&gt;</span> <span style='color:#111111'>getPlanRowMapper</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>getQueryAnalysis</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;ResolverEntry&gt;</span> <span style='color:#111111'>getResolverEntries</span>(<span style='color:darkblue'>SingleResolverRequest</span> <span style='color:#111111'>request</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltAnnotateExtractor</span> <span style='color:#111111'>getSaltAnnotateExtractor</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SqlGenerator</span> <span style='color:#111111'>getSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;SqlSessionModifier&gt;</span> <span style='color:#111111'>getSqlSessionModifiers</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getTimeout</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>init</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisAttribute&gt;</span> <span style='color:#111111'>listAnnotations</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>,
+                                              <span style='color:darkblue'>boolean</span> <span style='color:#111111'>listValues</span>,
+                                              <span style='color:darkblue'>boolean</span> <span style='color:#111111'>onlyMostFrequentValues</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnisCorpus&gt;</span> <span style='color:#111111'>listCorpora</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>listCorpusAnnotations</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>,
+                                                <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Annotation&gt;</span> <span style='color:#111111'>listCorpusAnnotations</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>corpusId</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>listCorpusByName</span>(<span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>corpusNames</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>mapCorpusIdsToNames</span>(<span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>ids</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>List&lt;AnnotatedMatch&gt;</span> <span style='color:#111111'>matrix</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>modifySqlSession</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>jdbcTemplate</span>, <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>parseAQL</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>aql</span>, <span style='color:darkblue'>List&lt;Long&gt;</span> <span style='color:#111111'>corpusList</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>retrieveAnnotationGraph</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>,
+                                             <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>SaltProject</span> <span style='color:#111111'>retrieveAnnotationGraph</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>textId</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAnnotateSqlGenerator</span>(<span style='color:darkblue'>AnnotateSqlGenerator&lt;SaltProject&gt;</span> <span style='color:#111111'>annotateSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setAqlParser</span>(<span style='color:darkblue'>AnnisParser</span> <span style='color:#111111'>aqlParser</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setByteHelper</span>(<span style='color:darkblue'>ByteHelper</span> <span style='color:#111111'>byteHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCorpusConfiguration</span>(<span style='color:darkblue'>HashMap&lt;Long, Properties&gt;</span> <span style='color:#111111'>corpusConfiguration</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCountExtractor</span>(<span style='color:darkblue'>CountExtractor</span> <span style='color:#111111'>countExtractor</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setCountSqlGenerator</span>(<span style='color:darkblue'>CountSqlGenerator</span> <span style='color:#111111'>countSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setFindSqlGenerator</span>(<span style='color:darkblue'>FindSqlGenerator</span> <span style='color:#111111'>findSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setGraphExtractor</span>(<span style='color:darkblue'>AnnotateSqlGenerator</span> <span style='color:#111111'>graphExtractor</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setListAnnotationsSqlHelper</span>(<span style='color:darkblue'>ListAnnotationsSqlHelper</span> <span style='color:#111111'>listNodeAnnotationsSqlHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setListCorpusAnnotationsSqlHelper</span>(<span style='color:darkblue'>ListCorpusAnnotationsSqlHelper</span> <span style='color:#111111'>listCorpusAnnotationsHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setListCorpusByNameDaoHelper</span>(<span style='color:darkblue'>ListCorpusByNameDaoHelper</span> <span style='color:#111111'>listCorpusByNameDaoHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setListCorpusSqlHelper</span>(<span style='color:darkblue'>ListCorpusSqlHelper</span> <span style='color:#111111'>listCorpusHelper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMatrixSqlGenerator</span>(<span style='color:darkblue'>MatrixSqlGenerator</span> <span style='color:#111111'>matrixSqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setMetaDataFilter</span>(<span style='color:darkblue'>MetaDataFilter</span> <span style='color:#111111'>metaDataFilter</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setPlanRowMapper</span>(<span style='color:darkblue'>&lt;any&gt;</span> <span style='color:#111111'>planRowMapper</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setQueryAnalysis</span>(<span style='color:darkblue'>QueryAnalysis</span> <span style='color:#111111'>queryAnalysis</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setSaltAnnotateExtractor</span>(<span style='color:darkblue'>SaltAnnotateExtractor</span> <span style='color:#111111'>saltAnnotateExtractor</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setSqlGenerator</span>(<span style='color:darkblue'>SqlGenerator</span> <span style='color:#111111'>sqlGenerator</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setSqlSessionModifiers</span>(<span style='color:darkblue'>List&lt;SqlSessionModifier&gt;</span> <span style='color:#111111'>sqlSessionModifiers</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setTimeout</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>timeout</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse SpringAnnisDao' src='figures/annis/dao/SpringAnnisDao/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Schnittstelle SqlSessionModifier'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.SqlSessionModifier'/>Schnittstelle SqlSessionModifier</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e4521'/>
+        <a class='indexterm' id='d0e4524'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>interface</span> <span style='color:#111111'>SqlSessionModifier</span> {
+
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>modifySqlSession</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>simpleJdbcTemplate</span>,
+                               <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Schnittstelle SqlSessionModifier' src='figures/annis/dao/SqlSessionModifier/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse TimeOutSqlSessionModifier'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.dao.TimeOutSqlSessionModifier'/>Klasse TimeOutSqlSessionModifier</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e4565'/>
+        <a class='indexterm' id='d0e4568'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>TimeOutSqlSessionModifier</span><span style='font-weight:bold; color:purple'> implements </span><span style='color:#111111'>SqlSessionModifier</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>TimeOutSqlSessionModifier</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>int</span> <span style='color:#111111'>getTimeout</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>modifySqlSession</span>(<span style='color:darkblue'>JdbcTemplate</span> <span style='color:#111111'>jdbcTemplate</span>, <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>setTimeout</span>(<span style='color:darkblue'>int</span> <span style='color:#111111'>timeout</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse TimeOutSqlSessionModifier' src='figures/annis/dao/TimeOutSqlSessionModifier/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

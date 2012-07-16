@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>Paket annis.­sqlgen.­fullfacts</title>
+    <link href='dbdoclet.css' rel='stylesheet' type='text/css'/>
+    <meta content='DocBook XSL Stylesheets V1.76.1' name='generator'/>
+  </head>
+  <body>
+    <div class='section' title='Paket annis.­sqlgen.­fullfacts'>
+      <div class='titlepage'>
+        <div>
+          <div>
+            <h1 class='title'><a id='package-annis.sqlgen.fullfacts'/>Paket annis.­sqlgen.­fullfacts</h1>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse FfAnnotateConditionProvider'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.sqlgen.fullfacts.FfAnnotateConditionProvider'/>Klasse FfAnnotateConditionProvider</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e14509'/>
+        <a class='indexterm' id='d0e14512'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>FfAnnotateConditionProvider</span><span style='font-weight:bold; color:purple'> implements </span><span style='color:#111111'>AnnotationConditionProvider</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FfAnnotateConditionProvider</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>void</span> <span style='color:#111111'>addAnnotationConditions</span>(<span style='color:darkblue'>List&lt;String&gt;</span> <span style='color:#111111'>conditions</span>,
+                                      <span style='color:darkblue'>QueryNode</span> <span style='color:#111111'>node</span>,
+                                      <span style='color:darkblue'>int</span> <span style='color:#111111'>index</span>,
+                                      <span style='color:darkblue'>QueryAnnotation</span> <span style='color:#111111'>annotation</span>,
+                                      <span style='color:darkblue'>String</span> <span style='color:#111111'>table</span>,
+                                      <span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                                      <span style='color:darkblue'>TableAccessStrategy</span> <span style='color:#111111'>tas</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse FfAnnotateConditionProvider' src='figures/annis/sqlgen/fullfacts/FfAnnotateConditionProvider/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+      <div class='section' title='Klasse FfAnnotateSqlGenerator'>
+        <div class='titlepage'>
+          <div>
+            <div>
+              <h2 class='title'><a id='class-annis.sqlgen.fullfacts.FfAnnotateSqlGenerator'/>Klasse FfAnnotateSqlGenerator</h2>
+            </div>
+          </div>
+        </div>
+        <a class='indexterm' id='d0e14599'/>
+        <a class='indexterm' id='d0e14602'/>
+        <pre xmlns='' xmlns:fo='http://www.w3.org/1999/XSL/Format'><span style='font-weight:bold; color:purple'>public</span> <span style='font-weight:bold; color:purple'>class</span> <span style='color:#111111'>FfAnnotateSqlGenerator&lt;T&gt;</span><span style='font-weight:bold; color:purple'> extends </span><span style='color:#111111'>AnnotateSqlGenerator&lt;T&gt;</span> {
+
+  <span style='color:darkcyan'>// Public Constructors</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:#111111'>FfAnnotateSqlGenerator</span>();<br xmlns='http://www.w3.org/1999/xhtml'/>
+  <span style='color:darkcyan'>// Public Methods</span>
+  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>fromClause</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                           <span style='color:darkblue'>List&lt;QueryNode&gt;</span> <span style='color:#111111'>alternative</span>,
+                           <span style='color:darkblue'>String</span> <span style='color:#111111'>indent</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getDocumentQuery</span>(<span style='color:darkblue'>String</span> <span style='color:#111111'>toplevelCorpusName</span>, <span style='color:darkblue'>String</span> <span style='color:#111111'>documentName</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>getTextQuery</span>(<span style='color:darkblue'>long</span> <span style='color:#111111'>textID</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>  <span style='font-weight:bold; color:purple'>public</span> <span style='color:darkblue'>String</span> <span style='color:#111111'>selectClause</span>(<span style='color:darkblue'>QueryData</span> <span style='color:#111111'>queryData</span>,
+                             <span style='color:darkblue'>List&lt;QueryNode&gt;</span> <span style='color:#111111'>alternative</span>,
+                             <span style='color:darkblue'>String</span> <span style='color:#111111'>indent</span>);<br xmlns='http://www.w3.org/1999/xhtml'/>}</pre>
+        <div class='variablelist'>
+          <dl>
+            <dt>
+              <span class='term'>
+                <span class='emphasis'>
+                  <em>Autor</em>
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <p>
+                <span class='simplelist'>thomas</span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+        <div class='informalfigure'>
+          <div class='mediaobject' style='text-align: center'>
+            <img alt='Klasse FfAnnotateSqlGenerator' src='figures/annis/sqlgen/fullfacts/FfAnnotateSqlGenerator/ClassDiagram.png' style='text-align: middle'/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

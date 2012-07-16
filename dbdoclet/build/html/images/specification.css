@@ -1,0 +1,47 @@
+* 
+{ 
+    font-family: sans-serif; 
+ }
+
+body  
+{ 
+  margin-left: 10%;
+  margin-right: 10%;
+  color: silver;
+  background-color: #000055;
+  }
+
+a
+{ 
+  color: orange;
+  }
+
+img 
+{
+	border: 0 none;
+	}
+	
+pre
+{ 
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 1em;
+  border: 3px solid #333;
+  color: black;
+  background-color: #cecece;
+  font-size: 0.7em;
+  }
+
+div.navheader table tr td a,
+div.navfooter table tr td a
+{ 
+  font-weight: bold;
+  color: orange;
+  text-decoration: none;
+  }
+
+div.navheader table tr td a:hover,
+div.navfooter table tr td a:hover
+{ 
+  text-decoration: underline;
+  }
