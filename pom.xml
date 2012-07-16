@@ -7,6 +7,19 @@
   <packaging>pom</packaging>
   <name>Annis corpus search</name>
   <version>2.3.0-SNAPSHOT</version>
+  <description>
+    ANNIS is an open source, versatile web browser-based search and 
+    visualization architecture for complex multilevel linguistic corpora with 
+    diverse types of annotation. ANNIS, which stands for ANNotation of Information 
+    Structure, has been designed to provide access to the data of the 
+    SFB 632 - "Information Structure: The Linguistic Means for Structuring 
+    Utterances, Sentences and Texts". Since information structure interacts with 
+    linguistic phenomena on many levels, ANNIS addresses the SFB's need to 
+    concurrently annotate, query and visualize data from such varied areas as 
+    syntax, semantics, morphology, prosody, referentiality, lexis and more. 
+    For projects working with spoken language, support for audio / video 
+    annotations is also required.
+  </description>
   
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
 
@@ -71,6 +84,13 @@
               <configuration>
                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
               </configuration>
+              <reports>
+                <report>index</report>
+                <report>summary</report>
+                <report>license</report>
+                <report>dependencies</report>
+              </reports>
+          
             </plugin>
           </reportPlugins>
         </configuration>
@@ -103,5 +123,5 @@
     <module>Annis-Kickstarter</module>
     <module>annis-gui</module>
   </modules>
-
+    
 </project>
