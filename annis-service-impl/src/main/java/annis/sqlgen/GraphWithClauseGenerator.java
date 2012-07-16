@@ -180,7 +180,7 @@ public class GraphWithClauseGenerator implements
         // concate conditions
         if (i < saltURIs.size() - 1)
         {
-          sb.append("\nOR\n").append(TABSTOP);
+          sb.append("\nAND\n").append(TABSTOP);
         }
       }
 
@@ -221,10 +221,9 @@ public class GraphWithClauseGenerator implements
       sb.append("\nORDER BY facts.token_index");
       sb.append("\n)"); //
 
-    }
+    } // end of island policy == context
     else
     {
-
 
       sb.append("min(facts.left_token) as min,\n").append(TABSTOP);
       sb.append("max(facts.right_token) as max,\n").append(TABSTOP);
