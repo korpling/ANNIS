@@ -66,9 +66,12 @@
               <goal>generate-html</goal>
               <goal>generate-pdf</goal>
             </goals>
-            <phase>post-site</phase>
+            <phase>site</phase>
           </execution>
         </executions>
+        <configuration>
+          <xincludeSupported>true</xincludeSupported>
+        </configuration>
       </plugin>
       
     </plugins>
