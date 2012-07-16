@@ -20,6 +20,7 @@ import static annis.sqlgen.TableAccessStrategy.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -138,8 +139,8 @@ public abstract class AnnotateSqlGenerator<T>
     List<Long> corpusList = queryData.getCorpusList();
     HashMap<Long, Properties> corpusProperties =
       queryData.getCorpusConfiguration();
-    IslandPolicies mostRestrictive = islandsPolicy.getMostRestrictivePolicy(
-      corpusList, corpusProperties);
+    IslandPolicies policy = getIslandsPolicy().getMostRestrictivePolicy(corpusList,
+      corpusProperties);
 
     List<String> result = new LinkedList<String>();
 
@@ -158,7 +159,7 @@ public abstract class AnnotateSqlGenerator<T>
 
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSolutionFromMatchesWithClause(queryData, mostRestrictive,
+        result.add(getSolutionFromMatchesWithClause(queryData, policy,
           alternative, "matches", indent + TABSTOP));
 
       }
@@ -170,7 +171,7 @@ public abstract class AnnotateSqlGenerator<T>
         result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
         result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
-          alternative, mostRestrictive, "coveredseg", indent));
+          alternative, policy, "coveredseg", indent));
 
       }
     }
