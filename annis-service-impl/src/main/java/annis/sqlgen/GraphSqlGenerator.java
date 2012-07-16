@@ -105,6 +105,9 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     fields.add("matching_nodes.span AS span");
     fields.add("matching_nodes.left_token AS left_token");
     fields.add("matching_nodes.right_token AS right_token");
+    fields.add("matching_nodes.seg_name AS seg_name");
+    fields.add("matching_nodes.seg_left AS seg_left");
+    fields.add("matching_nodes.seg_right AS seg_right");
     fields.add("matching_nodes.pre AS pre");
     fields.add("matching_nodes.post AS post");
     fields.add("matching_nodes.parent AS parent");

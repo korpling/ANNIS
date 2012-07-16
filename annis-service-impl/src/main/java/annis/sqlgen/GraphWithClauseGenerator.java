@@ -384,6 +384,9 @@ public class GraphWithClauseGenerator implements
     fields.add("facts.span");
     fields.add("facts.left_token");
     fields.add("facts.right_token");
+    fields.add("facts.seg_name");
+    fields.add("facts.seg_left");
+    fields.add("facts.seg_right");
     fields.add("facts.pre");
     fields.add("facts.post");
     fields.add("facts.parent");
