@@ -226,7 +226,7 @@ public class AnnisWebService
    * @return the graph of this hit.
    */
   @GET
-  @Path("subgraphs")
+  @Path("subgraph")
   @Produces("application/xml")
   public SaltProject subgraph(@QueryParam("q") String saltIDs,
     @DefaultValue("5") @QueryParam("left") String leftRaw,
@@ -330,12 +330,12 @@ public class AnnisWebService
     result.setConfig(tmp);
     return result;
   }
-  
+
   @GET
   @Path("corpora/{top}/annotations")
   @Produces("application/xml")
   public List<AnnisAttribute> annotations(
-    @PathParam("top") String toplevelCorpus, 
+    @PathParam("top") String toplevelCorpus,
     @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
     @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues
   )
@@ -343,7 +343,7 @@ public class AnnisWebService
     List<String> list = new LinkedList<String>();
     list.add(toplevelCorpus);
     List<Long> corpusList = annisDao.listCorpusByName(list);
-    
+
     return annisDao.listAnnotations(corpusList,
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
     );
