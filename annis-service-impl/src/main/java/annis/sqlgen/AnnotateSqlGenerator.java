@@ -92,9 +92,7 @@ public abstract class AnnotateSqlGenerator<T>
    *
    * @param jdbcTemplate
    * @param textID
-   * @return
-   * @deprecated use {@link #queryAnnotationGraph(org.springframework.jdbc.core.JdbcTemplate, java.lang.String, java.lang.String)}
-   * instead
+   * @deprecated
    */
   @Deprecated
   public T queryAnnotationGraph(
@@ -384,7 +382,14 @@ public abstract class AnnotateSqlGenerator<T>
   }
   
   /**
-   *  
+   * Get solution from a covered segmentation using a WITH clause.
+   * @param queryData
+   * @param annoQueryData
+   * @param alternative
+   * @param islandsPolicy
+   * @param coveredName
+   * @param indent
+   * @return 
    */
   protected String getSolutionFromCoveredSegWithClause(
     QueryData queryData, AnnotateQueryData annoQueryData, 

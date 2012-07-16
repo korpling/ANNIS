@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>annis-all</artifactId>
+    <groupId>de.hu-berlin.german.korpling.annis</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+  </parent>
+  <groupId>de.hu-berlin.german.korpling.annis</groupId>
+  <artifactId>annis-doc</artifactId>
+  <version>2.3.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>annis-doc</name>
+    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+              </configuration>
+              <reports>
+                <report>index</report>
+                <report>summary</report>
+                <report>license</report>
+              </reports>
+            </plugin>
+           
+              
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.8.1</version>
+              <configuration>
+                <doclet>org.dbdoclet.doclet.docbook.DocBookDoclet</doclet>
+                <docletPath>${basedir}/extlib/dbdoclet.jar</docletPath>
+                
+                <sourcepath>../annis-service-rmi/src/main/java:../annis-service-impl/target/generated-sources/sablecc/:../annis-service-impl/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
+
+                
+                <useStandardDocletOptions>false</useStandardDocletOptions>
+                <additionalparam>-windowtitle "Javadoc" -part</additionalparam>
+              </configuration>
+            </plugin>
+          
+             
+          </reportPlugins>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-maven-plugin</artifactId>
+        <version>2.0.14</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate-html</goal>
+              <goal>generate-pdf</goal>
+            </goals>
+            <phase>post-site</phase>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+  </build>
+    
+</project>

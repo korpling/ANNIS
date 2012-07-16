@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<part xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>ANNIS User Guide</title>
+  <!--
+  <info>
+    <title>ANNIS</title>
+    <subtitle>User Guide</subtitle>
+    <author>
+      <personname>
+        <firstname>Amir</firstname>
+        <surname>Zeldes</surname>
+      </personname>
+      <email>annis-admin@ling.uni-potsdam.de</email>
+    </author>
+    <orgname>SFB 632 Information Structure / D1 Linguistic Database</orgname>
+    <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
+    <releaseinfo>Version 2.2.1</releaseinfo>
+    <pubdate>18 April 2012</pubdate>
+  </info>
+  -->
+
+  <chapter>
+    <title>Introduction</title>
+    <para>ANNIS2 is an open source, browser-based search and visualization architecture for
+      multi-layer corpora. It can be used to search for complex graph structures of annotated nodes
+      and edges forming a variety of linguistic structures, such as constituent or dependency syntax
+      trees, coreference and parallel alignment edges, span annotations and associated multi-modal
+      data (audio/video). This guide provides an overview of the current ANNIS2 system, first steps
+      for installing either a local instance or an ANNIS server with a demo corpus, as well as
+      tutorials for converting data for ANNIS and running queries with AQL (ANNIS Query Language).
+    </para>
+  </chapter>
+
+  <chapter>
+    <title>New Features in Version 2.2.1</title>
+    <para>
+      <emphasis role="bold">Features:</emphasis>
+      <itemizedlist spacing="compact">
+        <listitem>
+          <para>Subcorpus and document path for each hit can be shown in search result list</para>
+        </listitem>
+        <listitem>
+          <para>Metadata coming from documents, subcorpora and top level corpora is sorted
+            separately in the metadata display</para>
+        </listitem>
+        <listitem>
+          <para>New grid-tree visualizer for a span visualization of hierarchical structures (e.g.
+            topological fields in German; see Section 5.1)<!-- TODO reference --></para>
+        </listitem>
+        <listitem>
+          <para>More intuitive search button position in GUI and other small GUI improvements</para>
+        </listitem>
+        <listitem>
+          <para>Updated tutorial</para>
+        </listitem>
+        <listitem>
+          <para>Faster import when large corpora are already in the system</para>
+        </listitem>
+      </itemizedlist>
+      <emphasis role="bold">Bugfixes:</emphasis>
+      <itemizedlist spacing="compact">
+        <listitem>
+          <para>Support for JDK 7</para>
+        </listitem>
+        <listitem>
+          <para>Fixed import bug which could disrupt queries of the sort >secedge m,n (see <link
+              xlink:href="https://bugs.launchpad.net/bugs/870108"
+              >https://bugs.launchpad.net/bugs/870108</link>) </para>
+        </listitem>
+        <listitem>
+          <para>Fixed bugs in some forms of query disjunction with ‘|’</para>
+        </listitem>
+        <listitem>
+          <para>Fixed resizing of visualizers in Chrome browsers</para>
+        </listitem>
+        <listitem>
+          <para>Fixed escaping of characters in WEKA export</para>
+        </listitem>
+      </itemizedlist> (For change logs of previous version see their respective distributions or
+      user guides) </para>
+  </chapter>
+
+  <chapter>
+    <title>Installing <application>ANNIS2</application></title>
+
+    <section>
+      <title>Installing a Local Version (ANNIS Kickstarter)</title>
+      <para> Local users who do not wish to make their corpora available online can install ANNIS
+        Kickstarter under most versions of Linux, Windows and Mac OS. To install Kickstarter follow
+        these steps:<orderedlist>
+          <listitem>
+            <para>Download and install PostgreSQL 8.4 for your operating system from <link
+                xlink:href="http://www.postgresql.org/download/"
+                >http://www.postgresql.org/download/</link> and <emphasis role="bold">make a note of
+                the administrator password</emphasis> you set during the installation. After
+              installation, Postgres may automatically launch the Postgres Stack Builder to download
+              additional components – you can safely skip this step and cancel the Stack Builder if
+              you wish. You may need to restart your OS if the Postgres installer tells you to.
+            </para>
+          </listitem>
+          <listitem>
+            <para>Download and unzip <link
+                xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-Kickstarter-2.2.1-distribution.zip"
+                >Annis-Kickstarter-2.2.1-distribution.zip</link> from the ANNIS website. </para>
+          </listitem>
+          <listitem>
+            <para>Start AnnisKickstarter.bat if you’re using Windows or run the bash script
+              AnnisKickstarter.sh otherwise (this may take a few seconds the first time you run
+              Kickstarter). At this point your Firewall may try to block Kickstarter and offer you
+              to unblock it – do so and Kickstarter should start up. </para>
+            <note>
+              <para>For most users it is a good idea to give Java more memory (if this is not
+                already the default). You can do this by editing the script AnnisKickstarter and
+                typing the following after the call to start java (before -splash:splashscreen.gif): </para>
+              <para><code>-Xss1024k -Xmx1024m</code></para>
+              <para>(To accelerate searches it is also possible to give the Postgres database more
+                memory, see the link in the next section below). </para>
+            </note>
+          </listitem>
+          <listitem>
+            <para>Once the program has started, if this is the first time you run Kickstarter, press
+              “Init Database” and supply your PostGres administrator password from step 1. </para>
+          </listitem>
+          <listitem>
+            <para>Download and unzip the <link
+                xlink:href="http://korpling.german.hu-berlin.de/~annis/downloads/sample_corpora/pcc2_relAnnis.zip"
+                >pcc2 demo corpus</link> from the ANNIS website. </para>
+          </listitem>
+          <listitem>
+            <para>Press “Import Corpus” and navigate to the directory containing the directory
+                <filename>pcc2_v2_relAnnis/</filename>. Select this directory (but do not go into
+              it) and press OK. </para>
+          </listitem>
+          <listitem>
+            <para>Once import is complete, press “Launch Annis frontend” and login with the username
+              and password “test” to test the corpus (try selecting the pcc2 corpus, typing
+                <code>pos="NN"</code> in the AnnisQL box and clicking “Show Result”. See the section
+              “Running Queries in <application>ANNIS2</application>” in this guide for some more
+              example queries, or press the Tutorial button at the top left of the interface).
+            </para>
+          </listitem>
+        </orderedlist></para>
+
+    </section>
+    <section>
+      <title>Building and Installing an ANNIS Server</title>
+      <para>The ANNIS server version can be installed on UNIX based server, or else under Windows
+        using <link xlink:href="http://www.cygwin.com/">Cygwin</link>, the freely available UNIX
+        emulator. To install the ANNIS server: <orderedlist>
+          <listitem>
+            <para>Install a PostgreSQL server for your operating system from <link
+                xlink:href="http://www.postgresql.org/download/"
+                >http://www.postgresql.org/download/</link>
+            </para>
+          </listitem>
+          <listitem>
+            <para>Install a web server such as <link xlink:href="http://tomcat.apache.org/"
+                >Tomcat</link> or <link xlink:href="http://www.mortbay.org/jetty/">Jetty</link>
+            </para>
+          </listitem>
+          <listitem>
+            <para>Make sure you have <link
+                xlink:href="http://java.sun.com/javase/downloads/index.jsp">JDK 6</link> and <link
+                xlink:href="http://maven.apache.org/">Maven 2</link> (or install them if you don’t)
+            </para>
+          </listitem>
+          <listitem>
+            <para>If you’re using Cygwin and Windows you will also need to install the “patch”
+              program via the Cygwin package manager </para>
+          </listitem>
+          <listitem>
+            <para>Download and unzip <link
+                xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-2.2.1.zip"
+                >Annis-2.2.1.zip</link>, then run the following commands (replacing the appropriate
+              directories):</para>
+            <para>
+              <programlisting>cd &lt;unzipped source>/Annis-Service
+mvn -DskipTests=true install 
+mvn -DskipTests=true assembly:assembly tar xzvf
+target/annis-service-&lt;version>-distribution.tar.gz -C &lt;installation directory&gt;            </programlisting>
+            </para>
+          </listitem>
+          <listitem>
+            <para>Next initialize your ANNIS database (only the first time you use the
+              system):</para>
+          </listitem>
+          <listitem>
+            <para>Set the environment variables (each time when starting up) </para>
+            <para>
+              <programlisting>export ANNIS_HOME=&lt;installation directory>
+export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
+            </para>
+          </listitem>
+          <listitem>
+            <para>Now you can import some corpora: </para>
+            <para>
+              <programlisting>annis-admin.sh import path/to/corpus1 path/to/corpus2 ...</programlisting>
+            </para>
+            <para>
+              <important>
+                <para>The above import-command calls other PostgreSQL database commands. If you
+                  abort the import script with Ctrl+C, these SQL processes will not be automatically
+                  terminated; instead they might keep hanging and prevent access to the database.
+                  The same might happen if you close your shell before the import script terminates,
+                  so you will want to prefix it with the "nohup"-command. </para>
+              </important>
+            </para>
+          </listitem>
+          <listitem>
+            <para>Now you can start the ANNIS service: </para>
+            <para>
+              <programlisting>annis-service.sh start</programlisting>
+            </para>
+          </listitem>
+          <listitem>
+            <para>To get the Annis front-end running, first compile it: </para>
+            <para>
+              <programlisting>cd &lt;unzipped source>
+mvn -DskipTests=true install</programlisting>
+            </para>
+            <para>If no error occurs the war-file will be available under 4 <filename>&lt;unzipped
+                source>/Annis-web/target/Annis-web.war</filename>. </para>
+          </listitem>
+          <listitem>
+            <para>And configure your web server as described here: <link
+                xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat "
+                >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat </link></para>
+          </listitem>
+        </orderedlist></para>
+      <para>The latest instructions for compiling and installing the ANNIS Server can also be found
+        at: <link
+          xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation "
+          >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation </link></para>
+      <para>We also <emphasis role="bold">strongly recommend</emphasis> reconfiguring the Postgres
+        server’s default settings as described here: <link
+          xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL"
+          >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL</link>
+      </para>
+    </section>
+
+
+  </chapter>
+  <chapter>
+    <title>Running Queries in ANNIS2 </title>
+    <section>
+      <title>The ANNIS2 Interface</title>
+      <figure xml:id="img_main-gui">
+        <title>ANNIS2 interface</title>
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/main_gui.png" width="100%"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+      </figure>
+    
+      <para>The ANNIS2 interface (see <xref linkend="img_main-gui"/>) is comprised of several windows, the most important of
+        which are the search form (in the red box above left) and the results window (in the
+        blue box above).</para>
+    
+    <section>
+      <title>The Search Form</title>
+      <para>The Search Form on the left of the interface window is
+        available immediately after login. In the middle, the list of
+        currently available corpora is shown. Using the checkboxes
+        on the left of each corpus, it is possible to select which
+        corpora should be searched in (hold down 'shift' to select
+        multiple corpora simultaneously). If you cannot see a corpus
+        that should be available to you, or else if the corpora list is
+        too cluttered, you may click on "more corpora" to open the
+        corpora window. You may then drag and drop the des
+      </para>
+    </section>
+    
+    </section>
+    
+  </chapter>
+
+</part>

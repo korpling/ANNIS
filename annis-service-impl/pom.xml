@@ -392,6 +392,7 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+        
       </plugins>
     </pluginManagement>
   </build>
