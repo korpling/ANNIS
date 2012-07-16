@@ -102,7 +102,6 @@
     <module>annis-service-impl</module>
     <module>Annis-Kickstarter</module>
     <module>annis-gui</module>
-    <module>annis-utilsgui</module>
   </modules>
 
 </project>
