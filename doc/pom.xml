@@ -43,7 +43,7 @@
                 <doclet>org.dbdoclet.doclet.docbook.DocBookDoclet</doclet>
                 <docletPath>${basedir}/extlib/dbdoclet.jar</docletPath>
                 
-                <sourcepath>../annis-service-rmi/src/main/java:../annis-service-impl/target/generated-sources/sablecc/:../annis-service-impl/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
+                <sourcepath>../annis-service-rmi/src/main/java:../annis-service-impl/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
 
                 
                 <useStandardDocletOptions>false</useStandardDocletOptions>
@@ -66,12 +66,38 @@
               <goal>generate-html</goal>
               <goal>generate-pdf</goal>
             </goals>
+            <configuration>
+              <targetDirectory>target/manual</targetDirectory>
+              <postProcess>
+                <copy todir="${project.build.directory}/manual/images">
+                  <fileset dir="src/docbkx/images">
+                  </fileset>
+                </copy>
+                <copy todir="${project.build.directory}/manual/figures">
+                  <fileset dir="${project.build.directory}/site/apidocs/figures">
+                  </fileset>
+                </copy>
+              </postProcess>
+            </configuration>
             <phase>site</phase>
           </execution>
         </executions>
+        
         <configuration>
           <xincludeSupported>true</xincludeSupported>
         </configuration>
+        
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.docbook</groupId>
+            <artifactId>docbook-xml</artifactId>
+            <version>5.0-all</version>
+            <classifier>resources</classifier>
+            <type>zip</type>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+        
       </plugin>
       
     </plugins>
