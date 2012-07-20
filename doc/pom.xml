@@ -69,7 +69,8 @@
               <goal>generate-pdf</goal>
             </goals>
             <configuration>
-              <targetDirectory>target/manual</targetDirectory>
+              <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
               <postProcess>
                 <copy todir="${project.build.directory}/manual/images">
                   <fileset dir="src/docbkx/images">

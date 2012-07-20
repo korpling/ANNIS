@@ -25,7 +25,23 @@
     
   </info>
 
-  <xi:include href="User-Guide.xml"/>   
+  <part>
+    <title>Information for Users</title>
+    <xi:include href="User-Guide.xml"/>   
+  </part>
   
+  <!-- TODO
+  <part>
+    <title>Information for Administrators running ANNIS on a central server</title>
+      
+  </part>
+  -->
+  
+  <!-- TODO
+  <part>
+    <title>Information for ANNIS developers</title>
+      
+  </part>
+  -->
 
 </book>
