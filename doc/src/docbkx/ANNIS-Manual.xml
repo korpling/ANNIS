@@ -25,9 +25,7 @@
     
   </info>
 
-  <xi:include href="User-Guide.xml"/>
-  <xi:include href="../../target/site/apidocs/Reference.xml"/>
-   
+  <xi:include href="User-Guide.xml"/>   
   
 
 </book>

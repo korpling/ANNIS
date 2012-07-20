@@ -34,6 +34,8 @@
               </reports>
             </plugin>
            
+           <!-- uncomment to enable JavaDoc to Docbook generation -->
+           <!--
               
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -50,7 +52,7 @@
                 <additionalparam>-windowtitle "Javadoc" -part</additionalparam>
               </configuration>
             </plugin>
-          
+          -->
              
           </reportPlugins>
         </configuration>
@@ -73,10 +75,12 @@
                   <fileset dir="src/docbkx/images">
                   </fileset>
                 </copy>
+                <!--
                 <copy todir="${project.build.directory}/manual/figures">
                   <fileset dir="${project.build.directory}/site/apidocs/figures">
                   </fileset>
                 </copy>
+                -->
               </postProcess>
             </configuration>
             <phase>site</phase>
