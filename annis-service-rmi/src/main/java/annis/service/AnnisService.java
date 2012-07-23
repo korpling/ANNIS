@@ -46,14 +46,6 @@ public interface AnnisService extends Remote
     AnnisCorpusAccessException;
 
   /**
-   * 
-   * @param textId The id of the text to get the annotation graph from.
-   * @return
-   * @throws RemoteException
-   */
-  public AnnisResult getAnnisResult(Long textId) throws RemoteException;
-
-  /**
    * Get an Annis Binary object identified by its id.
    * 
    * @param id

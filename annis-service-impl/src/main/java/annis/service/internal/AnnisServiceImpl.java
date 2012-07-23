@@ -111,17 +111,6 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public AnnisResult getAnnisResult(Long textId) throws RemoteException
-  {
-    SaltProject p = annisDao.retrieveAnnotationGraph(textId);
-    if (p != null)
-    {      
-      return new AnnisResultImpl(LegacyGraphConverter.convertToAOM(p).get(0));
-    }
-    throw new AnnisServiceException("no text found with id = " + textId);
-  }
-
-  @Override
   public List<Annotation> getMetadata(long corpusId) throws RemoteException,
     AnnisServiceException
   {
