@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.IslandsPolicy.IslandPolicies;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -61,16 +62,8 @@ public abstract class AnnotateSqlGenerator<T>
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
-
-
-  // old
-  public enum IslandPolicies
-  {
-
-    context, none
-  }
   private String matchedNodesViewName;
-  private String defaultIslandsPolicy;
+  private IslandsPolicy islandsPolicy;
 
   public AnnotateSqlGenerator()
   {
@@ -108,36 +101,6 @@ public abstract class AnnotateSqlGenerator<T>
       documentName), this);
   }
 
-  private IslandPolicies getMostRestrictivePolicy(
-    List<Long> corpora, Map<Long, Properties> props)
-  {
-    if(corpora.isEmpty())
-    {
-      return IslandPolicies.valueOf(defaultIslandsPolicy);
-    }
-    
-    IslandPolicies[] all = IslandPolicies.values();
-    IslandPolicies result = all[all.length - 1];
-    
-    for (Long l : corpora)
-    {
-      IslandPolicies newPolicy = IslandPolicies.valueOf(defaultIslandsPolicy);
-      
-      if (props.get(l) != null)
-      {
-        newPolicy =
-          IslandPolicies.valueOf(props.get(l).getProperty("islands-policy",
-          defaultIslandsPolicy));
-      }
-      
-      if (newPolicy.ordinal() < result.ordinal())
-      {
-        result = newPolicy;
-      }
-    }
-    return result;
-  }
-
   @Deprecated
   public abstract String getTextQuery(long textID);
 
@@ -152,16 +115,6 @@ public abstract class AnnotateSqlGenerator<T>
   public void setMatchedNodesViewName(String matchedNodesViewName)
   {
     this.matchedNodesViewName = matchedNodesViewName;
-  }
-
-  public String getDefaultIslandsPolicy()
-  {
-    return defaultIslandsPolicy;
-  }
-
-  public void setDefaultIslandsPolicy(String defaultIslandsPolicy)
-  {
-    this.defaultIslandsPolicy = defaultIslandsPolicy;
   }
 
   @Override
@@ -184,76 +137,78 @@ public abstract class AnnotateSqlGenerator<T>
     List<Long> corpusList = queryData.getCorpusList();
     HashMap<Long, Properties> corpusProperties =
       queryData.getCorpusConfiguration();
-    IslandPolicies islandsPolicy =
-      getMostRestrictivePolicy(corpusList, corpusProperties);
-    
+    IslandPolicies policy = getIslandsPolicy().getMostRestrictivePolicy(corpusList,
+      corpusProperties);
+
     List<String> result = new LinkedList<String>();
-    
-    List<AnnotateQueryData> ext = queryData.getExtensions(AnnotateQueryData.class);
-    if(!ext.isEmpty())
+
+    List<AnnotateQueryData> ext = queryData.getExtensions(
+      AnnotateQueryData.class);
+    if (!ext.isEmpty())
     {
       AnnotateQueryData annoQueryData = ext.get(0);
-      
-      if(annoQueryData.getSegmentationLayer() == null)
+
+      if (annoQueryData.getSegmentationLayer() == null)
       {
-        // token index based method 
-        
+        // token index based method
+
         // first get the raw matches
         result.add(getMatchesWithClause(queryData, indent));
-        
+
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSolutionFromMatchesWithClause(queryData, islandsPolicy, 
+        result.add(getSolutionFromMatchesWithClause(queryData, policy,
           alternative, "matches", indent + TABSTOP));
 
       }
       else
       {
         // segmentation layer based method
-        
+
         result.add(getMatchesWithClause(queryData, indent));
         result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
         result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
-          alternative, islandsPolicy, "coveredseg", indent));
-                
+          alternative, policy, "coveredseg", indent));
+
       }
     }
-    
+
     return result;
   }
 
-  /** 
-   * Uses the inner SQL generator and provides an ordered and limited view on 
-   * the matches with a match number. 
+  /**
+   * Uses the inner SQL generator and provides an ordered and limited view on
+   * the matches with a match number.
    */
   protected String getMatchesWithClause(QueryData queryData, String indent)
   {
-    StringBuilder sb = new StringBuilder();        
+    StringBuilder sb = new StringBuilder();
     sb.append(indent).append("matches AS\n");
     sb.append(indent).append("(\n");
-    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent
+      + TABSTOP));
     sb.append("\n").append(indent).append(")");
-    
+
     return sb.toString();
   }
-  
+
   /**
-   * Breaks down the matches table, so that each node of each match has
-   * it's own row.
+   * Breaks down the matches table, so that each node of each match has it's own
+   * row.
    */
-  protected String getSolutionFromMatchesWithClause(QueryData queryData, 
+  protected String getSolutionFromMatchesWithClause(QueryData queryData,
     IslandPolicies islandPolicies,
-    List<QueryNode> alternative, String matchesName, 
+    List<QueryNode> alternative, String matchesName,
     String indent)
   {
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("solutions AS\n");
     sb.append(indent).append("(\n");
-    
+
     String innerIndent = indent + TABSTOP;
-    
-    if(islandPolicies == IslandPolicies.none)
+
+    if (islandPolicies == IslandPolicies.none)
     {
       innerIndent = indent + TABSTOP + TABSTOP;
       sb.append(indent).append("SELECT min(\"key\") AS key, n, text, "
@@ -266,110 +221,99 @@ public abstract class AnnotateSqlGenerator<T>
     tas.getTableAliases().put("solutions", matchesName);
     List<String> keyColumns =
       key.generateOuterQueryColumns(tas, alternative.size());
-    
-   
-    for(int i=1; i <= alternative.size(); i++)
+
+
+    for (int i = 1; i <= alternative.size(); i++)
     {
-      if(i >= 2)
+      if (i >= 2)
       {
-        sb.append(innerIndent)
-          .append("UNION ALL\n");
+        sb.append(innerIndent).append("UNION ALL\n");
       }
-      sb.append(innerIndent)
-      .append("SELECT ")
-      .append(StringUtils.join(keyColumns, ", "))
-      .append(", n,  text")
-      .append(i).append(" AS text, min")
-      .append(i).append(" AS \"min\", max")
-      .append(i).append(" AS \"max\", corpus")
-      .append(i).append(" AS corpus ")
-      .append("FROM ")
-      .append(matchesName)
-      .append("\n");
+      sb.append(innerIndent).append("SELECT ").append(StringUtils.join(
+        keyColumns, ", ")).append(", n,  text").append(i).append(" AS text, min").
+        append(i).append(" AS \"min\", max").append(i).append(
+        " AS \"max\", corpus").append(i).append(" AS corpus ").append("FROM ").
+        append(matchesName).append("\n");
 
     } // end for all nodes in query
-    
-    if(islandPolicies == IslandPolicies.none)
+
+    if (islandPolicies == IslandPolicies.none)
     {
       sb.append(indent).append(") AS innersolution\n");
     }
-        
-    if(islandPolicies == IslandPolicies.none)
+
+    if (islandPolicies == IslandPolicies.none)
     {
       sb.append(indent).append("GROUP BY text, n\n");
     }
-    
+
     sb.append(indent).append(")");
 
     return sb.toString();
   }
-  
+
   /**
    * Get with clause for all covered spans of the segmentation layer.
    */
   protected String getCoveredSeqWithClause(
-    QueryData queryData, AnnotateQueryData annoQueryData, 
+    QueryData queryData, AnnotateQueryData annoQueryData,
     List<QueryNode> alternative, String matchesName, String indent)
   {
     String indent2 = indent + TABSTOP;
     String indent3 = indent2 + TABSTOP;
     String indent4 = indent3 + TABSTOP;
-    
+
     SolutionKey<?> key = createSolutionKey();
     TableAccessStrategy tas = createTableAccessStrategy();
     tas.getTableAliases().put("solutions", matchesName);
     List<String> keyColumns =
       key.generateOuterQueryColumns(tas, alternative.size());
-    
-    
+
+
     TableAccessStrategy tables = tables(null);
-    
+
     StringBuilder sb = new StringBuilder();
-        sb.append(indent).append("coveredseg AS\n");
+    sb.append(indent).append("coveredseg AS\n");
     sb.append(indent).append("(\n");
 
     sb.append(indent2).append("SELECT ");
-    for(String k : keyColumns)
+    for (String k : keyColumns)
     {
       sb.append(k);
     }
     sb.append(", matches.n, ").
-      append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(" - ")
-      .append(annoQueryData.getLeft()).append(" AS \"min\", ")
-      .append(tas.aliasedColumn(NODE_TABLE, "seg_right")).append(" + ")
-      .append(annoQueryData.getRight()).append(" AS \"max\", ")
-      .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-      .append(" AS \"text\"\n");
+      append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(" - ").append(annoQueryData.
+      getLeft()).append(" AS \"min\", ").append(tas.aliasedColumn(NODE_TABLE,
+      "seg_right")).append(" + ").append(annoQueryData.getRight()).append(
+      " AS \"max\", ").append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
+      " AS \"text\"\n");
 
-    
-    sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE))
-      .append(", matches\n");
+
+    sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(
+      ", matches\n");
     sb.append(indent2).append("WHERE\n");
-    
-    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus"))
-      .append(" IN (")
-      .append(StringUtils.join(queryData.getCorpusList(), ","))
-      .append(") AND\n");
-    
-   sb.append(indent3)
-    .append(tas.aliasedColumn(NODE_TABLE, "n_sample"))
-    .append(" IS TRUE AND\n");
-    
-    sb.append(indent3).append("seg_name = '")
-      .append(annoQueryData.getSegmentationLayer())
-      .append("' AND\n");
-    
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
+      append(" IN (").append(StringUtils.join(queryData.getCorpusList(), ",")).
+      append(") AND\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
+      " IS TRUE AND\n");
+
+    sb.append(indent3).append("seg_name = '").append(annoQueryData.
+      getSegmentationLayer()).append("' AND\n");
+
     sb.append(indent3).append("(\n");
-    
-    for(int i=1; i <= alternative.size(); i++)
+
+    for (int i = 1; i <= alternative.size(); i++)
     {
-      if(i >= 2)
+      if (i >= 2)
       {
         sb.append(indent4).append("OR\n");
       }
-      
-      sb.append(overlapForOneRange(indent4, 
-        "matches.min" + i, "matches.max"+i, 
+
+      sb.append(overlapForOneRange(indent4,
+        "matches.min" + i, "matches.max" + i,
         "matches.text" + i, tables));
       sb.append("\n");
     }
@@ -380,7 +324,7 @@ public abstract class AnnotateSqlGenerator<T>
 
     return sb.toString();
   }
-  
+
   /**
    * Get solution from a covered segmentation using a WITH clause.
    * @param queryData
@@ -390,96 +334,83 @@ public abstract class AnnotateSqlGenerator<T>
    * @param coveredName
    * @param indent
    * @return 
+   *
    */
   protected String getSolutionFromCoveredSegWithClause(
-    QueryData queryData, AnnotateQueryData annoQueryData, 
-    List<QueryNode> alternative, IslandPolicies islandsPolicy, String coveredName, String indent)
+    QueryData queryData, AnnotateQueryData annoQueryData,
+    List<QueryNode> alternative, IslandPolicies islandsPolicy,
+    String coveredName, String indent)
   {
-    
+
     TableAccessStrategy tas = createTableAccessStrategy();
-    
+
     String indent2 = indent + TABSTOP;
     String indent3 = indent2 + TABSTOP;
-    
+
     List<Long> corpusList = queryData.getCorpusList();
-    
+
     StringBuilder sb = new StringBuilder();
-    
+
     sb.append(indent).append("solutions AS\n");
     sb.append(indent).append("(\n");
-    
-    sb.append(indent2)
-      .append("SELECT DISTINCT ");
-    
-    if(islandsPolicy == IslandPolicies.none)
+
+    sb.append(indent2).append("SELECT DISTINCT ");
+
+    if (islandsPolicy == IslandPolicies.none)
     {
-      sb.append("min(")
-        .append(coveredName)
-        .append(".key) AS key, ")
-        .append(coveredName)
-        .append(".n AS n, ")
-        .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
-        .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
-        .append("").append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n");
+      sb.append("min(").append(coveredName).append(".key) AS key, ").append(
+        coveredName).append(".n AS n, ").append("min(").append(tas.aliasedColumn(
+        NODE_TABLE, "left_token")).append(") AS \"min\", ").append("max(").
+        append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(
+        ") AS \"max\", ").append("").append(tas.aliasedColumn(NODE_TABLE,
+        "text_ref")).append(" AS \"text\"\n");
     }
-    else if(islandsPolicy == IslandPolicies.context)
+    else if (islandsPolicy == IslandPolicies.context)
     {
-      sb.append(coveredName).append(".key AS key, ")
-        .append(coveredName).append(".n AS n, ")
-        .append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(" AS \"min\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(" AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n");
+      sb.append(coveredName).append(".key AS key, ").append(coveredName).append(
+        ".n AS n, ").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(
+        " AS \"min\", ").append(tas.aliasedColumn(NODE_TABLE, "right_token")).
+        append(" AS \"max\", ").append(tas.aliasedColumn(NODE_TABLE, "text_ref")).
+        append(" AS \"text\"\n");
     }
     else
     {
-      throw new NotImplementedException("No implementation for island policy " 
+      throw new NotImplementedException("No implementation for island policy "
         + islandsPolicy.toString());
     }
-    
-    sb.append(indent2)
-      .append("FROM ").append(coveredName).append(", ").append(tas.tableName(NODE_TABLE)).append("\n");
-    
-    sb.append(indent2)
-      .append("WHERE\n");
-    
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).append(" IN (")
-      .append(StringUtils.join(corpusList, ","))
-      .append(") AND\n");
-    
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(" IS TRUE AND\n");
-    
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "seg_name")).append(" = '")
-      .append(annoQueryData.getSegmentationLayer())
-      .append("' AND\n");
-    
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" = ")
-      .append(coveredName)
-      .append(".\"text\" AND\n");
-    
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(" <= ")
-      .append(coveredName)
-      .append(".\"max\" AND\n");
-    sb.append(indent3)
-      .append(tas.aliasedColumn(NODE_TABLE, "seg_right")).append(" >= ")
-      .append(coveredName)
-      .append(".\"min\"\n");
-    
-    if(islandsPolicy == IslandPolicies.none)
+
+    sb.append(indent2).append("FROM ").append(coveredName).append(", ").append(tas.
+      tableName(NODE_TABLE)).append("\n");
+
+    sb.append(indent2).append("WHERE\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
+      append(" IN (").append(StringUtils.join(corpusList, ",")).append(") AND\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
+      " IS TRUE AND\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_name")).append(
+      " = '").append(annoQueryData.getSegmentationLayer()).append("' AND\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
+      " = ").append(coveredName).append(".\"text\" AND\n");
+
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(
+      " <= ").append(coveredName).append(".\"max\" AND\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_right")).append(
+      " >= ").append(coveredName).append(".\"min\"\n");
+
+    if (islandsPolicy == IslandPolicies.none)
     {
-      sb.append(indent2)
-        .append("GROUP BY ").append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", n\n");
+      sb.append(indent2).append("GROUP BY ").append(tas.aliasedColumn(NODE_TABLE,
+        "text_ref")).append(", n\n");
     }
-    
+
     sb.append(indent).append(")\n");
-    
+
     return sb.toString();
   }
-  
 
   @Override
   public Set<String> whereConditions(QueryData queryData,
@@ -512,11 +443,12 @@ public abstract class AnnotateSqlGenerator<T>
 
 
     String overlap = overlapForOneRange(indent + TABSTOP,
-      "solutions.\"min\"", "solutions.\"max\"", "solutions.text", 
+      "solutions.\"min\"", "solutions.\"max\"", "solutions.text",
       tables);
     sb.append(overlap);
     sb.append("\n");
-    
+
+
 
     // corpus constriction
     sb.append(" AND\n");
@@ -539,14 +471,10 @@ public abstract class AnnotateSqlGenerator<T>
 
     sb.append(indent).append("(");
 
-    sb.append(tables.aliasedColumn(NODE_TABLE, "left_token"))
-      .append(" <= ").append(rangeMax).append(" AND ")
-      .append(tables.aliasedColumn(NODE_TABLE, "right_token"))
-      .append(" >= ").append(rangeMin)
-      .append(" AND ")
-      .append(tables.aliasedColumn(NODE_TABLE, "text_ref"))
-      .append(" = ").append(textRef)
-     ;
+    sb.append(tables.aliasedColumn(NODE_TABLE, "left_token")).append(" <= ").
+      append(rangeMax).append(" AND ").append(tables.aliasedColumn(NODE_TABLE,
+      "right_token")).append(" >= ").append(rangeMin).append(" AND ").append(tables.
+      aliasedColumn(NODE_TABLE, "text_ref")).append(" = ").append(textRef);
 
     sb.append(")");
 
@@ -650,5 +578,21 @@ public abstract class AnnotateSqlGenerator<T>
   public void setResultExtractor(ResultSetExtractor<T> resultExtractor)
   {
     this.resultExtractor = resultExtractor;
+  }
+
+  /**
+   * @return the islandsPolicy
+   */
+  public IslandsPolicy getIslandsPolicy()
+  {
+    return islandsPolicy;
+  }
+
+  /**
+   * @param islandsPolicy the islandsPolicy to set
+   */
+  public void setIslandsPolicy(IslandsPolicy islandsPolicy)
+  {
+    this.islandsPolicy = islandsPolicy;
   }
 }

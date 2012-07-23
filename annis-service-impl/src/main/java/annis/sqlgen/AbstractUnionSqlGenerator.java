@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,17 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
- * Abstract base class for a SQL statement 
- * which coalesces multiple alternatives using UNION.
- * 
+ * Abstract base class for a SQL statement which coalesces multiple alternatives
+ * using UNION.
+ *
  * Only the SELECT, FROM, WHERE and GROUP BY clauses are used for each
- * alternative. The ORDER BY and LIMIT/OFFSET clauses are applied to the
- * entire query.
- * 
- * It is the responsibility of the calling code to correctly set 
+ * alternative. The ORDER BY and LIMIT/OFFSET clauses are applied to the entire
+ * query.
+ *
+ * It is the responsibility of the calling code to correctly set
  * {@link QueryData.maxWidth} and the responsibility of the
  * {@link SelectClauseSqlGenrator} to pad the SELECT clause if necessary.
- * 
+ *
  * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
  *
  * @param <T> Type into which the JDBC result set is transformed.
@@ -43,25 +43,26 @@ import annis.ql.parser.QueryData;
 public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<T>
 {
 
-	// corpusList, documents
+  // corpusList, documents
   @Override
-	public String toSql(QueryData queryData, String indent) {
-		Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
-		
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append(indent);
-		List<String> alternatives = new ArrayList<String>();
-		for (List<QueryNode> alternative : queryData.getAlternatives()) {
-			alternatives.add(createSqlForAlternative(queryData, alternative, indent));
-		}
-		sb.append(StringUtils.join(alternatives, "\n" + indent + "UNION "));
+  public String toSql(QueryData queryData, String indent)
+  {
+    Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 
-		// ORDER BY and LIMIT/OFFSET clauses cannot depend on alternative?
-		appendOrderByClause(sb, queryData, null, indent);
-		appendLimitOffsetClause(sb, queryData, null, indent);
-				
-		return sb.toString();
-	}
+    StringBuffer sb = new StringBuffer();
 
+    sb.append(indent);
+    List<String> alternatives = new ArrayList<String>();
+    for (List<QueryNode> alternative : queryData.getAlternatives())
+    {
+      alternatives.add(createSqlForAlternative(queryData, alternative, indent));
+    }
+    sb.append(StringUtils.join(alternatives, "\n" + indent + "UNION "));
+
+    // ORDER BY and LIMIT/OFFSET clauses cannot depend on alternative?
+    appendOrderByClause(sb, queryData, null, indent);
+    appendLimitOffsetClause(sb, queryData, null, indent);
+
+    return sb.toString();
+  }
 }

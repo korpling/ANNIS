@@ -31,7 +31,7 @@ import org.apache.commons.lang.Validate;
 
 /**
  *
- *  @author thomas
+ *  @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {

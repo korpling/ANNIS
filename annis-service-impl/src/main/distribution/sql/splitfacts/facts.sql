@@ -195,6 +195,6 @@ FROM
   FROM
     _rank
     JOIN _component ON (_rank.component_ref = _component.id)
-    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.pre)
+    LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
 ) as tmp
 ;
