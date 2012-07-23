@@ -4,7 +4,6 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
     <info>
         <title>ANNIS User Guide</title>
-        <subtitle>User Guide</subtitle>
         <author>
             <personname>
                 <firstname>Amir</firstname>
@@ -83,7 +82,7 @@
     </section>
 
     <section>
-        <title>Installing <application>ANNIS2</application></title>
+        <title>Installing <application>ANNIS</application></title>
 
         <section>
             <title>Installing a Local Version (ANNIS Kickstarter)</title>
@@ -144,7 +143,7 @@
                             the username and password “test” to test the corpus (try selecting the
                             pcc2 corpus, typing <code>pos="NN"</code> in the AnnisQL box and
                             clicking “Show Result”. See the section “Running Queries in
-                                <application>ANNIS2</application>” in this guide for some more
+                                <application>ANNIS</application>” in this guide for some more
                             example queries, or press the Tutorial button at the top left of the
                             interface). </para>
                     </listitem>
@@ -255,11 +254,11 @@ mvn -DskipTests=true install</programlisting>
     </section>
 
     <section>
-        <title>Running Queries in ANNIS2 </title>
+        <title>Running Queries in ANNIS</title>
         <section>
-            <title>The ANNIS2 Interface</title>
+            <title>The ANNIS Interface</title>
             <figure xml:id="img_main-gui">
-                <title>ANNIS2 interface</title>
+                <title>ANNIS interface</title>
                 <screenshot>
                     <mediaobject>
                         <imageobject>
@@ -269,19 +268,106 @@ mvn -DskipTests=true install</programlisting>
                 </screenshot>
             </figure>
 
-            <para>The ANNIS2 interface (see <xref linkend="img_main-gui"/>) is comprised of several
+            <para>The ANNIS interface (see <xref linkend="img_main-gui"/>) is comprised of several
                 windows, the most important of which are the search form (in the red box above left)
                 and the results window (in the blue box above).</para>
 
             <section>
                 <title>The Search Form</title>
-                <para>The Search Form on the left of the interface window is available immediately
-                    after login. In the middle, the list of currently available corpora is shown.
-                    Using the checkboxes on the left of each corpus, it is possible to select which
-                    corpora should be searched in (hold down 'shift' to select multiple corpora
-                    simultaneously). If you cannot see a corpus that should be available to you, or
-                    else if the corpora list is too cluttered, you may click on "more corpora" to
-                    open the corpora window. You may then drag and drop the des </para>
+
+
+
+                <para>
+                    <screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/search_form.png" width="30%" align="center"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot> The Search Form on the left of the interface window is available
+                    immediately after login. In the middle, the list of currently available corpora
+                    is shown. Using the checkboxes on the left of each corpus, it is possible to
+                    select which corpora should be searched in (hold down 'shift' to select multiple
+                    corpora simultaneously). If you cannot see a corpus that should be available to
+                    you, or else if the corpora list is too cluttered, you may click on "more
+                    corpora" to open the corpora window. You may then drag and drop the desired or
+                    unwanted corpora between the list and the window. </para>
+
+                <para>Pressing the <inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/info.png" align="char"/>
+                        </imageobject>
+                    </inlinemediaobject> button next to a corpus in the list will open the corpus
+                    explorer window (see picture below), which shows metadata for the entire corpus
+                    on the left and a list of available annotations and example queries on the
+                    right. 6 Clicking on a query will copy it to the "AnnisQL" field at the top of
+                    the form. Pressing the link icon will give you a citation link that can be used
+                    to access the query from any browser. If the corpus contains hierarchical
+                    structures, such as dominance edges or pointing relations, there will be
+                    separate segments on the right hand side of the corpus explorer to show the
+                    available edge names and annotations together with example queries. Clicking on
+                    a query will copy it to the "AnnisQL" field at the top of the form. Pressing the
+                    link icon will give you a citation link that can be used to access the query
+                    from any browser. If the corpus contains hierarchical structures, such as
+                    dominance edges or pointing relations, there will be separate segments on the
+                    right hand side of the corpus explorer to show the available edge names and
+                    annotations together with example queries. <screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/corpus_explorer.png" width="100%"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot>
+                </para>
+
+                <para>The "AnnisQL" field at the top of the form is used for inputting queries
+                    manually (see the tutorials on the ANNIS Query Language). As soon as one or
+                    several corpora are selected and a query is entered or modified, the query will
+                    be validated automatically and possible errors in the query syntax will be
+                    commented on in the "Result" box below. When modifying a query, a delay of two
+                    seconds ia activated before the query is re-sent to the server for validation. </para>
+
+                <para>Once a valid query has been entered, pressing the "Show Result" button (or
+                    using the shortcut ctrl+Enter) will retrieve the number of matching positions in
+                    the selected corpora in the Result box and open the Result Window to display the
+                    first set of matches. Queries from the current session are saved in the query
+                    history and can be accessed using the button underneath the result field. </para>
+
+                <para>The context surrounding the matching expressions in the result list is
+                    determined by the "context left" and "context right" options at the bottom of
+                    the search form, and can be set to up to 10 tokens on each side, though some
+                    corpora allow longer spans, such as entire texts, to be viewed using special
+                    discourse visualizations. </para>
+
+            </section>
+            <section>
+                <title>The Result Window</title>
+                <para>The result window shows search results in pages of 10 hits each by default
+                    (this can be changed in the Search Form). The toolbar at the top of the window
+                    allows you to navigate between these pages. The "Token Annotations" button on
+                    the toolbar allows you to toggle 7 the token based annotations, such as lemmas
+                    and parts-of-speech, on or off for you convenience. The "Citation URL" button
+                    provides a hyperlink which you can e-mail or cite, allowing others to reproduce
+                    your query. <screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/kwic.png" width="70%" align="center"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot> The result list itself initially shows a KWIC (key word in
+                    context) concordance of matching positions in the selected corpora, with the
+                    matching region marked red and the context in black on either side. Token
+                    annotations are displayed in gray under each token, and hovering over them with
+                    the mouse will show the annotation name and namespace. More complex annotation
+                    levels can be expanded, if available, by clicking on the plus icon next to the
+                    level's name, e.g. tiger and exmaralda for the annotations in the tree and grid
+                    views in the picture below (circled in red). <screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/vis.png" width="60%" align="center"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot></para>
             </section>
 
         </section>
