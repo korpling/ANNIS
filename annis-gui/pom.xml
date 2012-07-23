@@ -64,7 +64,7 @@
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCommon</artifactId>
-                  <version>1.1.4-SNAPSHOT</version>
+                  <version>1.1.4-20120608.161025-16</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
@@ -119,6 +119,8 @@
           </systemProperties>
         </configuration>
       </plugin>
+      
+      
     </plugins>
   </build>
 
@@ -241,11 +243,47 @@
       <scope>compile</scope>
     </dependency>
     
+    
     <dependency>
-      <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-utilsgui</artifactId>
-      <version>2.3.0-SNAPSHOT</version>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.1</version>
       <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>net.xeoh.plugins</groupId>
+      <artifactId>jspf-core</artifactId>
+      <version>1.0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-graph-impl</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-io</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-visualization</artifactId>
+      <version>2.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
@@ -272,20 +310,6 @@
       <artifactId>validation-api</artifactId>
       <version>1.0.0.GA</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>net.xeoh.plugins</groupId>
-      <artifactId>jspf-core</artifactId>
-      <version>1.0.2</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.1</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>

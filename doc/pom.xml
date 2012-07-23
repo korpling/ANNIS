@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>annis-all</artifactId>
+    <groupId>de.hu-berlin.german.korpling.annis</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+  </parent>
+  <groupId>de.hu-berlin.german.korpling.annis</groupId>
+  <artifactId>annis-doc</artifactId>
+  <version>2.3.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>annis-doc</name>
+    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+              </configuration>
+              <reports>
+                <report>index</report>
+                <report>summary</report>
+                <report>license</report>
+              </reports>
+            </plugin>
+           
+           <!-- uncomment to enable JavaDoc to Docbook generation -->
+           <!--
+              
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.8.1</version>
+              <configuration>
+                <doclet>org.dbdoclet.doclet.docbook.DocBookDoclet</doclet>
+                <docletPath>${basedir}/extlib/dbdoclet.jar</docletPath>
+                
+                <sourcepath>../annis-service-rmi/src/main/java:../annis-service-impl/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
+
+                
+                <useStandardDocletOptions>false</useStandardDocletOptions>
+                <additionalparam>-windowtitle "Javadoc" -part</additionalparam>
+              </configuration>
+            </plugin>
+          -->
+             
+          </reportPlugins>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-maven-plugin</artifactId>
+        <version>2.0.14</version>
+        <executions>
+          <execution>
+            <id>pdf</id>
+            <goals>
+              <goal>generate-pdf</goal>
+            </goals>
+            <configuration>
+              <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
+              <foCustomization>${basedir}/src/docbkx/annis-pdf-cust.xsl</foCustomization>
+              <highlightSource>true</highlightSource>
+              <admonGraphics>true</admonGraphics>
+              <admonGraphicsPath>src/docbkx/images/docbook/</admonGraphicsPath>
+              <admonGraphicsExtension>.svg</admonGraphicsExtension>
+              <useSvg>true</useSvg>
+              <useExtensions>true</useExtensions>
+             
+            </configuration>
+            <phase>site</phase>
+          </execution>
+          <execution>
+          <id>html</id>
+          <goals>
+            <goal>generate-html</goal>
+          </goals>
+          <configuration>
+            <targetDirectory>${project.build.directory}/manual</targetDirectory>
+            <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
+            <highlightSource>true</highlightSource>
+            <admonGraphics>true</admonGraphics>
+            <admonGraphicsPath>images/docbook/</admonGraphicsPath>
+            <admonGraphicsExtension>.svg</admonGraphicsExtension>
+            <useSvg>true</useSvg>
+            <useExtensions>true</useExtensions>
+            <postProcess>
+              <copy todir="${project.build.directory}/manual/images">
+                <fileset dir="${basedir}/src/docbkx/images">
+                </fileset>
+              </copy>
+                <!--
+                <copy todir="${project.build.directory}/manual/figures">
+                  <fileset dir="${project.build.directory}/site/apidocs/figures">
+                  </fileset>
+                </copy>
+                -->
+            </postProcess>
+          </configuration>
+          <phase>site</phase>
+        </execution>
+      </executions>
+        
+      <configuration>
+        <xincludeSupported>true</xincludeSupported>
+      </configuration>
+        
+      <dependencies>
+        <dependency>
+          <groupId>net.sf.docbook</groupId>
+          <artifactId>docbook-xml</artifactId>
+          <version>5.0-all</version>
+          <classifier>resources</classifier>
+          <type>zip</type>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+        
+    </plugin>
+      
+  </plugins>
+</build>
+    
+</project>
