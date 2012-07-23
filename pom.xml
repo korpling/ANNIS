@@ -11,7 +11,7 @@
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
 
   <scm>
-    <developerConnection>scm:bazaar:lp:annis</developerConnection>
+    <developerConnection>scm:bazaar:lp:~annis/annis/releases</developerConnection>
   </scm>
 
   <organization>
