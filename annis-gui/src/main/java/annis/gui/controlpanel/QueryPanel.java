@@ -21,6 +21,9 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
 import annis.gui.HistoryPanel;
 import annis.service.AnnisService;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -237,26 +240,38 @@ public class QueryPanel extends Panel implements TextChangeListener,
     // validate query
     try
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      if(service != null && service.isValidQuery(query))
+      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      String result = annisResource.path("check").queryParam("q", query)
+        .get(String.class);
+      if ("ok".equalsIgnoreCase(result))
       {
         lblStatus.setValue(lastPublicStatus);
       }
+      else
+      {
+        lblStatus.setValue(result);
+      }
     }
-    catch(AnnisQLSyntaxException ex)
+    catch(UniformInterfaceException ex)
     {
-      lblStatus.setValue(ex.getMessage());
+      if(ex.getResponse().getStatus() == 400)
+      {
+        lblStatus.setValue(ex.getResponse().getEntity(String.class));
+      }
+      else
+      {
+        Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
+          "Exception when communicating with service", ex);
+        getWindow().showNotification("Exception when communicating with service: " + ex.getMessage(),
+          Notification.TYPE_TRAY_NOTIFICATION);
+      }
     }
-    catch(AnnisQLSemanticsException ex)
-    {
-      lblStatus.setValue(ex.getMessage());
-    }
-    catch(RemoteException ex)
+    catch(ClientHandlerException ex)
     {
       Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
-        "Remote exception when communicating with service", ex);
-      getWindow().showNotification("Remote exception when communicating with service: " + ex.getMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
+          "Could not connect to web service", ex);
+        getWindow().showNotification("Could not connect to web service: " + ex.getMessage(),
+          Notification.TYPE_TRAY_NOTIFICATION);
     }
   }
 

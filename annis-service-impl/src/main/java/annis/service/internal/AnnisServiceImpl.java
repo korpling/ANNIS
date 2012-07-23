@@ -122,14 +122,6 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public boolean isValidQuery(String annisQuery) throws RemoteException,
-    AnnisQLSemanticsException, AnnisQLSyntaxException
-  {
-    annisDao.parseAQL(annisQuery, new LinkedList<Long>());
-    return true;
-  }
-
-  @Override
   public List<Annotation> getMetadata(long corpusId) throws RemoteException,
     AnnisServiceException
   {

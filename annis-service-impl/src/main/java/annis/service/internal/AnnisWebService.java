@@ -348,6 +348,19 @@ public class AnnisWebService
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
     );
   }
+  
+  /**
+   * Return true if this is a valid query or throw exception when invalid
+   * @param query Query to check for validity
+   * @return 
+   */
+  @GET
+  @Path("check")
+  public String check(@QueryParam("q") String query)
+  {
+    annisDao.parseAQL(query, new LinkedList<Long>());
+    return "ok";
+  }
 
   private String createAnnotateLogParameters(int left, int right, int offset,
     int limit)

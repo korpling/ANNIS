@@ -83,12 +83,6 @@ public interface AnnisService extends Remote
    */
   public void ping() throws RemoteException;
 
-  /**
-   * Return true if this is a valid query or throw exception when invalid
-   */
-  public boolean isValidQuery(String annisQL) throws RemoteException,
-    AnnisQLSemanticsException, AnnisQLSyntaxException;
-
   public List<Annotation> getMetadata(long corpusId) throws RemoteException,
     AnnisServiceException;
 
