@@ -111,18 +111,6 @@ public class AnnisServiceImpl implements AnnisService
   }
 
   @Override
-  public String getPaula(Long textId) throws RemoteException
-  {
-    SaltProject p = annisDao.retrieveAnnotationGraph(textId);
-    List<AnnotationGraph> graphs = LegacyGraphConverter.convertToAOM(p);
-    if (graphs.size() >= 1)
-    {
-      return new AnnisResultImpl(graphs.get(0)).getPaula();
-    }
-    throw new AnnisServiceException("no text found with id = " + textId);
-  }
-
-  @Override
   public AnnisResult getAnnisResult(Long textId) throws RemoteException
   {
     SaltProject p = annisDao.retrieveAnnotationGraph(textId);

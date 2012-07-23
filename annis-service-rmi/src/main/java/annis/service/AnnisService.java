@@ -47,15 +47,6 @@ public interface AnnisService extends Remote
 
   /**
    * 
-   * @param textId The id of the text to get the Paula XML from.
-   * @return
-   * @throws RemoteException
-   */
-  @Deprecated
-  public String getPaula(Long textId) throws RemoteException;
-
-  /**
-   * 
    * @param textId The id of the text to get the annotation graph from.
    * @return
    * @throws RemoteException

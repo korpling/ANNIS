@@ -228,57 +228,7 @@ public class VisualizerInput
     this.namespace = namespace;
   }
 
-  /**
-   * Gets the private paula String property that will be uses by {@link #writeOutput(Writer)}.
-   *
-   * @return
-   * @deprecated
-   */
   @Deprecated
-  public String getPaula()
-  {
-    if (paula == null)
-    {
-      // construct Paula from result
-      paula = getResult().getPaula();
-    }
-    return paula;
-  }
-
-  /**
-   * Get a JDOM Document representing paula. Will be generated only once.
-   *
-   * @deprecated
-   */
-  @Deprecated
-  protected Document getPaulaJDOM()
-  {
-    if (paulaJDOM == null)
-    {
-      try
-      {
-        paulaJDOM =
-          new SAXBuilder().build(new InputSource(new StringReader(getPaula())));
-      }
-      catch (Exception ex)
-      {
-        Logger.getLogger(VisualizerInput.class.getName()).log(Level.SEVERE, null,
-          ex);
-
-        // never return null
-        paulaJDOM = new Document();
-      }
-    }
-
-    return paulaJDOM;
-  }
-
-  @Deprecated
-  public void setResult(AnnisResult result)
-  {
-    this.result = result;
-  }
-
   public AnnisResult getResult()
   {
     if (result == null)

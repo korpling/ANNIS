@@ -35,9 +35,6 @@ public interface AnnisResult extends Serializable
 	/** get Document Name with complete path from toplevel corpus */
 	public String[] getPath();
 
-	/** PAULA-Unart representation */
-	public String getPaula();
-
 	/** id of last token */
 	public long getEndNodeId();
 
