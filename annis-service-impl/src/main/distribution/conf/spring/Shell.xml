@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright 2009-2011 Collaborative Research Centre SFB 632 
+Copyright 2009-2011 Collaborative Research Centre SFB 632
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ limitations under the License.
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
-	
+
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
@@ -31,13 +31,14 @@ limitations under the License.
 	">
 
   <import resource="file:${annis.home}/conf/spring/Common.xml" />
- 
+
   <bean id="annisRunner" class="annis.AnnisRunner">
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
     <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
-		
+    <property name="graphSqlGenerator" ref="graphSqlGenerator" />
+
     <property name="annisDao" ref="annisDao"/>
     <property name="annisParser" ref="annisParser"/>
     <property name="helloMessage" value="ANNIS Interactive Shell 3.0.0"/>

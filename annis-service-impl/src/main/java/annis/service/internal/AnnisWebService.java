@@ -16,6 +16,7 @@
  */
 package annis.service.internal;
 
+import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
@@ -28,8 +29,10 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -50,7 +53,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author thomas
+ * @author thomas, Benjamin Weißenfels
  */
 @Component
 @Path("/annis")
@@ -112,7 +115,6 @@ public class AnnisWebService
     long end = new Date().getTime();
     logQuery("COUNT", query, corpusNames, end - start);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
-
   }
 
   @GET
@@ -214,6 +216,68 @@ public class AnnisWebService
     return annisDao.find(data);
   }
 
+  /**
+   * Get a graph as {@link SaltProject} of a set of Salt IDs.
+   *
+   * @param saltIDs saltIDs must have at least one saltId, more than one id are
+   * separated by + or space
+   * @param leftRaw left context parameter
+   * @param rightRaw right context parameter
+   * @return the graph of this hit.
+   */
+  @GET
+  @Path("subgraph")
+  @Produces("application/xml")
+  public SaltProject subgraph(@QueryParam("q") String saltIDs,
+    @DefaultValue("5") @QueryParam("left") String leftRaw,
+    @DefaultValue("5") @QueryParam("right") String rightRaw)
+  {
+    String[] ids;
+    List<URI> saltURI = new SaltURIs();
+    QueryData data = new QueryData();
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+    data.addExtension(new AnnotateQueryData(left, right));
+
+    // some robustness stuff
+    if (saltIDs == null)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter 'q'").build());
+    }
+
+    // check if this is a valid URI
+    ids = saltIDs.split("\\s");
+    for (String id : ids)
+    {
+      try
+      {
+        URI saltID = new URI(id);
+        saltURI.add(saltID);
+
+        if (saltID.getScheme() == null
+          || !saltID.getScheme().equals("salt")
+          || saltID.getFragment() == null)
+        {
+          throw new WebApplicationException(
+            Response.status(Response.Status.BAD_REQUEST).type(
+            MediaType.TEXT_PLAIN).entity(
+            "the scheme is not the salt identifier scheme").build());
+        }
+      }
+      catch (URISyntaxException ex)
+      {
+        String msg = id + "is not a valid salt scheme";
+        log.error(msg, ex);
+      }
+    }
+
+    data.addExtension(saltURI);
+    return annisDao.graph(data);
+  }
+
   @GET
   @Path("graphs/{top}/{doc}")
   @Produces("application/xml")
@@ -266,12 +330,12 @@ public class AnnisWebService
     result.setConfig(tmp);
     return result;
   }
-  
+
   @GET
   @Path("corpora/{top}/annotations")
   @Produces("application/xml")
   public List<AnnisAttribute> annotations(
-    @PathParam("top") String toplevelCorpus, 
+    @PathParam("top") String toplevelCorpus,
     @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
     @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues
   )
@@ -279,7 +343,7 @@ public class AnnisWebService
     List<String> list = new LinkedList<String>();
     list.add(toplevelCorpus);
     List<Long> corpusList = annisDao.listCorpusByName(list);
-    
+
     return annisDao.listAnnotations(corpusList,
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
     );

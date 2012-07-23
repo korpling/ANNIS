@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,15 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import java.util.List;
 
-public interface WithClauseSqlGenerator<T> 
+/**
+ * Interface for generating WITH clauses.
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @param <T> The transporter for a possible query and additional information
+ */
+public interface WithClauseSqlGenerator<T>
 {
-  
-  public List<String> withClauses(T queryData, List<QueryNode> alternative, String indent);
+
+  public List<String> withClauses(T queryData, List<QueryNode> alternative,
+    String indent);
 }

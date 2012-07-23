@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,6 +54,7 @@ import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.GraphSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -74,10 +76,34 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SaltAnnotateExtractor saltAnnotateExtractor;
   private MatrixSqlGenerator matrixSqlGenerator;
+  private GraphSqlGenerator<SaltProject> graphSqlGenerator;
   // configuration
   private int timeout;
   // fn: corpus id -> corpus name
   private Map<Long, String> corpusNamesById;
+
+  @Override
+  @Transactional
+  public SaltProject graph(QueryData data)
+  {
+    return executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
+  }
+
+  /**
+   * @return the graphSqlGenerator
+   */
+  public GraphSqlGenerator getGraphSqlGenerator()
+  {
+    return graphSqlGenerator;
+  }
+
+  /**
+   * @param graphSqlGenerator the graphSqlGenerator to set
+   */
+  public void setGraphSqlGenerator(GraphSqlGenerator graphSqlGenerator)
+  {
+    this.graphSqlGenerator = graphSqlGenerator;
+  }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
@@ -199,7 +225,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     // oder nur an annotate-Queries?
 
     queryData.setCorpusConfiguration(corpusConfiguration);
-    
+
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
