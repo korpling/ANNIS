@@ -281,7 +281,8 @@ mvn -DskipTests=true install</programlisting>
                     <screenshot>
                         <mediaobject>
                             <imageobject>
-                                <imagedata fileref="images/search_form.png" width="30%" align="center"/>
+                                <imagedata fileref="images/search_form.png" width="30%"
+                                    align="center"/>
                             </imageobject>
                         </mediaobject>
                     </screenshot> The Search Form on the left of the interface window is available
@@ -371,6 +372,136 @@ mvn -DskipTests=true install</programlisting>
             </section>
 
         </section>
+        <section>
+            <title>Using the ANNIS Query Builder</title>
+            <para>To open the graphical query builder, click on the Query Builder button on the
+                Search Form (clicking the button again will close the Query Builder). On the
+                left-hand side of the toolbar at the top of the query builder canvas, you will see
+                the Create Node button. Use this button to define nodes to be searched for (tokens,
+                non-terminal nodes or annotations). Creating nodes and modifying them on the canvas
+                will immediately update the AnnisQL field in the Search Form with your query, though
+                updating the query on the Search Form will not create a new graph in the Query
+                Builder. <screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/qb_button.png" width="60%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot>
+            </para>
+            <para> In each node you create you may click on "Add" to specify an annotation value.
+                The annotation name can be typed in or selected from a drop down list. The
+                "Op[erator]" field in the middle allows you to choose between an exact match (the
+                '=' symbol) or wildcard search using Regular Expressions (the '~' symbol). The
+                annotation value is given on the right, and should NOT be surrounded by quotations
+                (see the example below). It is also possible to specify multiple annotations
+                applying to the same position by clicking on "Add" multiple times. Clicking on
+                "Clear" will delete the values in the node. To search for word forms, simply leave
+                the field name on the left empty and type directly on the right under "Value". A
+                node with no data entered will match any node, that is an underspecified token or
+                non-terminal node or annotation. <screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/qb_node.png" width="30%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot></para>
+
+            <para> To specify the relationship between nodes, first click on the "Edge" button at
+                the top left of one node, and then click the "Dock" button which becomes available
+                on the other nodes. An edge will connect the nodes with an extra box from which
+                operators may be selected (see below). For operators allowing additional labels
+                (e.g. the dominance operator > allows edge labels to be specified), you may type
+                directly into the edge's operator box, as in the example with a "func" label in the
+                image below. Note that the node clicked on first (where the "Edge" button was
+                clicked) will be the first node in the resulting quey, i.e. if this is the first
+                node it will dominate the second node (#1 > #2) and not the other way around, as
+                also represented by the arrows along the edge. <screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/qb_graph.png" width="40%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot>
+            </para>
+        </section>
+
+        <section>
+            <title>Searching for Word Forms</title>
+            <para>To search for word forms in ANNIS2, simply select a corpus (in this example the
+                small pcc2 demo corpus) and enter a search string between double quotation marks,
+                e.g.: <programlisting>"statisch"</programlisting> Note that the search is case
+                sensitive, so it will not find cases of capitalized 'Statisch', for example at the
+                beginning of a sentence. In order to find both options, you can either look for one
+                form OR the other using the pipe sign ( | ):
+                <programlisting>"statisch" | "Statisch"</programlisting> or else you can use regular
+                expressions, which must be surrounded by slashes ( / ) instead of quotation marks:
+                <programlisting>/[Ss]tatisch/</programlisting> To look for a sequence of multiple
+                word forms, enter your search terms separated by &amp; and then specify that the
+                relation between the elements is one of precedence, as signified by the period ( . )
+                operator: <programlisting>"so" &amp; "statisch" &amp; #1 . #2</programlisting> The
+                expression #1 . #2 signifies that the first element ("so") precedes the second
+                element ("statisch"). For indirect precedence (where other tokens may stand between
+                the search terms), use the .* operator:
+                <programlisting>/[Ss]o/ &amp; "statisch" &amp; "wie" &amp; #1 . #2 &amp; #2 .* #3</programlisting>
+                The above query finds sequences beginning with either "So" or "so", followed
+                directly by "statisch", which must be followed either directly or indirectly (.*) by
+                "wie". A range of allowed distances can also be specified numerically as follows:
+                <programlisting>/[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2</programlisting> Meaning
+                the two words may appear at a distance of 1 to 5 tokens. The operator .* allows a
+                distance of up to 50 tokens by default, so searching with .1,50 is the same as using
+                .* instead. Greater distances (e.g. .1,100 for 'within 100 tokens') should always be
+                specified explicitly. Finally, we can add metadata restrictions to the query, which
+                filter out documents not matching our definitions. Metadata attributes must be
+                preceded by the prefix meta:: and may not be bound (i.e. they are not referred to as
+                #1 etc. and the numbering of other elements ignores their existence):
+                <programlisting>/[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2 &amp; meta::Genre="Sport"</programlisting>
+                To view metadata for a search result or for a corpus, press the "i" icon next to it
+                in the result window or in the search form respectively. </para>
+        </section>
+        
+        <section>
+            <title>Searching for Annotations</title>
+            <para>
+                Annotations may be searched for using an annotation name and value. The names of the
+                annotations vary from corpus to corpus, though many corpora contain part-of-speech and
+                lemma annotations with the names pos and lemma respectively (annotation names are
+                case sensitive). For example, to search for all forms of the German verb sein 'to be' in a
+                corpus with lemma annotation such as pcc2, simply select the pcc2 corpus and enter:
+                <programlisting>lemma="sein"</programlisting>
+                Negative searches are also possible using != instead of =. For negated tokens (word forms)
+                use the reserved attribute tok. For example:
+                <programlisting>lemma!="sein"</programlisting>
+                or:
+                <programlisting>tok!="ist"</programlisting>
+                Metadata can also be negated similarly:
+                <programlisting>lemma="sein" &amp; meta::Genre!="Sport"</programlisting>
+                To only find finite forms of this verb in pcc2, use the part-of-speech (pos) annotation
+                concurrently, and specify that both the lemma and pos should apply to the same element:
+                <programlisting>lemma="sein" &amp; pos="VAFIN" &amp; #1 _=_ #2</programlisting>
+                The expression #1 _=_ #2 uses the span identity operator to specify that the first
+                annotation and the second annotation apply to exactly the same position in the corpus.
+                Annotations can also apply to longer spans than a single token: for example, in pcc2, the
+                annotation Inf-Stat signifies the information structure status of a discourse referent. This
+                annotation can also apply to phrases longer than one token. The following query finds
+                spans containing new discourse referents, not previously mentioned in the text:
+                <programlisting>exmaralda:Inf-Stat="new"</programlisting>
+                If the corpus contains no more than one annotation type named Inf-Stat, the optional
+                namespace (in this case exmaralda:) may be dropped; if there are multiple annotations
+                with the same name but different namespaces, dropping the namespace will find all of
+                those annotations. In order to view the span of tokens to which this annotation applies,
+                enter the and click on "Show Result", then open the exmaralda annotation level to view
+                the grid containing the span. Further operators can test the relationships between
+                potentially overlapping annotations in spans. For example, the operator _i_ examines
+                whether one annotation fully contains the span of another annotation (the i stands for
+                'includes'):
+                <programlisting>Topic="ab" &amp; Inf-Stat="new" &amp; #1 _i_ #2</programlisting>
+                This query finds aboutness topics (Topic="ab") containing information structurally new
+                discourse referents.
+                
+            </para>
+        </section>
+
     </section>
 
 </article>
