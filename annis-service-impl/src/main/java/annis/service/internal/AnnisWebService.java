@@ -20,12 +20,12 @@ import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
+import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.AnnisServiceException;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
@@ -35,7 +35,6 @@ import annis.sqlgen.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
-import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -89,34 +88,14 @@ public class AnnisWebService
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
-    if (query == null)
-    {
-      return Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'q'").build();
-    }
-    if (rawCorpusNames == null)
-    {
-      return Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'corpora'").build();
-    }
-
-    List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
-    List<Long> corpusIDs = annisDao.listCorpusByName(
-      corpusNames);
-    if (corpusIDs.size() != corpusNames.size())
-    {
-      return Response.status(Response.Status.NOT_FOUND).type(
-        "text/plain").entity("one ore more corpora are unknown to the system").
-        build();
-    }
-    QueryData data = annisDao.parseAQL(query, corpusIDs);
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
     int count = annisDao.count(data);
     long end = new Date().getTime();
-    logQuery("COUNT", query, corpusNames, end - start);
+    logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return Response.ok("" + count).type(MediaType.TEXT_PLAIN).build();
   }
 
@@ -131,47 +110,24 @@ public class AnnisWebService
     @DefaultValue("5") @QueryParam("right") String rightRaw,
     @QueryParam("seglayer") String segmentationLayer) throws IOException
   {
-    if (query == null)
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'q'").build());
-    }
-    if (rawCorpusNames == null)
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'corpora'").build());
-    }
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
     int left = Math.min(maxContext, Integer.parseInt(leftRaw));
     int right = Math.min(maxContext, Integer.parseInt(rightRaw));
 
-    List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
-    List<Long> corpusIDs = annisDao.listCorpusByName(
-      corpusNames);
-    if (corpusIDs.size() != corpusNames.size())
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.NOT_FOUND).type(
-        "text/plain").entity("one ore more corpora are unknown to the system").
-        build());
-    }
-
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
     String logParameters = createAnnotateLogParameters(left, right, offset,
       limit);
 
-    QueryData data = annisDao.parseAQL(query, corpusIDs);
     data.addExtension(new LimitOffsetQueryData(offset, limit));
     data.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
     long start = new Date().getTime();
     SaltProject p = annisDao.annotate(data);
     long end = new Date().getTime();
-    logQuery("ANNOTATE", query, corpusNames, end - start, logParameters);
+    logQuery("ANNOTATE", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start, logParameters);
     return p;
 
   }
@@ -184,40 +140,50 @@ public class AnnisWebService
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException
   {
-    if (query == null)
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'q'").build());
-    }
-    if (rawCorpusNames == null)
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.BAD_REQUEST).type(
-        MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'corpora'").build());
-    }
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
 
-    List<String> corpusNames = Arrays.asList(rawCorpusNames.split(","));
-    List<Long> corpusIDs = annisDao.listCorpusByName(
-      corpusNames);
-    if (corpusIDs.size() != corpusNames.size())
-    {
-      throw new WebApplicationException(
-        Response.status(Response.Status.NOT_FOUND).type(
-        "text/plain").entity("one ore more corpora are unknown to the system").
-        build());
-    }
-
-    QueryData data = annisDao.parseAQL(query, corpusIDs);
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
     return annisDao.find(data);
   }
+  
+  
+  
+  /**
+   * Get result as matrix in WEKA (ARFF) format.
+   */
+  @GET
+  @Path("search/matrix")
+  @Produces("text/plain")
+  public String matrix(
+    @QueryParam("q") String query,
+    @QueryParam("corpora") String rawCorpusNames)
+  {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
+    
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    
+    long start = new Date().getTime();
+    List<AnnotatedMatch> matches = annisDao.matrix(data);
+    long end = new Date().getTime();
+    logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    
+    if(matches.isEmpty())
+    {
+      return "(empty)";
+    }
+    else
+    {
+      return WekaHelper.exportAsArff(matches);
+    }
+  }
+    
 
   /**
    * Get a graph as {@link SaltProject} of a set of Salt IDs.
@@ -447,6 +413,58 @@ public class AnnisWebService
     }
     String message = sb.toString();
     queryLog.info(message);
+  }
+  
+  /**
+   * Throw an exception if the parameter is missing.
+   * @param value Value which is checked for null.
+   * @param name The short name of parameter.
+   * @param description A one line description of the meaing of the parameter.
+   */
+  private void requiredParameter(String value, String name, String description)
+    throws WebApplicationException
+  {
+    if (value == null)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "missing required parameter '" + name + "' (" + description + ")").build());
+    }
+  }
+  
+  /**
+   * Get the {@link QueryData} from a query and the corpus names
+   * @param query The AQL query.
+   * @param rawCorpusNames The name of the toplevel corpus names seperated by ",".
+   * @return calculated {@link QueryData} for the given parametes.
+   * 
+   * @throws WebApplicationException Thrown if some corpora are unknown to the system.
+   */
+  private QueryData queryDataFromParameters(String query, String rawCorpusNames)
+    throws WebApplicationException
+  {
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    List<Long> corpusIDs = annisDao.listCorpusByName(
+      corpusNames);
+    if (corpusIDs.size() != corpusNames.size())
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.NOT_FOUND).type(
+        "text/plain").entity("one ore more corpora are unknown to the system").
+        build());
+    }
+    return annisDao.parseAQL(query, corpusIDs);
+  }
+  
+  /**
+   * Splits a list of corpus names into a proper java list.
+   * @param rawCorpusNames The corpus names separated by ",".
+   * @return 
+   */
+  private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
+  {
+    return Arrays.asList(rawCorpusNames.split(","));
   }
 
   public AnnisDao getAnnisDao()

@@ -17,34 +17,11 @@ package annis.service;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
-
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.Annotation;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisResult;
 
 public interface AnnisService extends Remote
 {
-
-
-  /**
-   * Get result in WEKA format
-   * @param corpusList
-   * @param annisQL
-   * @return The WEKA result
-   * @throws RemoteException
-   * @throws AnnisQLSemanticsException
-   * @throws AnnisQLSyntaxException
-   * @throws AnnisCorpusAccessException
-   */
-  public String getWeka(List<Long> corpusList, String annisQL) throws
-    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException;
-
   /**
    * Get an Annis Binary object identified by its id.
    * 

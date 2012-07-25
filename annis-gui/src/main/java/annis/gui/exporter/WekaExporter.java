@@ -15,11 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.Helper;
-import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,9 +23,8 @@ import annis.service.AnnisService;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
 import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 public class WekaExporter implements Exporter, Serializable
 {
@@ -43,30 +37,14 @@ public class WekaExporter implements Exporter, Serializable
     AnnisService service, WebResource annisResource, Writer out)
   {
     //this is a full result export
-    List<Long> corpusIdList = new LinkedList<Long>(
-      Helper.calculateID2Corpus(corpora).keySet());
-    
     try
     {
-      out.append(service.getWeka(corpusIdList, queryAnnisQL));
+      String result = annisResource.path("search").path("matrix")
+        .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
+        .queryParam("q", queryAnnisQL).get(String.class);
+      out.append(result);
     }
-    catch (AnnisQLSemanticsException ex)
-    {
-      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch (AnnisQLSyntaxException ex)
-    {
-      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch (AnnisCorpusAccessException ex)
-    {
-      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch (RemoteException ex)
-    {
-      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    catch (IOException ex)
+    catch (Exception ex)
     {
       Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
     }

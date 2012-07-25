@@ -101,27 +101,6 @@ public class AnnisServiceImpl implements AnnisService
     queryLog.info(message);
   }
 
-  @Override
-  public String getWeka(List<Long> corpusList, String annisQL) throws
-    RemoteException, AnnisQLSemanticsException, AnnisQLSyntaxException,
-    AnnisCorpusAccessException
-  {
-    long start = new Date().getTime();
-    QueryData queryData = analyzeQuery(annisQL, corpusList);
-    List<AnnotatedMatch> matches = annisDao.matrix(queryData);
-    long end = new Date().getTime();
-    logQuery("MATRIX", annisQL, corpusList, end - start);
-
-    if (matches.isEmpty())
-    {
-      return "(empty)";
-    }
-    else
-    {
-      return wekaHelper.exportAsArff(matches);
-    }
-  }
-
   public AnnisDao getAnnisDao()
   {
     return annisDao;
