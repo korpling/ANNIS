@@ -17,32 +17,9 @@ package annis.service;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisBinaryMetaData;
 
 public interface AnnisService extends Remote
 {
-  /**
-   * Get an Annis Binary object identified by its id.
-   * 
-   * @param id
-   * @param offset the part we want to start from
-   * @param length how many bytes we take
-   * @return AnnisBinary
-   */
-  public AnnisBinary getBinary(String corpusName, int offset, int length) throws
-    RemoteException;
-
-  /**
-   * Get the Metadata of an Annis Binary object identified by its id. This 
-   * function calls getBinary(long id, 1, 1), so this function does not work, 
-   * if the specs of getBinary(long id, int offset,int length) changed.
-   * 
-   * @param id
-   * @return AnnisBinaryMetaData
-   */
-  public AnnisBinaryMetaData getBinaryMeta(String corpusName) throws
-    RemoteException;
 
   /**
    * 

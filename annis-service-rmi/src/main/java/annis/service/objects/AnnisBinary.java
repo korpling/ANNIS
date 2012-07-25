@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.ifaces;
+package annis.service.objects;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author benjamin
- */
-public interface AnnisBinaryMetaData extends Serializable
+@XmlRootElement
+public class AnnisBinary extends AnnisBinaryMetaData implements Serializable
 {
 
-  public int getLength();
+  private byte[] bytes;
 
-  public String getCorpusName();
+  public byte[] getBytes()
+  {
+    return bytes;
+  }
 
-  public String getMimeType();
-
-  public String getFileName();
+  
+  
+  public void setBytes(byte[] bytes)
+  {
+    if (bytes == null)
+    {
+      throw new RuntimeException("didn't get bytes");
+    }
+    this.bytes = bytes;
+  }
 }

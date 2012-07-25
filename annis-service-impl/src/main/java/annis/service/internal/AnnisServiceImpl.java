@@ -29,8 +29,6 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.ql.parser.QueryData;
 import annis.service.AnnisService;
-import annis.service.ifaces.AnnisBinary;
-import annis.service.ifaces.AnnisBinaryMetaData;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -129,18 +127,5 @@ public class AnnisServiceImpl implements AnnisService
   public void setMaxContext(int maxContext)
   {
     this.maxContext = maxContext;
-  }
-
-  @Override
-  public AnnisBinary getBinary(String corpusName, int offset, int length)
-    throws RemoteException
-  {
-    return annisDao.getBinary(corpusName, offset, length);
-  }
-
-  @Override
-  public AnnisBinaryMetaData getBinaryMeta(String corpusName)
-  {
-    return annisDao.getBinary(corpusName, 1, 1);
   }
 }

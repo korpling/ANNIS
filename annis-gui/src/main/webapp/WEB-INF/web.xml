@@ -6,6 +6,11 @@
     <param-name>productionMode</param-name>
     <param-value>false</param-value>
   </context-param>
+  <context-param>
+    <description>URL of the Annis REST WebService</description>
+    <param-name>AnnisWebService.URL</param-name>
+    <param-value>http://localhost:5711/annis</param-value>
+  </context-param>
   <servlet>
     <servlet-name>MainApp</servlet-name>
     <servlet-class>annis.gui.AnnisApplicationServlet</servlet-class>
@@ -14,14 +19,9 @@
       <param-value>annis.gui.MainApp</param-value>
     </init-param>
     <init-param>
-      <description>URL of the Annis REST WebService</description>
+      <description>URL of the AnnisRMIServer</description>
       <param-name>AnnisRemoteService.URL</param-name>
       <param-value>rmi://localhost:4711/AnnisService</param-value>
-    </init-param>
-    <init-param>
-      <description>URL of the AnnisRMIServer</description>
-      <param-name>AnnisWebService.URL</param-name>
-      <param-value>http://localhost:5711/annis</param-value>
     </init-param>
     <init-param>
       <description>Path (or command) of the "dot" programm</description>
@@ -35,7 +35,7 @@
     </init-param>
     <init-param>
       <description>
-        	Application widgetset
+        Application widgetset
       </description>
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>

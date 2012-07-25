@@ -27,6 +27,8 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
@@ -352,6 +354,47 @@ public class AnnisWebService
       documentName = toplevelCorpusName;
     }
     return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
+  }
+  
+  /**
+   * Get an Annis Binary object identified by its id.
+   * 
+   * @param id
+   * @param rawOffset the part we want to start from
+   * @param rawLength how many bytes we take
+   * @return AnnisBinary
+   */
+  @GET
+  @Path("corpora/{top}/{document}/binary/{offset}/{length}")
+  @Produces("application/xml")
+  public AnnisBinary binary(
+    @PathParam("top") String corpusName,
+    @PathParam("document") String toplevelCorpusName,
+    @PathParam("offset") String rawOffset, 
+    @PathParam("length") String rawLength)
+  {
+    int offset = Integer.parseInt(rawOffset);
+    int length = Integer.parseInt(rawLength);
+    
+    return annisDao.getBinary(corpusName, toplevelCorpusName, offset, length);
+  }
+  
+  /**
+   * Get the Metadata of an Annis Binary object identified by its id. This 
+   * function calls getBinary(long id, 1, 1), so this function does not work, 
+   * if the specs of getBinary(long id, int offset,int length) changed.
+   * 
+   * @param id
+   * @return AnnisBinaryMetaData
+   */
+  @GET
+  @Path("corpora/{top}/{document}/binary/meta")
+  @Produces("application/xml")
+  public AnnisBinary binaryMeta(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String documentName)
+  {
+    return annisDao.getBinary(toplevelCorpusName, documentName, 1, 1);
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

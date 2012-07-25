@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class AnnisAttribute
+public class AnnisAttribute implements Serializable
 {
 
   public enum Type
