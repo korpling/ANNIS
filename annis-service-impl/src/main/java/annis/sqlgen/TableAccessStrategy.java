@@ -58,6 +58,14 @@ public class TableAccessStrategy {
 		this();
 		this.node = node;
 	}
+  
+  /** Copy constructor */
+  public TableAccessStrategy(TableAccessStrategy tas)
+  {
+    this.tableAliases = new HashMap<String, String>(tas.getTableAliases());
+    this.columnAliases = new HashMap<String, Map<String, String>>(tas.getColumnAliases());
+    this.node = tas.getNode();
+  }
 
 	///// table and column aliases
 	

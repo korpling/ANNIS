@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -70,13 +69,13 @@
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-graph</artifactId>
-                  <version>1.1.4-SNAPSHOT</version>
+                  <version>1.1.4-20120608.160959-19</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCore</artifactId>
-                  <version>1.1.4-SNAPSHOT</version>
+                  <version>1.1.4-20120608.161008-19</version>
                   <type>bundle</type>
                 </artifactItem>
               </artifactItems>
@@ -119,8 +118,6 @@
           </systemProperties>
         </configuration>
       </plugin>
-      
-      
     </plugins>
   </build>
 
@@ -182,7 +179,7 @@
             <version>1.0.2</version>
             <executions>
               <execution>
-                <configuration></configuration>
+                <configuration />
                 <goals>
                   <goal>update-widgetset</goal>
                 </goals>
@@ -232,58 +229,15 @@
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-rmi</artifactId>
-      <version>2.3.0-SNAPSHOT</version>
+      <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-impl</artifactId>
-      <version>2.3.0-SNAPSHOT</version>
+      <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
-    </dependency>
-    
-    
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.1</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.xeoh.plugins</groupId>
-      <artifactId>jspf-core</artifactId>
-      <version>1.0.2</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-graph-impl</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-io</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-visualization</artifactId>
-      <version>2.0</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
     </dependency>
     
     <dependency>
@@ -313,6 +267,20 @@
     </dependency>
 
     <dependency>
+      <groupId>net.xeoh.plugins</groupId>
+      <artifactId>jspf-core</artifactId>
+      <version>1.0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.1</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.5</version>
@@ -320,9 +288,9 @@
     </dependency>
     
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.1</version>
+      <groupId>net.sourceforge.collections</groupId>
+      <artifactId>collections-generic</artifactId>
+      <version>4.01</version>
       <scope>compile</scope>
     </dependency>
     
@@ -337,6 +305,34 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
       <version>1.11</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-graph-impl</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-io</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-visualization</artifactId>
+      <version>2.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
     </dependency>
    
 

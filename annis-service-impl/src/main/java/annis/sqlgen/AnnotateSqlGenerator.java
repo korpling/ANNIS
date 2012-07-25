@@ -217,8 +217,9 @@ public abstract class AnnotateSqlGenerator<T>
     }
 
     SolutionKey<?> key = createSolutionKey();
-    TableAccessStrategy tas = createTableAccessStrategy();
-    tas.getTableAliases().put("solutions", matchesName);
+    // use copy constructor in order not to mess up the global TableAccessStrategy bean
+    TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
+    tas.addTableAlias("solutions", matchesName);
     List<String> keyColumns =
       key.generateOuterQueryColumns(tas, alternative.size());
 
@@ -264,8 +265,9 @@ public abstract class AnnotateSqlGenerator<T>
     String indent4 = indent3 + TABSTOP;
 
     SolutionKey<?> key = createSolutionKey();
-    TableAccessStrategy tas = createTableAccessStrategy();
-    tas.getTableAliases().put("solutions", matchesName);
+    // use copy constructor in order not to mess up the global TableAccessStrategy bean
+    TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
+    tas.addTableAlias("solutions", matchesName);
     List<String> keyColumns =
       key.generateOuterQueryColumns(tas, alternative.size());
 
