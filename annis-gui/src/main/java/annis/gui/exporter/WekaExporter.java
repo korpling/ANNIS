@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-import annis.service.AnnisService;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
 import java.io.*;
@@ -34,7 +33,7 @@ public class WekaExporter implements Exporter, Serializable
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
-    AnnisService service, WebResource annisResource, Writer out)
+    WebResource annisResource, Writer out)
   {
     //this is a full result export
     try

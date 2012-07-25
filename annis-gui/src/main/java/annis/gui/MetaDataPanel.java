@@ -16,8 +16,6 @@
 package annis.gui;
 
 import annis.model.Annotation;
-import annis.service.AnnisService;
-import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
@@ -28,7 +26,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

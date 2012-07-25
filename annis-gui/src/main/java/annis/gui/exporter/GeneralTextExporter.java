@@ -18,14 +18,12 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.Helper;
 import annis.gui.resultview.AnnisResultQuery;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import annis.model.AnnisNode;
-import annis.service.AnnisService;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.ifaces.AnnisResult;
@@ -49,7 +47,7 @@ public class GeneralTextExporter implements Exporter, Serializable
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
-    AnnisService service, WebResource annisResource, Writer out)
+    WebResource annisResource, Writer out)
   {
     try
     {

@@ -16,11 +16,8 @@
 package annis.gui.controlpanel;
 
 import annis.gui.beans.HistoryEntry;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
 import annis.gui.HistoryPanel;
-import annis.service.AnnisService;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -42,7 +39,6 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
-import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
