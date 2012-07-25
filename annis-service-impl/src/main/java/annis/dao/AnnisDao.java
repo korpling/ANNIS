@@ -24,7 +24,7 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
-import annis.service.ifaces.AnnisBinary;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -46,12 +46,12 @@ public interface AnnisDao
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
-  public List<Annotation> listCorpusAnnotations(long id);
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName);
 
-  public AnnisBinary getBinary(String corpusName, int offset, int length);
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 

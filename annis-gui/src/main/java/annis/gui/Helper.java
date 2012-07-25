@@ -15,10 +15,7 @@
  */
 package annis.gui;
 
-import annis.exceptions.AnnisServiceFactoryException;
 import annis.provider.SaltProjectProvider;
-import annis.service.AnnisService;
-import annis.service.AnnisServiceFactory;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
@@ -26,12 +23,9 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,30 +56,6 @@ public class Helper
     return getAnnisWebResource(app.getProperty("AnnisWebService.URL"));
   }
 
-  public static AnnisService getService(Application app, Window window)
-  {
-    AnnisService service = null;
-
-    if (app == null || window == null)
-    {
-      return service;
-    }
-
-    try
-    {
-      service = AnnisServiceFactory.getClient(app.getProperty(
-        "AnnisRemoteService.URL"));
-    }
-    catch (AnnisServiceFactoryException ex)
-    {
-      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE,
-        "Could not connect to service", ex);
-      window.showNotification("Could not connect to service: " + ex.getMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
-    }
-
-    return service;
-  }
 
   public static String getContext(Application app)
   {

@@ -1,5 +1,6 @@
 package annis.gui.visualizers.media;
 
+import annis.CommonHelper;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
@@ -17,10 +18,12 @@ public abstract class MediaVisualizer extends WriterVisualizer
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {
+    List<String> corpusPath = CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(), input.getDocument());
     try
     {       
-      String binaryServletPath = input.getContextPath() + "/Binary?name="
-        + input.getResult().getDocumentName();
+      String binaryServletPath = input.getContextPath() + "/Binary?"
+        + "documentName=" + corpusPath.get(0)
+        + "&toplevelCorpusName=" + corpusPath.get(corpusPath.size()-1);
       writer.append("<!DOCTYPE html>");
       writer.append("<html>");
       writer.append("<head>");

@@ -25,23 +25,10 @@ import annis.model.Annotation;
 public class ListCorpusAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
 {
-
-  public String createSqlQuery(long corpusId)
-  {
-    String template = "SELECT parent.type, parent.name AS parent_name, ca.name, ca.value, ca.namespace "
-      + "FROM corpus_annotation ca, corpus parent, corpus this "
-      + "WHERE this.id = :id "
-      + "AND this.pre >= parent.pre "
-      + "AND this.post <= parent.post "
-      + "AND ca.corpus_ref = parent.id " + "ORDER BY parent.pre ASC";
-    String sql = template.replaceAll(":id", String.valueOf(corpusId));
-    return sql;
-  }
-
   public String createSqlQuery(String toplevelCorpusName, String corpusName)
   {
     String template = "SELECT parent.type, parent.name AS parent_name, parent.pre AS parent_pre, "
-      + "toplevel.name AS toplevel_name, ca.name, ca.value, ca.namespace "
+      + "ca.name, ca.value, ca.namespace "
       + "FROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
       + "WHERE this.name = ':docname' \n"
       + "AND toplevel.name = ':toplevelname' \n"

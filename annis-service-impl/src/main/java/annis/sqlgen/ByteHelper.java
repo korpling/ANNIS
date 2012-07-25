@@ -1,9 +1,9 @@
 package annis.sqlgen;
 
-import annis.service.ifaces.AnnisBinary;
-import annis.service.objects.AnnisBinaryImpl;
+import annis.service.objects.AnnisBinary;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.dao.DataAccessException;
@@ -12,35 +12,52 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 {
 
+  public final int[] ARG_TYPES = new int [] {
+    Types.INTEGER, Types.INTEGER,
+    Types.VARCHAR, Types.VARCHAR
+  };
+  
+
+  public final String SQL =
+        "SELECT\n"
+      + "  substring(file from ? for ?) AS partfile,\n"
+      + "  bytes, title, mime_type\n"
+      + "FROM media_files, corpus AS sub, corpus AS top \n"
+      + "WHERE\n"
+      + "  top.top_level = true AND\n"
+      + "  top.name = ? AND\n"
+      + "  sub.name = ? AND\n"
+      + "  sub.pre >= top.pre AND sub.post <= top.post AND\n"
+      + "  sub.id = corpus_ref";
+  ;
+  
   private String corpusName;
-
-  public String generateSql(String corpusName, int offset, int length)
+  
+  public Object[] getArgs(String toplevelCorpusName, String corpusName, int offset, int length)
   {
-    this.corpusName = corpusName;
+    return new Object[] 
+    {
+      offset, length, toplevelCorpusName, corpusName
+    }; 
 
-    return "SELECT substring((SELECT file FROM media_files "
-      + "WHERE corpus.id = corpus_ref) from " + offset + " for " + length + "),"
-      + " bytes, title, mime_type FROM media_files, corpus "
-      + "WHERE corpus.name = '" + corpusName + "' AND corpus.id = corpus_ref";
-    
   }
 
   @Override
   public AnnisBinary extractData(ResultSet rs) throws
     DataAccessException
   {
-    AnnisBinary ab = new AnnisBinaryImpl();
+    AnnisBinary ab = new AnnisBinary();
     try
     {
       while (rs.next())
       {
-        {
-          ab.setBytes(rs.getBytes("substring"));
-          ab.setFileName(rs.getString("title"));
-          ab.setCorpusName(corpusName);
-          ab.setMimeType(rs.getString("mime_type"));
-          ab.setLength(rs.getInt("bytes"));
-        }
+        ab.setBytes(rs.getBytes("partfile"));
+        ab.setFileName(rs.getString("title"));
+        ab.setCorpusName(corpusName);
+        ab.setMimeType(rs.getString("mime_type"));
+        ab.setLength(rs.getInt("bytes"));
+        // we only give one matching result back
+        break;
       }
     }
     catch (SQLException ex)
@@ -50,4 +67,5 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 
     return ab;
   }
+
 }

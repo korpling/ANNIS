@@ -542,7 +542,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         @Override
         public void buttonClick(ClickEvent event)
         {
-          MetaDataPanel meta = new MetaDataPanel(c.getName(), c.getName());
+          MetaDataPanel meta = new MetaDataPanel(c.getName());
           if (controlPanel != null)
           {
             CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controlPanel);

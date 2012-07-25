@@ -882,9 +882,21 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.
-      parseLong(corpusId));
-    printAsTable(corpusAnnotations, "namespace", "name", "value");
+    LinkedList<Long> corpusIdAsList = new LinkedList<Long>();
+    try
+    {
+      corpusIdAsList.add(Long.parseLong(corpusId));
+      List<String> toplevelNames = annisDao.mapCorpusIdsToNames(corpusIdAsList);
+      
+      List<Annotation> corpusAnnotations =
+        annisDao.listCorpusAnnotations(toplevelNames.get(0));
+      printAsTable(corpusAnnotations, "namespace", "name", "value");
+    }
+    catch (NumberFormatException ex)
+    {
+      System.out.print("not a number: " + corpusId);
+    }
+
   }
 
   public void doSqlText(String textID)

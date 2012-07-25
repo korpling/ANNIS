@@ -47,7 +47,7 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.ifaces.AnnisBinary;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator;
@@ -337,9 +337,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public List<Annotation> listCorpusAnnotations(long corpusId)
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName)
   {
-    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
+    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, toplevelCorpusName);
     final List<Annotation> corpusAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
@@ -673,10 +673,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public AnnisBinary getBinary(String corpusName, int offset, int length)
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(byteHelper.generateSql(
-      corpusName, offset, length), byteHelper);
+    return (AnnisBinary) getJdbcTemplate().query(byteHelper.SQL,
+      byteHelper.getArgs(toplevelCorpusName, corpusName, offset, length), 
+      byteHelper.ARG_TYPES, byteHelper);
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()

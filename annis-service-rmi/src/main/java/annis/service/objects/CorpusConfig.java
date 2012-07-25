@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import java.io.Serializable;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -24,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author thomas
  */
 @XmlRootElement
-public class CorpusConfig
+public class CorpusConfig implements Serializable
 {
   private Map<String,String> config;
 

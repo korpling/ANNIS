@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers;
+package annis.service.objects;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@PluginImplementation
-public class PaulaTextVisualizer extends PaulaVisualizer
+@XmlRootElement
+public class AnnisBinary extends AnnisBinaryMetaData implements Serializable
 {
 
-  @Override
-  public String getShortName()
-  {
-    return "paula_text";
-  }
+  private byte[] bytes;
 
-  @Override
-  public boolean isUsingText()
+  public byte[] getBytes()
   {
-    return true;
+    return bytes;
   }
 
   
   
+  public void setBytes(byte[] bytes)
+  {
+    if (bytes == null)
+    {
+      throw new RuntimeException("didn't get bytes");
+    }
+    this.bytes = bytes;
+  }
 }

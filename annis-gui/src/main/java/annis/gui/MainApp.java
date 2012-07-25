@@ -17,9 +17,6 @@ package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.CorefVisualizer;
-import annis.gui.visualizers.OldPartiturVisualizer;
-import annis.gui.visualizers.PaulaTextVisualizer;
-import annis.gui.visualizers.PaulaVisualizer;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.dependency.ProielDependecyTree;
 import annis.gui.visualizers.dependency.ProielRegularDependencyTree;
@@ -226,10 +223,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(OldPartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(PaulaTextVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(PaulaVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
