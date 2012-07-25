@@ -155,6 +155,23 @@ public class Annotation implements Comparable<Annotation>, Serializable
     return corpusName;
   }
 
+  public void setType(String type)
+  {
+    this.type = type;
+  }
+
+  public void setCorpusName(String corpusName)
+  {
+    this.corpusName = corpusName;
+  }
+
+  public void setPre(int pre)
+  {
+    this.pre = pre;
+  }
+  
+  
+
   public int getPre()
   {
     return pre;
