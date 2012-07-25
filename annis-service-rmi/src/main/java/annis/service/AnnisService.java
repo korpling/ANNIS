@@ -75,10 +75,4 @@ public interface AnnisService extends Remote
    */
   public void ping() throws RemoteException;
 
-  public List<Annotation> getMetadata(long corpusId) throws RemoteException,
-    AnnisServiceException;
-
-  public List<Annotation> getMetadata(String toplevelCorpusName,
-    String documentName) throws RemoteException;
-
 }

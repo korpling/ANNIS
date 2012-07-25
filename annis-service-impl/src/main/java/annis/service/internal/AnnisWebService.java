@@ -21,9 +21,11 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.Match;
+import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.service.AnnisServiceException;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
@@ -33,6 +35,7 @@ import annis.sqlgen.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -361,6 +364,29 @@ public class AnnisWebService
     annisDao.parseAQL(query, new LinkedList<Long>());
     return "ok";
   }
+  
+  @GET
+  @Path("corpora/{top}/metadata")
+  @Produces("application/xml")
+  public List<Annotation> getMetadata(
+    @PathParam("top") String toplevelCorpusName)
+  {
+    return annisDao.listCorpusAnnotations(toplevelCorpusName);
+  }
+
+  @GET
+  @Path("corpora/{top}/{document}/metadata")
+  @Produces("application/xml")
+  public List<Annotation> getMetadata(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String documentName)
+  {
+    if(documentName == null)
+    {
+      documentName = toplevelCorpusName;
+    }
+    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
+  }
 
   private String createAnnotateLogParameters(int left, int right, int offset,
     int limit)
@@ -380,6 +406,7 @@ public class AnnisWebService
     String logParameters = sb.toString();
     return logParameters;
   }
+  
 
   private void logQuery(String queryFunction, String toplevelCorpus,
     String documentName, long runtime)

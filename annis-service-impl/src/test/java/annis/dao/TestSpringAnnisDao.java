@@ -219,12 +219,12 @@ public class TestSpringAnnisDao
       ANNOTATIONS);
 
     // stub SQL query
-    final long ID = 42L;
-    when(listCorpusAnnotationsHelper.createSqlQuery(anyLong())).thenReturn(SQL);
+    final String ID = "toplevelcorpus";
+    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString())).thenReturn(SQL);
 
     // call and test
     assertThat(simpleAnnisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
-    verify(listCorpusAnnotationsHelper).createSqlQuery(ID);
+    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
 

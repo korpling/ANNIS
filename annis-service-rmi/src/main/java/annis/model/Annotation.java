@@ -16,10 +16,12 @@
 package annis.model;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+@XmlRootElement
 public class Annotation implements Comparable<Annotation>, Serializable
 {
 
@@ -31,6 +33,10 @@ public class Annotation implements Comparable<Annotation>, Serializable
   private String corpusName;
   private int pre; // determine the order
 
+  public Annotation()
+  {
+  }
+  
   public Annotation(String namespace, String name)
   {
     this(namespace, name, null);

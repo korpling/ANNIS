@@ -46,7 +46,7 @@ public interface AnnisDao
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
-  public List<Annotation> listCorpusAnnotations(long id);
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName);

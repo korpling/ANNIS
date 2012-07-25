@@ -17,7 +17,6 @@ package annis.service.internal;
 
 import java.rmi.RemoteException;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -28,18 +27,10 @@ import annis.dao.AnnotatedMatch;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
 import annis.ql.parser.QueryData;
 import annis.service.AnnisService;
-import annis.service.AnnisServiceException;
 import annis.service.ifaces.AnnisBinary;
 import annis.service.ifaces.AnnisBinaryMetaData;
-import annis.service.ifaces.AnnisResult;
-import annis.service.objects.AnnisCorpusSet;
-import annis.service.objects.AnnisResultImpl;
-import annis.utils.LegacyGraphConverter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 
 // TODO: Exceptions aufräumen
 // TODO: TestCase fehlt
@@ -109,21 +100,6 @@ public class AnnisServiceImpl implements AnnisService
     String message = sb.toString();
     queryLog.info(message);
   }
-
-  @Override
-  public List<Annotation> getMetadata(long corpusId) throws RemoteException,
-    AnnisServiceException
-  {
-    return annisDao.listCorpusAnnotations(corpusId);
-  }
-
-  @Override
-  public List<Annotation> getMetadata(String toplevelCorpusName,
-    String documentName) throws RemoteException
-  {
-    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
-  }
-
 
   @Override
   public String getWeka(List<Long> corpusList, String annisQL) throws

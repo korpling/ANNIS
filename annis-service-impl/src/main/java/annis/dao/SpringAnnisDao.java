@@ -337,9 +337,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public List<Annotation> listCorpusAnnotations(long corpusId)
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName)
   {
-    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(corpusId);
+    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, toplevelCorpusName);
     final List<Annotation> corpusAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
