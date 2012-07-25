@@ -43,6 +43,7 @@ public class WekaExporter implements Exporter, Serializable
         .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
         .queryParam("q", queryAnnisQL).get(String.class);
       out.append(result);
+      out.flush();
     }
     catch (Exception ex)
     {
