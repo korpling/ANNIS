@@ -252,14 +252,6 @@ public class AnnisRunner extends AnnisBaseRunner
     return split[1];
   }
 
-  private String getAnnisFunctionyFromFunctionCall(String functionCall)
-  {
-    String[] split = functionCall.split(" ", 2);
-
-    Validate.isTrue(split.length == 2, "bad call to plan");
-    return split[0];
-  }
-
   public void doRecord(String dummy)
   {
     out.println("recording new benchmark session");

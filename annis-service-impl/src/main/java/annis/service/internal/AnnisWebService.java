@@ -16,6 +16,7 @@
  */
 package annis.service.internal;
 
+import annis.CommonHelper;
 import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
@@ -23,6 +24,7 @@ import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
 import annis.dao.Match;
 import annis.model.Annotation;
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -37,11 +39,14 @@ import annis.sqlgen.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -198,18 +203,20 @@ public class AnnisWebService
    * @return the graph of this hit.
    */
   @GET
-  @Path("subgraph")
+  @Path("search/subgraph")
   @Produces("application/xml")
   public SaltProject subgraph(@QueryParam("q") String saltIDs,
     @DefaultValue("5") @QueryParam("left") String leftRaw,
-    @DefaultValue("5") @QueryParam("right") String rightRaw)
+    @DefaultValue("5") @QueryParam("right") String rightRaw,
+    @QueryParam("seglayer") String segmentationLayer)
   {
     String[] ids;
     List<URI> saltURI = new SaltURIs();
     QueryData data = new QueryData();
     int left = Integer.parseInt(leftRaw);
     int right = Integer.parseInt(rightRaw);
-    data.addExtension(new AnnotateQueryData(left, right));
+  
+    data.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
 
     // some robustness stuff
     if (saltIDs == null)
@@ -245,6 +252,22 @@ public class AnnisWebService
       }
     }
 
+    
+    // collect list of used corpora and created pseudo QueryNodes for each URI
+    Set<String> corpusNames = new TreeSet<String>();
+    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(saltURI.size());
+    for(java.net.URI u : saltURI)
+    {
+      pseudoNodes.add(new QueryNode());
+      
+      corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
+    }
+    
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
+    
+    data.setCorpusList(corpusIDs);
+    data.addAlternative(pseudoNodes);
+    
     data.addExtension(saltURI);
     return annisDao.graph(data);
   }
