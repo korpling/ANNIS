@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.service.objects.Match;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;

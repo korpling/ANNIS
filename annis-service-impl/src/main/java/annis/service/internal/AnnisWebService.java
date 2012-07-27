@@ -22,7 +22,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.dao.Match;
+import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
