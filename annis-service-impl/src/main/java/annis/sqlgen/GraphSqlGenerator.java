@@ -142,30 +142,6 @@ public class GraphSqlGenerator<T> extends AbstractSqlGenerator<T>
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  private String generateSolutionKey(QueryData queryData)
-  {
-    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
-    StringBuilder sb = new StringBuilder();
-
-    // only work with the first element
-    Validate.isTrue(!listOfSaltURIs.isEmpty());
-    SaltURIs saltURIs = listOfSaltURIs.get(0);
-
-    sb.append(" ARRAY[");
-    for (int i = 0; i < saltURIs.size(); i++)
-    {
-      sb.append("matching_nodes.id").append(i + 1);
-      if (i < saltURIs.size() - 1)
-      {
-        sb.append(", ");
-      }
-    }
-
-    sb.append("] AS key,\n");
-
-    return sb.toString();
-  }
-
   private void appendField(StringBuilder sb, ArrayList<String> fields)
   {
     sb.append(StringUtils.join(fields, ",\n" + TABSTOP));

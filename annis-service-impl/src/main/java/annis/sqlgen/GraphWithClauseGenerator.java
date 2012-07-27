@@ -297,14 +297,15 @@ public class GraphWithClauseGenerator implements
   private String generatePathName(URI uri)
   {
     StringBuilder sb = new StringBuilder();
-    String[] path = uri.getPath().split("/");
+    String rawPath = StringUtils.strip(uri.getPath(), "/ \t");
+    String[] path = rawPath.split("/");
 
     sb.append("'{");
-    for (int j = path.length - 1; j > 0; j--)
+    for (int j = path.length - 1; j >= 0; j--)
     {
       sb.append(path[j]);
 
-      if (j > 1)
+      if (j > 0)
       {
         sb.append(", ");
       }
