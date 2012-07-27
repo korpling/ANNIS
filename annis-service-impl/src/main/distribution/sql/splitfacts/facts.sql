@@ -122,7 +122,7 @@ FROM
     _node.seg_left AS seg_left,
     _node.seg_right AS seg_right,
     (SELECT id FROM annotation_pool_:id AS na 
-      WHERE na.namespace = _node_annotation.namespace
+      WHERE na.namespace IS NOT DISTINCT FROM _node_annotation.namespace
         AND na."name" = _node_annotation."name"
         AND na.val = _node_annotation."value"
         AND na."type" = 'node'
@@ -187,7 +187,7 @@ FROM
     _component.name AS edge_name,
 
     (SELECT id FROM annotation_pool_:id AS ea 
-      WHERE ea.namespace = _edge_annotation.namespace
+      WHERE ea.namespace IS NOT DISTINCT FROM _edge_annotation.namespace
         AND ea."name" = _edge_annotation."name"
         AND ea.val = _edge_annotation."value"
         AND ea."type" = 'edge'
