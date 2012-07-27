@@ -345,30 +345,9 @@ limitations under the License.
     <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
   </bean>
 
-  <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator">
-    <property name="islandsPolicy" ref="islandsPolicy" />
-    <property name="annisDao" ref="annisDao" />
+  <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
+    parent="commonAnnotateSqlGenerator" >
   </bean>
-
-  <bean id="graphFromClauseSqlGenerator" class="annis.sqlgen.GraphFromSqlGenerator" />
-  <bean id="graphWhereClauseSqlGenerator" class="annis.sqlgen.GraphWhereClauseGenerator" />
-
-  <util:list id="graphFromClauseSqlGenerators">
-    <ref bean="graphFromClauseSqlGenerator" />
-  </util:list>
-
-  <util:list id="graphWhereClauseSqlGenerators">
-    <ref bean="graphWhereClauseSqlGenerator" />
-  </util:list>
-
-  <bean id="graphSqlGenerator" class="annis.sqlgen.GraphSqlGenerator" parent="tableAccessStrategyFactory">
-    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
-    <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
-    <property name="fromClauseSqlGenerators" ref="graphSqlGenerator" />
-    <property name="whereClauseSqlGenerators" ref="graphSqlGenerator" />
-    <property name="orderByClauseSqlGenerator" ref="graphSqlGenerator" />
-  </bean>
-
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
         parent="tableAccessStrategyFactory">

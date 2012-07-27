@@ -13,15 +13,6 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="ServiceFastRun" profiles=""/>
         </configurations>
     </config-data>
-    <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
-        <!--
-Properties that influence various parts of the IDE, especially code formatting and the like. 
-You can copy and paste the single properties, into the pom.xml file and the IDE will pick them up.
-That way multiple projects can share the same settings (useful for formatting rules for example).
-Any value defined here will override the pom.xml file value but is only applicable to the current project.
--->
-        <org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>user</org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>
-    </properties>
     <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
         <config-files>
             <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
@@ -63,4 +54,14 @@ Any value defined here will override the pom.xml file value but is only applicab
             </config-file-group>
         </config-file-groups>
     </spring-data>
+    <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
+        <!--
+Properties that influence various parts of the IDE, especially code formatting and the like. 
+You can copy and paste the single properties, into the pom.xml file and the IDE will pick them up.
+That way multiple projects can share the same settings (useful for formatting rules for example).
+Any value defined here will override the pom.xml file value but is only applicable to the current project.
+-->
+        <org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>user</org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>
+        <netbeans.compile.on.save>all</netbeans.compile.on.save>
+    </properties>
 </project-shared-configuration>

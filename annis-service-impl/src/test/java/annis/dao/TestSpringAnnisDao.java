@@ -68,9 +68,11 @@ import javax.annotation.Resource;
 import org.springframework.context.annotation.PropertySource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-// TODO: do not text context only for annopool
+// TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
+  "file:src/main/distribution/conf/spring/CommonSqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/CommonDao.xml",
   "file:src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/modes/annopool/Dao.xml"
 })
@@ -265,7 +267,7 @@ public class TestSpringAnnisDao
       any(ListCorpusByNameDaoHelper.class));
     when(wtf).thenReturn(CORPUS_LIST);
 
-    assertThat(simpleAnnisDao.listCorpusByName(CORPUS_NAMES), is(CORPUS_LIST));
+    assertThat(simpleAnnisDao.mapCorpusNamesToIds(CORPUS_NAMES), is(CORPUS_LIST));
 
     verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
     verify(simpleJdbcTemplate).query(SQL, listCorpusByNameDaoHelper);

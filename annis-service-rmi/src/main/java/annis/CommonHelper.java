@@ -28,7 +28,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.net.URI;
 import java.util.*;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
@@ -216,5 +218,12 @@ public class CommonHelper
         }
       });
     return result;
+  }
+  
+  public static List<String> getCorpusPath(URI uri)
+  {
+    String rawPath = StringUtils.strip(uri.getPath(), "/ \t");
+    String[] path = rawPath.split("/");
+    return Arrays.asList(path);
   }
 }
