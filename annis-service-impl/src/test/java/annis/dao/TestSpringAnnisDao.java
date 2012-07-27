@@ -265,7 +265,7 @@ public class TestSpringAnnisDao
       any(ListCorpusByNameDaoHelper.class));
     when(wtf).thenReturn(CORPUS_LIST);
 
-    assertThat(simpleAnnisDao.listCorpusByName(CORPUS_NAMES), is(CORPUS_LIST));
+    assertThat(simpleAnnisDao.mapCorpusNamesToIds(CORPUS_NAMES), is(CORPUS_LIST));
 
     verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
     verify(simpleJdbcTemplate).query(SQL, listCorpusByNameDaoHelper);

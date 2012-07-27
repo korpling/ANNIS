@@ -74,7 +74,7 @@ public class CommonAnnotateWithClauseGenerator
         // token index based method
 
         // first get the raw matches
-        result.add(getMatchesWithClause(queryData, indent));
+        result.add(getMatchesWithClause(queryData, alternative, indent));
 
         // break the columns down in a way that every matched node has it's own
         // row
@@ -86,7 +86,7 @@ public class CommonAnnotateWithClauseGenerator
       {
         // segmentation layer based method
 
-        result.add(getMatchesWithClause(queryData, indent));
+        result.add(getMatchesWithClause(queryData, alternative, indent));
         result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
         result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
@@ -102,7 +102,7 @@ public class CommonAnnotateWithClauseGenerator
    * Uses the inner SQL generator and provides an ordered and limited view on
    * the matches with a match number.
    */
-  protected String getMatchesWithClause(QueryData queryData, String indent)
+  protected String getMatchesWithClause(QueryData queryData, List<QueryNode> alternative,  String indent)
   {
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("matches AS\n");
