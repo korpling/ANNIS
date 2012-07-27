@@ -41,6 +41,8 @@ import org.springframework.context.annotation.PropertySource;
 // TODO: do not text context only for annopool
 @ContextConfiguration(locations =
 {
+  "file:src/main/distribution/conf/spring/CommonSqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/CommonDao.xml",
   "file:src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/modes/annopool/Dao.xml"
 })
