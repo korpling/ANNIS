@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
@@ -51,21 +52,26 @@ public class ResultSetTable extends Table implements ResolverProvider
   private BeanItemContainer<Match> container;
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
-  private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private int start;
   private int contextLeft;
   private int contextRight;
+  private ResultViewPanel parent;
+  
+  private Set<String> tokenAnnotationLevelSet = 
+    Collections.synchronizedSet(new HashSet<String>());
   
   public ResultSetTable(List<Match> matches, int start, PluginSystem ps,
-    Set<String> visibleTokenAnnos, int contextLeft, int contextRight, String segmentationName)
+    int contextLeft, int contextRight, 
+    String segmentationName,
+    ResultViewPanel parent)
   {
     this.ps = ps;
-    this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
     this.start = start;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
+    this.parent = parent;
     
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -244,7 +250,7 @@ public class ResultSetTable extends Table implements ResolverProvider
       
       // get subgraph for match
       WebResource res;
-      synchronized(source.getApplication())
+      synchronized(getApplication())
       {
         res = Helper.getAnnisWebResource(source.getApplication());
       }
@@ -263,12 +269,16 @@ public class ResultSetTable extends Table implements ResolverProvider
         
         SaltProject p = res.get(SaltProject.class);
         
+        tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+        parent.updateTokenAnnos(tokenAnnotationLevelSet);
+
         SingleResultPanel resultPanel = new SingleResultPanel(
           p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-          resultNumber, rsProvider, ps, visibleTokenAnnos, segmentationName
+          resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName
         );
         
         resultPanelList.add(resultPanel);
+        
         
         return resultPanel;
       }

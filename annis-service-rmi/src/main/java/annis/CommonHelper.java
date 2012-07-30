@@ -129,6 +129,24 @@ public class CommonHelper
     
     return token;
   }
+  
+  public static Set<String> getTokenAnnotationLevelSet(SDocumentGraph graph)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    if(graph != null)
+    {
+      for (SToken n : graph.getSTokens())
+      {
+        for (SAnnotation anno : n.getSAnnotations())
+        {
+          result.add(anno.getQName());
+        }
+      }
+    }
+
+    return result;
+  }
 
   public static Set<String> getTokenAnnotationLevelSet(SaltProject p)
   {
@@ -139,16 +157,7 @@ public class CommonHelper
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        if(g != null)
-        {
-          for (SToken n : g.getSTokens())
-          {
-            for (SAnnotation anno : n.getSAnnotations())
-            {
-              result.add(anno.getQName());
-            }
-          }
-        }
+        result.addAll(getTokenAnnotationLevelSet(g));
       }
     }
 

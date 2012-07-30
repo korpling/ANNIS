@@ -145,6 +145,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
       {
         resultPanel.setVisible(false);
       }
+      
+      final ResultViewPanel finalThis = this;
 
       Runnable r = new Runnable()
       {
@@ -168,17 +170,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
             synchronized(getApplication()) 
             {
-              // TODO: update menu when first real subgraph was queried
-//              updateSegmentationLayer(result);
-//              updateTokenAnnos(result);
-
               if (resultPanel != null)
               {
                 mainLayout.removeComponent(resultPanel);
               }
               resultPanel = new ResultSetTable(result, start, ps,
-                getVisibleTokenAnnos(), contextLeft, contextRight, 
-                currentSegmentationLayer);
+                contextLeft, contextRight, 
+                currentSegmentationLayer, finalThis);
 
               mainLayout.addComponent(resultPanel);
               mainLayout.setExpandRatio(resultPanel, 1.0f);
@@ -233,7 +231,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
-  private Set<String> getVisibleTokenAnnos()
+  public Set<String> getVisibleTokenAnnos()
   {
     TreeSet<String> result = new TreeSet<String>();
 
@@ -259,7 +257,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     w.center();
   }
   
-  private void updateSegmentationLayer(SaltProject p)
+  public void updateSegmentationLayer(SaltProject p)
   {
     miSegmentation.removeChildren();
     
@@ -293,12 +291,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
-  private void updateTokenAnnos(SaltProject p)
+  public void updateTokenAnnos(Set<String> tokenAnnotationLevelSet)
   {
-    Set<String> tokenAnnotationLevelSet = CommonHelper.
-      getTokenAnnotationLevelSet(p);
-
-
     // add new annotations
     for (String s : tokenAnnotationLevelSet)
     {
