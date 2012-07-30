@@ -15,15 +15,17 @@
  */
 package annis.gui.resultview;
 
+import annis.service.objects.Match;
 import annis.gui.Helper;
 import annis.security.AnnisUser;
 import annis.security.IllegalCorpusAccessException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -40,21 +42,15 @@ public class AnnisResultQuery implements Serializable
   private Set<String> corpora;
   private String aql;
   private Application app;
-  private int contextLeft, contextRight;
-  private String segmentationLayer;
 
-  public AnnisResultQuery(Set<String> corpora, String aql, int contextLeft,
-    int contextRight, String segmentationLayer, Application app)
+  public AnnisResultQuery(Set<String> corpora, String aql, Application app)
   {
     this.corpora = corpora;
     this.aql = aql;
-    this.contextLeft = contextLeft;
-    this.contextRight = contextRight;
-    this.segmentationLayer = segmentationLayer;
     this.app = app;
   }
 
-  public SaltProject loadBeans(int startIndex, int count, AnnisUser user) throws
+  public List<Match> loadBeans(int startIndex, int count, AnnisUser user) throws
     IllegalCorpusAccessException
   {
     // check corpus selection by logged in user
@@ -70,25 +66,18 @@ public class AnnisResultQuery implements Serializable
       throw new IllegalCorpusAccessException("illegal corpus access");
     }
 
-    SaltProject result = SaltFactory.eINSTANCE.createSaltProject();
+    List<Match> result = new LinkedList<Match>();
     if (app != null)
     {
       WebResource annisResource = Helper.getAnnisWebResource(app);
       try
       {
-        annisResource = annisResource.path("search").path("annotate")
+        annisResource = annisResource.path("search").path("find")
           .queryParam("q", aql)
-          .queryParam("limit", "" + count)
-          .queryParam("offset", "" + startIndex)
-          .queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight)
+          .queryParam("limit", "" + count)         
           .queryParam("corpora", StringUtils.join(corpora, ","));
-       if(segmentationLayer != null)
-       {
-         annisResource = annisResource.queryParam("seglayer", segmentationLayer);
-         
-       }
-       
-       result = annisResource.get(SaltProject.class);
+
+       result = annisResource.get(new GenericType<List<Match>>() {});
       }
       catch (UniformInterfaceException ex)
       {

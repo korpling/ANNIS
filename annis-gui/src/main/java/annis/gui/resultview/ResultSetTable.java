@@ -20,59 +20,77 @@ import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
+import annis.service.objects.Match;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
  * @author thomas
  */
-public class ResultSetPanel extends VerticalLayout implements ResolverProvider
+public class ResultSetTable extends Table implements ResolverProvider
 {
 
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-  public List<SingleResultPanel> resultPanelList;
-
-  public ResultSetPanel(SaltProject p, int start, PluginSystem ps,
+  
+  private BeanItemContainer<Match> container;
+  private List<SingleResultPanel> resultPanelList;
+  private PluginSystem ps;
+  private Set<String> visibleTokenAnnos;
+  private String segmentationName;
+  private int start;
+  
+  public ResultSetTable(List<Match> matches, int start, PluginSystem ps,
     Set<String> visibleTokenAnnos, String segmentationName)
   {
+    this.ps = ps;
+    this.visibleTokenAnnos = visibleTokenAnnos;
+    this.segmentationName = segmentationName;
+    this.start = start;
+    
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
       Collections.synchronizedMap(
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
-    setWidth("100%");
-    setHeight("-1px");
+    setSizeFull();
 
     addStyleName("result-view");
 
+    container = new BeanItemContainer<Match>(Match.class, matches);
+    
     int i = start;
-    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+    for (Match m : matches)
     {
-      for (SDocument doc : corpusGraph.getSDocuments())
-      {
-        SingleResultPanel panel = new SingleResultPanel(doc, i, this, ps,
-          visibleTokenAnnos, segmentationName);
-        addComponent(panel);
-        resultPanelList.add(panel);
-        i++;
-      }
+     // SingleResultPanel panel = new SingleResultPanel(m, i, this, ps,
+     //   visibleTokenAnnos, segmentationName);
+     // resultPanelList.add(panel);
+      i++;
     }
+    
+    setContainerDataSource(container);
+    setPageLength(3);
+    
+    addGeneratedColumn("kwic",  new KWICColumnGenerator(this));
+    
+    setVisibleColumns(new String[] {"kwic"});
+    setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+    setRowHeaderMode(Table.ROW_HEADER_MODE_HIDDEN);
   }
 
   @Override
@@ -105,7 +123,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
         }
         catch (NullPointerException ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
+          Logger.getLogger(ResultSetTable.class.getName()).log(Level.WARNING,
             "NullPointerException when using Salt, was trying to get layer name",
             ex);
         }
@@ -155,7 +173,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
             }
             catch(Exception ex)
             {
-               Logger.getLogger(ResultSetPanel.class.getName())
+               Logger.getLogger(ResultSetTable.class.getName())
             .log(Level.SEVERE, "could not query resolver entries: " 
                  + res.toString(), ex);
             }
@@ -163,7 +181,7 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName())
+          Logger.getLogger(ResultSetTable.class.getName())
             .log(Level.SEVERE, null, ex);
         }
       }
@@ -209,5 +227,73 @@ public class ResultSetPanel extends VerticalLayout implements ResolverProvider
     {
       p.setVisibleTokenAnnosVisible(annos);
     }
+  }
+
+  
+  public class KWICColumnGenerator implements ColumnGenerator
+  {
+    private int contextLeft;
+    private int contextRight;
+    private String segLayer;
+    private ResolverProvider rsProvider;
+
+    public KWICColumnGenerator(ResolverProvider rsProvider)
+    {
+      this(rsProvider, 5,5);
+    }
+    
+    public KWICColumnGenerator(ResolverProvider rsProvider, int contextLeft, int contextRight)
+    {
+      this(rsProvider, contextLeft, contextRight, null);
+    }
+    
+    public KWICColumnGenerator(ResolverProvider rsProvider, int contextLeft, int contextRight, String segLayer)
+    {
+      this.contextLeft = contextLeft;
+      this.contextRight = contextRight;
+      this.segLayer = segLayer;
+      this.rsProvider = rsProvider;
+    }
+    
+    
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      Match m = (Match) itemId;
+      
+      int resultNumber = container.indexOfId(itemId) + start;
+      
+      // get subgraph for match
+      WebResource res;
+      synchronized(source.getApplication())
+      {
+        res = Helper.getAnnisWebResource(source.getApplication());
+      }
+      
+      if(res != null)
+      {
+        res = res.path("search/subgraph")
+          .queryParam("q", StringUtils.join(m.getSaltIDs(), ""))
+          .queryParam("left", "" + contextLeft)
+          .queryParam("right","" + contextRight);
+        
+        if(segLayer != null)
+        {
+          res = res.queryParam("seglayer", segLayer);
+        }
+        
+        SaltProject p = res.get(SaltProject.class);
+        
+        SingleResultPanel resultPanel = new SingleResultPanel(
+          p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+          resultNumber, rsProvider, ps, visibleTokenAnnos, segmentationName
+        );
+        
+        return resultPanel;
+      }
+      
+      return new Label("ERROR: could not get result from web service");
+    }
+    
   }
 }

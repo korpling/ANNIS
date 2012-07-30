@@ -25,6 +25,7 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -35,6 +36,7 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -50,19 +52,18 @@ import java.util.logging.Logger;
 public class ResultViewPanel extends Panel implements PagingCallback
 {
   private PagingComponent paging;
-  private ResultSetPanel resultPanel;
+  private ResultSetTable resultPanel;
   private String aql;
   private Map<String, AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
-  private VerticalLayout layout;
-  private Panel scrollPanel;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
+  private VerticalLayout mainLayout;
 
   public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int pageSize,
@@ -80,7 +81,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     setSizeFull();
 
-    VerticalLayout mainLayout = (VerticalLayout) getContent();
+    mainLayout = (VerticalLayout) getContent();
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
 
@@ -105,33 +106,23 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
 
-    scrollPanel = new Panel();
-    scrollPanel.setSizeFull();
-    scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    layout = (VerticalLayout) scrollPanel.getContent();
-    layout.setMargin(false);
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
-
+    
     mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
-    mainLayout.addComponent(scrollPanel);
-
+    
     mainLayout.setSizeFull();
-    mainLayout.setExpandRatio(scrollPanel, 1.0f);
-
+    
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
 
-    layout.addComponent(progressResult);
+    mainLayout.addComponent(progressResult);
   }
 
   @Override
   public void attach()
   {
-    query = new AnnisResultQuery(corpora.keySet(), aql,
-      contextLeft, contextRight, currentSegmentationLayer, getApplication());
+    query = new AnnisResultQuery(corpora.keySet(), aql, getApplication());
     createPage(0, pageSize);
 
     super.attach();
@@ -173,21 +164,24 @@ public class ResultViewPanel extends Panel implements PagingCallback
               }
             }
             
-            SaltProject result = query.loadBeans(start, limit, user);
+            List<Match> result = query.loadBeans(start, limit, user);
 
             synchronized(getApplication()) 
             {
-              updateSegmentationLayer(result);
-              updateTokenAnnos(result);
+              // TODO: update menu when first real subgraph was queried
+//              updateSegmentationLayer(result);
+//              updateTokenAnnos(result);
 
               if (resultPanel != null)
               {
-                layout.removeComponent(resultPanel);
+                mainLayout.removeComponent(resultPanel);
               }
-              resultPanel = new ResultSetPanel(result, start, ps,
+              resultPanel = new ResultSetTable(result, start, ps,
                 getVisibleTokenAnnos(), currentSegmentationLayer);
 
-              layout.addComponent(resultPanel);
+              mainLayout.addComponent(resultPanel);
+              mainLayout.setExpandRatio(resultPanel, 1.0f);
+
               resultPanel.setVisible(true);
             }
             
