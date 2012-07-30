@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class ResultViewPanel extends Panel implements PagingCallback
 {
   private PagingComponent paging;
-  private ResultSetTable resultPanel;
+  private ResultSetPanel resultPanel;
   private String aql;
   private Map<String, AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
@@ -105,7 +105,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging = new PagingComponent(0, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
-
     
     mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
@@ -178,7 +177,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
               {
                 mainLayout.removeComponent(resultPanel);
               }
-              resultPanel = new ResultSetTable(result, start, ps,
+              resultPanel = new ResultSetPanel(result, start, ps,
                 contextLeft, contextRight, 
                 currentSegmentationLayer, finalThis);
 

@@ -28,7 +28,9 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.lazyloadwrapper.LazyLoadWrapper;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -39,13 +41,12 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 
 /**
  *
  * @author thomas
  */
-public class ResultSetTable extends Table implements ResolverProvider
+public class ResultSetPanel extends Panel implements ResolverProvider
 {
 
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
@@ -59,10 +60,11 @@ public class ResultSetTable extends Table implements ResolverProvider
   private int contextLeft;
   private int contextRight;
   private ResultViewPanel parent;
+  private List<Match> matches;
   private Set<String> tokenAnnotationLevelSet =
     Collections.synchronizedSet(new HashSet<String>());
 
-  public ResultSetTable(List<Match> matches, int start, PluginSystem ps,
+  public ResultSetPanel(List<Match> matches, int start, PluginSystem ps,
     int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent)
@@ -73,6 +75,7 @@ public class ResultSetTable extends Table implements ResolverProvider
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
     this.parent = parent;
+    this.matches = matches;
 
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -80,24 +83,35 @@ public class ResultSetTable extends Table implements ResolverProvider
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setSizeFull();
+    VerticalLayout layout = (VerticalLayout) getContent();
+    layout.setWidth("100%");
+    layout.setHeight("-1px");
 
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    layout.setMargin(false);
     addStyleName("result-view");
 
     container = new BeanItemContainer<Match>(Match.class, matches);
 
-    setContainerDataSource(container);
-    setPageLength(1);
-
-    addGeneratedColumn("kwic", new KWICColumnGenerator(this));
-
-    setVisibleColumns(new String[]
-      {
-        "kwic"
-      });
-    setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
-    setRowHeaderMode(Table.ROW_HEADER_MODE_HIDDEN);
-
+    
+    
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    int i=0;
+    for(Match m : matches)
+    {
+      KWICColumnGenerator gen =  new KWICColumnGenerator(this);
+      addComponent(gen.getWrapper(m, i));
+      i++;
+    }
+  }
+  
+  
 
   @Override
   public ResolverEntry[] getResolverEntries(SDocument doc)
@@ -129,7 +143,7 @@ public class ResultSetTable extends Table implements ResolverProvider
         }
         catch (NullPointerException ex)
         {
-          Logger.getLogger(ResultSetTable.class.getName()).log(Level.WARNING,
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
             "NullPointerException when using Salt, was trying to get layer name",
             ex);
         }
@@ -181,7 +195,7 @@ public class ResultSetTable extends Table implements ResolverProvider
             }
             catch (Exception ex)
             {
-              Logger.getLogger(ResultSetTable.class.getName())
+              Logger.getLogger(ResultSetPanel.class.getName())
                 .log(Level.SEVERE, "could not query resolver entries: "
                 + res.toString(), ex);
             }
@@ -189,7 +203,7 @@ public class ResultSetTable extends Table implements ResolverProvider
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetTable.class.getName())
+          Logger.getLogger(ResultSetPanel.class.getName())
             .log(Level.SEVERE, null, ex);
         }
       }
@@ -236,7 +250,7 @@ public class ResultSetTable extends Table implements ResolverProvider
     }
   }
 
-  public class KWICColumnGenerator implements ColumnGenerator,
+  public class KWICColumnGenerator implements 
     LazyLoadWrapper.LazyLoadComponentProvider
   {
 
@@ -248,16 +262,14 @@ public class ResultSetTable extends Table implements ResolverProvider
     {
       this.rsProvider = rsProvider;
     }
-
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    
+    public Component getWrapper(Match m, int i)
     {
-      Match m = (Match) itemId;
-
-      resultNumber = container.indexOfId(itemId) + start;
+     
+      resultNumber = i + start;
 
       // get subgraph for match
-      res = Helper.getAnnisWebResource(source.getApplication());
+      res = Helper.getAnnisWebResource(getApplication());
 
       if (res != null)
       {
