@@ -54,14 +54,18 @@ public class ResultSetTable extends Table implements ResolverProvider
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private int start;
+  private int contextLeft;
+  private int contextRight;
   
   public ResultSetTable(List<Match> matches, int start, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName)
+    Set<String> visibleTokenAnnos, int contextLeft, int contextRight, String segmentationName)
   {
     this.ps = ps;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
     this.start = start;
+    this.contextLeft = contextLeft;
+    this.contextRight = contextRight;
     
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -73,15 +77,6 @@ public class ResultSetTable extends Table implements ResolverProvider
     addStyleName("result-view");
 
     container = new BeanItemContainer<Match>(Match.class, matches);
-    
-    int i = start;
-    for (Match m : matches)
-    {
-     // SingleResultPanel panel = new SingleResultPanel(m, i, this, ps,
-     //   visibleTokenAnnos, segmentationName);
-     // resultPanelList.add(panel);
-      i++;
-    }
     
     setContainerDataSource(container);
     setPageLength(3);
@@ -232,26 +227,10 @@ public class ResultSetTable extends Table implements ResolverProvider
   
   public class KWICColumnGenerator implements ColumnGenerator
   {
-    private int contextLeft;
-    private int contextRight;
-    private String segLayer;
     private ResolverProvider rsProvider;
 
     public KWICColumnGenerator(ResolverProvider rsProvider)
     {
-      this(rsProvider, 5,5);
-    }
-    
-    public KWICColumnGenerator(ResolverProvider rsProvider, int contextLeft, int contextRight)
-    {
-      this(rsProvider, contextLeft, contextRight, null);
-    }
-    
-    public KWICColumnGenerator(ResolverProvider rsProvider, int contextLeft, int contextRight, String segLayer)
-    {
-      this.contextLeft = contextLeft;
-      this.contextRight = contextRight;
-      this.segLayer = segLayer;
       this.rsProvider = rsProvider;
     }
     
@@ -277,9 +256,9 @@ public class ResultSetTable extends Table implements ResolverProvider
           .queryParam("left", "" + contextLeft)
           .queryParam("right","" + contextRight);
         
-        if(segLayer != null)
+        if(segmentationName != null)
         {
-          res = res.queryParam("seglayer", segLayer);
+          res = res.queryParam("seglayer", segmentationName);
         }
         
         SaltProject p = res.get(SaltProject.class);
@@ -288,6 +267,8 @@ public class ResultSetTable extends Table implements ResolverProvider
           p.getSCorpusGraphs().get(0).getSDocuments().get(0),
           resultNumber, rsProvider, ps, visibleTokenAnnos, segmentationName
         );
+        
+        resultPanelList.add(resultPanel);
         
         return resultPanel;
       }
