@@ -1,0 +1,17 @@
+@CHARSET "UTF-8";
+
+
+.v-lazyloadingwrapper{
+	background-color: transparent;
+}
+
+.v-lazyloadingwrapper-loading{
+	
+	background-color: grey; 
+	background-image: url(img/loading-indicator.gif);
+	background-repeat: no-repeat;
+	background-position: 50%;
+	border: 2px solid silver;
+
+	
+}

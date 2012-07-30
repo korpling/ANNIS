@@ -40,4 +40,6 @@
     <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
 
     
+
+    <inherits name="com.vaadin.lazyloadwrapper.widgetset.LazyLoadWrapperWidgetset" />
 </module>

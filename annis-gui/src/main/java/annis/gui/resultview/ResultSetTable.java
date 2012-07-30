@@ -25,6 +25,8 @@ import annis.service.objects.Match;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.lazyloadwrapper.LazyLoadWrapper;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -37,6 +39,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  *
@@ -48,7 +51,6 @@ public class ResultSetTable extends Table implements ResolverProvider
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-  
   private BeanItemContainer<Match> container;
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
@@ -57,12 +59,11 @@ public class ResultSetTable extends Table implements ResolverProvider
   private int contextLeft;
   private int contextRight;
   private ResultViewPanel parent;
-  
-  private Set<String> tokenAnnotationLevelSet = 
+  private Set<String> tokenAnnotationLevelSet =
     Collections.synchronizedSet(new HashSet<String>());
-  
+
   public ResultSetTable(List<Match> matches, int start, PluginSystem ps,
-    int contextLeft, int contextRight, 
+    int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent)
   {
@@ -72,7 +73,7 @@ public class ResultSetTable extends Table implements ResolverProvider
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
     this.parent = parent;
-    
+
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
       Collections.synchronizedMap(
@@ -83,16 +84,19 @@ public class ResultSetTable extends Table implements ResolverProvider
     addStyleName("result-view");
 
     container = new BeanItemContainer<Match>(Match.class, matches);
-    
+
     setContainerDataSource(container);
-    setPageLength(3);
-    
-    addGeneratedColumn("kwic",  new KWICColumnGenerator(this));
-    
-    setVisibleColumns(new String[] {"kwic"});
+    setPageLength(1);
+
+    addGeneratedColumn("kwic", new KWICColumnGenerator(this));
+
+    setVisibleColumns(new String[]
+      {
+        "kwic"
+      });
     setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
     setRowHeaderMode(Table.ROW_HEADER_MODE_HIDDEN);
-    
+
   }
 
   @Override
@@ -105,7 +109,7 @@ public class ResultSetTable extends Table implements ResolverProvider
       new HashSet<SingleResolverRequest>();
 
     Set<String> nodeLayers = new HashSet<String>();
-    
+
     for (SNode n : doc.getSDocumentGraph().getSNodes())
     {
       for (SLayer layer : n.getSLayers())
@@ -165,19 +169,21 @@ public class ResultSetTable extends Table implements ResolverProvider
           String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
           String namespace = r.getNamespace();
           String type = r.getType() == null ? null : r.getType().toString();
-          if(corpusName != null && namespace != null && type != null)
+          if (corpusName != null && namespace != null && type != null)
           {
             WebResource res = resResolver.path(corpusName).path(namespace).path(type);
             try
             {
-              tmp = res.get(new GenericType<List<ResolverEntry>>(){});
+              tmp = res.get(new GenericType<List<ResolverEntry>>()
+              {
+              });
               resolverList.addAll(tmp);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-               Logger.getLogger(ResultSetTable.class.getName())
-            .log(Level.SEVERE, "could not query resolver entries: " 
-                 + res.toString(), ex);
+              Logger.getLogger(ResultSetTable.class.getName())
+                .log(Level.SEVERE, "could not query resolver entries: "
+                + res.toString(), ex);
             }
           }
         }
@@ -194,7 +200,6 @@ public class ResultSetTable extends Table implements ResolverProvider
     ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
     Arrays.sort(visArray, new Comparator<ResolverEntry>()
     {
-
       @Override
       public int compare(ResolverEntry o1, ResolverEntry o2)
       {
@@ -214,10 +219,10 @@ public class ResultSetTable extends Table implements ResolverProvider
     });
     return visArray;
   }
-  
+
   public void setSegmentationLayer(String segmentationLayer)
   {
-    for(SingleResultPanel p : resultPanelList)
+    for (SingleResultPanel p : resultPanelList)
     {
       p.setSegmentationLayer(segmentationLayer);
     }
@@ -231,61 +236,64 @@ public class ResultSetTable extends Table implements ResolverProvider
     }
   }
 
-  
-  public class KWICColumnGenerator implements ColumnGenerator
+  public class KWICColumnGenerator implements ColumnGenerator,
+    LazyLoadWrapper.LazyLoadComponentProvider
   {
+
     private ResolverProvider rsProvider;
+    private WebResource res;
+    private int resultNumber;
 
     public KWICColumnGenerator(ResolverProvider rsProvider)
     {
       this.rsProvider = rsProvider;
     }
-    
-    
+
     @Override
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       Match m = (Match) itemId;
-      
-      int resultNumber = container.indexOfId(itemId) + start;
-      
+
+      resultNumber = container.indexOfId(itemId) + start;
+
       // get subgraph for match
-      WebResource res;
-      synchronized(getApplication())
-      {
-        res = Helper.getAnnisWebResource(source.getApplication());
-      }
-      
-      if(res != null)
+      res = Helper.getAnnisWebResource(source.getApplication());
+
+      if (res != null)
       {
         res = res.path("search/subgraph")
           .queryParam("q", StringUtils.join(m.getSaltIDs(), ""))
           .queryParam("left", "" + contextLeft)
-          .queryParam("right","" + contextRight);
-        
-        if(segmentationName != null)
+          .queryParam("right", "" + contextRight);
+
+        if (segmentationName != null)
         {
           res = res.queryParam("seglayer", segmentationName);
         }
-        
-        SaltProject p = res.get(SaltProject.class);
-        
-        tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
-        parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-        SingleResultPanel resultPanel = new SingleResultPanel(
-          p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-          resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName
-        );
+        LazyLoadWrapper wrapper = new LazyLoadWrapper(this);
         
-        resultPanelList.add(resultPanel);
-        
-        
-        return resultPanel;
+        return wrapper;
       }
-      
+
       return new Label("ERROR: could not get result from web service");
     }
-    
+
+    @Override
+    public Component onComponentVisible()
+    {
+      SaltProject p = res.get(SaltProject.class);
+
+      tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+      parent.updateTokenAnnos(tokenAnnotationLevelSet);
+
+      SingleResultPanel resultPanel = new SingleResultPanel(
+        p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+        resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+
+      resultPanelList.add(resultPanel);
+      
+      return resultPanel;
+    }
   }
 }
