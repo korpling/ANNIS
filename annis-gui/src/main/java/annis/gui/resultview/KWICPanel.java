@@ -78,6 +78,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setWidth("100%");
     setHeight("-1px");
     setPageLength(0);
+    
+    addStyleName("single-result");
 
     if (CommonHelper.containsRTLText(text.getSText()))
     {

@@ -92,6 +92,7 @@ public class ResultSetTable extends Table implements ResolverProvider
     setVisibleColumns(new String[] {"kwic"});
     setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
     setRowHeaderMode(Table.ROW_HEADER_MODE_HIDDEN);
+    
   }
 
   @Override

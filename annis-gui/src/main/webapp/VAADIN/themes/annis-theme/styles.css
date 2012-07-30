@@ -16,6 +16,14 @@
   background-color: white;
 }
 
+.result-view .v-table-cell-content {
+  padding: 0px;
+}
+
+.single-result .v-table-cell-content {
+  padding: 0px 6px;
+}
+
 .kwic {
   font-size: 11px;  
 }

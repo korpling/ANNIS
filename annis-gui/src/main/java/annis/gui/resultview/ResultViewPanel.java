@@ -115,8 +115,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
-
+    
     mainLayout.addComponent(progressResult);
+    
+    mainLayout.setExpandRatio(paging, 0.0f);
+    mainLayout.setExpandRatio(progressResult, 1.0f);
+
   }
 
   @Override
@@ -180,6 +184,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
               mainLayout.addComponent(resultPanel);
               mainLayout.setExpandRatio(resultPanel, 1.0f);
+              mainLayout.setExpandRatio(progressResult, 0.0f);
 
               resultPanel.setVisible(true);
             }
