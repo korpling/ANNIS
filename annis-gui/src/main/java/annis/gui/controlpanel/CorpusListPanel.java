@@ -185,6 +185,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     btReload.setIcon(new ThemeResource("../runo/icons/16/reload.png"));
     
     layout.addComponent(btReload);
+    layout.setComponentAlignment(btReload, Alignment.MIDDLE_CENTER);
     
   }
 
