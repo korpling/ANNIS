@@ -274,7 +274,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       if (res != null)
       {
         res = res.path("search/subgraph")
-          .queryParam("q", StringUtils.join(m.getSaltIDs(), ""))
+          .queryParam("q", StringUtils.join(m.getSaltIDs(), ","))
           .queryParam("left", "" + contextLeft)
           .queryParam("right", "" + contextRight);
 
@@ -284,7 +284,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
 
         LazyLoadWrapper wrapper = new LazyLoadWrapper(this);
-        
+        wrapper.setClientSideIsVisible(false);
+        wrapper.setWidth("100%");
         return wrapper;
       }
 

@@ -228,7 +228,7 @@ public class AnnisWebService
     }
 
     // check if this is a valid URI
-    ids = saltIDs.split("\\s");
+    ids = saltIDs.split("\\s*,\\s*");
     for (String id : ids)
     {
       try
