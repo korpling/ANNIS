@@ -37,9 +37,11 @@ public interface AnnisSecurityManager
    * @throws NamingException
    * @throws AuthenticationException 
    */
-  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled) throws NamingException, AuthenticationException;
+  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled) throws AuthenticationException;
 
   public void setProperties(Properties properties);
 
   public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException;
+  
+  public void updateUserCorpusList(AnnisUser user, boolean demoFallbackEnabled) throws AuthenticationException;
 }
