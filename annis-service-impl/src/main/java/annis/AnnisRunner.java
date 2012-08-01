@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.dao.Match;
+import annis.service.objects.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
@@ -250,14 +250,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(split.length == 2, "bad call to plan");
     return split[1];
-  }
-
-  private String getAnnisFunctionyFromFunctionCall(String functionCall)
-  {
-    String[] split = functionCall.split(" ", 2);
-
-    Validate.isTrue(split.length == 2, "bad call to plan");
-    return split[0];
   }
 
   public void doRecord(String dummy)
@@ -770,7 +762,7 @@ public class AnnisRunner extends AnnisBaseRunner
     JAXBContext jc = null;
     try
     {
-      jc = JAXBContext.newInstance(annis.dao.Match.class);
+      jc = JAXBContext.newInstance(annis.service.objects.Match.class);
     }
     catch (JAXBException ex)
     {

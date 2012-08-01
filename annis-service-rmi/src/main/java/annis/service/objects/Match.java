@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.dao;
+package annis.service.objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @SuppressWarnings("serial")
 @XmlRootElement
-public class Match
+public class Match implements Serializable
 {
-  @XmlElementWrapper(name="salt-ids")
-  @XmlElement(name="id")
+
   private List<String> saltIDs;
 
   public Match()
@@ -43,4 +44,17 @@ public class Match
   {
     return saltIDs.get(i);
   }
+
+  @XmlElementWrapper(name="salt-ids")
+  @XmlElement(name="id")
+  public List<String> getSaltIDs()
+  {
+    return saltIDs;
+  }
+
+  public void setSaltIDs(List<String> saltIDs)
+  {
+    this.saltIDs = saltIDs;
+  }
+  
 }

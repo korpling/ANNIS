@@ -23,7 +23,6 @@ import annis.gui.MetaDataPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.CorpusConfig;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
@@ -42,8 +41,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,12 +51,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 
 /**
  *
@@ -89,6 +84,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private String segmentationName;
   private CorpusConfig corpusConfig;
   private List<SNode> token;
+  private boolean wasAttached;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -106,9 +102,6 @@ public class SingleResultPanel extends VerticalLayout implements
     setWidth("100%");
     setHeight("-1px");
 
-
-    setWidth("100%");
-    setHeight("-1px");
     setMargin(false);
     setSpacing(false);
 
@@ -145,6 +138,12 @@ public class SingleResultPanel extends VerticalLayout implements
   public void attach()
   {
 
+    if(wasAttached)
+    {
+      return;
+    }
+    wasAttached = true;
+    
     // get corpus properties
 
     corpusConfig =

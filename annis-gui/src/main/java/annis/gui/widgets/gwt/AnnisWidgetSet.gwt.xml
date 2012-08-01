@@ -40,4 +40,6 @@
     <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
 
     
+
+    
 </module>

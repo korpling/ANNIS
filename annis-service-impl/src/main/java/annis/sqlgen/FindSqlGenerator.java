@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
 
-import annis.dao.Match;
+import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.internal.AnnisWebService;

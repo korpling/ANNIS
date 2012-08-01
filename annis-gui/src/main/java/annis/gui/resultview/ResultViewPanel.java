@@ -25,9 +25,11 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
@@ -35,6 +37,7 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -55,14 +58,13 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private Map<String, AnnisCorpus> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
-  private VerticalLayout layout;
-  private Panel scrollPanel;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
+  private VerticalLayout mainLayout;
 
   public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int pageSize,
@@ -80,7 +82,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     setSizeFull();
 
-    VerticalLayout mainLayout = (VerticalLayout) getContent();
+    mainLayout = (VerticalLayout) getContent();
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
 
@@ -104,34 +106,30 @@ public class ResultViewPanel extends Panel implements PagingCallback
     paging = new PagingComponent(0, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
-
-    scrollPanel = new Panel();
-    scrollPanel.setSizeFull();
-    scrollPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    layout = (VerticalLayout) scrollPanel.getContent();
-    layout.setMargin(false);
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
-
+    
     mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
-    mainLayout.addComponent(scrollPanel);
-
+    
     mainLayout.setSizeFull();
-    mainLayout.setExpandRatio(scrollPanel, 1.0f);
-
+    
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
+    progressResult.setPollingInterval(250);
+    progressResult.setCaption("Searching for \"" + aql.replaceAll("\n", " ") + "\"");
+    
+    mainLayout.addComponent(progressResult);
+    mainLayout.setComponentAlignment(progressResult, Alignment.TOP_CENTER);
+    
+    mainLayout.setExpandRatio(paging, 0.0f);
+    mainLayout.setExpandRatio(progressResult, 1.0f);
 
-    layout.addComponent(progressResult);
   }
 
   @Override
   public void attach()
   {
-    query = new AnnisResultQuery(corpora.keySet(), aql,
-      contextLeft, contextRight, currentSegmentationLayer, getApplication());
+    query = new AnnisResultQuery(corpora.keySet(), aql, getApplication());
     createPage(0, pageSize);
 
     super.attach();
@@ -154,6 +152,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
       {
         resultPanel.setVisible(false);
       }
+      
+      final ResultViewPanel finalThis = this;
 
       Runnable r = new Runnable()
       {
@@ -173,21 +173,22 @@ public class ResultViewPanel extends Panel implements PagingCallback
               }
             }
             
-            SaltProject result = query.loadBeans(start, limit, user);
+            List<Match> result = query.loadBeans(start, limit, user);
 
             synchronized(getApplication()) 
             {
-              updateSegmentationLayer(result);
-              updateTokenAnnos(result);
-
               if (resultPanel != null)
               {
-                layout.removeComponent(resultPanel);
+                mainLayout.removeComponent(resultPanel);
               }
               resultPanel = new ResultSetPanel(result, start, ps,
-                getVisibleTokenAnnos(), currentSegmentationLayer);
+                contextLeft, contextRight, 
+                currentSegmentationLayer, finalThis);
 
-              layout.addComponent(resultPanel);
+              mainLayout.addComponent(resultPanel);
+              mainLayout.setExpandRatio(resultPanel, 1.0f);
+              mainLayout.setExpandRatio(progressResult, 0.0f);
+
               resultPanel.setVisible(true);
             }
             
@@ -238,7 +239,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
-  private Set<String> getVisibleTokenAnnos()
+  public Set<String> getVisibleTokenAnnos()
   {
     TreeSet<String> result = new TreeSet<String>();
 
@@ -264,7 +265,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     w.center();
   }
   
-  private void updateSegmentationLayer(SaltProject p)
+  public void updateSegmentationLayer(SaltProject p)
   {
     miSegmentation.removeChildren();
     
@@ -298,12 +299,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     }
   }
 
-  private void updateTokenAnnos(SaltProject p)
+  public void updateTokenAnnos(Set<String> tokenAnnotationLevelSet)
   {
-    Set<String> tokenAnnotationLevelSet = CommonHelper.
-      getTokenAnnotationLevelSet(p);
-
-
     // add new annotations
     for (String s : tokenAnnotationLevelSet)
     {

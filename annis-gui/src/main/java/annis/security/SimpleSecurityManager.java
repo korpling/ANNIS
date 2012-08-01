@@ -268,12 +268,10 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
     try
     {
       String url = properties.getProperty("AnnisWebService.URL", "http://localhost:5711/annis");
-      WebResource res = Helper.getAnnisWebResource(url);
-
-      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>()
-      {
-      });
-      for (AnnisCorpus corpus : corpora)
+      WebResource res = Helper.createAnnisWebResource(url);
+      
+      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>(){});
+      for(AnnisCorpus corpus : corpora)
       {
         result.put(corpus.getName(), corpus);
       }
