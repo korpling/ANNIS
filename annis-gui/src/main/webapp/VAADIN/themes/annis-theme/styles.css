@@ -77,12 +77,6 @@ textarea.query {
   font-family: monospace;
 }
 
-/** white background color for placeholder */
-.v-lazyloadingwrapper-loading {
-  background-color: white !important;
-  border-width: 1px !important;
-}
-
 /* matched node colors by match index*/
 .match_1 {
   color: rgb(255,0,0);

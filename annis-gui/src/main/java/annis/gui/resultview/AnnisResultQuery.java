@@ -87,4 +87,6 @@ public class AnnisResultQuery implements Serializable
     }
     return result;
   }
+  
+  
 }

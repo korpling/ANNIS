@@ -102,9 +102,6 @@ public class SingleResultPanel extends VerticalLayout implements
     setWidth("100%");
     setHeight("-1px");
 
-
-    setWidth("100%");
-    setHeight("-1px");
     setMargin(false);
     setSpacing(false);
 

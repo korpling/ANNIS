@@ -25,10 +25,9 @@ import annis.service.objects.Match;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.lazyloadwrapper.LazyLoadWrapper;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -38,6 +37,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -63,6 +67,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private List<Match> matches;
   private Set<String> tokenAnnotationLevelSet =
     Collections.synchronizedSet(new HashSet<String>());
+  private ProgressIndicator indicator;
+  private VerticalLayout layout;
 
   public ResultSetPanel(List<Match> matches, int start, PluginSystem ps,
     int contextLeft, int contextRight,
@@ -75,7 +81,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
     this.parent = parent;
-    this.matches = matches;
+    this.matches = Collections.synchronizedList(matches);
 
     resultPanelList = new LinkedList<SingleResultPanel>();
     cacheResolver =
@@ -83,35 +89,135 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setSizeFull();
-    VerticalLayout layout = (VerticalLayout) getContent();
+    
+    layout = (VerticalLayout) getContent();
     layout.setWidth("100%");
     layout.setHeight("-1px");
+    
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout.setMargin(false);
     addStyleName("result-view");
 
-    container = new BeanItemContainer<Match>(Match.class, matches);
+    container = new BeanItemContainer<Match>(Match.class, this.matches);
 
-    
-    
+    indicator = new ProgressIndicator();
+    indicator.setIndeterminate(false);
+    indicator.setValue(0f);
+    indicator.setPollingInterval(100);
+
+    layout.addComponent(indicator);
+    layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
+
   }
 
   @Override
   public void attach()
   {
     super.attach();
+
+    String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
+    final int batchSize = propBatchSize == null ? 3 : Integer.parseInt(propBatchSize);
+    // enable indicator in order to get refresh GUI regulary
+    indicator.setEnabled(true);
+
+    ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
     
-    int i=0;
-    for(Match m : matches)
+    Runnable run = new Runnable()
     {
-      KWICColumnGenerator gen =  new KWICColumnGenerator(this);
-      addComponent(gen.getWrapper(m, i));
-      i++;
-    }
+      @Override
+      public void run()
+      {
+        ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
+
+        for (int offset = 0; offset < matches.size(); offset += batchSize)
+        {
+
+          int upperEnd = Math.min(offset + batchSize, matches.size());
+          synchronized (getApplication())
+          {
+            indicator.setCaption("fetching subgraphs " + (offset + 1) + " to " + (upperEnd));
+            indicator.setValue((float) offset / (float) matches.size());
+          }
+          
+          Map<Integer, Future<SingleResultPanel>> tasks 
+            = loadNextResultBatch(batchSize, offset, executorService);
+
+          // wait until all tasks are done
+          for(int i=offset; i < offset + batchSize; i++)
+          {
+            if(tasks.containsKey(i))
+            {
+              Future<SingleResultPanel> future = tasks.get(i);
+              try
+              {
+                SingleResultPanel panel =  future.get();
+                // add the panel
+                synchronized(getApplication())
+                {
+                  panel.setWidth("100%");
+                  panel.setHeight("-1px");
+                  layout.addComponent(panel);
+                }
+              }
+              catch (Exception ex)
+              {
+                Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+              }
+            }
+          }
+        }
+
+        synchronized (getApplication())
+        {
+          indicator.setEnabled(false);
+          indicator.setVisible(false);
+          layout.removeComponent(indicator);
+        }
+      }
+    };
+
+    singleExecutor.submit(run);
+
+
+
   }
-  
-  
+
+  private Map<Integer, Future<SingleResultPanel>> loadNextResultBatch(int batchSize, 
+    int offset, ExecutorService executorService)
+  {
+
+    Map<Integer, Future<SingleResultPanel>> tasks =
+      Collections.synchronizedMap(new HashMap<Integer, Future<SingleResultPanel>>());
+
+    ListIterator<Match> it = matches.listIterator(offset);
+    while (it.hasNext() && (it.nextIndex() - offset) < batchSize)
+    {
+      int i = it.nextIndex();
+      Match m = it.next();
+
+      // get subgraph for match
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+
+      if (res != null)
+      {
+        res = res.path("search/subgraph")
+          .queryParam("q", StringUtils.join(m.getSaltIDs(), ","))
+          .queryParam("left", "" + contextLeft)
+          .queryParam("right", "" + contextRight);
+
+        if (segmentationName != null)
+        {
+          res = res.queryParam("seglayer", segmentationName);
+        }
+
+        Future<SingleResultPanel> f = lazyLoadResultPanel(executorService, res, m, i, this, batchSize);
+        tasks.put(i, f);
+      }
+    }
+    
+    return tasks;
+  }
 
   @Override
   public ResolverEntry[] getResolverEntries(SDocument doc)
@@ -250,63 +356,37 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  public class KWICColumnGenerator implements 
-    LazyLoadWrapper.LazyLoadComponentProvider
+  private Future<SingleResultPanel> lazyLoadResultPanel(
+    final ExecutorService executorService,
+    final WebResource subgraphRes, final Match match, final int offset,
+    final ResolverProvider rsProvider, final int batchSize)
   {
+    final int resultNumber = start + offset;
 
-    private ResolverProvider rsProvider;
-    private WebResource res;
-    private int resultNumber;
-
-    public KWICColumnGenerator(ResolverProvider rsProvider)
+    Callable<SingleResultPanel> run = new Callable<SingleResultPanel>()
     {
-      this.rsProvider = rsProvider;
-    }
-    
-    public Component getWrapper(Match m, int i)
-    {
-     
-      resultNumber = i + start;
-
-      // get subgraph for match
-      res = Helper.getAnnisWebResource(getApplication());
-
-      if (res != null)
+      @Override
+      public SingleResultPanel call()
       {
-        res = res.path("search/subgraph")
-          .queryParam("q", StringUtils.join(m.getSaltIDs(), ","))
-          .queryParam("left", "" + contextLeft)
-          .queryParam("right", "" + contextRight);
+        // load result asynchronous
+        SaltProject p = subgraphRes.get(SaltProject.class);
 
-        if (segmentationName != null)
+        SingleResultPanel result;
+        // get synchronized again in order not to confuse Vaadin
+        synchronized (getApplication())
         {
-          res = res.queryParam("seglayer", segmentationName);
+          tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+          parent.updateTokenAnnos(tokenAnnotationLevelSet);
+
+          result = 
+            new SingleResultPanel(
+              p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+              resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
         }
-
-        LazyLoadWrapper wrapper = new LazyLoadWrapper(this);
-        wrapper.setClientSideIsVisible(false);
-        wrapper.setWidth("100%");
-        return wrapper;
+        return result;
       }
+    };
 
-      return new Label("ERROR: could not get result from web service");
-    }
-
-    @Override
-    public Component onComponentVisible()
-    {
-      SaltProject p = res.get(SaltProject.class);
-
-      tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
-      parent.updateTokenAnnos(tokenAnnotationLevelSet);
-
-      SingleResultPanel resultPanel = new SingleResultPanel(
-        p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-        resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
-
-      resultPanelList.add(resultPanel);
-      
-      return resultPanel;
-    }
+    return executorService.submit(run);
   }
 }

@@ -29,6 +29,7 @@ import annis.service.objects.Match;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
@@ -114,8 +115,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
+    progressResult.setCaption("Searching for \"" + aql.replaceAll("\n", " ") + "\"");
     
     mainLayout.addComponent(progressResult);
+    mainLayout.setComponentAlignment(progressResult, Alignment.TOP_CENTER);
     
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);

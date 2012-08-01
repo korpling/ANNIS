@@ -41,5 +41,5 @@
 
     
 
-    <inherits name="com.vaadin.lazyloadwrapper.widgetset.LazyLoadWrapperWidgetset" />
+    
 </module>
