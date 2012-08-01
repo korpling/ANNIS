@@ -38,7 +38,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -89,11 +88,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setSizeFull();
-    
+
     layout = (VerticalLayout) getContent();
     layout.setWidth("100%");
     layout.setHeight("-1px");
-    
+
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout.setMargin(false);
@@ -104,7 +103,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(false);
     indicator.setValue(0f);
-    indicator.setPollingInterval(100);
 
     layout.addComponent(indicator);
     layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
@@ -122,7 +120,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator.setEnabled(true);
 
     ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
-    
+
     Runnable run = new Runnable()
     {
       @Override
@@ -130,39 +128,56 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
 
-        for (int offset = 0; offset < matches.size(); offset += batchSize)
+
+        WebResource res = Helper.getAnnisWebResource(getApplication());
+        if (res != null)
         {
+          res = res.path("search/subgraph")
+            .queryParam("left", "" + contextLeft)
+            .queryParam("right", "" + contextRight);
 
-          int upperEnd = Math.min(offset + batchSize, matches.size());
-          synchronized (getApplication())
+          if (segmentationName != null)
           {
-            indicator.setCaption("fetching subgraphs " + (offset + 1) + " to " + (upperEnd));
-            indicator.setValue((float) offset / (float) matches.size());
+            res = res.queryParam("seglayer", segmentationName);
           }
-          
-          Map<Integer, Future<SingleResultPanel>> tasks 
-            = loadNextResultBatch(batchSize, offset, executorService);
 
-          // wait until all tasks are done
-          for(int i=offset; i < offset + batchSize; i++)
+
+          for (int offset = 0; offset < matches.size(); offset += batchSize)
           {
-            if(tasks.containsKey(i))
+
+            int upperEnd = Math.min(offset + batchSize, matches.size());
+            synchronized (getApplication())
             {
-              Future<SingleResultPanel> future = tasks.get(i);
-              try
+              indicator.setCaption("fetching subgraph(s) " 
+                + (offset + 1) + " to " + (upperEnd) 
+                + " from " + (matches.size()) + " total" );
+              indicator.setValue((float) offset / (float) matches.size());
+            }
+
+            Map<Integer, Future<SingleResultPanel>> tasks = 
+              loadNextResultBatch(batchSize, offset, executorService, res);
+
+            // wait until all tasks are done
+            for (int i = offset; i < offset + batchSize; i++)
+            {
+              if (tasks.containsKey(i))
               {
-                SingleResultPanel panel =  future.get();
-                // add the panel
-                synchronized(getApplication())
+                Future<SingleResultPanel> future = tasks.get(i);
+                try
                 {
-                  panel.setWidth("100%");
-                  panel.setHeight("-1px");
-                  layout.addComponent(panel);
+                  SingleResultPanel panel = future.get();
+                  // add the panel
+                  synchronized (getApplication())
+                  {
+                    panel.setWidth("100%");
+                    panel.setHeight("-1px");
+                    layout.addComponent(panel);
+                  }
                 }
-              }
-              catch (Exception ex)
-              {
-                Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+                catch (Exception ex)
+                {
+                  Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
               }
             }
           }
@@ -179,12 +194,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     singleExecutor.submit(run);
 
-
-
   }
 
-  private Map<Integer, Future<SingleResultPanel>> loadNextResultBatch(int batchSize, 
-    int offset, ExecutorService executorService)
+  private Map<Integer, Future<SingleResultPanel>> loadNextResultBatch(int batchSize,
+    int offset, ExecutorService executorService, WebResource resWithoutMatch)
   {
 
     Map<Integer, Future<SingleResultPanel>> tasks =
@@ -197,25 +210,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       Match m = it.next();
 
       // get subgraph for match
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = 
+        resWithoutMatch.queryParam("q", StringUtils.join(m.getSaltIDs(), ","));
 
       if (res != null)
       {
-        res = res.path("search/subgraph")
-          .queryParam("q", StringUtils.join(m.getSaltIDs(), ","))
-          .queryParam("left", "" + contextLeft)
-          .queryParam("right", "" + contextRight);
-
-        if (segmentationName != null)
-        {
-          res = res.queryParam("seglayer", segmentationName);
-        }
-
-        Future<SingleResultPanel> f = lazyLoadResultPanel(executorService, res, m, i, this, batchSize);
+        Future<SingleResultPanel> f =
+          lazyLoadResultPanel(executorService, res, i, this);
         tasks.put(i, f);
       }
     }
-    
+
     return tasks;
   }
 
@@ -358,8 +363,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
   private Future<SingleResultPanel> lazyLoadResultPanel(
     final ExecutorService executorService,
-    final WebResource subgraphRes, final Match match, final int offset,
-    final ResolverProvider rsProvider, final int batchSize)
+    final WebResource subgraphRes, final int offset,
+    final ResolverProvider rsProvider)
   {
     final int resultNumber = start + offset;
 
@@ -378,10 +383,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
           parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-          result = 
+          result =
             new SingleResultPanel(
-              p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-              resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+            p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+            resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
         }
         return result;
       }
