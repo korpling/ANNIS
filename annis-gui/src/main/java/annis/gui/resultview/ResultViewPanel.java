@@ -115,6 +115,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setEnabled(false);
+    progressResult.setPollingInterval(250);
     progressResult.setCaption("Searching for \"" + aql.replaceAll("\n", " ") + "\"");
     
     mainLayout.addComponent(progressResult);
