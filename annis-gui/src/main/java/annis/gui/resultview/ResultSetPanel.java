@@ -26,6 +26,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
@@ -35,6 +36,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -169,9 +171,18 @@ public class ResultSetPanel extends Panel implements ResolverProvider
                   // add the panel
                   synchronized (getApplication())
                   {
-                    panel.setWidth("100%");
-                    panel.setHeight("-1px");
-                    layout.addComponent(panel);
+                    if(panel == null)
+                    {
+                      layout.addComponent(new Label("Could not get subgraph for result " + (start + i + 1)));
+                    }
+                    else
+                    {
+                      panel.setWidth("100%");
+                      panel.setHeight("-1px");
+                      layout.addComponent(panel);
+
+                      resultPanelList.add(panel);
+                    }
                   }
                 }
                 catch (Exception ex)
@@ -209,9 +220,22 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       int i = it.nextIndex();
       Match m = it.next();
 
+      List<String> encodedSaltIDs = new LinkedList<String>();
+      for(String s : m.getSaltIDs())
+      {
+        try
+        {
+          encodedSaltIDs.add(URLEncoder.encode(s, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+      
       // get subgraph for match
       WebResource res = 
-        resWithoutMatch.queryParam("q", StringUtils.join(m.getSaltIDs(), ","));
+        resWithoutMatch.queryParam("q", StringUtils.join(encodedSaltIDs, ","));
 
       if (res != null)
       {
@@ -383,10 +407,18 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
           parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-          result =
-            new SingleResultPanel(
-            p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-            resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+          if(p.getSCorpusGraphs().size() > 0 
+            && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
+          {
+            result =
+              new SingleResultPanel(
+              p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+              resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+          }
+          else
+          {
+            result = null;
+          }
         }
         return result;
       }

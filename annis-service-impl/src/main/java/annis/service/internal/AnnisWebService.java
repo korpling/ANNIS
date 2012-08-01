@@ -247,7 +247,7 @@ public class AnnisWebService
       }
       catch (URISyntaxException ex)
       {
-        String msg = id + "is not a valid salt scheme";
+        String msg = id + " is not a valid salt scheme";
         log.error(msg, ex);
       }
     }
