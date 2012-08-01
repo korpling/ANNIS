@@ -41,8 +41,6 @@ public interface AnnisDao
 
   public List<AnnisCorpus> listCorpora();
 
-  public List<Long> listCorpusByName(List<String> corpusNames);
-
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
@@ -57,15 +55,13 @@ public interface AnnisDao
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
-
   // new 
   int count(QueryData queryData);
 
   List<Match> find(QueryData queryData);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with
-   * {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with    {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -103,6 +99,8 @@ public interface AnnisDao
   int getTimeout();
 
   public List<String> mapCorpusIdsToNames(List<Long> ids);
+
+  public List<Long> mapCorpusNamesToIds(List<String> corpusNames);
 
   /**
    * Get a specific configuration of a corpus from directory

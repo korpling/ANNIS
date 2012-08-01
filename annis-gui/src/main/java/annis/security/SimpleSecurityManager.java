@@ -37,10 +37,10 @@ import javax.naming.NamingException;
 
 /**
  * A simple security manager using plain text files (Java-properties). <br>
- * 
- * Every user is part of a group. Every group has certain access rights.
- * Ther is a "all-corpora" group.
- * 
+ *
+ * Every user is part of a group. Every group has certain access rights. Ther is
+ * a "all-corpora" group.
+ *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
 public class SimpleSecurityManager implements AnnisSecurityManager,
@@ -49,51 +49,42 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
 
   public final static String CONFIG_PATH = "userconfig_path";
   private Properties properties;
-  
+
   @Override
-  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled) throws NamingException, AuthenticationException
+  public AnnisUser login(String userName, String password, boolean demoFallbackEnabled)
+    throws AuthenticationException
   {
-    if(properties == null)
+    if (properties == null)
     {
-      throw new NamingException("don't know where to search for the user configuration, "
+      throw new AuthenticationException("don't know where to search for the user configuration, "
         + "properties not set");
     }
-    else if(!demoFallbackEnabled && !properties.containsKey(CONFIG_PATH))
+    else if (!demoFallbackEnabled && !properties.containsKey(CONFIG_PATH))
     {
-      throw new NamingException("don't know where to search for the user configuration, "
+      throw new AuthenticationException("don't know where to search for the user configuration, "
         + "key \"" + CONFIG_PATH + "\" not set and demo fallback not enabled");
     }
-
-    if(userName != null && !"".equals(userName) && password != null && !"".equals(password))
-    {      
-      File configDir = properties.getProperty(CONFIG_PATH) == null ? null 
+    
+    
+    if (userName != null && !"".equals(userName) && password != null && !"".equals(password))
+    {
+      AnnisUser user = new AnnisUser(userName);
+      updateUserCorpusList(user, demoFallbackEnabled);
+      
+      File configDir = properties.getProperty(CONFIG_PATH) == null ? null
         : new File(properties.getProperty(CONFIG_PATH));
-            
-      if(configDir != null && configDir.isDirectory())
+
+      if (configDir != null && configDir.isDirectory())
       {
         File usersDir = new File(configDir.getAbsolutePath() + "/users/");
-        File groupsFile = new File(configDir.getAbsolutePath() + "/groups");
-
-        if(groupsFile.isFile() && usersDir.isDirectory())
+        
+        if (usersDir.isDirectory())
         {
           try
           {
-            Properties groupProps = new Properties();
-            FileInputStream groupsStream = new FileInputStream(groupsFile);
-            try
-            {
-              groupProps.load(groupsStream);
-            }
-            finally
-            {
-              groupsStream.close();
-            }
-            
             File fileOfUser = new File(usersDir.getAbsolutePath() + "/" + userName);
-            if(fileOfUser.isFile())
+            if (fileOfUser.isFile())
             {
-              AnnisUser user = new AnnisUser(userName);
-
               FileInputStream userStream = new FileInputStream(fileOfUser);
               try
               {
@@ -103,86 +94,43 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
               {
                 userStream.close();
               }
-              
+
               // check password
               String passwordAsSHA = Crypto.calculateSHAHash(password);
 
-              if(passwordAsSHA.equalsIgnoreCase(user.getPassword()))
+              if (passwordAsSHA.equalsIgnoreCase(user.getPassword()))
               {
 
-                // get corpora by traversing the groups of this user
-                String groupNames = user.getProperty(AnnisUser.GROUPS);
-                if(groupNames != null)
-                {
+                updateUserCorpusList(user, demoFallbackEnabled);  
 
-                  String[] allGroups = groupNames.split("\\s*,\\s*");
-                  TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
-                  for(String g : allGroups)
-                  {
-                    if("*".equals(g))
-                    {
-                      // superuser, has all available corpora
-                      userCorpora.putAll(getAllAvailableCorpora());
+                // finally return the user
+                return user;
 
-                      break;
-                    }
-                    else
-                    {
-                      String groupCorporaAsString = groupProps.getProperty(g, "");
-                      String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
-
-                      Map<String, AnnisCorpus> allCorpora = getAllAvailableCorpora();
-
-                      for(String groupCorpusName : corporaOfGroup)
-                      {
-                        try
-                        {
-                          AnnisCorpus c = allCorpora.get(groupCorpusName);
-                          if(c != null)
-                          {
-                            userCorpora.put(c.getName(), c);
-                          }
-                        }
-                        catch(NumberFormatException ex)
-                        {
-                          // ignore
-                        }
-                      }
-
-                    }
-                  }
-
-                  // create user object
-                  user.setCorpusList(userCorpora);
-
-                  // finally return the user
-                  return user;
-                }
+              }
+              else
+              {
+                throw new AuthenticationException("invalid user name or password");
               }
             }
           }
-          catch(NoSuchAlgorithmException ex)
+          catch (NoSuchAlgorithmException ex)
           {
             Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
           }
-          catch(UnsupportedEncodingException ex)
+          catch (UnsupportedEncodingException ex)
           {
             Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
           }
-          catch(IOException ex)
+          catch (IOException ex)
           {
             Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
           }
         }
 
       }
-      else if(demoFallbackEnabled && FALLBACK_USER.equals(userName))
+      else if (demoFallbackEnabled && FALLBACK_USER.equals(userName))
       {
-        // add all corpora to fallback user
-        AnnisUser user = new AnnisUser(FALLBACK_USER);
-        TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
-        userCorpora.putAll(getAllAvailableCorpora());
-        user.setCorpusList(userCorpora);
+        // return the user with all corpora enabled if no configuration is given
         return user;
       }
 
@@ -191,6 +139,129 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
     throw new AuthenticationException("invalid user name or password");
   }
   
+  
+  @Override
+  public void updateUserCorpusList(AnnisUser user, boolean demoFallbackEnabled) throws AuthenticationException
+  {
+    if (properties == null)
+    {
+      throw new AuthenticationException("don't know where to search for the user configuration, "
+        + "properties not set");
+    }
+    else if (!demoFallbackEnabled && !properties.containsKey(CONFIG_PATH))
+    {
+      throw new AuthenticationException("don't know where to search for the user configuration, "
+        + "key \"" + CONFIG_PATH + "\" not set and demo fallback not enabled");
+    }
+
+    user.getCorpusList().clear();
+
+    File configDir = properties.getProperty(CONFIG_PATH) == null ? null
+      : new File(properties.getProperty(CONFIG_PATH));
+
+    if (configDir != null && configDir.isDirectory())
+    {
+      File usersDir = new File(configDir.getAbsolutePath() + "/users/");
+      File groupsFile = new File(configDir.getAbsolutePath() + "/groups");
+
+      if (groupsFile.isFile() && usersDir.isDirectory())
+      {
+        try
+        {
+          Properties groupProps = new Properties();
+          FileInputStream groupsStream = new FileInputStream(groupsFile);
+          try
+          {
+            groupProps.load(groupsStream);
+          }
+          finally
+          {
+            groupsStream.close();
+          }
+
+          File fileOfUser = new File(usersDir.getAbsolutePath() + "/" + user.getUserName());
+          if (fileOfUser.isFile())
+          {
+
+            FileInputStream userStream = new FileInputStream(fileOfUser);
+            try
+            {
+              user.load(userStream);
+            }
+            finally
+            {
+              userStream.close();
+            }
+
+            // get corpora by traversing the groups of this user
+            String groupNames = user.getProperty(AnnisUser.GROUPS);
+            if (groupNames != null)
+            {
+
+              String[] allGroups = groupNames.split("\\s*,\\s*");
+              TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
+              for (String g : allGroups)
+              {
+                if ("*".equals(g))
+                {
+                  // superuser, has all available corpora
+                  userCorpora.putAll(getAllAvailableCorpora());
+
+                  break;
+                }
+                else
+                {
+                  String groupCorporaAsString = groupProps.getProperty(g, "");
+                  String[] corporaOfGroup = groupCorporaAsString.split("\\s*,\\s*");
+
+                  Map<String, AnnisCorpus> allCorpora = getAllAvailableCorpora();
+
+                  for (String groupCorpusName : corporaOfGroup)
+                  {
+                    try
+                    {
+                      AnnisCorpus c = allCorpora.get(groupCorpusName);
+                      if (c != null)
+                      {
+                        userCorpora.put(c.getName(), c);
+                      }
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                      // ignore
+                    }
+                  }
+
+                }
+              }
+
+              // create user object
+              user.setCorpusList(userCorpora);
+
+            }
+          }
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (IOException ex)
+        {
+          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
+
+    }
+    else if (demoFallbackEnabled && FALLBACK_USER.equals(user.getUserName()))
+    {
+      // add all corpora to fallback user
+      TreeMap<String, AnnisCorpus> userCorpora = new TreeMap<String, AnnisCorpus>();
+      userCorpora.putAll(getAllAvailableCorpora());
+      user.setCorpusList(userCorpora);
+    }
+
+  }
+
   private Map<String, AnnisCorpus> getAllAvailableCorpora()
   {
     TreeMap<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
@@ -198,14 +269,16 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
     {
       String url = properties.getProperty("AnnisWebService.URL", "http://localhost:5711/annis");
       WebResource res = Helper.getAnnisWebResource(url);
-      
-      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>(){});
-      for(AnnisCorpus corpus : corpora)
+
+      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>()
+      {
+      });
+      for (AnnisCorpus corpus : corpora)
       {
         result.put(corpus.getName(), corpus);
       }
     }
-    catch(Exception e)
+    catch (Exception e)
     {
     }
     return result;
@@ -221,17 +294,17 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
   public void storeUserProperties(AnnisUser user) throws NamingException, AuthenticationException, IOException
   {
     File configDir = new File(properties.getProperty(CONFIG_PATH));
-    if(configDir.isDirectory())
+    if (configDir.isDirectory())
     {
       File usersDir = new File(configDir.getAbsolutePath() + "/users/");
       File fileOfUser = new File(usersDir.getAbsolutePath() + "/" + user.getUserName());
-      if(fileOfUser.isFile())
+      if (fileOfUser.isFile())
       {
         try
         {
           user.store(new FileOutputStream(fileOfUser, false), "");
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
           Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE,
             "", ex);

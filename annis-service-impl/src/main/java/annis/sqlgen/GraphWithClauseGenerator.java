@@ -15,17 +15,16 @@
  */
 package annis.sqlgen;
 
-import annis.dao.AnnisDao;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
+
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
@@ -37,274 +36,158 @@ import org.apache.commons.lang.StringUtils;
  * The leading / of the URI is a must, // would cause an error, because
  * authorities are currently not supported.
  *
- * TODO support table access strategy
- *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class GraphWithClauseGenerator implements
-  WithClauseSqlGenerator<QueryData>
+public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
 
-  private Logger log = Logger.getLogger(GraphWithClauseGenerator.class);
-  private AnnisDao annisDao;
-  private static final String TABSTOP = "    ";
-  private IslandsPolicy islandsPolicy;
-
   @Override
-  public List<String> withClauses(QueryData queryData,
+  protected String getMatchesWithClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    TableAccessStrategy tas = createTableAccessStrategy();
+
+    StringBuilder sb = new StringBuilder();
+
+    String indent2 = indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+
+    List<AnnotateQueryData> extensions =
+      queryData.getExtensions(AnnotateQueryData.class);
+    AnnotateQueryData annotateQueryData = extensions.isEmpty()
+      ? new AnnotateQueryData(5, 5) : extensions.get(0);
+
     List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
 
     SaltURIs saltURIs = listOfSaltURIs.get(0);
-    List<String> withClauseList = new ArrayList<String>();
-    StringBuilder sb = new StringBuilder();
-    List<Long> corpusList = getCorpusList(saltURIs);
 
-    // island policies
-    HashMap<Long, Properties> corpusProperties =
-      queryData.getCorpusConfiguration();
-    IslandsPolicy.IslandPolicies islandPolicy = islandsPolicy.
-      getMostRestrictivePolicy(
-      corpusList, corpusProperties);
+    sb.append(indent).append("matches AS\n");
+    sb.append(indent).append("(\n");
 
-    sb.append("node_ids AS (\n");
-    sb.append("SELECT DISTINCT\n").append(TABSTOP);
-    for (int i = 1; i <= saltURIs.size(); i++)
+    // SELECT
+    sb.append(indent2).append("SELECT\n");
+    sb.append(indent3).append("1 AS n, \n").append(indent3);
+
+    for (int i = 1; i <= alternative.size(); i++)
     {
-      sb.append("facts").append(i).append(".id AS id").append(i);
+      // factsN.id AS idN
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
+        .append("id").append(i).append(", ");
 
-      if (i < saltURIs.size())
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
+        .append("text").append(i).append(", ");
+
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "left_token"))
+        .append(" - ").append(annotateQueryData.getLeft())
+        .append(" AS ").append("min").append(i).append(", ");
+
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "right_token"))
+        .append(" + ").append(annotateQueryData.getLeft())
+        .append(" AS ").append("max").append(i).append(", ");
+
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "corpus_ref"))
+        .append(" AS ").append("corpus").append(i).append(", ");
+
+      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+        .append(tas.columnName(NODE_TABLE, "node_name"))
+        .append(" AS ").append("name").append(i);
+
+      if (i == alternative.size())
       {
-        sb.append(",\n").append(TABSTOP);
+        sb.append("\n");
+      }
+      else
+      {
+        sb.append(", \n").append(indent3);
       }
     }
 
-    sb.append("\nFROM\n").append(TABSTOP);
-    for (int i = 1; i <= saltURIs.size(); i++)
+    // FROM
+    sb.append(indent2).append("FROM\n");
+    for (int i = 1; i <= alternative.size(); i++)
     {
-      sb.append("facts").append(" AS facts").append(i);
-      sb.append(",\n");
-      sb.append(TABSTOP);
+      sb.append(indent3)
+        .append(tas.tableName(NODE_TABLE)).append(" AS ")
+        .append("facts").append(i).append(", ")
+        .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
+        .append("corpus").append(i);
+
+      if (i == alternative.size())
+      {
+        sb.append("\n");
+      }
+      else
+      {
+        sb.append(",\n").append(indent3);
+      }
+
     }
 
-    sb.append("corpus\n");
-    sb.append("\nWHERE\n").append(TABSTOP);
-    for (int i = 1; i <= saltURIs.size(); i++)
+    // WHERE
+    sb.append(indent2).append("WHERE\n");
+    for (int i = 1; i <= alternative.size(); i++)
     {
       URI uri = saltURIs.get(i - 1);
 
-      sb.append("path_name = ").append(generatePathName(uri));
+      // check for corpus/document by it's path
+      sb.append(indent3)
+        .append("corpus").append(i).append(".path_name = ")
+        .append(generatePathName(uri)).append(" AND\n");
 
-      sb.append("\nAND\n").append(TABSTOP);
+      // join the found corpus/document to the facts table
+      sb.append(indent3)
+        .append("facts").append(i).append(".corpus_ref = ")
+        .append("corpus").append(i).append(".id AND\n");
 
-      sb.append("facts").append(i).append(".corpus_ref");
-      sb.append(" = ");
-      sb.append("corpus.id");
+      // filter the node with the right name
+      sb.append(indent3)
+        .append("facts").append(i).append(".node_name = ")
+        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
 
-      sb.append("\nAND\n").append(TABSTOP);
+      // use the toplevel partioning
+      sb.append(indent3)
+        .append("facts").append(i).append(".toplevel_corpus IN ( ")
+        .append(StringUtils.join(queryData.getCorpusList(), ",")).append(") ");
 
-      sb.append("facts").append(i).append(".node_name");
-      sb.append(" = ");
-      sb.append("'").append(uri.getFragment()).append("'");
-
-      if (i < saltURIs.size())
+      if (i < alternative.size())
       {
-        sb.append("\nAND\n").append(TABSTOP);
+        sb.append("AND\n");
+      }
+      else
+      {
+        sb.append("\n");
       }
     }
 
-    sb.append("\n), ");
-    sb.append("min_max AS (\n");
-    sb.append("SELECT\n").append(TABSTOP);
-    /**
-     * If the island policy is set to context, the generated sql is bit more
-     * complex. We need to generate an extra column for every match.
-     */
-    if (islandPolicy == IslandsPolicy.IslandPolicies.context)
-    {
-      for (int i = 1; i <= saltURIs.size(); i++)
-      {
-        sb.append("min(facts").append(i);
-        sb.append(".left_token) as min").append(i);
-        sb.append(",\n").append(TABSTOP);
+    // LIMIT to one row
+    sb.append(indent2).append("LIMIT 1\n");
 
-        sb.append("max(facts").append(i);
-        sb.append(".right_token) as max").append(i);
-        sb.append(",\n").append(TABSTOP);
+    // end WITH inner select
+    sb.append(indent).append(")");
 
-        sb.append("corpus").append(i).append(".id AS id").append(i);
-
-        if (i < saltURIs.size())
-        {
-          sb.append(",\n").append(TABSTOP);
-        }
-      }
-
-
-      sb.append("\nFROM\n").append(TABSTOP);
-      for (int i = 1; i <= saltURIs.size(); i++)
-      {
-        sb.append("corpus AS corpus").append(i).append(", ");
-
-        sb.append("facts AS facts").append(i);
-        if (i < saltURIs.size())
-        {
-          sb.append(", ");
-        }
-      }
-      sb.append("\n");
-      sb.append("WHERE \n").append(TABSTOP);
-      for (int i = 0; i < saltURIs.size(); i++)
-      {
-        URI uri = saltURIs.get(i);
-
-        // the path is reversed in relAnnis saved
-        sb.append("corpus").append(i + 1);
-        sb.append(".path_name = ").append(generatePathName(uri));
-
-        sb.append("\nAND\n").append(TABSTOP);
-
-        sb.append("facts").append(i + 1).append(".corpus_ref");
-        sb.append(" = ");
-        sb.append("corpus").append(i + 1).append(".id");
-
-        sb.append("\nAND\n").append(TABSTOP);
-
-        sb.append("facts").append(i + 1).append(".node_name");
-        sb.append(" = ");
-        sb.append("'").append(uri.getFragment()).append("'");
-
-        // concate conditions
-        if (i < saltURIs.size() - 1)
-        {
-          sb.append("\nAND\n").append(TABSTOP);
-        }
-      }
-
-      sb.append("\nGROUP BY\n").append(TABSTOP);
-      for (int i = 1; i <= saltURIs.size(); i++)
-      {
-        sb.append("corpus").append(i).append(".id");
-
-        if (i < saltURIs.size())
-        {
-          sb.append(", ");
-        }
-      }
-      sb.append("\n), ");
-
-      sb.append("matching_nodes AS (\n");
-      sb.append("SELECT DISTINCT\n").append(TABSTOP);
-
-      appendSelectedColumns(sb);
-
-      sb.append("\nFROM min_max, facts\n");
-
-      sb.append("WHERE\n").append(TABSTOP);
-      for (int i = 1; i <= saltURIs.size(); i++)
-      {
-        sb.append("min_max.min").append(i).append(" - 5 <= facts.left_token  ");
-        sb.append("\nAND\n").append(TABSTOP);
-        sb.append("facts.right_token <= min_max.max").append(i).append(" + 5");
-        sb.append("\nAND\n").append(TABSTOP);
-        sb.append("corpus_ref = min_max.id").append(i);
-
-        if (i < saltURIs.size())
-        {
-          sb.append("\nAND\n").append(TABSTOP);
-        }
-      }
-
-      sb.append("\nORDER BY facts.token_index");
-      sb.append("\n)"); //
-
-    } // end of island policy == context
-    else
-    {
-
-      sb.append("min(facts.left_token) as min,\n").append(TABSTOP);
-      sb.append("max(facts.right_token) as max,\n").append(TABSTOP);
-
-      for (int i = 1; i <= saltURIs.size(); i++)
-      {
-        sb.append("min(facts.id) AS min_id").append(i).append(",\n");
-        sb.append(TABSTOP);
-        sb.append("max(facts.id) AS max_id").append(i).append(",\n");
-        sb.append(TABSTOP);
-      }
-      sb.append("corpus.id as id\n");
-
-      sb.append("FROM\n").append(TABSTOP);
-      sb.append("corpus, facts\n");
-
-
-      sb.append("WHERE \n").append(TABSTOP);
-      for (int i = 0; i < saltURIs.size(); i++)
-      {
-        URI uri = saltURIs.get(i);
-
-        // the path is reversed in relAnnis saved
-        sb.append("path_name = ").append(generatePathName(uri));
-
-        sb.append("\nAND\n").append(TABSTOP);
-
-        sb.append("facts.corpus_ref");
-        sb.append(" = ");
-        sb.append("corpus.id");
-
-        sb.append("\nAND\n").append(TABSTOP);
-
-        sb.append("facts.node_name");
-        sb.append(" = ");
-        sb.append("'").append(uri.getFragment()).append("'");
-
-        // concate conditions
-        if (i < saltURIs.size() - 1)
-        {
-          sb.append("\nOR\n").append(TABSTOP);
-        }
-      }
-
-      sb.append("\nGROUP BY corpus.id");
-      sb.append("\n), ");
-
-      sb.append("matching_nodes AS (\n");
-      sb.append("SELECT DISTINCT\n").append(TABSTOP);
-
-      appendSelectedColumns(sb);
-
-      sb.append("\nFROM min_max, facts\n");
-
-      sb.append("WHERE\n").append(TABSTOP);
-
-      sb.append("min_max.min - 5 <= facts.left_token  ");
-      sb.append("\nAND\n").append(TABSTOP);
-      sb.append("facts.right_token <= min_max.max + 5");
-      sb.append("\nAND\n").append(TABSTOP);
-      sb.append("corpus_ref = min_max.id");
-
-      sb.append("\nORDER BY facts.token_index");
-      sb.append("\n)"); //
-    }
-
-    withClauseList.add(sb.toString());
-    return withClauseList;
+    return sb.toString();
   }
 
   private String generatePathName(URI uri)
   {
     StringBuilder sb = new StringBuilder();
-    String[] path = uri.getPath().split("/");
+    String rawPath = StringUtils.strip(uri.getPath(), "/ \t");
+    String[] path = rawPath.split("/");
 
     sb.append("'{");
-    for (int j = path.length - 1; j > 0; j--)
+    for (int j = path.length - 1; j >= 0; j--)
     {
       sb.append(path[j]);
 
-      if (j > 1)
+      if (j > 0)
       {
         sb.append(", ");
       }
@@ -312,91 +195,5 @@ public class GraphWithClauseGenerator implements
 
     sb.append("}'");
     return sb.toString();
-  }
-
-  private void appendField(StringBuilder sb, ArrayList<String> fields)
-  {
-    sb.append(StringUtils.join(fields, ",\n" + TABSTOP));
-  }
-
-  /**
-   * @return the islandsPolicy
-   */
-  public IslandsPolicy getIslandsPolicy()
-  {
-    return islandsPolicy;
-  }
-
-  /**
-   * @param islandsPolicy the islandsPolicy to set
-   */
-  public void setIslandsPolicy(IslandsPolicy islandsPolicy)
-  {
-    this.islandsPolicy = islandsPolicy;
-  }
-
-  private List<Long> getCorpusList(SaltURIs saltURIs)
-  {
-    List<String> corpusIds = new ArrayList<String>();
-
-    for (URI uri : saltURIs)
-    {
-      corpusIds.add(uri.getPath().split("/")[0]);
-
-    }
-    return getAnnisDao().listCorpusByName(corpusIds);
-  }
-
-  /**
-   * @return the annisDao
-   */
-  public AnnisDao getAnnisDao()
-  {
-    return annisDao;
-  }
-
-  /**
-   * @param annisDao the annisDao to set
-   */
-  public void setAnnisDao(AnnisDao annisDao)
-  {
-    this.annisDao = annisDao;
-  }
-
-  private void appendSelectedColumns(StringBuilder sb)
-  {
-    ArrayList<String> fields = new ArrayList<String>();
-
-    fields.add("facts.id");
-    fields.add("facts.node_anno_ref");
-    fields.add("facts.edge_anno_ref");
-    fields.add("facts.text_ref");
-    fields.add("facts.corpus_ref");
-    fields.add("facts.toplevel_corpus");
-    fields.add("facts.node_namespace");
-    fields.add("facts.node_name");
-    fields.add("facts.left");
-    fields.add("facts.right");
-    fields.add("facts.token_index");
-    fields.add("facts.is_token");
-    fields.add("facts.continuous");
-    fields.add("facts.span");
-    fields.add("facts.left_token");
-    fields.add("facts.right_token");
-    fields.add("facts.seg_name");
-    fields.add("facts.seg_left");
-    fields.add("facts.seg_right");
-    fields.add("facts.pre");
-    fields.add("facts.post");
-    fields.add("facts.parent");
-    fields.add("facts.root");
-    fields.add("facts.level");
-    fields.add("facts.component_id");
-    fields.add("facts.edge_type");
-    fields.add("facts.edge_name");
-    fields.add("facts.edge_namespace");
-
-
-    appendField(sb, fields);
   }
 }

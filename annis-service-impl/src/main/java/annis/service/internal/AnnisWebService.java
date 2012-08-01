@@ -57,7 +57,8 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author thomas, Benjamin Weißenfels
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels
  */
 @Component
 @Path("/annis")
@@ -229,8 +230,7 @@ public class AnnisWebService
         saltURI.add(saltID);
 
         if (saltID.getScheme() == null
-          || !saltID.getScheme().equals("salt")
-          || saltID.getFragment() == null)
+          || !saltID.getScheme().equals("salt"))
         {
           throw new WebApplicationException(
             Response.status(Response.Status.BAD_REQUEST).type(
@@ -313,7 +313,7 @@ public class AnnisWebService
   {
     List<String> list = new LinkedList<String>();
     list.add(toplevelCorpus);
-    List<Long> corpusList = annisDao.listCorpusByName(list);
+    List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
 
     return annisDao.listAnnotations(corpusList,
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
@@ -488,7 +488,7 @@ public class AnnisWebService
     throws WebApplicationException
   {
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
-    List<Long> corpusIDs = annisDao.listCorpusByName(
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(
       corpusNames);
     if (corpusIDs.size() != corpusNames.size())
     {

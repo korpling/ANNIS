@@ -29,9 +29,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
-import com.vaadin.data.Container;
-import com.vaadin.data.Container.ItemSetChangeEvent;
-import com.vaadin.data.Container.PropertySetChangeEvent;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -60,6 +57,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.AuthenticationException;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -164,6 +162,31 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     
     layout.setExpandRatio(tblCorpora, 1.0f);
 
+    Button btReload = new Button("Reload corpus list", new Button.ClickListener() 
+    {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        MainApp app = (MainApp) getApplication();
+        try
+        {
+          app.getWindowSearch().getSecurityManager().updateUserCorpusList(app.getUser(), true);
+        }
+        catch (AuthenticationException ex)
+        {
+          Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        updateCorpusSetList(false);
+        getWindow().showNotification("Reloaded corpus list", 
+          Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    btReload.setIcon(new ThemeResource("../runo/icons/16/reload.png"));
+    
+    layout.addComponent(btReload);
+    layout.setComponentAlignment(btReload, Alignment.MIDDLE_CENTER);
+    
   }
 
   @Override
@@ -177,8 +200,13 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     updateCorpusSetList();
 
   }
-
+  
   private void updateCorpusSetList()
+  {
+    updateCorpusSetList(true);
+  }
+
+  private void updateCorpusSetList(boolean showLoginMessage)
   {
     corpusSets.clear();
 
@@ -197,7 +225,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
             + "(use button at upper right corner) to see more corpora.",
             Notification.TYPE_HUMANIZED_MESSAGE);
         }
-        else
+        else if(showLoginMessage)
         {
           getWindow().showNotification(
             "You can login (use button at upper right corner) to see more corpora",

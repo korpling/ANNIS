@@ -16,24 +16,41 @@ Without this configuration present, some functionality in the IDE may be limited
     <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
         <config-files>
             <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-            <config-file>src/main/java/de/deutschdiachrondigital/dddquery/DddQueryMapper-context.xml</config-file>
-            <config-file>src/main/java/de/deutschdiachrondigital/dddquery/parser/DddQueryParser-context.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
             <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
             <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/modes/fullfacts/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/modes/fullfacts/SqlGenerator.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/modes/splitfacts/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/modes/splitfacts/SqlGenerator.xml</config-file>
         </config-files>
         <config-file-groups>
             <config-file-group name="annopool">
                 <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
                 <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
+            </config-file-group>
+            <config-file-group name="fullfacts">
+                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/modes/fullfacts/Dao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/modes/fullfacts/SqlGenerator.xml</config-file>
             </config-file-group>
         </config-file-groups>
     </spring-data>
@@ -45,5 +62,6 @@ That way multiple projects can share the same settings (useful for formatting ru
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
         <org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>user</org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>
+        <netbeans.compile.on.save>all</netbeans.compile.on.save>
     </properties>
 </project-shared-configuration>
