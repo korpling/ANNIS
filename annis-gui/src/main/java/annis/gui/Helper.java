@@ -44,7 +44,9 @@ import org.apache.commons.lang.StringUtils;
 public class Helper
 {
   
-  public static WebResource getAnnisWebResource(String uri)
+  private static ThreadLocal<WebResource> annisWebResource = new ThreadLocal<WebResource>();
+  
+  public static WebResource createAnnisWebResource(String uri)
   {
     ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
     Client c = Client.create(rc);
@@ -53,7 +55,11 @@ public class Helper
 
   public static WebResource getAnnisWebResource(Application app)
   {
-    return getAnnisWebResource(app.getProperty("AnnisWebService.URL"));
+    if(annisWebResource.get() == null)
+    {
+      annisWebResource.set(createAnnisWebResource(app.getProperty("AnnisWebService.URL")));
+    }
+    return annisWebResource.get();
   }
 
 
