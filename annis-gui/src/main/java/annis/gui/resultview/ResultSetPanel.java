@@ -438,7 +438,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
               synchronized (getApplication())
               {
                 indicator.setCaption("fetched subgraph "
-                  + (i + 1) + " from " + (matches.size()) + " total");
+                  + (i + 1) + " from " + (matches.size()));
                 indicator.setValue((float) offset / (float) matches.size());
               }
             }
