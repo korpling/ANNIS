@@ -39,10 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -105,6 +102,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(false);
     indicator.setValue(0f);
+    indicator.setCaption("fetching subgraphs");
 
     layout.addComponent(indicator);
     layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
@@ -123,86 +121,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
 
-    Runnable run = new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
-
-
-        WebResource res = Helper.getAnnisWebResource(getApplication());
-        if (res != null)
-        {
-          res = res.path("search/subgraph")
-            .queryParam("left", "" + contextLeft)
-            .queryParam("right", "" + contextRight);
-
-          if (segmentationName != null)
-          {
-            res = res.queryParam("seglayer", segmentationName);
-          }
-
-
-          for (int offset = 0; offset < matches.size(); offset += batchSize)
-          {
-
-            int upperEnd = Math.min(offset + batchSize, matches.size());
-            synchronized (getApplication())
-            {
-              indicator.setCaption("fetching subgraph(s) " 
-                + (offset + 1) + " to " + (upperEnd) 
-                + " from " + (matches.size()) + " total" );
-              indicator.setValue((float) offset / (float) matches.size());
-            }
-
-            Map<Integer, Future<SingleResultPanel>> tasks = 
-              loadNextResultBatch(batchSize, offset, executorService, res);
-
-            // wait until all tasks are done
-            for (int i = offset; i < offset + batchSize; i++)
-            {
-              if (tasks.containsKey(i))
-              {
-                Future<SingleResultPanel> future = tasks.get(i);
-                try
-                {
-                  SingleResultPanel panel = future.get();
-                  // add the panel
-                  synchronized (getApplication())
-                  {
-                    if(panel == null)
-                    {
-                      layout.addComponent(new Label("Could not get subgraph for result " + (start + i + 1)));
-                    }
-                    else
-                    {
-                      panel.setWidth("100%");
-                      panel.setHeight("-1px");
-                      layout.addComponent(panel);
-
-                      resultPanelList.add(panel);
-                    }
-                  }
-                }
-                catch (Exception ex)
-                {
-                  Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-              }
-            }
-          }
-        }
-
-        synchronized (getApplication())
-        {
-          indicator.setEnabled(false);
-          indicator.setVisible(false);
-          layout.removeComponent(indicator);
-        }
-      }
-    };
-
+    Runnable run = new AllResultsFetcher(batchSize);
     singleExecutor.submit(run);
 
   }
@@ -221,7 +140,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       Match m = it.next();
 
       List<String> encodedSaltIDs = new LinkedList<String>();
-      for(String s : m.getSaltIDs())
+      for (String s : m.getSaltIDs())
       {
         try
         {
@@ -232,9 +151,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
-      
+
       // get subgraph for match
-      WebResource res = 
+      WebResource res =
         resWithoutMatch.queryParam("q", StringUtils.join(encodedSaltIDs, ","));
 
       if (res != null)
@@ -330,16 +249,14 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             }
             catch (Exception ex)
             {
-              Logger.getLogger(ResultSetPanel.class.getName())
-                .log(Level.SEVERE, "could not query resolver entries: "
+              Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, "could not query resolver entries: "
                 + res.toString(), ex);
             }
           }
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName())
-            .log(Level.SEVERE, null, ex);
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
       visSet.addAll(resolverList);
@@ -349,6 +266,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
     Arrays.sort(visArray, new Comparator<ResolverEntry>()
     {
+
       @Override
       public int compare(ResolverEntry o1, ResolverEntry o2)
       {
@@ -392,38 +310,139 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   {
     final int resultNumber = start + offset;
 
-    Callable<SingleResultPanel> run = new Callable<SingleResultPanel>()
-    {
-      @Override
-      public SingleResultPanel call()
-      {
-        // load result asynchronous
-        SaltProject p = subgraphRes.get(SaltProject.class);
-
-        SingleResultPanel result;
-        // get synchronized again in order not to confuse Vaadin
-        synchronized (getApplication())
-        {
-          tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
-          parent.updateTokenAnnos(tokenAnnotationLevelSet);
-
-          if(p.getSCorpusGraphs().size() > 0 
-            && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
-          {
-            result =
-              new SingleResultPanel(
-              p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-              resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
-          }
-          else
-          {
-            result = null;
-          }
-        }
-        return result;
-      }
-    };
+    Callable<SingleResultPanel> run =
+      new SingleResultFetcher(subgraphRes, resultNumber, rsProvider);
 
     return executorService.submit(run);
   }
+
+  public class SingleResultFetcher implements Callable<SingleResultPanel>
+  {
+
+    private WebResource subgraphRes;
+    private int resultNumber;
+    private ResolverProvider rsProvider;
+
+    public SingleResultFetcher(WebResource subgraphRes, int resultNumber, ResolverProvider rsProvider)
+    {
+      this.subgraphRes = subgraphRes;
+      this.resultNumber = resultNumber;
+      this.rsProvider = rsProvider;
+    }
+
+    @Override
+    public SingleResultPanel call()
+    {
+      // load result asynchronous
+      SaltProject p = subgraphRes.get(SaltProject.class);
+
+      SingleResultPanel result;
+      // get synchronized again in order not to confuse Vaadin
+      synchronized (getApplication())
+      {
+        tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+        parent.updateTokenAnnos(tokenAnnotationLevelSet);
+
+        if (p.getSCorpusGraphs().size() > 0
+          && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
+        {
+          result =
+            new SingleResultPanel(
+            p.getSCorpusGraphs().get(0).getSDocuments().get(0),
+            resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+        }
+        else
+        {
+          result = null;
+        }
+      }
+      return result;
+    }
+  }
+
+  public class AllResultsFetcher implements Runnable
+  {
+
+    private int batchSize;
+
+    public AllResultsFetcher(int batchSize)
+    {
+      this.batchSize = batchSize;
+    }
+
+    @Override
+    public void run()
+    {
+      ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
+
+
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+      if (res != null)
+      {
+        res = res.path("search/subgraph").queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight);
+
+        if (segmentationName != null)
+        {
+          res = res.queryParam("seglayer", segmentationName);
+        }
+
+
+        for (int offset = 0; offset < matches.size(); offset += batchSize)
+        {
+          Map<Integer, Future<SingleResultPanel>> tasks =
+            loadNextResultBatch(batchSize, offset, executorService, res);
+
+          waitForTasks(tasks, offset);
+
+        }
+      }
+
+      synchronized (getApplication())
+      {
+        indicator.setEnabled(false);
+        indicator.setVisible(false);
+        layout.removeComponent(indicator);
+      }
+    }
+
+    private void waitForTasks(Map<Integer, Future<SingleResultPanel>> tasks, int offset)
+    {
+      // wait until all tasks are done
+      for (int i = offset; i < offset + batchSize; i++)
+      {
+        if (tasks.containsKey(i))
+        {
+          Future<SingleResultPanel> future = tasks.get(i);
+          try
+          {
+            SingleResultPanel panel = future.get();
+            // add the panel
+            synchronized (getApplication())
+            {
+              if (panel == null)
+              {
+                layout.addComponent(new Label("Could not get subgraph for result " + (start + i + 1)));
+              }
+              else
+              {
+                panel.setWidth("100%");
+                panel.setHeight("-1px");
+                layout.addComponent(panel);
+
+                resultPanelList.add(panel);
+
+                indicator.setCaption("fetched subgraph "
+                  + (i + 1) + " from " + (matches.size()) + " total");
+                indicator.setValue((float) offset / (float) matches.size());
+              }
+            }
+          }
+          catch (Exception ex)
+          {
+            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+          }
+        }
+      }
+    }
+  } // end class AllResultsFetcher
 }
