@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
@@ -37,7 +38,10 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.XMLParserPool;
+import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMLParserPoolImpl;
 
 /**
  *
@@ -47,6 +51,9 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   MessageBodyReader<SaltProject>
 {
+  
+  private static ThreadLocal<XMLParserPool> xmlParserPool = 
+    new ThreadLocal<XMLParserPool>();
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,
@@ -120,9 +127,18 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
       SaltCommonPackage.eINSTANCE);
     
+    
     XMIResourceImpl resource = new XMIResourceImpl();
     resourceSet.getResources().add(resource);
     
+    if(xmlParserPool.get() == null)
+    {
+      xmlParserPool.set(new XMLParserPoolImpl());
+    }
+    
+    Map<Object,Object> options = resource.getDefaultLoadOptions();
+    options.put(XMLResource.OPTION_USE_PARSER_POOL, xmlParserPool.get());
+    options.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
     resource.load(entityStream, null);
 
     SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
