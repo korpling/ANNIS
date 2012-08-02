@@ -79,7 +79,7 @@ public class CommonAnnotateWithClauseGenerator
         // break the columns down in a way that every matched node has it's own
         // row
         result.add(getSolutionFromMatchesWithClause(queryData, policy,
-          alternative, "matches", indent + TABSTOP));
+          alternative, "matches", indent));
 
       }
       else

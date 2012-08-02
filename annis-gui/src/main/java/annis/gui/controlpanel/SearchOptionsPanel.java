@@ -93,7 +93,7 @@ public class SearchOptionsPanel extends Panel
 
     cbLeftContext.setValue("5");
     cbRightContext.setValue("5");
-    cbResultsPerPage.setValue("5");
+    cbResultsPerPage.setValue("10");
 
     layout.addComponent(cbLeftContext);
     layout.addComponent(cbRightContext);

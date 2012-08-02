@@ -25,11 +25,7 @@ import annis.service.objects.Match;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -81,7 +77,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
 
-    resultPanelList = new LinkedList<SingleResultPanel>();
+    resultPanelList = 
+      Collections.synchronizedList(new LinkedList<SingleResultPanel>());
     cacheResolver =
       Collections.synchronizedMap(
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
@@ -401,7 +398,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         indicator.setEnabled(false);
         indicator.setVisible(false);
-        layout.removeComponent(indicator);
+        
+        for(SingleResultPanel panel : resultPanelList)
+        {
+          layout.addComponent(panel);
+        }
       }
     }
 
@@ -416,21 +417,26 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           try
           {
             SingleResultPanel panel = future.get();
-            // add the panel
-            synchronized (getApplication())
+            if (panel == null)
             {
-              if (panel == null)
+              synchronized(getApplication())
               {
-                layout.addComponent(new Label("Could not get subgraph for result " + (start + i + 1)));
+                getWindow().showNotification("Could not get subgraph " + i, 
+                  Window.Notification.TYPE_TRAY_NOTIFICATION);
               }
-              else
+            }
+            else
+            {
+              // add the panel
+            
+              panel.setWidth("100%");
+              panel.setHeight("-1px");
+              
+              resultPanelList.add(panel);
+
+              
+              synchronized (getApplication())
               {
-                panel.setWidth("100%");
-                panel.setHeight("-1px");
-                layout.addComponent(panel);
-
-                resultPanelList.add(panel);
-
                 indicator.setCaption("fetched subgraph "
                   + (i + 1) + " from " + (matches.size()) + " total");
                 indicator.setValue((float) offset / (float) matches.size());
