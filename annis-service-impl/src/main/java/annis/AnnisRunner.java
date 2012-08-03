@@ -712,7 +712,7 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
 
-    if (queryFunction != null && queryFunction.matches("(sql_)?annotate"))
+    if (queryFunction != null && queryFunction.matches("(sql_)?(annotate|find)"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer));

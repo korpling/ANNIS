@@ -40,11 +40,12 @@ import annis.service.internal.AnnisWebService;
  * @author Benjamin Weißenfels
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
-  implements SelectClauseSqlGenerator<QueryData>
-{
-
+  implements SelectClauseSqlGenerator<QueryData>, 
+  OrderByClauseSqlGenerator<QueryData>
+{  
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
+  private boolean sortSolutions;
   private CorpusPathExtractor corpusPathExtractor;
 
   @Override
@@ -86,6 +87,37 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(ids, ", ");
+  }
+  
+  @Override
+  protected void appendOrderByClause(StringBuffer sb, QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    // only use ORDER BY clause if result has to be sorted
+    if (!sortSolutions)
+    {
+      return;
+    }
+    // don't use ORDER BY clause if we are only counting saves a sort
+    List<LimitOffsetQueryData> extensions =
+      queryData.getExtensions(LimitOffsetQueryData.class);
+    
+    if (extensions.size() > 0)
+    {
+      super.appendOrderByClause(sb, queryData, alternative, indent);
+    }
+  }
+  
+  @Override
+  public String orderByClause(QueryData queryData, List<QueryNode> alternative,
+    String indent)
+  {
+    List<String> ids = new ArrayList<String>();
+    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    {
+      ids.add("id" + i);
+    }
+    return StringUtils.join(ids, ", ");
   }
 
   @Override
@@ -181,4 +213,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   {
     this.corpusPathExtractor = corpusPathExtractor;
   }
+
+  public boolean isSortSolutions()
+  {
+    return sortSolutions;
+  }
+
+  public void setSortSolutions(boolean sortSolutions)
+  {
+    this.sortSolutions = sortSolutions;
+  }
+  
+  
 }

@@ -25,11 +25,7 @@ import annis.service.objects.Match;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -81,7 +77,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
 
-    resultPanelList = new LinkedList<SingleResultPanel>();
+    resultPanelList = 
+      Collections.synchronizedList(new LinkedList<SingleResultPanel>());
     cacheResolver =
       Collections.synchronizedMap(
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
@@ -100,8 +97,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     container = new BeanItemContainer<Match>(Match.class, this.matches);
 
     indicator = new ProgressIndicator();
-    indicator.setIndeterminate(false);
+    indicator.setIndeterminate(true);
     indicator.setValue(0f);
+    indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
 
     layout.addComponent(indicator);
@@ -115,7 +113,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     super.attach();
 
     String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
-    final int batchSize = propBatchSize == null ? 3 : Integer.parseInt(propBatchSize);
+    final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 
@@ -401,7 +399,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         indicator.setEnabled(false);
         indicator.setVisible(false);
-        layout.removeComponent(indicator);
+        
+        for(SingleResultPanel panel : resultPanelList)
+        {
+          layout.addComponent(panel);
+        }
       }
     }
 
@@ -416,25 +418,22 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           try
           {
             SingleResultPanel panel = future.get();
-            // add the panel
-            synchronized (getApplication())
+            if (panel == null)
             {
-              if (panel == null)
+              synchronized(getApplication())
               {
-                layout.addComponent(new Label("Could not get subgraph for result " + (start + i + 1)));
+                getWindow().showNotification("Could not get subgraph " + i, 
+                  Window.Notification.TYPE_TRAY_NOTIFICATION);
               }
-              else
-              {
-                panel.setWidth("100%");
-                panel.setHeight("-1px");
-                layout.addComponent(panel);
-
-                resultPanelList.add(panel);
-
-                indicator.setCaption("fetched subgraph "
-                  + (i + 1) + " from " + (matches.size()) + " total");
-                indicator.setValue((float) offset / (float) matches.size());
-              }
+            }
+            else
+            {
+              // add the panel
+            
+              panel.setWidth("100%");
+              panel.setHeight("-1px");
+              
+              resultPanelList.add(panel);
             }
           }
           catch (Exception ex)

@@ -337,12 +337,14 @@ limitations under the License.
         parent="tableAccessStrategyFactory">
 
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
+    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
     <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
     <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
+    <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
   </bean>
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
