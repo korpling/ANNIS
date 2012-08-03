@@ -50,6 +50,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -162,7 +163,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     
     layout.setExpandRatio(tblCorpora, 1.0f);
 
-    Button btReload = new Button("Reload corpus list", new Button.ClickListener() 
+    Button btReload = new Button();
+    btReload.addListener(new Button.ClickListener()
     {
 
       @Override
@@ -183,9 +185,11 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       }
     });
     btReload.setIcon(new ThemeResource("../runo/icons/16/reload.png"));
+    btReload.setDescription("Reload corpus list");
+    btReload.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     
-    layout.addComponent(btReload);
-    layout.setComponentAlignment(btReload, Alignment.MIDDLE_CENTER);
+    selectionLayout.addComponent(btReload);
+    selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
     
   }
 
