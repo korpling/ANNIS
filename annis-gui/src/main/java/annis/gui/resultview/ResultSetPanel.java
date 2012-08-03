@@ -97,7 +97,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     container = new BeanItemContainer<Match>(Match.class, this.matches);
 
     indicator = new ProgressIndicator();
-    indicator.setIndeterminate(false);
+    indicator.setIndeterminate(true);
     indicator.setValue(0f);
     indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
@@ -113,7 +113,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     super.attach();
 
     String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
-    final int batchSize = propBatchSize == null ? 3 : Integer.parseInt(propBatchSize);
+    final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 
@@ -434,14 +434,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
               panel.setHeight("-1px");
               
               resultPanelList.add(panel);
-
-              
-              synchronized (getApplication())
-              {
-                indicator.setCaption("fetched subgraph "
-                  + (i + 1) + " from " + (matches.size()));
-                indicator.setValue((float) offset / (float) matches.size());
-              }
             }
           }
           catch (Exception ex)
