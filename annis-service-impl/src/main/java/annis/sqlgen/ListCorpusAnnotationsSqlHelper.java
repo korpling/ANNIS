@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.model.Annotation;
+import static annis.sqlgen.SqlConstraints.sqlString;
 
 public class ListCorpusAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
@@ -30,8 +31,8 @@ public class ListCorpusAnnotationsSqlHelper implements
     String template = "SELECT parent.type, parent.name AS parent_name, parent.pre AS parent_pre, "
       + "ca.name, ca.value, ca.namespace "
       + "FROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
-      + "WHERE this.name = ':docname' \n"
-      + "AND toplevel.name = ':toplevelname' \n"
+      + "WHERE this.name = :docname \n"
+      + "AND toplevel.name = :toplevelname \n"
       + "AND toplevel.top_level = true \n"
       + "AND parent.pre >= toplevel.pre \n"
       + "AND parent.post <= toplevel.post \n"
@@ -39,8 +40,8 @@ public class ListCorpusAnnotationsSqlHelper implements
       + "AND this.post <= parent.post \n"
       + "AND ca.corpus_ref = parent.id \n"
       + "ORDER BY parent_pre ASC";
-    String sql = template.replaceAll(":docname", corpusName).
-      replaceAll(":toplevelname", toplevelCorpusName);
+    String sql = template.replaceAll(":docname", sqlString(corpusName)).
+      replaceAll(":toplevelname", sqlString(toplevelCorpusName));
     return sql;
   }
 

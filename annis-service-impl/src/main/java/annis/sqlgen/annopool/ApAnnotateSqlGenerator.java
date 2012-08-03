@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
+import static annis.sqlgen.SqlConstraints.sqlString;
+
 /**
  *
  *  @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
@@ -219,12 +221,12 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
         + " = edge_anno.id AND " + tas.aliasedColumn(RANK_TABLE, "toplevel_corpus") + " = edge_anno.toplevel_corpus),\n"
       + "\tcorpus as c, corpus as toplevel\n"
       + "WHERE\n"
-      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
       + "\tAND toplevel.top_level IS TRUE\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
       + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
-    String sql = template.replace(":toplevel_name", String.valueOf(
-      toplevelCorpusName)).replace(":document_name", documentName);
+    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
+      .replace(":document_name", sqlString(documentName));
     return sql;
   }
 }
