@@ -210,7 +210,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin</artifactId>
-      <version>6.8.0</version>
+      <version>6.8.1</version>
     </dependency>
     
     <dependency>

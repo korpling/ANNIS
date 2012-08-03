@@ -99,6 +99,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(false);
     indicator.setValue(0f);
+    indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
 
     layout.addComponent(indicator);
