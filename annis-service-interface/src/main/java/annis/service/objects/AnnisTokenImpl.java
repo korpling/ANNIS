@@ -47,31 +47,31 @@ public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToke
   {
   }
 
+  @Override
   public long getId()
   {
     return id;
   }
 
-  public String getJSON()
-  {
-    throw new RuntimeException("Not implemented yet");
-  }
-
+  @Override
   public String getText()
   {
     return text;
   }
 
+  @Override
   public long getLeft()
   {
     return left;
   }
 
+  @Override
   public long getRight()
   {
     return right;
   }
 
+  @Override
   public long getTokenIndex()
   {
     return tokenIndex;
@@ -100,6 +100,7 @@ public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToke
     // TODO Auto-generated method stub
   }
 
+  @Override
   public void setText(String text)
   {
     // TODO Auto-generated method stub
@@ -111,11 +112,13 @@ public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToke
     return "token: '" + text + "' " + super.toString();
   }
 
+  @Override
   public long getCorpusId()
   {
     return this.corpusId;
   }
 
+  @Override
   public void setCorpusId(long corpusId)
   {
     this.corpusId = corpusId;

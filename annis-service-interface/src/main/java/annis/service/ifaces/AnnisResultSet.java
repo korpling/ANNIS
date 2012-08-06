@@ -24,7 +24,8 @@ import java.util.Set;
  * @author k.huetter
  *
  */
-public interface AnnisResultSet extends Set<AnnisResult>, Serializable, JSONAble {
+public interface AnnisResultSet extends Set<AnnisResult>, Serializable 
+{
 	public abstract Set<String> getAnnotationLevelSet();
 	public abstract Set<String> getTokenAnnotationLevelSet();
 }

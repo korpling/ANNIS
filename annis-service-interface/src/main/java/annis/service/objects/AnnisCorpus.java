@@ -17,11 +17,10 @@ package annis.service.objects;
 
 import java.io.Serializable;
 
-import annis.service.ifaces.JSONAble;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class AnnisCorpus implements Serializable, JSONAble, Comparable<AnnisCorpus>
+public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus>
 {
 
   private long id;
@@ -86,15 +85,6 @@ public class AnnisCorpus implements Serializable, JSONAble, Comparable<AnnisCorp
   public String toString()
   {
     return String.valueOf("corpus #" + id + ": " + name);
-  }
-
-  /* (non-Javadoc)
-   * @see annisservice.objects.AnnisCorpus#getJSON()
-   */
-  @Override
-  public String getJSON()
-  {
-    return "{\"id\":" + id + ",\"name\":\"" + name + "\",\"textCount\":" + textCount + ",\"tokenCount\":" + tokenCount + "}";
   }
 
   @Override

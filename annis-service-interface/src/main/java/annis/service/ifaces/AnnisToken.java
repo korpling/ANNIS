@@ -24,7 +24,7 @@ import java.util.Map;
  * @author k.huetter
  *
  */
-public interface AnnisToken extends Map<String, String>, JSONAble, Serializable {
+public interface AnnisToken extends Map<String, String>, Serializable {
 
 	/**
 	 * 

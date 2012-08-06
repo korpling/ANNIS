@@ -30,6 +30,7 @@ public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisRes
 	private static class AnnisResultSetComparator implements Comparator<AnnisResult>, Serializable {
 		
 
+    @Override
 		public int compare(AnnisResult o1, AnnisResult o2) {
 			int order =  Long.signum(o1.getStartNodeId() - o2.getStartNodeId());
 			if (order == 0) {
@@ -54,10 +55,7 @@ public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisRes
 		addAll(collection);
 	}
 
-	public String getJSON() {
-		throw new RuntimeException("Not implemented yet");
-	}
-
+  @Override
 	public Set<String> getAnnotationLevelSet() {
 		Set<String> levelSet = new HashSet<String>();
 		for(AnnisResult result : this)
@@ -65,6 +63,7 @@ public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisRes
 		return levelSet;
 	}
 
+  @Override
 	public Set<String> getTokenAnnotationLevelSet() {
 		Set<String> levelSet = new HashSet<String>();
 		for(AnnisResult result : this)
