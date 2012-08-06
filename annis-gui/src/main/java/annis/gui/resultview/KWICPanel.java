@@ -160,7 +160,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
     setCellStyleGenerator(new KWICStyleGenerator());
     setItemDescriptionGenerator(new TooltipGenerator());
-    
+
   }
   
   
@@ -206,7 +206,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   
   public class KWICStyleGenerator implements Table.CellStyleGenerator
   {
-    public String getStyle(String layer, SToken token)
+    public String getStyle(String layer, SNode token)
     {
 
       BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
@@ -249,9 +249,9 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     @Override
     public String getStyle(Object itemId, Object propertyId)
     {
-      if(propertyId != null && propertyId instanceof SToken)
+      if(propertyId != null && propertyId instanceof SNode)
       {
-        return getStyle((String) itemId, (SToken) propertyId);
+        return getStyle((String) itemId, (SNode) propertyId);
       }
       else
       {
