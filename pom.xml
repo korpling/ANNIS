@@ -110,7 +110,7 @@
   
   
   <modules>
-    <module>annis-service-rmi</module>    
+    <module>annis-service-interface</module>    
     <module>annis-service-impl</module>
     <module>Annis-Kickstarter</module>
     <module>annis-gui</module>

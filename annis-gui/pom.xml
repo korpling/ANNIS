@@ -228,14 +228,7 @@
 
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-service-rmi</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-service-impl</artifactId>
+      <artifactId>annis-service-interface</artifactId>
       <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
