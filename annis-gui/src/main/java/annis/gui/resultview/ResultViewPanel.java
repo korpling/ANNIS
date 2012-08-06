@@ -265,11 +265,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
     w.center();
   }
   
-  public void updateSegmentationLayer(SaltProject p)
+  public void updateSegmentationLayer( Set<String> segLayers)
   {
     miSegmentation.removeChildren();
-    
-    Set<String> segLayers = CommonHelper.getOrderingTypes(p);
     
     segLayers.add("");
     

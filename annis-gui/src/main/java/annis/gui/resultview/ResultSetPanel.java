@@ -61,6 +61,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private List<Match> matches;
   private Set<String> tokenAnnotationLevelSet =
     Collections.synchronizedSet(new HashSet<String>());
+  private Set<String> segmentationLayerSet =
+    Collections.synchronizedSet(new HashSet<String>());
   private ProgressIndicator indicator;
   private VerticalLayout layout;
 
@@ -338,7 +340,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       // get synchronized again in order not to confuse Vaadin
       synchronized (getApplication())
       {
+        segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
         tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+        
+        parent.updateSegmentationLayer(segmentationLayerSet);
         parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
         if (p.getSCorpusGraphs().size() > 0
