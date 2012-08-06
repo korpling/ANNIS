@@ -3,7 +3,7 @@
 #conf
 export ANNIS_HOME=$1
 
-ANNIS_VERSION=2.3.0-SNAPSHOT
+ANNIS_VERSION=3.0.0-SNAPSHOT
 DIST_DIR=annis-service-impl/target/annis-service-impl-$ANNIS_VERSION-distribution/annis-service-impl-$ANNIS_VERSION
 
 #code

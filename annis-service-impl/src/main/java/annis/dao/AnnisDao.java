@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.service.objects.Match;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -24,7 +25,7 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
-import annis.service.ifaces.AnnisBinary;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -41,22 +42,19 @@ public interface AnnisDao
 
   public List<AnnisCorpus> listCorpora();
 
-  public List<Long> listCorpusByName(List<String> corpusNames);
-
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
-  public List<Annotation> listCorpusAnnotations(long id);
+  public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName);
 
-  public AnnisBinary getBinary(String corpusName, int offset, int length);
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
-
 
   // new 
   int count(QueryData queryData);
@@ -64,8 +62,7 @@ public interface AnnisDao
   List<Match> find(QueryData queryData);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with
-   * {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with    {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -103,6 +100,8 @@ public interface AnnisDao
   int getTimeout();
 
   public List<String> mapCorpusIdsToNames(List<Long> ids);
+
+  public List<Long> mapCorpusNamesToIds(List<String> corpusNames);
 
   /**
    * Get a specific configuration of a corpus from directory

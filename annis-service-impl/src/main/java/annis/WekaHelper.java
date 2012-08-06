@@ -35,7 +35,7 @@ import org.apache.commons.lang.StringUtils;
 public class WekaHelper
 {
 
-  public String exportAsArff(List<AnnotatedMatch> annotatedMatches)
+  public static String exportAsArff(List<AnnotatedMatch> annotatedMatches)
   {
     StringBuilder sb = new StringBuilder();
 
@@ -143,7 +143,7 @@ public class WekaHelper
     return sb.toString();
   }
 
-  private String fullColumnName(int i, String name)
+  private static String fullColumnName(int i, String name)
   {
     return "#" + i + "_" + name;
   }

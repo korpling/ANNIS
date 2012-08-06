@@ -15,11 +15,6 @@
  */
 package annis.sqlgen.fullfacts;
 
-import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -31,6 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+
+import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
+import static annis.sqlgen.SqlConstraints.sqlString;
 
 /**
  *
@@ -59,11 +61,11 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
       + "FROM\n"
       + "\tfacts AS facts, corpus as c, corpus as toplevel\n" + "WHERE\n"
-      + "\ttoplevel.name = ':toplevel_name' AND c.name = ':document_name' AND facts.corpus_ref = c.id\n"
+      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND facts.corpus_ref = c.id\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
       + "ORDER BY facts.pre";
-    String sql = template.replace(":toplevel_name", String.valueOf(
-      toplevelCorpusName)).replace(":document_name", documentName);
+    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
+      .replace(":document_name", sqlString(documentName));
     return sql;
   }
 

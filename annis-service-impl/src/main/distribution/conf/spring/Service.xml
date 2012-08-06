@@ -7,13 +7,6 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
   <import resource="Common.xml" />
-
-	<!-- AnnisService -->
-  <bean id="annisService" class="annis.service.internal.AnnisServiceImpl" init-method="sayHello">
-    <property name="annisDao" ref="annisDao"/>
-    <property name="wekaHelper" ref="wekaHelper"/>
-    <property name="maxContext" value="${annis.max-context}" />
-  </bean>
    
    <!-- AnnisWebService -->
   <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="sayHello">
@@ -23,11 +16,4 @@
     <property name="port" value="${annis.webservice-port}" />
   </bean>
 
-
-  <bean class="org.springframework.remoting.rmi.RmiServiceExporter">
-    <property name="serviceName" value="AnnisService"/>
-    <property name="service" ref="annisService"/>
-    <property name="serviceInterface" value="annis.service.AnnisService"/>
-    <property name="registryPort" value="${annis.service-port}"/>
-  </bean>
 </beans>

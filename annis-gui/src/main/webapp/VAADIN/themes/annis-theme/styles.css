@@ -16,15 +16,27 @@
   background-color: white;
 }
 
+.result-view .v-table-cell-content {
+  padding: 0px;
+}
+
+.single-result .v-table-cell-content {
+  padding: 0px 6px;
+}
+
 .kwic {
   font-size: 11px;  
 }
 
-.kwic-anno {
+.v-table-cell-content-kwic-anno {
   color: grey;  
 }
 
-.pointer, .clickable {
+.v-table-cell-content-kwic-clickable {
+  color: grey;
+}
+
+.pointer, .v-table-cell-content-kwic-clickable {
   cursor: pointer;
 }
 
@@ -70,28 +82,28 @@ textarea.query {
 }
 
 /* matched node colors by match index*/
-.match_1 {
+.v-table-cell-content-match_1 {
   color: rgb(255,0,0);
 }
-.match_2 {
+.v-table-cell-content-match_2 {
   color: rgb(199,21,133);
 }
-.match_3 {
+.v-table-cell-content-match_3 {
   color: rgb(50, 205, 50);
 }
-.match_4 {
+.v-table-cell-content-match_4 {
   color: rgb(205,133,63);
 }
-.match_5 {
+.v-table-cell-content-match_5 {
   color: rgb(205,92,92);
 }
-.match_6 {
+.v-table-cell-content-match_6 {
   color: rgb(173,255,47);
 }
-.match_7 {
+.v-table-cell-content-match_7 {
   color: rgb(139,0,0);
 }
-.match_8 {
+.v-table-cell-content-match_8 {
   color: rgb(255,69,0);
 }
 

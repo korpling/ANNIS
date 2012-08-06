@@ -78,6 +78,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setWidth("100%");
     setHeight("-1px");
     setPageLength(0);
+    
+    addStyleName("single-result");
 
     if (CommonHelper.containsRTLText(text.getSText()))
     {
@@ -142,10 +144,9 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     {
 
       @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
+      public Object generateCell(Table source, Object itemId, Object columnId)
       {
-        Label lbl = new Label("");
-        return lbl;
+        return "";
       }
     });
     setColumnWidth(DUMMY_COLUMN, 0);
@@ -156,6 +157,10 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setContainerDataSource(containerAnnos);
     setVisibleColumns(visible.toArray());
 
+
+    setCellStyleGenerator(new KWICStyleGenerator());
+    setItemDescriptionGenerator(new TooltipGenerator());
+    
   }
   
   
@@ -169,32 +174,104 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       containerAnnos.addAll(annos);
     }
   }
-
-  public interface KWICComponentGenerator extends Table.ColumnGenerator
+  
+  public class TooltipGenerator implements ItemDescriptionGenerator
   {
-
-    public Object generateCell(String layer);
-  }
-
-  public static class GapColumnGenerator implements KWICComponentGenerator
-  {
+    
+    public String generateDescription(String layer, SToken token)
+    {
+      SAnnotation a = token.getSAnnotation(layer);
+      if(a != null)
+      {
+        return a.getQName();
+      }
+        
+      return null;
+    }
 
     @Override
-    public Object generateCell(String layer)
+    public String generateDescription(Component source, Object itemId, Object propertyId)
     {
-      Label l = new Label();
-      l.setSizeUndefined();
-      if ("tok".equals(layer))
+      if(propertyId != null && propertyId instanceof SToken)
       {
-        l.setValue("(...)");
+        return generateDescription((String) itemId, (SToken) propertyId);
       }
       else
       {
-        l.setValue("");
-        l.addStyleName("kwic-anno");
+        return null;
+      }
+    }
+    
+  }
+  
+  public class KWICStyleGenerator implements Table.CellStyleGenerator
+  {
+    public String getStyle(String layer, SToken token)
+    {
+
+      BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+      textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+     
+
+      if ("tok".equals(layer))
+      {
+        
+        if (markedAndCovered.containsKey(token))
+        {
+          // add color
+          return MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
+        }
+        else
+        {
+          return null;
+        }
+      }
+      else
+      {
+        SAnnotation a = token.getSAnnotation(layer);
+        if (a != null)
+        {         
+          for (String media_anno : media_annotations)
+          {
+            if (media_anno.equals(a.getName()))
+            {
+              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
+              {
+                return "kwic-clickable";
+              }
+            }
+          }
+        }
+      }
+      return "kwic-anno";
+    }
+
+    @Override
+    public String getStyle(Object itemId, Object propertyId)
+    {
+      if(propertyId != null && propertyId instanceof SToken)
+      {
+        return getStyle((String) itemId, (SToken) propertyId);
+      }
+      else
+      {
+        return null;
+      }
+    }
+    
+  }
+  
+  public static class GapColumnGenerator implements ColumnGenerator
+  {
+
+    public Object generateCell(String layer)
+    {
+      if ("tok".equals(layer))
+      {
+        return "(...)";
       }
 
-      return l;
+      return "";
     }
 
     @Override
@@ -204,7 +281,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     }
   }
 
-  public class TokenColumnGenerator implements KWICComponentGenerator
+  public class TokenColumnGenerator implements ColumnGenerator
   {
 
     private Map<String, SAnnotation> annotationsByQName;
@@ -227,7 +304,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       }
     }
 
-    @Override
     public Object generateCell(String layer)
     {
 
@@ -235,63 +311,46 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
       SDocumentGraph docGraph = result.getSDocumentGraph();
 
-      Label l = new Label("");
-      l.setSizeUndefined();
-
+      
       if ("tok".equals(layer))
       {
         if(segmentationName == null)
         {
           SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
             textualRelation).get(0);
-          l.setValue(((String) seq.getSSequentialDS().getSData()).substring(seq.
-            getSStart(), seq.getSEnd())); 
+          return ((String) seq.getSSequentialDS().getSData()).substring(seq.
+            getSStart(), seq.getSEnd()); 
         }
         else
         {
           SAnnotation a = annotationsByQName.get(segmentationName);
           if(a != null)
           {
-            l.setValue(a.getValueString());
+            return a.getValueString();
           }
-        }
-        
-        if (markedAndCovered.containsKey(token))
-        {
-          // add color
-          String styleName =
-            MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
-          l.addStyleName(styleName);
-        }
-        
+        }        
       }
       else
       {
         SAnnotation a = annotationsByQName.get(layer);
         if (a != null)
         {
-          l.setValue(a.getValueString());
-          l.setDescription(a.getQName());
-          l.addStyleName("kwic-anno");
-
           for (String media_anno : media_annotations)
           {
             if (media_anno.equals(a.getName()))
             {
-              if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
-              {
-                l.addStyleName("clickable");
-              }
               String startTime = getStartTime((String) a.getValue());
               String endTime = getEndTime((String) a.getValue());
               startTime = trimTimeAnno(startTime);
               endTime = trimTimeAnno(endTime);
-              l.setValue(startTime + "-" + endTime);
+              return (startTime + "-" + endTime);
             }
           }
+          
+          return a.getValueString();
         }
       }
-      return l;
+      return "";
     }
 
     @Override

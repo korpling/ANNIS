@@ -9,10 +9,14 @@
           http://www.springframework.org/schema/util/spring-util-2.5.xsd http://www.springframework.org/schema/util/spring-util-3.0.xsd/spring-spring-util-3.0.xsd-3.0.xsd
 ">
   
-	<!-- Enable bean autowiring -->
-	<context:annotation-config/>
+  <!-- Enable bean autowiring -->
+  <context:annotation-config/>
    
-  	<!-- AnnisDao -->
+  <!-- common configuration -->
+  <import resource="file:${annis.home}/conf/spring/CommonSqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/CommonDao.xml" />
+  
+  <!-- mode specific specializations -->
   <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/SqlGenerator.xml" />
   <import resource="file:${annis.home}/conf/spring/modes/${annis.mode}/Dao.xml"/>
  

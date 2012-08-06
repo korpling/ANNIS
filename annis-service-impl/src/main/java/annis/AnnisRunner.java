@@ -27,10 +27,12 @@ import org.apache.log4j.Logger;
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.dao.Match;
+import annis.service.objects.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
@@ -51,6 +53,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -75,7 +79,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
-  private GraphSqlGenerator graphSqlGenerator;
+  private AnnotateSqlGenerator graphSqlGenerator;
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -96,7 +100,7 @@ public class AnnisRunner extends AnnisBaseRunner
   /**
    * @return the graphSqlGenerator
    */
-  public GraphSqlGenerator getGraphSqlGenerator()
+  public AnnotateSqlGenerator getGraphSqlGenerator()
   {
     return graphSqlGenerator;
   }
@@ -104,7 +108,7 @@ public class AnnisRunner extends AnnisBaseRunner
   /**
    * @param graphSqlGenerator the graphSqlGenerator to set
    */
-  public void setGraphSqlGenerator(GraphSqlGenerator graphSqlGenerator)
+  public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
@@ -157,12 +161,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("2032");
-
-    doSet("seg to clean");
-
-    doSql("count tok & tok & #1 .clean,20 #2");
-    doAnnotate("tok");
+    doCorpus("0");
+    doSubgraph("salt:/pcc2/4282/#tok_8");
   }
 
   public void doParse(String annisQuery)
@@ -250,14 +250,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(split.length == 2, "bad call to plan");
     return split[1];
-  }
-
-  private String getAnnisFunctionyFromFunctionCall(String functionCall)
-  {
-    String[] split = functionCall.split(" ", 2);
-
-    Validate.isTrue(split.length == 2, "bad call to plan");
-    return split[0];
   }
 
   public void doRecord(String dummy)
@@ -685,8 +677,9 @@ public class AnnisRunner extends AnnisBaseRunner
    *
    * If the query function is "subgraph" or "sql_subgraph" the annisQuery string
    * should contain space separated salt ids. In this case the annisQuery is not
-   * parsed and the {@link QueryData#getAlternatives()} method should return an
-   * empty List. Instead of parsing the annisQuery it extracts the salt ids and
+   * parsed and the {@link QueryData#getAlternatives()} method should return a 
+   * List with dummy QueryNode entries. 
+   * Instead of parsing the annisQuery it extracts the salt ids and
    * put it into the extension's of {@link QueryData}.
    *
    * @param annisQuery should include a valid annis query
@@ -719,13 +712,13 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
 
-    if (queryFunction != null && queryFunction.matches("(sql_)?annotate"))
+    if (queryFunction != null && queryFunction.matches("(sql_)?(annotate|find)"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer));
       queryData.addExtension(new LimitOffsetQueryData(offset, limit));
     }
-    else if (queryFunction != null && queryFunction.matches("(sql_)?find"))
+    else if (queryFunction != null && queryFunction.matches("(sql_)?subgraph"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer));
@@ -769,7 +762,7 @@ public class AnnisRunner extends AnnisBaseRunner
     JAXBContext jc = null;
     try
     {
-      jc = JAXBContext.newInstance(annis.dao.Match.class);
+      jc = JAXBContext.newInstance(annis.service.objects.Match.class);
     }
     catch (JAXBException ex)
     {
@@ -839,7 +832,7 @@ public class AnnisRunner extends AnnisBaseRunner
         // check if there is a corpus with this name
         LinkedList<String> splitList = new LinkedList<String>();
         splitList.add(split);
-        corpusList.addAll(annisDao.listCorpusByName(splitList));
+        corpusList.addAll(annisDao.mapCorpusNamesToIds(splitList));
       }
     }
 
@@ -882,9 +875,21 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    List<Annotation> corpusAnnotations = annisDao.listCorpusAnnotations(Long.
-      parseLong(corpusId));
-    printAsTable(corpusAnnotations, "namespace", "name", "value");
+    LinkedList<Long> corpusIdAsList = new LinkedList<Long>();
+    try
+    {
+      corpusIdAsList.add(Long.parseLong(corpusId));
+      List<String> toplevelNames = annisDao.mapCorpusIdsToNames(corpusIdAsList);
+      
+      List<Annotation> corpusAnnotations =
+        annisDao.listCorpusAnnotations(toplevelNames.get(0));
+      printAsTable(corpusAnnotations, "namespace", "name", "value");
+    }
+    catch (NumberFormatException ex)
+    {
+      System.out.print("not a number: " + corpusId);
+    }
+
   }
 
   public void doSqlText(String textID)
@@ -1117,6 +1122,21 @@ public class AnnisRunner extends AnnisBaseRunner
 
       uris.add(uri);
     }
+    
+    // collect list of used corpora and created pseudo QueryNodes for each URI
+    Set<String> corpusNames = new TreeSet<String>();
+    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(uris.size());
+    for(java.net.URI u : uris)
+    {
+      pseudoNodes.add(new QueryNode());
+      
+      corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
+    }
+    
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
+    
+    queryData.setCorpusList(corpusIDs);
+    queryData.addAlternative(pseudoNodes);
 
     log.debug(uris);
     queryData.addExtension(uris);

@@ -163,8 +163,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
               Integer.parseInt((String) cbLeftContext.getValue()),
               Integer.parseInt((String) cbRightContext.getValue()),
               corpusListPanel.getSelectedCorpora(),
-              null, (String) txtParameters.getValue(),
-              Helper.getService(getApplication(), getWindow()), 
+              null, (String) txtParameters.getValue(), 
               Helper.getAnnisWebResource(getApplication()),
               new OutputStreamWriter(out));
           }

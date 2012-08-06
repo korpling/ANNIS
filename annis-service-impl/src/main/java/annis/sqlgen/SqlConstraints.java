@@ -162,7 +162,14 @@ public class SqlConstraints
 
   public static String sqlString(String string)
   {
-    return "'" + StringEscapeUtils.escapeSql(string) + "'";
+    if(string == null)
+    {
+      return "''";
+    }
+    else
+    {
+      return "'" + StringUtils.replace(string, "'", "''") + "'";
+    }
   }
 
   public static String sqlString(String string, TextMatching textMatching)

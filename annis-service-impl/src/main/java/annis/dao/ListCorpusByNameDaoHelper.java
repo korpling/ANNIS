@@ -22,6 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
+import static annis.sqlgen.SqlConstraints.sqlString;
+
 public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMapper<Long>
 {
 
@@ -33,7 +35,7 @@ public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMappe
     List<String> corpusNamesSqlStrings = new ArrayList<String>();
     for (String corpus : corpusNames)
     {
-      corpusNamesSqlStrings.add("'" + corpus + "'");
+      corpusNamesSqlStrings.add(sqlString(corpus));
     }
 
     // build sql query

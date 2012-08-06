@@ -16,7 +16,8 @@
 package annis.gui;
 
 import annis.model.Annotation;
-import annis.service.AnnisService;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Component;
@@ -25,7 +26,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +45,11 @@ public class MetaDataPanel extends Panel
   private String toplevelCorpusName;
   private String documentName;
 
+  public MetaDataPanel(String toplevelCorpusName)
+  {
+    this(toplevelCorpusName, null);
+  }
+  
   public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
@@ -69,9 +74,9 @@ public class MetaDataPanel extends Panel
       new BeanItemContainer<Annotation>(Annotation.class);
 
     // are we called from the corpusBrowser or there is no subcorpus stay here:
-    if (documentName.equals(toplevelCorpusName))
+    if (documentName == null)
     {
-      mData.addAll(getMetaData(toplevelCorpusName, documentName));
+      mData.addAll(getMetaData(toplevelCorpusName, null));
       layout.addComponent(setupTable(mData));
     }
     else
@@ -96,15 +101,19 @@ public class MetaDataPanel extends Panel
     String documentName)
   {
     List<Annotation> result = new ArrayList<Annotation>();
+    WebResource res = Helper.getAnnisWebResource(getApplication());
     try
     {
-      AnnisService service = Helper.getService(getApplication(), getWindow());
-      if (service != null)
+      res = res.path("corpora").path(toplevelCorpusName);
+      if (documentName != null)
       {
-        result = service.getMetadata(toplevelCorpusName, documentName);
+        res = res.path(documentName);
       }
+      res = res.path("metadata");
+
+      result = res.get(new GenericType<List<Annotation>>() {});
     }
-    catch (RemoteException ex)
+    catch (Exception ex)
     {
       Logger.getLogger(MetaDataPanel.class.getName()).log(Level.SEVERE,
         null, ex);
@@ -122,7 +131,6 @@ public class MetaDataPanel extends Panel
     tblMeta.setContainerDataSource(mData);
     tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator()
     {
-
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
@@ -139,7 +147,6 @@ public class MetaDataPanel extends Panel
     });
     tblMeta.addGeneratedColumn("genvalue", new Table.ColumnGenerator()
     {
-
       @Override
       public Component generateCell(Table source, Object itemId, Object columnId)
       {
