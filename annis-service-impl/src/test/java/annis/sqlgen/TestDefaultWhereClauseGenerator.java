@@ -228,7 +228,7 @@ public class TestDefaultWhereClauseGenerator
         join("=", "_rank23.pre", "_rank42.parent"));
     checkWhereConditions(
         node42,
-        "_rank_annotation42.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^(value3)$', ARRAY[], 'edge'))"
+        "_rank_annotation42.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
     );
   }
 
@@ -616,10 +616,25 @@ public class TestDefaultWhereClauseGenerator
         "value2", TextMatching.EXACT_EQUAL));
     node23.addNodeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
+    
     checkWhereConditions(
-      "_annotation23_1.anno_ref= ANY(getAnnoByNamespaceName('namespace1', 'name1', ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnnoByNamespaceNameVal('namespace2', 'name2', 'value2', ARRAY[], 'node'))",
-      "_annotation23_3.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^(value3)$', ARRAY[], 'node'))"
+      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
+      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
+      "_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
+    );
+  }
+  
+  @Test
+  public void whereClauseForNodeAnnotationNot()
+  {
+    node23.addNodeAnnotation(new QueryAnnotation("namespace2", "name2",
+        "value2", TextMatching.EXACT_NOT_EQUAL));
+    node23.addNodeAnnotation(new QueryAnnotation("namespace3", "name3",
+        "value3", TextMatching.REGEXP_NOT_EQUAL));
+    
+    checkWhereConditions(
+      "_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
+      "_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
     );
   }
 
@@ -633,9 +648,22 @@ public class TestDefaultWhereClauseGenerator
     node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     checkWhereConditions(
-      "_rank_annotation23_1.anno_ref= ANY(getAnnoByNamespaceName('namespace1', 'name1', ARRAY[], 'edge'))",
-      "_rank_annotation23_2.anno_ref= ANY(getAnnoByNamespaceNameVal('namespace2', 'name2', 'value2', ARRAY[], 'edge'))",
-      "_rank_annotation23_3.anno_ref= ANY(getAnnoByNamespaceNameValRegex('namespace3', 'name3', '^(value3)$', ARRAY[], 'edge'))"
+      "_rank_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'edge'))",
+      "_rank_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
+      "_rank_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+    );
+  }
+  
+  @Test
+  public void whereClauseForNodeEdgeAnnotationNot()
+  {
+    node23.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2",
+        "value2", TextMatching.EXACT_NOT_EQUAL));
+    node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
+        "value3", TextMatching.REGEXP_NOT_EQUAL));
+    checkWhereConditions(
+      "_rank_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
+      "_rank_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
     );
   }
 
