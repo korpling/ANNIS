@@ -26,6 +26,8 @@ import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
+import static annis.sqlgen.SqlConstraints.sqlString;
+
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
  *
@@ -182,7 +184,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     String rawPath = StringUtils.strip(uri.getPath(), "/ \t");
     String[] path = rawPath.split("/");
 
-    sb.append("'{");
+    sb.append("{");
     for (int j = path.length - 1; j >= 0; j--)
     {
       sb.append(path[j]);
@@ -193,7 +195,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       }
     }
 
-    sb.append("}'");
-    return sb.toString();
+    sb.append("}");
+    return  sqlString(sb.toString());
   }
 }
