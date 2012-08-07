@@ -78,59 +78,146 @@
               <admonGraphicsExtension>.svg</admonGraphicsExtension>
               <useSvg>true</useSvg>
               <useExtensions>true</useExtensions>
-             
+              <!-- font configuration -->
+              <bodyFontFamily>DejaVuSerif</bodyFontFamily>
+              <monospaceFontFamily>DejaVuMono</monospaceFontFamily>
+              <titleFontFamily>DejaVuSans</titleFontFamily>
+              <fonts>
+                <font>
+                  <name>DejaVuMono</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/fonts/DejaVuSansMono.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSansMono-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSerif</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/fonts/DejaVuSerif.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSerif</name>
+                  <style>italic</style>
+                  <weight>normal</weight>
+                  <embedFile>src/fonts/DejaVuSerif-Italic.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-Italic-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSerif</name>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <embedFile>src/fonts/DejaVuSerif-Bold.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-Bold-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSerif</name>
+                  <style>italic</style>
+                  <weight>bold</weight>
+                  <embedFile>src/fonts/DejaVuSerif-BoldItalic.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-BoldItalic-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSans</name>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <embedFile>src/fonts/DejaVuSans-Bold.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSans-Bold-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVuSans</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/fonts/DejaVuSans.ttf</embedFile>
+                  <metricsFile>${basedir}/target/fonts/DejaVuSans-metrics.xml</metricsFile>
+                </font>
+              </fonts>
             </configuration>
             <phase>site</phase>
           </execution>
           <execution>
-          <id>html</id>
-          <goals>
-            <goal>generate-html</goal>
-          </goals>
-          <configuration>
-            <targetDirectory>${project.build.directory}/manual</targetDirectory>
-            <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
-            <highlightSource>true</highlightSource>
-            <admonGraphics>true</admonGraphics>
-            <admonGraphicsPath>images/docbook/</admonGraphicsPath>
-            <admonGraphicsExtension>.svg</admonGraphicsExtension>
-            <useSvg>true</useSvg>
-            <useExtensions>true</useExtensions>
-            <postProcess>
-              <copy todir="${project.build.directory}/manual/images">
-                <fileset dir="${basedir}/src/docbkx/images">
-                </fileset>
-              </copy>
+            <id>html</id>
+            <goals>
+              <goal>generate-html</goal>
+            </goals>
+            <configuration>
+              <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
+              <highlightSource>true</highlightSource>
+              <admonGraphics>true</admonGraphics>
+              <admonGraphicsPath>images/docbook/</admonGraphicsPath>
+              <admonGraphicsExtension>.svg</admonGraphicsExtension>
+              <useSvg>true</useSvg>
+              <useExtensions>true</useExtensions>
+              <postProcess>
+                <copy todir="${project.build.directory}/manual/images">
+                  <fileset dir="${basedir}/src/docbkx/images">
+                  </fileset>
+                </copy>
                 <!--
                 <copy todir="${project.build.directory}/manual/figures">
                   <fileset dir="${project.build.directory}/site/apidocs/figures">
                   </fileset>
                 </copy>
                 -->
-            </postProcess>
-          </configuration>
-          <phase>site</phase>
-        </execution>
-      </executions>
+              </postProcess>
+            </configuration>
+            <phase>site</phase>
+          </execution>
+        </executions>
         
-      <configuration>
-        <xincludeSupported>true</xincludeSupported>
-      </configuration>
+        <configuration>
+          <xincludeSupported>true</xincludeSupported>
+        </configuration>
         
-      <dependencies>
-        <dependency>
-          <groupId>net.sf.docbook</groupId>
-          <artifactId>docbook-xml</artifactId>
-          <version>5.0-all</version>
-          <classifier>resources</classifier>
-          <type>zip</type>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.docbook</groupId>
+            <artifactId>docbook-xml</artifactId>
+            <version>5.0-all</version>
+            <classifier>resources</classifier>
+            <type>zip</type>
+            <scope>runtime</scope>
+          </dependency>
         
-    </plugin>
+          <dependency>
+            <groupId>net.sf.xslthl</groupId> 
+            <artifactId>xslthl</artifactId> 
+            <version>2.0.2</version>
+            <scope>runtime</scope>
+          </dependency>
+          
+          <dependency>
+            <groupId>net.sf.offo</groupId>
+            <artifactId>fop-hyph</artifactId>
+            <version>1.2</version>
+            <scope>runtime</scope>
+          </dependency>
+        
+        </dependencies>
+        
+      </plugin>
       
-  </plugins>
-</build>
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-fop-support</artifactId>
+        <version>2.0.14</version>
+        <executions>
+          <execution>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>src/fonts/</sourceDirectory>
+              <ansi>false</ansi>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+  </build>
     
 </project>

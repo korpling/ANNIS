@@ -193,7 +193,8 @@
                             <programlisting>cd &lt;unzipped source>/Annis-Service
 mvn -DskipTests=true install 
 mvn -DskipTests=true assembly:assembly tar xzvf
-target/annis-service-&lt;version>-distribution.tar.gz -C &lt;installation directory&gt;            </programlisting>
+target/annis-service-&lt;version>-distribution.tar.gz↵
+    -C &lt;installation directory&gt;</programlisting>
                         </para>
                     </listitem>
                     <listitem>
@@ -206,7 +207,8 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                     <listitem>
                         <para>Next initialize your ANNIS database (only the first time you use the
                             system):</para>
-                        <programlisting>annis-admin.sh init -u &lt;username> -d &lt;dbname> -p  &lt;password> -P &lt;postgres password></programlisting>
+                        <programlisting>annis-admin.sh init -u &lt;username> -d &lt;dbname> -p  &lt;password&gt;↵
+    -P &lt;postgres password></programlisting>
                     </listitem>
                     <listitem>
                         <para>Now you can import some corpora: </para>
@@ -304,7 +306,7 @@ mvn -DskipTests=true install</programlisting>
 
                 <para>Pressing the <inlinemediaobject>
                         <imageobject>
-                            <imagedata fileref="images/info.png" align="char"/>
+                            <imagedata fileref="images/info.png"/>
                         </imageobject>
                     </inlinemediaobject> button next to a corpus in the list will open the corpus
                     explorer window (see picture below), which shows metadata for the entire corpus
@@ -597,18 +599,19 @@ mmax:np_form="defnp" &amp;
                 relation can be viewed by hovering of the appropriate underline. <screenshot>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="images/coreference.png" width="100%" align="center"/>
+                            <imagedata fileref="images/coreference.png" width="100%" align="center"
+                            />
                         </imageobject>
                     </mediaobject>
-                </screenshot>
-                Another way to use pointing relations is found in syntactic dependency trees. The queries 
-                in this case can use both pointing relation types and annotation, as in the following query:
+                </screenshot> Another way to use pointing relations is found in syntactic dependency
+                trees. The queries in this case can use both pointing relation types and annotation,
+                as in the following query:
                 <programlisting>pos="VVFIN" &amp; tok &amp; #1 ->dep[func="obja"] #2</programlisting>
-                This query searches for a finite verb (with the part-of-speech VVFIN) and a token, with a 
-                pointing relation of the type ‘dep’ (for dependency) between the two, annotated with 
-                ‘func="obja"’ (the function Object, Accusative). The result can be viewed with the 
-                dependency arch visualizer, which shows the verb  gibt ‘gives’ and its object  Wunder 
-                ‘miracles’.<screenshot>
+                This query searches for a finite verb (with the part-of-speech VVFIN) and a token,
+                with a pointing relation of the type ‘dep’ (for dependency) between the two,
+                annotated with ‘func="obja"’ (the function Object, Accusative). The result can be
+                viewed with the dependency arch visualizer, which shows the verb gibt ‘gives’ and
+                its object Wunder ‘miracles’.<screenshot>
                     <mediaobject>
                         <imageobject>
                             <imagedata fileref="images/dependencies.png" width="30%" align="left"/>
@@ -618,6 +621,101 @@ mmax:np_form="defnp" &amp;
             </para>
         </section>
 
+        <section>
+            <title>Exporting Search Results</title>
+            <para>By going to the Export tab at the bottom of the search form on the left, you can
+                select one of several exporters:<screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/export.png" width="40%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot> The <emphasis role="bold">SimpleTextExporter</emphasis> simply gives
+                the text for all tokens in each search result, including context, in a
+                one-row-per-hit format. The tokens covered by the match area are marked with square
+                brackets and the results are numbered, as in the following example
+                <programlisting>1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große 
+2. der 1,62 Meter große Gennadi [Subow] die deutsche Nationalelf↵
+    vorübergehend in 
+3. und Reputation kämpfenden Mannschaft von [Rudi] Völler der Weg↵ 
+    zur Weltmeisterschaft 
+4. Reputation kämpfenden Mannschaft von Rudi [Völler] der Weg zur↵
+    Weltmeisterschaft endgültig 
+5. die deutschen Nationalkicker einen " [Rudi] Riese " auf der Bank 
+                </programlisting>
+            </para>
+            <para> The <emphasis role="bold">TextExporter</emphasis> adds all annotations of each
+                token separated by slashes (e.g. <computeroutput>dogs/NN/dog</computeroutput> for
+                the token dogs annotated with a part-of-speech NN and a lemma dog). </para>
+            <para>The <emphasis role="bold">GridExporter</emphasis> adds all annotations available
+                for the span of retrieved tokens, with each annotation layer in a separate line.
+                Annotations are separated by spaces and the hierarchical order of annotations is
+                lost, though the span of tokens covered by each annotation may optionally be given
+                in square brackets (to turn this off use the optional parameter
+                    <computeroutput>numbers=false</computeroutput>). The user can specify annotation
+                layers to be exported in the additional ‘Parameters’ box, using the setting ‘keys=’
+                and annotation names separated by comas. If nothing is specified in the parameters
+                box, all available annotations will be exported. Multiple options are separated by a
+                semicolon, e.g. <computeroutput>keys=tok,pos,cat;numbers=false</computeroutput>. An
+                example output with token numbers looks as follows.
+                <screen>1. tok ein Dialog zwischen den Generationen angestoßen . 
+cat NP[1-5] S[1-6] VP[1-6] PP[3-5] 
+pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
+                Meaning that the annotation cat="NP" applied to tokens 1-5 in the search result, and
+                so on. Note that when specifying annotation layers, if the reserved name <emphasis
+                    role="bold">‘tok’</emphasis> is not specified, the tokens themselves will not be
+                exported (annotations only). </para>
+            <para>The <emphasis role="bold">WekaExporter</emphasis> outputs the format used by the WEKA machine learning tool (<link
+                    xlink:href="http://www.cs.waikato.ac.nz/ml/weka/"
+                    >http://www.cs.waikato.ac.nz/ml/weka/</link>). Only the attributes of the search
+                elements (#1, #2 etc. in AQL) are outputted, and are separated by commas. The order
+                and name of the attributes is declared in the beginning of the export text, as in
+                this example:
+            <screen>@relation name
+@attribute #1_id string
+@attribute #1_token string
+@attribute #1_tiger:cat string
+@attribute #2_id string
+@attribute #2_token string
+@attribute #2_tiger:lemma string
+@attribute #2_tiger:morph string
+@attribute #2_tiger:pos string
+@data
+'288662','NULL','NP','288392','ganze','ganz','Pos.Acc.Sg.Fem',↵
+    'ADJA
+'289175','NULL','NP','288712','geladenen','geladen',↵
+    'Pos.Nom.Pl.*','ADJA'
+'289660','NULL','NP','289409','Döberitzer','Döberitzer',↵
+    'Pos.*.*.*','ADJA'
+'288672','NULL','NP','288302','deutschen','deutsch',↵
+    'Pos.Nom.Pl.Masc','ADJA'
+'289614','NULL','NP','289291','deutsche','deutsch',↵
+    'Pos.Nom.Sg.Fem','ADJA'
+'289625','NULL','NP','289245','fulminanter','fulminant','↵
+    Pos.Nom.Sg.Masc','ADJA'
+'288607','NULL','NP','288242','einstige','einstig',↵
+    'Pos.Nom.Sg.Fem','ADJA'
+'288620','NULL','NP','288334','ähnliche','ähnlich',↵
+    'Pos.Acc.Pl.Neut','ADJA'
+'289220','NULL','NP','288883','große','groß','Pos.Nom.Sg.Fem',↵
+    'ADJA'
+'288610','NULL','NP','288313','deutsche','deutsch',↵
+    'Pos.Acc.Sg.Fem','ADJA'
+'289174','NULL','NP','288809','böse','böse','Pos.Nom.Sg.Fem',↵
+    'ADJA'
+'289611','NULL','NP','289241','Dallgower','Dallgower',↵
+    'Pos.*.*.*','ADJA'
+'288624','NULL','NP','288330','ukrainische','ukrainisch','↵
+    Pos.Nom.Sg.Masc','ADJA'</screen>
+                The export shows the properties of an NP node dominating a token with the part-ofspeech ADJA. Since the token also has other attributes, such as the lemma, the token text 
+                and morphology, these are also retrieved.  Note that exporting may be slow  in both 
+                exporters if the result set is very large.
+            </para>
+        </section>
+        <section>
+            <title>Complete List of Operators</title>
+            <para>The ANNIS Query Language (AQL) currently includes the following operators:</para>
+        </section>
     </section>
 
 </article>
