@@ -195,17 +195,18 @@ mvn -DskipTests=true install
 mvn -DskipTests=true assembly:assembly tar xzvf
 target/annis-service-&lt;version>-distribution.tar.gz -C &lt;installation directory&gt;            </programlisting>
                         </para>
-                    </listitem>
-                    <listitem>
-                        <para>Next initialize your ANNIS database (only the first time you use the
-                            system):</para>
-                    </listitem>
+                    </listitem>                    
                     <listitem>
                         <para>Set the environment variables (each time when starting up) </para>
                         <para>
                             <programlisting>export ANNIS_HOME=&lt;installation directory>
 export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                         </para>
+                    </listitem>
+                    <listitem>
+                        <para>Next initialize your ANNIS database (only the first time you use the
+                            system):</para>
+                        <programlisting>annis-admin.sh init -u &lt;username> -d &lt;dbname> -p  &lt;password> -P &lt;postgres password></programlisting>
                     </listitem>
                     <listitem>
                         <para>Now you can import some corpora: </para>
