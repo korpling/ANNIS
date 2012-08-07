@@ -459,46 +459,107 @@ mvn -DskipTests=true install</programlisting>
                 To view metadata for a search result or for a corpus, press the "i" icon next to it
                 in the result window or in the search form respectively. </para>
         </section>
-        
+
         <section>
             <title>Searching for Annotations</title>
-            <para>
-                Annotations may be searched for using an annotation name and value. The names of the
-                annotations vary from corpus to corpus, though many corpora contain part-of-speech and
-                lemma annotations with the names pos and lemma respectively (annotation names are
-                case sensitive). For example, to search for all forms of the German verb sein 'to be' in a
-                corpus with lemma annotation such as pcc2, simply select the pcc2 corpus and enter:
-                <programlisting>lemma="sein"</programlisting>
-                Negative searches are also possible using != instead of =. For negated tokens (word forms)
-                use the reserved attribute tok. For example:
-                <programlisting>lemma!="sein"</programlisting>
-                or:
-                <programlisting>tok!="ist"</programlisting>
-                Metadata can also be negated similarly:
-                <programlisting>lemma="sein" &amp; meta::Genre!="Sport"</programlisting>
-                To only find finite forms of this verb in pcc2, use the part-of-speech (pos) annotation
-                concurrently, and specify that both the lemma and pos should apply to the same element:
-                <programlisting>lemma="sein" &amp; pos="VAFIN" &amp; #1 _=_ #2</programlisting>
-                The expression #1 _=_ #2 uses the span identity operator to specify that the first
-                annotation and the second annotation apply to exactly the same position in the corpus.
-                Annotations can also apply to longer spans than a single token: for example, in pcc2, the
-                annotation Inf-Stat signifies the information structure status of a discourse referent. This
-                annotation can also apply to phrases longer than one token. The following query finds
-                spans containing new discourse referents, not previously mentioned in the text:
-                <programlisting>exmaralda:Inf-Stat="new"</programlisting>
-                If the corpus contains no more than one annotation type named Inf-Stat, the optional
-                namespace (in this case exmaralda:) may be dropped; if there are multiple annotations
-                with the same name but different namespaces, dropping the namespace will find all of
-                those annotations. In order to view the span of tokens to which this annotation applies,
-                enter the and click on "Show Result", then open the exmaralda annotation level to view
-                the grid containing the span. Further operators can test the relationships between
-                potentially overlapping annotations in spans. For example, the operator _i_ examines
-                whether one annotation fully contains the span of another annotation (the i stands for
-                'includes'):
+            <para> Annotations may be searched for using an annotation name and value. The names of
+                the annotations vary from corpus to corpus, though many corpora contain
+                part-of-speech and lemma annotations with the names pos and lemma respectively
+                (annotation names are case sensitive). For example, to search for all forms of the
+                German verb sein 'to be' in a corpus with lemma annotation such as pcc2, simply
+                select the pcc2 corpus and enter: <programlisting>lemma="sein"</programlisting>
+                Negative searches are also possible using != instead of =. For negated tokens (word
+                forms) use the reserved attribute tok. For example:
+                <programlisting>lemma!="sein"</programlisting> or:
+                <programlisting>tok!="ist"</programlisting> Metadata can also be negated similarly:
+                <programlisting>lemma="sein" &amp; meta::Genre!="Sport"</programlisting> To only
+                find finite forms of this verb in pcc2, use the part-of-speech (pos) annotation
+                concurrently, and specify that both the lemma and pos should apply to the same
+                element:
+                <programlisting>lemma="sein" &amp; pos="VAFIN" &amp; #1 _=_ #2</programlisting> The
+                expression #1 _=_ #2 uses the span identity operator to specify that the first
+                annotation and the second annotation apply to exactly the same position in the
+                corpus. Annotations can also apply to longer spans than a single token: for example,
+                in pcc2, the annotation Inf-Stat signifies the information structure status of a
+                discourse referent. This annotation can also apply to phrases longer than one token.
+                The following query finds spans containing new discourse referents, not previously
+                mentioned in the text: <programlisting>exmaralda:Inf-Stat="new"</programlisting> If
+                the corpus contains no more than one annotation type named Inf-Stat, the optional
+                namespace (in this case exmaralda:) may be dropped; if there are multiple
+                annotations with the same name but different namespaces, dropping the namespace will
+                find all of those annotations. In order to view the span of tokens to which this
+                annotation applies, enter the and click on "Show Result", then open the exmaralda
+                annotation level to view the grid containing the span. Further operators can test
+                the relationships between potentially overlapping annotations in spans. For example,
+                the operator _i_ examines whether one annotation fully contains the span of another
+                annotation (the i stands for 'includes'):
                 <programlisting>Topic="ab" &amp; Inf-Stat="new" &amp; #1 _i_ #2</programlisting>
-                This query finds aboutness topics (Topic="ab") containing information structurally new
-                discourse referents.
-                
+                This query finds aboutness topics (Topic="ab") containing information structurally
+                new discourse referents. </para>
+        </section>
+
+        <section>
+            <title>Searching using Regular Expressions</title>
+            <para> When searching for word forms and annotation values, it is possible to employ
+                wildcards as placeholders for a variety of characters, using Regular Expression
+                syntax (see <link xlink:href="http://www.regular-expressions.info/"
+                    >http://www.regular-expressions.info/</link> for detailed information). To
+                search for wildcards use slashes instead of quotation marks to surround your search
+                term. For example, you can use the period (.) to replace any single character:
+                <programlisting>tok=/de./</programlisting> This finds word forms such as "der",
+                "dem", "den" etc. It is also possible to make characters optional by following them
+                with a question mark (?). The following example finds cases of "das" and "dass",
+                since the second "s" is optional: <programlisting>tok=/dass?/</programlisting> It is
+                also possible to specify an arbitrary number of repetitions, with an asterisk (*)
+                signifying zero or more occurrences and a plus (+) signifying at least one
+                occurrence. For example, the first query below finds "da", "das", and "dass" (since
+                the asterisk means zero or more times the preceding "s"), while the second finds
+                "das" and "dass", since at least one "s" must be found:
+                <programlisting>tok=/das*/
+
+tok=/das+/</programlisting> It is possible to combine
+                these operators with the period operator to mean any number of occurrences of an
+                arbitrary character. For example, the query below searches for pos (part-of-speech)
+                annotations that begin with "VA", corresponding to all forms of auxiliary verbs. The
+                string "VA" means that the result must begin with "VA", the period stands for any
+                character, and the asterisk means that 'any character' can be repeated zero or more
+                time, as above.<programlisting>pos=/VA.*/</programlisting> This finds both finite verbs ("VAFIN") and non-finite
+                ones ("VAINF"). It is also possible to search for explicit alternatives by either
+                specifying characters in square brackets or longer strings in round brackets
+                separated by pipe signs. The first example below finds either "dem" or "der" (i.e.
+                "de" followed by either "m" or "r") while the second example finds lemma annotations
+                that are either "sein" or "werden". <programlisting>tok=/de[mr]/
+
+lemma=/(sein|werden)/</programlisting> 
+                Finally, negative searches can be used as usual with the exclamation point, and regular
+                expressions can generally be used also in edge annotations. For example, if we
+                search for trees (see also Searching for Trees below) where a node dominates another
+                node with edges not containing an object, we can use a wildcard to rule out all
+                edges labels beginning with "O" for object: <programlisting>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2 </programlisting></para>
+        </section>
+        
+        <section>
+            <title>Searching for Trees</title>
+            <para>
+                In corpora containing hierarchical structures, annotations such as syntax trees can be 
+                searched for by defining terminal or none-terminal node annotations and their values. A 
+                simple search for prepostional phrases in the small pcc2 demo corpus looks like this:
+                <programlisting>tiger:cat="PP"</programlisting> 
+                If the corpus contains no more than one annotation called cat, the optional namespace, in 
+                this case tiger:, may be dropped. This finds all PP nodes in the corpus. To find all PP 
+                nodes directly dominating a proper name, a second element can be specified with the 
+                appropriate part-of-speech (pos) value:
+                <programlisting>cat="PP" &amp; pos="NE" &amp; #1 > #2</programlisting> 
+                The operator > signifies direct dominance, which must hold between the first and the 
+                second element. Once the Result Window is shown you may open the "tiger" annotation 
+                level to see the corresponding tree.
+                <screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/tiger_tree.png" width="90%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot>
             </para>
         </section>
 
