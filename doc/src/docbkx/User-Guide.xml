@@ -163,7 +163,7 @@
                         <para>Make note of the postgres password. Under linux, you will have to set
                             the postgres manually. You can achieve this with running the following
                             commands:</para>
-                        <para> 
+                        <para>
                             <programlisting>sudo -u postgres psql
 \password
 \q</programlisting></para>
@@ -195,7 +195,7 @@ mvn -DskipTests=true install
 mvn -DskipTests=true assembly:assembly tar xzvf
 target/annis-service-&lt;version>-distribution.tar.gz -C &lt;installation directory&gt;            </programlisting>
                         </para>
-                    </listitem>                    
+                    </listitem>
                     <listitem>
                         <para>Set the environment variables (each time when starting up) </para>
                         <para>
@@ -531,40 +531,87 @@ tok=/das+/</programlisting> It is possible to combine
                 annotations that begin with "VA", corresponding to all forms of auxiliary verbs. The
                 string "VA" means that the result must begin with "VA", the period stands for any
                 character, and the asterisk means that 'any character' can be repeated zero or more
-                time, as above.<programlisting>pos=/VA.*/</programlisting> This finds both finite verbs ("VAFIN") and non-finite
-                ones ("VAINF"). It is also possible to search for explicit alternatives by either
-                specifying characters in square brackets or longer strings in round brackets
-                separated by pipe signs. The first example below finds either "dem" or "der" (i.e.
-                "de" followed by either "m" or "r") while the second example finds lemma annotations
-                that are either "sein" or "werden". <programlisting>tok=/de[mr]/
+                time, as above.<programlisting>pos=/VA.*/</programlisting> This finds both finite
+                verbs ("VAFIN") and non-finite ones ("VAINF"). It is also possible to search for
+                explicit alternatives by either specifying characters in square brackets or longer
+                strings in round brackets separated by pipe signs. The first example below finds
+                either "dem" or "der" (i.e. "de" followed by either "m" or "r") while the second
+                example finds lemma annotations that are either "sein" or "werden".
+                <programlisting>tok=/de[mr]/
 
-lemma=/(sein|werden)/</programlisting> 
-                Finally, negative searches can be used as usual with the exclamation point, and regular
+lemma=/(sein|werden)/</programlisting> Finally,
+                negative searches can be used as usual with the exclamation point, and regular
                 expressions can generally be used also in edge annotations. For example, if we
                 search for trees (see also Searching for Trees below) where a node dominates another
                 node with edges not containing an object, we can use a wildcard to rule out all
-                edges labels beginning with "O" for object: <programlisting>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2 </programlisting></para>
+                edges labels beginning with "O" for object:
+                <programlisting>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2 </programlisting></para>
         </section>
-        
+
         <section>
             <title>Searching for Trees</title>
-            <para>
-                In corpora containing hierarchical structures, annotations such as syntax trees can be 
-                searched for by defining terminal or none-terminal node annotations and their values. A 
-                simple search for prepostional phrases in the small pcc2 demo corpus looks like this:
-                <programlisting>tiger:cat="PP"</programlisting> 
-                If the corpus contains no more than one annotation called cat, the optional namespace, in 
-                this case tiger:, may be dropped. This finds all PP nodes in the corpus. To find all PP 
-                nodes directly dominating a proper name, a second element can be specified with the 
-                appropriate part-of-speech (pos) value:
-                <programlisting>cat="PP" &amp; pos="NE" &amp; #1 > #2</programlisting> 
-                The operator > signifies direct dominance, which must hold between the first and the 
-                second element. Once the Result Window is shown you may open the "tiger" annotation 
-                level to see the corresponding tree.
-                <screenshot>
+            <para> In corpora containing hierarchical structures, annotations such as syntax trees
+                can be searched for by defining terminal or none-terminal node annotations and their
+                values. A simple search for prepostional phrases in the small pcc2 demo corpus looks
+                like this: <programlisting>tiger:cat="PP"</programlisting> If the corpus contains no
+                more than one annotation called cat, the optional namespace, in this case tiger:,
+                may be dropped. This finds all PP nodes in the corpus. To find all PP nodes directly
+                dominating a proper name, a second element can be specified with the appropriate
+                part-of-speech (pos) value:
+                <programlisting>cat="PP" &amp; pos="NE" &amp; #1 > #2</programlisting> The operator
+                > signifies direct dominance, which must hold between the first and the second
+                element. Once the Result Window is shown you may open the "tiger" annotation level
+                to see the corresponding tree. <screenshot>
                     <mediaobject>
                         <imageobject>
                             <imagedata fileref="images/tiger_tree.png" width="90%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot>
+            </para>
+        </section>
+
+        <section>
+            <title>Searching for Pointing Relations – Coreference and Dependencies</title>
+            <para>Pointing relations are used to express an arbitrary directed relationship between
+                two elements (terminals or non-terminals) without implying dominance or coverage
+                inheritance. For instance, in the pcc2 demo corpus, elements in the mmax: namespace
+                may point to each other to express coreference or anaphoric relations. The following
+                query searches for two np_form annotations, which specify for example whether a
+                nominal phrase is pronominal, definite or indefinite.
+                <programlisting>mmax:np_form="pper" &amp; 
+mmax:np_form="defnp" &amp; 
+#1 ->anaphor_antecedent #2</programlisting>
+                Using the pointing relation operator -> with the type anaphor_antecedent, the first
+                np_form, which should be a personal pronoun (pper), is said to be the anaphor to its
+                antecedent, the second np_form, which is definite (defnp). To see a visualization of
+                the coreference relations, open the mmax annotation level in the example corpus. In
+                the image below, one of the matches for the above query is highlighted in red (die
+                Seeburger und einige Groß-Glienicker ... sie ‘the Seeburgers and some
+                Groß-Glienickers... they’). Other discourse referents in the text (marked with an
+                underline) may be clicked on, causing coreferential chains containing them to be
+                highlighted as well. Note that discourse referents may overlap, leading to multiple
+                underlines: Die Seeburger ‘the Seeburgers’ is a shorter discourse referent
+                overlapping with the larger one (‘the Seeburgers and some Groß-Glienickers’), and
+                each referent has its own underline. Annotations of the coreference edges of each
+                relation can be viewed by hovering of the appropriate underline. <screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/coreference.png" width="100%" align="center"/>
+                        </imageobject>
+                    </mediaobject>
+                </screenshot>
+                Another way to use pointing relations is found in syntactic dependency trees. The queries 
+                in this case can use both pointing relation types and annotation, as in the following query:
+                <programlisting>pos="VVFIN" &amp; tok &amp; #1 ->dep[func="obja"] #2</programlisting>
+                This query searches for a finite verb (with the part-of-speech VVFIN) and a token, with a 
+                pointing relation of the type ‘dep’ (for dependency) between the two, annotated with 
+                ‘func="obja"’ (the function Object, Accusative). The result can be viewed with the 
+                dependency arch visualizer, which shows the verb  gibt ‘gives’ and its object  Wunder 
+                ‘miracles’.<screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/dependencies.png" width="30%" align="left"/>
                         </imageobject>
                     </mediaobject>
                 </screenshot>
