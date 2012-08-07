@@ -160,6 +160,13 @@
                                 xlink:href="http://www.postgresql.org/download/"
                                 >http://www.postgresql.org/download/</link>
                         </para>
+                        <para>Make note of the postgres password. Under linux, you will have to set
+                            the postgres manually. You can achieve this with running the following
+                            commands:</para>
+                        <para> 
+                            <programlisting>sudo -u postgres psql
+\password
+\q</programlisting></para>
                     </listitem>
                     <listitem>
                         <para>Install a web server such as <link
