@@ -39,37 +39,53 @@ public class ApAnnotationConditionProvider implements
   {
     TextMatching tm = annotation.getTextMatching();
 
-    StringBuilder sbFunc = new StringBuilder("get");
+    StringBuilder sbFunc = new StringBuilder("getAnno");
+    
+    if (tm == TextMatching.EXACT_NOT_EQUAL || tm
+      == TextMatching.REGEXP_NOT_EQUAL)
+    {
+      sbFunc.append("Not");
+    }
 
-    sbFunc.append("AnnoBy");
 
     List<String> params = new LinkedList<String>();
 
     if (annotation.getNamespace() != null)
     {
       params.add("'" + annotation.getNamespace() + "'");
-      sbFunc.append("Namespace");
     }
+    else
+    {
+      params.add("NULL");
+    }
+    
     if (annotation.getName() != null)
     {
       params.add("'" + annotation.getName() + "'");
-      sbFunc.append("Name");
     }
+    else
+    {
+      params.add("NULL");
+    }
+    
     if (annotation.getValue() != null)
     {
-
-      sbFunc.append("Val");
-
       if (tm == TextMatching.REGEXP_EQUAL
         || tm == TextMatching.REGEXP_NOT_EQUAL)
       {
-        sbFunc.append("Regex");
+        params.add("NULL");
         params.add("'^(" + annotation.getValue() + ")$'");
       }
       else
       {
         params.add("'" + annotation.getValue() + "'");
+        params.add("NULL");
       }
+    }
+    else
+    {
+      params.add("NULL");
+      params.add("NULL");
     }
 
     params.add("ARRAY[" + StringUtils.join(queryData.getCorpusList(), ", ")
@@ -87,11 +103,7 @@ public class ApAnnotationConditionProvider implements
       tas.aliasedColumn(table, "anno_ref", index)
       + "= ANY(" + sbFunc.toString() + ")";
 
-    if (tm == TextMatching.EXACT_NOT_EQUAL || tm
-      == TextMatching.REGEXP_NOT_EQUAL)
-    {
-      cond = "NOT (" + cond + ")";
-    }
+    
     conditions.add(cond);
   }
 }

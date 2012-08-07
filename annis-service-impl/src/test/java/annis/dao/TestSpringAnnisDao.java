@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.AnnisXmlContextLoader;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -71,15 +72,8 @@ import org.springframework.context.annotation.PropertySource;
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/CommonSqlGenerator.xml",
-  "file:src/main/distribution/conf/spring/CommonDao.xml",
-  "file:src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml",
-  "file:src/main/distribution/conf/spring/modes/annopool/Dao.xml"
-})
-@PropertySource(value =
-{
-  "file:src/main/distribution/conf/annis-service.properties"
-})
+  "file:src/main/distribution/conf/spring/Common.xml"
+}, loader=AnnisXmlContextLoader.class)
 public class TestSpringAnnisDao
 {
 
