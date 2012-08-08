@@ -19,7 +19,7 @@
   </xsl:attribute-set>
 
   <xsl:template match="caption"> 
-    <fo:block font-size="9pt" font-family="DejaVuSerif" font-weight="bold"> 
+    <fo:block font-size="9pt" font-family="DejaVu Serif" font-weight="bold"> 
       <xsl:apply-templates/> 
     </fo:block> 
   </xsl:template>
