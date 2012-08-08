@@ -1091,7 +1091,7 @@ pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
                                             <mediaobject>
                                                 <imageobject>
                                                   <imagedata
-                                                  fileref="images/ordered_dependecy_vis.png"
+                                                  fileref="images/ordered_dependency_vis.png"
                                                   width="70%" align="center"/>
                                                 </imageobject>
                                             </mediaobject>
@@ -1135,10 +1135,104 @@ pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
                                 </listitem>
                             </itemizedlist></para>
                     </listitem>
+                <listitem>
+                        <para><emphasis role="italic">display_name</emphasis> determines the heading
+                            that is shown for each visualizer in the interface</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="italic">order</emphasis> determines the order in which
+                            visualizers are rendered in the interface (low to high)</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="italic">mappings</emphasis> provides additional
+                            parameters for some visualizations:<itemizedlist>
+                                <listitem>
+                                    <para><emphasis role="italic">tree</emphasis> – the annotation
+                                        names to be displayed in non terminal nodes can be set e.g.
+                                        using <userinput>node_key:cat</userinput> for an annotation
+                                        called cat (the default), and similarly the edge labels
+                                        using <userinput>edge_key:func</userinput> for an edge label
+                                        called <userinput>func</userinput> (the default).
+                                        Instructions are separated using semicolons.</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">graph</emphasis> – use
+                                            <userinput>ns_all:true</userinput> to visualize the
+                                        entire annotation graph. Specifying e.g.
+                                            <userinput>node_ns:tiger</userinput> or
+                                            <userinput>edge_ns:tiger</userinput> instead causes only
+                                        nodes and edges of the namespace tiger to be visualized
+                                        (i.e. only a subgraph of all annotations) </para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">grid</emphasis> – it is possible
+                                        to specify the order of annotation layers in each grid. Use
+                                            <userinput>annos: anno_name1, anno_name2,
+                                            anno_name3</userinput> to specify the order or
+                                        annotation layers. If <userinput>anno:</userinput> is used,
+                                        additional annotation layers not present in the list will
+                                        not be visualized. If mappings is left empty, layers will be
+                                        ordered alphabetically</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">grid_tree</emphasis> – specify the
+                                        name of the annotation to be visualized in the grid with
+                                            <userinput>node_key:name</userinput>. Note that all grid
+                                        levels visualize the same annotation name at different
+                                        hierarchical depths.</para>
+                                </listitem>
+                            </itemizedlist></para>
+                    </listitem>
 
                 </itemizedlist></para>
 
         </section>
+        <section>
+            <title>Visualizations with Software Requirements</title>
+            <para>Some ANNIS visualizers require additional software, depending on whether or not
+                they render graphics as an image directly in Java or not. At present, three
+                visualizations require an installation of the freely available software GraphViz
+                    (<link xlink:href="http://www.graphviz.org/">http://www.graphviz.org/</link>):
+                    <emphasis role="italic">ordered_dependency</emphasis>, <emphasis role="italic"
+                    >hierarchical_dependency</emphasis> and the general <emphasis role="italic"
+                    >graph</emphasis> visualization. To use these, install GraphViz on the server
+                (or your local machine for Kickstarter) and make sure it is available in your system
+                path (check this by calling e.g. the program <command>dot</command> on the command
+                line).</para>
+            <para>Another type of restriction is that some visualizers may use SVG (scalable vector
+                graphics) instead of images, which mean the user’s browser must be SVG capable (e.g.
+                FireFox) or a plugin must be used (e.g. for Internet Explorer 8 or below). This is
+                currently the case for the <emphasis role="italic">arch_dependency</emphasis>
+                visualizer.</para>
+        </section>
+        <section>
+            <title>Changing maximal context size and possible context steps</title>
+            <para>The maximal context size of <emphasis role="italic">±n</emphasis> tokens from each
+                search result (for the KWIC view, but also for other visualization) can be set for
+                the ANNIS service in the file
+                    <filename>&lt;service-home>/conf/annis-service.properties</filename> Using the
+                syntax, e.g. for a maximum context of 10 tokens:
+                <programlisting>annis.max-context=1025</programlisting> To configure which steps are
+                actually shown in the front-end (up to the maximum allowed by the service above) and
+                the default context selected on login, configure the file:
+                    <filename>&lt;annis-web-home->/javascript/annis/config.js</filename> With the
+                syntax:
+                <programlisting>var search_context = [[0], [1], [2], [5], [10]]; 
+var search_context_default = 5;</programlisting></para>
+        </section>
+    </section>
+    <section>
+        <title>Converting Corpora for ANNIS using SaltNPepper</title>
+        <para>ANNIS uses a relational database format called relANNIS. The Pepper converter
+            framework allows users to convert data from various formats including PAULA XML,
+            EXMARaLDA XML, TigerXML, CoNLL, RSTTool and TreeTagger directly into relAnnis (the Tiger
+            XML conversion is limited to corpora without secondary edges at the moment). Further
+            formats (including Tiger XML with secondary edges, mmax2) can be converted first into
+            PAULA XML and then into relANNIS using the converters found on the ANNIS downloads
+            page.</para>
+        <para>For complete information on converting corpora with SaltNPepper see: <link
+                xlink:href="http://korpling.german.hu-berlin.de/saltnpepper/"
+                >http://korpling.german.hu-berlin.de/saltnpepper/</link></para>
     </section>
 
 </article>
