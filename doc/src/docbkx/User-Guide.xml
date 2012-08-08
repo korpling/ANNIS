@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+<article xmlns="http://docbook.org/ns/docbook" version="5.1"
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
     <info>
         <title>ANNIS User Guide</title>
@@ -952,6 +952,192 @@ pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
                         </tbody>
                     </tgroup>
                 </table></para>
+        </section>
+    </section>
+
+    <section>
+        <title>Configuring Visualizations </title>
+        <section>
+            <title>Triggering Visualizations with the Resolver Table</title>
+            <para>By default, ANNIS2 displays all search results in the Key Word in Context (KWIC)
+                view in the search result window. Further visualizations, such as syntax trees or
+                grid views, are displayed by default based on the following namespaces:
+                    <informaltable frame="void">
+                    <tbody>
+                        <tr>
+                            <td>Nodes with the namespace tiger:</td>
+                            <td>tree visualizer</td>
+                        </tr>
+                        <tr>
+                            <td>Nodes with the namespace exmaralda:</td>
+                            <td>grid visualizer</td>
+                        </tr>
+                        <tr>
+                            <td>Edges with the namespace mmax:</td>
+                            <td>discourse view</td>
+                        </tr>
+                        <tr>
+                            <td>Nodes with the namespace external:</td>
+                            <td>multimedia player</td>
+                        </tr>
+                    </tbody>
+                </informaltable> In these cases the namespaces are usually taken from the source
+                format in which the corpus was generated, and carried over into relAnnis during the
+                conversion. It is also possible to use other namespaces, most easily when working
+                with PAULA XML. In PAULA XML, the namespace is determined by the string prefix
+                before the first period in the file name / paula_id of each annotation layer. In
+                order to manually determine the visualizer and the display name for each namespace
+                in each corpus, the resolver table in the database must be edited. To do so, open
+                PGAdmin (or if you did not install PGAdmin with ANNIS then via PSQL), and access the
+                table <emphasis><database>resolver_vis_map</database></emphasis> (it can be found in
+                PGAdmin under <emphasis>PostgreSQL 8.4 > Databases > anniskickstart > Schemas >
+                    public > Tables</emphasis> (for ANNIS servers replace “anniskickstart” with
+                “annis_db”). You may need to give your PostgreSQL password to gain access. Right
+                click on the table and select <emphasis>View Data > View All Rows</emphasis>. The
+                table should look like this:<screenshot>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/resolver_table.png" width="100%"
+                                align="center"/>
+                        </imageobject>
+                        <caption><para>Resolver table (resolver_vis_map)</para></caption>
+                    </mediaobject>
+                </screenshot>
+            </para>
+            <para>The columns in the table can be filled out as follows:<itemizedlist>
+                    <listitem>
+                        <para><emphasis role="italic">corpus</emphasis> determines the corpora for
+                            which the instruction is valid (null values apply to all corpora)</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="italic">namespace</emphasis> specifies relevant
+                            namespace which triggers the visualization</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="italic">element</emphasis> determines if a node or an
+                            edge should carry the relevant annotation for triggering the
+                            visualization</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="italic">vis_type</emphasis> determines the visualizer
+                            module used and is one of: <itemizedlist>
+                                <listitem>
+                                    <para><emphasis role="italic">tree</emphasis> (annotation grid,
+                                        with annotations spanning multiple tokens)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata fileref="images/tiger_tree_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">grid</emphasis> (constituent
+                                        syntax tree)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata fileref="images/grid_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">grid_tree</emphasis> (a grid
+                                        visualizing hierarchical tree annotations as ordered grid
+                                        layers; note that all layers represent the same annotation
+                                        name at different hierarchical depths, marked level:0,1,2,…
+                                        etc. on the left)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata fileref="images/grid_tree_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">discourse</emphasis> (a view of
+                                        the entire text of a document, possibly with interactive
+                                        coreference links. It is possible to use this visualization
+                                        to view entire texts even if you do not have coreference annotations)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata fileref="images/discourse_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">arch_dependency</emphasis>
+                                        (dependency tree with labeled arches between tokens;
+                                        requires SVG enabled browser, see 5.2)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata
+                                                  fileref="images/arch_dependency_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">ordered_dependency</emphasis>
+                                        (arrow based dependency visualization for corpora with
+                                        dependencies between non terminal nodes; requires GraphViz,
+                                        see 5.2)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata
+                                                  fileref="images/ordered_dependecy_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">hierarchical_dependency</emphasis>
+                                        (unordered vertical tree of dependent tokens; requires
+                                        GraphViz, see 5.2)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata
+                                                  fileref="images/hierarchical_dependency_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">graph</emphasis> (a debug view of
+                                        the annotation graph; requires GraphViz, see 5.2)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                  <imagedata
+                                                  fileref="images/graph_vis.png"
+                                                  width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis role="italic">file</emphasis> (a linked multimedia file)<screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata
+                                                        fileref="images/file_vis.png"
+                                                        width="70%" align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                </listitem>
+                            </itemizedlist></para>
+                    </listitem>
+
+                </itemizedlist></para>
+
         </section>
     </section>
 

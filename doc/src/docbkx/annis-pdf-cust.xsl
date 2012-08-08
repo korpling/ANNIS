@@ -3,11 +3,13 @@
   xmlns:d="http://docbook.org/ns/docbook" xmlns:fo="http://www.w3.org/1999/XSL/Format"
   exclude-result-prefixes="xslthl" version="1.0">
 
-  <xsl:import href="urn:docbkx:stylesheet"/>
+  <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"/>
+<!--  <xsl:import href="urn:docbkx:stylesheet"/> -->
 
   <!-- highlight.xsl must be imported in order to enable highlighting support, highlightSource=1 parameter
    is not sufficient -->
-  <xsl:import href="urn:docbkx:stylesheet/highlight.xsl"/>
+  <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/fo/highlight.xsl"/>
+ <!-- <xsl:import href="urn:docbkx:stylesheet/highlight.xsl"/> -->
 
   <!-- Make hyperlinks blue but still display the underlying URL -->
   <xsl:param name="ulink.show" select="1"/>
@@ -16,5 +18,10 @@
     <xsl:attribute name="color">blue</xsl:attribute>
   </xsl:attribute-set>
 
+  <xsl:template match="caption"> 
+    <fo:block font-size="9pt" font-family="DejaVuSerif" font-weight="bold"> 
+      <xsl:apply-templates/> 
+    </fo:block> 
+  </xsl:template>
 
 </xsl:stylesheet>
