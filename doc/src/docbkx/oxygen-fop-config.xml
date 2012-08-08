@@ -1,0 +1,58 @@
+<fop version="1.0">
+  <renderers>
+    <renderer mime="application/pdf">
+      <fonts>
+        <font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSansMono-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSansMono.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuMono"
+            style="normal"
+            weight="normal"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSerif-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSerif.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSerif"
+            style="normal"
+            weight="normal"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSerif-Italic-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSerif-Italic.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSerif"
+            style="italic"
+            weight="normal"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSerif-Bold-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSerif-Bold.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSerif"
+            style="normal"
+            weight="bold"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSerif-BoldItalic-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSerif-BoldItalic.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSerif"
+            style="italic"
+            weight="bold"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSans-Bold-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSans-Bold.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSans"
+            style="normal"
+            weight="bold"
+          />
+        </font><font metrics-url="file:/home/thomas/annis/docs/doc/target/fonts/DejaVuSans-metrics.xml"
+          embed-url="file:/home/thomas/annis/docs/doc/src/fonts/DejaVuSans.ttf"
+          kerning="no">
+          <font-triplet name="DejaVuSans"
+            style="normal"
+            weight="normal"
+          />
+        </font>
+      </fonts>
+    </renderer>
+  </renderers>
+</fop>
