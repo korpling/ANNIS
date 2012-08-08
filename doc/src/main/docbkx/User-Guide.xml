@@ -13,8 +13,8 @@
         </author>
         <orgname>SFB 632 Information Structure / D1 Linguistic Database</orgname>
         <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
-        <releaseinfo>Version 2.2.1</releaseinfo>
-        <pubdate>18 April 2012</pubdate>
+        <releaseinfo>Version ${project.version}</releaseinfo>
+        <pubdate>${mavenBuildTimestamp}</pubdate>
     </info>
 
     <section>
@@ -438,7 +438,7 @@ mvn -DskipTests=true install</programlisting>
 
         <section>
             <title>Searching for Word Forms</title>
-            <para>To search for word forms in ANNIS2, simply select a corpus (in this example the
+            <para>To search for word forms in ANNIS, simply select a corpus (in this example the
                 small pcc2 demo corpus) and enter a search string between double quotation marks,
                 e.g.: <programlisting>"statisch"</programlisting> Note that the search is case
                 sensitive, so it will not find cases of capitalized 'Statisch', for example at the
@@ -959,7 +959,7 @@ pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
         <title>Configuring Visualizations </title>
         <section>
             <title>Triggering Visualizations with the Resolver Table</title>
-            <para>By default, ANNIS2 displays all search results in the Key Word in Context (KWIC)
+            <para>By default, ANNIS displays all search results in the Key Word in Context (KWIC)
                 view in the search result window. Further visualizations, such as syntax trees or
                 grid views, are displayed by default based on the following namespaces:
                     <informaltable frame="void">

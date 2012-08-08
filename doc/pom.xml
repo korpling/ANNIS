@@ -12,7 +12,17 @@
   <packaging>pom</packaging>
   <name>annis-doc</name>
     
+    
+    <!-- hack: the maven.build.timestamp property is not used in resource filtering -->
+  <properties>
+    <maven.build.timestamp.format>dd.MM.yyyy-HH:mm</maven.build.timestamp.format>
+    <mavenBuildTimestamp>${maven.build.timestamp}</mavenBuildTimestamp>
+  </properties>
+    
   <build>
+    
+
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -69,15 +79,17 @@
               <goal>generate-pdf</goal>
             </goals>
             <configuration>
+              <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
               <targetDirectory>${project.build.directory}/manual</targetDirectory>
               <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
-              <foCustomization>${basedir}/src/docbkx/annis-pdf-cust.xsl</foCustomization>
+              <foCustomization>${basedir}/src/main/docbkx/annis-pdf-cust.xsl</foCustomization>
               <highlightSource>true</highlightSource>
               <admonGraphics>true</admonGraphics>
-              <admonGraphicsPath>src/docbkx/images/docbook/</admonGraphicsPath>
+              <admonGraphicsPath>src/main/docbkx/images/docbook/</admonGraphicsPath>
               <admonGraphicsExtension>.svg</admonGraphicsExtension>
               <useSvg>true</useSvg>
               <useExtensions>true</useExtensions>
+              <sectionAutolabel>true</sectionAutolabel>
               <!-- font configuration -->
               <bodyFontFamily>DejaVu Serif</bodyFontFamily>
               <monospaceFontFamily>DejaVu Sans Mono</monospaceFontFamily>
@@ -87,50 +99,50 @@
                   <name>DejaVu Sans Mono</name>
                   <style>normal</style>
                   <weight>normal</weight>
-                  <embedFile>src/fonts/DejaVuSansMono.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSansMono-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSansMono.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSansMono-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Serif</name>
                   <style>normal</style>
                   <weight>normal</weight>
-                  <embedFile>src/fonts/DejaVuSerif.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSerif.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Serif</name>
                   <style>italic</style>
                   <weight>normal</weight>
-                  <embedFile>src/fonts/DejaVuSerif-Italic.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-Italic-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSerif-Italic.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-Italic-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Serif</name>
                   <style>normal</style>
                   <weight>bold</weight>
-                  <embedFile>src/fonts/DejaVuSerif-Bold.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-Bold-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSerif-Bold.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-Bold-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Serif</name>
                   <style>italic</style>
                   <weight>bold</weight>
-                  <embedFile>src/fonts/DejaVuSerif-BoldItalic.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSerif-BoldItalic-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSerif-BoldItalic.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-BoldItalic-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Sans</name>
                   <style>normal</style>
                   <weight>bold</weight>
-                  <embedFile>src/fonts/DejaVuSans-Bold.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSans-Bold-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSans-Bold.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSans-Bold-metrics.xml</metricsFile>
                 </font>
                 <font>
                   <name>DejaVu Sans</name>
                   <style>normal</style>
                   <weight>normal</weight>
-                  <embedFile>src/fonts/DejaVuSans.ttf</embedFile>
-                  <metricsFile>${basedir}/target/fonts/DejaVuSans-metrics.xml</metricsFile>
+                  <embedFile>src/main/fonts/DejaVuSans.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSans-metrics.xml</metricsFile>
                 </font>
               </fonts>
             </configuration>
@@ -142,6 +154,7 @@
               <goal>generate-html</goal>
             </goals>
             <configuration>
+              <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
               <targetDirectory>${project.build.directory}/manual</targetDirectory>
               <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
               <highlightSource>true</highlightSource>
@@ -152,7 +165,7 @@
               <useExtensions>true</useExtensions>
               <preProcess>
                 <copy todir="${project.build.directory}/manual/images">
-                  <fileset dir="${basedir}/src/docbkx/images">
+                  <fileset dir="${basedir}/src/main/docbkx/images">
                   </fileset>
                 </copy>
                 <!--
@@ -170,33 +183,7 @@
         <configuration>
           <xincludeSupported>true</xincludeSupported>
         </configuration>
-        
-        <dependencies>
-          <dependency>
-            <groupId>net.sf.docbook</groupId>
-            <artifactId>docbook-xml</artifactId>
-            <version>5.0-all</version>
-            <classifier>resources</classifier>
-            <type>zip</type>
-            <scope>runtime</scope>
-          </dependency>
-        
-          <dependency>
-            <groupId>net.sf.xslthl</groupId> 
-            <artifactId>xslthl</artifactId> 
-            <version>2.0.2</version>
-            <scope>runtime</scope>
-          </dependency>
-          
-          <dependency>
-            <groupId>net.sf.offo</groupId>
-            <artifactId>fop-hyph</artifactId>
-            <version>1.2</version>
-            <scope>runtime</scope>
-          </dependency>
-        
-        </dependencies>
-        
+                
       </plugin>
       
       <plugin>
@@ -210,9 +197,32 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <sourceDirectory>src/fonts/</sourceDirectory>
+              <sourceDirectory>src/main/fonts/</sourceDirectory>
               <ansi>false</ansi>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-filter-docbook</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/docbkx</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/docbkx/</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>             
+            </configuration>            
           </execution>
         </executions>
       </plugin>
