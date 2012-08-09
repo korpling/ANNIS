@@ -31,8 +31,9 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.util.logging.Level;
-import jline.ConsoleReader;
-import jline.SimpleCompletor;
+import jline.console.ConsoleReader;
+import jline.console.completer.StringsCompleter;
+import jline.console.history.FileHistory;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -129,14 +130,17 @@ public abstract class AnnisBaseRunner
     System.out.println();
 
     ConsoleReader console = new ConsoleReader();
-    console.setUseHistory(true);
     File annisDir = new File(System.getProperty("user.home") + "/.annis/");
     annisDir.mkdirs();
-    console.getHistory().setHistoryFile(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
+    
+    FileHistory history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
+    console.setHistory(history);
+    console.setHistoryEnabled(true);
     console.setBellEnabled(true);
 
-    String[] commands = detectAvailableCommands().toArray(new String[0]);
-    console.addCompletor(new SimpleCompletor(commands));
+    List<String> commands =  detectAvailableCommands();
+    Collections.sort(commands);
+    console.addCompleter(new StringsCompleter(commands));
 
     String line;
     prompt = "no corpus>";

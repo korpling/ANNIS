@@ -41,8 +41,6 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Types;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Priority;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;

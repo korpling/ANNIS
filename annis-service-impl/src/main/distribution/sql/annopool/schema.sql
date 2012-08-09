@@ -2,13 +2,13 @@
 CREATE TABLE corpus
 (
   id         bigint PRIMARY KEY,
-  name       varchar(100) NOT NULL, -- UNIQUE,
-  type       varchar(100) NOT NULL,
-  version    varchar(100),
+  name       varchar NOT NULL, -- UNIQUE,
+  type       varchar NOT NULL,
+  version    varchar,
   pre        bigint NOT NULL UNIQUE,
   post       bigint NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
-  path_name  varchar(100)[]
+  path_name  varchar[]
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
@@ -19,9 +19,9 @@ COMMENT ON COLUMN corpus.path_name IS 'path of this corpus in the corpus tree (n
 CREATE TABLE corpus_annotation
 (
   corpus_ref  bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-  namespace   varchar(100),
-  name        varchar(1000) NOT NULL,
-  value       varchar(2000),
+  namespace   varchar,
+  name        varchar NOT NULL,
+  value       varchar,
   UNIQUE (corpus_ref, namespace, name)
 );
 COMMENT ON COLUMN corpus_annotation.corpus_ref IS 'foreign key to corpus.id';
@@ -32,7 +32,7 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 CREATE TABLE text
 (
   id    bigint PRIMARY KEY,
-  name  varchar(1000),
+  name  varchar,
   text  text,
   toplevel_corpus bigint REFERENCES corpus(id)
 );
@@ -45,9 +45,9 @@ CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 CREATE TABLE annotation_pool (
   id bigserial,
   toplevel_corpus bigint REFERENCES corpus(id),
-  namespace varchar(150),
-  "name" varchar(150),
-  val varchar(1500),
+  namespace varchar,
+  "name" varchar,
+  val varchar,
   "type" annotype,
   occurences bigint,
   PRIMARY KEY(id),
@@ -60,17 +60,17 @@ CREATE TABLE facts (
   text_ref bigint REFERENCES text(id),
   corpus_ref bigint REFERENCES corpus(id),
   toplevel_corpus bigint REFERENCES corpus(id),
-  node_namespace character varying(100),
-  node_name character varying(100),
+  node_namespace varchar,
+  node_name varchar,
   "left" integer,
   "right" integer,
   token_index integer,
   is_token boolean,
   continuous boolean,
-  span character varying(2000),
+  span varchar,
   left_token integer,
   right_token integer,
-  seg_name varchar(100),
+  seg_name varchar,
   seg_left integer,
   seg_right integer,
   pre bigint, -- pre-order value
@@ -80,8 +80,8 @@ CREATE TABLE facts (
   "level" bigint,
   component_id bigint, -- component id
   edge_type character(1), -- edge type of this component
-  edge_namespace character varying(255), -- optional namespace of the edges’ names
-  edge_name character varying(255), -- name of the edges in this component
+  edge_namespace varchar, -- optional namespace of the edges’ names
+  edge_name varchar, -- name of the edges in this component
   node_anno_ref bigint REFERENCES annotation_pool(id),
   edge_anno_ref bigint REFERENCES annotation_pool(id),
   n_sample boolean,
@@ -112,8 +112,8 @@ CREATE TABLE media_files
   file  bytea NOT NULL,
   corpus_ref  bigint NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
   bytes bigint NOT NULL,
-  mime_type character varying(40) NOT NULL,
-  title character varying(40) NOT NULL,
+  mime_type varchar NOT NULL,
+  title varchar NOT NULL,
   UNIQUE (corpus_ref, title)
 );
 
@@ -146,14 +146,14 @@ FROM
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
-  "corpus"   varchar(100),
-  "version"   varchar(100),
-  "namespace"  varchar(100),
-  "element"    varchar(4) CHECK (element = 'node' OR element = 'edge'),
-  "vis_type"   varchar(100) NOT NULL,
-  "display_name"   varchar(100) NOT NULL,
+  "corpus"   varchar,
+  "version"   varchar,
+  "namespace"  varchar,
+  "element"    varchar CHECK (element = 'node' OR element = 'edge'),
+  "vis_type"   varchar NOT NULL,
+  "display_name"   varchar NOT NULL,
   "order" bigint default '0',
-  "mappings" varchar(100),
+  "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              
 );
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
@@ -169,14 +169,14 @@ COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus
 CREATE TABLE annotations
 (
   id bigserial NOT NULL,
-  namespace varchar(150),
-  "name" varchar(150),
-  "value" varchar(1500),
+  namespace varchar,
+  "name" varchar,
+  "value" varchar,
   occurences bigint,
   "type" varchar,
   "subtype" char(1),
-  edge_namespace varchar(150),
-  edge_name varchar(150),
+  edge_namespace varchar,
+  edge_name varchar,
   toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 );
