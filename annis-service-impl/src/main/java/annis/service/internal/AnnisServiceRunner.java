@@ -151,7 +151,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     ctx.refresh();
     
     
-    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider");
+    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider", "annis.rest.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
