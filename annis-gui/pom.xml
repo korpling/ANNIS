@@ -107,15 +107,6 @@
             </baseResource>
           </webAppConfig>
           
-          <systemProperties>
-            <systemProperty>
-              <name>java.security.manager</name>
-            </systemProperty>
-            <systemProperty>
-              <name>java.security.policy</name>
-              <value>all_allowed.policy</value>
-            </systemProperty>
-          </systemProperties>
         </configuration>
       </plugin>
     </plugins>
