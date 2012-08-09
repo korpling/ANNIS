@@ -1,47 +1,29 @@
-CREATE OR REPLACE FUNCTION getAnnoByName("name" varchar(150), toplevel_corpus bigint[], "type" varchar) 
+CREATE OR REPLACE FUNCTION getAnno(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus bigint[], "type" varchar) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE "name" = $1 AND toplevel_corpus = ANY($2) AND "type" = $3::annotype::annotype
+  SELECT id 
+  FROM annotation_pool 
+  WHERE 
+    ($1 IS NULL OR namespace=$1) AND 
+    ($2 IS NULL OR "name" = $2) AND 
+    ($3 IS NULL OR val = $3) AND
+    ($4 IS NULL OR val ~ $4) AND
+    toplevel_corpus = ANY($5) AND 
+    "type" = $6::annotype
 );
 $f$ LANGUAGE SQL IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION getAnnoByNamespaceName(namespace varchar(150), "name" varchar(150), toplevel_corpus bigint[], "type" varchar) 
+CREATE OR REPLACE FUNCTION getAnnoNot(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus bigint[], "type" varchar) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE "namespace" = $1 AND "name" = $2 AND toplevel_corpus = ANY($3) AND "type" = $4::annotype 
-);
-$f$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION getAnnoByNameVal("name" varchar(150), val varchar(1500), toplevel_corpus bigint[], "type" varchar) 
-RETURNS bigint[] AS $f$
-SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE "name" = $1 AND val = $2 AND toplevel_corpus = ANY($3) AND "type" = $4::annotype 
-);
-$f$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION getAnnoByNamespaceNameVal(namespace varchar(150), "name" varchar(150), val varchar(1500), toplevel_corpus bigint[], "type" varchar) 
-RETURNS bigint[] AS $f$
-SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE namespace=$1 AND "name" = $2 AND val = $3 AND toplevel_corpus = ANY($4) AND "type" = $5::annotype
-);
-$f$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION getAnnoByNameValRegex("name" varchar(150), val varchar(1500), toplevel_corpus bigint[], "type" varchar) 
-RETURNS bigint[] AS $f$
-SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE "name" = $1 AND val ~ $2 AND toplevel_corpus = ANY($3) AND "type" = $4::annotype
-);
-$f$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION getAnnoByNamespaceNameValRegex(namespace varchar(150), "name" varchar(150), val varchar(1500), toplevel_corpus bigint[] ,"type" varchar) 
-RETURNS bigint[] AS $f$
-SELECT ARRAY(
-  SELECT id FROM annotation_pool 
-  WHERE namespace=$1 AND "name" = $2 AND val ~ $3 AND toplevel_corpus = ANY($4) AND "type" = $5::annotype
+  SELECT id 
+  FROM annotation_pool 
+  WHERE 
+    ($1 IS NULL OR namespace=$1) AND 
+    ($2 IS NULL OR "name" = $2) AND 
+    ($3 IS NULL OR val <> $3) AND
+    ($4 IS NULL OR val !~ $4) AND
+    toplevel_corpus = ANY($5) AND 
+    "type" = $6::annotype
 );
 $f$ LANGUAGE SQL IMMUTABLE;

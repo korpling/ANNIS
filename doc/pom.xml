@@ -12,7 +12,17 @@
   <packaging>pom</packaging>
   <name>annis-doc</name>
     
+    
+    <!-- hack: the maven.build.timestamp property is not used in resource filtering -->
+  <properties>
+    <maven.build.timestamp.format>dd.MM.yyyy-HH:mm</maven.build.timestamp.format>
+    <mavenBuildTimestamp>${maven.build.timestamp}</mavenBuildTimestamp>
+  </properties>
+    
   <build>
+    
+
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -69,68 +79,155 @@
               <goal>generate-pdf</goal>
             </goals>
             <configuration>
+              <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
               <targetDirectory>${project.build.directory}/manual</targetDirectory>
               <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
-              <foCustomization>${basedir}/src/docbkx/annis-pdf-cust.xsl</foCustomization>
+              <foCustomization>${basedir}/src/main/docbkx/annis-pdf-cust.xsl</foCustomization>
               <highlightSource>true</highlightSource>
               <admonGraphics>true</admonGraphics>
-              <admonGraphicsPath>src/docbkx/images/docbook/</admonGraphicsPath>
+              <admonGraphicsPath>src/main/docbkx/images/docbook/</admonGraphicsPath>
               <admonGraphicsExtension>.svg</admonGraphicsExtension>
               <useSvg>true</useSvg>
               <useExtensions>true</useExtensions>
-             
+              <sectionAutolabel>true</sectionAutolabel>
+              <!-- font configuration -->
+              <bodyFontFamily>DejaVu Serif</bodyFontFamily>
+              <monospaceFontFamily>DejaVu Sans Mono</monospaceFontFamily>
+              <titleFontFamily>DejaVu Sans</titleFontFamily>
+              <fonts>
+                <font>
+                  <name>DejaVu Sans Mono</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/main/fonts/DejaVuSansMono.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSansMono-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Serif</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/main/fonts/DejaVuSerif.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Serif</name>
+                  <style>italic</style>
+                  <weight>normal</weight>
+                  <embedFile>src/main/fonts/DejaVuSerif-Italic.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-Italic-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Serif</name>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <embedFile>src/main/fonts/DejaVuSerif-Bold.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-Bold-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Serif</name>
+                  <style>italic</style>
+                  <weight>bold</weight>
+                  <embedFile>src/main/fonts/DejaVuSerif-BoldItalic.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSerif-BoldItalic-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Sans</name>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <embedFile>src/main/fonts/DejaVuSans-Bold.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSans-Bold-metrics.xml</metricsFile>
+                </font>
+                <font>
+                  <name>DejaVu Sans</name>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <embedFile>src/main/fonts/DejaVuSans.ttf</embedFile>
+                  <metricsFile>${project.build.directory}/fonts/DejaVuSans-metrics.xml</metricsFile>
+                </font>
+              </fonts>
             </configuration>
             <phase>site</phase>
           </execution>
           <execution>
-          <id>html</id>
-          <goals>
-            <goal>generate-html</goal>
-          </goals>
-          <configuration>
-            <targetDirectory>${project.build.directory}/manual</targetDirectory>
-            <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
-            <highlightSource>true</highlightSource>
-            <admonGraphics>true</admonGraphics>
-            <admonGraphicsPath>images/docbook/</admonGraphicsPath>
-            <admonGraphicsExtension>.svg</admonGraphicsExtension>
-            <useSvg>true</useSvg>
-            <useExtensions>true</useExtensions>
-            <postProcess>
-              <copy todir="${project.build.directory}/manual/images">
-                <fileset dir="${basedir}/src/docbkx/images">
-                </fileset>
-              </copy>
+            <id>html</id>
+            <goals>
+              <goal>generate-html</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
+              <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
+              <highlightSource>true</highlightSource>
+              <admonGraphics>true</admonGraphics>
+              <admonGraphicsPath>images/docbook/</admonGraphicsPath>
+              <admonGraphicsExtension>.svg</admonGraphicsExtension>
+              <useSvg>true</useSvg>
+              <useExtensions>true</useExtensions>
+              <preProcess>
+                <copy todir="${project.build.directory}/manual/images">
+                  <fileset dir="${basedir}/src/main/docbkx/images">
+                  </fileset>
+                </copy>
                 <!--
                 <copy todir="${project.build.directory}/manual/figures">
                   <fileset dir="${project.build.directory}/site/apidocs/figures">
                   </fileset>
                 </copy>
                 -->
-            </postProcess>
-          </configuration>
-          <phase>site</phase>
-        </execution>
-      </executions>
+              </preProcess>
+            </configuration>
+            <phase>site</phase>
+          </execution>
+        </executions>
         
-      <configuration>
-        <xincludeSupported>true</xincludeSupported>
-      </configuration>
-        
-      <dependencies>
-        <dependency>
-          <groupId>net.sf.docbook</groupId>
-          <artifactId>docbook-xml</artifactId>
-          <version>5.0-all</version>
-          <classifier>resources</classifier>
-          <type>zip</type>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
-        
-    </plugin>
+        <configuration>
+          <xincludeSupported>true</xincludeSupported>
+        </configuration>
+                
+      </plugin>
       
-  </plugins>
-</build>
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-fop-support</artifactId>
+        <version>2.0.14</version>
+        <executions>
+          <execution>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>src/main/fonts/</sourceDirectory>
+              <ansi>false</ansi>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-filter-docbook</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/docbkx</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/docbkx/</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>             
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+  </build>
     
 </project>

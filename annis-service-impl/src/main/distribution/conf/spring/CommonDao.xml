@@ -19,10 +19,6 @@
 	<!-- Enable bean autowiring -->
   <context:annotation-config/>
 
-	<!-- Enable AspectJ-style AOP annotations -->
-  <aop:aspectj-autoproxy/>
-
-
 	<!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

@@ -94,6 +94,10 @@ limitations under the License.
   <bean id="matrixSqlGenerator" class="annis.sqlgen.annopool.ApMatrixSqlGenerator"
         parent="matrixSqlGeneratorBase">
   </bean>
+  
+  <bean id="graphSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator" parent="annotateSqlGenerator">
+    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
+  </bean>
 
 
 </beans>

@@ -22,7 +22,9 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
+import com.google.gwt.http.client.Response;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
@@ -39,6 +41,7 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 /**
  *
@@ -334,8 +337,36 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     public SingleResultPanel call()
     {
       // load result asynchronous
-      SaltProject p = subgraphRes.get(SaltProject.class);
-
+      SaltProject p = null;
+      int tries = 0;
+      while(p == null && tries < 100)
+      {
+        try
+        {
+          p = subgraphRes.get(SaltProject.class);
+        }
+        catch(UniformInterfaceException ex)
+        {
+          if(ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
+          {
+            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            break;
+          }
+          // wait some time
+          try
+          {
+            Thread.sleep(500);
+          }
+          catch (InterruptedException ex1)
+          {
+            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex1);
+          }
+        }
+        tries++;
+      }
+      
+      Validate.notNull(p);
+      
       SingleResultPanel result;
       // get synchronized again in order not to confuse Vaadin
       synchronized (getApplication())
