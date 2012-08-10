@@ -88,10 +88,12 @@ public class CommonAnnotateWithClauseGenerator
         // segmentation layer based method
 
         result.add(getMatchesWithClause(queryData, alternative, indent));
-        result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
+        result.add(getNearestSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
+        //result.add(getCoveredSeqWithClause(queryData, annoQueryData, alternative,
+        //  "matches", indent));
         result.add(getSolutionFromCoveredSegWithClause(queryData, annoQueryData,
-          alternative, policy, "coveredseg", indent));
+          alternative, policy, "nearestseg", indent));
 
       }
     }
@@ -248,6 +250,92 @@ public class CommonAnnotateWithClauseGenerator
 
     return sb.toString();
   }
+  
+  protected String getNearestSeqWithClause(
+    QueryData queryData, AnnotateQueryData annoQueryData,
+    List<QueryNode> alternative, String matchesName, String indent)
+  {
+    String indent2 = indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+    String indent4 = indent3 + TABSTOP;
+
+    SolutionKey<?> key = createSolutionKey();
+    // use copy constructor in order not to mess up the global TableAccessStrategy bean
+    TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
+    tas.addTableAlias("solutions", matchesName);
+    List<String> keyColumns =
+      key.generateOuterQueryColumns(tas, alternative.size());
+
+
+    TableAccessStrategy tables = tables(null);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent).append("nearestseg AS\n");
+    sb.append(indent).append("(\n");
+
+    for(int i=1; i <= alternative.size(); i++)
+    {
+    
+      sb.append(indent2).append("SELECT\n");
+      
+      sb.append(indent3);
+      for (String k : keyColumns)
+      {
+        sb.append(k);
+      }
+      sb.append(", matches.n,\n");
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(" - ").append(annoQueryData.
+        getLeft()).append(" AS \"min\",\n");
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE,
+        "seg_right")).append(" + ").append(annoQueryData.getRight()).append(
+        " AS \"max\",\n");
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
+        " AS \"text\", \n");
+
+
+      sb.append(indent3).append("rank() OVER (PARTITION BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+        .append(" ORDER BY abs(min").append(i).append(" - ")
+        .append(tas.aliasedColumn(NODE_TABLE, "right_token"))
+        .append(") ASC) AS rank_left,\n");
+
+      sb.append(indent3).append("rank() OVER (PARTITION BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+        .append(" ORDER BY abs(")
+        .append(tas.aliasedColumn(NODE_TABLE, "left_token"))
+        .append(" - max").append(i).append(") ASC) AS rank_right\n");
+
+
+      sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(
+        ", matches\n");
+      sb.append(indent2).append("WHERE\n");
+
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
+        append(" IN (").append(StringUtils.join(queryData.getCorpusList(), ",")).
+        append(") AND\n");
+
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
+        " IS TRUE AND\n");
+
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_name"))
+        .append(" = ").append(sqlString(annoQueryData.getSegmentationLayer()))
+        .append(" AND\n");
+
+
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+        .append(" = matches.text").append(i).append("\n");
+      
+      // put subqueries together with an UNION ALL
+      if(i < alternative.size())
+      {
+        sb.append("\n").append(indent2).append("UNION ALL").append("\n\n");
+      }
+      
+    }
+    sb.append(indent).append(")");
+
+    return sb.toString();
+  }
 
   /**
    * Get solution from a covered segmentation using a WITH clause.
@@ -325,7 +413,11 @@ public class CommonAnnotateWithClauseGenerator
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(
       " <= ").append(coveredName).append(".\"max\" AND\n");
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_right")).append(
-      " >= ").append(coveredName).append(".\"min\"\n");
+      " >= ").append(coveredName).append(".\"min\" AND\n");
+    
+    sb.append(indent3).append("(").append(coveredName)
+      .append(".rank_left = 1 OR ").append(coveredName)
+      .append(".rank_right = 1)\n");
 
     if (islandsPolicy == IslandsPolicy.IslandPolicies.none)
     {
