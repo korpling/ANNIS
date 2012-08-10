@@ -46,7 +46,9 @@ public abstract class AnnisBaseRunner
   private static String annisHomePath;
   // console output for easier testing, normally set to System.out
   protected PrintStream out = System.out;
-  ;
+  
+  private FileHistory history;
+  
   // for the interactive shell
   private String helloMessage;
   private String prompt;
@@ -133,11 +135,11 @@ public abstract class AnnisBaseRunner
     File annisDir = new File(System.getProperty("user.home") + "/.annis/");
     annisDir.mkdirs();
     
-    FileHistory history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
+    history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setHistory(history);
     console.setHistoryEnabled(true);
     console.setBellEnabled(true);
-
+    
     List<String> commands =  detectAvailableCommands();
     Collections.sort(commands);
     console.addCompleter(new StringsCompleter(commands));
@@ -219,6 +221,11 @@ public abstract class AnnisBaseRunner
       Method commandMethod = getClass().getMethod(methodName, String.class);
       commandMethod.invoke(this, args);
       System.out.println("Time: " + (new Date().getTime() - start) + " ms");
+      
+      if(history != null)
+      {
+        history.flush();
+      }
     }
     catch (InvocationTargetException e)
     {
@@ -253,6 +260,10 @@ public abstract class AnnisBaseRunner
     {
       throw new UsageException("don't know how to do: " + command);
     }
+    catch (IOException e)
+    {
+      log.error("IOException was thrown", e);
+    }
   }
 
   private static void checkForAnnisHome()
@@ -285,7 +296,7 @@ public abstract class AnnisBaseRunner
         "%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
     }
   }
-
+  
   ///// Getter / Setter
   public static String getAnnisHome()
   {

@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 import static annis.sqlgen.TableAccessStrategy.*;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.sqlString;
 
 /**
  *
@@ -223,8 +224,8 @@ public class CommonAnnotateWithClauseGenerator
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
       " IS TRUE AND\n");
 
-    sb.append(indent3).append("seg_name = '").append(annoQueryData.
-      getSegmentationLayer()).append("' AND\n");
+    sb.append(indent3).append("seg_name = ").append(
+      sqlString(annoQueryData.getSegmentationLayer())).append(" AND\n");
 
     sb.append(indent3).append("(\n");
 
@@ -315,7 +316,8 @@ public class CommonAnnotateWithClauseGenerator
       " IS TRUE AND\n");
 
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_name")).append(
-      " = '").append(annoQueryData.getSegmentationLayer()).append("' AND\n");
+      " = ")
+      .append(sqlString(annoQueryData.getSegmentationLayer())).append(" AND\n");
 
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
       " = ").append(coveredName).append(".\"text\" AND\n");
