@@ -85,14 +85,21 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
         .append("text").append(i).append(", ");
 
       sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "left_token"))
-        .append(" - ").append(annotateQueryData.getLeft())
-        .append(" AS ").append("min").append(i).append(", ");
+        .append(tas.columnName(NODE_TABLE, "left_token"));
+        
+      if(annotateQueryData.getSegmentationLayer() == null)
+      {
+        sb.append(" - ").append(annotateQueryData.getLeft());
+      }
+      sb.append(" AS ").append("min").append(i).append(", ");
 
       sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "right_token"))
-        .append(" + ").append(annotateQueryData.getRight())
-        .append(" AS ").append("max").append(i).append(", ");
+        .append(tas.columnName(NODE_TABLE, "right_token"));
+      if(annotateQueryData.getSegmentationLayer() == null)
+      {
+        sb.append(" + ").append(annotateQueryData.getRight());
+      }
+      sb.append(" AS ").append("max").append(i).append(", ");
 
       sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
         .append(tas.columnName(NODE_TABLE, "corpus_ref"))
