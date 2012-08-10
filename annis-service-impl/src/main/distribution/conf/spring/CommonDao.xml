@@ -26,12 +26,12 @@
   </bean>
 
   <!-- database connection configuration -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
     <property name="location" value="file:${annis.home}/conf/database.properties"/>
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
 	<!-- DataSource -->
-  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
     <property name="driverClassName" value="$dao{datasource.driver}"/>
     <property name="url" value="$dao{datasource.url}"/>
     <property name="username" value="$dao{datasource.username}"/>
@@ -39,43 +39,43 @@
   </bean>
 
 
-  <bean id="countExtractor" class="annis.dao.CountExtractor">
+  <bean id="countExtractor" class="annis.dao.CountExtractor" lazy-init="true">
     <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
   </bean>
 
 	<!-- Helper for weka command -->
-  <bean id="wekaHelper" class="annis.WekaHelper"/>
+  <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
 
 	<!-- Helper for list command -->
-  <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper"/>
+  <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>
 
 	<!-- Helper for nodeAnnotations command -->
-  <bean id="listAnnotationsSqlHelper" class="annis.sqlgen.ListAnnotationsSqlHelper"/>
+  <bean id="listAnnotationsSqlHelper" class="annis.sqlgen.ListAnnotationsSqlHelper" lazy-init="true"/>
 
 	<!-- Helper for listCorpusAnnotations command -->
-  <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper"/>
+  <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
 
   <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
 
-  <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper">
+  <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper" lazy-init="true">
     <property name="requiredType" value="java.lang.Long"/>
   </bean>
 
-  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" lazy-init="true">
     <property name="dataSource" ref="dataSource"/>
     <property name="fetchSize" value="0"/>
   </bean>
 
-  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter">
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true">
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
 		<!--<property name="dataSource" ref="dataSource"/>-->
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
 
-  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" />
+  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
 
-  <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier">
+  <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
     
     <!-- missing: administrationDao -->
@@ -84,7 +84,7 @@
    <!-- BEGIN EXPORTS -->
 
 	<!-- exported bean: AnnisDao -->
-  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init">
+  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
 
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>
@@ -123,7 +123,7 @@
 
 
 	<!-- base bean for exported Database API for administration tasks -->
-  <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao">
+  <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />

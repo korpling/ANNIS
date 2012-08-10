@@ -19,12 +19,12 @@
   <context:annotation-config/>
 	
 	<!-- Public API for corpus administration -->
-  <bean id="corpusAdministration" class="annis.administration.CorpusAdministration">
+  <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
   </bean>
 
       <!-- AnnisAdminRunner -->
-  <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner">
+  <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner" lazy-init="true">
     <property name="corpusAdministration" ref="corpusAdministration" />
   </bean>
 	
