@@ -25,7 +25,7 @@ limitations under the License.
 
 	<!-- Configure use of BETWEEN SYMMETRIC -->
   <bean
-    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="true">
     <property name="targetClass">
       <value>annis.sqlgen.SqlConstraints</value>
     </property>
@@ -39,7 +39,7 @@ limitations under the License.
 
 	<!-- Configure BETWEEN workaround for MonetDB -->
   <bean
-    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="true">
     <property name="targetClass">
       <value>annis.sqlgen.SqlConstraints</value>
     </property>
@@ -53,14 +53,14 @@ limitations under the License.
 
 	<!-- FROM clause generator -->
   <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator"
-        parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory"  lazy-init="true"/>
 
   <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
-        parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory"  lazy-init="true"/>
 
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGeneratorBase" class="annis.sqlgen.DefaultWhereClauseGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
     <property name="optimizeIndirectPrecedence" value="${annis.optimize-indirect-precedence}" />
     <property name="allowIdenticalSibling" value="${annis.allow-identical-sibling}" />
     <property name="optimizeInclusion" value="${annis.optimize-inclusion}" />
@@ -74,13 +74,13 @@ limitations under the License.
   </bean>
 
   <bean id="subcorpusConstraintWhereClause" class="annis.sqlgen.SubcorpusConstraintWhereClause"
-        parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" lazy-init="true" />
 
   <bean id="sampleWhereClause" class="annis.sqlgen.SampleWhereClause"
-        parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" lazy-init="true" />
 
   <bean id="metaDataAndCorpusWhereClauseGenerator" class="annis.sqlgen.MetaDataAndCorpusWhereClauseGenerator"
-        parent="tableAccessStrategyFactory" />
+        parent="tableAccessStrategyFactory" lazy-init="true" />
 
   <util:map id="factsTableAliases">
     <entry key="node" value="facts" />
@@ -189,19 +189,19 @@ limitations under the License.
   </util:map>
 
   <bean id="tableAccessStrategy" class="annis.sqlgen.TableAccessStrategy"
-        scope="prototype">
+        scope="prototype" lazy-init="true">
     <property name="tableAliases" ref="factsTableAliases" />
     <property name="columnAliases" ref="factsColumnAliases" />
   </bean>
 
-  <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory">
+  <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory" lazy-init="true">
     <lookup-method name="createTableAccessStrategy" bean="tableAccessStrategy" />
   </bean>
 
-  <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" />
+  <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" lazy-init="true" />
 
   <bean id="matrixSqlGeneratorBase" class="annis.sqlgen.MatrixSqlGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
@@ -221,22 +221,22 @@ limitations under the License.
     <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
   </bean>
 
-  <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor"/>
+  <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor" lazy-init="true"/>
 
-  <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype">
+  <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype" lazy-init="true">
     <property name="idColumnName" value="${annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
 
   <!-- autowired by LegacyGraphConverterTest -->
-  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor">
+  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor" lazy-init="true">
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
   </bean>
   
-  <bean id="commonLimitOffsetGenerator" class="annis.sqlgen.CommonLimitOffsetGenerator" />
+  <bean id="commonLimitOffsetGenerator" class="annis.sqlgen.CommonLimitOffsetGenerator" lazy-init="true" />
 
   <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
 
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
 
@@ -248,22 +248,22 @@ limitations under the License.
     <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
   </bean>
 
-  <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy">
+  <bean id="annotateOuterQueryTableAccessStrategy" class="annis.sqlgen.TableAccessStrategy" lazy-init="true">
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
   </bean>
 
-  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor">
+  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor" lazy-init="true">
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
   </bean>
 
-  <bean id="islandsPolicy" class="annis.sqlgen.IslandsPolicy" >
+  <bean id="islandsPolicy" class="annis.sqlgen.IslandsPolicy" lazy-init="true" >
     <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
   </bean>
 
   <bean id="commonAnnotateSqlGenerator" class="annis.sqlgen.CommonAnnotateWithClauseGenerator"
-    parent="tableAccessStrategyFactory">
+    parent="tableAccessStrategyFactory" lazy-init="true">
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     
     <property name="islandsPolicy" ref="islandsPolicy" />
@@ -271,7 +271,7 @@ limitations under the License.
   </bean>
 
   <bean id="annotateSqlGeneratorBase" class="annis.sqlgen.AnnotateSqlGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
@@ -308,7 +308,7 @@ limitations under the License.
     <ref bean="corpusPathWhereClauseGenerator" />
   </util:list>
 
-  <bean id="corpusPathWhereClauseGenerator" class="annis.sqlgen.CorpusPathWhereClauseGenerator"   parent="tableAccessStrategyFactory"/>
+  <bean id="corpusPathWhereClauseGenerator" class="annis.sqlgen.CorpusPathWhereClauseGenerator"   parent="tableAccessStrategyFactory" lazy-init="true"/>
 
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
@@ -334,7 +334,7 @@ limitations under the License.
 
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
 
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
@@ -348,11 +348,11 @@ limitations under the License.
   </bean>
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
-    parent="commonAnnotateSqlGenerator" >
+    parent="commonAnnotateSqlGenerator" lazy-init="true" >
   </bean>
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
-        parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory" lazy-init="true">
 
     <property name="selectClauseSqlGenerator" ref="countSqlGenerator" />
 

@@ -32,7 +32,7 @@ limitations under the License.
 
   <import resource="file:${annis.home}/conf/spring/Common.xml" />
 
-  <bean id="annisRunner" class="annis.AnnisRunner">
+  <bean id="annisRunner" class="annis.AnnisRunner" lazy-init="true">
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
     <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>

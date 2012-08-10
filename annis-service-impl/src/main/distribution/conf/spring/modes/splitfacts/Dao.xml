@@ -16,7 +16,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 	">
 
-  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier" parent="sqlScriptSessionModifierBase">
+  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier" parent="sqlScriptSessionModifierBase" lazy-init="true">
     <property name="administrationDao">
       <bean class="annis.administration.ApAdministrationDao">
         <property name="scriptPath" value="${annis.script-path}"/>
@@ -27,7 +27,7 @@
 	
 
   <!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.SfAdministrationDao" parent="administrationDaoBase">
+  <bean id="administrationDao" class="annis.administration.SfAdministrationDao" parent="administrationDaoBase" lazy-init="true">
   </bean>
 
   <!-- END EXPORTS -->

@@ -24,22 +24,22 @@ limitations under the License.
 
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
-        parent="defaultWhereClauseGeneratorBase">
+        parent="defaultWhereClauseGeneratorBase" lazy-init="true">
     <property name="annoCondition">
       <bean class="annis.sqlgen.fullfacts.FfAnnotateConditionProvider" />
     </property>
   </bean>
 
   <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-        parent="matrixSqlGeneratorBase">
+        parent="matrixSqlGeneratorBase" lazy-init="true">
   </bean>
   
   <bean id="annotateSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator"
-        parent="annotateSqlGeneratorBase">
+        parent="annotateSqlGeneratorBase" lazy-init="true">
   </bean>
   
   <bean id="graphSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator" parent="annotateSqlGenerator">
-    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
+    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" lazy-init="true" />
   </bean>
 
 </beans>

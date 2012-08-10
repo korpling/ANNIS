@@ -17,7 +17,7 @@
 	">
 
   <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier"
-        parent="sqlScriptSessionModifierBase">
+        parent="sqlScriptSessionModifierBase" lazy-init="true">
     <property name="administrationDao">
       <bean class="annis.administration.DefaultAdministrationDao">
         <property name="scriptPath" value="${annis.script-path}"/>
@@ -30,7 +30,7 @@
      
   <!-- exported Database API for administration tasks -->
   <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao"
-        parent="administrationDaoBase">
+        parent="administrationDaoBase" lazy-init="true">
   </bean>
 
   <!-- END EXPORTS -->

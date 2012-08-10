@@ -9,7 +9,7 @@
   <import resource="Common.xml" />
    
    <!-- AnnisWebService -->
-  <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="sayHello">
+  <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="sayHello" lazy-init="true">
     <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />
