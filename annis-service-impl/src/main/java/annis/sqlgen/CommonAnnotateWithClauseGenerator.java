@@ -292,18 +292,29 @@ public class CommonAnnotateWithClauseGenerator
       sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
         " AS \"text\", \n");
 
+      String distLeft = "min" + i 
+        + " - " 
+        + tas.aliasedColumn(NODE_TABLE, "right_token");
+      String distRight = tas.aliasedColumn(NODE_TABLE, "left_token") 
+        + " - max" 
+        + i;
 
-      sb.append(indent3).append("rank() OVER (PARTITION BY ")
+      // create ordered window partition
+      // values are ordered by their distance to the min or max token index
+      // NULLIF( dist+1, -abs(dist+1) will give negative entries NULL which means
+      // their are put last in the ordered list
+      // +1 is there to ensure that positive equal values (thus dist=0) are not ignored
+      sb.append(indent3).append("row_number() OVER (PARTITION BY ")
         .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(" ORDER BY abs(min").append(i).append(" - ")
-        .append(tas.aliasedColumn(NODE_TABLE, "right_token"))
-        .append(") ASC) AS rank_left,\n");
+        .append(" ORDER BY NULLIF(")
+        .append(distLeft).append("+ 1, -abs(").append(distLeft)
+        .append(" + 1)) ASC) AS rank_left,\n");
 
-      sb.append(indent3).append("rank() OVER (PARTITION BY ")
+      sb.append(indent3).append("row_number() OVER (PARTITION BY ")
         .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(" ORDER BY abs(")
-        .append(tas.aliasedColumn(NODE_TABLE, "left_token"))
-        .append(" - max").append(i).append(") ASC) AS rank_right\n");
+        .append(" ORDER BY NULLIF(")
+        .append(distRight).append(" + 1, -abs(").append(distRight)
+        .append(" + 1)) ASC) AS rank_right\n");
 
 
       sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(

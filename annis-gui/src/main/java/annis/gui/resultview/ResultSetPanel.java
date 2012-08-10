@@ -362,6 +362,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex1);
           }
         }
+        catch(Exception ex)
+        {
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+          break;
+        }
         tries++;
       }
       
@@ -387,6 +392,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         else
         {
+          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING, 
+            "did not get a proper corpus graph for URI {0}", 
+            subgraphRes.toString());
           result = null;
         }
       }
