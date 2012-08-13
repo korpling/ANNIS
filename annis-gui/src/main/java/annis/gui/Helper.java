@@ -48,7 +48,8 @@ public class Helper
   
   public static WebResource createAnnisWebResource(String uri)
   {
-    ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
+    ClientConfig rc = new DefaultClientConfig();
+    rc.getClasses().add(SaltProjectProvider.class);
     Client c = Client.create(rc);
     return c.resource(uri);
   }
