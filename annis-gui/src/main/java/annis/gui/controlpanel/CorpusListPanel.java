@@ -56,10 +56,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -69,6 +68,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   AbstractSelect.NewItemHandler, ValueChangeListener, Action.Handler
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
+  
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   public static final String ALL_CORPORA = "All";
   public static final String CORPUSSET_PREFIX = "corpusset_";
@@ -177,7 +178,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         }
         catch (AuthenticationException ex)
         {
-          Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
         updateCorpusSetList(false);
         getWindow().showNotification("Reloaded corpus list", 
@@ -262,8 +263,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
                 }
                 catch (NumberFormatException ex)
                 {
-                  Logger.getLogger(CorpusListPanel.class.getName()).log(
-                    Level.WARNING, "invalid number in corpus set " + setName, ex);
+                  log.warn("invalid number in corpus set " + setName, ex);
                 }
               }
             }
@@ -327,7 +327,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
     catch (ClientHandlerException ex)
     {
-      Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
       getWindow().showNotification("Service not available: "
         + ex.getLocalizedMessage(),
@@ -335,7 +335,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
     catch (UniformInterfaceException ex)
     {
-      Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
       getWindow().showNotification("Remote exception: "
         + ex.getLocalizedMessage(),
@@ -377,7 +377,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
           }
           catch (Exception ex)
           {
-            Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE,
+            log.error(
               "could not store new corpus set", ex);
             getWindow().showNotification("Could not store new corpus set: "
               + ex.getLocalizedMessage(),
@@ -494,7 +494,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       }
       catch (Exception ex)
       {
-        Logger.getLogger(CorpusListPanel.class.getName()).log(Level.SEVERE, null,
+        log.error(null,
           ex);
       }
     }

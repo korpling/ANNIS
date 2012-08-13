@@ -15,12 +15,11 @@
  */
 package annis.gui.visualizers.tree.backends.staticimg;
 
+import annis.gui.visualizers.tree.GraphicsItem;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import annis.gui.visualizers.tree.GraphicsItem;
 
 public abstract class AbstractImageGraphicsItem implements GraphicsItem {
 	private List<AbstractImageGraphicsItem> children = new ArrayList<AbstractImageGraphicsItem>();

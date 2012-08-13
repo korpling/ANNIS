@@ -33,6 +33,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import static org.mockito.Mockito.*;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,6 +41,8 @@ import static org.mockito.Mockito.*;
  */
 public class CsvResultSetProvider
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CsvResultSetProvider.class);
 
   @Mock
   protected ResultSet rs;
@@ -64,8 +67,7 @@ public class CsvResultSetProvider
     }
     catch (IOException ex)
     {
-      Logger.getLogger(CsvResultSetProvider.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
     wasNull = false;
@@ -376,8 +378,7 @@ public class CsvResultSetProvider
           }
           catch (NumberFormatException ex)
           {
-            Logger.getLogger(CsvResultSetProvider.class.getName()).log(
-              Level.SEVERE, null, ex);
+            log.error(null, ex);
           }
         }
         return result;

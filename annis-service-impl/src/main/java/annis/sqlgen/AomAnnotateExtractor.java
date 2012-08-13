@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import org.apache.log4j.Logger;
+
 
 import org.apache.commons.lang.Validate;
 import org.springframework.dao.DataAccessException;
@@ -29,10 +29,12 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
-import org.apache.log4j.Level;
+
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 import annis.sqlgen.SaltAnnotateExtractor.RankID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,7 +44,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
 {
   
   private static final Logger log =
-    Logger.getLogger(AomAnnotateExtractor.class);
+    LoggerFactory.getLogger(AomAnnotateExtractor.class);
 
   private TableAccessStrategy outerQueryTableAccessStrategy;
   

@@ -15,20 +15,18 @@
  */
 package annis.gui.exporter;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
-import java.io.*;
+import java.io.Serializable;
+import java.io.Writer;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 
 public class WekaExporter implements Exporter, Serializable
 {
 
-  private static final long serialVersionUID = -8182635617256833563L;
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(WekaExporter.class);
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
@@ -46,7 +44,7 @@ public class WekaExporter implements Exporter, Serializable
     }
     catch (Exception ex)
     {
-      Logger.getLogger(WekaExporter.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 }

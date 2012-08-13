@@ -94,6 +94,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -101,6 +102,8 @@ import org.apache.commons.lang.Validate;
  */
 public class ClauseAnalysis extends DepthFirstAdapter
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ClauseAnalysis.class);
 
   private Map<String, QueryNode> nodes;
   private int aliasCount;
@@ -667,7 +670,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     }
     catch (Exception ex)
     {
-      Logger.getLogger(ClauseAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 

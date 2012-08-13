@@ -28,9 +28,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,6 +39,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class CorefVisualizer extends WriterVisualizer
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorefVisualizer.class);
 
   VisualizerInput theInput;
   Writer theWriter;
@@ -496,7 +497,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
     catch (IOException ex)
     {
-      Logger.getLogger(CorefVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 

@@ -6,12 +6,15 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
+  
   public final int[] ARG_TYPES = new int [] {
     Types.INTEGER, Types.INTEGER,
     Types.VARCHAR, Types.VARCHAR
@@ -62,7 +65,7 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
     }
     catch (SQLException ex)
     {
-      Logger.getLogger(ByteHelper.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
     return ab;

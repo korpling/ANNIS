@@ -18,7 +18,7 @@ package annis.ql.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+
 
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.node.AAndExpr;
@@ -31,11 +31,13 @@ import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.ATextSearchNotEqualExpr;
 import annis.ql.node.PExpr;
 import annis.ql.node.Start;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DnfTransformer extends DepthFirstAdapter
 {
 
-  private Logger log = Logger.getLogger(this.getClass());
+  private static final Logger log = LoggerFactory.getLogger(DnfTransformer.class);
   private SearchExpressionCounter counter;
   private DnfNodeRelNumberUpdater relNumberUpdater;
 

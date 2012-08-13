@@ -15,9 +15,9 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.beans.HistoryEntry;
 import annis.gui.Helper;
 import annis.gui.HistoryPanel;
+import annis.gui.beans.HistoryEntry;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -27,22 +27,12 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Window.Notification;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.hene.splitbutton.SplitButton;
 import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
 
@@ -53,6 +43,8 @@ import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
 public class QueryPanel extends Panel implements TextChangeListener,
   ValueChangeListener
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
   
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
@@ -256,7 +248,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
       }
       else
       {
-        Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
+        log.error(
           "Exception when communicating with service", ex);
         getWindow().showNotification("Exception when communicating with service: " + ex.getMessage(),
           Notification.TYPE_TRAY_NOTIFICATION);
@@ -264,7 +256,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     }
     catch(ClientHandlerException ex)
     {
-      Logger.getLogger(QueryPanel.class.getName()).log(Level.SEVERE,
+      log.error(
           "Could not connect to web service", ex);
         getWindow().showNotification("Could not connect to web service: " + ex.getMessage(),
           Notification.TYPE_TRAY_NOTIFICATION);

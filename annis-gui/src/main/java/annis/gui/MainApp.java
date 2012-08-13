@@ -24,7 +24,6 @@ import annis.gui.visualizers.dependency.VakyarthaDependencyTree;
 import annis.gui.visualizers.graph.DotGraphVisualizer;
 import annis.gui.visualizers.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.media.AudioVisualizer;
-import annis.gui.visualizers.media.MediaVisualizer;
 import annis.gui.visualizers.media.VideoVisualizer;
 import annis.gui.visualizers.partitur.PartiturVisualizer;
 import annis.gui.visualizers.tree.TigerTreeVisualizer;
@@ -48,8 +47,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -58,6 +55,7 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Application's "main" class
@@ -67,6 +65,8 @@ public class MainApp extends Application implements PluginSystem,
   UserChangeListener, HttpServletRequestListener, Serializable
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
+  
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private transient SearchWindow windowSearch;
@@ -88,7 +88,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(Exception ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
     addListener((UserChangeListener) this);
@@ -124,7 +124,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(NumberFormatException ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
+     log.debug(null, ex);
     }
     return result;
   }
@@ -178,7 +178,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch(Exception ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
+      log.debug(null, ex);
     }
     return result;
   }
@@ -195,7 +195,7 @@ public class MainApp extends Application implements PluginSystem,
       }
       catch(Exception ex)
       {
-        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
     super.setUser(user);
@@ -212,8 +212,6 @@ public class MainApp extends Application implements PluginSystem,
 
   private void initPlugins()
   {
-    Logger log = Logger.getLogger(MainApp.class.getName());
-
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
@@ -237,7 +235,7 @@ public class MainApp extends Application implements PluginSystem,
     if(basicPlugins.isDirectory())
     {
       pluginManager.addPluginsFrom(basicPlugins.toURI());
-      log.log(Level.INFO, "added plugins from {0}", basicPlugins.getPath());
+      log.info("added plugins from {0}", basicPlugins.getPath());
     }
 
 
@@ -245,7 +243,7 @@ public class MainApp extends Application implements PluginSystem,
     if(globalPlugins != null)
     {
       pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
-      log.log(Level.INFO, "added plugins from {0}", globalPlugins);
+      log.info("added plugins from {0}", globalPlugins);
     }
 
     StringBuilder listOfPlugins = new StringBuilder();
@@ -321,12 +319,12 @@ public class MainApp extends Application implements PluginSystem,
         }
         catch(IOException ex)
         {
-          Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
       catch(UnsupportedEncodingException ex)
       {
-        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
 
 

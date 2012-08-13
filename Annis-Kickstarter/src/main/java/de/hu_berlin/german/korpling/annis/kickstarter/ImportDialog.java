@@ -17,7 +17,6 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
-import annis.administration.DefaultAdministrationDao;
 import java.io.File;
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -27,6 +26,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
+import org.slf4j.LoggerFactory;
+
+
 
 /**
  *
@@ -34,6 +36,8 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class ImportDialog extends javax.swing.JDialog
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ImportDialog.class);
 
   private class ImportDialogWorker extends SwingWorker<String, Void> implements
     Serializable
@@ -78,7 +82,7 @@ public class ImportDialog extends javax.swing.JDialog
       }
       catch(Exception ex)
       {
-        Logger.getLogger(ImportDialog.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
   }

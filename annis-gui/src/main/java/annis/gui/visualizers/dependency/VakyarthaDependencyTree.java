@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -39,6 +38,7 @@ import org.json.JSONObject;
 public class VakyarthaDependencyTree extends WriterVisualizer
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(VakyarthaDependencyTree.class);
   private Writer theWriter;
 
   @Override
@@ -151,10 +151,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     catch (JSONException ex)
     {
-      Logger.getLogger(VakyarthaDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }    catch (IOException ex)
     {
-      Logger.getLogger(VakyarthaDependencyTree.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 

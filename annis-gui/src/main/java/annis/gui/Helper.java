@@ -33,9 +33,8 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 public class Helper
 {
   
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
   private static ThreadLocal<WebResource> annisWebResource = new ThreadLocal<WebResource>();
   
   public static WebResource createAnnisWebResource(String uri)
@@ -99,13 +99,13 @@ public class Helper
       }
       catch (URISyntaxException ex)
       {
-        Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
       return "ERROR";
     }
     catch (URISyntaxException ex)
     {
-      Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
     return "ERROR";
   }

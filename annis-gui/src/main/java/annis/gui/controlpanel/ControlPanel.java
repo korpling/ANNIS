@@ -15,21 +15,17 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.beans.HistoryEntry;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
+import annis.gui.beans.HistoryEntry;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;

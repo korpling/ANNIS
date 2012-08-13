@@ -6,7 +6,6 @@ import annis.gui.visualizers.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;

@@ -18,31 +18,28 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.resultview.AnnisResultQuery;
-import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import annis.model.AnnisNode;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisCorpus;
 import annis.utils.LegacyGraphConverter;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.Writer;
+import java.rmi.RemoteException;
+import java.util.*;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 
 public class GeneralTextExporter implements Exporter, Serializable
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
@@ -129,7 +126,7 @@ public class GeneralTextExporter implements Exporter, Serializable
         }
         catch (UniformInterfaceException ex)
         {
-          Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE,
+          log.error(
             ex.getResponse().getEntity(String.class), ex);
         }
 
@@ -149,27 +146,27 @@ public class GeneralTextExporter implements Exporter, Serializable
     }
     catch (AnnisQLSemanticsException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
     }
     catch (AnnisQLSyntaxException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
     }
     catch (AnnisCorpusAccessException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
     }
     catch (RemoteException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
     }
     catch (IOException ex)
     {
-      Logger.getLogger(GeneralTextExporter.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
     }
   }

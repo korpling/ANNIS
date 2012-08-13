@@ -16,14 +16,13 @@
 package annis.gui.visualizers.tree;
 
 import annis.gui.visualizers.VisualizerInput;
-import java.util.ArrayList;
-import java.util.List;
-
 import annis.model.AnnisNode;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import java.util.ArrayList;
+import java.util.List;
 
 class AnnisGraphTools
 {

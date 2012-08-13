@@ -23,10 +23,8 @@ import com.vaadin.ui.Button.ClickEvent;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.mail.*;
-import org.netomi.vaadin.screenshot.Screenshot;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,6 +33,8 @@ import org.netomi.vaadin.screenshot.Screenshot;
  */
 public class ReportBugPanel extends Panel
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
 
   private Form form;
   private TextField txtSummary;
@@ -204,8 +204,7 @@ public class ReportBugPanel extends Panel
          }
           catch (IOException ex)
           {
-            Logger.getLogger(ReportBugPanel.class.getName()).
-              log(Level.SEVERE, null, ex);
+           log.error(null, ex);
           }
         }
       }
@@ -222,7 +221,7 @@ public class ReportBugPanel extends Panel
       getWindow().showNotification("E-Mail not configured on server", 
         "If this is no Kickstarter version please ask the adminstrator of this ANNIS-instance for assistance. "
         + "Bug reports are not available for ANNIS Kickstarter", Window.Notification.TYPE_ERROR_MESSAGE);
-      Logger.getLogger(ReportBugPanel.class.getName()).log(Level.SEVERE, null,
+      log.error(null,
         ex);
     }
   }

@@ -17,10 +17,10 @@ package annis.service.internal;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger; 
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
+
+ 
+
+
 
 import annis.AnnisBaseRunner;
 import annis.utils.Utils;
@@ -32,7 +32,12 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -40,7 +45,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
 
-  private static Logger log = Logger.getLogger(AnnisServiceRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(AnnisServiceRunner.class);
   private static AnnisServiceRunner annisServiceRunner;
   private static boolean isShutdownRequested = false;
   private static Thread mainThread;
@@ -71,7 +76,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.info("Running in Debug mode");
       // create a logging appender for stdout
-      Logger.getRootLogger().addAppender(
+      org.apache.log4j.Logger.getRootLogger().addAppender(
         new ConsoleAppender(new PatternLayout(
         "%d{HH:mm:ss,SSS} [%t] %C{1} %p: %m\n")));
       annisServiceRunner.start();
@@ -88,8 +93,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     }
     catch (InterruptedException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
-        log(Level.SEVERE, "interrupted in endless loop", ex);
+      log.error("interrupted in endless loop", ex);
     }
 
   }
@@ -163,18 +167,15 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     }
     catch (IOException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
     catch (IllegalArgumentException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
     catch (NullPointerException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
   }
@@ -191,8 +192,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       }
       catch (IOException ex)
       {
-        java.util.logging.Logger.getLogger(AnnisServiceRunner.class.getName()).
-          log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
 

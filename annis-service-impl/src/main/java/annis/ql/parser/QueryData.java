@@ -28,9 +28,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryData implements Cloneable
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryData.class);
 	private List<List<QueryNode>> alternatives;
 	private List<Long> corpusList;
 	private List<Long> documents;
@@ -138,7 +141,7 @@ public class QueryData implements Cloneable
       return (QueryData) super.clone();
     } catch (CloneNotSupportedException ex)
     {
-      Logger.getLogger(QueryData.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
       throw new InternalError("could not clone QueryData");
     }
   }

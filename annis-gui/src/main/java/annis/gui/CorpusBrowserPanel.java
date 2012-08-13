@@ -35,8 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -44,6 +43,8 @@ import java.util.logging.Logger;
  */
 public class CorpusBrowserPanel extends Panel
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
 
   /**
    * 
@@ -246,8 +247,7 @@ public class CorpusBrowserPanel extends Panel
     }
     catch(Exception ex)
     {
-      Logger.getLogger(CorpusBrowserPanel.class.getName()).log(
-        Level.SEVERE, null, ex);
+      log.error(null, ex);
       getWindow().showNotification(
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.TYPE_WARNING_MESSAGE);

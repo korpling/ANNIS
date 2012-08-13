@@ -45,6 +45,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.*;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
@@ -53,6 +54,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  */
 public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltAnnotateExtractor.class);
   private TableAccessStrategy outerQueryTableAccessStrategy;
   private CorpusPathExtractor corpusPathExtractor;
   
@@ -175,7 +177,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     catch(Exception ex)
     {
-      Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(Level.SEVERE, "could not map result set to SaltProject", ex);
+      log.error("could not map result set to SaltProject", ex);
     }
 
     return project;
@@ -592,8 +594,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           rel.setSSource(nodeByPre.get(new RankID(componentID,parent)));
           if("c".equals(type) && !(targetNode instanceof SToken))
           {
-            Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
-              Level.WARNING, "invalid edge detected: target node ({0}) "
+            log.warn("invalid edge detected: target node ({0}) "
               + "of a coverage relation (from: {1}, internal id {2}) was not a token", 
               new Object[] {targetNode.getSName(), sourceNode.getSName(), "" + pre});
           }
@@ -605,8 +606,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         }
         catch (SaltException ex)
         {          
-          Logger.getLogger(SaltAnnotateExtractor.class.getName()).log(
-            Level.WARNING, "invalid edge detected", ex);
+          log.warn("invalid edge detected", ex);
         }
       } // end if no existing relation
 

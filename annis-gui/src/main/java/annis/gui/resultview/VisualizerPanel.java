@@ -40,8 +40,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author thomas
@@ -49,6 +48,8 @@ import java.util.logging.Logger;
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
   public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
     "icon-collapse.gif");
@@ -150,7 +151,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
     catch (Exception e)
     {
-      Logger.getLogger(VisualizerPanel.class.getName()).log(Level.SEVERE,
+      log.error(
         "General remote service exception", e);
     }
     return text;

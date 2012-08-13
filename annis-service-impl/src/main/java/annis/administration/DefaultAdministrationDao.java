@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.postgresql.PGConnection;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -41,6 +41,8 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Types;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultAdministrationDao implements AdministrationDao
 {
 
-  private Logger log = Logger.getLogger(AdministrationDao.class);
+  private static final Logger log = LoggerFactory.getLogger(AdministrationDao.class);
   // external files path
   private String externalFilesPath;
   // script path
@@ -346,8 +348,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     catch (IOException ex)
     {
-      java.util.logging.Logger.getLogger(DefaultAdministrationDao.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 

@@ -30,10 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.AuthenticationException;
 import javax.naming.NamingException;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple security manager using plain text files (Java-properties). <br>
@@ -47,6 +46,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
   Serializable
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleSecurityManager.class);
   public final static String CONFIG_PATH = "userconfig_path";
   private Properties properties;
 
@@ -115,15 +115,15 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
           }
           catch (NoSuchAlgorithmException ex)
           {
-            Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(null, ex);
           }
           catch (UnsupportedEncodingException ex)
           {
-            Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(null, ex);
           }
           catch (IOException ex)
           {
-            Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(null, ex);
           }
         }
 
@@ -243,11 +243,11 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
         }
         catch (UnsupportedEncodingException ex)
         {
-          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
         catch (IOException ex)
         {
-          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
 
@@ -304,7 +304,7 @@ public class SimpleSecurityManager implements AnnisSecurityManager,
         }
         catch (IOException ex)
         {
-          Logger.getLogger(SimpleSecurityManager.class.getName()).log(Level.SEVERE,
+          log.error(
             "", ex);
         }
       }

@@ -15,7 +15,10 @@
  */
 package annis.administration;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 /**
  *
@@ -24,7 +27,7 @@ import org.apache.log4j.Logger;
 public class ApAdministrationDao extends DefaultAdministrationDao
 {
 
-  private static final Logger log = Logger.getLogger(ApAdministrationDao.class);
+  private static final Logger log = LoggerFactory.getLogger(ApAdministrationDao.class);
 
   @Override
   public void populateSchema()

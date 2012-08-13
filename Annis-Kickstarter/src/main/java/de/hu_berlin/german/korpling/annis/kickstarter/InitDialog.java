@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -29,7 +30,10 @@ import javax.swing.SwingWorker;
  */
 public class InitDialog extends javax.swing.JDialog
 {
-
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    InitDialog.class);
+  
   private class InitDialogWorker extends SwingWorker<String, Void>
     implements Serializable
   {
@@ -84,11 +88,11 @@ public class InitDialog extends javax.swing.JDialog
       }
       catch(InterruptedException ex)
       {
-        Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
       catch(ExecutionException ex)
       {
-        Logger.getLogger(InitDialog.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
   }

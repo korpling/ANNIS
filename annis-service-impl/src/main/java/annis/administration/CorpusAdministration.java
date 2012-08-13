@@ -27,7 +27,9 @@ import org.postgresql.Driver;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -37,7 +39,7 @@ public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
-  private Logger log = Logger.getLogger(this.getClass());
+  private static final Logger log = LoggerFactory.getLogger(CorpusAdministration.class);
 
   public CorpusAdministration()
   {

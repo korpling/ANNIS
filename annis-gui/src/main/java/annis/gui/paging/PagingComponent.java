@@ -32,8 +32,7 @@ import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,6 +41,8 @@ import java.util.logging.Logger;
 public class PagingComponent extends CustomComponent implements
   Button.ClickListener
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(PagingComponent.class);
 
   public static final ThemeResource LEFT_ARROW = new ThemeResource(
     "left_arrow.png");
@@ -327,8 +328,7 @@ public class PagingComponent extends CustomComponent implements
       }
       catch (Exception ex)
       {
-        Logger.getLogger(PagingComponent.class.getName()).log(Level.FINE, null,
-          ex);
+        log.error(null, ex);
       }
     }
   }

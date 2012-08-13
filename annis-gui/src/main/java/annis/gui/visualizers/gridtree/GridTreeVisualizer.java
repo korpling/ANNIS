@@ -1,18 +1,16 @@
 package annis.gui.visualizers.gridtree;
 
 import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.WriterVisualizer;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.model.Edge;
-
-import annis.gui.visualizers.WriterVisualizer;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

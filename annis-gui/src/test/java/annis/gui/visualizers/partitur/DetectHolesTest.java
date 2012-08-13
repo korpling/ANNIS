@@ -15,11 +15,11 @@
  */
 package annis.gui.visualizers.partitur;
 
-import java.util.List;
-import java.util.ArrayList;
 import annis.model.AnnisNode;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

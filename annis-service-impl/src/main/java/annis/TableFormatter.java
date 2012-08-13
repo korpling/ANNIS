@@ -21,12 +21,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+
 
 public class TableFormatter {
 
-	private Logger log = Logger.getLogger(this.getClass());
+	private final static Logger log = LoggerFactory.getLogger(TableFormatter.class);
 	
 	public String formatAsTable(List<?> list, String... fields) {
 		if (list.isEmpty())
