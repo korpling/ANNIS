@@ -101,8 +101,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisRemoteServiceURL(getApplication().getProperty(
-      "AnnisRemoteService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
     input.setId("" + rand.nextLong());

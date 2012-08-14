@@ -50,16 +50,6 @@ public class VisualizerInput
   private List<String> mediaIDs;
 
   /**
-   * Get the URL which is configured for the Annis installation.
-   *
-   * @return
-   */
-  public String getAnnisRemoteServiceURL()
-  {
-    return annisRemoteServiceURL;
-  }
-
-  /**
    * Set the URL which is configured for the Annis installation.
    *
    * @param annisRemoteServiceURL

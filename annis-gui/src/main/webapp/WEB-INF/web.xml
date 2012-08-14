@@ -19,11 +19,6 @@
       <param-value>annis.gui.MainApp</param-value>
     </init-param>
     <init-param>
-      <description>URL of the AnnisRMIServer</description>
-      <param-name>AnnisRemoteService.URL</param-name>
-      <param-value>rmi://localhost:4711/AnnisService</param-value>
-    </init-param>
-    <init-param>
       <description>Path (or command) of the "dot" programm</description>
       <param-name>DotPath</param-name>
       <param-value>dot</param-value>

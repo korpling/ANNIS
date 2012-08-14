@@ -188,6 +188,13 @@
       </exclusions> 
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.6</version>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
 
@@ -195,7 +202,7 @@
 
     <resources>
       <resource>
-                <!-- include everything from src/main/java except *.java files -->
+        <!-- include everything from src/main/java except *.java files -->
         <directory>${basedir}/src/main/java</directory>
         <includes>
           <include>**/*</include>
@@ -344,8 +351,8 @@
 
     <pluginManagement>
       <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings 
-                    only. It has no influence on the Maven build itself. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+        only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
