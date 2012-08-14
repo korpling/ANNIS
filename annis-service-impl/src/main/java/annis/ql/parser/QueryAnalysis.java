@@ -22,7 +22,9 @@ import annis.ql.node.Start;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -31,7 +33,7 @@ import org.apache.log4j.Logger;
 public class QueryAnalysis
 {
   // logging
-  private final static Logger log = Logger.getLogger(QueryAnalysis.class);
+  private final static Logger log = LoggerFactory.getLogger(QueryAnalysis.class);
 
   // use each node in exactly one edge relation
   private boolean normalizeNodesInEdgeRelations;

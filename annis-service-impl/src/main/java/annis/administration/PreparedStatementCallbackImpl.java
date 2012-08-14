@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.MimetypesFileTypeMap;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 
@@ -35,6 +36,8 @@ public class PreparedStatementCallbackImpl implements
   PreparedStatementCallback<Boolean>
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(PreparedStatementCallbackImpl.class);
+  
   private FileInputStream fileStream;
   private File file;
   private String mimeType;
@@ -51,8 +54,7 @@ public class PreparedStatementCallbackImpl implements
     }
     catch (FileNotFoundException ex)
     {
-      Logger.getLogger(PreparedStatementCallbackImpl.class.getName()).
-        log(Level.SEVERE, null, ex);
+     log.error(null, ex);
     }
   }
 
@@ -73,8 +75,7 @@ public class PreparedStatementCallbackImpl implements
     }
     catch (IOException ex)
     {
-      Logger.getLogger(PreparedStatementCallbackImpl.class.getName()).
-        log(Level.SEVERE, null, ex);
+     log.error(null, ex);
     }
     return true;
   }

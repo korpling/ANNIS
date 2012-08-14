@@ -31,13 +31,6 @@
     </dependency>
 
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.5</version>
@@ -62,7 +55,23 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>3.1.0.RELEASE</version>
+      <!-- do not use commons logging -->
+      <exclusions>
+         <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+         </exclusion>
+      </exclusions>
     </dependency>
+    
+    <!-- provide a binary replacement for commons-logging based on slf4j -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.6.6</version>
+      <scope>runtime</scope>
+   </dependency>
+    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
@@ -195,6 +204,13 @@
       </exclusions> 
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.6</version>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
 
@@ -202,7 +218,7 @@
 
     <resources>
       <resource>
-                <!-- include everything from src/main/java except *.java files -->
+        <!-- include everything from src/main/java except *.java files -->
         <directory>${basedir}/src/main/java</directory>
         <includes>
           <include>**/*</include>
@@ -351,8 +367,8 @@
 
     <pluginManagement>
       <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings 
-                    only. It has no influence on the Maven build itself. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+        only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>

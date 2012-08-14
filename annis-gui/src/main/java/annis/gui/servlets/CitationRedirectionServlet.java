@@ -18,12 +18,11 @@ package annis.gui.servlets;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CitationRedirectionServlet extends HttpServlet
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CitationRedirectionServlet.class);
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -44,7 +45,7 @@ public class CitationRedirectionServlet extends HttpServlet
     }
     catch(URISyntaxException ex)
     {
-      Logger.getLogger(CitationRedirectionServlet.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
       
       resp.sendError(500, ex.getMessage());
     }

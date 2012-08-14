@@ -29,10 +29,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -41,6 +40,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 @PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(PartiturVisualizer.class);
 
   private List<AnnisNode> nodes;
   private List<AnnisNode> token;  
@@ -376,7 +377,7 @@ public class PartiturVisualizer extends WriterVisualizer
     }
     catch (Exception ex)
     {
-      Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
       try
       {
@@ -397,7 +398,7 @@ public class PartiturVisualizer extends WriterVisualizer
       }
       catch (IOException ex1)
       {
-        Logger.getLogger(PartiturVisualizer.class.getName()).log(Level.SEVERE,
+        log.error(
           null, ex1);
       }
     }

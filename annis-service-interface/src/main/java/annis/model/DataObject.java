@@ -26,7 +26,9 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Base implementation of a class that only holds data values.
@@ -54,7 +56,7 @@ public class DataObject implements Serializable
 	@Target(value=ElementType.FIELD)
 	public static @interface Transient { }
 	
-	private static Logger log = Logger.getLogger(DataObject.class);
+	private static final Logger log = LoggerFactory.getLogger(DataObject.class);
 	
 	// encapsulates the actions for each field in equals() and hashCode()
 	private interface FieldCallBack {

@@ -25,15 +25,15 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 
-import java.util.logging.Level;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 import jline.console.history.FileHistory;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -41,7 +41,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 public abstract class AnnisBaseRunner
 {
 
-  private static Logger log = Logger.getLogger(AnnisBaseRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(AnnisBaseRunner.class);
   // the root of the Annis installation
   private static String annisHomePath;
   // console output for easier testing, normally set to System.out
@@ -292,7 +292,8 @@ public abstract class AnnisBaseRunner
 
     if (console)
     {
-      Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout(
+      org.apache.log4j.Logger.getRootLogger()
+        .addAppender(new ConsoleAppender(new PatternLayout(
         "%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
     }
   }

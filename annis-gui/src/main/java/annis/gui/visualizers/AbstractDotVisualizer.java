@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -29,34 +28,34 @@ import java.util.logging.Logger;
 public abstract class AbstractDotVisualizer extends WriterVisualizer
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractDotVisualizer.class);
   public final int scale = 50;
 
   @Override
   public final void writeOutput(VisualizerInput input, Writer writer)
   {
-   
+
     StringBuilder dot = new StringBuilder();
     OutputStreamWriter stdin = null;
     InputStream stdout = null;
     InputStream stderr = null;
     try
     {
-      String cmd = input.getMappings().getProperty("dotpath", "dot") 
+      String cmd = input.getMappings().getProperty("dotpath", "dot")
         + " -s" + scale + ".0 -Tpng";
       Runtime runTime = Runtime.getRuntime();
       Process p = runTime.exec(cmd);
       stdin = new OutputStreamWriter(p.getOutputStream(), "UTF-8");
 
       createDotContent(input, dot);
-      
-      Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.FINE,
-        "outputting dot graph:\n{0}", dot.toString());
+
+      log.debug("outputting dot graph:\n{0}", dot.toString());
 
       stdin.append(dot);
       stdin.flush();
 
       stdin.close();
-      
+
       int chr;
       stdout = p.getInputStream();
       StringBuilder outMessage = new StringBuilder();
@@ -78,8 +77,7 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
 
       if (!"".equals(errorMessage.toString()))
       {
-        Logger.getLogger(AbstractDotVisualizer.class.getName()).log(
-          Level.SEVERE,
+        log.error(
           "Could not execute dot graph-layouter.\ncommand line:\n{0}\n\nstderr:\n{1}\n\nstdin:\n{2}",
           new Object[]
           {
@@ -90,47 +88,47 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
     }
     catch (IOException ex)
     {
-      Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
     finally
     {
-      if(stdin != null)
+      if (stdin != null)
       {
         try
         {
           stdin.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
-      if(stdout != null)
+      if (stdout != null)
       {
         try
         {
           stdout.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
-      if(stderr != null)
+      if (stderr != null)
       {
         try
         {
           stderr.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-          Logger.getLogger(AbstractDotVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
     }
 
   }
-  
+
   public abstract void createDotContent(VisualizerInput input, StringBuilder sb);
 
   @Override

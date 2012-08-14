@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
+
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
@@ -31,7 +30,6 @@ import annis.service.objects.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
 import annis.model.QueryNode;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -67,13 +65,15 @@ import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
 {
 
   // logging
-  private Logger log = Logger.getLogger(this.getClass());
+  private static final Logger log = LoggerFactory.getLogger(AnnisRunner.class);
   // SQL generators for query functions
   private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
@@ -452,8 +452,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     catch (IOException ex)
     {
-      java.util.logging.Logger.getLogger(AnnisRunner.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
   }
@@ -969,7 +968,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     catch (IOException ex)
     {
-      log.error(ex);
+      log.error(null, ex);
     }
     return "";
   }
@@ -1116,7 +1115,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       catch (URISyntaxException ex)
       {
-        log.error(ex);
+        log.error(null, ex);
         continue;
       }
 
@@ -1138,7 +1137,7 @@ public class AnnisRunner extends AnnisBaseRunner
     queryData.setCorpusList(corpusIDs);
     queryData.addAlternative(pseudoNodes);
 
-    log.debug(uris);
+    log.debug(uris.toString());
     queryData.addExtension(uris);
     return queryData;
   }

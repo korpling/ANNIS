@@ -24,12 +24,14 @@ import annis.gui.visualizers.dependency.VakyarthaDependencyTree;
 import annis.gui.visualizers.graph.DotGraphVisualizer;
 import annis.gui.visualizers.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.media.AudioVisualizer;
-import annis.gui.visualizers.media.MediaVisualizer;
 import annis.gui.visualizers.media.VideoVisualizer;
 import annis.gui.visualizers.partitur.PartiturVisualizer;
 import annis.gui.visualizers.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
 import com.vaadin.terminal.ClassResource;
@@ -58,6 +60,7 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Application's "main" class
@@ -67,6 +70,7 @@ public class MainApp extends Application implements PluginSystem,
   UserChangeListener, HttpServletRequestListener, Serializable
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private transient SearchWindow windowSearch;
@@ -80,15 +84,19 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void init()
   {
+
+    initLogging();
+
+    // get version of ANNIS
     ClassResource res = new ClassResource("version.properties", this);
     versionProperties = new Properties();
     try
     {
       versionProperties.load(res.getStream().getStream());
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
     addListener((UserChangeListener) this);
@@ -96,8 +104,34 @@ public class MainApp extends Application implements PluginSystem,
     initPlugins();
 
     setTheme("annis-theme");
+
+    initWindow();
+  }
+
+  protected void initLogging()
+  {
+    try
+    {
+      ClassResource res = new ClassResource("logback.xml", this);
     
-    initWindow(); 
+      if(res != null)
+      { 
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator jc = new JoranConfigurator();
+        jc.setContext(context);
+        context.reset();
+        context.putProperty("webappHome",
+          getContext().getBaseDirectory().getAbsolutePath());
+
+        // load config file
+        jc.doConfigure(res.getStream().getStream());
+      }
+    }
+    catch (JoranException ex)
+    {
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
   }
 
   public void initWindow()
@@ -115,10 +149,10 @@ public class MainApp extends Application implements PluginSystem,
     }
 
   }
-  
+
   public SearchWindow getWindowSearch()
   {
-    if(windowSearch == null)
+    if (windowSearch == null)
     {
       initWindow();
     }
@@ -132,9 +166,9 @@ public class MainApp extends Application implements PluginSystem,
     {
       result = Integer.parseInt(versionProperties.getProperty("build_revision", "-1"));
     }
-    catch(NumberFormatException ex)
+    catch (NumberFormatException ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
+      log.debug(null, ex);
     }
     return result;
   }
@@ -147,18 +181,18 @@ public class MainApp extends Application implements PluginSystem,
     StringBuilder result = new StringBuilder();
 
     result.append(getVersionNumber());
-    if(rev >= 0 || date != null)
+    if (rev >= 0 || date != null)
     {
       result.append(" (");
 
       boolean added = false;
-      if(rev >= 0)
+      if (rev >= 0)
       {
         result.append("rev. ");
         result.append(rev);
         added = true;
       }
-      if(date != null)
+      if (date != null)
       {
         result.append(added ? ", built " : "");
 
@@ -186,9 +220,9 @@ public class MainApp extends Application implements PluginSystem,
       DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
       result = format.parse(versionProperties.getProperty("build_date"));
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.FINE, null, ex);
+      log.debug(null, ex);
     }
     return result;
   }
@@ -196,16 +230,16 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void setUser(Object user)
   {
-    if(user == null || !(user instanceof AnnisUser))
+    if (user == null || !(user instanceof AnnisUser))
     {
       try
       {
         user = getWindowSearch().getSecurityManager().login(AnnisSecurityManager.FALLBACK_USER,
           AnnisSecurityManager.FALLBACK_USER, true);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
     super.setUser(user);
@@ -222,8 +256,6 @@ public class MainApp extends Application implements PluginSystem,
 
   private void initPlugins()
   {
-    Logger log = Logger.getLogger(MainApp.class.getName());
-
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
@@ -244,31 +276,31 @@ public class MainApp extends Application implements PluginSystem,
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
-    if(basicPlugins.isDirectory())
+    if (basicPlugins.isDirectory())
     {
       pluginManager.addPluginsFrom(basicPlugins.toURI());
-      log.log(Level.INFO, "added plugins from {0}", basicPlugins.getPath());
+      log.info("added plugins from {0}", basicPlugins.getPath());
     }
 
 
     String globalPlugins = System.getenv("ANNIS_PLUGINS");
-    if(globalPlugins != null)
+    if (globalPlugins != null)
     {
       pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
-      log.log(Level.INFO, "added plugins from {0}", globalPlugins);
+      log.info("added plugins from {0}", globalPlugins);
     }
 
     StringBuilder listOfPlugins = new StringBuilder();
     listOfPlugins.append("loaded plugins:\n");
     PluginManagerUtil util = new PluginManagerUtil(pluginManager);
-    for(Plugin p : util.getPlugins())
+    for (Plugin p : util.getPlugins())
     {
       listOfPlugins.append(p.getClass().getName()).append("\n");
     }
     log.info(listOfPlugins.toString());
 
     Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
-    for(VisualizerPlugin vis : visualizers)
+    for (VisualizerPlugin vis : visualizers)
     {
       visualizerRegistry.put(vis.getShortName(), vis);
       resourceAddedDate.put(vis.getShortName(), new Date());
@@ -278,7 +310,7 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void close()
   {
-    if(pluginManager != null)
+    if (pluginManager != null)
     {
       pluginManager.shutdown();
     }
@@ -289,7 +321,7 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public PluginManager getPluginManager()
   {
-    if(pluginManager == null)
+    if (pluginManager == null)
     {
       initPlugins();
     }
@@ -319,7 +351,7 @@ public class MainApp extends Application implements PluginSystem,
   {
     String origURI = request.getRequestURI();
     String parameters = origURI.replaceAll(".*?/Cite(/)?", "");
-    if(!"".equals(parameters) && !origURI.equals(parameters))
+    if (!"".equals(parameters) && !origURI.equals(parameters))
     {
       try
       {
@@ -329,14 +361,14 @@ public class MainApp extends Application implements PluginSystem,
         {
           response.sendRedirect(getURL().toString());
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
-          Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
-      catch(UnsupportedEncodingException ex)
+      catch (UnsupportedEncodingException ex)
       {
-        Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
 
 

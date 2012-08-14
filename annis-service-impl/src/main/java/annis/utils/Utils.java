@@ -20,13 +20,15 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
   public static File getAnnisHomeLocation()
   {
@@ -90,7 +92,7 @@ public class Utils
       }
       catch (NumberFormatException ex)
       {
-        Logger.getLogger(Utils.class.getName()).log(Level.SEVERE,
+        log.error(
           "Could not parse long value, assuming \"0\" as default", ex);
       }
     }

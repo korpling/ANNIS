@@ -15,12 +15,11 @@
  */
 package annis.gui.visualizers.tree;
 
-import java.awt.Color;
-import java.awt.Stroke;
-
 import annis.gui.visualizers.tree.GraphicsBackend.Font;
 import annis.model.AnnisNode;
 import annis.model.Edge;
+import java.awt.Color;
+import java.awt.Stroke;
 
 public interface TreeElementStyler {
 	

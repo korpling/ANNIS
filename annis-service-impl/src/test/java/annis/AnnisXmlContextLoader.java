@@ -17,7 +17,9 @@ package annis;
 
 import annis.utils.Utils;
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -30,7 +32,7 @@ import org.springframework.test.context.support.GenericXmlContextLoader;
 public class AnnisXmlContextLoader extends GenericXmlContextLoader
 {
   
-  private static Logger log = Logger.getLogger(AnnisXmlContextLoader.class);
+  private static final Logger log = LoggerFactory.getLogger(AnnisXmlContextLoader.class);
 
   
   @Override

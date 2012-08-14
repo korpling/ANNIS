@@ -27,33 +27,18 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
-import com.vaadin.ui.themes.ChameleonTheme;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.LoginForm;
 import com.vaadin.ui.LoginForm.LoginEvent;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.netomi.vaadin.screenshot.Screenshot;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -63,6 +48,8 @@ public class SearchWindow extends Window
   implements LoginForm.LoginListener, Screenshot.ScreenshotListener
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
+  
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
@@ -320,7 +307,7 @@ public class SearchWindow extends Window
         }
         catch (NumberFormatException ex)
         {
-          Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE,
+          log.error(
             "could not parse context value", ex);
         }
         control.setQuery(aql, selectedCorpora, cleft, cright);
@@ -438,7 +425,7 @@ public class SearchWindow extends Window
     }
     catch (Exception ex)
     {
-      Logger.getLogger(SearchWindow.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
 
       showNotification("Unexpected exception: " + ex.getMessage(),
         Window.Notification.TYPE_ERROR_MESSAGE);

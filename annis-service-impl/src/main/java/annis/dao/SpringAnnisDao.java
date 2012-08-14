@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
@@ -63,6 +63,8 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 // FIXME: test and refactor timeout and transaction management
@@ -154,7 +156,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       return toSql(queryData);
     }
   }
-  private static Logger log = Logger.getLogger(SpringAnnisDao.class);
+  private static final Logger log = LoggerFactory.getLogger(SpringAnnisDao.class);
   // / old
   private SqlGenerator sqlGenerator;
   private ListCorpusSqlHelper listCorpusSqlHelper;
@@ -409,11 +411,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         }
         catch (NoSuchAlgorithmException ex)
         {
-          log.log(Level.WARN, null, ex);
+          log.warn(null, ex);
         }
         catch (UnsupportedEncodingException ex)
         {
-          log.log(Level.WARN, null, ex);
+          log.warn(null, ex);
         }
 
         if (conf == null || !conf.isFile())
@@ -435,7 +437,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           }
           catch (IOException ex)
           {
-            log.log(Level.WARN, "could not load corpus configuration file "
+            log.warn("could not load corpus configuration file "
               + conf.getAbsolutePath(), ex);
           }
         }
@@ -465,8 +467,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex)
     {
-      log.log(Level.WARN,
-        "No corpus configuration loaded due to missing database connection.");
+      log.warn("No corpus configuration loaded due to missing database connection.");
     }
   }
 

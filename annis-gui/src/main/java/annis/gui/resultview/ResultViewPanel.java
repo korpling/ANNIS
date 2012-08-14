@@ -15,7 +15,6 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -26,7 +25,6 @@ import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Alignment;
@@ -36,15 +34,13 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,6 +48,9 @@ import java.util.logging.Logger;
  */
 public class ResultViewPanel extends Panel implements PagingCallback
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
+  
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
@@ -216,7 +215,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
           }
           catch (Exception ex)
           {
-            Logger.getLogger(ResultViewPanel.class.getName()).log(Level.SEVERE,
+            log.error(
               "unknown exception in result view", ex);
             synchronized(getApplication()) 
             {

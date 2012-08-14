@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+
 
 public class MultipleColumnsSolutionKey<BaseType>
   extends AbstractSolutionKey<BaseType>
@@ -13,7 +15,7 @@ public class MultipleColumnsSolutionKey<BaseType>
 {
 
   // logging with log4j
-  private static Logger log = Logger.getLogger(MultipleColumnsSolutionKey.class);
+  private static final Logger log = LoggerFactory.getLogger(MultipleColumnsSolutionKey.class);
   
   // the name of the ID array in the outer query
   private String keyColumnName;

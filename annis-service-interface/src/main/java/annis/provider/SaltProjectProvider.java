@@ -42,6 +42,7 @@ import org.eclipse.emf.ecore.xmi.XMLParserPool;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLParserPoolImpl;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,6 +53,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   MessageBodyReader<SaltProject>
 {
   
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
   private static ThreadLocal<XMLParserPool> xmlParserPool = 
     new ThreadLocal<XMLParserPool>();
 
@@ -102,8 +104,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     }
     catch(Exception ex)
     {
-      Logger.getLogger(SaltProjectProvider.class.getName()).log(
-        Level.SEVERE, "exception when serializing SaltProject", ex);
+      log.error("exception when serializing SaltProject", ex);
     }
   }
 

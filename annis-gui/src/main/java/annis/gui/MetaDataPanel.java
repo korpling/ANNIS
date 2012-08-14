@@ -19,20 +19,10 @@ import annis.model.Annotation;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Window.Notification;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,7 +30,8 @@ import java.util.logging.Logger;
  */
 public class MetaDataPanel extends Panel
 {
-
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
+  
   private VerticalLayout layout;
   private String toplevelCorpusName;
   private String documentName;
@@ -115,7 +106,7 @@ public class MetaDataPanel extends Panel
     }
     catch (Exception ex)
     {
-      Logger.getLogger(MetaDataPanel.class.getName()).log(Level.SEVERE,
+      log.error(
         null, ex);
       getWindow().showNotification("Remote exception: "
         + ex.getLocalizedMessage(),

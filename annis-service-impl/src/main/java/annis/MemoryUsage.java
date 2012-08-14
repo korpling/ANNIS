@@ -15,7 +15,10 @@
  */
 package annis;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 /**
  * Utility class that prints out memory usage of the Java VM to a logfile.
@@ -24,7 +27,7 @@ import org.apache.log4j.Logger;
  */
 public class MemoryUsage {
 
-	private static Logger log = Logger.getLogger(MemoryUsage.class);	
+	private static final Logger log = LoggerFactory.getLogger(MemoryUsage.class);	
 	
 	/**
 	 * Print total, free and maximum memory of the VM to a logfile.

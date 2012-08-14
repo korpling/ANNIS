@@ -42,8 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,6 +51,7 @@ import java.util.logging.Logger;
 public class TigerQueryBuilderCanvas extends Panel
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(TigerQueryBuilderCanvas.class);
   private SimpleCanvas canvas;
   private Map<NodeWindow, DragAndDropWrapper> nodes;
   private List<EdgeWindow> edges;
@@ -137,8 +137,7 @@ public class TigerQueryBuilderCanvas extends Panel
       }
       catch (Exception ex)
       {
-        Logger.getLogger(TigerQueryBuilderCanvas.class.getName()).log(
-          Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
     return result;

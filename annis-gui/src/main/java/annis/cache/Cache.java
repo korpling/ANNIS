@@ -15,8 +15,6 @@
  */
 package annis.cache;
 
-import java.io.IOException;
-
 public interface Cache {
 
 	public abstract String get(String key) throws CacheException;

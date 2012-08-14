@@ -1,15 +1,16 @@
 package annis.sqlgen;
 
 import static java.util.Arrays.asList;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+
 
 /**
  * TODO Document semantics of of multiple ID columns TODO Code supporting
@@ -22,7 +23,7 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
 {
 
   // logging with log4j
-  private static Logger log = Logger.getLogger(PostgreSqlArraySolutionKey.class);
+  private static final Logger log = LoggerFactory.getLogger(PostgreSqlArraySolutionKey.class);
   // the name of the ID array in the outer query
   private String keyColumnName;
 

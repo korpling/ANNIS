@@ -24,17 +24,19 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+
 
 import annis.ql.analysis.DepthFirstAdapter;
 import annis.ql.lexer.Lexer;
 import annis.ql.lexer.LexerException;
 import annis.ql.node.Start;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnisParser
 {
 
-  private static Logger log = Logger.getLogger(AnnisParser.class);
+  private static final Logger log = LoggerFactory.getLogger(AnnisParser.class);
 
   // extra class to allow stubbing in tests
   public static class InternalParser

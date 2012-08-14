@@ -34,12 +34,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -47,6 +46,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class MainFrame extends javax.swing.JFrame
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    MainFrame.class);
 
   private class MainFrameWorker extends SwingWorker<String, String>
     implements Serializable
@@ -127,7 +129,7 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (IOException ex)
       {
-        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        log.error(null, ex);
       }
     }
     this.setIconImages(allImages);
@@ -146,7 +148,7 @@ public class MainFrame extends javax.swing.JFrame
     }
     catch (Exception ex)
     {
-      Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
 
     initComponents();

@@ -9,13 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class AbstractSolutionKey<BaseType>
 {
 
   // logging with log4j
-  private static Logger log = Logger.getLogger(AbstractSolutionKey.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractSolutionKey.class);
   // name of the column identifying a node
   private String idColumnName;
   // the last key

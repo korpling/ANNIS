@@ -15,11 +15,10 @@
  */
 package annis.gui.visualizers.tree;
 
-import java.awt.Color;
-import java.awt.Stroke;
-
 import annis.gui.visualizers.tree.GraphicsBackend.Alignment;
 import annis.gui.visualizers.tree.GraphicsBackend.Font;
+import java.awt.Color;
+import java.awt.Stroke;
 
 public interface Shape {
 	double getXPadding();

@@ -21,12 +21,7 @@ import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

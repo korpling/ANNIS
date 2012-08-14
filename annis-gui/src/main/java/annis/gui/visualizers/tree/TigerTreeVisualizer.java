@@ -16,26 +16,6 @@
 package annis.gui.visualizers.tree;
 
 import annis.MatchedNodeColors;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-
 import annis.gui.visualizers.Visualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.tree.backends.staticimg.AbstractImageGraphicsItem;
@@ -45,6 +25,15 @@ import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.*;
+import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation

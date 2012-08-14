@@ -15,15 +15,14 @@
  */
 package annis.gui.visualizers.tree.backends.staticimg;
 
+import annis.gui.visualizers.tree.GraphicsBackend.Alignment;
+import annis.gui.visualizers.tree.Shape;
+import annis.gui.visualizers.tree.backends.staticimg.Java2dBackend.Java2dFont;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.font.GlyphMetrics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
-import annis.gui.visualizers.tree.Shape;
-import annis.gui.visualizers.tree.GraphicsBackend.Alignment;
-import annis.gui.visualizers.tree.backends.staticimg.Java2dBackend.Java2dFont;
 
 public class LabelItem extends AbstractImageGraphicsItem {
 	private final java.awt.Font awtFont;

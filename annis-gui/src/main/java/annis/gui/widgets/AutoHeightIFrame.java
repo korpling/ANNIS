@@ -2,13 +2,11 @@ package annis.gui.widgets;
 
 import annis.gui.resultview.VisualizerPanel;
 import annis.gui.widgets.gwt.client.VAutoHeightIFrame;
-
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
-import com.vaadin.ui.Window;
 import java.util.Map;
 
 /**

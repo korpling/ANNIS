@@ -51,10 +51,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -64,6 +63,8 @@ public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleResultPanel.class);
+  
   private static final String HIDE_KWIC = "hide_kwic";
   private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
@@ -454,8 +455,7 @@ public class SingleResultPanel extends VerticalLayout implements
     }
     catch (IOException ex)
     {
-      Logger.getLogger(SingleResultPanel.class.getName()).
-        log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
     return null;
   }

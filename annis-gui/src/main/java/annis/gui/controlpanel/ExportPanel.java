@@ -24,23 +24,14 @@ import annis.security.AnnisUser;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.StreamResource;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Window.Notification;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,6 +39,8 @@ import java.util.logging.Logger;
  */
 public class ExportPanel extends Panel implements Button.ClickListener
 {
+  
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -186,7 +179,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
     }
     catch(IOException ex)
     {
-      Logger.getLogger(ExportPanel.class.getName()).log(Level.SEVERE, null, ex);
+      log.error(null, ex);
     }
   }
 }

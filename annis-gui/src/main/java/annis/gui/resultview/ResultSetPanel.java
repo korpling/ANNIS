@@ -38,10 +38,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -50,6 +49,8 @@ import org.apache.commons.lang.Validate;
 public class ResultSetPanel extends Panel implements ResolverProvider
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultSetPanel.class);
+  
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
@@ -151,7 +152,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         catch (UnsupportedEncodingException ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
 
@@ -200,8 +201,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         catch (NullPointerException ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING,
-            "NullPointerException when using Salt, was trying to get layer name",
+          log.warn("NullPointerException when using Salt, was trying to get layer name",
             ex);
         }
       }
@@ -252,14 +252,14 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             }
             catch (Exception ex)
             {
-              Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, "could not query resolver entries: "
+              log.error("could not query resolver entries: "
                 + res.toString(), ex);
             }
           }
         }
         catch (Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+          log.error(null, ex);
         }
       }
       visSet.addAll(resolverList);
@@ -349,7 +349,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         {
           if(ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
           {
-            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             break;
           }
           // wait some time
@@ -359,12 +359,12 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           }
           catch (InterruptedException ex1)
           {
-            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex1);
+            log.error(null, ex1);
           }
         }
         catch(Exception ex)
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+          log.error(ex.getMessage(), ex);
           break;
         }
         tries++;
@@ -392,8 +392,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         else
         {
-          Logger.getLogger(ResultSetPanel.class.getName()).log(Level.WARNING, 
-            "did not get a proper corpus graph for URI {0}", 
+          log.warn("did not get a proper corpus graph for URI {0}", 
             subgraphRes.toString());
           result = null;
         }
@@ -482,7 +481,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           }
           catch (Exception ex)
           {
-            Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(null, ex);
           }
         }
       }

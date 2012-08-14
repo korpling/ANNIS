@@ -30,7 +30,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
-import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
@@ -56,8 +55,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -70,8 +71,8 @@ import org.springframework.stereotype.Component;
 public class AnnisWebService
 {
 
-  private final static Logger log = Logger.getLogger(AnnisWebService.class);
-  private static Logger queryLog = Logger.getLogger("QueryLog");
+  private final static Logger log = LoggerFactory.getLogger(AnnisWebService.class);
+  private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
   private AnnisDao annisDao;
   private WekaHelper wekaHelper;
   private int maxContext = 10;

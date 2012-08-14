@@ -15,14 +15,8 @@
  */
 package annis.gui.visualizers;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implentation of Visualizer which uses Writers instead of OutputStream
@@ -31,6 +25,8 @@ import java.util.logging.Logger;
 public abstract class WriterVisualizer extends Visualizer
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(WriterVisualizer.class);
+  
   /**
    * Will create a Writer of the outstream.
    * @param outstream
@@ -46,8 +42,7 @@ public abstract class WriterVisualizer extends Visualizer
     }
     catch(IOException ex)
     {
-      Logger.getLogger(WriterVisualizer.class.getName())
-        .log(Level.SEVERE, "Exception when writing visualizer output.", ex);
+      log.error("Exception when writing visualizer output.", ex);
       ex.printStackTrace(new PrintWriter(outstream));
     }
   }

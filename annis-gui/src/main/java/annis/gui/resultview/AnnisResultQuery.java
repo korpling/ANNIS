@@ -28,9 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class AnnisResultQuery implements Serializable
 {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisResultQuery.class);
 
   private Set<String> corpora;
   private String aql;
@@ -81,7 +81,7 @@ public class AnnisResultQuery implements Serializable
       }
       catch (UniformInterfaceException ex)
       {
-        Logger.getLogger(AnnisResultQuery.class.getName()).log(Level.SEVERE,
+        log.error(
           ex.getResponse().getEntity(String.class), ex);
       }
     }

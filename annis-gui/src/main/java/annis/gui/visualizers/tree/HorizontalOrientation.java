@@ -15,9 +15,8 @@
  */
 package annis.gui.visualizers.tree;
 
-import java.util.Comparator;
-
 import annis.model.AnnisNode;
+import java.util.Comparator;
 
 public enum HorizontalOrientation {
 	LEFT_TO_RIGHT(1),
