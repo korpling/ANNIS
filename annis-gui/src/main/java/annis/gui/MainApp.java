@@ -102,8 +102,18 @@ public class MainApp extends Application implements PluginSystem,
 
   public void initWindow()
   {
-    windowSearch = new SearchWindow((PluginSystem) this);
-    setMainWindow(windowSearch);
+    try
+    {
+      windowSearch = new SearchWindow((PluginSystem) this);
+      setMainWindow(windowSearch);
+    }
+    catch (Exception e)
+    {
+      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
+        "something fundamently goes wrong, probably in one of the attach blocks"
+        , e);
+    }
+
   }
   
   public SearchWindow getWindowSearch()
