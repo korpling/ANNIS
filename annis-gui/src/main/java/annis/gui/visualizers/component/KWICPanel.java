@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers;
+package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
