@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe;
+package annis.gui.visualizers;
 
 import annis.gui.visualizers.IFrameVisualizerPlugin;
 import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.iframe.ResourcePlugin;
 import annis.gui.visualizers.iframe.ResourcePlugin;
 import java.io.OutputStream;
 
