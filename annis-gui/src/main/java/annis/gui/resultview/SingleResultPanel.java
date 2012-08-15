@@ -15,16 +15,15 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.visualizers.component.KWICPanel;
 import annis.CommonHelper;
 import annis.gui.Helper;
-import annis.gui.PluginSystem;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
+import annis.gui.PluginSystem;
+import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.CorpusConfig;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -33,6 +32,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
@@ -65,7 +65,6 @@ public class SingleResultPanel extends VerticalLayout implements
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleResultPanel.class);
-  
   private static final String HIDE_KWIC = "hide_kwic";
   private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
@@ -140,12 +139,12 @@ public class SingleResultPanel extends VerticalLayout implements
   public void attach()
   {
 
-    if(wasAttached)
+    if (wasAttached)
     {
       return;
     }
     wasAttached = true;
-    
+
     // get corpus properties
 
     corpusConfig =
@@ -191,7 +190,7 @@ public class SingleResultPanel extends VerticalLayout implements
 
     for (VisualizerPanel p : openVisualizers)
     {
-      p.openVisualizer(false);
+      p.toggleVisualizer(false);
     }
 
 
@@ -257,7 +256,7 @@ public class SingleResultPanel extends VerticalLayout implements
     markedCoveredMap = new HashMap<String, String>();
 
     SDocumentGraph g = result.getSDocumentGraph();
-    if(g != null)
+    if (g != null)
     {
       for (SNode n : result.getSDocumentGraph().getSNodes())
       {

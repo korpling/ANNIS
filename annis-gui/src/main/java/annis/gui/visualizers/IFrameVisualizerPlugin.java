@@ -19,10 +19,10 @@ import java.io.OutputStream;
 import net.xeoh.plugins.base.Plugin;
 
 /**
- * Base interface for all visualizer plugins
+ * Base interface for all iframe visualizer plugins
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  */
-public interface IFrameVisualizerPlugin extends Plugin
+public interface IFrameVisualizerPlugin extends VisualizerPlugin
 {
 
   /**

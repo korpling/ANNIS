@@ -19,9 +19,12 @@ import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerPanel;
+import annis.gui.visualizers.ComponentVisualizerPlugin;
+import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -31,6 +34,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
@@ -38,7 +44,9 @@ import org.eclipse.emf.common.util.EList;
  *
  * @author thomas
  */
-public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
+@PluginImplementation
+public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener,
+  ComponentVisualizerPlugin
 {
 
   private SDocument result;
@@ -47,18 +55,52 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   private Map<SNode, Long> markedAndCovered;
   private List<String> mediaIDs;
   private List<VisualizerPanel> mediaVisualizer;
-  // only used for media files  
+  // only used for media files
   private String startTime;
   private String endTime;
   private String[] media_annotations =
   {
     "time"
   };
+  private VisualizerInput visInput;
 
+  public KWICPanel()
+  {
+  }
+
+  ;
+  
   public KWICPanel(SDocument result, List<SNode> token, Set<String> tokenAnnos,
     Map<SNode, Long> markedAndCovered, STextualDS text, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent, String segmentationName)
-  {    
+    List<VisualizerPanel> mediaVisualizer, SingleResultPanel parent,
+    String segmentationName)
+  {
+    initKWICPanel(result, token, tokenAnnos, markedAndCovered, text, mediaIDs,
+      mediaVisualizer, parent, segmentationName);
+  }
+
+  @Override
+  public void attach()
+  {
+    if (visInput != null)
+    {
+      initKWICPanel(visInput.getSResult(),
+        visInput.getToken(),
+        visInput.getVisibleTokenAnnos(),
+        visInput.getMarkedAndCovered(), 
+        visInput.getText(),
+        visInput.getMediaIDs(),
+        visInput.getMediaVisualizer(),
+        visInput.getSingleResultPanel(),
+        visInput.getSegmentationName());
+    }
+  }
+
+  private void initKWICPanel(SDocument result, List<SNode> token,
+    Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text,
+    List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer,
+    SingleResultPanel parent, String segmentationName)
+  {
     this.result = result;
     this.markedAndCovered = markedAndCovered;
     this.mediaIDs = mediaIDs;
@@ -79,14 +121,14 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setWidth("100%");
     setHeight("-1px");
     setPageLength(0);
-    
+
     addStyleName("single-result");
 
     if (CommonHelper.containsRTLText(text.getSText()))
     {
       addStyleName("rtl");
     }
-    
+
     SDocumentGraph graph = result.getSDocumentGraph();
 
     ArrayList<Object> visible = new ArrayList<Object>(10);
@@ -97,23 +139,26 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       STextualDS tokenText = null;
       EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
       types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-     
-      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(t, types);
-      if(dataSources != null)
+
+
+      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(t,
+        types);
+      if (dataSources != null)
       {
-        for(SDataSourceSequence seq : dataSources)
+        for (SDataSourceSequence seq : dataSources)
         {
-          if(seq.getSSequentialDS() instanceof STextualDS)
+          if (seq.getSSequentialDS() instanceof STextualDS)
           {
             tokenText = (STextualDS) seq.getSSequentialDS();
             break;
           }
         }
       }
-      
+
       SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
-        segmentationName == null ?
-        AnnisConstants.FEAT_TOKENINDEX : AnnisConstants.FEAT_SEGLEFT);
+        segmentationName == null ? AnnisConstants.FEAT_TOKENINDEX
+        : AnnisConstants.FEAT_SEGLEFT);
+
       if (tokenText == text)
       {
         // TODO: howto nativly detect gaps in Salt?
@@ -123,14 +168,22 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         {
           // add "(...)"
           Long gapColumnID = featTokenIndex.getSValueSNUMERIC();
-          addGeneratedColumn(gapColumnID, new GapColumnGenerator());
+          addGeneratedColumn(gapColumnID, new KWICPanel.GapColumnGenerator());
           setColumnExpandRatio(gapColumnID, 0.0f);
           visible.add(gapColumnID);
         }
 
-        // add a column for each token
-        addGeneratedColumn(t, new TokenColumnGenerator(t, segmentationName));
-        setColumnExpandRatio(t, 0.0f);
+        //add a column for each token
+        try
+        {
+          addGeneratedColumn(t, new KWICPanel.TokenColumnGenerator(t, segmentationName));          
+          setColumnExpandRatio(t, 0.0f);
+        }
+        catch (IllegalArgumentException ex)
+        {
+          Logger.getLogger(KWICPanel.TokenColumnGenerator.class.getName()).log(Level.SEVERE,
+            "unknown", ex);
+        }
         visible.add(t);
 
 
@@ -143,7 +196,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
     addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
     {
-
       @Override
       public Object generateCell(Table source, Object itemId, Object columnId)
       {
@@ -159,13 +211,12 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     setVisibleColumns(visible.toArray());
 
 
-    setCellStyleGenerator(new KWICStyleGenerator());
-    setItemDescriptionGenerator(new TooltipGenerator());
+    setCellStyleGenerator(new KWICPanel.KWICStyleGenerator());
+    setItemDescriptionGenerator(new KWICPanel.TooltipGenerator());
 
   }
-  
-  
 
+  @Override
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     if (containerAnnos != null)
@@ -175,25 +226,25 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       containerAnnos.addAll(annos);
     }
   }
-  
-  public class TooltipGenerator implements ItemDescriptionGenerator
+
+  public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
   {
-    
+
     public String generateDescription(String layer, SToken token)
     {
       SAnnotation a = token.getSAnnotation(layer);
-      if(a != null)
+      if (a != null)
       {
         return a.getQName();
       }
-        
+
       return null;
     }
 
     @Override
     public String generateDescription(Component source, Object itemId, Object propertyId)
     {
-      if(propertyId != null && propertyId instanceof SToken)
+      if (propertyId != null && propertyId instanceof SToken)
       {
         return generateDescription((String) itemId, (SToken) propertyId);
       }
@@ -202,21 +253,19 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         return null;
       }
     }
-    
   }
-  
+
   public class KWICStyleGenerator implements Table.CellStyleGenerator
   {
     public String getStyle(String layer, SNode token)
     {
-
       BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
       textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-     
+
 
       if ("tok".equals(layer))
       {
-        
+
         if (markedAndCovered.containsKey(token))
         {
           // add color
@@ -231,7 +280,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       {
         SAnnotation a = token.getSAnnotation(layer);
         if (a != null)
-        {         
+        {
           for (String media_anno : media_annotations)
           {
             if (media_anno.equals(a.getName()))
@@ -250,7 +299,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     @Override
     public String getStyle(Object itemId, Object propertyId)
     {
-      if(propertyId != null && propertyId instanceof SNode)
+      if (propertyId != null && propertyId instanceof SToken)
       {
         return getStyle((String) itemId, (SNode) propertyId);
       }
@@ -259,10 +308,21 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
         return null;
       }
     }
-    
   }
-  
-  public static class GapColumnGenerator implements ColumnGenerator
+
+  @Override
+  public String getShortName()
+  {
+    return "KWIC";
+  }
+
+  @Override
+  public void setVisualizerInput(VisualizerInput visInput)
+  {
+    this.visInput = visInput;
+  }
+
+  public static class GapColumnGenerator implements Table.ColumnGenerator
   {
 
     public Object generateCell(String layer)
@@ -282,7 +342,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     }
   }
 
-  public class TokenColumnGenerator implements ColumnGenerator
+  public class TokenColumnGenerator implements Table.ColumnGenerator
   {
 
     private Map<String, SAnnotation> annotationsByQName;
@@ -298,7 +358,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       {
         annotationsByQName.put(a.getQName(), a);
         // also add non-qualified name if we are working on a segmentation path
-        if(a.getSName().equals(segmentationName))
+        if (a.getSName().equals(segmentationName))
         {
           annotationsByQName.put(a.getSName(), a);
         }
@@ -312,24 +372,28 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
       SDocumentGraph docGraph = result.getSDocumentGraph();
 
-      
+
       if ("tok".equals(layer))
       {
-        if(segmentationName == null)
+        if (segmentationName == null)
         {
           SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
             textualRelation).get(0);
+
           return ((String) seq.getSSequentialDS().getSData()).substring(seq.
-            getSStart(), seq.getSEnd()); 
+            getSStart(), seq.getSEnd());
+
         }
         else
         {
           SAnnotation a = annotationsByQName.get(segmentationName);
-          if(a != null)
+          if (a != null)
           {
             return a.getValueString();
           }
-        }        
+
+        }
+
       }
       else
       {
@@ -347,7 +411,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
               return (startTime + "-" + endTime);
             }
           }
-          
+
           return a.getValueString();
         }
       }
@@ -390,7 +454,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
       }
     }
 
-    // do not start the media player, when there is only an 
+    // do not start the media player, when there is only an
     // end time defined
     if (time != null && time.matches("\\-[0-9]*(\\.[0-9]*)?"))
     {
@@ -399,7 +463,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
     for (VisualizerPanel vis : mediaVisualizer)
     {
-      vis.openVisualizer(false);
+      vis.toggleVisualizer(false);
     }
 
     time = (time == null) ? "no time given" : time;

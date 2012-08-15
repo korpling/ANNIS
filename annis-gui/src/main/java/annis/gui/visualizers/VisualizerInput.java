@@ -15,15 +15,21 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.MatchedNodeColors;
+import annis.gui.resultview.SingleResultPanel;
+import annis.gui.resultview.VisualizerPanel;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import org.jdom.Document;
 
 /**
@@ -37,6 +43,7 @@ public class VisualizerInput
   private SDocument document;
   private String namespace = "";
   private String paula = null;
+  private Map<SNode, Long> markedAndCovered;
   private Map<String, String> markableMap = new HashMap<String, String>();
   private Map<String, String> markableExactMap = new HashMap<String, String>();
   private String id = "";
@@ -48,6 +55,22 @@ public class VisualizerInput
   private Properties mappings;
   private String resourcePathTemplate = "%s";
   private List<String> mediaIDs;
+  private List<SNode> token;
+  private Set<String> tokenAnnos;
+  private STextualDS text;
+  private SingleResultPanel singleResultPanel;
+  private String segmentationName;
+  private List<VisualizerPanel> mediaVisualizer;
+
+  /**
+   * Get the URL which is configured for the Annis installation.
+   *
+   * @return
+   */
+  public String getAnnisRemoteServiceURL()
+  {
+    return annisRemoteServiceURL;
+  }
 
   /**
    * Set the URL which is configured for the Annis installation.
@@ -84,7 +107,7 @@ public class VisualizerInput
    * Get the path to the dot graph layout generator program.
    *
    * @deprecated For configuration of visualizers please use the more general
-   *             {@link #getMappings()} .
+   * {@link #getMappings()} .
    */
   @Deprecated
   public String getDotPath()
@@ -97,7 +120,7 @@ public class VisualizerInput
    *
    * @param dotPath
    * @deprecated For configuration of visualizers please use the more general
-   *             {@link #setMappings(Properties)} .
+   * {@link #setMappings(Properties)} .
    */
   @Deprecated
   public void setDotPath(String dotPath)
@@ -169,7 +192,8 @@ public class VisualizerInput
    * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of
    * this map must be the corresponding node id of annotations or tokens. The
    * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
+   * detailed information on HTML color definition refer to
+   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @return
    */
@@ -183,7 +207,8 @@ public class VisualizerInput
    * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of
    * this map must be the corresponding node id of annotations or tokens. The
    * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to {@link http://www.w3schools.com/HTML/html_colornames.asp}
+   * detailed information on HTML color definition refer to
+   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @param markableMap
    */
@@ -191,6 +216,32 @@ public class VisualizerInput
   public void setMarkableMap(Map<String, String> markableMap)
   {
     this.markableMap = markableMap;
+  }
+
+  /**
+   * This map is used for calculating the colors of a matching node.
+   *
+   * All Nodes, which are not included, should not be colorized. For getting
+   * HEX-values according to html or css standards, it is possible to use
+   * {@link MatchedNodeColors}.
+   *
+   */
+  public void setMarkedAndCovered(Map<SNode, Long> markedAndCovered)
+  {
+    this.markedAndCovered = markedAndCovered;
+  }
+
+  /**
+   * This map is used for calculating the colors of a matching node.
+   *
+   * All Nodes, which are not included, should not be colorized. For getting
+   * HEX-values according to html or css standards, it is possible to use
+   * {@link MatchedNodeColors}.
+   *
+   */
+  public Map<SNode, Long> getMarkedAndCovered()
+  {
+    return markedAndCovered;
   }
 
   /**
@@ -233,6 +284,22 @@ public class VisualizerInput
   public void setDocument(SDocument document)
   {
     this.document = document;
+  }
+
+  /**
+   * Alias for {@link VisualizerInput#setDocument(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument)
+   */
+  public void setResult(SDocument document)
+  {
+    setDocument(document);
+  }
+
+  /**
+   * Alias for {@link VisualizerInput#getDocument()}
+   */
+  public SDocument getSResult()
+  {
+    return getDocument();
   }
 
   public String getResourcePathTemplate()
@@ -279,5 +346,97 @@ public class VisualizerInput
   public List<String> getMediaIDs()
   {
     return mediaIDs;
+  }
+
+  /**
+   * should contains a list of all token of a the which is available with
+   * {@link VisualizerInput#getSResult()}.
+   */
+  public void setToken(List<SNode> token)
+  {
+    this.token = token;
+  }
+
+  /**
+   * should contains a list of all token of a the which is available with
+   * {@link VisualizerInput#getSResult()}.
+   *
+   * @return TODO at the moment it's not certain, that token are nodes of the
+   * {@link VisualizerInput#getSResult()}.
+   *
+   */
+  public List<SNode> getToken()
+  {
+    return this.token;
+  }
+
+  /**
+   * Set all token annotations which should be displayed by the visualizer and
+   * correspondands to the annos choosen by the user in the annis gui.
+   */
+  public void setVisibleTokenAnnos(Set<String> tokenAnnos)
+  {
+    this.tokenAnnos = tokenAnnos;
+  }
+
+  /**
+   * This token annotation should displayed by the visualizer and is selected by
+   * the user in the annis gui.
+   */
+  public Set<String> getVisibleTokenAnnos()
+  {
+    return this.tokenAnnos;
+  }
+
+  // TODO find out why we need this.
+  public void setText(STextualDS text)
+  {
+    this.text = text;
+  }
+
+  // TODO find out why we need this
+  public STextualDS getText()
+  {
+    return this.text;
+  }
+
+  // TODO find out why we need this
+  public void setSingleResultPanelRef(SingleResultPanel parentPanel)
+  {
+    this.singleResultPanel = parentPanel;
+  }
+
+  // TODO find out why we need this
+  public SingleResultPanel getSingleResultPanel()
+  {
+    return this.singleResultPanel;
+  }
+
+  public void setSegmentationName(String segmentationName)
+  {
+    this.segmentationName = segmentationName;
+  }
+
+  /**
+   * @return the segmentationName
+   */
+  public String getSegmentationName()
+  {
+    return segmentationName;
+  }
+
+  /**
+   * All available visualizer for this result.
+   *
+   * @param mediaVisualizer
+   */
+  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
+  {
+    this.mediaVisualizer = mediaVisualizer;
+  }
+
+  public List<VisualizerPanel> getMediaVisualizer()
+  {
+    return mediaVisualizer;
   }
 }

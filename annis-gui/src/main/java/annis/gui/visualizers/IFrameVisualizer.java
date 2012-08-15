@@ -15,9 +15,6 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.visualizers.IFrameVisualizerPlugin;
-import annis.gui.visualizers.VisualizerInput;
-import annis.gui.visualizers.iframe.ResourcePlugin;
 import annis.gui.visualizers.iframe.ResourcePlugin;
 import java.io.OutputStream;
 
