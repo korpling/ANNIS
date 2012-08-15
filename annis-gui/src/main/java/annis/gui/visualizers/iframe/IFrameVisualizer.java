@@ -20,7 +20,7 @@ import annis.gui.visualizers.iframe.VisualizerInput;
 import annis.gui.visualizers.iframe.ResourcePlugin;
 import java.io.OutputStream;
 
-public abstract class Visualizer implements VisualizerPlugin, ResourcePlugin
+public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlugin
 {
 
   @Override

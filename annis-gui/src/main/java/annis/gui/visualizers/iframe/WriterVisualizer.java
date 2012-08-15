@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Implentation of Visualizer which uses Writers instead of OutputStream
  * @author thomas
  */
-public abstract class WriterVisualizer extends Visualizer
+public abstract class WriterVisualizer extends IFrameVisualizer
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(WriterVisualizer.class);
