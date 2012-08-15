@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.visualizers.iframe.VisualizerInput;
 import java.io.OutputStream;
 import net.xeoh.plugins.base.Plugin;
 

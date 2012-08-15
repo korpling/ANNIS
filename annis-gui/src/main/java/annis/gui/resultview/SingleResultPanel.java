@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.visualizers.KWICPanel;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;

@@ -15,9 +15,10 @@
  */
 package annis.gui.resultview;
 
+import annis.gui.visualizers.KWICPanel;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.iframe.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.resolver.ResolverEntry;

@@ -16,17 +16,17 @@
 package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.visualizers.CorefVisualizer;
+import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.dependency.ProielDependecyTree;
-import annis.gui.visualizers.dependency.ProielRegularDependencyTree;
-import annis.gui.visualizers.dependency.VakyarthaDependencyTree;
-import annis.gui.visualizers.graph.DotGraphVisualizer;
-import annis.gui.visualizers.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.media.AudioVisualizer;
-import annis.gui.visualizers.media.VideoVisualizer;
-import annis.gui.visualizers.partitur.PartiturVisualizer;
-import annis.gui.visualizers.tree.TigerTreeVisualizer;
+import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
+import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
+import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
+import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
+import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
+import annis.gui.visualizers.iframe.media.AudioVisualizer;
+import annis.gui.visualizers.iframe.media.VideoVisualizer;
+import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
+import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
