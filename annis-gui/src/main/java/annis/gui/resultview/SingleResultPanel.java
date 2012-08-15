@@ -20,6 +20,8 @@ import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
+import annis.gui.visualizers.ComponentVisualizerPlugin;
+import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
@@ -64,7 +66,6 @@ public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleResultPanel.class);
   private static final String HIDE_KWIC = "hide_kwic";
   private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
@@ -86,6 +87,14 @@ public class SingleResultPanel extends VerticalLayout implements
   private CorpusConfig corpusConfig;
   private List<SNode> token;
   private boolean wasAttached;
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    SingleResultPanel.class);
+
+  // TODO should be configurable with resolver_vis_tab
+  private String[] alwaysVisibleVis =
+  {
+    "KWIC"
+  };
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -157,13 +166,37 @@ public class SingleResultPanel extends VerticalLayout implements
     List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
     mediaVisualizer = new ArrayList<VisualizerPanel>();
 
+
+    // hacky implemented ComponentVisualizer
+    for (int i = 0; i < alwaysVisibleVis.length; i++)
+    {
+      String id = "resolver-" + resultNumber + "-" + i;
+      CustomLayout visContainer = this.visContainer(id, "compVis");
+
+      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+      {
+        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
+          result.getSDocumentGraph());
+
+        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+        calulcateColorsForMarkedAndCoverd();
+
+
+        VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
+          token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
+          mediaVisualizer, id, this, segmentationName, ps, visContainer);
+        visualizers.add(p);
+      }
+    }
+    // /hacky implemented ComponentVisualizer
+
     for (int i = 0; i < entries.length; i++)
     {
       String id = "resolver-" + resultNumber + "-" + i;
-      CustomLayout customLayout = this.customLayout(id);
+      CustomLayout visContainer = this.visContainer(id, "iframe");
 
       VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-        markedExactMap, markedCoveredMap, customLayout, mediaIDs, id);
+        markedExactMap, markedCoveredMap, visContainer, mediaIDs, id);
 
       if ("media".equals(entries[i].getVisType())
         || "video".equals(entries[i].getVisType())
@@ -192,9 +225,6 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       p.toggleVisualizer(false);
     }
-
-
-    super.attach();
   }
 
   private void addKWICPanels()
@@ -241,6 +271,24 @@ public class SingleResultPanel extends VerticalLayout implements
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
+
+    for (String visName : alwaysVisibleVis)
+    {
+      VisualizerPlugin vis = ps.getVisualizer(visName);
+      ComponentVisualizerPlugin compVis;
+
+      if (vis instanceof ComponentVisualizerPlugin)
+      {
+        compVis = (ComponentVisualizerPlugin) vis;
+        compVis.setVisibleTokenAnnosVisible(annos);
+      }
+      else
+      {
+        log.warn(visName + " is not an instance of "
+          + ComponentVisualizerPlugin.class.getName());
+      }
+    }
+
     if (kwicPanels != null)
     {
       for (KWICPanel kwic : kwicPanels)
@@ -262,7 +310,8 @@ public class SingleResultPanel extends VerticalLayout implements
       {
 
         SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
+        Long match = featMatched == null ? null : featMatched.
+          getSValueSNUMERIC();
 
         if (match != null)
         {
@@ -287,8 +336,7 @@ public class SingleResultPanel extends VerticalLayout implements
       int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
         - 1,
         MatchedNodeColors.values().length - 1));
-      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS,
-        FEAT_INTERNALID);
+      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
       if (feat != null)
       {
         markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
@@ -318,7 +366,7 @@ public class SingleResultPanel extends VerticalLayout implements
     }
 
     // calculate covered nodes
-    CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.
+    SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(doc.
       getSDocumentGraph(), initialCovered);
     Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
@@ -442,20 +490,20 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  private CustomLayout customLayout(String id)
+  private CustomLayout visContainer(String id, String place)
   {
-    String layout = ""
-      + "<div id=\"" + id + "\">"
-      + "  <div location=\"btEntry\"></div>"
-      + "  <div location=\"iframe\"></div>"
-      + "</div>";
+    StringBuilder sb = new StringBuilder();
+    sb.append("<div id=\"").append(id).append("\">");
+    sb.append("<div location=\"btEntry\"></div>");
+    sb.append("  <div location=\"").append(place).append("\"></div>");
+    sb.append("</div>");
     try
     {
-      return new CustomLayout(new ByteArrayInputStream(layout.getBytes()));
+      return new CustomLayout(new ByteArrayInputStream(sb.toString().getBytes()));
     }
     catch (IOException ex)
     {
-      log.error(null, ex);
+      log.error("problems with generating vis container", ex);
     }
     return null;
   }

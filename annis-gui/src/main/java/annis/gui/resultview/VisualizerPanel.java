@@ -18,10 +18,10 @@ package annis.gui.resultview;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.visualizers.ComponentVisualizerPlugin;
-import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.IFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.resolver.ResolverEntry;
 import com.sun.jersey.api.client.WebResource;
@@ -97,10 +97,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,
     STextualDS text, List<String> mediaIDs,
     List<VisualizerPanel> mediaVisualizer, String htmlID,
-    SingleResultPanel parent, String segmentationName, PluginSystem ps, CustomLayout visContainer)
+    SingleResultPanel parent, String segmentationName, PluginSystem ps, 
+    CustomLayout visContainer)
   {
     VisualizerPlugin vis = ps.getVisualizer(visType);
-
 
     this.result = result;
     this.token = token;
