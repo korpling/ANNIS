@@ -17,7 +17,7 @@ package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.iframe.CorefVisualizer;
-import annis.gui.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.IFrameVisualizerPlugin;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
@@ -75,8 +75,8 @@ public class MainApp extends Application implements PluginSystem,
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private transient SearchWindow windowSearch;
   private transient PluginManager pluginManager;
-  private static final Map<String, VisualizerPlugin> visualizerRegistry =
-    Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
+  private static final Map<String, IFrameVisualizerPlugin> visualizerRegistry =
+    Collections.synchronizedMap(new HashMap<String, IFrameVisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private Properties versionProperties;
@@ -299,8 +299,8 @@ public class MainApp extends Application implements PluginSystem,
     }
     log.info(listOfPlugins.toString());
 
-    Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
-    for (VisualizerPlugin vis : visualizers)
+    Collection<IFrameVisualizerPlugin> visualizers = util.getPlugins(IFrameVisualizerPlugin.class);
+    for (IFrameVisualizerPlugin vis : visualizers)
     {
       visualizerRegistry.put(vis.getShortName(), vis);
       resourceAddedDate.put(vis.getShortName(), new Date());
@@ -329,7 +329,7 @@ public class MainApp extends Application implements PluginSystem,
   }
 
   @Override
-  public VisualizerPlugin getVisualizer(String shortName)
+  public IFrameVisualizerPlugin getVisualizer(String shortName)
   {
     return visualizerRegistry.get(shortName);
   }

@@ -18,8 +18,8 @@ package annis.gui.resultview;
 import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.iframe.VisualizerInput;
-import annis.gui.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.IFrameVisualizerPlugin;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.resolver.ResolverEntry;
 
@@ -186,7 +186,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       if (iframe == null)
       {
 
-        VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
+        IFrameVisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
         if (vis == null)
         {
           entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);

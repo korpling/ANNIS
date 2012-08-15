@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.iframe.tree;
 
-import annis.gui.visualizers.iframe.VisualizerInput;
+import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.tree.GraphicsBackend.Alignment;
 import annis.model.AnnisNode;
 import annis.model.Edge;

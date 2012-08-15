@@ -15,12 +15,12 @@
  */
 package annis.gui.visualizers.iframe;
 
-import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.iframe.VisualizerInput;
+import annis.gui.visualizers.IFrameVisualizerPlugin;
+import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.ResourcePlugin;
 import java.io.OutputStream;
 
-public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlugin
+public abstract class IFrameVisualizer implements IFrameVisualizerPlugin, ResourcePlugin
 {
 
   @Override

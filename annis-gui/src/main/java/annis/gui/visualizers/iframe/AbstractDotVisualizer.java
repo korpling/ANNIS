@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.iframe;
 
+import annis.gui.visualizers.VisualizerInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;

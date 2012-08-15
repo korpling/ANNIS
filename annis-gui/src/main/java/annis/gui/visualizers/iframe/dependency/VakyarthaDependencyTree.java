@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.iframe.dependency;
 
-import annis.gui.visualizers.iframe.VisualizerInput;
+import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;

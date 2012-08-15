@@ -17,7 +17,7 @@ package annis.gui.visualizers.iframe.tree;
 
 import annis.MatchedNodeColors;
 import annis.gui.visualizers.iframe.IFrameVisualizer;
-import annis.gui.visualizers.iframe.VisualizerInput;
+import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.AbstractImageGraphicsItem;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.Java2dBackend;
 import annis.model.AnnisNode;
