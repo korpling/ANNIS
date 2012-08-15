@@ -15,7 +15,6 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.visualizers.iframe.ResourcePlugin;
 import java.io.OutputStream;
 
 public abstract class IFrameVisualizer implements IFrameVisualizerPlugin, ResourcePlugin
