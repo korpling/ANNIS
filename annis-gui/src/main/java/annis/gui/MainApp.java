@@ -51,8 +51,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -114,9 +112,9 @@ public class MainApp extends Application implements PluginSystem,
     try
     {
       ClassResource res = new ClassResource("logback.xml", this);
-    
-      if(res != null)
-      { 
+
+      if (res != null)
+      {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator jc = new JoranConfigurator();
         jc.setContext(context);
@@ -130,7 +128,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (JoranException ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      log.error("init loggin failed", ex);
     }
 
   }
@@ -144,9 +142,8 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (Exception e)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-        "something fundamently goes wrong, probably in one of the attach blocks"
-        , e);
+      log.error("something fundamently goes wrong, "
+        + "probably in one of the attach blocks", e);
     }
 
   }
@@ -298,7 +295,7 @@ public class MainApp extends Application implements PluginSystem,
     for (Plugin p : util.getPlugins())
     {
       listOfPlugins.append(p.getClass().getName()).append("\n");
-      
+
     }
     log.info(listOfPlugins.toString());
 
