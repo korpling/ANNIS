@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  
+  <appender name="QUERYLOG" class="ch.qos.logback.core.FileAppender">
+    <file>${annis.home}/log/query.log</file>
+    <encoder>
+      <pattern>%date{ISO8601} - %m</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+  
+  <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${annis.home}/log/annis.log</file>
+    <encoder>
+      <pattern>%p [%t] %date{ISO8601}  %C{1} - %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>annis.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <!-- keep 7 days' worth of history -->
+      <MaxHistory>7</MaxHistory>
+
+      <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <MaxFileSize>1MB</MaxFileSize>
+      </TimeBasedFileNamingAndTriggeringPolicy>
+
+    </rollingPolicy>
+  </appender>
+  
+  <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${annis.home}/log/error.log</file>
+    <encoder>
+      <pattern>%p [%t] %date{ISO8601} %C{1} - %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+    
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>error.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <!-- keep 7 days' worth of history -->
+      <MaxHistory>7</MaxHistory>
+
+      <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <MaxFileSize>1MB</MaxFileSize>
+      </TimeBasedFileNamingAndTriggeringPolicy>
+
+    </rollingPolicy>
+    
+  </appender>
+  
+  <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${annis.home}/log/debug.log</file>
+    <encoder>
+      <immediateFlush>false</immediateFlush>
+      <pattern>%p [%t] %date{ISO8601}  %C - %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>DEBUG</level>
+    </filter>
+    
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>annis.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <!-- keep 1 days' worth of history -->
+      <MaxHistory>1</MaxHistory>
+
+      <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <MaxFileSize>1MB</MaxFileSize>
+      </TimeBasedFileNamingAndTriggeringPolicy>
+
+    </rollingPolicy>
+  </appender>
+  
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="annis.administration.CorpusAdministration" level="INFO"/>
+  <logger name="annis.administrations" level="WARN"/>
+  <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>
+  <logger name="annis.benchmarking" level="DEBUG"/>
+  
+  <logger name="annis" level="DEBUG">
+    <appender-ref ref="DEBUG"/>
+  </logger>
+  
+  <logger name="QueryLog" level="INFO">
+    <appender-ref ref="QUERYLOG"/>
+  </logger>
+  <root level="INFO">
+    <appender-ref ref="LOGFILE"/>
+    <appender-ref ref="ERROR"/>
+  </root>
+
+</configuration>

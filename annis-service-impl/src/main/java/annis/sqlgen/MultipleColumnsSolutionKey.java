@@ -14,7 +14,6 @@ public class MultipleColumnsSolutionKey<BaseType>
   implements SolutionKey<List<BaseType>>
 {
 
-  // logging with log4j
   private static final Logger log = LoggerFactory.getLogger(MultipleColumnsSolutionKey.class);
   
   // the name of the ID array in the outer query

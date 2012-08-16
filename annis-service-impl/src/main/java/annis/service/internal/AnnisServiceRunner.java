@@ -16,9 +16,8 @@
 package annis.service.internal;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
- 
+
 
 
 
@@ -32,9 +31,6 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +49,9 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   public static void main(String[] args) throws IOException
   {
+    AnnisBaseRunner.setupLogging(false);
+
     mainThread = Thread.currentThread();
-    
-    PropertyConfigurator.configure(System.getProperty("annis.home")
-      + "/conf/logging.properties");
 
     annisServiceRunner = new AnnisServiceRunner();
 
@@ -69,21 +64,26 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       pidFile.deleteOnExit();
 
       annisServiceRunner.start();
-      closeSystemStreams();    
+
+      if(!isShutdownRequested)
+      {
+        closeSystemStreams();
+      }
+
     }
     // no, run in debug mode
     else
     {
       log.info("Running in Debug mode");
-      // create a logging appender for stdout
-      org.apache.log4j.Logger.getRootLogger().addAppender(
-        new ConsoleAppender(new PatternLayout(
-        "%d{HH:mm:ss,SSS} [%t] %C{1} %p: %m\n")));
+
       annisServiceRunner.start();
     }
-    
-    addShutdownHook();
 
+    if(!isShutdownRequested)
+    {
+      addShutdownHook();
+    }
+    
     try
     {
       while (!isShutdownRequested)
@@ -153,8 +153,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     }
     ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
     ctx.refresh();
-    
-    
+
+
     ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider", "annis.rest.provider");
     IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
@@ -163,19 +163,22 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     URI baseURI = UriBuilder.fromUri("http://localhost").port(port).build();
     try
     {
-      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);      
+      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);
     }
     catch (IOException ex)
     {
-      log.error(null, ex);
+      log.error("IOException at ANNIS service startup", ex);
+      isShutdownRequested = true;
     }
     catch (IllegalArgumentException ex)
     {
-      log.error(null, ex);
+      log.error("IllegalArgumentException at ANNIS service startup", ex);
+      isShutdownRequested = true;;
     }
     catch (NullPointerException ex)
     {
-      log.error(null, ex);
+      log.error("NullPointerException at ANNIS service startup", ex);
+      isShutdownRequested = true;
     }
 
   }
@@ -183,18 +186,25 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private void start()
   {
     log.info("Starting up...");
-    createWebServer();
-    if (server != null)
+
+    try
     {
-      try
+      createWebServer();
+      if (server == null)
+      {
+        isShutdownRequested = true;
+      }
+      else
       {
         server.start();
       }
-      catch (IOException ex)
-      {
-        log.error(null, ex);
-      }
     }
+    catch (Exception ex)
+    {
+      log.error("could not start ANNIS REST service", ex);
+      isShutdownRequested = true;
+    }
+
 
   }
 }
