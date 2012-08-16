@@ -39,6 +39,7 @@ import jline.console.completer.StringsCompleter;
 import jline.console.history.FileHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -328,6 +329,9 @@ public abstract class AnnisBaseRunner
     
     
     logbackLogger.addAppender(consoleAppender);
+    
+    SLF4JBridgeHandler.removeHandlersForRootLogger();;
+    SLF4JBridgeHandler.install();
   }
 
   ///// Getter / Setter

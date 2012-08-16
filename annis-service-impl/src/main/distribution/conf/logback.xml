@@ -8,6 +8,9 @@
 <!--    http://www.qos.ch/shop/products/professionalSupport         -->
 <!--                                                                -->
 <configuration>
+  
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  
   <appender name="QUERYLOG" class="ch.qos.logback.core.FileAppender">
     <file>${annis.home}/log/query.log</file>
     <encoder>

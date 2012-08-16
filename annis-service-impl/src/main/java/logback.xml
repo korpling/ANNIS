@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  
   <root level="INFO">
     <!-- no appenders yet -->
   </root>
