@@ -34,11 +34,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -49,6 +49,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   ComponentVisualizerPlugin
 {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(KWICPanel.class);
   private SDocument result;
   private static final String DUMMY_COLUMN = "dummyColumn";
   private BeanItemContainer<String> containerAnnos;
@@ -63,6 +64,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     "time"
   };
   private VisualizerInput visInput;
+  private boolean wasAttached;
 
   public KWICPanel()
   {
@@ -82,7 +84,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   @Override
   public void attach()
   {
-    if (visInput != null)
+    
+   if (visInput != null)
     {
       initKWICPanel(visInput.getSResult(),
         visInput.getToken(),
@@ -175,14 +178,13 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
         //add a column for each token
         try
-        {
+        {          
           addGeneratedColumn(t, new KWICPanel.TokenColumnGenerator(t, segmentationName));          
           setColumnExpandRatio(t, 0.0f);
         }
         catch (IllegalArgumentException ex)
         {
-          Logger.getLogger(KWICPanel.TokenColumnGenerator.class.getName()).log(Level.SEVERE,
-            "unknown", ex);
+          log.error("unknown", ex);
         }
         visible.add(t);
 

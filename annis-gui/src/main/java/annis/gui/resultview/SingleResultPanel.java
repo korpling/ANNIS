@@ -146,90 +146,92 @@ public class SingleResultPanel extends VerticalLayout implements
   @Override
   public void attach()
   {
-
-    if (wasAttached)
+    try
     {
-      return;
-    }
-    wasAttached = true;
 
-    // get corpus properties
-
-    corpusConfig =
-      Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
-
-    ResolverEntry[] entries =
-      resolverProvider.getResolverEntries(result);
-    mediaIDs = mediaVisIds(entries);
-    List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
-    List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-    mediaVisualizer = new ArrayList<VisualizerPanel>();
-
-
-    // hacky implemented ComponentVisualizer
-    for (int i = 0; i < alwaysVisibleVis.length; i++)
-    {
-      String id = "resolver-" + resultNumber + "-" + i;
-      CustomLayout visContainer = this.visContainer(id, "compVis");
-
-      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+      if (wasAttached)
       {
-        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-          result.getSDocumentGraph());
+        return;
+      }
+      wasAttached = true;
 
-        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
-        calulcateColorsForMarkedAndCoverd();
+      // get corpus properties
 
-        try
+      corpusConfig =
+        Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
+
+      ResolverEntry[] entries =
+        resolverProvider.getResolverEntries(result);
+      mediaIDs = mediaVisIds(entries);
+      List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+      List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
+      mediaVisualizer = new ArrayList<VisualizerPanel>();
+
+
+      // hacky implemented ComponentVisualizer
+      for (int i = 0; i < alwaysVisibleVis.length; i++)
+      {
+        String id = "resolver-" + resultNumber + "-" + i;
+        CustomLayout visContainer = this.visContainer(id, "compVis");
+
+        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
         {
+          token = CommonHelper.getSortedSegmentationNodes(segmentationName,
+            result.getSDocumentGraph());
+
+          markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+          calulcateColorsForMarkedAndCoverd();
+
           VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
             token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
             mediaVisualizer, id, this, segmentationName, ps, visContainer);
           visualizers.add(p);
+
         }
-        catch (Exception ex)
+      }
+      // /hacky implemented ComponentVisualizer
+
+      for (int i = 0; i < entries.length; i++)
+      {
+        String id = "resolver-" + resultNumber + "-" + i;
+        CustomLayout visContainer = this.visContainer(id, "iframe");
+
+        VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
+          markedExactMap, markedCoveredMap, visContainer, mediaIDs, id);
+
+        if ("media".equals(entries[i].getVisType())
+          || "video".equals(entries[i].getVisType())
+          || "audio".equals(entries[i].getVisType()))
         {
-          log.error("problems with initializing Visualizer Panel", ex);
+          mediaVisualizer.add(p);
+        }
+
+        visualizers.add(p);
+        Properties mappings = entries[i].getMappings();
+        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+        {
+          openVisualizers.add(p);
         }
       }
-    }
-    // /hacky implemented ComponentVisualizer
 
-    for (int i = 0; i < entries.length; i++)
-    {
-      String id = "resolver-" + resultNumber + "-" + i;
-      CustomLayout visContainer = this.visContainer(id, "iframe");
+      kwicPanels = new ArrayList<KWICPanel>();
+      addKWICPanels();
 
-      VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-        markedExactMap, markedCoveredMap, visContainer, mediaIDs, id);
-
-      if ("media".equals(entries[i].getVisType())
-        || "video".equals(entries[i].getVisType())
-        || "audio".equals(entries[i].getVisType()))
+      for (VisualizerPanel p : visualizers)
       {
-        mediaVisualizer.add(p);
+        addComponent(p);
       }
 
-      visualizers.add(p);
-      Properties mappings = entries[i].getMappings();
-      if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+      for (VisualizerPanel p : openVisualizers)
       {
-        openVisualizers.add(p);
+        p.toggleVisualizer(false);
       }
     }
-
-    kwicPanels = new ArrayList<KWICPanel>();
-    addKWICPanels();
-
-    for (VisualizerPanel p : visualizers)
+    catch (Exception ex)
     {
-      addComponent(p);
+      log.error("problems with initializing Visualizer Panel", ex);
     }
-
-    for (VisualizerPanel p : openVisualizers)
-    {
-      p.toggleVisualizer(false);
-    }
+    super.attach();
   }
 
   private void addKWICPanels()
