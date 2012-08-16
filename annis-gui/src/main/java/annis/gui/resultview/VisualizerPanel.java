@@ -138,10 +138,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
 
     compVis = (ComponentVisualizerPlugin) vis;
-    this.setWidth("100%");
-    label = new Label("KWIC");
-    this.setContent(this.visContainer);
-    this.visContainer.addComponent(label, "btEntry");
+    
+    this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    this.setWidth("100%");    
+    this.setContent(this.visContainer);    
   }
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
