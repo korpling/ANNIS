@@ -16,17 +16,18 @@
 package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.visualizers.CorefVisualizer;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.dependency.ProielDependecyTree;
-import annis.gui.visualizers.dependency.ProielRegularDependencyTree;
-import annis.gui.visualizers.dependency.VakyarthaDependencyTree;
-import annis.gui.visualizers.graph.DotGraphVisualizer;
-import annis.gui.visualizers.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.media.AudioVisualizer;
-import annis.gui.visualizers.media.VideoVisualizer;
-import annis.gui.visualizers.partitur.PartiturVisualizer;
-import annis.gui.visualizers.tree.TigerTreeVisualizer;
+import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.iframe.CorefVisualizer;
+import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
+import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
+import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
+import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
+import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
+import annis.gui.visualizers.iframe.media.AudioVisualizer;
+import annis.gui.visualizers.iframe.media.VideoVisualizer;
+import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
+import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
@@ -50,8 +51,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -113,9 +112,9 @@ public class MainApp extends Application implements PluginSystem,
     try
     {
       ClassResource res = new ClassResource("logback.xml", this);
-    
-      if(res != null)
-      { 
+
+      if (res != null)
+      {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator jc = new JoranConfigurator();
         jc.setContext(context);
@@ -129,7 +128,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (JoranException ex)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+      log.error("init loggin failed", ex);
     }
 
   }
@@ -143,9 +142,8 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (Exception e)
     {
-      Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-        "something fundamently goes wrong, probably in one of the attach blocks"
-        , e);
+      log.error("something fundamently goes wrong, "
+        + "probably in one of the attach blocks", e);
     }
 
   }
@@ -273,6 +271,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -296,6 +295,7 @@ public class MainApp extends Application implements PluginSystem,
     for (Plugin p : util.getPlugins())
     {
       listOfPlugins.append(p.getClass().getName()).append("\n");
+
     }
     log.info(listOfPlugins.toString());
 

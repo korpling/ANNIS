@@ -15,23 +15,23 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.MainApp;
-import net.xeoh.plugins.base.Plugin;
+import com.vaadin.ui.Component;
+import java.util.Set;
 
 /**
- * Every visualizer must implement this interface. It' s also necessary to
- * to load this plugin by hand in {@link MainApp#initPlugins()}
+ * All Vaadin Plugins must implement this Interface.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-  public interface VisualizerPlugin extends Plugin
+public interface ComponentVisualizerPlugin extends VisualizerPlugin, Component
 {
-
+  
+  public void setVisualizerInput(VisualizerInput visInput); 
+  
   /**
-   * Get the shorted name of the linguistic type of this visualizer ("partitur",
-   * "tree", etc.)
-   *
-   * @return
+   * The implementation is optional.
+   * 
    */
-  public String getShortName();
+  public void setVisibleTokenAnnosVisible(Set<String> annos);
+  
 }

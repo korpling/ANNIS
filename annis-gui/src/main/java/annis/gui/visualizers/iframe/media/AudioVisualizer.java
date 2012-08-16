@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers;
+package annis.gui.visualizers.iframe.media;
 
-import annis.gui.MainApp;
-import net.xeoh.plugins.base.Plugin;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * Every visualizer must implement this interface. It' s also necessary to
- * to load this plugin by hand in {@link MainApp#initPlugins()}
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author thomas
  */
-  public interface VisualizerPlugin extends Plugin
+@PluginImplementation
+public class AudioVisualizer extends MediaVisualizer
 {
 
-  /**
-   * Get the shorted name of the linguistic type of this visualizer ("partitur",
-   * "tree", etc.)
-   *
-   * @return
-   */
-  public String getShortName();
+  @Override
+  public String getTag()
+  {
+    return "audio";
+  }
+
+  @Override
+  public String getMediaMime()
+  {
+    return "audio/ogg";
+  }
+
+  @Override
+  public String getShortName()
+  {
+    return "audio";
+  }
+  
 }

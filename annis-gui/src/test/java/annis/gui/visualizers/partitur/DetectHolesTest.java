@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.partitur;
 
+import annis.gui.visualizers.iframe.partitur.DetectHoles;
 import annis.model.AnnisNode;
 import java.util.ArrayList;
 import java.util.List;
