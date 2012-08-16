@@ -31,6 +31,7 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -45,16 +46,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @author thomas
+ * @author thomas, Benjamin Weißenfels
  *
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
 
+  private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
   public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
     "icon-collapse.gif");
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
@@ -73,8 +75,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private KWICPanel kwicPanel;
   private List<String> mediaIDs;
   private String htmlID;
-  private final static Logger log = Logger.getLogger(
-    VisualizerPanel.class.getName());
   private CustomLayout visContainer;
   private ComponentVisualizerPlugin compVis;
   private Set<String> visibleTokenAnnos;
@@ -92,10 +92,30 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,
     STextualDS text, List<String> mediaIDs,
     List<VisualizerPanel> mediaVisualizer, String htmlID,
-    SingleResultPanel parent, String segmentationName, PluginSystem ps, 
+    SingleResultPanel parent, String segmentationName, PluginSystem ps,
     CustomLayout visContainer)
   {
-    VisualizerPlugin vis = ps.getVisualizer(visType);
+    // get the Visualizer instance
+    VisualizerPlugin tmpVis = ps.getVisualizer(visType);
+    VisualizerPlugin vis = null;
+    Label label;
+
+    /**
+     * build a new instance, cause the Pluginsystem holds only one instance of
+     * the plugin.
+     */
+    try
+    {
+      vis = tmpVis.getClass().newInstance();
+    }
+    catch (InstantiationException ex)
+    {
+      log.error("could not initiate {}", tmpVis.getShortName(), ex);
+    }
+    catch (IllegalAccessException ex)
+    {
+      log.error("could not initiate {}", tmpVis.getShortName(), ex);
+    }
 
     this.result = result;
     this.token = token;
@@ -103,25 +123,25 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markedAndCovered = markedAndCovered;
     this.text = text;
     this.parentPanel = parent;
-    this.segmentationName = segmentationName;    
+    this.segmentationName = segmentationName;
     this.mediaVisualizer = mediaVisualizer;
     this.mediaIDs = mediaIDs;
     // TODO use this also for ComponentVisualizer, or lookup a native mediaplayer
     this.htmlID = htmlID;
-    
+
     this.visContainer = visContainer;
 
     if (!(vis instanceof ComponentVisualizerPlugin))
     {
-      log.warning(vis.getShortName() + " is not a ComponentVisualizer");
+      log.warn("{} is not a ComponentVisualizer", vis.getShortName());
       return;
     }
 
     compVis = (ComponentVisualizerPlugin) vis;
     this.setWidth("100%");
-    btEntry = new Button("KWIC");
+    label = new Label("KWIC");
     this.setContent(this.visContainer);
-    this.visContainer.addComponent(btEntry, "btEntry");
+    this.visContainer.addComponent(label, "btEntry");
   }
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
@@ -134,10 +154,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.entry = entry;
     this.markersExact = markersExact;
     this.markersCovered = markersCovered;
-    this.visContainer = costumLayout;    
+    this.visContainer = costumLayout;
     this.mediaIDs = mediaIDs;
     this.htmlID = htmlID;
-    
+
 
     setContent(this.visContainer);
 
@@ -175,9 +195,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     visInput.setSingleResultPanelRef(parentPanel);
     visInput.setSegmentationName(segmentationName);
     visInput.setMediaIDs(mediaIDs);
-    visInput.setMediaVisualizer(mediaVisualizer);    
+    visInput.setMediaVisualizer(mediaVisualizer);
 
-    compVis.setVisualizerInput(visInput);   
+    compVis.setVisualizerInput(visInput);
     visContainer.addComponent(compVis, "compVis");
   }
 
@@ -240,8 +260,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
     catch (Exception e)
     {
-      Logger.getLogger(VisualizerPanel.class.getName()).log(Level.SEVERE,
-        "General remote service exception", e);
+      log.error("General remote service exception", e);
     }
     return text;
   }
@@ -320,7 +339,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
           resource = createResource(outStream, iframeVis.getContentType());
           String url = getApplication().getRelativeLocation(resource);
           iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
-
 
           visContainer.addComponent(iframe, "iframe");
         }

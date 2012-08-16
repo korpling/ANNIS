@@ -214,9 +214,6 @@ public class SingleResultPanel extends VerticalLayout implements
         }
       }
 
-      kwicPanels = new ArrayList<KWICPanel>();
-      addKWICPanels();
-
       for (VisualizerPanel p : visualizers)
       {
         addComponent(p);
@@ -231,9 +228,9 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       log.error("problems with initializing Visualizer Panel", ex);
     }
-    super.attach();
   }
 
+  @Deprecated
   private void addKWICPanels()
   {
     if (!corpusConfig.getConfig().containsKey(HIDE_KWIC)
