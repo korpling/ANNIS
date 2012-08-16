@@ -128,10 +128,16 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {
+    try{
     query = new AnnisResultQuery(corpora.keySet(), aql, getApplication());
     createPage(0, pageSize);
 
     super.attach();
+    }
+    catch (Exception ex)
+    {
+      log.error("something failed", ex);
+    }
   }
 
   public void setCount(int count)

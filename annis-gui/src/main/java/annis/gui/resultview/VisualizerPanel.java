@@ -87,11 +87,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
    *
-   * @param visType linguist name of the visualizer
-   * @param markedAndCovered map with matching nodes
-   * @param customLayout custom layout is used for building a div container with
-   * a unique html id
-   * @param ps the Pluginsystem provides the component visualizer
    */
   public VisualizerPanel(String visType, SDocument result, List<SNode> token,
     Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,

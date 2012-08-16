@@ -89,7 +89,6 @@ public class SingleResultPanel extends VerticalLayout implements
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
-
   // TODO should be configurable with resolver_vis_tab
   private String[] alwaysVisibleVis =
   {
@@ -181,11 +180,17 @@ public class SingleResultPanel extends VerticalLayout implements
         markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
         calulcateColorsForMarkedAndCoverd();
 
-
-        VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
-          token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
-          mediaVisualizer, id, this, segmentationName, ps, visContainer);
-        visualizers.add(p);
+        try
+        {
+          VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
+            token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
+            mediaVisualizer, id, this, segmentationName, ps, visContainer);
+          visualizers.add(p);
+        }
+        catch (Exception ex)
+        {
+          log.error("problems with initializing Visualizer Panel", ex);
+        }
       }
     }
     // /hacky implemented ComponentVisualizer

@@ -16,8 +16,9 @@
 package annis.gui;
 
 import annis.gui.servlets.ResourceServlet;
+import annis.gui.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.iframe.CorefVisualizer;
-import annis.gui.visualizers.IFrameVisualizerPlugin;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
@@ -75,8 +76,8 @@ public class MainApp extends Application implements PluginSystem,
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
   private transient SearchWindow windowSearch;
   private transient PluginManager pluginManager;
-  private static final Map<String, IFrameVisualizerPlugin> visualizerRegistry =
-    Collections.synchronizedMap(new HashMap<String, IFrameVisualizerPlugin>());
+  private static final Map<String, VisualizerPlugin> visualizerRegistry =
+    Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private Properties versionProperties;
@@ -273,6 +274,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -296,11 +298,12 @@ public class MainApp extends Application implements PluginSystem,
     for (Plugin p : util.getPlugins())
     {
       listOfPlugins.append(p.getClass().getName()).append("\n");
+      
     }
     log.info(listOfPlugins.toString());
 
-    Collection<IFrameVisualizerPlugin> visualizers = util.getPlugins(IFrameVisualizerPlugin.class);
-    for (IFrameVisualizerPlugin vis : visualizers)
+    Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
+    for (VisualizerPlugin vis : visualizers)
     {
       visualizerRegistry.put(vis.getShortName(), vis);
       resourceAddedDate.put(vis.getShortName(), new Date());
@@ -329,7 +332,7 @@ public class MainApp extends Application implements PluginSystem,
   }
 
   @Override
-  public IFrameVisualizerPlugin getVisualizer(String shortName)
+  public VisualizerPlugin getVisualizer(String shortName)
   {
     return visualizerRegistry.get(shortName);
   }

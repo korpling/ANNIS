@@ -15,7 +15,7 @@
  */
 package annis.gui;
 
-import annis.gui.visualizers.IFrameVisualizerPlugin;
+import annis.gui.visualizers.VisualizerPlugin;
 import net.xeoh.plugins.base.PluginManager;
 
 /**
@@ -33,5 +33,5 @@ public interface PluginSystem
   public PluginManager getPluginManager();
   
   /** Gets a visualizer by its short name */
-  public IFrameVisualizerPlugin getVisualizer(String shortName); 
+  public VisualizerPlugin getVisualizer(String shortName); 
 }
