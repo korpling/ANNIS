@@ -11,7 +11,7 @@
   <appender name="QUERYLOG" class="ch.qos.logback.core.FileAppender">
     <file>${annis.home}/log/query.log</file>
     <encoder>
-      <pattern>%d - %m</pattern>
+      <pattern>%date{ISO8601} - %m</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
@@ -20,7 +20,7 @@
   <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${annis.home}/log/annis.log</file>
     <encoder>
-      <pattern>[%t] %d %p %C{1} - %m%n</pattern>
+      <pattern>%p [%t] %date{ISO8601}  %C{1} - %m%n</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
@@ -40,7 +40,7 @@
   <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${annis.home}/log/error.log</file>
     <encoder>
-      <pattern>[%t] %d %p %C{1} - %m%n</pattern>
+      <pattern>%p [%t] %date{ISO8601} %C{1} - %m%n</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
