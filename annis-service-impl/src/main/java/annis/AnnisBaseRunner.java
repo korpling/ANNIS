@@ -17,6 +17,14 @@ package annis;
 
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.utils.Utils;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.filter.ThresholdFilter;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,9 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 import jline.console.history.FileHistory;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -46,9 +51,7 @@ public abstract class AnnisBaseRunner
   private static String annisHomePath;
   // console output for easier testing, normally set to System.out
   protected PrintStream out = System.out;
-  
   private FileHistory history;
-  
   // for the interactive shell
   private String helloMessage;
   private String prompt;
@@ -58,7 +61,7 @@ public abstract class AnnisBaseRunner
   {
     return getInstance(beanName, true, contextLocations);
   }
-  
+
   public static AnnisBaseRunner getInstance(String beanName,
     boolean logToConsole, String... contextLocations)
   {
@@ -82,7 +85,7 @@ public abstract class AnnisBaseRunner
     {
       log.error("Could not load conf/annis-service.properties", ex);
     }
-    
+
     ctx.load(contextLocations);
     ctx.refresh();
     return ctx.getBean(beanName);
@@ -134,13 +137,13 @@ public abstract class AnnisBaseRunner
     ConsoleReader console = new ConsoleReader();
     File annisDir = new File(System.getProperty("user.home") + "/.annis/");
     annisDir.mkdirs();
-    
+
     history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setHistory(history);
     console.setHistoryEnabled(true);
     console.setBellEnabled(true);
-    
-    List<String> commands =  detectAvailableCommands();
+
+    List<String> commands = detectAvailableCommands();
     Collections.sort(commands);
     console.addCompleter(new StringsCompleter(commands));
 
@@ -200,8 +203,7 @@ public abstract class AnnisBaseRunner
         String commandName = m.getName().substring("do".length());
         if (commandName.length() > 1)
         {
-          commandName = commandName.substring(0, 1).toLowerCase() + commandName.
-            substring(1);
+          commandName = commandName.substring(0, 1).toLowerCase() + commandName.substring(1);
           result.add(commandName);
         }
       }
@@ -211,8 +213,7 @@ public abstract class AnnisBaseRunner
 
   protected void runCommand(String command, String args)
   {
-    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.
-      substring(1);
+    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.substring(1);
     log.debug("looking for: " + methodName);
 
     try
@@ -221,8 +222,8 @@ public abstract class AnnisBaseRunner
       Method commandMethod = getClass().getMethod(methodName, String.class);
       commandMethod.invoke(this, args);
       System.out.println("Time: " + (new Date().getTime() - start) + " ms");
-      
-      if(history != null)
+
+      if (history != null)
       {
         history.flush();
       }
@@ -286,18 +287,49 @@ public abstract class AnnisBaseRunner
   }
 
   // configure logging
-  private static void setupLogging(boolean console)
+  public static void setupLogging(boolean console)
   {
-    PropertyConfigurator.configure(annisHomePath + "/conf/logging.properties");
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-    if (console)
+    JoranConfigurator jc = new JoranConfigurator();
+    jc.setContext(loggerContext);
+    try
     {
-      org.apache.log4j.Logger.getRootLogger()
-        .addAppender(new ConsoleAppender(new PatternLayout(
-        "%d{HH:mm:ss.SSS} %C{1} %p: %m\n")));
+      jc.doConfigure(System.getProperty("annis.home")
+        + "/conf/logback.xml");
     }
+    catch (JoranException ex)
+    {
+      System.out.println(ex.getMessage());
+    }
+
+    ConsoleAppender consoleAppender = new ConsoleAppender();
+    consoleAppender.setContext(loggerContext);
+    consoleAppender.setName("CONSOLE");
+
+    PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
+    consoleEncoder.setContext(loggerContext);
+    consoleEncoder.setPattern("%r %thread %level - %msg%n");
+    consoleEncoder.start();
+
+    ThresholdFilter consoleFilter = new ThresholdFilter();
+    consoleFilter.setLevel(console ? "INFO" : "WARN");
+
+    consoleFilter.start();
+
+
+    consoleAppender.setEncoder(consoleEncoder);
+    consoleAppender.addFilter(consoleFilter);
+    consoleAppender.setTarget("System.err");
+    consoleAppender.start();
+
+
+    ch.qos.logback.classic.Logger logbackLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+    
+    
+    logbackLogger.addAppender(consoleAppender);
   }
-  
+
   ///// Getter / Setter
   public static String getAnnisHome()
   {
