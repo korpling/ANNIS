@@ -60,6 +60,7 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * The Application's "main" class
@@ -109,6 +110,9 @@ public class MainApp extends Application implements PluginSystem,
 
   protected void initLogging()
   {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+    
     try
     {
       ClassResource res = new ClassResource("logback.xml", this);
