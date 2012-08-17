@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<article xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0">
     <info>
         <title>ANNIS Developer Guide</title>
         <author>
@@ -15,10 +15,23 @@
         <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
         <releaseinfo>Version ${project.version}</releaseinfo>
         <pubdate>${mavenBuildTimestamp}</pubdate>
-        
+
     </info>
-    <sect1>
+    <section>
+        <title>Running an embedded Jetty instance for local access</title>
+        <para> This way of running the frontend is very useful, if you want to access Annis on you
+            local machine as a single user. </para>
+        <para> You don't need to install Jetty or Tomcat by yourself using this method. A security
+            manager had to be setup like described here. The recommend (and most easy to configure)
+            security manager for this setup is the TestSecurityManager.
+            <programlisting>cd &lt;unzipped source>/annis-gui/
+mvn jetty:run</programlisting> Now
+            you can access the site under <link xlink:href="http://localhost:8080/annis-gui/app"
+                >http://localhost:8080/annis-gui/app</link>. The Jetty server might be stopped by
+            pressing "CTRL-C". </para>
+    </section>
+    <section>
         <title>HOWTO add new visualizers</title>
         <para>TODO</para>
-    </sect1>
+    </section>
 </article>

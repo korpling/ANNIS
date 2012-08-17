@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="14.0">
+<project version="13.2">
     <meta>
         <filters directoryPatterns="" filePatterns="" positiveFilePatterns="" showHiddenFiles="false"/>
         <options>
-            <serialized version="14.0" xml:space="preserve">
+            <serialized version="13.2" xml:space="preserve">
                 <map>
                     <entry>
                         <String>enable.project.master.files.support</String>
@@ -13,48 +13,25 @@
                         <String>scenario.associations</String>
                         <scenarioAssociation-array>
                             <scenarioAssociation>
+                                <field name="name">
+                                    <String>ANNIS PDF</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
                                 <field name="url">
                                     <String>ANNIS-Manual.xml</String>
                                 </field>
-                                <field name="scenarioIds">
-                                    <list>
-                                        <String>ANNIS PDF</String>
-                                    </list>
-                                </field>
-                                <field name="scenarioTypes">
-                                    <list>
-                                        <String>XSL</String>
-                                    </list>
-                                </field>
                             </scenarioAssociation>
                             <scenarioAssociation>
+                                <field name="name">
+                                    <String>ANNIS PDF</String>
+                                </field>
+                                <field name="type">
+                                    <String>XSL</String>
+                                </field>
                                 <field name="url">
                                     <String>Developer.xml</String>
-                                </field>
-                                <field name="scenarioIds">
-                                    <list>
-                                        <String>ANNIS PDF</String>
-                                    </list>
-                                </field>
-                                <field name="scenarioTypes">
-                                    <list>
-                                        <String>XSL</String>
-                                    </list>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="url">
-                                    <String>User-Guide.xml</String>
-                                </field>
-                                <field name="scenarioIds">
-                                    <list>
-                                        <String>ANNIS PDF</String>
-                                    </list>
-                                </field>
-                                <field name="scenarioTypes">
-                                    <list>
-                                        <String>XSL</String>
-                                    </list>
                                 </field>
                             </scenarioAssociation>
                         </scenarioAssociation-array>
@@ -445,12 +422,18 @@
                             </scenario>
                         </scenario-array>
                     </entry>
+                    <entry>
+                        <String>scenarios.load.from.project</String>
+                        <Boolean>true</Boolean>
+                    </entry>
                 </map>
             </serialized>
         </options>
     </meta>
     <projectTree name="ANNIS.xpr">
+        <file name="Administration.xml"/>
         <file name="ANNIS-Manual.xml"/>
+        <file name="Developer.xml"/>
         <file name="User-Guide.xml"/>
     </projectTree>
 </project>
