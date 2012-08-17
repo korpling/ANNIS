@@ -82,185 +82,70 @@
     </section>
 
     <section>
-        <title>Installing <application>ANNIS</application></title>
+        <title>Installing a Local Version (<application>ANNIS Kickstarter</application>)</title>
 
-        <section>
-            <title>Installing a Local Version (ANNIS Kickstarter)</title>
-            <para> Local users who do not wish to make their corpora available online can install
-                ANNIS Kickstarter under most versions of Linux, Windows and Mac OS. To install
-                Kickstarter follow these steps:<orderedlist>
-                    <listitem>
-                        <para>Download and install PostgreSQL 8.4 for your operating system from
-                                <link xlink:href="http://www.postgresql.org/download/"
-                                >http://www.postgresql.org/download/</link> and <emphasis
-                                role="bold">make a note of the administrator password</emphasis> you
-                            set during the installation. After installation, Postgres may
-                            automatically launch the Postgres Stack Builder to download additional
-                            components – you can safely skip this step and cancel the Stack Builder
-                            if you wish. You may need to restart your OS if the Postgres installer
-                            tells you to. </para>
-                    </listitem>
-                    <listitem>
-                        <para>Download and unzip <link
-                                xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-Kickstarter-2.2.1-distribution.zip"
-                                >Annis-Kickstarter-2.2.1-distribution.zip</link> from the ANNIS
-                            website. </para>
-                    </listitem>
-                    <listitem>
-                        <para>Start AnnisKickstarter.bat if you’re using Windows or run the bash
-                            script AnnisKickstarter.sh otherwise (this may take a few seconds the
-                            first time you run Kickstarter). At this point your Firewall may try to
-                            block Kickstarter and offer you to unblock it – do so and Kickstarter
-                            should start up. </para>
-                        <note>
-                            <para>For most users it is a good idea to give Java more memory (if this
-                                is not already the default). You can do this by editing the script
-                                AnnisKickstarter and typing the following after the call to start
-                                java (before -splash:splashscreen.gif): </para>
-                            <para><code>-Xss1024k -Xmx1024m</code></para>
-                            <para>(To accelerate searches it is also possible to give the Postgres
-                                database more memory, see the link in the next section below).
-                            </para>
-                        </note>
-                    </listitem>
-                    <listitem>
-                        <para>Once the program has started, if this is the first time you run
-                            Kickstarter, press “Init Database” and supply your PostGres
-                            administrator password from step 1. </para>
-                    </listitem>
-                    <listitem>
-                        <para>Download and unzip the <link
-                                xlink:href="http://korpling.german.hu-berlin.de/~annis/downloads/sample_corpora/pcc2_relAnnis.zip"
-                                >pcc2 demo corpus</link> from the ANNIS website. </para>
-                    </listitem>
-                    <listitem>
-                        <para>Press “Import Corpus” and navigate to the directory containing the
-                            directory <filename>pcc2_v2_relAnnis/</filename>. Select this directory
-                            (but do not go into it) and press OK. </para>
-                    </listitem>
-                    <listitem>
-                        <para>Once import is complete, press “Launch Annis frontend” and login with
-                            the username and password “test” to test the corpus (try selecting the
-                            pcc2 corpus, typing <code>pos="NN"</code> in the AnnisQL box and
-                            clicking “Show Result”. See the section “Running Queries in
-                                <application>ANNIS</application>” in this guide for some more
-                            example queries, or press the Tutorial button at the top left of the
-                            interface). </para>
-                    </listitem>
-                </orderedlist></para>
+        <para> Local users who do not wish to make their corpora available online can install ANNIS
+            Kickstarter under most versions of Linux, Windows and Mac OS. To install Kickstarter
+            follow these steps:<orderedlist>
+                <listitem>
+                    <para>Download and install PostgreSQL 8.4 for your operating system from <link
+                            xlink:href="http://www.postgresql.org/download/"
+                            >http://www.postgresql.org/download/</link> and <emphasis role="bold"
+                            >make a note of the administrator password</emphasis> you set during the
+                        installation. After installation, Postgres may automatically launch the
+                        Postgres Stack Builder to download additional components – you can safely
+                        skip this step and cancel the Stack Builder if you wish. You may need to
+                        restart your OS if the Postgres installer tells you to. </para>
+                </listitem>
+                <listitem>
+                    <para>Download and unzip <link
+                            xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-Kickstarter-2.2.1-distribution.zip"
+                            >Annis-Kickstarter-2.2.1-distribution.zip</link> from the ANNIS website.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>Start AnnisKickstarter.bat if you’re using Windows or run the bash script
+                        AnnisKickstarter.sh otherwise (this may take a few seconds the first time
+                        you run Kickstarter). At this point your Firewall may try to block
+                        Kickstarter and offer you to unblock it – do so and Kickstarter should start
+                        up. </para>
+                    <note>
+                        <para>For most users it is a good idea to give Java more memory (if this is
+                            not already the default). You can do this by editing the script
+                            AnnisKickstarter and typing the following after the call to start java
+                            (before -splash:splashscreen.gif): </para>
+                        <para><code>-Xss1024k -Xmx1024m</code></para>
+                        <para>(To accelerate searches it is also possible to give the Postgres
+                            database more memory, see the link in the next section below). </para>
+                    </note>
+                </listitem>
+                <listitem>
+                    <para>Once the program has started, if this is the first time you run
+                        Kickstarter, press “Init Database” and supply your PostGres administrator
+                        password from step 1. </para>
+                </listitem>
+                <listitem>
+                    <para>Download and unzip the <link
+                            xlink:href="http://korpling.german.hu-berlin.de/~annis/downloads/sample_corpora/pcc2_relAnnis.zip"
+                            >pcc2 demo corpus</link> from the ANNIS website. </para>
+                </listitem>
+                <listitem>
+                    <para>Press “Import Corpus” and navigate to the directory containing the
+                        directory <filename>pcc2_v2_relAnnis/</filename>. Select this directory (but
+                        do not go into it) and press OK. </para>
+                </listitem>
+                <listitem>
+                    <para>Once import is complete, press “Launch Annis frontend” and login with the
+                        username and password “test” to test the corpus (try selecting the pcc2
+                        corpus, typing <code>pos="NN"</code> in the AnnisQL box and clicking “Show
+                        Result”. See the section “Running Queries in
+                            <application>ANNIS</application>” in this guide for some more example
+                        queries, or press the Tutorial button at the top left of the interface).
+                    </para>
+                </listitem>
+            </orderedlist></para>
 
-        </section>
-        <section>
-            <title>Building and Installing an ANNIS Server</title>
-            <para>The ANNIS server version can be installed on UNIX based server, or else under
-                Windows using <link xlink:href="http://www.cygwin.com/">Cygwin</link>, the freely
-                available UNIX emulator. To install the ANNIS server: <orderedlist>
-                    <listitem>
-                        <para>Install a PostgreSQL server for your operating system from <link
-                                xlink:href="http://www.postgresql.org/download/"
-                                >http://www.postgresql.org/download/</link>
-                        </para>
-                        <para>Make note of the postgres password. Under linux, you will have to set
-                            the postgres manually. You can achieve this with running the following
-                            commands:</para>
-                        <para>
-                            <programlisting>sudo -u postgres psql
-\password
-\q</programlisting></para>
-                    </listitem>
-                    <listitem>
-                        <para>Install a web server such as <link
-                                xlink:href="http://tomcat.apache.org/">Tomcat</link> or <link
-                                xlink:href="http://www.mortbay.org/jetty/">Jetty</link>
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>Make sure you have <link
-                                xlink:href="http://java.sun.com/javase/downloads/index.jsp">JDK
-                                6</link> and <link xlink:href="http://maven.apache.org/">Maven
-                                2</link> (or install them if you don’t) </para>
-                    </listitem>
-                    <listitem>
-                        <para>If you’re using Cygwin and Windows you will also need to install the
-                            “patch” program via the Cygwin package manager </para>
-                    </listitem>
-                    <listitem>
-                        <para>Download and unzip <link
-                                xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-2.2.1.zip"
-                                >Annis-2.2.1.zip</link>, then run the following commands (replacing
-                            the appropriate directories):</para>
-                        <para>
-                            <programlisting>cd &lt;unzipped source>/Annis-Service
-mvn -DskipTests=true install 
-mvn -DskipTests=true assembly:assembly tar xzvf
-target/annis-service-&lt;version>-distribution.tar.gz↵
-    -C &lt;installation directory&gt;</programlisting>
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>Set the environment variables (each time when starting up) </para>
-                        <para>
-                            <programlisting>export ANNIS_HOME=&lt;installation directory>
-export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>Next initialize your ANNIS database (only the first time you use the
-                            system):</para>
-                        <programlisting>annis-admin.sh init -u &lt;username> -d &lt;dbname> -p  &lt;password&gt;↵
-    -P &lt;postgres password></programlisting>
-                    </listitem>
-                    <listitem>
-                        <para>Now you can import some corpora: </para>
-                        <para>
-                            <programlisting>annis-admin.sh import path/to/corpus1 path/to/corpus2 ...</programlisting>
-                        </para>
-                        <para>
-                            <important>
-                                <para>The above import-command calls other PostgreSQL database
-                                    commands. If you abort the import script with Ctrl+C, these SQL
-                                    processes will not be automatically terminated; instead they
-                                    might keep hanging and prevent access to the database. The same
-                                    might happen if you close your shell before the import script
-                                    terminates, so you will want to prefix it with the
-                                    "nohup"-command. </para>
-                            </important>
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>Now you can start the ANNIS service: </para>
-                        <para>
-                            <programlisting>annis-service.sh start</programlisting>
-                        </para>
-                    </listitem>
-                    <listitem>
-                        <para>To get the Annis front-end running, first compile it: </para>
-                        <para>
-                            <programlisting>cd &lt;unzipped source>
-mvn -DskipTests=true install</programlisting>
-                        </para>
-                        <para>If no error occurs the war-file will be available under 4
-                                <filename>&lt;unzipped
-                                source>/Annis-web/target/Annis-web.war</filename>. </para>
-                    </listitem>
-                    <listitem>
-                        <para>And configure your web server as described here: <link
-                                xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat "
-                                >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat
-                            </link></para>
-                    </listitem>
-                </orderedlist></para>
-            <para>The latest instructions for compiling and installing the ANNIS Server can also be
-                found at: <link
-                    xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation "
-                    >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation
-                </link></para>
-            <para>We also <emphasis role="bold">strongly recommend</emphasis> reconfiguring the
-                Postgres server’s default settings as described here: <link
-                    xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL"
-                    >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL</link>
-            </para>
-        </section>
+
     </section>
 
     <section>
@@ -955,272 +840,7 @@ pos ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7] </screen>
         </section>
     </section>
 
-    <section>
-        <title>Configuring Visualizations </title>
-        <section>
-            <title>Triggering Visualizations with the Resolver Table</title>
-            <para>By default, ANNIS displays all search results in the Key Word in Context (KWIC)
-                view in the search result window. Further visualizations, such as syntax trees or
-                grid views, are displayed by default based on the following namespaces:
-                    <informaltable frame="void">
-                    <tbody>
-                        <tr>
-                            <td>Nodes with the namespace tiger:</td>
-                            <td>tree visualizer</td>
-                        </tr>
-                        <tr>
-                            <td>Nodes with the namespace exmaralda:</td>
-                            <td>grid visualizer</td>
-                        </tr>
-                        <tr>
-                            <td>Edges with the namespace mmax:</td>
-                            <td>discourse view</td>
-                        </tr>
-                        <tr>
-                            <td>Nodes with the namespace external:</td>
-                            <td>multimedia player</td>
-                        </tr>
-                    </tbody>
-                </informaltable> In these cases the namespaces are usually taken from the source
-                format in which the corpus was generated, and carried over into relAnnis during the
-                conversion. It is also possible to use other namespaces, most easily when working
-                with PAULA XML. In PAULA XML, the namespace is determined by the string prefix
-                before the first period in the file name / paula_id of each annotation layer. In
-                order to manually determine the visualizer and the display name for each namespace
-                in each corpus, the resolver table in the database must be edited. To do so, open
-                PGAdmin (or if you did not install PGAdmin with ANNIS then via PSQL), and access the
-                table <emphasis><database>resolver_vis_map</database></emphasis> (it can be found in
-                PGAdmin under <emphasis>PostgreSQL 8.4 > Databases > anniskickstart > Schemas >
-                    public > Tables</emphasis> (for ANNIS servers replace “anniskickstart” with
-                “annis_db”). You may need to give your PostgreSQL password to gain access. Right
-                click on the table and select <emphasis>View Data > View All Rows</emphasis>. The
-                table should look like this:<screenshot>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="images/resolver_table.png" width="100%"
-                                align="center"/>
-                        </imageobject>
-                        <caption><para>Resolver table (resolver_vis_map)</para></caption>
-                    </mediaobject>
-                </screenshot>
-            </para>
-            <para>The columns in the table can be filled out as follows:<itemizedlist>
-                    <listitem>
-                        <para><emphasis role="italic">corpus</emphasis> determines the corpora for
-                            which the instruction is valid (null values apply to all corpora)</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="italic">namespace</emphasis> specifies relevant
-                            namespace which triggers the visualization</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="italic">element</emphasis> determines if a node or an
-                            edge should carry the relevant annotation for triggering the
-                            visualization</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="italic">vis_type</emphasis> determines the visualizer
-                            module used and is one of: <itemizedlist>
-                                <listitem>
-                                    <para><emphasis role="italic">tree</emphasis> (annotation grid,
-                                        with annotations spanning multiple tokens)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata fileref="images/tiger_tree_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">grid</emphasis> (constituent
-                                        syntax tree)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata fileref="images/grid_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">grid_tree</emphasis> (a grid
-                                        visualizing hierarchical tree annotations as ordered grid
-                                        layers; note that all layers represent the same annotation
-                                        name at different hierarchical depths, marked level:0,1,2,…
-                                        etc. on the left)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata fileref="images/grid_tree_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">discourse</emphasis> (a view of
-                                        the entire text of a document, possibly with interactive
-                                        coreference links. It is possible to use this visualization
-                                        to view entire texts even if you do not have coreference annotations)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata fileref="images/discourse_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">arch_dependency</emphasis>
-                                        (dependency tree with labeled arches between tokens;
-                                        requires SVG enabled browser, see 5.2)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata
-                                                  fileref="images/arch_dependency_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">ordered_dependency</emphasis>
-                                        (arrow based dependency visualization for corpora with
-                                        dependencies between non terminal nodes; requires GraphViz,
-                                        see 5.2)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata
-                                                  fileref="images/ordered_dependency_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">hierarchical_dependency</emphasis>
-                                        (unordered vertical tree of dependent tokens; requires
-                                        GraphViz, see 5.2)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata
-                                                  fileref="images/hierarchical_dependency_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">graph</emphasis> (a debug view of
-                                        the annotation graph; requires GraphViz, see 5.2)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                  <imagedata
-                                                  fileref="images/graph_vis.png"
-                                                  width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">file</emphasis> (a linked multimedia file)<screenshot>
-                                            <mediaobject>
-                                                <imageobject>
-                                                    <imagedata
-                                                        fileref="images/file_vis.png"
-                                                        width="70%" align="center"/>
-                                                </imageobject>
-                                            </mediaobject>
-                                        </screenshot></para>
-                                </listitem>
-                            </itemizedlist></para>
-                    </listitem>
-                <listitem>
-                        <para><emphasis role="italic">display_name</emphasis> determines the heading
-                            that is shown for each visualizer in the interface</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="italic">order</emphasis> determines the order in which
-                            visualizers are rendered in the interface (low to high)</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis role="italic">mappings</emphasis> provides additional
-                            parameters for some visualizations:<itemizedlist>
-                                <listitem>
-                                    <para><emphasis role="italic">tree</emphasis> – the annotation
-                                        names to be displayed in non terminal nodes can be set e.g.
-                                        using <userinput>node_key:cat</userinput> for an annotation
-                                        called cat (the default), and similarly the edge labels
-                                        using <userinput>edge_key:func</userinput> for an edge label
-                                        called <userinput>func</userinput> (the default).
-                                        Instructions are separated using semicolons.</para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">graph</emphasis> – use
-                                            <userinput>ns_all:true</userinput> to visualize the
-                                        entire annotation graph. Specifying e.g.
-                                            <userinput>node_ns:tiger</userinput> or
-                                            <userinput>edge_ns:tiger</userinput> instead causes only
-                                        nodes and edges of the namespace tiger to be visualized
-                                        (i.e. only a subgraph of all annotations) </para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">grid</emphasis> – it is possible
-                                        to specify the order of annotation layers in each grid. Use
-                                            <userinput>annos: anno_name1, anno_name2,
-                                            anno_name3</userinput> to specify the order or
-                                        annotation layers. If <userinput>anno:</userinput> is used,
-                                        additional annotation layers not present in the list will
-                                        not be visualized. If mappings is left empty, layers will be
-                                        ordered alphabetically</para>
-                                </listitem>
-                                <listitem>
-                                    <para><emphasis role="italic">grid_tree</emphasis> – specify the
-                                        name of the annotation to be visualized in the grid with
-                                            <userinput>node_key:name</userinput>. Note that all grid
-                                        levels visualize the same annotation name at different
-                                        hierarchical depths.</para>
-                                </listitem>
-                            </itemizedlist></para>
-                    </listitem>
-
-                </itemizedlist></para>
-
-        </section>
-        <section>
-            <title>Visualizations with Software Requirements</title>
-            <para>Some ANNIS visualizers require additional software, depending on whether or not
-                they render graphics as an image directly in Java or not. At present, three
-                visualizations require an installation of the freely available software GraphViz
-                    (<link xlink:href="http://www.graphviz.org/">http://www.graphviz.org/</link>):
-                    <emphasis role="italic">ordered_dependency</emphasis>, <emphasis role="italic"
-                    >hierarchical_dependency</emphasis> and the general <emphasis role="italic"
-                    >graph</emphasis> visualization. To use these, install GraphViz on the server
-                (or your local machine for Kickstarter) and make sure it is available in your system
-                path (check this by calling e.g. the program <command>dot</command> on the command
-                line).</para>
-            <para>Another type of restriction is that some visualizers may use SVG (scalable vector
-                graphics) instead of images, which mean the user’s browser must be SVG capable (e.g.
-                FireFox) or a plugin must be used (e.g. for Internet Explorer 8 or below). This is
-                currently the case for the <emphasis role="italic">arch_dependency</emphasis>
-                visualizer.</para>
-        </section>
-        <section>
-            <title>Changing maximal context size and possible context steps</title>
-            <para>The maximal context size of <emphasis role="italic">±n</emphasis> tokens from each
-                search result (for the KWIC view, but also for other visualization) can be set for
-                the ANNIS service in the file
-                    <filename>&lt;service-home>/conf/annis-service.properties</filename> Using the
-                syntax, e.g. for a maximum context of 10 tokens:
-                <programlisting>annis.max-context=1025</programlisting> To configure which steps are
-                actually shown in the front-end (up to the maximum allowed by the service above) and
-                the default context selected on login, configure the file:
-                    <filename>&lt;annis-web-home->/javascript/annis/config.js</filename> With the
-                syntax:
-                <programlisting>var search_context = [[0], [1], [2], [5], [10]]; 
-var search_context_default = 5;</programlisting></para>
-        </section>
-    </section>
+    
     <section>
         <title>Converting Corpora for ANNIS using SaltNPepper</title>
         <para>ANNIS uses a relational database format called relANNIS. The Pepper converter
