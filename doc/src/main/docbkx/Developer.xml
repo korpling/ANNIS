@@ -18,20 +18,61 @@
 
     </info>
     <section>
-        <title>Running an embedded Jetty instance for local access</title>
-        <para> This way of running the frontend is very useful, if you want to access Annis on you
-            local machine as a single user. </para>
-        <para> You don't need to install Jetty or Tomcat by yourself using this method. A security
-            manager has to be configured. The recommend (and most easy to configure)
-            security manager for this setup is the TestSecurityManager.
-            <programlisting>cd &lt;unzipped source>/annis-gui/
-mvn jetty:run</programlisting> Now
-            you can access the site under <link xlink:href="http://localhost:8080/annis-gui/app"
-                >http://localhost:8080/annis-gui/app</link>. The Jetty server might be stopped by
-            pressing "CTRL-C". </para>
+        <title>Building ANNIS</title>
+        <para>ANNIS uses <link xlink:href="http://maven.apache.org/">Maven3</link> as build tool.
+        Maven itself is based on Java and should run on every major operating system.
+        You have to download and install the appropriate version for your operating system from 
+            <link xlink:href="http://maven.apache.org/download.html">http://maven.apache.org/download.html</link>
+        before you can build ANNIS. Maven will download all needed dependencies from central servers
+        on the first build so you will need to have a working internet connection. The dependencies
+        are cached locally once their are downloaded.
+        </para>
+        <para> When you have downloaded or checked out the source of ANNIS the top-level directory
+            of the source code is the parent project for all ANNIS sub-projects. If you want to
+            build every project that is part of ANNIS just execute
+            <programlisting>cd &lt;annis-sources>/
+mvn install            </programlisting> This
+            might take a while on the first execution. <code>mvn clean</code> will remove all
+            compiled code if necessary. </para>
+        <para>If you only want to compile a sub-project execute <code>mvn install</code> in the
+            corresponding sub-directory. Every folder with a sub-project will have a
+                <filename>pom.xml</filename> file. These files configure the whole build process.
+            The Maven documenation contains detailed explanations of the structure and possible
+            content of the configuration files.</para>
+        <para> Some sub-projects don't provide a library but will produce a zip or tar/gz-file when
+            they are compiled. These assembly steps (see <link
+                xlink:href="http://maven.apache.org/plugins/maven-assembly-plugin/">Maven
+                documentation</link>) are automatically invoked on <code>mvn install</code>.</para>
     </section>
     <section>
-        <title>HOWTO add new visualizers</title>
-        <para>TODO</para>
+        <title>Using an IDE</title>
+        <para>While you can use any text editor of your choice to change ANNIS and compile it
+            completly on the command line using Maven, a proper IDE will be a huge help for you.
+            You can use any IDE which has a good support for Maven. The ANNIS main developers
+            currently recommend the Netbeans 7.x IDE for development.</para>
+    </section>
+    <section>
+        <title>Frontend</title>
+        <para>The ANNIS frontend is a web application implemented in Java and the <link
+                xlink:href="https://vaadin.com/">Vaadin</link> framework. It communicates 
+            with the backend service via a REST interface.</para>
+        <section>
+            <title>Running an embedded Jetty instance for local access</title>
+            <para> This way of running the frontend is very useful, if you want to access Annis on
+                you local machine as a single user. </para>
+            <para> You don't need to install Jetty or Tomcat by yourself using this method. A
+                security manager has to be configured. The recommend (and most easy to configure)
+                security manager for this setup is the TestSecurityManager.
+                <programlisting>cd &lt;unzipped source>/annis-gui/
+mvn jetty:run</programlisting>
+                Now you can access the site under <link
+                    xlink:href="http://localhost:8080/annis-gui/app"
+                    >http://localhost:8080/annis-gui/app</link>. The Jetty server might be stopped
+                by pressing "CTRL-C". </para>
+        </section>
+        <section>
+            <title>HOWTO add new visualizers</title>
+            <para>TODO</para>
+        </section>
     </section>
 </article>
