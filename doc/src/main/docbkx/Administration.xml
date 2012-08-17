@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.oasis-open.org/docbook/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<article xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+    <info>
+        <title>ANNIS Administration Guide</title>
+        <author>
+            <personname>
+                <firstname>Amir</firstname>
+                <surname>Zeldes</surname>
+            </personname>
+            <email>annis-admin@ling.uni-potsdam.de</email>
+        </author>
+        <author>
+            <personname>
+                <firstname>Thomas</firstname>
+                <surname>Krause</surname>
+            </personname>
+            <email>annis-admin@ling.uni-potsdam.de</email>
+        </author>
+        <orgname>SFB 632 Information Structure / D1 Linguistic Database</orgname>
+        <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
+        <releaseinfo>Version ${project.version}</releaseinfo>
+        <pubdate>${mavenBuildTimestamp}</pubdate>
+        
+    </info>
+    <section>
+        <title>Setup on a public server</title>
+        
+        <para>TODO</para>
+    </section>
+</article>

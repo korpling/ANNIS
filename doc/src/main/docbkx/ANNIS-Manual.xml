@@ -19,29 +19,15 @@
     </author>
     <orgname>SFB 632 Information Structure / D1 Linguistic Database</orgname>
     <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
-    <releaseinfo>Version 2.2.1</releaseinfo>
-    <pubdate>18 April 2012</pubdate>
+    <releaseinfo>Version ${project.version}</releaseinfo>
+    <pubdate>${mavenBuildTimestamp}</pubdate>
     
     
   </info>
-
-  <part>
-    <title>Information for Users</title>
-    <xi:include href="User-Guide.xml"/>   
-  </part>
   
-  <!-- TODO
-  <part>
-    <title>Information for Administrators running ANNIS on a central server</title>
-      
-  </part>
-  -->
   
-  <!-- TODO
-  <part>
-    <title>Information for ANNIS developers</title>
-      
-  </part>
-  -->
+  <xi:include href="User-Guide.xml"/>   
+  <xi:include href="Administration.xml"/>  
+  <xi:include href="Developer.xml"/>
 
 </book>
