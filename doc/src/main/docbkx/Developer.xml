@@ -22,7 +22,7 @@
         <para> This way of running the frontend is very useful, if you want to access Annis on you
             local machine as a single user. </para>
         <para> You don't need to install Jetty or Tomcat by yourself using this method. A security
-            manager had to be setup like described here. The recommend (and most easy to configure)
+            manager has to be configured. The recommend (and most easy to configure)
             security manager for this setup is the TestSecurityManager.
             <programlisting>cd &lt;unzipped source>/annis-gui/
 mvn jetty:run</programlisting> Now
