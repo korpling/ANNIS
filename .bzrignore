@@ -1,5 +1,0 @@
-target
-annis-service-impl/src/main/distribution/log/annis.log
-annis-service-impl/src/main/distribution/log/error.log
-annis-service-impl/src/main/distribution/log/query.log
-catalog.xml

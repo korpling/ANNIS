@@ -1,0 +1,9 @@
+/.gitignore~
+/annis-service-impl/src/main/distribution/log/debug.log
+/annis-service-interface/target/
+/annis-service-impl/target/
+/annis-gui/target/
+/Annis-Kickstarter/target/
+/annis-service-impl/src/main/distribution/log/annis.log
+/annis-service-impl/src/main/distribution/log/error.log
+/annis-service-impl/src/main/distribution/log/query.log

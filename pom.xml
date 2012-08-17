@@ -24,7 +24,7 @@
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
 
   <scm>
-    <developerConnection>scm:bazaar:lp:~annis/annis/releases</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
   </scm>
 
   <organization>
