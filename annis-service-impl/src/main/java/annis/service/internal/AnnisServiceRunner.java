@@ -49,14 +49,22 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   public static void main(String[] args) throws IOException
   {
-    AnnisBaseRunner.setupLogging(false);
+    
+    boolean daemonMode = false;
+    if(args.length == 1 && ("-d".equals(args[0])))
+    {
+      daemonMode = true;
+    }
+    
+    AnnisBaseRunner.setupLogging(!daemonMode);
 
+    
     mainThread = Thread.currentThread();
 
     annisServiceRunner = new AnnisServiceRunner();
 
     // run as a deamon?
-    if (args.length == 1 && ("-d".equals(args[0])))
+    if (daemonMode)
     {
       log.info("Running in Daemon mode");
 
