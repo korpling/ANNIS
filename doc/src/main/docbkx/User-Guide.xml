@@ -88,7 +88,7 @@
             Kickstarter under most versions of Linux, Windows and Mac OS. To install Kickstarter
             follow these steps:<orderedlist>
                 <listitem>
-                    <para>Download and install PostgreSQL 8.4 for your operating system from <link
+                    <para>Download and install PostgreSQL 9.1 for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password</emphasis> you set during the

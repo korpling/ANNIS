@@ -9,7 +9,7 @@
                 <firstname>Thomas</firstname>
                 <surname>Krause</surname>
             </personname>
-            <email>annis-admin@ling.uni-potsdam.de</email>
+            <email>thomas.krause@alumni.hu-berlin.de</email>
         </author>
         <orgname>SFB 632 Information Structure / D1 Linguistic Database</orgname>
         <orgname>Humboldt-Universität zu Berlin &amp; Universität Potsdam</orgname>
@@ -17,6 +17,40 @@
         <pubdate>${mavenBuildTimestamp}</pubdate>
 
     </info>
+    <section>
+        <title>Architecture</title>
+        <para>ANNIS is a web-based search and visualization architecture for multi-layer corpora.
+            ANNIS consists of two major components: a backend service and a web front-end. There is
+            also a local version, ANNIS Kickstarter, which is a simple starting point for new users
+            who want to try out the system without installing a full server.<variablelist>
+                <varlistentry>
+                    <term>Backend Service</term>
+                    <listitem>
+                        <para>The service runs on a web server such as Tomcat or Jetty and
+                            communicates with a relational database, using the open source DB
+                            PostgreSQL. PostgreSQL (V9.1) must be installed for ANNIS to work. For
+                            more information on installing and managing the backend service, see the
+                            Administration Guide in the documentation.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>Web Front-end</term>
+                    <listitem>
+                        <para>The web front-end runs in a normal browser (we recommend Google
+                            Chrome) and communicates with the backend server.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ANNIS Kickstarter</term>
+                    <listitem>
+                        <para>ANNIS Kickstarter is a cross-platform local version which requires
+                            nothing but a PostgreSQL installation to run. It will run under LINUX,
+                            Windows and Mac. For a quick tutorial to get started with Kickstarter,
+                            see the ANNIS User Guide.</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist></para>
+    </section>
     <section>
         <title>Building ANNIS</title>
         <para>ANNIS uses <link xlink:href="http://maven.apache.org/">Maven3</link> as build tool.
@@ -52,13 +86,13 @@ mvn install            </programlisting> This
             currently recommend the Netbeans 7.x IDE for development.</para>
     </section>
     <section>
-        <title>Frontend</title>
-        <para>The ANNIS frontend is a web application implemented in Java and the <link
-                xlink:href="https://vaadin.com/">Vaadin</link> framework. It communicates 
-            with the backend service via a REST interface.</para>
+        <title>Front-end</title>
+        <para>The ANNIS front-end is a web application implemented in Java and the <link
+                xlink:href="https://vaadin.com/">Vaadin</link> framework. It communicates with the
+            backend service via a REST interface.</para>
         <section>
             <title>Running an embedded Jetty instance for local access</title>
-            <para> This way of running the frontend is very useful, if you want to access Annis on
+            <para> This way of running the front-end is very useful, if you want to access Annis on
                 you local machine as a single user. </para>
             <para> You don't need to install Jetty or Tomcat by yourself using this method. A
                 security manager has to be configured. The recommend (and most easy to configure)
