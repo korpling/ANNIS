@@ -17,7 +17,6 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
 import annis.gui.visualizers.IFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
@@ -30,8 +29,8 @@ import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -76,7 +75,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
-  private ComponentVisualizerPlugin compVis;
+  private VisualizerPlugin compVis;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private SingleResultPanel parentPanel;
@@ -97,8 +96,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   {
     // get the Visualizer instance
     VisualizerPlugin tmpVis = ps.getVisualizer(visType);
-    VisualizerPlugin vis = null;
-    Label label;
 
     /**
      * build a new instance, cause the Pluginsystem holds only one instance of
@@ -106,7 +103,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
      */
     try
     {
-      vis = tmpVis.getClass().newInstance();
+      this.compVis = tmpVis.getClass().newInstance();
     }
     catch (InstantiationException ex)
     {
@@ -131,17 +128,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     this.visContainer = visContainer;
 
-    if (!(vis instanceof ComponentVisualizerPlugin))
-    {
-      log.warn("{} is not a ComponentVisualizer", vis.getShortName());
-      return;
-    }
-
-    compVis = (ComponentVisualizerPlugin) vis;
-    
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    this.setWidth("100%");    
-    this.setContent(this.visContainer);    
+    this.setWidth("100%");
+    this.setContent(this.visContainer);
   }
 
   public VisualizerPanel(final ResolverEntry entry, SDocument result,
@@ -178,6 +167,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public void attach()
   {
     VisualizerInput visInput;
+    Component vis;
 
     /**
      * check if this is a ComponentVisualizer.
@@ -197,8 +187,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     visInput.setMediaIDs(mediaIDs);
     visInput.setMediaVisualizer(mediaVisualizer);
 
-    compVis.setVisualizerInput(visInput);
-    visContainer.addComponent(compVis, "compVis");
+    vis = this.compVis.createComponent(visInput);
+    visContainer.addComponent(vis, "compVis");
   }
 
   private VisualizerInput createInput()

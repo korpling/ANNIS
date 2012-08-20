@@ -16,15 +16,17 @@
 package annis.gui.visualizers;
 
 import annis.gui.MainApp;
+import com.vaadin.ui.Component;
+import java.util.Set;
 import net.xeoh.plugins.base.Plugin;
 
 /**
- * Every visualizer must implement this interface. It' s also necessary to
- * to load this plugin by hand in {@link MainApp#initPlugins()}
+ * Every visualizer must implement this interface. It' s also necessary to to
+ * load this plugin by hand in {@link MainApp#initPlugins()}
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-  public interface VisualizerPlugin extends Plugin
+public interface VisualizerPlugin extends Plugin
 {
 
   /**
@@ -34,4 +36,17 @@ import net.xeoh.plugins.base.Plugin;
    * @return
    */
   public String getShortName();
+
+  /**
+   * It is used by the ANNIS plugin system to generate something viewable for
+   * vaadin.
+   *
+   */
+  public Component createComponent(VisualizerInput visInput);
+
+  /**
+   * The implementation is optional.
+   *
+   */
+  public void setVisibleTokenAnnosVisible(Set<String> annos);
 }

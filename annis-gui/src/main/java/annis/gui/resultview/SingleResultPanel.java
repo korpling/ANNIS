@@ -20,7 +20,6 @@ import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
@@ -279,18 +278,7 @@ public class SingleResultPanel extends VerticalLayout implements
     for (String visName : alwaysVisibleVis)
     {
       VisualizerPlugin vis = ps.getVisualizer(visName);
-      ComponentVisualizerPlugin compVis;
-
-      if (vis instanceof ComponentVisualizerPlugin)
-      {
-        compVis = (ComponentVisualizerPlugin) vis;
-        compVis.setVisibleTokenAnnosVisible(annos);
-      }
-      else
-      {
-        log.warn(visName + " is not an instance of "
-          + ComponentVisualizerPlugin.class.getName());
-      }
+      vis.setVisibleTokenAnnosVisible(annos);
     }
 
     if (kwicPanels != null)

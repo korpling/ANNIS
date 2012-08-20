@@ -19,8 +19,8 @@ import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerPanel;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
 import annis.gui.visualizers.VisualizerInput;
+import annis.gui.visualizers.VisualizerPlugin;
 import annis.model.AnnisConstants;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -39,14 +39,14 @@ import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
-
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krause@informatik.hu-berlin.>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
 public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener,
-  ComponentVisualizerPlugin
+  VisualizerPlugin
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(KWICPanel.class);
@@ -84,13 +84,13 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   @Override
   public void attach()
   {
-    
-   if (visInput != null)
+
+    if (visInput != null)
     {
       initKWICPanel(visInput.getSResult(),
         visInput.getToken(),
         visInput.getVisibleTokenAnnos(),
-        visInput.getMarkedAndCovered(), 
+        visInput.getMarkedAndCovered(),
         visInput.getText(),
         visInput.getMediaIDs(),
         visInput.getMediaVisualizer(),
@@ -178,8 +178,8 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
         //add a column for each token
         try
-        {          
-          addGeneratedColumn(t, new KWICPanel.TokenColumnGenerator(t, segmentationName));          
+        {
+          addGeneratedColumn(t, new KWICPanel.TokenColumnGenerator(t, segmentationName));
           setColumnExpandRatio(t, 0.0f);
         }
         catch (IllegalArgumentException ex)
@@ -229,6 +229,13 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
     }
   }
 
+  @Override
+  public Component createComponent(VisualizerInput visInput)
+  {
+    this.visInput = visInput;
+    return this;
+  }
+
   public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
   {
 
@@ -259,6 +266,7 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
 
   public class KWICStyleGenerator implements Table.CellStyleGenerator
   {
+
     public String getStyle(String layer, SNode token)
     {
       BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
@@ -316,12 +324,6 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   public String getShortName()
   {
     return "KWIC";
-  }
-
-  @Override
-  public void setVisualizerInput(VisualizerInput visInput)
-  {
-    this.visInput = visInput;
   }
 
   public static class GapColumnGenerator implements Table.ColumnGenerator

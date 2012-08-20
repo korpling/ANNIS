@@ -15,33 +15,64 @@
  */
 package annis.gui.visualizers;
 
+import com.vaadin.ui.Component;
 import java.io.OutputStream;
+import java.util.Set;
 
-public abstract class IFrameVisualizer implements IFrameVisualizerPlugin, ResourcePlugin
+/**
+ * Base class for all iframe visualizer plugins
+ *
+ * @author Thomas Krause <krause@informatik.hu-berlin.>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ */
+public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlugin
 {
 
-  @Override
+  /**
+   * Writes the final output to passed OutputStream. The stream should remain
+   * open.
+   *
+   * @param input The input from which the visualization should be generated
+   * from
+   * @param outstream The OutputStream to be used
+   */
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
 
-  @Override
   public String getContentType()
   {
     return "text/html";
   }
 
-  @Override
+  /**
+   * Returns the character endocing for this particular Visualizer output. For
+   * more information see
+   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
+   * overridden to change default "utf-8".
+   *
+   * @return the CharacterEncoding
+   */
   public String getCharacterEncoding()
   {
     return "utf-8";
   }
 
-  @Override
+  /**
+   * Return if this visualizer is using the complete text.
+   */
   public boolean isUsingText()
   {
     return false;
   }
-  
-  
 
+  @Override
+  public Component createComponent(VisualizerInput vis)
+  {
+    throw new UnsupportedOperationException();
+  }
 
+  @Override
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  {
+    throw new UnsupportedOperationException();
+  }
 }
