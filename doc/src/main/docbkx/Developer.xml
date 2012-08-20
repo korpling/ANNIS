@@ -103,10 +103,21 @@ mvn jetty:run</programlisting>
                     xlink:href="http://localhost:8080/annis-gui/app"
                     >http://localhost:8080/annis-gui/app</link>. The Jetty server might be stopped
                 by pressing "CTRL-C". </para>
-        </section>
+        </section>   
+        
+        
         <section>
             <title>HOWTO add new visualizers</title>
-            <para>TODO</para>
+            <para>TODO</para>            
+                <!--<section>
+                    <title>ANNIS visualizer plugin hierachy</title>
+                    <para> The ANNIS-Visualizer plugins also depends of the PluginSystem, which searches the
+                        Java Classpath for classes with the annotation @PluginImplementation.<inlinemediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/plugin_structure.svg" width="100%"/>
+                            </imageobject>
+                        </inlinemediaobject></para>                    
+                </section> -->
         </section>
     </section>
 </article>
