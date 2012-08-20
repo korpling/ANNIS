@@ -45,7 +45,7 @@
                 <listitem>
                     <para>New grid-tree visualizer for a span visualization of hierarchical
                         structures (e.g. topological fields in German; see Section
-                        5.1)<!-- TODO reference --></para>
+                        see Administration Guide "Configuring Visualizations")</para>
                 </listitem>
                 <listitem>
                     <para>More intuitive search button position in GUI and other small GUI

@@ -253,7 +253,7 @@ mvn -DskipTests=true install</programlisting>
                                 <listitem>
                                     <para><emphasis role="italic">arch_dependency</emphasis>
                                         (dependency tree with labeled arches between tokens;
-                                        requires SVG enabled browser, see 5.2)<screenshot>
+                                        requires SVG enabled browser, see <xref linkend="annis-admin-vis-software-requirement"/>)<screenshot>
                                             <mediaobject>
                                                 <imageobject>
                                                   <imagedata
@@ -267,7 +267,7 @@ mvn -DskipTests=true install</programlisting>
                                     <para><emphasis role="italic">ordered_dependency</emphasis>
                                         (arrow based dependency visualization for corpora with
                                         dependencies between non terminal nodes; requires GraphViz,
-                                        see 5.2)<screenshot>
+                                        see <xref linkend="annis-admin-vis-software-requirement"/>)<screenshot>
                                             <mediaobject>
                                                 <imageobject>
                                                   <imagedata
@@ -280,7 +280,7 @@ mvn -DskipTests=true install</programlisting>
                                 <listitem>
                                     <para><emphasis role="italic">hierarchical_dependency</emphasis>
                                         (unordered vertical tree of dependent tokens; requires
-                                        GraphViz, see 5.2)<screenshot>
+                                        GraphViz, see <xref linkend="annis-admin-vis-software-requirement"/>)<screenshot>
                                             <mediaobject>
                                                 <imageobject>
                                                   <imagedata
@@ -366,7 +366,7 @@ mvn -DskipTests=true install</programlisting>
                 </itemizedlist></para>
 
         </section>
-        <section>
+        <section xml:id="annis-admin-vis-software-requirement">
             <title>Visualizations with Software Requirements</title>
             <para>Some ANNIS visualizers require additional software, depending on whether or not
                 they render graphics as an image directly in Java or not. At present, three
