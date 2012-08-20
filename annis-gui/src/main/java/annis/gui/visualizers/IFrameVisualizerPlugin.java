@@ -20,43 +20,46 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Base interface for all iframe visualizer plugins
+ *
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  */
 public interface IFrameVisualizerPlugin extends VisualizerPlugin
 {
 
   /**
-   * Writes the final output to passed OutputStream. The stream should remain open.
-   * 
-   * @param input The input from which the visualization should be generated from
+   * Writes the final output to passed OutputStream. The stream should remain
+   * open.
+   *
+   * @param input The input from which the visualization should be generated
+   * from
    * @param outstream The OutputStream to be used
    */
   public void writeOutput(VisualizerInput input, OutputStream outstream);
 
   /**
-   * Returns the character endocing for this particular Visualizer output. For more information see {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}.
-   * Must be overridden to change default "utf-8".
+   * Returns the character endocing for this particular Visualizer output. For
+   * more information see
+   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
+   * overridden to change default "utf-8".
+   *
    * @return the CharacterEncoding
    */
   public String getCharacterEncoding();
 
   /**
-   * Returns the content-type for this particular Visualizer output. For more information see {@link javax.servlet.ServletResponse#setContentType(String)}.
-   * Must be overridden to change default "text/html".
+   * Returns the content-type for this particular Visualizer output. For more
+   * information see
+   * {@link javax.servlet.ServletResponse#setContentType(String)}. Must be
+   * overridden to change default "text/html".
+   *
    * @return the ContentType
    */
   public String getContentType();
-  
-  /**
-   * Get the shorted name of the linguistic type of this visualizer ("partitur", 
-   * "tree", etc.)
-   * @return 
-   */
-  public String getShortName();
-  
+
   /**
    * Return if this visualizer is using the complete text.
-   * @return 
+   *
+   * @return
    */
   public boolean isUsingText();
 }
