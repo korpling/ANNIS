@@ -1,5 +1,5 @@
-Annis 2.3.0
-Copyright 2009-2011 Collaborative Research Centre SFB 632
+ANNIS 3.0.0-beta2
+Copyright 2009-2012 Collaborative Research Centre SFB 632
 
 special thanks
 ==============
@@ -17,37 +17,11 @@ We want to thank the following people for their work on ANNIS
 
 This product includes software developed by others which may have
 separate licenses. Please read the associated license information
-carefully, which is located in the "3RD_PARTY_LICENCES" folder.
+carefully, which is located in the "3RD_PARTY_SOFTWARE" folder.
 
-List of included software:
- * Apache Commons CLI
- * Apache Commons Codec
- * Apache Commons Collections
- * Apache Commons IO
- * Apache Commons Lang
- * Apache Commons Logging
- * AspectJ
- * cglib (includes asm)
- * ExtJS
- * explorercanvas
- * FLV Player (http://flv-player.net/)
- * Hamcrest
- * jbar (http://javan.us/jbar/)
- * JDOM
- * jQuery
- * JLine
- * log4j
- * mockito
- * noty (http://needim.github.com/noty/)
- * MP3 Player (http://flash-mp3-player.net/)
- * PostgreSQL JDBC driver
- * Raphael - JavaScript Vector Library
- * SableCC
- * Spring
- * vakyartha dependency script
- 
-Please note that the JavaScript-files in
-Annis-web/src/main/webapp/javascript/annis/ are licensed under the GPLv3 in
-order to be compatible to the ExtJS FLOSS exception.
+You can find an INFO.txt textfile including the name of the 
+project, the publisher and an URL in the subdirectory of
+"3RD_PARTY_SOFTWARE" corresponding to the dependency.
 
-The Annis Logo was build using a photo from http://www.flickr.com/photos/geishaboy500/4298493666/ of the flickr user "geishaboy500". The Photo was licensed by Creative Commons BY 2.0. 
+
+The ANNIS Logo was build using a photo from http://www.flickr.com/photos/geishaboy500/4298493666/ of the flickr user "geishaboy500". The Photo was licensed by Creative Commons BY 2.0. 

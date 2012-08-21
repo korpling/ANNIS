@@ -1,0 +1,1 @@
+Commons Codec, Apache Software Foundation - http://commons.apache.org/codec/
