@@ -35,10 +35,46 @@
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
+      <resource>
+        <directory>${basedir}/target/extra-resources</directory>
+        <filtering>true</filtering>
+      </resource>
     </resources>
 
     <plugins>
-      
+   
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>../</directory>
+                  <includes>
+                    <include>NOTICE</include>
+                    <include>CHANGELOG</include>
+                    <include>LICENSE</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+                <resource>
+                  <directory>THIRD-PARTY</directory>
+                  <targetPath>THIRD-PARTY</targetPath>
+                  <excludes></excludes>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
    
       <!-- 
       Maven does not copy the "bundle" artifacts to WEB-INF/lib so we have to do it by ourself. 
@@ -335,5 +371,5 @@
     <scope>provided</scope> </dependency> -->
 
   </dependencies>
-    <name>annis-gui</name>
+  <name>annis-gui</name>
 </project>
