@@ -5,7 +5,7 @@
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
-  <name>Annis corpus search</name>
+  <name>ANNIS corpus search</name>
   <version>3.0.0-SNAPSHOT</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and 
@@ -128,8 +128,8 @@
   
   <modules>
     <module>annis-service-interface</module>    
-    <module>annis-service-impl</module>
-    <module>Annis-Kickstarter</module>
+    <module>annis-service-implementation</module>
+    <module>annis-kickstarter</module>
     <module>annis-gui</module>
     <module>doc</module>
   </modules>

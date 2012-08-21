@@ -18,7 +18,7 @@ Lists of 74 third-party dependencies.
      (The Apache Software License, Version 2.0) Commons IO (commons-io:commons-io:1.3.2 - http://jakarta.apache.org/commons/io/)
      (The Apache Software License, Version 2.0) Commons IO (commons-io:commons-io:1.4 - http://commons.apache.org/io/)
      (The Apache Software License, Version 2.0) Commons Lang (commons-lang:commons-lang:2.5 - http://commons.apache.org/lang/)
-     (The Apache Software License, Version 2.0) Annis GUI (de.hu-berlin.german.korpling.annis:annis-gui:3.0.0-SNAPSHOT - http://www.sfb632.uni-potsdam.de/annis/annis-gui/)
+     (The Apache Software License, Version 2.0) annis-gui (de.hu-berlin.german.korpling.annis:annis-gui:3.0.0-SNAPSHOT - http://www.sfb632.uni-potsdam.de/annis/annis-gui/)
      (The Apache Software License, Version 2.0) annis-service-implementation (de.hu-berlin.german.korpling.annis:annis-service-impl:3.0.0-SNAPSHOT - http://www.sfb632.uni-potsdam.de/annis/annis-service-impl/)
      (The Apache Software License, Version 2.0) annis-service-interface (de.hu-berlin.german.korpling.annis:annis-service-interface:3.0.0-SNAPSHOT - http://www.sfb632.uni-potsdam.de/annis/annis-service-interface/)
      (The Apache Software License, Version 2.0) salt-graph (de.hu_berlin.german.korpling.saltnpepper:salt-graph:1.1.4-SNAPSHOT - https://korpling.german.hu-berlin.de/p/projects/salt/salt-graph)

@@ -11,3 +11,6 @@
 /target/
 *~
 /.netbeans/
+/annis-service-implementation/target/
+/annis-service-implementation/.settings/
+/annis-kickstarter/target/
