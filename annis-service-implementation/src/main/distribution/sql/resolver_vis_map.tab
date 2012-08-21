@@ -2,5 +2,5 @@
 2	NULL	NULL	exmaralda	node	grid	exmaralda	102	NULL
 3	NULL	NULL	mmax	node	grid	mmax	103	NULL
 4	NULL	NULL	mmax	edge	discourse	coref	104	NULL
-5	NULL	NULL	urml	node	old_grid	urml	105	NULL
+5	NULL	NULL	urml	node	grid	urml	105	NULL
 6	NULL	NULL	external	node	file	external file	106	NULL
