@@ -348,6 +348,10 @@ testpassword9f735e0df9a1ddc702bf0a1a7b83033f9f[...]</screen>The
                                                   </imageobject>
                                                 </mediaobject>
                                             </screenshot></para>
+                                        <para>A known Bug is, that equal annotation names which
+                                            cover the same range or a subset of nodes and have the
+                                            same hierarchical depths are not rendered correctly by
+                                            grid_tree.</para>
                                     </listitem>
                                     <listitem>
                                         <para><emphasis role="italic">discourse</emphasis> (a view
