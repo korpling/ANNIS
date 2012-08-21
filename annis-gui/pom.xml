@@ -242,13 +242,6 @@
       <artifactId>codemirror2</artifactId>
       <version>2.2.4</version>
     </dependency>
-    
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>net.xeoh.plugins</groupId>
@@ -291,11 +284,7 @@
       <version>1.11</version>
     </dependency>
     
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-graph-impl</artifactId>
-      <version>2.0</version>
-    </dependency>
+
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-api</artifactId>
@@ -303,15 +292,10 @@
     </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
-      <artifactId>jung-io</artifactId>
+      <artifactId>jung-graph-impl</artifactId>
       <version>2.0</version>
     </dependency>
-    <dependency>
-      <groupId>net.sf.jung</groupId>
-      <artifactId>jung-visualization</artifactId>
-      <version>2.0</version>
-    </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
