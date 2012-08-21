@@ -14,9 +14,11 @@ import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * 
- * @author benjamin
- * 
+ * Known Bug: the visualizer does not handle crossing edges.
+ * {@linkplain https://github.com/korpling/ANNIS/issues/14}
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmailcom>
+ *
  */
 @PluginImplementation
 public class GridTreeVisualizer extends WriterVisualizer
@@ -30,9 +32,9 @@ public class GridTreeVisualizer extends WriterVisualizer
    * This helper-class saves the span from a specific Node. The span is
    * represented as tokenIndex from the most left and the most right Token of
    * the root.
-   * 
+   *
    * @author benjamin
-   * 
+   *
    */
   private class Span implements Comparable<Span>
   {
@@ -46,11 +48,10 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     /**
      * left and right should be initiate with null, when root is not a token.
-     * 
+     *
      * @param root
      * @param offset the tokenIndex of the first element in token
-     * @param length the length of token
-     *          must be a sorted List of the result
+     * @param length the length of token must be a sorted List of the result
      */
     public Span(AnnisNode root, long offset, int length, String anno)
     {
@@ -64,12 +65,11 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     @Override
     /**
-     * this function assumes the spans doesn't have conflicts which means
-     * that: <br />
-     * sp.height == this.height => [sp.left, sp.right] &cap; [this.left,
+     * this function assumes the spans doesn't have conflicts which means that:
+     * <br /> sp.height == this.height => [sp.left, sp.right] &cap; [this.left,
      * sp.right] == &empty;
-     * 
-     * 
+     *
+     *
      */
     public int compareTo(Span sp)
     {
@@ -82,7 +82,8 @@ public class GridTreeVisualizer extends WriterVisualizer
         if (this.left > sp.right)
         {
           return 1;
-        } else
+        }
+        else
         {
           return -1;
         }
@@ -178,34 +179,35 @@ public class GridTreeVisualizer extends WriterVisualizer
       writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 
       writer.append("<link href=\""
-              + input.getResourcePath("jquery.tooltip.css")
-              + "\" rel=\"stylesheet\" type=\"text/css\" >");
+        + input.getResourcePath("jquery.tooltip.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getResourcePath("partitur.css")
-              + "\" rel=\"stylesheet\" type=\"text/css\" >");
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
       writer.append("<link href=\"" + input.getResourcePath("gridtree.css")
-              + "\" rel=\"stylesheet\" type=\"text/css\" >");
+        + "\" rel=\"stylesheet\" type=\"text/css\" >");
 
       writer.append("<script type=\"text/javascript\" src=\""
-              + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
+        + input.getResourcePath("jquery-1.6.2.min.js") + "\"></script>");
       writer.append("<script type=\"text/javascript\" src=\""
-              + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
+        + input.getResourcePath("jquery.tooltip.min.js") + "\"></script>");
 
       writer.append("<script type=\"text/javascript\" src=\""
-              + input.getResourcePath("gridtreeVisualizer.js") + "\"></script>");
+        + input.getResourcePath("gridtreeVisualizer.js") + "\"></script>");
       writer.append("</head>\n<body>");
       writer.append("<table id=\"gridtree-partitur\" class=\"grid-tree partitur_table\">\n");
       writer.append(findAnnotation(input.getResult().getGraph(), input, spans));
       writer.append("</table>\n");
       writer.append("</body></html>");
 
-    } catch (IOException e)
+    }
+    catch (IOException e)
     {
       // TODO Auto-generated catch block
     }
   }
 
   private String findAnnotation(AnnotationGraph graph, VisualizerInput input,
-          ArrayList<Span> spans)
+    ArrayList<Span> spans)
   {
 
     List<AnnisNode> nodes = graph.getNodes();
@@ -222,7 +224,7 @@ public class GridTreeVisualizer extends WriterVisualizer
       if (hasAnno(n, anno))
       {
         Span tmp = new Span(n, result.get(0).getTokenIndex(), result.size(),
-                anno);
+          anno);
         spans.add(tmp);
       }
     }
@@ -262,11 +264,9 @@ public class GridTreeVisualizer extends WriterVisualizer
 
   /**
    * Returns true when the node is annotated with the string.
-   * 
-   * @param n
-   *          the node to check
-   * @param annotation
-   *          String to check
+   *
+   * @param n the node to check
+   * @param annotation String to check
    * @return
    */
   private boolean hasAnno(AnnisNode n, String annotation)
@@ -289,18 +289,15 @@ public class GridTreeVisualizer extends WriterVisualizer
 
   /**
    * Build a html-table-row.
-   * 
-   * @param sb
-   *          the html-code, where the row is embedded
-   * @param result
-   *          List of all results, the list must be sorted by the token-index
-   * @param spans
-   *          Sorted List of Span objects with left and right limit
-   * @param anno
-   *          the anno, which matches to all Span-Objects
+   *
+   * @param sb the html-code, where the row is embedded
+   * @param result List of all results, the list must be sorted by the
+   * token-index
+   * @param spans Sorted List of Span objects with left and right limit
+   * @param anno the anno, which matches to all Span-Objects
    */
   private void htmlTableRow(StringBuilder sb, List<AnnisNode> result,
-          ArrayList<Span> spans, String anno)
+    ArrayList<Span> spans, String anno)
   {
 
     int j = 0;
@@ -331,7 +328,8 @@ public class GridTreeVisualizer extends WriterVisualizer
           // skip iteration which where covered by colspan
           i += Math.abs(tmp.right - tmp.left);
           j++; // take next span
-        } else
+        }
+        else
         {
           sb.append("<td></td>");
         }
@@ -345,7 +343,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
   /**
    * Build a simple html-row
-   * 
+   *
    * @param sb
    * @param result
    */
