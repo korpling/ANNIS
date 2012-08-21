@@ -77,6 +77,14 @@ textarea.citation {
   font-family: monospace;
 }
 
+textarea.license {
+  background-color: white;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  font-family: monospace;
+}
+
 textarea.query {
   font-family: monospace;
 }

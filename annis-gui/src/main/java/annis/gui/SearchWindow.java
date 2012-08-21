@@ -101,7 +101,9 @@ public class SearchWindow extends Window
       {
         Window w = new Window("About ANNIS", new AboutPanel(getApplication()));
         w.setModal(true);
-        w.setResizable(false);
+        w.setResizable(true);
+        w.setWidth("500px");
+        w.setHeight("500px");
         addWindow(w);
         w.center();
       }
