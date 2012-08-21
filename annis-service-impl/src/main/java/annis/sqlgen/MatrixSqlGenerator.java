@@ -56,7 +56,8 @@ public class MatrixSqlGenerator
   extends AbstractSqlGenerator<List<AnnotatedMatch>>
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
-  WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>
+  WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>,
+  OrderByClauseSqlGenerator<QueryData>
 {
 
   @Deprecated
@@ -307,7 +308,23 @@ public class MatrixSqlGenerator
   public String groupByAttributes(QueryData queryData,
     List<QueryNode> alternative)
   {
-    return "key, " + tables(null).aliasedColumn(NODE_TABLE, "id") + ", span";
+    TableAccessStrategy tas = tables(null);
+    return "key, " 
+      + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "text_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "token_index") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "id");
+  }
+  
+  @Override
+  public String orderByClause(QueryData queryData, List<QueryNode> alternative, String indent)
+  {
+    TableAccessStrategy tas = tables(null);
+    return "key, " 
+      + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "text_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "token_index") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "id");
   }
 
   private List<Annotation> extractAnnotations(Array array) throws SQLException
@@ -387,4 +404,5 @@ public class MatrixSqlGenerator
   {
     this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
   }
+
 }
