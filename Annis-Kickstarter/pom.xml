@@ -66,6 +66,13 @@
   <dependencies>
     
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.6</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-impl</artifactId>
       <version>3.0.0-SNAPSHOT</version>

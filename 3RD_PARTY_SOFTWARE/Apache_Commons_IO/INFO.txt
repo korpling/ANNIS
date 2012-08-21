@@ -1,1 +1,0 @@
-Commons IO, Apache Software Foundation - http://commons.apache.org/io/

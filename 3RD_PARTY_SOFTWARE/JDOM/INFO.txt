@@ -1,1 +1,0 @@
-JDOM, Jason Hunter & Brett McLaughlin - http://www.jdom.org/

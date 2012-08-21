@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<licenseSummary xmlns="http://mojo.codehaus.org/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://mojo.codehaus.org/ licenses.xsd">
+  <dependencies>
+    
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>codemirror2</artifactId>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>js-screenshot</artifactId>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>popupbutton</artifactId>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.vaadin.hene.splitbutton</groupId>
+      <artifactId>splitbutton</artifactId>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <licenses>
+        <license>
+          <name>Common Development and Distribution License (CDDL) v1.0</name>
+          <url>http://glassfish.java.net/public/CDDLv1.0.html</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <licenses>
+        <license>
+          <name>Common Development and Distribution License (CDDL) v1.0</name>
+          <url>http://glassfish.java.net/public/CDDLv1.0.html</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <licenses>
+        <license>
+          <name>Common Development and Distribution License (CDDL) v1.0</name>
+          <url>http://glassfish.java.net/public/CDDLv1.0.html</url>
+        </license>
+      </licenses>
+    </dependency>
+    
+    
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <licenses>
+        <license>
+          <name>JDOM license</name>
+          <url>http://acs.lbl.gov/software/colt/license.html</url>
+        </license>
+      </licenses>
+    </dependency>
+
+  </dependencies>
+</licenseSummary>

@@ -14,6 +14,19 @@
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>../</directory>
+      <includes>
+        <include>NOTICE</include>
+        <include>LICENSE</include>
+        <include>CHANGELOG</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>THIRD-PARTY</directory>
+      <outputDirectory>THIRD-PARTY</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>src/main/distribution/bin/</directory>
       <outputDirectory>bin/</outputDirectory>
       <fileMode>0774</fileMode>

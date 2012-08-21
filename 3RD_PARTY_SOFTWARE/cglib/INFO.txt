@@ -1,1 +1,0 @@
-cglib - http://cglib.sourceforge.net/

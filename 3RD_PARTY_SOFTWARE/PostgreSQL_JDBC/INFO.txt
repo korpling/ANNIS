@@ -1,1 +1,0 @@
-PostgreSQL JDBC Driver, PostgreSQL Global Development Group - http://jdbc.postgresql.org/

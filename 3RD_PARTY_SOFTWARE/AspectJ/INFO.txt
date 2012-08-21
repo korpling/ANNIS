@@ -1,1 +1,0 @@
-AspectJ, Eclipse Foundation - http://www.eclipse.org/aspectj/

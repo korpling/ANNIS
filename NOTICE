@@ -17,11 +17,9 @@ We want to thank the following people for their work on ANNIS
 
 This product includes software developed by others which may have
 separate licenses. Please read the associated license information
-carefully, which is located in the "3RD_PARTY_SOFTWARE" folder.
-
-You can find an INFO.txt textfile including the name of the 
-project, the publisher and an URL in the subdirectory of
-"3RD_PARTY_SOFTWARE" corresponding to the dependency.
+carefully. Each sub-project has a folder "THIRD_PARTY" which contains
+the licenses and a file "<projectname>_dependencies.txt" which lists 
+all third party projects and their license.
 
 
 The ANNIS Logo was build using a photo from http://www.flickr.com/photos/geishaboy500/4298493666/ of the flickr user "geishaboy500". The Photo was licensed by Creative Commons BY 2.0. 

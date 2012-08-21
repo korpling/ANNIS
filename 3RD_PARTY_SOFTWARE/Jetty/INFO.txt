@@ -1,1 +1,0 @@
-Jetty, Eclipse Foundation - http://www.eclipse.org/jetty/

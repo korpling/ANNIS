@@ -1,1 +1,0 @@
-Commons Lang, Apache Software Foundation - http://commons.apache.org/lang/

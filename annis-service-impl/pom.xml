@@ -24,6 +24,13 @@
   <dependencies>
 
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.6</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service-interface</artifactId>
       <version>3.0.0-SNAPSHOT</version>
@@ -54,7 +61,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>3.1.0.RELEASE</version>
+      <version>3.1.2.RELEASE</version>
       <!-- do not use commons logging -->
       <exclusions>
          <exclusion>
@@ -83,18 +90,18 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>3.1.0.RELEASE</version>
+      <version>3.1.2.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>3.1.0.RELEASE</version>
+      <version>3.1.2.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>3.1.0.RELEASE</version>
+      <version>3.1.2.RELEASE</version>
       <scope>test</scope>
     </dependency>
 
