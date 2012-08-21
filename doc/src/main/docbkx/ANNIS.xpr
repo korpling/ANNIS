@@ -14,6 +14,21 @@
                         <scenarioAssociation-array>
                             <scenarioAssociation>
                                 <field name="url">
+                                    <String>User-Guide.xml</String>
+                                </field>
+                                <field name="scenarioIds">
+                                    <list>
+                                        <String>ANNIS PDF</String>
+                                    </list>
+                                </field>
+                                <field name="scenarioTypes">
+                                    <list>
+                                        <String>XSL</String>
+                                    </list>
+                                </field>
+                            </scenarioAssociation>
+                            <scenarioAssociation>
+                                <field name="url">
                                     <String>Administration.xml</String>
                                 </field>
                                 <field name="scenarioIds">
@@ -29,7 +44,7 @@
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="url">
-                                    <String>ANNIS-Manual.xml</String>
+                                    <String>Developer.xml</String>
                                 </field>
                                 <field name="scenarioIds">
                                     <list>
@@ -44,7 +59,7 @@
                             </scenarioAssociation>
                             <scenarioAssociation>
                                 <field name="url">
-                                    <String>Developer.xml</String>
+                                    <String>ANNIS-Manual.xml</String>
                                 </field>
                                 <field name="scenarioIds">
                                     <list>

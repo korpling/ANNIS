@@ -86,24 +86,32 @@
 
         <para> Local users who do not wish to make their corpora available online can install ANNIS
             Kickstarter under most versions of Linux, Windows and Mac OS. To install Kickstarter
-            follow these steps:<orderedlist>
-                <listitem>
+            follow these steps:<procedure>
+                <step>
                     <para>Download and install PostgreSQL 9.1 for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password</emphasis> you set during the
-                        installation. After installation, Postgres may automatically launch the
-                        Postgres Stack Builder to download additional components – you can safely
+                        installation.
+                        <note><para>Under Linux, you might have to set the
+                            PostgreSQL password manually. E.g. on Ubuntu you can achieve this with by running the following
+                            commands:</para>
+                            <para>
+                                <programlisting>sudo -u postgres psql
+\password
+\q</programlisting></para></note>
+                        After installation, PostgreSQL may automatically launch the
+                        PostgreSQL Stack Builder to download additional components – you can safely
                         skip this step and cancel the Stack Builder if you wish. You may need to
                         restart your OS if the Postgres installer tells you to. </para>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Download and unzip <link
                             xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-Kickstarter-2.2.1-distribution.zip"
                             >Annis-Kickstarter-2.2.1-distribution.zip</link> from the ANNIS website.
                     </para>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Start AnnisKickstarter.bat if you’re using Windows or run the bash script
                         AnnisKickstarter.sh otherwise (this may take a few seconds the first time
                         you run Kickstarter). At this point your Firewall may try to block
@@ -118,23 +126,23 @@
                         <para>(To accelerate searches it is also possible to give the Postgres
                             database more memory, see the link in the next section below). </para>
                     </note>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Once the program has started, if this is the first time you run
                         Kickstarter, press “Init Database” and supply your PostGres administrator
                         password from step 1. </para>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Download and unzip the <link
                             xlink:href="http://korpling.german.hu-berlin.de/~annis/downloads/sample_corpora/pcc2_relAnnis.zip"
                             >pcc2 demo corpus</link> from the ANNIS website. </para>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Press “Import Corpus” and navigate to the directory containing the
                         directory <filename>pcc2_v2_relAnnis/</filename>. Select this directory (but
                         do not go into it) and press OK. </para>
-                </listitem>
-                <listitem>
+                </step>
+                <step>
                     <para>Once import is complete, press “Launch Annis frontend” and login with the
                         username and password “test” to test the corpus (try selecting the pcc2
                         corpus, typing <code>pos="NN"</code> in the AnnisQL box and clicking “Show
@@ -142,8 +150,8 @@
                             <application>ANNIS</application>” in this guide for some more example
                         queries, or press the Tutorial button at the top left of the interface).
                     </para>
-                </listitem>
-            </orderedlist></para>
+                </step>
+            </procedure></para>
 
 
     </section>
