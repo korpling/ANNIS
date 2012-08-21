@@ -8,3 +8,4 @@
 /annis-service-impl/src/main/distribution/log/error.log
 /annis-service-impl/src/main/distribution/log/query.log
 /doc/target/
+/target/
