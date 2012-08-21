@@ -16,9 +16,18 @@
 package annis.gui;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.ClassResource;
+import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,17 +35,30 @@ import com.vaadin.ui.*;
  */
 public class AboutPanel extends Panel
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(AboutPanel.class);
 
-  private static ClassResource logo_res;
+  private static ClassResource logo_sfb_res;
+  private static ClassResource logo_annis_res;
+  private VerticalLayout layout;
+  
   public AboutPanel(Application app)
   {
-    if(logo_res == null)
+    if(logo_sfb_res == null)
     {
-      logo_res = new ClassResource(AboutPanel.class,
+      logo_sfb_res = new ClassResource(AboutPanel.class,
       "annis-logo.jpg", app);
     }
-    setWidth("400px");
-    setHeight("-1px");
+    if(logo_annis_res == null)
+    {
+      logo_annis_res = new ClassResource(AboutPanel.class,
+      "annis-logo-128.png", app);
+    }
+    setSizeFull();
+    
+    layout = (VerticalLayout) getContent();
+    
+    layout.setSizeFull();
   }
 
   @Override
@@ -44,17 +66,65 @@ public class AboutPanel extends Panel
   {
     super.attach();
 
-    Embedded logo = new Embedded();
-    logo.setSource(logo_res);
-    logo.setType(Embedded.TYPE_IMAGE);
-        
-    addComponent(logo);
+    HorizontalLayout hLayout = new HorizontalLayout();
+    
+    Embedded logoAnnis = new Embedded();
+    logoAnnis.setSource(logo_annis_res);
+    logoAnnis.setType(Embedded.TYPE_IMAGE);    
+    hLayout.addComponent(logoAnnis);
+    
+    Embedded logoSfb = new Embedded();
+    logoSfb.setSource(logo_sfb_res);
+    logoSfb.setType(Embedded.TYPE_IMAGE);    
+    hLayout.addComponent(logoSfb);
+    
+    hLayout.setComponentAlignment(logoAnnis, Alignment.MIDDLE_LEFT);
+    hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
+    
+    addComponent(hLayout);
+    
     addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     addComponent(new Label("Homepage: "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/d1/annis/\">"
       + "http://www.sfb632.uni-potsdam.de/d1/annis/</a>.", Label.CONTENT_XHTML));
     addComponent(new Label("Version: " + getApplication().getVersion()));
+    
+    TextArea txtThirdParty = new TextArea();
+    txtThirdParty.setSizeFull();
+    
+    
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append("The ANNIS team want's to thank these third party software that "
+      + "made the ANNIS GUI possible:\n");
+    
+    File thirdPartyFolder = 
+      new File(getApplication().getContext().getBaseDirectory(), "THIRD-PARTY");
+    if(thirdPartyFolder.isDirectory())
+    {
+      for(File c : thirdPartyFolder.listFiles((FileFilter) new WildcardFileFilter("*.txt")))
+      {
+        if(c.isFile())
+        {
+          try
+          {
+            sb.append(FileUtils.readFileToString(c)).append("\n");
+          }
+          catch (IOException ex)
+          {
+            log.error("Could not read file", ex);
+          }
+        }
+      }
+    }
+    
+    txtThirdParty.setValue(sb.toString());
+    txtThirdParty.setReadOnly(true);
+    txtThirdParty.addStyleName("license");
+    txtThirdParty.setWordwrap(false);
+    
+    addComponent(txtThirdParty);
     
     Button btOK = new Button("OK");
     btOK.addListener(new Button.ClickListener() {
@@ -68,8 +138,8 @@ public class AboutPanel extends Panel
     });
     addComponent(btOK);
     
-    ((VerticalLayout) getContent()).setComponentAlignment(logo, Alignment.MIDDLE_CENTER);
-    ((VerticalLayout) getContent()).setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
-    
+    layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
+    layout.setExpandRatio(txtThirdParty, 1.0f);
   }
 }

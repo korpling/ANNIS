@@ -5,7 +5,7 @@
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
-  <name>Annis corpus search</name>
+  <name>ANNIS corpus search</name>
   <version>3.0.0-SNAPSHOT</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and 
@@ -51,15 +51,6 @@
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
     </repository>  
   </repositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.6</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     
@@ -114,6 +105,22 @@
         </configuration>
       </plugin>
       
+      <!-- update this with 
+      mvn license:add-third-party license:download-licenses
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.2</version>
+        <configuration>
+          <useMissingFile>true</useMissingFile>
+          <missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
+          <licensesConfigFile>${basedir}/src/licenses.xml</licensesConfigFile>
+          <outputDirectory>${basedir}/THIRD-PARTY</outputDirectory>
+          <thirdPartyFilename>${project.name}_dependencies.txt</thirdPartyFilename>
+          <licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
+        </configuration>
+      </plugin>
       
     </plugins>
   </build>
@@ -121,8 +128,8 @@
   
   <modules>
     <module>annis-service-interface</module>    
-    <module>annis-service-impl</module>
-    <module>Annis-Kickstarter</module>
+    <module>annis-service-implementation</module>
+    <module>annis-kickstarter</module>
     <module>annis-gui</module>
     <module>doc</module>
   </modules>

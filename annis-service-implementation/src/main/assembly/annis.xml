@@ -1,0 +1,43 @@
+
+<assembly>
+  <id>distribution</id>
+  <formats>
+    <format>dir</format>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/distribution/</directory>
+      <excludes>
+        <exclude>bin/</exclude>
+      </excludes>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../</directory>
+      <includes>
+        <include>NOTICE</include>
+        <include>LICENSE</include>
+        <include>CHANGELOG</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>THIRD-PARTY</directory>
+      <outputDirectory>THIRD-PARTY</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/distribution/bin/</directory>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0774</fileMode>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib/</outputDirectory>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <fileMode>0644</fileMode>
+    </dependencySet>
+  </dependencySets>
+</assembly>
