@@ -1,4 +1,14 @@
-grammar aql;
+grammar Aql;
+
+options {
+	output=AST;
+}
+
+@parser::header {package annis.ql;}
+@lexer::header {package annis.ql;}
+
+start 
+	: (expr)+;
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
@@ -24,26 +34,24 @@ OCTAL_ESC
     |   '\\' ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7')
     ;
-
+    
 text_spec 
-	:	'"' ( ESC_SEQ | ~('"') )* '"'
-	|	'/' ( ESC_SEQ | ~('/') )* '/'
-	;
-
-start
-	: expr EOF    
+	:	'"'^ ( ESC_SEQ | ~('"') )* '"'!
+	|	'/'^ ( ESC_SEQ | ~('/') )* '/'!
 	;
 
 qName
-	:  (ID ':')? ID 
+	: namespace+=ID ':' name+=ID -> ^($name $namespace)
+	| ID^
 	;
 
 expr 
 	: qName
-	|	qName '=' text_spec
-	| qName '!=' text_spec
-	|	'(' expr ')'
-	|	'&' expr
-	| '|' expr
+	|	qName '=' text_spec -> ^('=' qName text_spec)
+	| qName '!=' text_spec -> ^('=' qName text_spec)
+	|	'(' expr+ ')' -> ^('(' expr+)
+	|	'&'^ expr
+	| '|'^ expr
 	;
+	
 	
