@@ -229,34 +229,7 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  @Deprecated
-  private void addKWICPanels()
-  {
-    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC)
-      || Boolean.parseBoolean(
-      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
-    {
-      kwicPanels.clear();
-      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-      {
-        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-          result.getSDocumentGraph());
-
-        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
-        calulcateColorsForMarkedAndCoverd();
-
-
-        KWICPanel kwic = new KWICPanel(result, token, visibleTokenAnnos,
-          markedAndCovered, text, mediaIDs, mediaVisualizer, this,
-          segmentationName);
-
-        // add after the info bar component
-        addComponent(kwic, 1);
-        kwicPanels.add(kwic);
-      }
-    }
-  }
-
+  //TODO apply this to new plugin system
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
@@ -264,11 +237,11 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       for (KWICPanel kwic : kwicPanels)
       {
-        removeComponent(kwic);
+//        removeComponent(kwic);
       }
 
       kwicPanels.clear();
-      addKWICPanels();
+//      addKWICPanels();
     }
   }
 
