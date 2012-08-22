@@ -25,7 +25,6 @@
     
   </info>
   
-  
   <xi:include href="User-Guide.xml"/>   
   <xi:include href="Administration.xml"/>  
   <xi:include href="Developer.xml"/>
