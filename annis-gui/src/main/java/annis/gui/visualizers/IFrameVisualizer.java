@@ -16,12 +16,10 @@
 package annis.gui.visualizers;
 
 import annis.gui.widgets.AutoHeightIFrame;
-import com.vaadin.Application;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.Set;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -29,7 +27,7 @@ import java.util.Set;
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlugin
+public abstract class IFrameVisualizer extends AbstractVisualizer implements  ResourcePlugin
 {
 
   /**
@@ -41,32 +39,6 @@ public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlug
    * @param outstream The OutputStream to be used
    */
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
-
-  public String getContentType()
-  {
-    return "text/html";
-  }
-
-  /**
-   * Returns the character endocing for this particular Visualizer output. For
-   * more information see
-   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
-   * overridden to change default "utf-8".
-   *
-   * @return the CharacterEncoding
-   */
-  public String getCharacterEncoding()
-  {
-    return "utf-8";
-  }
-
-  /**
-   * Return if this visualizer is using the complete text.
-   */
-  public boolean isUsingText()
-  {
-    return false;
-  }
 
   @Override
   public Component createComponent(VisualizerInput vis)
@@ -80,11 +52,5 @@ public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlug
     String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
     iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, vis.getVisPanel());
     return iframe;
-  }
-
-  @Override
-  public void setVisibleTokenAnnosVisible(Set<String> annos)
-  {
-    throw new UnsupportedOperationException();
   }
 }

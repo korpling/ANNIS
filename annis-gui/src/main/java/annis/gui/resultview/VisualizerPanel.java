@@ -21,7 +21,7 @@ import annis.gui.visualizers.IFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
-import annis.gui.widgets.AutoHeightIFrame;
+import annis.gui.visualizers.component.KWICPanel.KWICPanelImpl;
 import annis.resolver.ResolverEntry;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.ApplicationResource;
@@ -71,7 +71,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanel kwicPanel;
+  private KWICPanelImpl kwicPanel;
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
@@ -326,7 +326,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
   }
 
-  public void setKwicPanel(KWICPanel kwicPanel)
+  public void setKwicPanel(KWICPanelImpl kwicPanel)
   {
     this.kwicPanel = kwicPanel;
   }
