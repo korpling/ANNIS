@@ -94,25 +94,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     SingleResultPanel parent, String segmentationName, PluginSystem ps,
     CustomLayout visContainer)
   {
-    // get the Visualizer instance
-    VisualizerPlugin tmpVis = ps.getVisualizer(visType);
 
-    /**
-     * build a new instance, cause the Pluginsystem holds only one instance of
-     * the plugin.
-     */
-    try
-    {
-      this.compVis = tmpVis.getClass().newInstance();
-    }
-    catch (InstantiationException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
-    catch (IllegalAccessException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
+    compVis = ps.getVisualizer(visType);
 
     this.result = result;
     this.token = token;

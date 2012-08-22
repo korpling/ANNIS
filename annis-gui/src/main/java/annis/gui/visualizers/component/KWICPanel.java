@@ -232,8 +232,9 @@ public class KWICPanel extends Table implements ItemClickEvent.ItemClickListener
   @Override
   public Component createComponent(VisualizerInput visInput)
   {
-    this.visInput = visInput;
-    return this;
+    KWICPanel kWICPanel = new KWICPanel();
+    kWICPanel.visInput = visInput;
+    return kWICPanel;
   }
 
   public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
