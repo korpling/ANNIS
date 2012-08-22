@@ -61,7 +61,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
   private ApplicationResource resource = null;
-  private AutoHeightIFrame iframe;
+  private Component iframe;
   private SDocument result;
   private PluginSystem ps;
   private ResolverEntry entry;
@@ -200,7 +200,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     return input;
   }
 
-  private ApplicationResource createResource(
+  public ApplicationResource createResource(
     final ByteArrayOutputStream byteStream,
     String mimeType)
   {
@@ -301,18 +301,11 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
           }
           else
           {
-
             input.setDocument(result);
-
           }
 
-          ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-          iframeVis.writeOutput(input, outStream);
-
-          resource = createResource(outStream, iframeVis.getContentType());
-          String url = getApplication().getRelativeLocation(resource);
-          iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
-
+          input.setVisPanel(this);
+          iframe = iframeVis.createComponent(input);
           visContainer.addComponent(iframe, "iframe");
         }
 

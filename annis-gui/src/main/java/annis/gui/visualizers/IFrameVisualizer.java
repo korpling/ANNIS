@@ -15,7 +15,11 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.widgets.AutoHeightIFrame;
+import com.vaadin.Application;
+import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.ui.Component;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
@@ -67,7 +71,15 @@ public abstract class IFrameVisualizer implements VisualizerPlugin, ResourcePlug
   @Override
   public Component createComponent(VisualizerInput vis)
   {
-    throw new UnsupportedOperationException();
+    AutoHeightIFrame iframe;
+    ApplicationResource resource;
+
+    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    writeOutput(vis, outStream);
+    resource = vis.getVisPanel().createResource(outStream, getContentType());
+    String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
+    iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, vis.getVisPanel());
+    return iframe;
   }
 
   @Override
