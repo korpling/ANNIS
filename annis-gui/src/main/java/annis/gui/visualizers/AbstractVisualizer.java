@@ -19,8 +19,9 @@ import java.util.Set;
 
 /**
  * Base class for all Visualizer. This class sets some defaults, so you may
- * implement the {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput) method for pure Vaadin component plugins.
- * }
+ * implement the null
+ * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)}
+ * method for pure Vaadin component plugins.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */

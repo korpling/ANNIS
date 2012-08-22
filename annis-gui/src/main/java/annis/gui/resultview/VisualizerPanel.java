@@ -17,7 +17,7 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
@@ -283,12 +283,12 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         }
 
         VisualizerInput input = createInput();
-        IFrameVisualizer iframeVis;
+        AbstractIFrameVisualizer iframeVis;
 
         //TODO print error message
-        if (vis instanceof IFrameVisualizer)
+        if (vis instanceof AbstractIFrameVisualizer)
         {
-          iframeVis = (IFrameVisualizer) vis;
+          iframeVis = (AbstractIFrameVisualizer) vis;
 
           if (iframeVis.isUsingText()
             && result.getSDocumentGraph().getSNodes().size() > 0)

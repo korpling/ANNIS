@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class IFrameVisualizer extends AbstractVisualizer implements  ResourcePlugin
+public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements  ResourcePlugin
 {
 
   /**

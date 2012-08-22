@@ -16,6 +16,7 @@
 package annis.gui.visualizers;
 
 import annis.gui.MainApp;
+import annis.gui.visualizers.component.KWICPanel;
 import com.vaadin.ui.Component;
 import java.util.Set;
 import net.xeoh.plugins.base.Plugin;
@@ -23,6 +24,18 @@ import net.xeoh.plugins.base.Plugin;
 /**
  * Every visualizer must implement this interface. It' s also necessary to to
  * load this plugin by hand in {@link MainApp#initPlugins()}
+ *
+ * If you wish to implement an iframe visualizer you should extend the
+ * {@link AbstractIFrameVisualizer} class, because this class already has
+ * implemented the
+ * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)}
+ * method.
+ *
+ * For the case of using Vaadin Component directly its recommended to extend the
+ * {@link AbstractVisualizer} class. There you will have to implement the {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)
+ * } method. Normally you need a inner or additional class which extends a
+ * vaadin implementation of the {@link Component} interface. The
+ * {@link KWICPanel} is an example for that.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
