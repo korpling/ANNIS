@@ -216,7 +216,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       String schema = 
         result.size() > 0 ? (String) result.get(0).get("value") : "";
       
-      if(!getSchemaVersion().equalsIgnoreCase(schema))
+      if(getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(schema))
       {
         String error = "Wrong database schema \"" + schema + "\", please initialize the database.";
         log.error(error);

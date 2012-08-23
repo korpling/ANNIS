@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import annis.exceptions.AnnisException;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -47,15 +48,22 @@ public class ImportDialog extends javax.swing.JDialog
   private File confFile;
   private Properties confProps;
 
-  private class ImportDialogWorker extends SwingWorker<String, Void> implements
+  private class Status
+  {
+    public boolean ok = true;
+    public String errorMessage = "";
+    public Exception ex = new Exception();
+  }
+  
+  private class ImportDialogWorker extends SwingWorker<Status, Void> implements
     Serializable
   {
 
     @Override
-    protected String doInBackground() throws Exception
+    protected Status doInBackground() throws Exception
     {
-      
-      StringBuilder result = new StringBuilder();
+      Status status = new Status();
+      StringBuilder errorMessages = new StringBuilder();
       
       if(corpora == null)
       {
@@ -77,8 +85,10 @@ public class ImportDialog extends javax.swing.JDialog
         }
         catch (Exception ex)
         {
-          log.error("could not import corpus", ex);
-          return ex.getMessage();
+          status.ok = false;
+          status.ex = ex;
+          status.errorMessage = ex.getMessage();
+          return status;
         }
       }
       else
@@ -122,14 +132,22 @@ public class ImportDialog extends javax.swing.JDialog
             catch (Exception ex)
             {
               log.error("could not import corpus", ex);
-              result.append("[").append(path).append("]\n");
-              result.append(ex.getMessage()).append(path).append("\n\n");
+              errorMessages.append("[").append(path).append("]\n");
+              errorMessages.append(ex.getMessage()).append(path).append("\n\n");
             }
           }
           i++;
         }
       }
-      return result.toString();
+      
+      if(errorMessages.length() > 0)
+      {
+        status.ok = false;
+        status.errorMessage = errorMessages.toString();
+        return status;
+      }
+      
+      return status;
     }
 
     @Override
@@ -145,7 +163,8 @@ public class ImportDialog extends javax.swing.JDialog
       
       try
       {
-        if ("".equals(this.get()))
+        Status status = this.get();
+        if (status.ok)
         {
           JOptionPane.showMessageDialog(null,
             "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
@@ -153,8 +172,7 @@ public class ImportDialog extends javax.swing.JDialog
         }
         else
         {
-          new ExceptionDialog(new Exception(
-            "Import failed:\n" + this.get())).setVisible(true);
+          new ExceptionDialog( status.ex, "Import failed").setVisible(true);
           setVisible(false);
         }
       }
@@ -165,7 +183,7 @@ public class ImportDialog extends javax.swing.JDialog
     }
   }
   private CorpusAdministration corpusAdministration;
-  private SwingWorker<String, Void> worker;
+  private SwingWorker<Status, Void> worker;
   private boolean isImporting;
   private List<Map<String, Object>> corpora;
 
