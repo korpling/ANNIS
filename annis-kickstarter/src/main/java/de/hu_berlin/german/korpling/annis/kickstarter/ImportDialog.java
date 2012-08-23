@@ -107,9 +107,9 @@ public class ImportDialog extends javax.swing.JDialog
               @Override
               public void run()
               {
-                pbCorpus.setString("" + finalI + "/" + corpora.size());
                 lblCurrentCorpus.setText("import " 
-                  + StringUtils.abbreviateMiddle(path, "...", 30));
+                  + StringUtils.abbreviateMiddle(path, "...", 40)
+                  + " [" + (finalI+1) + "/" + corpora.size() + "]");
                 pbCorpus.setValue(finalI);
               }
             });
