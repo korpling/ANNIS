@@ -178,7 +178,7 @@ public class ListDialog extends javax.swing.JDialog
     {
       tableModel = new DefaultTableModel(new String[]
         {
-          "name", "id", "node", "rank", "text", "tokens", "roots", "depth"
+          "name", "id", "text", "tokens", "source_path"
         }, 0);
       tableList.setModel(tableModel);
 
