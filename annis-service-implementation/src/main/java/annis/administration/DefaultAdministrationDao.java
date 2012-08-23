@@ -218,7 +218,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 //    if (true) return;
     
     computeLevel();
-    computeCorpusStatistics();
+    computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
 
     applyConstraints();
@@ -227,7 +227,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     insertCorpus();
 
     computeCorpusPath(corpusID);
-    addCorpusSourcePath(path, corpusID);
 
     createAnnotations(corpusID);
 
@@ -456,10 +455,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("level_coverage.sql");
   }
 
-  void computeCorpusStatistics()
+  void computeCorpusStatistics(String path)
   {
     log.info("computing statistics for top-level corpus");
-    executeSqlFromScript("corpus_stats.sql");
+    MapSqlParameterSource args = makeArgs().addValue(":path", path);
+    executeSqlFromScript("corpus_stats.sql", args);
   }
 
   void updateCorpusStatistic(long corpusID)
@@ -475,15 +475,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("computing path information of the corpus tree for corpus with ID "
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
-  }
-  
-  void addCorpusSourcePath(String sourcePath, long id)
-  {
-    log.info("setting the source path for the corpus");
-    MapSqlParameterSource args = new MapSqlParameterSource();
-    args.addValue(":path", sourcePath);
-    args.addValue(":id", id);
-    executeSqlFromScript("insert_source_corpus_name.sql", args);
   }
 
   protected void  adjustRankPrePost()

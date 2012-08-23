@@ -18,5 +18,10 @@ CREATE TABLE _corpus_stats AS SELECT
     (SELECT max(post) + 1 FROM _corpus) AS max_corpus_post,
 
     -- max text id
-    (SELECT max(id) + 1 FROM _text) AS max_text_id  
+    (SELECT max(id) + 1 FROM _text) AS max_text_id,
+
+    NULL::bigint AS max_component_id,
+    NULL::bigint AS max_node_id,
+
+    ':path' AS source_path
 ;
