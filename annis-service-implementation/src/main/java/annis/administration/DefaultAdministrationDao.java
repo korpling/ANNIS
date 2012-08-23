@@ -507,9 +507,21 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   void computeCorpusStatistics(String path)
-  {
+  { 
+    
+    File f = new File(path);
+    String absolutePath = path;
+    try
+    {
+      absolutePath = f.getCanonicalPath();
+    }
+    catch (IOException ex)
+    {
+      log.error("Something went really wrong when calculating the canonical path", ex);
+    }
+    
     log.info("computing statistics for top-level corpus");
-    MapSqlParameterSource args = makeArgs().addValue(":path", path);
+    MapSqlParameterSource args = makeArgs().addValue(":path", absolutePath);
     executeSqlFromScript("corpus_stats.sql", args);
   }
 
