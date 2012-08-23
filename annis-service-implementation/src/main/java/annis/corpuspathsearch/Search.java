@@ -26,11 +26,13 @@ public class Search
 
   private List<File> rootPaths;
   private Map<String, File> corpusPaths;
+  private boolean wasSearched;
 
   public Search(List<File> rootPaths)
   {
     this.rootPaths = rootPaths;
     this.corpusPaths = new TreeMap<String, File>();
+    this.wasSearched = false;
   }
 
   public void startSearch()
@@ -40,6 +42,7 @@ public class Search
     {
       searchPath(f);
     }
+    wasSearched = true;
   }
 
   private void searchPath(File path)
@@ -102,6 +105,16 @@ public class Search
     return corpusPaths;
   }
 
+  public boolean isWasSearched()
+  {
+    return wasSearched;
+  }
+
+  public void setWasSearched(boolean wasSearched)
+  {
+    this.wasSearched = wasSearched;
+  }
+  
   @Override
   public String toString()
   {

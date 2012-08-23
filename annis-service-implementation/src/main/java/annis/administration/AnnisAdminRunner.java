@@ -188,7 +188,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     if(migrateCorpora && existingCorpora.size() > 0)
     {
       String corpusRoot = cmdLine.getOptionValue("migratecorpora");
-      Map<String, File> corpusPaths = null;
+      
+      Search search = null;
       if(corpusRoot != null && !"".equals(corpusRoot))
       {
         File rootCorpusPath = new File(corpusRoot);
@@ -197,14 +198,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
           LinkedList<File> l = new LinkedList<File>();
           l.add(rootCorpusPath);
           
-          Search search = new Search(l);
-          log.info("Searching for corpora in corpus root directory");
-          search.startSearch();
-          corpusPaths = search.getCorpusPaths();
+          search = new Search(l);
         }
       }
       
-      if(corpusPaths == null)
+      if(search == null)
       {
         log.error("You have to give a valid corpus root directory as argument to migratecorpora");
       }
@@ -214,11 +212,21 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
         {
           String migratePath = c.getSourcePath();
          
+          if(migratePath == null)
+          {
+            if(!search.isWasSearched())
+            {
+              log.info("Searching for corpora at given directory, "
+                + "this can take some minutes");
+              search.startSearch();
+            }
+          }
+          
           // used the searched corpus path of corpus path was not part of the
           // corpus description in the database
-          if(migratePath == null && corpusPaths.containsKey(c.getName()))
+          if(migratePath == null && search.getCorpusPaths().containsKey(c.getName()))
           {
-            migratePath = corpusPaths.get(c.getName()).getParentFile()
+            migratePath = search.getCorpusPaths().get(c.getName()).getParentFile()
               .getAbsolutePath();
           }
           
