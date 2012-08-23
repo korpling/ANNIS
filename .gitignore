@@ -12,3 +12,4 @@
 /annis-service-implementation/target/
 /annis-service-implementation/.settings/
 /annis-kickstarter/target/
+/annis-service-implementation/src/main/antlr3/annis/ql/output/
