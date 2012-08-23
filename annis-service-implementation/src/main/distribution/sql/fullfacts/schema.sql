@@ -1,4 +1,11 @@
 -- (modified) source tables
+CREATE TABLE repository_metadata
+(
+  name varchar NOT NULL PRIMARY KEY,
+  "value" varchar NOT NULL
+);
+
+
 CREATE TABLE corpus
 (
   id         bigint PRIMARY KEY,

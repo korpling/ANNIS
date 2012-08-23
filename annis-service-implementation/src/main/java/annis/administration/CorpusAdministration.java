@@ -122,6 +122,7 @@ public class CorpusAdministration
       log.info("Importing corpus from: " + path);
       administrationDao.importCorpus(path);
       log.info("Finished import from: " + path);
+      
     }
   }
 
