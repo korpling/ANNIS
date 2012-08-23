@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import annis.exceptions.AnnisException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -47,6 +48,9 @@ public interface AdministrationDao
   public List<Map<String, Object>> listTableStats();
   public List<String> listUsedIndexes();
   public List<String> listUnusedIndexes();
+  
+  public String getDatabaseSchemaVersion();
+  public boolean checkDatabaseSchemaVersion() throws AnnisException;
   
   public boolean executeSqlFromScript(String script);
   public boolean executeSqlFromScript(String script, MapSqlParameterSource args);

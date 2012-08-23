@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import annis.exceptions.AnnisException;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -66,6 +67,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   // save the datasource to manually retrieve connections (needed for bulk-import)
   private DataSource dataSource;
   private boolean temporaryStagingArea;
+  
+  private String schemaVersion;
   
   /**
    * The name of the file and the relation containing the resolver information.
@@ -172,6 +175,11 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
+    
+   jdbcTemplate.getJdbcOperations().execute("INSERT INTO repository_metadata " 
+     + "VALUES ('schema-version', '" 
+     + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
+    
   }
   
   @Override
@@ -192,9 +200,51 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
+  @Transactional(readOnly=true)
+  public String getDatabaseSchemaVersion()
+  {
+    try
+    {
+      Map<String, String> map = new HashMap<String, String>();
+      
+      List<Map<String, Object>> result = jdbcTemplate.queryForList(
+        "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'", 
+        map);
+      
+      String schema = 
+        result.size() > 0 ? (String) result.get(0).get("value") : "";
+      return schema;
+    }
+    catch(DataAccessException ex)
+    {
+      String error = "Wrong database schema (too old to get the exact number), "
+        + "please initialize the database.";
+      log.error(error);
+    }
+    return "";
+  }
+  
+  @Override
+  public boolean checkDatabaseSchemaVersion() throws AnnisException
+  {
+    String dbSchemaVersion = getDatabaseSchemaVersion();
+    if(getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(dbSchemaVersion))
+    {
+      String error = "Wrong database schema \"" + dbSchemaVersion + "\", please initialize the database.";
+      log.error(error);
+      throw new AnnisException(error);
+    }
+    return true;
+  }
+
+  @Override
   @Transactional(readOnly = false)
   public void importCorpus(String path)
   {
+    
+    // check schema version first
+    checkDatabaseSchemaVersion();
+    
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
     
@@ -218,7 +268,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 //    if (true) return;
     
     computeLevel();
-    computeCorpusStatistics();
+    computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
 
     applyConstraints();
@@ -241,6 +291,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       dropStagingArea();
     }
     analyzeFacts(corpusID);
+    
   }
 
   ///// Subtasks of importing a corpus
@@ -363,6 +414,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("computing top-level corpus");
     executeSqlFromScript("toplevel_corpus.sql");
   }
+  
 
   void importBinaryData(String path)
   {
@@ -454,10 +506,23 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("level_coverage.sql");
   }
 
-  void computeCorpusStatistics()
-  {
+  void computeCorpusStatistics(String path)
+  { 
+    
+    File f = new File(path);
+    String absolutePath = path;
+    try
+    {
+      absolutePath = f.getCanonicalPath();
+    }
+    catch (IOException ex)
+    {
+      log.error("Something went really wrong when calculating the canonical path", ex);
+    }
+    
     log.info("computing statistics for top-level corpus");
-    executeSqlFromScript("corpus_stats.sql");
+    MapSqlParameterSource args = makeArgs().addValue(":path", absolutePath);
+    executeSqlFromScript("corpus_stats.sql", args);
   }
 
   void updateCorpusStatistic(long corpusID)
@@ -997,5 +1062,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.temporaryStagingArea = temporaryStagingArea;
   }
+
+  public String getSchemaVersion()
+  {
+    return schemaVersion;
+  }
+
+  public void setSchemaVersion(String schemaVersion)
+  {
+    this.schemaVersion = schemaVersion;
+  }
+  
+  
   
 }

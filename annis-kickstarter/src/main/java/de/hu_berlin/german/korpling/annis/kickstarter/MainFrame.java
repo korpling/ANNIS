@@ -31,8 +31,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -81,7 +79,7 @@ public class MainFrame extends javax.swing.JFrame
         pbStart.setValue(100);
         if ("".equals(this.get()))
         {
-          lblStatusService.setText("ANNIS started");
+          lblStatusService.setText("<html>ANNIS started</html>");
           lblStatusService.setIcon(
             new javax.swing.ImageIcon(
             getClass().getResource(
@@ -91,7 +89,7 @@ public class MainFrame extends javax.swing.JFrame
         }
         else
         {
-          lblStatusService.setText("ANNIS start failed: " + this.get());
+          lblStatusService.setText("<html>ANNIS start failed: " + this.get() + "</html>");
           lblStatusService.setIcon(
             new javax.swing.ImageIcon(
             getClass().getResource(
@@ -163,7 +161,7 @@ public class MainFrame extends javax.swing.JFrame
         if (serviceWorker.getProgress() == 1)
         {
           pbStart.setIndeterminate(true);
-          lblStatusService.setText("Starting ANNIS...");
+          lblStatusService.setText("<html>Starting ANNIS...</html>");
           lblStatusService.setIcon(
             new javax.swing.ImageIcon(
             getClass().getResource(
@@ -240,7 +238,7 @@ public class MainFrame extends javax.swing.JFrame
         lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
         lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
-        lblStatusService.setText("Annis stopped");
+        lblStatusService.setText("<html>Annis stopped</html>");
         lblStatusService.setName("lblStatusService"); // NOI18N
 
         btLaunch.setForeground(java.awt.Color.lightGray);
@@ -302,7 +300,7 @@ public class MainFrame extends javax.swing.JFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btList)
                 .addGap(18, 18, 18)
-                .addComponent(lblStatusService)
+                .addComponent(lblStatusService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pbStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -409,6 +407,12 @@ public class MainFrame extends javax.swing.JFrame
 
   private boolean isInitialized()
   {
+    if(corpusAdministration.checkDatabaseSchemaVersion() == false)
+    {
+      btInit.setText("Init to update your database");
+      return false;
+    }
+      
     // hack, just try to list corpora
     try
     {

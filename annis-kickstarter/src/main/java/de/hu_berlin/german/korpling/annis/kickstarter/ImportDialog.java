@@ -16,17 +16,22 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
+import annis.exceptions.AnnisException;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
-import java.io.File;
-import java.io.Serializable;
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,24 +44,110 @@ public class ImportDialog extends javax.swing.JDialog
 
   private static final org.slf4j.Logger log =
     LoggerFactory.getLogger(ImportDialog.class);
+  
+  private File confFile;
+  private Properties confProps;
 
-  private class ImportDialogWorker extends SwingWorker<String, Void> implements
+  private class Status
+  {
+    public boolean ok = true;
+    public String errorMessage = "";
+    public Exception ex = new Exception();
+  }
+  
+  private class ImportDialogWorker extends SwingWorker<Status, Void> implements
     Serializable
   {
 
     @Override
-    protected String doInBackground() throws Exception
+    protected Status doInBackground() throws Exception
     {
-      try
+      Status status = new Status();
+      StringBuilder errorMessages = new StringBuilder();
+      
+      if(corpora == null)
       {
-        corpusAdministration.importCorpora(txtInputDir.getText());
+        try
+        {
+          SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run()
+            {
+              lblCurrentCorpus.setText("import " + StringUtils.abbreviateMiddle(
+                txtInputDir.getText(), "...", 50));
+              pbCorpus.setMaximum(1);
+              pbCorpus.setMinimum(0);
+              pbCorpus.setValue(0);
+            }
+          });
+          corpusAdministration.importCorpora(txtInputDir.getText());
+        }
+        catch (Exception ex)
+        {
+          status.ok = false;
+          status.ex = ex;
+          status.errorMessage = ex.getMessage();
+          return status;
+        }
       }
-      catch (Exception ex)
+      else
       {
-        ex.printStackTrace();
-        return ex.getMessage();
+        SwingUtilities.invokeLater(new Runnable() {
+
+          @Override
+          public void run()
+          {
+            pbCorpus.setMaximum(corpora.size());
+            pbCorpus.setMinimum(0);
+            pbCorpus.setValue(0);
+          }
+        });
+        
+        int i=0;
+        for(Map<String, Object> corpus : corpora)
+        {
+          if(corpus.containsKey("source_path"))
+          {
+            final String path = (String) corpus.get("source_path");
+           
+            final int finalI = i;
+            SwingUtilities.invokeLater(new Runnable() {
+
+              @Override
+              public void run()
+              {
+                lblCurrentCorpus.setText("import " 
+                  + StringUtils.abbreviateMiddle(path, "...", 40)
+                  + " [" + (finalI+1) + "/" + corpora.size() + "]");
+                pbCorpus.setValue(finalI);
+              }
+            });
+            
+            
+            try
+            {
+              corpusAdministration.importCorpora(path);
+            }
+            catch (Exception ex)
+            {
+              log.error("could not import corpus", ex);
+              errorMessages.append("[").append(path).append("]\n");
+              errorMessages.append(ex.getMessage()).append(path).append("\n\n");
+            }
+          }
+          i++;
+        }
       }
-      return "";
+      
+      if(errorMessages.length() > 0)
+      {
+        status.ok = false;
+        status.errorMessage = errorMessages.toString();
+        return status;
+      }
+      
+      return status;
     }
 
     @Override
@@ -66,19 +157,22 @@ public class ImportDialog extends javax.swing.JDialog
       btOk.setEnabled(true);
       btSearchInputDir.setEnabled(true);
       txtInputDir.setEnabled(true);
+      lblCurrentCorpus.setText("");
+      pbCorpus.setValue(pbCorpus.getMaximum());
       pbImport.setIndeterminate(false);
+      
       try
       {
-        if ("".equals(this.get()))
+        Status status = this.get();
+        if (status.ok)
         {
           JOptionPane.showMessageDialog(null,
-            "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);
+            "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
           setVisible(false);
         }
         else
         {
-          new ExceptionDialog(new Exception(
-            "Import failed: " + this.get())).setVisible(true);
+          new ExceptionDialog( status.ex, "Import failed").setVisible(true);
           setVisible(false);
         }
       }
@@ -89,30 +183,94 @@ public class ImportDialog extends javax.swing.JDialog
     }
   }
   private CorpusAdministration corpusAdministration;
-  private SwingWorker<String, Void> worker;
+  private SwingWorker<Status, Void> worker;
   private boolean isImporting;
+  private List<Map<String, Object>> corpora;
+
+  public ImportDialog(java.awt.Frame parent, boolean modal,
+    CorpusAdministration corpusAdmin)
+  {
+    this(parent, modal, corpusAdmin, null);
+  }
 
   /**
    * Creates new form ImportDialog
    */
   public ImportDialog(java.awt.Frame parent, boolean modal,
-    CorpusAdministration corpusAdmin)
+    CorpusAdministration corpusAdmin, List<Map<String, Object>> corpora)
   {
     super(parent, modal);
 
     this.corpusAdministration = corpusAdmin;
+    this.corpora = corpora;
 
+    confProps = new Properties();
+    confFile = new File(System.getProperty("user.home") 
+      + "/.annis/kickstart.properties");
+    try
+    {
+      if(!confFile.exists())
+      {
+        confFile.getParentFile().mkdirs();
+        confFile.createNewFile();
+      }
+    }
+    catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    
     initComponents();
 
+    loadProperties();
+    
     getRootPane().setDefaultButton(btOk);
 
     isImporting = false;
     worker = new ImportDialogWorker();
 
     addAppender();
+    
+    // directly start import if we were called from outside
+    if(this.corpora != null)
+    {
+      startImport();
+    }
 
   }
 
+  private void storeProperties()
+  {
+    confProps.put("last-directory", txtInputDir.getText());
+    try
+    {
+      confProps.store(new FileOutputStream(confFile), "");
+    }
+    catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+  }
+  
+  private void loadProperties()
+  {
+    try
+    {
+      confProps.load(new FileInputStream(confFile));
+      String lastDirectory = confProps.getProperty("last-directory");
+      if(lastDirectory != null)
+      {
+        txtInputDir.setText(lastDirectory);
+      }
+    
+    }
+    catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    
+  }
+  
   private void addAppender()
   {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -138,6 +296,19 @@ public class ImportDialog extends javax.swing.JDialog
     appender.start();
   }
 
+  private void startImport()
+  {
+    btOk.setEnabled(false);
+    btSearchInputDir.setEnabled(false);
+    txtInputDir.setEnabled(false);
+
+    pbImport.setIndeterminate(true);
+
+    isImporting = true;
+    worker.execute();
+
+  }
+
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,6 +327,8 @@ public class ImportDialog extends javax.swing.JDialog
         pbImport = new javax.swing.JProgressBar();
         jLabel2 = new javax.swing.JLabel();
         lblStatus = new javax.swing.JLabel();
+        pbCorpus = new javax.swing.JProgressBar();
+        lblCurrentCorpus = new javax.swing.JLabel();
 
         fileChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
@@ -190,28 +363,37 @@ public class ImportDialog extends javax.swing.JDialog
 
         jLabel2.setText("status:");
 
+        lblStatus.setText("...");
+
+        lblCurrentCorpus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCurrentCorpus.setText("Please select corpus for import!");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pbImport, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
+                    .addComponent(pbImport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtInputDir, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                        .addComponent(txtInputDir, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btSearchInputDir, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 285, Short.MAX_VALUE)
-                        .addComponent(btOk, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)))
+                        .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblCurrentCorpus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pbCorpus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btOk, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -223,12 +405,16 @@ public class ImportDialog extends javax.swing.JDialog
                     .addComponent(txtInputDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btSearchInputDir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(pbCorpus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblCurrentCorpus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(7, 7, 7)
                 .addComponent(pbImport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btCancel)
                     .addComponent(btOk))
@@ -251,15 +437,7 @@ public class ImportDialog extends javax.swing.JDialog
     private void btOkActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btOkActionPerformed
     {//GEN-HEADEREND:event_btOkActionPerformed
 
-      btOk.setEnabled(false);
-      btSearchInputDir.setEnabled(false);
-      txtInputDir.setEnabled(false);
-
-      pbImport.setIndeterminate(true);
-
-      isImporting = true;
-      worker.execute();
-
+      startImport();
     }//GEN-LAST:event_btOkActionPerformed
 
     private void btSearchInputDirActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btSearchInputDirActionPerformed
@@ -278,6 +456,7 @@ public class ImportDialog extends javax.swing.JDialog
       {
         File f = fileChooser.getSelectedFile();
         txtInputDir.setText(f.getAbsolutePath());
+        storeProperties();
       }
 
     }//GEN-LAST:event_btSearchInputDirActionPerformed
@@ -288,7 +467,9 @@ public class ImportDialog extends javax.swing.JDialog
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblCurrentCorpus;
     private javax.swing.JLabel lblStatus;
+    private javax.swing.JProgressBar pbCorpus;
     private javax.swing.JProgressBar pbImport;
     private javax.swing.JTextField txtInputDir;
     // End of variables declaration//GEN-END:variables
