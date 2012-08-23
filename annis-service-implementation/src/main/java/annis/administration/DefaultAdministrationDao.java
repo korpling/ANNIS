@@ -227,6 +227,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     insertCorpus();
 
     computeCorpusPath(corpusID);
+    addCorpusSourcePath(path, corpusID);
 
     createAnnotations(corpusID);
 
@@ -363,6 +364,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("computing top-level corpus");
     executeSqlFromScript("toplevel_corpus.sql");
   }
+  
 
   void importBinaryData(String path)
   {
@@ -473,6 +475,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("computing path information of the corpus tree for corpus with ID "
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
+  }
+  
+  void addCorpusSourcePath(String sourcePath, long id)
+  {
+    log.info("setting the source path for the corpus");
+    MapSqlParameterSource args = new MapSqlParameterSource();
+    args.addValue(":path", sourcePath);
+    args.addValue(":id", id);
+    executeSqlFromScript("insert_source_corpus_name.sql", args);
   }
 
   protected void  adjustRankPrePost()

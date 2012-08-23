@@ -8,7 +8,8 @@ CREATE TABLE corpus
   pre        bigint NOT NULL UNIQUE,
   post       bigint NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
-  path_name  varchar[]
+  path_name  varchar, 
+  source_path varchar -- original path to the folder containing the relANNIS sources
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
