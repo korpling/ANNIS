@@ -51,8 +51,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private static final Logger log = LoggerFactory.getLogger(AnnisAdminRunner.class);
   // API for corpus administration
   private CorpusAdministration corpusAdministration;
-  private AnnisDao annisDao;
-
+  
   public static void main(String[] args)
   {
     // get Runner from Spring
@@ -203,12 +202,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     String superPassword = cmdLine.getOptionValue("superpassword");
 
     boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-    List<AnnisCorpus> existingCorpora = new LinkedList<AnnisCorpus>();
+    List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
     
     if (migrateCorpora)
     {
       // get corpus list
-      existingCorpora = annisDao.listCorpora();
+      existingCorpora = corpusAdministration.listCorpusStats();
     }
 
     corpusAdministration.initializeDatabase(host, port, database, user, password, defaultDatabase, superUser, superPassword);
@@ -230,9 +229,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         }
       }
 
-      for (AnnisCorpus c : existingCorpora)
+      for (Map<String, Object> corpusStat : existingCorpora)
       {
-        String migratePath = c.getSourcePath();
+        String corpusName = (String) corpusStat.get("name");
+        String migratePath = (String) corpusStat.get("source_path");
 
         if (migratePath == null)
         {
@@ -251,9 +251,9 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           
           // used the searched corpus path of corpus path was not part of the
           // corpus description in the database
-          if(search.getCorpusPaths().containsKey(c.getName()))
+          if(search.getCorpusPaths().containsKey(corpusName))
           {
-            migratePath = search.getCorpusPaths().get(c.getName()).getParentFile().getAbsolutePath();
+            migratePath = search.getCorpusPaths().get(corpusName).getParentFile().getAbsolutePath();
           }
           
         } // end if migratePath == null
@@ -261,12 +261,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
         if (migratePath == null || !(new File(migratePath).isDirectory()))
         {
-          log.warn("Unable to migrate \"" + c.getName() + "\" because the system "
+          log.warn("Unable to migrate \"" + corpusName + "\" because the system "
             + "can not find a valid source directory where it is located.");
         }
         else
         {
-          log.info("migrating corpus " + c.getName());
+          log.info("migrating corpus " + corpusName);
           corpusAdministration.importCorpora(migratePath);
         }
       }
@@ -453,15 +453,5 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   public void setCorpusAdministration(CorpusAdministration administration)
   {
     this.corpusAdministration = administration;
-  }
-
-  public AnnisDao getAnnisDao()
-  {
-    return annisDao;
-  }
-
-  public void setAnnisDao(AnnisDao annisDao)
-  {
-    this.annisDao = annisDao;
   }
 }

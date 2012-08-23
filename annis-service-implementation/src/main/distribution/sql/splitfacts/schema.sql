@@ -138,7 +138,8 @@ CREATE VIEW corpus_info AS SELECT
   name,
   id, 
   text,
-  tokens
+  tokens,
+  source_path
 FROM 
   corpus_stats;
   
