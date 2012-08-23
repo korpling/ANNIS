@@ -2,13 +2,16 @@ grammar Aql;
 
 options {
 	output=AST;
+	backtrack=true;
 }
 
 @parser::header {package annis.ql;}
 @lexer::header {package annis.ql;}
 
 start 
-	: (expr)+;
+	: andExpr
+	| orExpr
+	;
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
@@ -41,17 +44,24 @@ text_spec
 	;
 
 qName
-	: namespace+=ID ':' name+=ID -> ^($name $namespace)
+	: namespace=ID ':' name=ID -> ^($name $namespace)
 	| ID^
 	;
+
+andExpr
+	: (expr '&')+ expr -> ^('&' expr+ expr)
+	;
+	
+orExpr
+	: (expr '|')+ expr -> ^('&' expr+ expr)
+	;	
 
 expr 
 	: qName
 	|	qName '=' text_spec -> ^('=' qName text_spec)
 	| qName '!=' text_spec -> ^('=' qName text_spec)
-	|	'(' expr+ ')' -> ^('(' expr+)
-	|	'&'^ expr
-	| '|'^ expr
+	|	'('! andExpr^ ')'!
+	|	'('! orExpr^ ')'!
 	;
 	
 	
