@@ -26,6 +26,7 @@ public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus>
   private long id;
   private String name;
   private int textCount, tokenCount;
+  private String sourcePath;
 
   public AnnisCorpus(long id, String name, int textCount, int tokenCount)
   {
@@ -80,6 +81,17 @@ public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus>
   {
     this.tokenCount = tokenCount;
   }
+
+  public String getSourcePath()
+  {
+    return sourcePath;
+  }
+
+  public void setSourcePath(String sourcePath)
+  {
+    this.sourcePath = sourcePath;
+  }
+  
 
   @Override
   public String toString()

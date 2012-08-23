@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
@@ -36,7 +35,13 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
+import annis.corpuspathsearch.Search;
+import annis.dao.AnnisDao;
+import annis.service.objects.AnnisCorpus;
 import annis.utils.Utils;
+import java.io.File;
+import java.util.LinkedList;
+import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +51,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
 	// API for corpus administration
 	private CorpusAdministration corpusAdministration;
+  private AnnisDao annisDao;
 	
 	public static void main(String[] args) {
 		// get Runner from Spring
@@ -135,16 +141,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 		}
 	}
 	
-	private String getValue(Options options, String option) {
-		return options.getOption(option).getValue();
-	}
-
-	private String getDefaultValue(Options options, String option,
-			String defaultValue) {
-		return options.getOption(option).getValue(defaultValue);
-	}
-	
-	private void doInit(List<String> commandArgs) {
+	private void doInit(List<String> commandArgs) 
+  {
 		Options options = new OptionBuilder()
 			.addParameter("h", "host", "database server host (defaults to localhost)")
 			.addLongParameter("port", "database server port")
@@ -154,24 +152,90 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 			.addParameter("D", "defaultdb", "name of the PostgreSQL default database (defaults to \"postgres\")")
 			.addParameter("U", "superuser", "name of a PostgreSQL super user (defaults to \"postgres\")")
 			.addParameter("P", "superpassword", "password of a PostgreSQL super user")
+      .addParameter("m", "migratecorpora", 
+        "Try to import the already existing corpora into the database. "
+        + "You can set the root directory for corpus sources as an argument.")
 			.createOptions();
 		CommandLineParser parser = new PosixParser();
+    CommandLine cmdLine = null;
 		try {
-			parser.parse(options, commandArgs.toArray(new String[] { }));
+			cmdLine = parser.parse(options, commandArgs.toArray(new String[] { }));
+      
 		} catch (ParseException e) {
 			throw new UsageException(e.getMessage());
 		}
 		
-		String host = getDefaultValue(options, "host", "localhost");
-		String port = getDefaultValue(options, "port", "5432");
-		String database = getValue(options, "database");
-		String user = getValue(options, "user");
-		String password = getValue(options, "password");
-		String defaultDatabase = getDefaultValue(options, "defaultdb", "postgres");
-		String superUser = getDefaultValue(options, "superuser", "postgres");
-		String superPassword = getValue(options, "superpassword");
-		
+		String host = cmdLine.getOptionValue("host", "localhost");
+		String port = cmdLine.getOptionValue("port", "5432");
+		String database = cmdLine.getOptionValue("database");
+		String user = cmdLine.getOptionValue("user");
+		String password = cmdLine.getOptionValue("password");
+		String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
+		String superUser = cmdLine.getOptionValue("superuser", "postgres");
+		String superPassword = cmdLine.getOptionValue("superpassword");
+   
+    boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
+		List<AnnisCorpus> existingCorpora = new LinkedList<AnnisCorpus>();
+    
+    if(migrateCorpora)
+    {
+      // get corpus list
+      existingCorpora = annisDao.listCorpora();
+    }
+    
 		corpusAdministration.initializeDatabase(host, port, database, user, password, defaultDatabase, superUser, superPassword);
+    
+    if(migrateCorpora && existingCorpora.size() > 0)
+    {
+      String corpusRoot = cmdLine.getOptionValue("migratecorpora");
+      Map<String, File> corpusPaths = null;
+      if(corpusRoot != null && !"".equals(corpusRoot))
+      {
+        File rootCorpusPath = new File(corpusRoot);
+        if(rootCorpusPath.isDirectory())
+        {
+          LinkedList<File> l = new LinkedList<File>();
+          l.add(rootCorpusPath);
+          
+          Search search = new Search(l);
+          log.info("Searching for corpora in corpus root directory");
+          search.startSearch();
+          corpusPaths = search.getCorpusPaths();
+        }
+      }
+      
+      if(corpusPaths == null)
+      {
+        log.error("You have to give a valid corpus root directory as argument to migratecorpora");
+      }
+      else
+      {
+        for(AnnisCorpus c : existingCorpora)
+        {
+          String migratePath = c.getSourcePath();
+         
+          // used the searched corpus path of corpus path was not part of the
+          // corpus description in the database
+          if(migratePath == null && corpusPaths.containsKey(c.getName()))
+          {
+            migratePath = corpusPaths.get(c.getName()).getParentFile()
+              .getAbsolutePath();
+          }
+          
+          if(migratePath == null)
+          {
+            log.warn("Cannot migrate \"" + c.getName() + "\" because the system "
+              + "can not find a valid source directory where it is located.");
+          }
+          else
+          {
+            log.info("migrating corpus " + c.getName());
+            corpusAdministration.importCorpora(migratePath);
+          }
+        }
+      }
+      
+    }
 	}
 
 	private void doImport(List<String> commandArgs) {
@@ -309,5 +373,17 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 	public void setCorpusAdministration(CorpusAdministration administration) {
 		this.corpusAdministration = administration;
 	}
+
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+  
+  
 
 }
