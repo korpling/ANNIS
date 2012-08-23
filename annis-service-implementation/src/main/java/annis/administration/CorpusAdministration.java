@@ -27,9 +27,9 @@ import org.postgresql.Driver;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.exceptions.AnnisException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  *
@@ -100,7 +100,7 @@ public class CorpusAdministration
     administrationDao.setDataSource(createDataSource(host, port, database,
       superUser, superPassword));
     administrationDao.setupDatabase();
- 
+
     // switch to new database as new user for the rest
     administrationDao.setDataSource(createDataSource(host, port, database,
       user, password));
@@ -122,8 +122,21 @@ public class CorpusAdministration
       log.info("Importing corpus from: " + path);
       administrationDao.importCorpus(path);
       log.info("Finished import from: " + path);
-      
+
     }
+  }
+
+  public boolean checkDatabaseSchemaVersion()
+  {
+    try
+    {
+      administrationDao.checkDatabaseSchemaVersion();
+    }
+    catch(AnnisException ex)
+    {
+      return false;
+    }
+    return true;
   }
 
   public void importCorpora(String... paths)
@@ -177,7 +190,6 @@ public class CorpusAdministration
   }
 
   ///// Getter / Setter
-
   public AdministrationDao getAdministrationDao()
   {
     return administrationDao;
@@ -187,5 +199,4 @@ public class CorpusAdministration
   {
     this.administrationDao = administrationDao;
   }
-  
 }

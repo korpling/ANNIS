@@ -34,20 +34,20 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pbInit" alignment="0" pref="485" max="32767" attributes="0"/>
+                  <Component id="pbInit" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtAdminUsername" pref="281" max="32767" attributes="0"/>
+                      <Component id="txtAdminUsername" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="txtAdminPassword" pref="276" max="32767" attributes="0"/>
+                      <Component id="txtAdminPassword" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="btCancel" min="-2" pref="105" max="-2" attributes="0"/>
-                      <EmptySpace pref="275" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="btOk" min="-2" pref="105" max="-2" attributes="0"/>
                   </Group>
                   <Component id="cbMigrate" alignment="0" max="32767" attributes="0"/>
@@ -124,8 +124,11 @@
     <Component class="javax.swing.JCheckBox" name="cbMigrate">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
-        <Property name="text" type="java.lang.String" value="migrate already imported corpora"/>
+        <Property name="text" type="java.lang.String" value="migrate already imported corpora (will take same time as re-import)"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbMigrateActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

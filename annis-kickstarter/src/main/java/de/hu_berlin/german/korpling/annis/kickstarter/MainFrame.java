@@ -31,8 +31,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -409,6 +407,12 @@ public class MainFrame extends javax.swing.JFrame
 
   private boolean isInitialized()
   {
+    if(corpusAdministration.checkDatabaseSchemaVersion() == false)
+    {
+      btInit.setText("Init to update your database");
+      return false;
+    }
+      
     // hack, just try to list corpora
     try
     {

@@ -200,11 +200,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly = false)
-  public void importCorpus(String path)
+  @Transactional(readOnly=true)
+  public String getDatabaseSchemaVersion()
   {
-    
-    // check schema version first
     try
     {
       Map<String, String> map = new HashMap<String, String>();
@@ -215,21 +213,37 @@ public class DefaultAdministrationDao implements AdministrationDao
       
       String schema = 
         result.size() > 0 ? (String) result.get(0).get("value") : "";
-      
-      if(getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(schema))
-      {
-        String error = "Wrong database schema \"" + schema + "\", please initialize the database.";
-        log.error(error);
-        throw new AnnisException(error);
-      }
+      return schema;
     }
     catch(DataAccessException ex)
     {
       String error = "Wrong database schema (too old to get the exact number), "
         + "please initialize the database.";
       log.error(error);
+    }
+    return "";
+  }
+  
+  @Override
+  public boolean checkDatabaseSchemaVersion() throws AnnisException
+  {
+    String dbSchemaVersion = getDatabaseSchemaVersion();
+    if(getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(dbSchemaVersion))
+    {
+      String error = "Wrong database schema \"" + dbSchemaVersion + "\", please initialize the database.";
+      log.error(error);
       throw new AnnisException(error);
     }
+    return true;
+  }
+
+  @Override
+  @Transactional(readOnly = false)
+  public void importCorpus(String path)
+  {
+    
+    // check schema version first
+    checkDatabaseSchemaVersion();
     
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
