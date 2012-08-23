@@ -177,7 +177,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript(dbLayout + "/schema.sql");
     
    jdbcTemplate.getJdbcOperations().execute("INSERT INTO repository_metadata " 
-     + "VALUES (\"schema-version\", '" 
+     + "VALUES ('schema-version', '" 
      + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
     
   }
