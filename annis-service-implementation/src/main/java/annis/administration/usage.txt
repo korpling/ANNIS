@@ -2,42 +2,45 @@ Annis Administration Utility
 ----------------------------
 
 usage: 
-	annis-admin init DATABASE OPTIONS
-	annis-admin import PATH [PATH ...]
-	annis-admin delete CORPUS_ID [CORPUS_ID ...]
-	annis-admin list
-	annis-admin stats
-	annis-admin indexes
+  annis-admin init DATABASE OPTIONS
+  annis-admin import PATH [PATH ...]
+  annis-admin delete CORPUS_ID [CORPUS_ID ...]
+  annis-admin list
+  annis-admin stats
+  annis-admin indexes
 
-* init:		Initialize a PostgreSQL database for Annis and 
-		update conf/database.properties
-	
-	Options:
-	
-	-d, --database		name of the Annis database (REQUIRED)
-	-u, --user		name of the Annis user (REQUIRED)
-	-p, --password		password of the Annis user (REQUIRED)
+* init:    Initialize a PostgreSQL database for Annis and 
+    update conf/database.properties
+  
+  Options:
+  
+  -d, --database    name of the Annis database (REQUIRED)
+  -u, --user    name of the Annis user (REQUIRED)
+  -p, --password    password of the Annis user (REQUIRED)
 
-	NOTE: The database and the user will be dropped if they exist.
+  NOTE: The database and the user will be dropped if they exist.
 
-	-h, --host		database server host
-				(defaults to localhost)
-	--port			database server port
+  -h, --host    database server host
+        (defaults to localhost)
+  --port      database server port
 
-	-D, --defaultdb		name of the PostgreSQL default database
-				(defaults to "postgres")
-	-U, --superuser		name of a PostgreSQL super user
-				(defaults to "postgres")
-	-P, --superpassword	password of the PostgreSQL super user
-		
-* import:	Import a list of corpora.  
-		Specify the path to one or more corpora as arguments.
+  -D, --defaultdb    name of the PostgreSQL default database
+        (defaults to "postgres")
+  -U, --superuser    name of a PostgreSQL super user
+        (defaults to "postgres")
+  -P, --superpassword  password of the PostgreSQL super user
+  -m, --migratecorpora  Try to import the already existing corpora 
+                        into the database. You can set the root 
+                        directory for corpus sources as an argument.
+    
+* import:  Import a list of corpora.  
+    Specify the path to one or more corpora as arguments.
 
-* delete: 	Delete a list of corpora. 
-		Specify the IDs of one or more corpora as arguments.
+* delete:   Delete a list of corpora. 
+    Specify the IDs of one or more corpora as arguments.
 
-* list:		List all top-level corpora.
+* list:    List all top-level corpora.
 
-* stats:	Count entries in tables.
+* stats:  Count entries in tables.
 
-* indexes:	Show definitions of used and unused indexes.
+* indexes:  Show definitions of used and unused indexes.

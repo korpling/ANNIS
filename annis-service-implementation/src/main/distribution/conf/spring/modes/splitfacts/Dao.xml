@@ -28,6 +28,7 @@
 
   <!-- exported Database API for administration tasks -->
   <bean id="administrationDao" class="annis.administration.SfAdministrationDao" parent="administrationDaoBase" lazy-init="true">
+    <property name="schemaVersion" value="3.0.0-beta2-splitfacts"/>
   </bean>
 
   <!-- END EXPORTS -->
