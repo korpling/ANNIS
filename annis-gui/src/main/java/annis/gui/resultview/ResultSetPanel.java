@@ -50,7 +50,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultSetPanel.class);
-  
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
@@ -83,7 +82,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
 
-    resultPanelList = 
+    resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
     cacheResolver =
       Collections.synchronizedMap(
@@ -210,14 +209,12 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (String ns : nodeLayers)
     {
       resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns,
-        ElementType.node));
+        getSRootCorpus().get(0).getSName(), ns, ElementType.node));
     }
     for (String ns : edgeLayers)
     {
       resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns,
-        ElementType.edge));
+        getSRootCorpus().get(0).getSName(), ns, ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique
@@ -269,7 +266,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
     Arrays.sort(visArray, new Comparator<ResolverEntry>()
     {
-
       @Override
       public int compare(ResolverEntry o1, ResolverEntry o2)
       {
@@ -339,15 +335,15 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       // load result asynchronous
       SaltProject p = null;
       int tries = 0;
-      while(p == null && tries < 100)
+      while (p == null && tries < 100)
       {
         try
         {
           p = subgraphRes.get(SaltProject.class);
         }
-        catch(UniformInterfaceException ex)
+        catch (UniformInterfaceException ex)
         {
-          if(ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
+          if (ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
           {
             log.error(ex.getMessage(), ex);
             break;
@@ -362,23 +358,23 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             log.error(null, ex1);
           }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           log.error(ex.getMessage(), ex);
           break;
         }
         tries++;
       }
-      
+
       Validate.notNull(p);
-      
+
       SingleResultPanel result;
       // get synchronized again in order not to confuse Vaadin
       synchronized (getApplication())
       {
         segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
         tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
-        
+
         parent.updateSegmentationLayer(segmentationLayerSet);
         parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
@@ -392,7 +388,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         else
         {
-          log.warn("did not get a proper corpus graph for URI {0}", 
+          log.warn("did not get a proper corpus graph for URI {0}",
             subgraphRes.toString());
           result = null;
         }
@@ -442,8 +438,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         indicator.setEnabled(false);
         indicator.setVisible(false);
-        
-        for(SingleResultPanel panel : resultPanelList)
+
+        for (SingleResultPanel panel : resultPanelList)
         {
           layout.addComponent(panel);
         }
@@ -463,19 +459,19 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             SingleResultPanel panel = future.get();
             if (panel == null)
             {
-              synchronized(getApplication())
+              synchronized (getApplication())
               {
-                getWindow().showNotification("Could not get subgraph " + i, 
+                getWindow().showNotification("Could not get subgraph " + i,
                   Window.Notification.TYPE_TRAY_NOTIFICATION);
               }
             }
             else
             {
               // add the panel
-            
+
               panel.setWidth("100%");
               panel.setHeight("-1px");
-              
+
               resultPanelList.add(panel);
             }
           }
