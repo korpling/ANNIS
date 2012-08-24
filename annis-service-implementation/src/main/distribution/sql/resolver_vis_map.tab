@@ -1,6 +1,6 @@
-1	NULL	NULL	tiger	node	tree	tree	101	NULL
-2	NULL	NULL	exmaralda	node	grid	exmaralda	102	NULL
-3	NULL	NULL	mmax	node	grid	mmax	103	NULL
-4	NULL	NULL	mmax	edge	discourse	coref	104	NULL
-5	NULL	NULL	urml	node	grid	urml	105	NULL
-6	NULL	NULL	external	node	file	external file	106	NULL
+1	NULL	NULL	NULL	node	kwic	kwic	permanent	100	NULL
+2	NULL	NULL	tiger	node	tree	tree	no	101	NULL
+3	NULL	NULL	exmaralda	node	grid	exmaralda	no	102	NULL
+4	NULL	NULL	mmax	node	grid	mmax	no	103	NULL
+5	NULL	NULL	mmax	edge	discourse	coref	no	104	NULL
+6	NULL	NULL	urml	node	grid	urml	no	105	NULL

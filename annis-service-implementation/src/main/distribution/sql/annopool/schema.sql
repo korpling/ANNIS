@@ -161,6 +161,7 @@ CREATE TABLE resolver_vis_map
   "element"    varchar CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar NOT NULL,
   "display_name"   varchar NOT NULL,
+  "visibility"    varchar CHECK (visibility = 'permanent' OR visibility = 'yes' OR visibility = 'no'),
   "order" bigint default '0',
   "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              
@@ -172,6 +173,7 @@ COMMENT ON COLUMN resolver_vis_map.namespace IS 'the several layers of the corpu
 COMMENT ON COLUMN resolver_vis_map.element IS 'the type of the entry: node | edge';
 COMMENT ON COLUMN resolver_vis_map.vis_type IS 'the abstract type of visualization: tree, discourse, grid, ...';
 COMMENT ON COLUMN resolver_vis_map.display_name IS 'the name of the layer which shall be shown for display';
+COMMENT ON COLUMN resolver_vis_map.visibility IS 'defines the visibility state of a corpus: permanent: is always shown and can not be toggled, yes: is shown and can be toggled, no: is not shown can be toggled';
 COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
 COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';
 
