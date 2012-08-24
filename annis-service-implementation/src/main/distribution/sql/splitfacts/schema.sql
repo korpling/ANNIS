@@ -161,7 +161,7 @@ CREATE TABLE resolver_vis_map
   "element"    varchar CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar NOT NULL,
   "display_name"   varchar NOT NULL,
-  "visibility"    varchar CHECK (visibility = 'permanent' OR visibility = 'yes' OR visibility = 'no'),
+  "visibility"    varchar NOT NULL CHECK (visibility = 'permanent' OR visibility = 'yes' OR visibility = 'no'),
   "order" bigint default '0',
   "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              
