@@ -21,7 +21,6 @@ import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerPanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import annis.gui.visualizers.VisualizerPlugin;
 import annis.model.AnnisConstants;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Key words in context visualizer (KWIC).
- * 
+ *
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -88,8 +87,6 @@ public class KWICPanel extends AbstractVisualizer
     {
     }
 
-    ;
-  
     public KWICPanelImpl(VisualizerInput visInput)
     {
       this.visInput = visInput;
