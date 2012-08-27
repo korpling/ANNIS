@@ -81,6 +81,7 @@
             <configuration>
               <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
               <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <targetFileExtension>${project.version}.pdf</targetFileExtension>
               <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
               <foCustomization>${basedir}/src/main/docbkx/annis-pdf-cust.xsl</foCustomization>
               <highlightSource>true</highlightSource>
@@ -156,6 +157,7 @@
             <configuration>
               <sourceDirectory>${project.build.directory}/docbkx</sourceDirectory>
               <targetDirectory>${project.build.directory}/manual</targetDirectory>
+              <targetFileExtension>${project.version}.html</targetFileExtension>
               <includes>ANNIS-Manual.xml,User-Guide.xml</includes>
               <highlightSource>true</highlightSource>
               <admonGraphics>true</admonGraphics>
