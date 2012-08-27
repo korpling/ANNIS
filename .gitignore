@@ -1,14 +1,9 @@
 /.gitignore~
 /annis-service-implementation/src/main/distribution/log/debug.log
-/annis-service-interface/target/
-/annis-gui/target/
 /annis-service-implementation/src/main/distribution/log/annis.log
 /annis-service-implementation/src/main/distribution/log/error.log
 /annis-service-implementation/src/main/distribution/log/query.log
-/doc/target/
-/target/
 *~
 /.netbeans/
-/annis-service-implementation/target/
 /annis-service-implementation/.settings/
-/annis-kickstarter/target/
+target/
