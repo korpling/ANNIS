@@ -16,10 +16,9 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
@@ -52,19 +51,19 @@ public class AnnisAttribute implements Serializable
   
   private String name = "";
   private String edgeName = null;
-  private Set<String> distinctValues = new HashSet<String>();
+  private LinkedHashSet<String> distinctValues = new LinkedHashSet<String>();
   private Type type;
   private SubType subtype;
 
   
   @XmlElementWrapper(name="value-set")
   @XmlElement(name="value")
-  public List<String> getValueSet()
+  public Collection<String> getValueSet()
   {
-    return new LinkedList<String>(this.distinctValues);
+    return distinctValues;
   }
   
-  public void setValueSet(List<String> values)
+  public void setValueSet(Collection<String> values)
   {
     this.distinctValues.clear();
     this.distinctValues.addAll(values);
