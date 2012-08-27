@@ -14,32 +14,32 @@ By going to the Export tab at the bottom of the search form on the
 left, you can select one of four exporters: the SimpleTextExporter, the
 TextExporter, the WekaExporter and the GridExporter.
 </p>
-<img src="export218.GIF">
+<img src="export.png">
 <p>The
 The SimpleTextExporter simply gives the text for all tokens in each search result, including context, in a one-row-per-hit format. The tokens covered by the match area are marked with square brackets and the results are numbered, as in the following example:</p>
 <tt><small>
-1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große <br>
-2. der 1,62 Meter große Gennadi [Subow] die deutsche Nationalelf vorübergehend in <br>
-3. und Reputation kämpfenden Mannschaft von [Rudi] Völler der Weg zur Weltmeisterschaft <br>
-4. Reputation kämpfenden Mannschaft von Rudi [Völler] der Weg zur Weltmeisterschaft endgültig <br>
+1. Tor zum 1:0 fÃ¼r die [Ukraine] stÃ¼rzte der 1,62 Meter groÃŸe <br>
+2. der 1,62 Meter groÃŸe Gennadi [Subow] die deutsche Nationalelf vorÃ¼bergehend in <br>
+3. und Reputation kÃ¤mpfenden Mannschaft von [Rudi] VÃ¶ller der Weg zur Weltmeisterschaft <br>
+4. Reputation kÃ¤mpfenden Mannschaft von Rudi [VÃ¶ller] der Weg zur Weltmeisterschaft endgÃ¼ltig <br>
 5. die deutschen Nationalkicker einen " [Rudi] Riese " auf der Bank <br>
 </tt></small>
 <p>
 The TextExporter adds all annotations of each token separated by slashes (e.g. dogs/NN/dog for the token dogs annotated with a part-of-speech NN and a lemma dog).
 </p>
 <p>
-The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter numbers=false). The user can specify annotation layers to be exported in the additional ‘Parameters’ box, using the setting ‘keys=’ and annotation names separated by comas. If nothing is specified in the parameters box, all available annotations will be exported. Multiple options are separated by a semicolon, e.g. keys=tok,pos,cat;numbers=false. An example output with token numbers looks as follows.
+The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter numbers=false). The user can specify annotation layers to be exported in the additional 'Parameters' box, using the setting 'keys=' and annotation names separated by comas. If nothing is specified in the parameters box, all available annotations will be exported. Multiple options are separated by a semicolon, e.g. keys=tok,pos,cat;numbers=false. An example output with token numbers looks as follows.
 </p>
 <tt><small>
 <table border="0">
 <tr>
-<td>1.&nbsp;</td><td>tok&nbsp;&nbsp;</td><td>ein Dialog zwischen den Generationen angestoßen . </td></tr>
+<td>1.&nbsp;</td><td>tok&nbsp;&nbsp;</td><td>ein Dialog zwischen den Generationen angestoÃŸen . </td></tr>
 <td>&nbsp;&nbsp;&nbsp;</td><td>cat&nbsp;&nbsp;</td><td> NP[1-5] S[1-6] VP[1-6] PP[3-5] </td></tr>
 <td>&nbsp;&nbsp;&nbsp;</td><td>pos&nbsp;&nbsp;</td><td>ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7]</td></tr>
 </table>
 </tt></small>
 <p>
-Meaning that the annotation cat="NP" applied to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name ‘tok’ is not specified, the tokens themselves will not be exported (annotations only).
+Meaning that the annotation cat="NP" applied to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name 'tok' is not specified, the tokens themselves will not be exported (annotations only).
 </p>
 <p>The WekaExporter outputs the
 format used by the WEKA machine learning
