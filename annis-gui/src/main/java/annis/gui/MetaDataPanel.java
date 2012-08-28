@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Window.Notification;
+import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +96,8 @@ public class MetaDataPanel extends Panel
     WebResource res = Helper.getAnnisWebResource(getApplication());
     try
     {
-      res = res.path("corpora").path(toplevelCorpusName);
+      res = res.path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
       if (documentName != null)
       {
         res = res.path(documentName);

@@ -28,11 +28,15 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,6 +44,7 @@ import org.eclipse.emf.common.util.EList;
  */
 public class CommonHelper
 {
+  private final static Logger log = LoggerFactory.getLogger(CommonHelper.class);
 
   public static boolean containsRTLText(String str)
   {
@@ -231,9 +236,29 @@ public class CommonHelper
   
   public static List<String> getCorpusPath(URI uri)
   {
-    String rawPath = StringUtils.strip(uri.getPath(), "/ \t");
+    String rawPath = StringUtils.strip(uri.getRawPath(), "/ \t");
+    
+    // split on raw path (so "/" in corpus names are still encoded)
     String[] path = rawPath.split("/");
-    return Arrays.asList(path);
+    
+    
+    // decode every single part by itself
+    ArrayList<String> result = new ArrayList<String>(path.length);
+    for(int i=0; i < path.length; i++)
+    {
+      try
+      {
+        result.add(URLDecoder.decode(path[i], "UTF-8"));
+      }
+      catch (UnsupportedEncodingException ex)
+      {
+        log.error(null, ex);
+        // fallback
+        result.add(path[i]);
+      }
+    }
+    
+    return result;
   }
   
 }

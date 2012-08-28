@@ -30,6 +30,7 @@ import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window.Notification;
+import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
 
@@ -235,7 +236,9 @@ public class CorpusBrowserPanel extends Panel
       WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        result = service.path("corpora").path(toplevelCorpus).path("annotations")
+        result = service.path("corpora")
+          .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
+          .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true")
           .get(new GenericType<List<AnnisAttribute>>(){});

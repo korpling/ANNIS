@@ -32,6 +32,10 @@ import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.internal.AnnisWebService;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generates identifers for salt which are needed for the
@@ -43,6 +47,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   implements SelectClauseSqlGenerator<QueryData>, 
   OrderByClauseSqlGenerator<QueryData>
 {  
+  
+  private static final Logger log = LoggerFactory.getLogger(FindSqlGenerator.class);
+  
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
   private boolean sortSolutions;
@@ -197,7 +204,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     for (String dir : path)
     {
-      sb.append(dir).append("/");
+      try
+      {
+        sb.append(URLEncoder.encode(dir, "UTF-8")).append("/");
+      }
+      catch (UnsupportedEncodingException ex)
+      {
+        log.error(null, ex);
+        // fallback, cross fingers there are no invalid characters
+        sb.append(dir).append("/");
+      }
     }
 
 
