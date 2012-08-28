@@ -76,7 +76,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <version>1.6.6</version>
-      <scope>runtime</scope>
+      <scope>compile</scope>
    </dependency>
    
    <!-- redirect all java util logging to slfj4 -->
