@@ -85,8 +85,11 @@ public class AnnisWebService
    * <tt>@PostConstruct</tt>, but that doesn't seem to work. As a work-around,
    * the method is called by Spring as an init-method.
    */
-  public void sayHello()
+  public void init()
   {
+    // check version of PostgreSQL
+    annisDao.checkDatabaseVersion();
+    
     // log a message after successful startup
     log.info("AnnisWebService loaded.");
   }

@@ -161,8 +161,8 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCorpus("0");
-    doSubgraph("salt:/pcc2/4282/#tok_8");
+    doDoc("TueBa-D/Z.6.0 in.tuebadz-6_anaphora_1079");
+
   }
 
   public void doParse(String annisQuery)
@@ -238,7 +238,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = getGraphSqlGenerator();
     }
-
+    
     Validate.notNull(generator, "don't now query function: " + function);
 
     return generator;

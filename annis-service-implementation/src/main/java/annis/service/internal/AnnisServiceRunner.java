@@ -16,11 +16,6 @@
 package annis.service.internal;
 
 import java.io.IOException;
-
-
-
-
-
 import annis.AnnisBaseRunner;
 import annis.utils.Utils;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
