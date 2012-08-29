@@ -38,10 +38,9 @@ import com.vaadin.Application.UserChangeListener;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Window;
+import java.io.*;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -148,6 +147,21 @@ public class MainApp extends Application implements PluginSystem,
     {
       log.error("something fundamently goes wrong, "
         + "probably in one of the attach blocks", e);
+      
+      Window debugWindow = new Window();
+      
+      Label lblError = new Label();
+      
+      
+      lblError.setValue("Could not start ANNIS, error message of type " + e.getClass().getSimpleName() 
+        + " is:\n" + e.getMessage() 
+        + "\n\nMore information is available in the log files.\n\n" 
+        + e.getStackTrace()[0].toString());
+      lblError.setContentMode(Label.CONTENT_PREFORMATTED);
+      debugWindow.addComponent(lblError);
+      
+      setMainWindow(debugWindow);
+      
     }
 
   }
