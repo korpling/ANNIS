@@ -2,4 +2,4 @@
 
 export ANNIS_HOME=$1
 
-$ANNIS_HOME/bin/annis-admin init $2
+$ANNIS_HOME/bin/annis-admins.sh init $2
