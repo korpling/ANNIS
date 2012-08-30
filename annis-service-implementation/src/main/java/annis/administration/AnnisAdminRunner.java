@@ -207,7 +207,16 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     if (migrateCorpora)
     {
       // get corpus list
-      existingCorpora = corpusAdministration.listCorpusStats();
+      try
+      {
+        existingCorpora = corpusAdministration.listCorpusStats();
+      }
+      catch(Exception ex)
+      {
+        log.warn("Could not get existing corpus list for migration, migrating "
+          + "the corpora will be disabled.", ex);
+        migrateCorpora = false;
+      }
     }
 
     corpusAdministration.initializeDatabase(host, port, database, user, password, defaultDatabase, superUser, superPassword);

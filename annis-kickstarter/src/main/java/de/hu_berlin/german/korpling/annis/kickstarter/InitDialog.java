@@ -19,6 +19,7 @@ import annis.administration.CorpusAdministration;
 import java.awt.Frame;
 import java.io.File;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -280,12 +281,22 @@ public class InitDialog extends javax.swing.JDialog
       btCancel.setEnabled(false);
 
       // collect all necessary information for migration
-      List<Map<String, Object>> existingCorpora = null;
+      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
       if (cbMigrate.isSelected())
       {
         // catch all existing corpora
-        existingCorpora = corpusAdministration.listCorpusStats();
-
+        try
+        {
+          existingCorpora = corpusAdministration.listCorpusStats();
+        }
+        catch(Exception ex)
+        {
+          log.warn("Could not get existing corpus list for migration, migrating "
+          + "the corpora will be disabled.", ex);
+          JOptionPane.showMessageDialog(parentFrame, 
+            "Could not get existing corpus list for migration, migrating "
+          + "the corpora will be disabled.");
+        }
         // check if any of these corpora needs more information from the user
         for (Map<String, Object> corpus : existingCorpora)
         {
