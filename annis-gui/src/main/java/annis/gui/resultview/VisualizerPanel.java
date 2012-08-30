@@ -49,7 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author thomas, Benjamin Weißenfels
+ * Controls the visibility of visualizer plugins and provides some control
+ * methods for the media visualizers.
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
