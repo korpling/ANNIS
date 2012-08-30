@@ -175,34 +175,26 @@ public class MainApp extends Application implements PluginSystem,
     return windowSearch;
   }
 
-  public int getBuildRevision()
+  public String getBuildRevision()
   {
-    int result = -1;
-    try
-    {
-      result = Integer.parseInt(versionProperties.getProperty("build_revision", "-1"));
-    }
-    catch (NumberFormatException ex)
-    {
-      log.debug(null, ex);
-    }
+    String result = versionProperties.getProperty("build_revision", "");
     return result;
   }
 
   @Override
   public String getVersion()
   {
-    int rev = getBuildRevision();
+    String rev = getBuildRevision();
     Date date = getBuildDate();
     StringBuilder result = new StringBuilder();
 
     result.append(getVersionNumber());
-    if (rev >= 0 || date != null)
+    if (!"".equals(rev) || date != null)
     {
       result.append(" (");
 
       boolean added = false;
-      if (rev >= 0)
+      if (!"".equals(rev))
       {
         result.append("rev. ");
         result.append(rev);
