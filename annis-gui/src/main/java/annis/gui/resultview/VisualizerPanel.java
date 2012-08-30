@@ -85,6 +85,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private SingleResultPanel parentPanel;
   private String segmentationName;
   private List<VisualizerPanel> mediaVisualizer;
+  private final String PERMANENT = "permanent";
+  private final String ISVISIBLE = "yes";
+  private final String NOTVISIBLE = "no";
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -175,6 +178,40 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     visInput.setMediaVisualizer(mediaVisualizer);
 
     vis = this.visPlugin.createComponent(visInput);
+
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
+    {
+      vis.setVisible(true);
+    }
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(ISVISIBLE))
+    {
+      vis.setVisible(true);
+      btEntry = new Button(entry.getDisplayName());
+      btEntry.setIcon(ICON_COLLAPSE);
+      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+        + ChameleonTheme.BUTTON_SMALL);
+      btEntry.addListener((Button.ClickListener) this);
+      visContainer.addComponent(btEntry, "btEntry");
+
+      vis.setVisible(true);
+    }
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(NOTVISIBLE))
+    {
+      vis.setVisible(true);
+      btEntry = new Button(entry.getDisplayName());
+      btEntry.setIcon(ICON_EXPAND);
+      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+        + ChameleonTheme.BUTTON_SMALL);
+      btEntry.addListener((Button.ClickListener) this);
+      visContainer.addComponent(btEntry, "btEntry");
+
+      vis.setVisible(false);
+    }
+
+
 
     visContainer.addComponent(vis, "compVis");
   }
