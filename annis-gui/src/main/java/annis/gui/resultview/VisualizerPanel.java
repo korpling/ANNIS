@@ -79,7 +79,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
-  private VisualizerPlugin compVis;
+  private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private SingleResultPanel parentPanel;
@@ -99,7 +99,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     CustomLayout visContainer)
   {
 
-    compVis = ps.getVisualizer(visType);
+    visPlugin = ps.getVisualizer(visType);
 
     this.result = result;
     this.token = token;
@@ -159,7 +159,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     /**
      * check if this is a ComponentVisualizer.
      */
-    if (compVis == null)
+    if (visPlugin == null)
     {
       return;
     }
@@ -174,7 +174,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     visInput.setMediaIDs(mediaIDs);
     visInput.setMediaVisualizer(mediaVisualizer);
 
-    vis = this.compVis.createComponent(visInput);
+    vis = this.visPlugin.createComponent(visInput);
+
     visContainer.addComponent(vis, "compVis");
   }
 
