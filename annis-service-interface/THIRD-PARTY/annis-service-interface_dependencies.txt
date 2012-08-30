@@ -2,9 +2,9 @@
 Lists of 15 third-party dependencies.
      (The Apache Software License, Version 2.0) Commons IO (commons-io:commons-io:1.3.2 - http://jakarta.apache.org/commons/io/)
      (The Apache Software License, Version 2.0) Commons Lang (commons-lang:commons-lang:2.5 - http://commons.apache.org/lang/)
-     (The Apache Software License, Version 2.0) salt-graph (de.hu_berlin.german.korpling.saltnpepper:salt-graph:1.1.4-SNAPSHOT - https://korpling.german.hu-berlin.de/p/projects/salt/salt-graph)
-     (The Apache Software License, Version 2.0) salt-saltCommon (de.hu_berlin.german.korpling.saltnpepper:salt-saltCommon:1.1.4-SNAPSHOT - https://korpling.german.hu-berlin.de/p/projects/salt/salt-saltCommon)
-     (The Apache Software License, Version 2.0) salt-saltCore (de.hu_berlin.german.korpling.saltnpepper:salt-saltCore:1.1.4-SNAPSHOT - https://korpling.german.hu-berlin.de/p/projects/salt/salt-saltCore)
+     (The Apache Software License, Version 2.0) salt-graph (de.hu_berlin.german.korpling.saltnpepper:salt-graph:1.1.4 - https://korpling.german.hu-berlin.de/p/projects/salt/salt-graph)
+     (The Apache Software License, Version 2.0) salt-saltCommon (de.hu_berlin.german.korpling.saltnpepper:salt-saltCommon:1.1.4 - https://korpling.german.hu-berlin.de/p/projects/salt/salt-saltCommon)
+     (The Apache Software License, Version 2.0) salt-saltCore (de.hu_berlin.german.korpling.saltnpepper:salt-saltCore:1.1.4 - https://korpling.german.hu-berlin.de/p/projects/salt/salt-saltCore)
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1 - https://jsr311.dev.java.net)
      (Common Public License Version 1.0) JUnit (junit:junit:4.10 - http://junit.org)
      (The Apache Software License, Version 2.0) OSGi R4 Compendium Bundle (org.apache.felix:org.osgi.compendium:1.4.0 - http://felix.apache.org/org.osgi.compendium/)
