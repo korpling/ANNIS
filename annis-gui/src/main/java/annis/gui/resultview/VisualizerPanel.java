@@ -94,11 +94,21 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    * Visualizer.
    *
    */
-  public VisualizerPanel(String visType, SDocument result, List<SNode> token,
-    Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,
-    STextualDS text, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer, String htmlID,
-    SingleResultPanel parent, String segmentationName, PluginSystem ps,
+  public VisualizerPanel(
+    String visType,
+    SDocument result,
+    List<SNode> token,
+    Set<String> visibleTokenAnnos,
+    Map<SNode, Long> markedAndCovered,
+    @Deprecated Map<String, String> markedAndCoveredMap,
+    @Deprecated Map<String, String> markedExactMap,
+    STextualDS text,
+    List<String> mediaIDs,
+    List<VisualizerPanel> mediaVisualizer,
+    String htmlID,
+    SingleResultPanel parent,
+    String segmentationName,
+    PluginSystem ps,
     CustomLayout visContainer)
   {
 

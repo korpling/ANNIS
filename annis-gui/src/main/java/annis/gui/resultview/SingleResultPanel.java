@@ -91,7 +91,7 @@ public class SingleResultPanel extends VerticalLayout implements
   // TODO should be configurable with resolver_vis_tab
   private String[] alwaysVisibleVis =
   {
-    "KWIC"
+    "kwic"
   };
 
   public SingleResultPanel(final SDocument result, int resultNumber,
@@ -182,8 +182,9 @@ public class SingleResultPanel extends VerticalLayout implements
           calulcateColorsForMarkedAndCoverd();
 
           VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
-            token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
-            mediaVisualizer, id, this, segmentationName, ps, visContainer);
+            token, visibleTokenAnnos, markedAndCovered, markedExactMap,
+            markedCoveredMap, text, mediaIDs, mediaVisualizer, id, this,
+            segmentationName, ps, visContainer);
           visualizers.add(p);
 
         }
