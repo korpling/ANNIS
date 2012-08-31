@@ -341,6 +341,14 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         + ex.getLocalizedMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
     }
+    catch (Exception ex)
+    {
+      log.error(
+        null, ex);
+      getWindow().showNotification("Exception: "
+        + ex.getLocalizedMessage(),
+        Notification.TYPE_TRAY_NOTIFICATION);
+    }
     return result;
   }
 

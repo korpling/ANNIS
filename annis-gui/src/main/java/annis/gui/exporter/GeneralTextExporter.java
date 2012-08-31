@@ -31,6 +31,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
 import org.apache.commons.lang.StringUtils;
@@ -62,7 +63,9 @@ public class GeneralTextExporter implements Exporter, Serializable
         for(String corpus : corpora.keySet())
         {
           attributes.addAll(
-            annisResource.path("corpora").path(corpus).path("annotations")
+            annisResource.path("corpora")
+              .path(URLEncoder.encode(corpus, "UTF-8"))
+              .path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})

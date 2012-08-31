@@ -4,7 +4,7 @@
 export ANNIS_HOME=$1
 
 ANNIS_VERSION=3.0.0-SNAPSHOT
-DIST_DIR=annis-service-impl/target/annis-service-impl-$ANNIS_VERSION-distribution/annis-service-impl-$ANNIS_VERSION
+DIST_DIR=annis-service-implementation/target/annis-service-implementation-$ANNIS_VERSION-distribution/annis-service-implementation-$ANNIS_VERSION
 
 #code
 # delete all old libraries so that they don't get into the classpath

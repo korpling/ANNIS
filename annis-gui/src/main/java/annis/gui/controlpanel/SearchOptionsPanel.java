@@ -24,18 +24,23 @@ import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
 public class SearchOptionsPanel extends Panel
-{
-
+{  
   public static final String DEFAULT_SEGMENTATION = "default-segmentation";
+
+  private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
   
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
@@ -116,12 +121,20 @@ public class SearchOptionsPanel extends Panel
 
       for (String corpus : corpora)
       {
-        attributes.addAll(
-          service.path("corpora").path(corpus).path("annotations").queryParam(
-          "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
-          get(new GenericType<List<AnnisAttribute>>()
+        try
         {
-        }));
+          attributes.addAll(
+            service.path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+            .path("annotations").queryParam(
+            "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
+            get(new GenericType<List<AnnisAttribute>>()
+          {
+          }));
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          log.error(null, ex);
+        }
         
         CorpusConfig config = Helper.getCorpusConfig(corpus, getApplication(), getWindow());
         

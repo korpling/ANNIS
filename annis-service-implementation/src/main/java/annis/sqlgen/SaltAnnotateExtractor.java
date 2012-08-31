@@ -470,6 +470,140 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
   }
+  
+  private SRelation findExistingRelation(SDocumentGraph graph, 
+    SNode sourceNode, SNode targetNode, String edgeName, SLayer layer)
+  {
+    SRelation rel = null;
+    
+    EList<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
+      targetNode.getSId());
+    if (existingEdges != null)
+    {
+      for (Edge e : existingEdges)
+      {
+        // only select the edge that has the same type ("edge_name" and
+        // the same layer ("edge_namespace")
+        if (e instanceof SRelation)
+        {
+          SRelation existingRel = (SRelation) e;
+
+          boolean noType = existingRel.getSTypes() == null || existingRel.getSTypes().size() == 0;
+          if (((noType && edgeName == null) || (!noType && existingRel.getSTypes().
+            contains(edgeName)))
+            && existingRel.getSLayers().contains(layer))
+          {
+            rel = existingRel;
+            break;
+          }
+
+        }
+      }
+    }
+    return rel;
+  }  
+  
+  private SRelation createNewRelation(SDocumentGraph graph, SStructuredNode sourceNode, 
+    SNode targetNode, String edgeName, String type, long componentID, 
+    SLayer layer, long parent, long pre,
+    Map<RankID, SNode> nodeByPre)
+  {
+    SRelation rel = null;;
+    // create new relation
+    if ("d".equals(type))
+    {
+      SDominanceRelation domrel = SaltFactory.eINSTANCE.createSDominanceRelation();
+      rel = domrel;
+
+      if (sourceNode != null && !(sourceNode instanceof SStructure))
+      {
+        sourceNode = recreateNode(SStructure.class, sourceNode);
+        nodeByPre.put(new RankID(componentID, parent), sourceNode);
+      }
+    }
+    else if ("c".equals(type))
+    {
+      SSpanningRelation spanrel = SaltFactory.eINSTANCE.createSSpanningRelation();
+      rel = spanrel;
+
+      if (sourceNode != null && !(sourceNode instanceof SSpan))
+      {
+        sourceNode = recreateNode(SSpan.class, sourceNode);
+        nodeByPre.put(new RankID(componentID, parent), sourceNode);
+      }
+    }
+    else if ("p".equals(type))
+    {
+      SPointingRelation pointingrel = SaltFactory.eINSTANCE.createSPointingRelation();
+      rel = pointingrel;
+    }
+
+    try
+    {
+      rel.getSLayers().add(layer);
+      rel.addSType(edgeName);
+
+
+      SFeature featInternalID = SaltFactory.eINSTANCE.createSFeature();
+      featInternalID.setSNS(ANNIS_NS);
+      featInternalID.setSName(FEAT_INTERNALID);
+      featInternalID.setSValue(Long.valueOf(pre));
+      rel.addSFeature(featInternalID);
+
+      SFeature featComponentID = SaltFactory.eINSTANCE.createSFeature();
+      featComponentID.setSNS(ANNIS_NS);
+      featComponentID.setSName(FEAT_COMPONENTID);
+      featComponentID.setSValue(Long.valueOf(componentID));
+      rel.addSFeature(featComponentID);
+
+      rel.setSSource(nodeByPre.get(new RankID(componentID, parent)));
+      if ("c".equals(type) && !(targetNode instanceof SToken))
+      {
+        log.warn("invalid edge detected: target node ({0}) "
+          + "of a coverage relation (from: {1}, internal id {2}) was not a token",
+          new Object[]
+          {
+            targetNode.getSName(), sourceNode.getSName(), "" + pre
+          });
+      }
+      else
+      {
+        rel.setSTarget(targetNode);
+        graph.addSRelation(rel);
+      }
+    }
+    catch (SaltException ex)
+    {
+      log.warn("invalid edge detected", ex);
+    }
+    
+    return rel;
+  }
+  
+  private void addEdgeAnnotations(ResultSet resultSet, SRelation rel) 
+    throws SQLException
+  {
+    String edgeAnnoValue =
+        stringValue(resultSet, EDGE_ANNOTATION_TABLE, "value");
+      String edgeAnnoNameSpace = stringValue(resultSet, EDGE_ANNOTATION_TABLE,
+        "namespace");
+      String edgeAnnoName =
+        stringValue(resultSet, EDGE_ANNOTATION_TABLE, "name");
+      if (!resultSet.wasNull())
+      {
+        String fullName = edgeAnnoNameSpace == null ? "" : edgeAnnoNameSpace
+          + "::" + edgeAnnoName;
+        SAnnotation anno = rel.getSAnnotation(fullName);
+        if (anno == null)
+        {
+          anno = SaltFactory.eINSTANCE.createSAnnotation();
+          anno.setSNS(edgeAnnoNameSpace == null ? "" : edgeAnnoNameSpace);
+          anno.setSName(edgeAnnoName);
+          anno.setSValue(edgeAnnoValue);
+          rel.addSAnnotation(anno);
+        }
+      } // end if edgeAnnoName exists
+  }
 
   private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
     Map<RankID, SNode> nodeByPre, SNode targetNode) throws
@@ -511,126 +645,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     if (!resultSet.wasNull())
     {
 
-      EList<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
-        targetNode.getSId());
-      if (existingEdges != null)
-      {
-        for (Edge e : existingEdges)
-        {
-          // only select the edge that has the same type ("edge_name" and
-          // the same layer ("edge_namespace")
-          if (e instanceof SRelation)
-          {
-            SRelation existingRel = (SRelation) e;
-
-            boolean noType = existingRel.getSTypes() == null || existingRel.
-              getSTypes().size() == 0;
-            if (((noType && edgeName == null) || (!noType && existingRel.
-              getSTypes().
-              contains(edgeName)))
-              && existingRel.getSLayers().contains(layer))
-            {
-              rel = existingRel;
-              break;
-            }
-
-          }
-        }
-      }
-
+      rel = findExistingRelation(graph, sourceNode, targetNode, edgeName, layer);
 
       if (rel == null)
       {
-        // create new relation
-        if ("d".equals(type))
-        {
-          SDominanceRelation domrel = SaltFactory.eINSTANCE.
-            createSDominanceRelation();
-          rel = domrel;
-
-          if (sourceNode != null && !(sourceNode instanceof SStructure))
-          {
-            sourceNode = recreateNode(SStructure.class, sourceNode);
-            nodeByPre.put(new RankID(componentID, parent), sourceNode);
-          }
-        }
-        else if ("c".equals(type))
-        {
-          SSpanningRelation spanrel = SaltFactory.eINSTANCE.
-            createSSpanningRelation();
-          rel = spanrel;
-
-          if (sourceNode != null && !(sourceNode instanceof SSpan))
-          {
-            sourceNode = recreateNode(SSpan.class, sourceNode);
-            nodeByPre.put(new RankID(componentID, parent), sourceNode);
-          }
-        }
-        else if ("p".equals(type))
-        {
-          SPointingRelation pointingrel = SaltFactory.eINSTANCE.
-            createSPointingRelation();
-          rel = pointingrel;
-        }
-
-        try
-        {
-          rel.getSLayers().add(layer);
-          rel.addSType(edgeName);
-
-          
-          SFeature featInternalID = SaltFactory.eINSTANCE.createSFeature();
-          featInternalID.setSNS(ANNIS_NS);
-          featInternalID.setSName(FEAT_INTERNALID);
-          featInternalID.setSValue(Long.valueOf(pre));
-          rel.addSFeature(featInternalID);
-          
-          SFeature featComponentID = SaltFactory.eINSTANCE.createSFeature();
-          featComponentID.setSNS(ANNIS_NS);
-          featComponentID.setSName(FEAT_COMPONENTID);
-          featComponentID.setSValue(Long.valueOf(componentID));
-          rel.addSFeature(featComponentID);
-          
-          rel.setSSource(nodeByPre.get(new RankID(componentID,parent)));
-          if("c".equals(type) && !(targetNode instanceof SToken))
-          {
-            log.warn("invalid edge detected: target node ({0}) "
-              + "of a coverage relation (from: {1}, internal id {2}) was not a token", 
-              new Object[] {targetNode.getSName(), sourceNode.getSName(), "" + pre});
-          }
-          else
-          {
-            rel.setSTarget(targetNode);
-            graph.addSRelation(rel);
-          }
-        }
-        catch (SaltException ex)
-        {          
-          log.warn("invalid edge detected", ex);
-        }
+        rel = createNewRelation(graph, sourceNode, targetNode, edgeName, type, 
+          componentID, layer, parent, pre, nodeByPre);
       } // end if no existing relation
 
       // add edge annotations
-      String edgeAnnoValue =
-        stringValue(resultSet, EDGE_ANNOTATION_TABLE, "value");
-      String edgeAnnoNameSpace = stringValue(resultSet, EDGE_ANNOTATION_TABLE,
-        "namespace");
-      String edgeAnnoName =
-        stringValue(resultSet, EDGE_ANNOTATION_TABLE, "name");
-      if (!resultSet.wasNull())
-      {
-        String fullName = edgeAnnoNameSpace == null ? "" : edgeAnnoNameSpace
-          + "::" + edgeAnnoName;
-        SAnnotation anno = rel.getSAnnotation(fullName);
-        if (anno == null)
-        {
-          anno = SaltFactory.eINSTANCE.createSAnnotation();
-          anno.setSNS(edgeAnnoNameSpace == null ? "" : edgeAnnoNameSpace);
-          anno.setSName(edgeAnnoName);
-          anno.setSValue(edgeAnnoValue);
-          rel.addSAnnotation(anno);
-        }
-      } // end if edgeAnnoName exists
+      addEdgeAnnotations(resultSet, rel);
     }
     return rel;
   }

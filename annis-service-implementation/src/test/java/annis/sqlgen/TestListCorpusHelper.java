@@ -48,8 +48,7 @@ public class TestListCorpusHelper {
 	@Test
 	public void createSqlQuery() {
 		String expected = "" +
-			"SELECT id, name, text, tokens " +
-			"FROM corpus_stats";
+			"SELECT * FROM corpus_stats";
 		assertEquals(expected, listCorpusHelper.createSqlQuery());
 	}
 	

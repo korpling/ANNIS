@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -73,7 +74,8 @@ public class BinaryServlet extends HttpServlet
     }
     WebResource annisRes = c.resource(annisServiceURL);
     
-    WebResource binaryRes = annisRes.path("corpora").path(toplevelCorpusName)
+    WebResource binaryRes = annisRes.path("corpora")
+      .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
       .path(documentName).path("binary"); 
     
     if (range != null)

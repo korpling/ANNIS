@@ -30,11 +30,8 @@ import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window.Notification;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.net.URLEncoder;
+import java.util.*;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -233,13 +230,15 @@ public class CorpusBrowserPanel extends Panel
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
   {
-    List<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
+    Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
     try
     {
       WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        result = service.path("corpora").path(toplevelCorpus).path("annotations")
+        result = service.path("corpora")
+          .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
+          .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true")
           .get(new GenericType<List<AnnisAttribute>>(){});
@@ -252,7 +251,7 @@ public class CorpusBrowserPanel extends Panel
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.TYPE_WARNING_MESSAGE);
     }
-    return result;
+    return new LinkedList<AnnisAttribute>(result);
   }
 
   public static class ExampleTable extends Table
@@ -331,7 +330,7 @@ public class CorpusBrowserPanel extends Panel
     return splitted[splitted.length - 1];
   }
 
-  private String getFirst(List<String> list)
+  private String getFirst(Collection<String> list)
   {
     Iterator<String> it = list.iterator();
     return it.hasNext() ? it.next() : null;

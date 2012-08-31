@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.util.HashMap;
 import java.util.List;
@@ -110,4 +111,7 @@ public interface AnnisDao
    * @return The corpus configuration is represented as Key-Value-Pairs.
    */
   public Map<String, String> getCorpusConfiguration(String corpusName);
+  
+  /** Called to check if the database management program has the right version */
+  public boolean checkDatabaseVersion() throws AnnisException;
 }

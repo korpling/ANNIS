@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.io.File;
 import java.io.FileReader;
@@ -63,6 +64,8 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.sql.DatabaseMetaData;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -470,6 +473,25 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       log.warn("No corpus configuration loaded due to missing database connection.");
     }
   }
+
+  @Override
+  public boolean checkDatabaseVersion() throws AnnisException
+  {
+    try
+    {
+      DatabaseMetaData meta = 
+        getJdbcTemplate().getDataSource().getConnection().getMetaData();
+      
+      log.info("major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName());
+    }
+    catch (SQLException ex)
+    {
+      log.error("could not get database version", ex);
+    }
+    return false;
+  }
+  
+  
 
   public AnnisParser getAqlParser()
   {

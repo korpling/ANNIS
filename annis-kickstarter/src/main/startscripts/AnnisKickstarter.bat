@@ -1,1 +1,1 @@
-start javaw -Xmx128m -splash:splashscreen.gif -cp "lib\*;" de.hu_berlin.german.korpling.annis.kickstarter.MainFrame
+start javaw -Xmx512m -splash:splashscreen.gif -cp "lib\*;" de.hu_berlin.german.korpling.annis.kickstarter.MainFrame

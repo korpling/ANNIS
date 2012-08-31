@@ -21,21 +21,34 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.service.objects.AnnisCorpus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus> {
+public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus>
+{
+  
+  private static final Logger log = LoggerFactory.getLogger(ListCorpusSqlHelper.class);
 
-	public String createSqlQuery() {
-		return 	"SELECT id, name, text, tokens " +
-				"FROM corpus_stats";
-	}
-	
-	public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException {
-		AnnisCorpus corpus = new AnnisCorpus();
-		corpus.setId(rs.getLong("id"));
-		corpus.setName(rs.getString("name"));
-		corpus.setTextCount(rs.getInt("text"));
-		corpus.setTokenCount(rs.getInt("tokens"));
-		return corpus;
-	}
-	
+  public String createSqlQuery()
+  {
+    return "SELECT * FROM corpus_stats";
+  }
+
+  public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException
+  {
+    AnnisCorpus corpus = new AnnisCorpus();
+    corpus.setId(rs.getLong("id"));
+    corpus.setName(rs.getString("name"));
+    corpus.setTextCount(rs.getInt("text"));
+    corpus.setTokenCount(rs.getInt("tokens"));
+    try
+    {
+      corpus.setSourcePath(rs.getString("source_path"));
+    }
+    catch (SQLException ex)
+    {
+      log.debug(null, ex);    
+    }
+    return corpus;
+  }
 }
