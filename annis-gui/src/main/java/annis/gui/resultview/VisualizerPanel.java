@@ -170,6 +170,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   {
     VisualizerInput visInput;
     visInput = createInput();
+
+    if (visPlugin == null)
+    {
+      entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+      visPlugin = ps.getVisualizer(entry.getVisType());
+    }
+
     vis = this.visPlugin.createComponent(visInput);
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
@@ -314,9 +321,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     if (btEntry.getIcon() == ICON_EXPAND)
     {
-
-
-
 
       if (visPlugin == null)
       {
