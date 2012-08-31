@@ -52,7 +52,7 @@ public class KWICPanel extends AbstractVisualizer
   @Override
   public String getShortName()
   {
-    return "KWIC";
+    return "kwic";
   }
 
   @Override
