@@ -20,7 +20,6 @@ import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
@@ -88,11 +87,6 @@ public class SingleResultPanel extends VerticalLayout implements
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
-  // TODO should be configurable with resolver_vis_tab
-  private String[] alwaysVisibleVis =
-  {
-    "kwic"
-  };
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -166,62 +160,49 @@ public class SingleResultPanel extends VerticalLayout implements
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
       mediaVisualizer = new ArrayList<VisualizerPanel>();
 
-
-      // hacky implemented ComponentVisualizer
-      for (int i = 0; i < alwaysVisibleVis.length; i++)
+      for (int i = 0; i < entries.length; i++)
       {
-        String id = "resolver-" + resultNumber + "-" + i;
-        CustomLayout visContainer = this.visContainer(id, "compVis");
-
         for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
         {
+          String id = "resolver-" + resultNumber + "-" + i;
+          CustomLayout visContainer = this.visContainer(id, "iframe");
+
           token = CommonHelper.getSortedSegmentationNodes(segmentationName,
             result.getSDocumentGraph());
 
           markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
           calulcateColorsForMarkedAndCoverd();
 
-          VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
+          VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
             markedCoveredMap, text, mediaIDs, mediaVisualizer, id, this,
             segmentationName, ps, visContainer);
+
+
+          if ("media".equals(entries[i].getVisType())
+            || "video".equals(entries[i].getVisType())
+            || "audio".equals(entries[i].getVisType()))
+          {
+            mediaVisualizer.add(p);
+          }
+
           visualizers.add(p);
-
+          Properties mappings = entries[i].getMappings();
+          if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+          {
+            openVisualizers.add(p);
+          }
         }
-      }
-      // /hacky implemented ComponentVisualizer
 
-      for (int i = 0; i < entries.length; i++)
-      {
-        String id = "resolver-" + resultNumber + "-" + i;
-        CustomLayout visContainer = this.visContainer(id, "iframe");
-
-        VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-          markedExactMap, markedCoveredMap, visContainer, mediaIDs, id);
-
-        if ("media".equals(entries[i].getVisType())
-          || "video".equals(entries[i].getVisType())
-          || "audio".equals(entries[i].getVisType()))
+        for (VisualizerPanel p : visualizers)
         {
-          mediaVisualizer.add(p);
+          addComponent(p);
         }
 
-        visualizers.add(p);
-        Properties mappings = entries[i].getMappings();
-        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+        for (VisualizerPanel p : openVisualizers)
         {
-          openVisualizers.add(p);
+          p.toggleVisualizer(false);
         }
-      }
-
-      for (VisualizerPanel p : visualizers)
-      {
-        addComponent(p);
-      }
-
-      for (VisualizerPanel p : openVisualizers)
-      {
-        p.toggleVisualizer(false);
       }
     }
     catch (Exception ex)
@@ -249,11 +230,11 @@ public class SingleResultPanel extends VerticalLayout implements
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
 
-    for (String visName : alwaysVisibleVis)
-    {
-      VisualizerPlugin vis = ps.getVisualizer(visName);
-      vis.setVisibleTokenAnnosVisible(annos);
-    }
+//    for (String visName : alwaysVisibleVis)
+//    {
+//      VisualizerPlugin vis = ps.getVisualizer(visName);
+//      vis.setVisibleTokenAnnosVisible(annos);
+//    }
 
     if (kwicPanels != null)
     {

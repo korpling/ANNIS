@@ -95,7 +95,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    *
    */
   public VisualizerPanel(
-    String visType,
+    final ResolverEntry entry,
     SDocument result,
     List<SNode> token,
     Set<String> visibleTokenAnnos,
@@ -112,7 +112,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     CustomLayout visContainer)
   {
 
-    visPlugin = ps.getVisualizer(visType);
+    visPlugin = ps.getVisualizer(entry.getVisType());
+
+    this.ps = ps;
+    this.entry = entry;
+    this.markersExact = markedExactMap;
+    this.markersCovered = markedAndCoveredMap;
+
 
     this.result = result;
     this.token = token;
@@ -131,39 +137,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
     this.setContent(this.visContainer);
-  }
-
-  public VisualizerPanel(final ResolverEntry entry, SDocument result,
-    PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout,
-    List<String> mediaIDs, String htmlID)
-  {
-    visPlugin = ps.getVisualizer(entry.getVisType());
-
-    this.result = result;
-    this.ps = ps;
-    this.entry = entry;
-    this.markersExact = markersExact;
-    this.markersCovered = markersCovered;
-    this.visContainer = costumLayout;
-    this.mediaIDs = mediaIDs;
-    this.htmlID = htmlID;
-
-
-    setContent(this.visContainer);
-
-    this.setWidth("100%");
-    this.setHeight("-1px");
-
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    btEntry = new Button(entry.getDisplayName());
-    btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-      + ChameleonTheme.BUTTON_SMALL);
-    btEntry.addListener((Button.ClickListener) this);
-    visContainer.addComponent(btEntry, "btEntry");
-  }
+  }  
 
   @Override
   public void attach()
@@ -209,8 +183,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
       vis.setVisible(false);
     }
-
-
 
     visContainer.addComponent(vis, "compVis");
   }
