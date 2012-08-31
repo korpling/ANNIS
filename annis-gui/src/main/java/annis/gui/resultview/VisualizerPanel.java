@@ -65,7 +65,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
   private ApplicationResource resource = null;
-  private Component iframe;
+  private Component vis;
   private SDocument result;
   private PluginSystem ps;
   private ResolverEntry entry;
@@ -138,6 +138,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     Map<String, String> markersCovered, CustomLayout costumLayout,
     List<String> mediaIDs, String htmlID)
   {
+    visPlugin = ps.getVisualizer(entry.getVisType());
+
     this.result = result;
     this.ps = ps;
     this.entry = entry;
@@ -167,28 +169,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public void attach()
   {
     VisualizerInput visInput;
-    Component vis;
-
-    /**
-     * check if this is a ComponentVisualizer.
-     */
-    if (visPlugin == null)
-    {
-      return;
-    }
-
     visInput = createInput();
-    visInput.setResult(result);
-    visInput.setToken(token);
-    visInput.setVisibleTokenAnnos(visibleTokenAnnos);
-    visInput.setText(text);
-    visInput.setSingleResultPanelRef(parentPanel);
-    visInput.setSegmentationName(segmentationName);
-    visInput.setMediaIDs(mediaIDs);
-    visInput.setMediaVisualizer(mediaVisualizer);
-
     vis = this.visPlugin.createComponent(visInput);
-
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
     {
@@ -239,6 +221,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     input.setMarkableMap(markersCovered);
     input.setMediaIDs(mediaIDs);
     input.setMarkedAndCovered(markedAndCovered);
+    input.setVisPanel(this);
+
+    input.setResult(result);
+    input.setToken(token);
+    input.setVisibleTokenAnnos(visibleTokenAnnos);
+    input.setText(text);
+    input.setSingleResultPanelRef(parentPanel);
+    input.setSegmentationName(segmentationName);
+    input.setMediaIDs(mediaIDs);
+    input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
     {
@@ -322,56 +314,52 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     if (btEntry.getIcon() == ICON_EXPAND)
     {
-      // expand
-      if (iframe == null)
+
+
+
+
+      if (visPlugin == null)
       {
+        entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+        visPlugin = ps.getVisualizer(entry.getVisType());
+      }
 
-        VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
+      VisualizerInput input = createInput();
+      AbstractIFrameVisualizer iframeVis;
 
-        if (vis == null)
+      //TODO print error message
+      if (visPlugin instanceof AbstractIFrameVisualizer)
+      {
+        iframeVis = (AbstractIFrameVisualizer) visPlugin;
+
+        if (iframeVis.isUsingText()
+          && result.getSDocumentGraph().getSNodes().size() > 0)
         {
-          entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-          vis = ps.getVisualizer(entry.getVisType());
+          SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+            get(0).getSName(), result.getSName());
+
+          input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
+
+        }
+        else
+        {
+          input.setDocument(result);
         }
 
-        VisualizerInput input = createInput();
-        AbstractIFrameVisualizer iframeVis;
-
-        //TODO print error message
-        if (vis instanceof AbstractIFrameVisualizer)
-        {
-          iframeVis = (AbstractIFrameVisualizer) vis;
-
-          if (iframeVis.isUsingText()
-            && result.getSDocumentGraph().getSNodes().size() > 0)
-          {
-            SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
-              get(0).getSName(), result.getSName());
-
-            input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
-          }
-          else
-          {
-            input.setDocument(result);
-          }
-
-          input.setVisPanel(this);
-          iframe = iframeVis.createComponent(input);
-          visContainer.addComponent(iframe, "iframe");
-        }
-
+        input.setVisPanel(this);
+        this.vis = iframeVis.createComponent(input);
+        visContainer.addComponent(this.vis, "iframe");
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
-      iframe.setVisible(true);
+      vis.setVisible(true);
     }
     else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
       // collapse
-      if (iframe != null)
+      if (vis != null)
       {
-        iframe.setVisible(false);
+        vis.setVisible(false);
         stopMediaVisualizers();
       }
       btEntry.setIcon(ICON_EXPAND);
