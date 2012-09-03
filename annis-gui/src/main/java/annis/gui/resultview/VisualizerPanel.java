@@ -184,7 +184,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       vis.setVisible(false);
     }
 
-    visContainer.addComponent(vis, "compVis");
+    visContainer.addComponent(vis, "iframe");
   }
 
   private VisualizerInput createInput()

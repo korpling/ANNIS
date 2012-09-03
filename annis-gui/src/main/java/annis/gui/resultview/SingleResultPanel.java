@@ -165,7 +165,7 @@ public class SingleResultPanel extends VerticalLayout implements
         for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
         {
           String id = "resolver-" + resultNumber + "-" + i;
-          CustomLayout visContainer = this.visContainer(id, "iframe");
+          CustomLayout visContainer = this.visContainer(id);
 
           token = CommonHelper.getSortedSegmentationNodes(segmentationName,
             result.getSDocumentGraph());
@@ -437,12 +437,12 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  private CustomLayout visContainer(String id, String place)
+  private CustomLayout visContainer(String id)
   {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id=\"").append(id).append("\">");
     sb.append("<div location=\"btEntry\"></div>");
-    sb.append("  <div location=\"").append(place).append("\"></div>");
+    sb.append("  <div location=\"iframe\"></div>");
     sb.append("</div>");
     try
     {
