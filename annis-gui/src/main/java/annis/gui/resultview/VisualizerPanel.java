@@ -137,7 +137,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
     this.setContent(this.visContainer);
-  }  
+  }
 
   @Override
   public void attach()
@@ -286,6 +286,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    */
   public void toggleVisualizer(boolean collapse)
   {
+    VisualizerInput input;
+
     if (resource != null && collapse)
     {
       getApplication().removeResource(resource);
@@ -300,32 +302,26 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         visPlugin = ps.getVisualizer(entry.getVisType());
       }
 
-      VisualizerInput input = createInput();
-      AbstractIFrameVisualizer iframeVis;
+      input = createInput();
 
-      //TODO print error message
-      if (visPlugin instanceof AbstractIFrameVisualizer)
+      if (visPlugin.isUsingText()
+        && result.getSDocumentGraph().getSNodes().size() > 0)
       {
-        iframeVis = (AbstractIFrameVisualizer) visPlugin;
+        SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+          get(0).getSName(), result.getSName());
 
-        if (iframeVis.isUsingText()
-          && result.getSDocumentGraph().getSNodes().size() > 0)
-        {
-          SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
-            get(0).getSName(), result.getSName());
+        input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
 
-          input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
-        }
-        else
-        {
-          input.setDocument(result);
-        }
-
-        input.setVisPanel(this);
-        this.vis = iframeVis.createComponent(input);
-        visContainer.addComponent(this.vis, "iframe");
       }
+      else
+      {
+        input.setDocument(result);
+      }
+
+      input.setVisPanel(this);
+      this.vis = visPlugin.createComponent(input);
+      visContainer.addComponent(this.vis, "iframe");
+
 
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);

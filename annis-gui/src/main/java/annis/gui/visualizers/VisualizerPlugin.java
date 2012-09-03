@@ -62,4 +62,9 @@ public interface VisualizerPlugin extends Plugin
    *
    */
   public void setVisibleTokenAnnosVisible(Set<String> annos);
+
+  /**
+   * Checks if the Plugin needs the primary text source.
+   */
+  public boolean isUsingText();
 }
