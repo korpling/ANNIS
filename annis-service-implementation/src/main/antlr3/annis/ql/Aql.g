@@ -2,16 +2,26 @@ grammar Aql;
 
 options {
 	output=AST;
-	backtrack=true;
+}
+
+
+tokens {
+	ID;
+	AND='&';
+	OR='|';
+	EQ='=';
+	NEQ='!=';
+	EXPR;
 }
 
 @parser::header {package annis.ql;}
 @lexer::header {package annis.ql;}
 
+
 start 
-	: andExpr
-	| orExpr
+	: expr^
 	;
+
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
@@ -48,20 +58,29 @@ qName
 	| ID^
 	;
 
-andExpr
-	: (expr '&')+ expr -> ^('&' expr+ expr)
+term
+	: qName^
+	|	qName EQ text_spec -> ^('=' qName text_spec)
+	| qName NEQ text_spec -> ^('=' qName text_spec)
+	| '('! expr^ ')'!
 	;
 	
-orExpr
-	: (expr '|')+ expr -> ^('&' expr+ expr)
+	
+or_tail
+	:	OR! term^
+	;
+
+and_tail 
+	: AND! term^
 	;	
 
-expr 
-	: qName
-	|	qName '=' text_spec -> ^('=' qName text_spec)
-	| qName '!=' text_spec -> ^('=' qName text_spec)
-	|	'('! andExpr^ ')'!
-	|	'('! orExpr^ ')'!
+
+expr
+	: term
+		(	and_tail+ -> ^('&' term and_tail+)
+		|	or_tail+ -> ^('|' term or_tail+)
+		)?
 	;
+
 	
 	
