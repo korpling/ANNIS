@@ -85,8 +85,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private String segmentationName;
   private List<VisualizerPanel> mediaVisualizer;
   private final String PERMANENT = "permanent";
-  private final String ISVISIBLE = "yes";
-  private final String NOTVISIBLE = "no";
+  private final String ISVISIBLE = "visible";
+  private final String NOTVISIBLE = "hidden";
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
