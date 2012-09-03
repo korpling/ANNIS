@@ -20,9 +20,14 @@ tokens {
 	OVERLAP='_o_';
 	LEFT_ALIGN='_l_';
 	RIGHT_ALIGN='_r_';
+	LEFT_OVERLAP='_ol_';
+	RIGHT_OVERLAP='_or_';
 	LEFT_CHILD='>@l';
 	RIGHT_CHILD='>@r';
 	COMMON_PARENT='$';
+	ROOT=':root';
+	ARITY=':arity';
+	TOKEN_ARITY=':tokenarity';
 	REF;
 	DIGITS;
 }
@@ -77,9 +82,24 @@ qName
 	;
 
 fragment
-linguistic_term
-	:	REF DOMINANCE^ REF
+binary_linguistic_term
+	:	REF IDENT_COV^ REF
+	|	REF LEFT_ALIGN^ REF
+	|	REF RIGHT_ALIGN^ REF
+	|	REF INCLUSION^ REF
+	|	REF OVERLAP^ REF
+	|	REF RIGHT_OVERLAP^ REF
+	| 	REF LEFT_OVERLAP^REF
+	|	REF DOMINANCE^ REF
 	|	REF POINTING^ REF
+	|	REF COMMON_PARENT^ REF
+	;
+	
+fragment
+unary_linguistic_term
+	:	REF ROOT^
+	|	REF ARITY^
+	|	REF TOKEN_ARITY^
 	;
 
 term
@@ -88,7 +108,8 @@ term
 	|	qName EQ text_spec -> ^('=' qName text_spec)
 	|	qName NEQ text_spec -> ^('=' qName text_spec)
 	|	'('! expr^ ')'!
-	|	linguistic_term
+	|	unary_linguistic_term
+	|	binary_linguistic_term
 	;
 	
 	
