@@ -17,10 +17,8 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.KWICPanel.KWICPanelImpl;
 import annis.resolver.ResolverEntry;
 import com.sun.jersey.api.client.WebResource;
@@ -55,8 +53,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
- * TODO test, if this works with mediaplayer TODO performance problems. Only
- * create input for visisible visualizer
+ * TODO test, if this works with mediaplayer
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
@@ -143,8 +140,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void attach()
   {
-    VisualizerInput visInput;
-
 
     if (visPlugin == null)
     {
@@ -152,17 +147,20 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    visInput = createInput();
-    vis = this.visPlugin.createComponent(visInput);
+
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
     {
+      // create the visualizer and calc input
+      vis = this.visPlugin.createComponent(createInput());
       vis.setVisible(true);
+      visContainer.addComponent(vis, "iframe");
     }
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(ISVISIBLE))
     {
-      vis.setVisible(true);
+
+      // build button for visualizer
       btEntry = new Button(entry.getDisplayName());
       btEntry.setIcon(ICON_COLLAPSE);
       btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
@@ -170,23 +168,26 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       btEntry.addListener((Button.ClickListener) this);
       visContainer.addComponent(btEntry, "btEntry");
 
+
+      // create the visualizer and calc input
+      vis = this.visPlugin.createComponent(createInput());
       vis.setVisible(true);
+      visContainer.addComponent(vis, "iframe");
     }
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(NOTVISIBLE))
     {
-      vis.setVisible(true);
+
+      // build button for visualizer
       btEntry = new Button(entry.getDisplayName());
       btEntry.setIcon(ICON_EXPAND);
       btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
         + ChameleonTheme.BUTTON_SMALL);
       btEntry.addListener((Button.ClickListener) this);
       visContainer.addComponent(btEntry, "btEntry");
-
-      vis.setVisible(false);
     }
 
-    visContainer.addComponent(vis, "iframe");
+
   }
 
   private VisualizerInput createInput()
@@ -310,6 +311,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     if (btEntry.getIcon() == ICON_EXPAND)
     {
+
+      // check if it's necessary to create input
+      if (visPlugin != null && vis == null)
+      {
+        vis = this.visPlugin.createComponent(createInput());
+        this.visContainer.addComponent(vis, "iframe");
+      }
 
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);
