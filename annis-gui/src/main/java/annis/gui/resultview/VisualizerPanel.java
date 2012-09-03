@@ -55,7 +55,8 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
- * TODO test, if this works with mediaplayer
+ * TODO test, if this works with mediaplayer TODO performance problems. Only
+ * create input for visisible visualizer
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
@@ -143,7 +144,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public void attach()
   {
     VisualizerInput visInput;
-    visInput = createInput();
+
 
     if (visPlugin == null)
     {
@@ -151,6 +152,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
+    visInput = createInput();
     vis = this.visPlugin.createComponent(visInput);
 
     if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
