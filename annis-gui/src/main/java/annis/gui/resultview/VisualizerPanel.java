@@ -220,6 +220,20 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       input.setResourcePathTemplate(template);
     }
 
+    if (visPlugin.isUsingText()
+      && result.getSDocumentGraph().getSNodes().size() > 0)
+    {
+      SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+        get(0).getSName(), result.getSName());
+
+      input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
+
+    }
+    else
+    {
+      input.setDocument(result);
+    }
+
     return input;
   }
 
@@ -286,7 +300,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    */
   public void toggleVisualizer(boolean collapse)
   {
-    VisualizerInput input;
 
     if (resource != null && collapse)
     {
@@ -302,26 +315,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         visPlugin = ps.getVisualizer(entry.getVisType());
       }
 
-      input = createInput();
-
-      if (visPlugin.isUsingText()
-        && result.getSDocumentGraph().getSNodes().size() > 0)
-      {
-        SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
-          get(0).getSName(), result.getSName());
-
-        input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
-      }
-      else
-      {
-        input.setDocument(result);
-      }
-
-      input.setVisPanel(this);
-      this.vis = visPlugin.createComponent(input);
       visContainer.addComponent(this.vis, "iframe");
-
 
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);
