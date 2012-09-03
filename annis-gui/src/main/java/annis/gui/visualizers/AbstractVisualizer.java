@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * Base class for all Visualizer. This class sets some defaults, so you may
- * implement the null
+ * implement the
  * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)}
  * method for pure Vaadin component plugins.
  *
@@ -27,24 +27,6 @@ import java.util.Set;
  */
 public abstract class AbstractVisualizer implements VisualizerPlugin
 {
-
-  /**
-   * Returns the character endocing for this particular Visualizer output. For
-   * more information see
-   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
-   * overridden to change default "utf-8".
-   *
-   * @return the CharacterEncoding
-   */
-  public String getCharacterEncoding()
-  {
-    return "utf-8";
-  }
-
-  public String getContentType()
-  {
-    return "text/html";
-  }
 
   /**
    * Return if this visualizer is using the complete text.

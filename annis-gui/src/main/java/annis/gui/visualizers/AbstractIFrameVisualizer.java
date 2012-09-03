@@ -27,8 +27,26 @@ import java.io.OutputStream;
  * @author Thomas Krause <krause@informatik.hu-berlin.>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements  ResourcePlugin
+public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
 {
+
+  /**
+   * Returns the character endocing for this particular Visualizer output. For
+   * more information see
+   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
+   * overridden to change default "utf-8".
+   *
+   * @return the CharacterEncoding
+   */
+  public String getCharacterEncoding()
+  {
+    return "utf-8";
+  }
+
+  public String getContentType()
+  {
+    return "text/html";
+  }
 
   /**
    * Writes the final output to passed OutputStream. The stream should remain
