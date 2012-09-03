@@ -57,6 +57,5 @@ public abstract class AbstractVisualizer implements VisualizerPlugin
   @Override
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    throw new UnsupportedOperationException();
   }
 }
