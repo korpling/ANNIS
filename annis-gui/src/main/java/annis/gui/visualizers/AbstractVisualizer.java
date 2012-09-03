@@ -49,6 +49,7 @@ public abstract class AbstractVisualizer implements VisualizerPlugin
   /**
    * Return if this visualizer is using the complete text.
    */
+  @Override
   public boolean isUsingText()
   {
     return false;
