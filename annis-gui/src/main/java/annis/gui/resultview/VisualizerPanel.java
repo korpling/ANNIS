@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
+ * TODO test, if this works with mediaplayer
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
@@ -129,7 +130,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.segmentationName = segmentationName;
     this.mediaVisualizer = mediaVisualizer;
     this.mediaIDs = mediaIDs;
-    // TODO use this also for ComponentVisualizer, or lookup a native mediaplayer
     this.htmlID = htmlID;
 
     this.visContainer = visContainer;
@@ -309,25 +309,17 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     if (btEntry.getIcon() == ICON_EXPAND)
     {
 
-      if (visPlugin == null)
-      {
-        entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-        visPlugin = ps.getVisualizer(entry.getVisType());
-      }
-
-      visContainer.addComponent(this.vis, "iframe");
-
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);
     }
     else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
-      // collapse
       if (vis != null)
       {
         vis.setVisible(false);
         stopMediaVisualizers();
       }
+
       btEntry.setIcon(ICON_EXPAND);
     }
   }
