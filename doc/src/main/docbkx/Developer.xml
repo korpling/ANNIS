@@ -54,13 +54,13 @@
     <section>
         <title>Building ANNIS</title>
         <para>ANNIS uses <link xlink:href="http://maven.apache.org/">Maven3</link> as build tool.
-        Maven itself is based on Java and should run on every major operating system.
-        You have to download and install the appropriate version for your operating system from 
-            <link xlink:href="http://maven.apache.org/download.html">http://maven.apache.org/download.html</link>
-        before you can build ANNIS. Maven will download all needed dependencies from central servers
-        on the first build so you will need to have a working internet connection. The dependencies
-        are cached locally once their are downloaded.
-        </para>
+            Maven itself is based on Java and should run on every major operating system. You have
+            to download and install the appropriate version for your operating system from <link
+                xlink:href="http://maven.apache.org/download.html"
+                >http://maven.apache.org/download.html</link> before you can build ANNIS. Maven will
+            download all needed dependencies from central servers on the first build so you will
+            need to have a working internet connection. The dependencies are cached locally once
+            their are downloaded. </para>
         <para> When you have downloaded or checked out the source of ANNIS the top-level directory
             of the source code is the parent project for all ANNIS sub-projects. If you want to
             build every project that is part of ANNIS just execute
@@ -81,9 +81,9 @@ mvn install            </programlisting> This
     <section>
         <title>Using an IDE</title>
         <para>While you can use any text editor of your choice to change ANNIS and compile it
-            completly on the command line using Maven, a proper IDE will be a huge help for you.
-            You can use any IDE which has a good support for Maven. The ANNIS main developers
-            currently recommend the Netbeans 7.x IDE for development.</para>
+            completly on the command line using Maven, a proper IDE will be a huge help for you. You
+            can use any IDE which has a good support for Maven. The ANNIS main developers currently
+            recommend the Netbeans 7.x IDE for development.</para>
     </section>
     <section>
         <title>Front-end</title>
@@ -104,9 +104,31 @@ mvn jetty:run</programlisting>
                     >http://localhost:8080/annis-gui/app</link>. The Jetty server might be stopped
                 by pressing "CTRL-C". </para>
         </section>
+
+
         <section>
             <title>HOWTO add new visualizers</title>
-            <para>TODO</para>
+            <section>
+                <title>ANNIS visualizer plugin hierachy</title>
+                <para> The ANNIS-Visualizer plugins also depends of the PluginSystem, which searches
+                    the Java Classpath for classes with the annotation @PluginImplementation.<inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/plugin_structure.svg" width="100%"/>
+                        </imageobject>
+                    </inlinemediaobject></para>
+            </section>
+            <section>
+                <title>HOWTO implement a new visualizer</title>
+                <para>There exists two different kinds of visualizer.</para>
+                <section>
+                    <title>iframe visualizer</title>
+                    <para>TODO</para>                    
+                </section>
+                <section>
+                    <title>vaadin visualizer</title>
+                    <para>TODO</para>                    
+                </section>
+            </section>
         </section>
     </section>
 </article>

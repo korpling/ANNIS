@@ -16,7 +16,7 @@
 package annis.gui.visualizers.iframe.tree;
 
 import annis.MatchedNodeColors;
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.AbstractImageGraphicsItem;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.Java2dBackend;
@@ -37,7 +37,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class TigerTreeVisualizer extends IFrameVisualizer
+public class TigerTreeVisualizer extends AbstractIFrameVisualizer
 {
 
   private VisualizerInput input = new VisualizerInput();

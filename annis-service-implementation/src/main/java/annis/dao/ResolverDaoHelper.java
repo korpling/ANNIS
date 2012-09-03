@@ -50,6 +50,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
       + "resolver_vis_map.vis_type, "
       + "resolver_vis_map.display_name, "
       + "resolver_vis_map.order, "
+      + "resolver_vis_map.visibility, "
       + "resolver_vis_map.mappings\n";
 
     String defaultFromWhere = 
@@ -163,6 +164,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
         element == null ? null : ResolverEntry.ElementType.valueOf(element),
         rs.getString("vis_type"),
         rs.getString("display_name"),
+        rs.getString("visibility"),
         mappings,
         rs.getInt("order"));
       result.add(e);

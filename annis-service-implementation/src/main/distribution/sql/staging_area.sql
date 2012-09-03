@@ -122,6 +122,7 @@ CREATE :tmp TABLE _resolver_vis_map
   "element"    varchar, -- the type of the entry: node | edge
   "vis_type"   varchar NOT NULL, -- the abstract type of visualization: tree, discourse, grid, ...
   "display_name"   varchar NOT NULL, -- the name of the layer which shall be shown for display
+  "visibility"  varchar default 'hidden' NOT NULL,
   "order" bigint default '0', -- the order of the layers, in which they shall be shown
   "mappings" varchar			    
 );

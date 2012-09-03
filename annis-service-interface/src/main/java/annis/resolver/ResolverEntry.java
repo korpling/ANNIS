@@ -21,17 +21,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class corresponds to a single entry in the resolver table
+ *
  * @author thomas
  */
-
 @XmlRootElement
 public class ResolverEntry implements Serializable
 {
+
   public enum ElementType
   {
+
     node, edge
   }
-
   private long id;
   private String corpus;
   private String version;
@@ -39,15 +40,15 @@ public class ResolverEntry implements Serializable
   private ElementType element;
   private String visType;
   private String displayName;
-
+  private String visibility;
   private Properties mappings;
   private int order;
 
   public ResolverEntry()
-  {    
+  {
   }
-  
-  public ResolverEntry(long id, String corpus, String version, String namespace, ElementType element, String visType, String displayName, Properties mappings, int order)
+
+  public ResolverEntry(long id, String corpus, String version, String namespace, ElementType element, String visType, String displayName, String visibility, Properties mappings, int order)
   {
     this.id = id;
     this.corpus = corpus;
@@ -57,6 +58,7 @@ public class ResolverEntry implements Serializable
     this.visType = visType;
     this.displayName = displayName;
     this.mappings = mappings;
+    this.visibility = visibility;
     this.order = order;
   }
 
@@ -150,6 +152,16 @@ public class ResolverEntry implements Serializable
     this.visType = visType;
   }
 
+  public String getVisibility()
+  {
+    return this.visibility;
+  }
+
+  public void setVisibility(String visibility)
+  {
+    this.visibility = visibility;
+  }
+
   @Override
   public boolean equals(Object obj)
   {
@@ -190,6 +202,13 @@ public class ResolverEntry implements Serializable
     {
       return false;
     }
+
+    if ((this.visibility == null) ? (other.visibility != null) : !this.visibility.equals(other.visibility))
+    {
+      return false;
+    }
+
+
     if (this.mappings != other.mappings && (this.mappings == null || !this.mappings.equals(other.mappings)))
     {
       return false;
@@ -212,9 +231,9 @@ public class ResolverEntry implements Serializable
     hash = 97 * hash + (this.element != null ? this.element.hashCode() : 0);
     hash = 97 * hash + (this.visType != null ? this.visType.hashCode() : 0);
     hash = 97 * hash + (this.displayName != null ? this.displayName.hashCode() : 0);
+    hash = 97 * hash + (this.visibility != null ? this.visibility.hashCode() : 0);
     hash = 97 * hash + (this.mappings != null ? this.mappings.hashCode() : 0);
     hash = 97 * hash + this.order;
     return hash;
   }
-
 }

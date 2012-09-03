@@ -15,23 +15,30 @@
  */
 package annis.gui.visualizers;
 
-import com.vaadin.ui.Component;
 import java.util.Set;
 
 /**
- * All Vaadin Plugins must implement this Interface.
+ * Base class for all Visualizer. This class sets some defaults, so you may
+ * implement the
+ * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)}
+ * method for pure Vaadin component plugins.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface ComponentVisualizerPlugin extends VisualizerPlugin, Component
+public abstract class AbstractVisualizer implements VisualizerPlugin
 {
-  
-  public void setVisualizerInput(VisualizerInput visInput); 
-  
+
   /**
-   * The implementation is optional.
-   * 
+   * Return if this visualizer is using the complete text.
    */
-  public void setVisibleTokenAnnosVisible(Set<String> annos);
-  
+  @Override
+  public boolean isUsingText()
+  {
+    return false;
+  }
+
+  @Override
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  {
+  }
 }
