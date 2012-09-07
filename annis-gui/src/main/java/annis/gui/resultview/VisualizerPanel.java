@@ -103,8 +103,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     @Deprecated Map<String, String> markedAndCoveredMap,
     @Deprecated Map<String, String> markedExactMap,
     STextualDS text,
-    List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer,
     String htmlID,
     SingleResultPanel parent,
     String segmentationName,
@@ -127,8 +125,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.markedAndCovered = markedAndCovered;
     this.text = text;
     this.segmentationName = segmentationName;
-    this.mediaVisualizer = mediaVisualizer;
-    this.mediaIDs = mediaIDs;
     this.htmlID = htmlID;
 
     this.visContainer = visContainer;
@@ -201,7 +197,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
-    input.setMediaIDs(mediaIDs);
     input.setMarkedAndCovered(markedAndCovered);
     input.setVisPanel(this);
 
@@ -210,7 +205,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setText(text);
     input.setSegmentationName(segmentationName);
-    input.setMediaIDs(mediaIDs);
     input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
@@ -358,6 +352,21 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.kwicPanel = kwicPanel;
   }
 
+  public String getHtmlID()
+  {
+    return htmlID;
+  }
+
+  public List<VisualizerPanel> getMediaVisualizer()
+  {
+    return mediaVisualizer;
+  }
+
+  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
+  {
+    this.mediaVisualizer = mediaVisualizer;
+  }
+
   public void startMediaVisFromKWIC()
   {
     if (kwicPanel != null)
@@ -374,6 +383,5 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       + "document.getElementById(\"" + this.htmlID + "\")"
       + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
     getWindow().executeJavaScript(stopCommand);
-
   }
 }

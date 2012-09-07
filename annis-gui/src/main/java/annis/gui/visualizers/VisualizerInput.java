@@ -26,6 +26,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -51,7 +52,6 @@ public class VisualizerInput
   private AnnisResult result;
   private Properties mappings;
   private String resourcePathTemplate = "%s";
-  private List<String> mediaIDs;
   private List<SToken> token;
   private Set<String> tokenAnnos;
   private STextualDS text;
@@ -317,19 +317,6 @@ public class VisualizerInput
   }
 
   /**
-   * mediaVisIds This sets the id of possible media visualizer. We use this to
-   * resolve the javascript api in the html frontend. The List could be null,
-   * which means, that there was no media visualizer triggered in the resovler
-   * entries
-   *
-   * @param mediaVisTriggered
-   */
-  public void setMediaIDs(List<String> mediaIDs)
-  {
-    this.mediaIDs = mediaIDs;
-  }
-
-  /**
    * returns the media visualizer ids. We insert the iframe in a div block with
    * this id: "resolver-resultNum-numOfVis"
    *
@@ -337,7 +324,12 @@ public class VisualizerInput
    */
   public List<String> getMediaIDs()
   {
-    return mediaIDs;
+    List<String> res = new LinkedList<String>();
+    for(VisualizerPanel p : getMediaVisualizer())
+    {
+      res.add(p.getHtmlID());
+    }
+    return res;
   }
 
   /**

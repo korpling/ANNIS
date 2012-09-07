@@ -73,8 +73,6 @@ public class SingleResultPanel extends VerticalLayout implements
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
   private List<VisualizerPanel> visualizers;
-  private List<VisualizerPanel> mediaVisualizer;
-  private List<String> mediaIDs;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
@@ -148,10 +146,9 @@ public class SingleResultPanel extends VerticalLayout implements
 
       ResolverEntry[] entries =
         resolverProvider.getResolverEntries(result);
-      mediaIDs = mediaVisIds(entries);
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-      mediaVisualizer = new ArrayList<VisualizerPanel>();
+      List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
       
       token = result.getSDocumentGraph().getSortedSTokenByText();
 
@@ -167,12 +164,13 @@ public class SingleResultPanel extends VerticalLayout implements
         EList<STextualDS> allTexts = result.getSDocumentGraph().getSTextualDSs();
         for (STextualDS text : allTexts)
         {
-          String id = "resolver-" + resultNumber + "_" + textNr + "_" + "-" + i;
-          CustomLayout visContainer = this.visContainer(id);
+          String id = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
+          
+          CustomLayout visContainer = visContainer(id);
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
-            markedCoveredMap, text, mediaIDs, mediaVisualizer, id, this,
+            markedCoveredMap, text, id, this,
             segmentationName, ps, visContainer, allTexts.size() > 1);
 
 
@@ -193,17 +191,19 @@ public class SingleResultPanel extends VerticalLayout implements
           textNr++;
           
         } // end for each text
-
-        for (VisualizerPanel p : visualizers)
-        {
-          addComponent(p);
-        }
-
-        for (VisualizerPanel p : openVisualizers)
-        {
-          p.toggleVisualizer(false);
-        }
+      } // for each resolver entry
+      
+      for (VisualizerPanel p : visualizers)
+      {
+        p.setMediaVisualizer(mediaVisualizer);
+        addComponent(p);
       }
+
+      for (VisualizerPanel p : openVisualizers)
+      {
+        p.toggleVisualizer(false);
+      }
+      
     }
     catch (Exception ex)
     {
@@ -440,22 +440,5 @@ public class SingleResultPanel extends VerticalLayout implements
       log.error("problems with generating vis container", ex);
     }
     return null;
-  }
-
-  private List<String> mediaVisIds(ResolverEntry[] entries)
-  {
-    List<String> mediaIds = new ArrayList<String>();
-    int counter = 0;
-    for (ResolverEntry e : entries)
-    {
-      String id = "resolver-" + resultNumber + "-" + counter++;
-      if ("media".equals(e.getVisType())
-        || "audio".equals(e.getVisType())
-        || "video".equals(e.getVisType()))
-      {
-        mediaIds.add(id);
-      }
-    }
-    return mediaIds;
   }
 }
