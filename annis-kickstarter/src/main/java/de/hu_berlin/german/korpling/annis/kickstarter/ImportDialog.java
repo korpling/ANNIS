@@ -107,6 +107,12 @@ public class ImportDialog extends javax.swing.JDialog
         int i=0;
         for(Map<String, Object> corpus : corpora)
         {
+          if(isCancelled())
+          {
+            status.ok = true;
+            return status;
+          }
+          
           if(corpus.containsKey("source_path"))
           {
             final String path = (String) corpus.get("source_path");
@@ -149,7 +155,7 @@ public class ImportDialog extends javax.swing.JDialog
       
       return status;
     }
-
+    
     @Override
     protected void done()
     {
@@ -163,17 +169,20 @@ public class ImportDialog extends javax.swing.JDialog
       
       try
       {
-        Status status = this.get();
-        if (status.ok)
+        if(!isCancelled())
         {
-          JOptionPane.showMessageDialog(null,
-            "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
-          setVisible(false);
-        }
-        else
-        {
-          new ExceptionDialog( status.ex, "Import failed").setVisible(true);
-          setVisible(false);
+          Status status = this.get();
+          if (status.ok)
+          {
+            JOptionPane.showMessageDialog(null,
+              "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
+            setVisible(false);
+          }
+          else
+          {
+            new ExceptionDialog( status.ex, "Import failed").setVisible(true);
+            setVisible(false);
+          }
         }
       }
       catch (Exception ex)
