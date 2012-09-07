@@ -78,7 +78,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
-  private VisualizerPlugin<Component> visPlugin;
+  private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private SingleResultPanel parentPanel;
@@ -241,17 +241,25 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-    if(visPlugin != null && vis != null)
+    this.visibleTokenAnnos = annos;
+    if(visPlugin != null && vis != null && visContainer != null)
     {
-      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
+      Component newVis = visPlugin.createComponent(createInput());
+      visContainer.replaceComponent(vis, newVis);
+      vis = newVis;
     }
   }
   
-  public void setSegmentationLayer(String segmentationName)
+  public void setSegmentationLayer(List<SNode> token, String segmentationName)
   {
-    if(visPlugin != null && vis != null)
+    this.token = token;
+    this.segmentationName = segmentationName;
+    
+    if(visPlugin != null && vis != null && visContainer != null)
     {
-      this.visPlugin.setSegmentationLayer(this.vis, segmentationName);
+      Component newVis = visPlugin.createComponent(createInput());
+      visContainer.replaceComponent(vis, newVis);
+      vis = newVis;
     }
   }
 

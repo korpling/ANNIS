@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>
+public abstract class AbstractVisualizer implements VisualizerPlugin
 {
 
   /**
@@ -38,14 +38,4 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
     return false;
   }
 
-  @Override
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos)
-  {
-  }
-  
-  @Override
-  public void setSegmentationLayer(I visualizerImplementation, String segmentationName)
-  {
-    
-  }
 }

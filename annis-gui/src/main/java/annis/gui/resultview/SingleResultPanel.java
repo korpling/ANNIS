@@ -206,9 +206,11 @@ public class SingleResultPanel extends VerticalLayout implements
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
+    this.token = CommonHelper.getSortedSegmentationNodes(segmentationName,
+            result.getSDocumentGraph());
     for(VisualizerPanel p : visualizers)
     {
-      p.setSegmentationLayer(segmentationName);
+      p.setSegmentationLayer(this.token, segmentationName);
     }
   }
 

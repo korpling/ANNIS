@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
+public class KWICPanel extends AbstractVisualizer
 {
 
   @Override
@@ -59,12 +59,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   public KWICPanelImpl createComponent(VisualizerInput visInput)
   {
     return new KWICPanelImpl(visInput);
-  }
-
-  @Override
-  public void setVisibleTokenAnnosVisible(KWICPanelImpl visualizerImplementation, Set<String> annos)
-  {
-    visualizerImplementation.setVisibleTokenAnnosVisible(annos);
   }
 
   public class KWICPanelImpl extends Table implements ItemClickEvent.ItemClickListener
@@ -120,7 +114,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text,
       List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer,
       SingleResultPanel parent, String segmentationName)
-    {
+    {      
       this.result = result;
       this.markedAndCovered = markedAndCovered;
       this.mediaIDs = mediaIDs;
@@ -191,6 +185,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
             addGeneratedColumn(gapColumnID, new KWICPanelImpl.GapColumnGenerator());
             setColumnExpandRatio(gapColumnID, 0.0f);
             visible.add(gapColumnID);
+            
           }
 
           //add a column for each token
@@ -221,6 +216,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           return "";
         }
       });
+            
       setColumnWidth(DUMMY_COLUMN, 0);
       setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
       visible.add(DUMMY_COLUMN);
@@ -233,16 +229,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       setCellStyleGenerator(new KWICPanelImpl.KWICStyleGenerator());
       setItemDescriptionGenerator(new KWICPanelImpl.TooltipGenerator());
 
-    }
-
-    public void setVisibleTokenAnnosVisible(Set<String> annos)
-    {
-      if (containerAnnos != null)
-      {
-        containerAnnos.removeAllItems();
-        containerAnnos.addItem("tok");
-        containerAnnos.addAll(annos);
-      }
     }
 
     public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator

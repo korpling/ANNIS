@@ -39,7 +39,7 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface VisualizerPlugin<I extends Component> extends Plugin
+public interface VisualizerPlugin extends Plugin
 {
 
   /**
@@ -55,21 +55,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin
    * vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput);
-
-  /**
-   * If applicable change the visible token annotations.
-   *
-   * @param annos Which token annotations (qualified name) to show.
-   */
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos);
-  
-  /**
-   * If applicable change the displayed segmentation.
-   * 
-   * @param segmentationName 
-   */
-  public void setSegmentationLayer(I visualizerImplementation, String segmentationName);
+  public Component createComponent(VisualizerInput visInput);
 
   /**
    * Checks if the Plugin needs the primary text source.
