@@ -18,6 +18,7 @@ package annis.gui.visualizers;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,7 +42,8 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
   }
 
   @Override
-  public void setSegmentationLayer(I visualizerImplementation, String segmentationName)
+  public void setSegmentationLayer(I visualizerImplementation, 
+    String segmentationName, Map<SNode, Long> markedAndCovered)
   {
   }
 

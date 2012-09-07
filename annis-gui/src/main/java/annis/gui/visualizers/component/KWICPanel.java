@@ -68,9 +68,10 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   
   
   @Override
-  public void setSegmentationLayer(KWICPanelImpl visualizerImplementation, String segmentationName)
+  public void setSegmentationLayer(KWICPanelImpl visualizerImplementation, 
+    String segmentationName, Map<SNode, Long> markedAndCovered)
   {
-    visualizerImplementation.setSegmentationLayer(segmentationName);
+    visualizerImplementation.setSegmentationLayer(segmentationName, markedAndCovered);
   }
   
   
@@ -254,7 +255,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       }
     }
     
-    public void setSegmentationLayer(String segmentationName)
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
     {
       // delete old columns
       if(generatedColumns != null)
@@ -272,7 +273,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       {
         initKWICPanel(visInput.getSResult(),
           visInput.getVisibleTokenAnnos(),
-          visInput.getMarkedAndCovered(),
+          markedAndCovered,
           visInput.getText(),
           visInput.getMediaIDs(),
           visInput.getMediaVisualizer(),

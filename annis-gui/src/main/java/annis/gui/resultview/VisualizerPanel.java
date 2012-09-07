@@ -246,13 +246,14 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
   }
   
-  public void setSegmentationLayer(String segmentationName)
+  public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
+    this.markedAndCovered = markedAndCovered;
     
     if(visPlugin != null && vis != null)
     {
-      visPlugin.setSegmentationLayer(vis, segmentationName);
+      visPlugin.setSegmentationLayer(vis, segmentationName,markedAndCovered);
     }
   }
 

@@ -214,7 +214,7 @@ public class SingleResultPanel extends VerticalLayout implements
     
     for(VisualizerPanel p : visualizers)
     {
-      p.setSegmentationLayer(segmentationName);
+      p.setSegmentationLayer(segmentationName, markedAndCovered);
     }
   }
 
