@@ -51,6 +51,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -162,15 +163,17 @@ public class SingleResultPanel extends VerticalLayout implements
 
       for (int i = 0; i < entries.length; i++)
       {
-        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
+        int textNr = 0;
+        EList<STextualDS> allTexts = result.getSDocumentGraph().getSTextualDSs();
+        for (STextualDS text : allTexts)
         {
-          String id = "resolver-" + resultNumber + "-" + i;
+          String id = "resolver-" + resultNumber + "_" + textNr + "_" + "-" + i;
           CustomLayout visContainer = this.visContainer(id);
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
             markedCoveredMap, text, mediaIDs, mediaVisualizer, id, this,
-            segmentationName, ps, visContainer);
+            segmentationName, ps, visContainer, allTexts.size() > 1);
 
 
           if ("media".equals(entries[i].getVisType())
@@ -186,6 +189,9 @@ public class SingleResultPanel extends VerticalLayout implements
           {
             openVisualizers.add(p);
           }
+          
+          textNr++;
+          
         } // end for each text
 
         for (VisualizerPanel p : visualizers)

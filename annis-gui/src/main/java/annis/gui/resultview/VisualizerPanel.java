@@ -82,9 +82,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
-  private SingleResultPanel parentPanel;
   private String segmentationName;
   private List<VisualizerPanel> mediaVisualizer;
+  private boolean showTextID;
   private final String PERMANENT = "permanent";
   private final String ISVISIBLE = "visible";
   private final String NOTVISIBLE = "hidden";
@@ -109,7 +109,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     SingleResultPanel parent,
     String segmentationName,
     PluginSystem ps,
-    CustomLayout visContainer)
+    CustomLayout visContainer,
+    boolean showTextID)
   {
 
     visPlugin = ps.getVisualizer(entry.getVisType());
@@ -125,13 +126,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
     this.text = text;
-    this.parentPanel = parent;
     this.segmentationName = segmentationName;
     this.mediaVisualizer = mediaVisualizer;
     this.mediaIDs = mediaIDs;
     this.htmlID = htmlID;
 
     this.visContainer = visContainer;
+    this.showTextID = showTextID;
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -159,9 +160,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       }
       else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
       {
-
         // build button for visualizer
-        btEntry = new Button(entry.getDisplayName());
+        btEntry = new Button(entry.getDisplayName() 
+          + (showTextID ? " (" + text.getSName() + ")" : ""));
         btEntry.setIcon(ICON_COLLAPSE);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
@@ -177,7 +178,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       else
       {
         // build button for visualizer
-        btEntry = new Button(entry.getDisplayName());
+        btEntry = new Button(entry.getDisplayName()
+          + (showTextID ? " (" + text.getSName() + ")" : ""));
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);

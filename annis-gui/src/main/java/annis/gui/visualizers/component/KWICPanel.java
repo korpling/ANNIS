@@ -218,7 +218,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           {
             lastTokenIndex = featTokenIndex.getSValueSNUMERIC();
           }
-        }
+        } // end if token belongs to text
       }
 
       addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
