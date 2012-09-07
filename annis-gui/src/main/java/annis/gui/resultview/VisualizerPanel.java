@@ -240,11 +240,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     this.visibleTokenAnnos = annos;
-    if(visPlugin != null && vis != null && visContainer != null)
+    if(visPlugin != null && vis != null)
     {
-      Component newVis = visPlugin.createComponent(createInput());
-      visContainer.replaceComponent(vis, newVis);
-      vis = newVis;
+      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
     }
   }
   
@@ -253,11 +251,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.token = token;
     this.segmentationName = segmentationName;
     
-    if(visPlugin != null && vis != null && visContainer != null)
+    if(visPlugin != null && vis != null)
     {
-      Component newVis = visPlugin.createComponent(createInput());
-      visContainer.replaceComponent(vis, newVis);
-      vis = newVis;
+      visPlugin.setSegmentationLayer(vis, segmentationName);
     }
   }
 
