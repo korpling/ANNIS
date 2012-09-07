@@ -38,6 +38,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
@@ -56,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * TODO test, if this works with mediaplayer
  */
-public class VisualizerPanel extends Panel implements Button.ClickListener
+public class VisualizerPanel extends CustomLayout implements Button.ClickListener
 {
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
@@ -78,7 +79,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private KWICPanelImpl kwicPanel;
   private List<String> mediaIDs;
   private String htmlID;
-  private CustomLayout visContainer;
   private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
@@ -89,6 +89,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private final String ISVISIBLE = "visible";
   private final String NOTVISIBLE = "hidden";
 
+  private final static String htmlTemplate = 
+    "<div id=\":id\"><div location=\"btEntry\"></div>"
+    + "<div location=\"iframe\"></div></div>";
+    
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -107,9 +111,9 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     SingleResultPanel parent,
     String segmentationName,
     PluginSystem ps,
-    CustomLayout visContainer,
-    boolean showTextID)
+    boolean showTextID) throws IOException
   {
+    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes()));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
 
@@ -127,12 +131,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
 
-    this.visContainer = visContainer;
     this.showTextID = showTextID;
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-    this.setContent(this.visContainer);
   }
 
   @Override
@@ -152,7 +154,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         // create the visualizer and calc input
         vis = this.visPlugin.createComponent(createInput());
         vis.setVisible(true);
-        visContainer.addComponent(vis, "iframe");
+        addComponent(vis, "iframe");
       }
       else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
       {
@@ -163,13 +165,13 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addListener((Button.ClickListener) this);
-        visContainer.addComponent(btEntry, "btEntry");
+        addComponent(btEntry, "btEntry");
 
 
         // create the visualizer and calc input
         vis = this.visPlugin.createComponent(createInput());
         vis.setVisible(true);
-        visContainer.addComponent(vis, "iframe");
+        addComponent(vis, "iframe");
       }
       else
       {
@@ -180,7 +182,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addListener((Button.ClickListener) this);
-        visContainer.addComponent(btEntry, "btEntry");
+        addComponent(btEntry, "btEntry");
       }
     }
 
@@ -329,7 +331,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       if (visPlugin != null && vis == null)
       {
         vis = this.visPlugin.createComponent(createInput());
-        this.visContainer.addComponent(vis, "iframe");
+        addComponent(vis, "iframe");
       }
 
       btEntry.setIcon(ICON_COLLAPSE);

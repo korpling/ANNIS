@@ -24,6 +24,7 @@ import annis.resolver.ResolverEntry;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class SingleResultPanel extends VerticalLayout implements
+public class SingleResultPanel extends CssLayout implements
   Button.ClickListener
 {
 
@@ -101,7 +102,7 @@ public class SingleResultPanel extends VerticalLayout implements
     setHeight("-1px");
 
     setMargin(false);
-    setSpacing(false);
+    //setSpacing(false);
 
     HorizontalLayout infoBar = new HorizontalLayout();
     infoBar.addStyleName("docPath");
@@ -165,13 +166,11 @@ public class SingleResultPanel extends VerticalLayout implements
         for (STextualDS text : allTexts)
         {
           String id = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
-          
-          CustomLayout visContainer = visContainer(id);
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
             markedCoveredMap, text, id, this,
-            segmentationName, ps, visContainer, allTexts.size() > 1);
+            segmentationName, ps, allTexts.size() > 1);
 
 
           if ("media".equals(entries[i].getVisType())
@@ -424,21 +423,4 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  private CustomLayout visContainer(String id)
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id=\"").append(id).append("\">");
-    sb.append("<div location=\"btEntry\"></div>");
-    sb.append("  <div location=\"iframe\"></div>");
-    sb.append("</div>");
-    try
-    {
-      return new CustomLayout(new ByteArrayInputStream(sb.toString().getBytes()));
-    }
-    catch (IOException ex)
-    {
-      log.error("problems with generating vis container", ex);
-    }
-    return null;
-  }
 }
