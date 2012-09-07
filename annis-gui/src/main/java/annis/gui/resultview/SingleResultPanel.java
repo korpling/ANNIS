@@ -154,7 +154,10 @@ public class SingleResultPanel extends VerticalLayout implements
       
       token = result.getSDocumentGraph().getSortedSTokenByText();
 
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+        result.getSDocumentGraph());
+      
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       calulcateColorsForMarkedAndCoverd();
 
       for (int i = 0; i < entries.length; i++)
@@ -205,10 +208,13 @@ public class SingleResultPanel extends VerticalLayout implements
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
+    List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+        result.getSDocumentGraph());
+    markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
     
     for(VisualizerPanel p : visualizers)
     {
-      p.setSegmentationLayer(this.token, segmentationName);
+      p.setSegmentationLayer(segmentationName);
     }
   }
 
@@ -268,7 +274,7 @@ public class SingleResultPanel extends VerticalLayout implements
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
-    SDocument doc, List<SToken> segNodes)
+    SDocument doc, List<SNode> segNodes)
   {
     Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();

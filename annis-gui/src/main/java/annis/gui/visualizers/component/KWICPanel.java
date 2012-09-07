@@ -354,7 +354,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       @Override
       public String getStyle(Object itemId, Object propertyId)
       {
-        if (propertyId != null && propertyId instanceof SToken)
+        if (propertyId != null && propertyId instanceof SNode)
         {
           return getStyle((String) itemId, (SNode) propertyId);
         }

@@ -246,9 +246,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
   }
   
-  public void setSegmentationLayer(List<SToken> token, String segmentationName)
+  public void setSegmentationLayer(String segmentationName)
   {
-    this.token = token;
     this.segmentationName = segmentationName;
     
     if(visPlugin != null && vis != null)
