@@ -79,7 +79,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<String> path;
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
-  private List<SNode> token;
+  private List<SToken> token;
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -151,6 +151,11 @@ public class SingleResultPanel extends VerticalLayout implements
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
       mediaVisualizer = new ArrayList<VisualizerPanel>();
+      
+      token = result.getSDocumentGraph().getSortedSTokenByText();
+
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
+      calulcateColorsForMarkedAndCoverd();
 
       for (int i = 0; i < entries.length; i++)
       {
@@ -158,12 +163,6 @@ public class SingleResultPanel extends VerticalLayout implements
         {
           String id = "resolver-" + resultNumber + "-" + i;
           CustomLayout visContainer = this.visContainer(id);
-
-          token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-            result.getSDocumentGraph());
-
-          markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
-          calulcateColorsForMarkedAndCoverd();
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
@@ -184,7 +183,7 @@ public class SingleResultPanel extends VerticalLayout implements
           {
             openVisualizers.add(p);
           }
-        }
+        } // end for each text
 
         for (VisualizerPanel p : visualizers)
         {
@@ -206,8 +205,7 @@ public class SingleResultPanel extends VerticalLayout implements
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
-    this.token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-            result.getSDocumentGraph());
+    
     for(VisualizerPanel p : visualizers)
     {
       p.setSegmentationLayer(this.token, segmentationName);
@@ -270,7 +268,7 @@ public class SingleResultPanel extends VerticalLayout implements
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
-    SDocument doc, List<SNode> segNodes)
+    SDocument doc, List<SToken> segNodes)
   {
     Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();

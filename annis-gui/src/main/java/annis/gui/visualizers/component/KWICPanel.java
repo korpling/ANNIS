@@ -17,7 +17,6 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
-import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerPanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer
+public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 {
 
   @Override
@@ -61,7 +60,22 @@ public class KWICPanel extends AbstractVisualizer
     return new KWICPanelImpl(visInput);
   }
 
-  public class KWICPanelImpl extends Table implements ItemClickEvent.ItemClickListener
+  @Override
+  public void setVisibleTokenAnnosVisible(KWICPanelImpl visualizerImplementation, Set<String> annos)
+  {
+    visualizerImplementation.setVisibleTokenAnnosVisible(annos);
+  }
+  
+  
+  @Override
+  public void setSegmentationLayer(KWICPanelImpl visualizerImplementation, String segmentationName)
+  {
+    visualizerImplementation.setSegmentationLayer(segmentationName);
+  }
+  
+  
+
+  public static class KWICPanelImpl extends Table implements ItemClickEvent.ItemClickListener
   {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(KWICPanelImpl.class);
@@ -78,17 +92,13 @@ public class KWICPanel extends AbstractVisualizer
     {
       "time"
     };
+    private List<Object> generatedColumns;
+    
     private VisualizerInput visInput;
-
-    /**
-     * Used by the Pluginsystem.
-     */
-    public KWICPanelImpl()
-    {
-    }
 
     public KWICPanelImpl(VisualizerInput visInput)
     {
+      this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
     }
 
@@ -99,21 +109,19 @@ public class KWICPanel extends AbstractVisualizer
       if (visInput != null)
       {
         initKWICPanel(visInput.getSResult(),
-          visInput.getToken(),
           visInput.getVisibleTokenAnnos(),
           visInput.getMarkedAndCovered(),
           visInput.getText(),
           visInput.getMediaIDs(),
           visInput.getMediaVisualizer(),
-          visInput.getSingleResultPanel(),
           visInput.getSegmentationName());
       }
     }
 
-    private void initKWICPanel(SDocument result, List<SNode> token,
+    private void initKWICPanel(SDocument result,
       Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text,
-      List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer,
-      SingleResultPanel parent, String segmentationName)
+      List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer, 
+      String segmentationName)
     {      
       this.result = result;
       this.markedAndCovered = markedAndCovered;
@@ -148,6 +156,8 @@ public class KWICPanel extends AbstractVisualizer
       ArrayList<Object> visible = new ArrayList<Object>(10);
       Long lastTokenIndex = null;
 
+      List<SNode> token = CommonHelper.getSortedSegmentationNodes(segmentationName, graph);
+      
       for (SNode t : token)
       {
         STextualDS tokenText = null;
@@ -183,6 +193,7 @@ public class KWICPanel extends AbstractVisualizer
             // add "(...)"
             Long gapColumnID = featTokenIndex.getSValueSNUMERIC();
             addGeneratedColumn(gapColumnID, new KWICPanelImpl.GapColumnGenerator());
+            generatedColumns.add(gapColumnID);
             setColumnExpandRatio(gapColumnID, 0.0f);
             visible.add(gapColumnID);
             
@@ -192,6 +203,7 @@ public class KWICPanel extends AbstractVisualizer
           try
           {
             addGeneratedColumn(t, new KWICPanelImpl.TokenColumnGenerator(t, segmentationName));
+            generatedColumns.add(t);
             setColumnExpandRatio(t, 0.0f);
           }
           catch (IllegalArgumentException ex)
@@ -216,6 +228,7 @@ public class KWICPanel extends AbstractVisualizer
           return "";
         }
       });
+      generatedColumns.add(DUMMY_COLUMN);
             
       setColumnWidth(DUMMY_COLUMN, 0);
       setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
@@ -231,6 +244,43 @@ public class KWICPanel extends AbstractVisualizer
 
     }
 
+    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    {
+      if (containerAnnos != null)
+      {
+        containerAnnos.removeAllItems();
+        containerAnnos.addItem("tok");
+        containerAnnos.addAll(annos);
+      }
+    }
+    
+    public void setSegmentationLayer(String segmentationName)
+    {
+      // delete old columns
+      if(generatedColumns != null)
+      {
+        for(Object o : generatedColumns)
+        {
+          removeGeneratedColumn(o);
+        }
+      }
+      
+      // re-init the complete KWIC
+      
+      generatedColumns = new LinkedList<Object>();
+      if (visInput != null)
+      {
+        initKWICPanel(visInput.getSResult(),
+          visInput.getVisibleTokenAnnos(),
+          visInput.getMarkedAndCovered(),
+          visInput.getText(),
+          visInput.getMediaIDs(),
+          visInput.getMediaVisualizer(),
+          segmentationName);
+      }
+    }
+
+    
     public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
     {
 

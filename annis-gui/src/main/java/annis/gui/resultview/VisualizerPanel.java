@@ -34,6 +34,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -70,7 +71,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private ResolverEntry entry;
   private Random rand = new Random();
   private Map<SNode, Long> markedAndCovered;
-  private List<SNode> token;
+  private List<SToken> token;
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
@@ -96,7 +97,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
-    List<SNode> token,
+    List<SToken> token,
     Set<String> visibleTokenAnnos,
     Map<SNode, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
@@ -147,8 +148,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-
-
     if(entry != null)
     {
       if(PERMANENT.equalsIgnoreCase(entry.getVisibility()))
@@ -192,8 +191,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisRemoteServiceURL(getApplication().getProperty(
-      "AnnisRemoteService.URL"));
+    input.setAnnisWebServiceURL(getApplication().getProperty(
+      "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
     input.setId("" + rand.nextLong());
@@ -208,7 +207,6 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setText(text);
-    input.setSingleResultPanelRef(parentPanel);
     input.setSegmentationName(segmentationName);
     input.setMediaIDs(mediaIDs);
     input.setMediaVisualizer(mediaVisualizer);
@@ -250,7 +248,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
   }
   
-  public void setSegmentationLayer(List<SNode> token, String segmentationName)
+  public void setSegmentationLayer(List<SToken> token, String segmentationName)
   {
     this.token = token;
     this.segmentationName = segmentationName;

@@ -16,6 +16,8 @@
 package annis.gui.visualizers;
 
 import com.vaadin.ui.Component;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Set;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class AbstractVisualizer implements VisualizerPlugin
+public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>
 {
 
   /**
@@ -37,5 +39,17 @@ public abstract class AbstractVisualizer implements VisualizerPlugin
   {
     return false;
   }
+
+  @Override
+  public void setSegmentationLayer(I visualizerImplementation, String segmentationName)
+  {
+  }
+
+  @Override
+  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos)
+  {
+  }
+  
+  
 
 }
