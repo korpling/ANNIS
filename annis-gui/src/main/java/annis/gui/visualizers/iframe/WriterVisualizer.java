@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.iframe;
 
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import java.io.*;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * Implentation of Visualizer which uses Writers instead of OutputStream
  * @author thomas
  */
-public abstract class WriterVisualizer extends IFrameVisualizer
+public abstract class WriterVisualizer extends AbstractIFrameVisualizer
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(WriterVisualizer.class);

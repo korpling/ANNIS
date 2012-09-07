@@ -61,12 +61,8 @@ public class VisualizerInput
   private SingleResultPanel singleResultPanel;
   private String segmentationName;
   private List<VisualizerPanel> mediaVisualizer;
+  private VisualizerPanel visPanel;
 
-  /**
-   * Get the URL which is configured for the Annis installation.
-   *
-   * @return
-   */
   public String getAnnisRemoteServiceURL()
   {
     return annisRemoteServiceURL;
@@ -438,5 +434,22 @@ public class VisualizerInput
   public List<VisualizerPanel> getMediaVisualizer()
   {
     return mediaVisualizer;
+  }
+
+  /**
+   * @return the visPanel
+   */
+  public VisualizerPanel getVisPanel()
+  {
+    return visPanel;
+  }
+
+  /**
+   * @param visPanel this should be the parent VisualizerPanel for the
+   * visualizer which render this result
+   */
+  public void setVisPanel(VisualizerPanel visPanel)
+  {
+    this.visPanel = visPanel;
   }
 }

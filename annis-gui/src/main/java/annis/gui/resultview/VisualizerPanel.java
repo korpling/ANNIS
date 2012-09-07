@@ -17,12 +17,9 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
-import annis.gui.visualizers.IFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
-import annis.gui.widgets.AutoHeightIFrame;
+import annis.gui.visualizers.component.KWICPanel.KWICPanelImpl;
 import annis.resolver.ResolverEntry;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.ApplicationResource;
@@ -30,8 +27,8 @@ import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -50,8 +47,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author thomas, Benjamin Weißenfels
+ * Controls the visibility of visualizer plugins and provides some control
+ * methods for the media visualizers.
  *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ *
+ * TODO test, if this works with mediaplayer
  */
 public class VisualizerPanel extends Panel implements Button.ClickListener
 {
@@ -62,7 +64,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
   private ApplicationResource resource = null;
-  private AutoHeightIFrame iframe;
+  private Component vis;
   private SDocument result;
   private PluginSystem ps;
   private ResolverEntry entry;
@@ -72,50 +74,50 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanel kwicPanel;
+  private KWICPanelImpl kwicPanel;
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
-  private ComponentVisualizerPlugin compVis;
+  private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private SingleResultPanel parentPanel;
   private String segmentationName;
   private List<VisualizerPanel> mediaVisualizer;
+  private final String PERMANENT = "permanent";
+  private final String ISVISIBLE = "visible";
+  private final String NOTVISIBLE = "hidden";
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
    *
    */
-  public VisualizerPanel(String visType, SDocument result, List<SNode> token,
-    Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,
-    STextualDS text, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer, String htmlID,
-    SingleResultPanel parent, String segmentationName, PluginSystem ps,
+  public VisualizerPanel(
+    final ResolverEntry entry,
+    SDocument result,
+    List<SNode> token,
+    Set<String> visibleTokenAnnos,
+    Map<SNode, Long> markedAndCovered,
+    @Deprecated Map<String, String> markedAndCoveredMap,
+    @Deprecated Map<String, String> markedExactMap,
+    STextualDS text,
+    List<String> mediaIDs,
+    List<VisualizerPanel> mediaVisualizer,
+    String htmlID,
+    SingleResultPanel parent,
+    String segmentationName,
+    PluginSystem ps,
     CustomLayout visContainer)
   {
-    // get the Visualizer instance
-    VisualizerPlugin tmpVis = ps.getVisualizer(visType);
-    VisualizerPlugin vis = null;
-    Label label;
 
-    /**
-     * build a new instance, cause the Pluginsystem holds only one instance of
-     * the plugin.
-     */
-    try
-    {
-      vis = tmpVis.getClass().newInstance();
-    }
-    catch (InstantiationException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
-    catch (IllegalAccessException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
+    visPlugin = ps.getVisualizer(entry.getVisType());
+
+    this.ps = ps;
+    this.entry = entry;
+    this.markersExact = markedExactMap;
+    this.markersCovered = markedAndCoveredMap;
+
 
     this.result = result;
     this.token = token;
@@ -126,79 +128,66 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.segmentationName = segmentationName;
     this.mediaVisualizer = mediaVisualizer;
     this.mediaIDs = mediaIDs;
-    // TODO use this also for ComponentVisualizer, or lookup a native mediaplayer
     this.htmlID = htmlID;
 
     this.visContainer = visContainer;
 
-    if (!(vis instanceof ComponentVisualizerPlugin))
-    {
-      log.warn("{} is not a ComponentVisualizer", vis.getShortName());
-      return;
-    }
-
-    compVis = (ComponentVisualizerPlugin) vis;
-    
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    this.setWidth("100%");    
-    this.setContent(this.visContainer);    
-  }
-
-  public VisualizerPanel(final ResolverEntry entry, SDocument result,
-    PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout,
-    List<String> mediaIDs, String htmlID)
-  {
-    this.result = result;
-    this.ps = ps;
-    this.entry = entry;
-    this.markersExact = markersExact;
-    this.markersCovered = markersCovered;
-    this.visContainer = costumLayout;
-    this.mediaIDs = mediaIDs;
-    this.htmlID = htmlID;
-
-
-    setContent(this.visContainer);
-
     this.setWidth("100%");
-    this.setHeight("-1px");
-
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    btEntry = new Button(entry.getDisplayName());
-    btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-      + ChameleonTheme.BUTTON_SMALL);
-    btEntry.addListener((Button.ClickListener) this);
-    visContainer.addComponent(btEntry, "btEntry");
+    this.setContent(this.visContainer);
   }
 
   @Override
   public void attach()
   {
-    VisualizerInput visInput;
 
-    /**
-     * check if this is a ComponentVisualizer.
-     */
-    if (compVis == null)
+    if (visPlugin == null)
     {
-      return;
+      entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+      visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    visInput = createInput();
-    visInput.setResult(result);
-    visInput.setToken(token);
-    visInput.setVisibleTokenAnnos(visibleTokenAnnos);
-    visInput.setText(text);
-    visInput.setSingleResultPanelRef(parentPanel);
-    visInput.setSegmentationName(segmentationName);
-    visInput.setMediaIDs(mediaIDs);
-    visInput.setMediaVisualizer(mediaVisualizer);
 
-    compVis.setVisualizerInput(visInput);
-    visContainer.addComponent(compVis, "compVis");
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
+    {
+      // create the visualizer and calc input
+      vis = this.visPlugin.createComponent(createInput());
+      vis.setVisible(true);
+      visContainer.addComponent(vis, "iframe");
+    }
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(ISVISIBLE))
+    {
+
+      // build button for visualizer
+      btEntry = new Button(entry.getDisplayName());
+      btEntry.setIcon(ICON_COLLAPSE);
+      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+        + ChameleonTheme.BUTTON_SMALL);
+      btEntry.addListener((Button.ClickListener) this);
+      visContainer.addComponent(btEntry, "btEntry");
+
+
+      // create the visualizer and calc input
+      vis = this.visPlugin.createComponent(createInput());
+      vis.setVisible(true);
+      visContainer.addComponent(vis, "iframe");
+    }
+
+    if (entry != null && entry.getVisibility().equalsIgnoreCase(NOTVISIBLE))
+    {
+
+      // build button for visualizer
+      btEntry = new Button(entry.getDisplayName());
+      btEntry.setIcon(ICON_EXPAND);
+      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+        + ChameleonTheme.BUTTON_SMALL);
+      btEntry.addListener((Button.ClickListener) this);
+      visContainer.addComponent(btEntry, "btEntry");
+    }
+
+
   }
 
   private VisualizerInput createInput()
@@ -214,6 +203,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     input.setMarkableMap(markersCovered);
     input.setMediaIDs(mediaIDs);
     input.setMarkedAndCovered(markedAndCovered);
+    input.setVisPanel(this);
+
+    input.setResult(result);
+    input.setToken(token);
+    input.setVisibleTokenAnnos(visibleTokenAnnos);
+    input.setText(text);
+    input.setSingleResultPanelRef(parentPanel);
+    input.setSegmentationName(segmentationName);
+    input.setMediaIDs(mediaIDs);
+    input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
     {
@@ -224,10 +223,24 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       input.setResourcePathTemplate(template);
     }
 
+    if (visPlugin.isUsingText()
+      && result.getSDocumentGraph().getSNodes().size() > 0)
+    {
+      SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+        get(0).getSName(), result.getSName());
+
+      input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
+
+    }
+    else
+    {
+      input.setDocument(result);
+    }
+
     return input;
   }
 
-  private ApplicationResource createResource(
+  public ApplicationResource createResource(
     final ByteArrayOutputStream byteStream,
     String mimeType)
   {
@@ -290,6 +303,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
    */
   public void toggleVisualizer(boolean collapse)
   {
+
     if (resource != null && collapse)
     {
       getApplication().removeResource(resource);
@@ -297,70 +311,30 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
     if (btEntry.getIcon() == ICON_EXPAND)
     {
-      // expand
-      if (iframe == null)
+
+      // check if it's necessary to create input
+      if (visPlugin != null && vis == null)
       {
-
-        VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
-
-        if (vis == null)
-        {
-          entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-          vis = ps.getVisualizer(entry.getVisType());
-        }
-
-        VisualizerInput input = createInput();
-        IFrameVisualizer iframeVis;
-
-        //TODO print error message
-        if (vis instanceof IFrameVisualizer)
-        {
-          iframeVis = (IFrameVisualizer) vis;
-
-          if (iframeVis.isUsingText()
-            && result.getSDocumentGraph().getSNodes().size() > 0)
-          {
-            SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
-              get(0).getSName(), result.getSName());
-
-            input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
-          }
-          else
-          {
-
-            input.setDocument(result);
-
-          }
-
-          ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-          iframeVis.writeOutput(input, outStream);
-
-          resource = createResource(outStream, iframeVis.getContentType());
-          String url = getApplication().getRelativeLocation(resource);
-          iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
-
-          visContainer.addComponent(iframe, "iframe");
-        }
-
+        vis = this.visPlugin.createComponent(createInput());
+        this.visContainer.addComponent(vis, "iframe");
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
-      iframe.setVisible(true);
+      vis.setVisible(true);
     }
     else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
-      // collapse
-      if (iframe != null)
+      if (vis != null)
       {
-        iframe.setVisible(false);
+        vis.setVisible(false);
         stopMediaVisualizers();
       }
+
       btEntry.setIcon(ICON_EXPAND);
     }
   }
 
-  public void setKwicPanel(KWICPanel kwicPanel)
+  public void setKwicPanel(KWICPanelImpl kwicPanel)
   {
     this.kwicPanel = kwicPanel;
   }
