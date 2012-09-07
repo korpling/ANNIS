@@ -78,7 +78,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   private List<String> mediaIDs;
   private String htmlID;
   private CustomLayout visContainer;
-  private VisualizerPlugin visPlugin;
+  private VisualizerPlugin<Component> visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private SingleResultPanel parentPanel;
@@ -149,44 +149,43 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
 
 
 
-    if (entry != null && entry.getVisibility().equalsIgnoreCase(PERMANENT))
+    if(entry != null)
     {
-      // create the visualizer and calc input
-      vis = this.visPlugin.createComponent(createInput());
-      vis.setVisible(true);
-      visContainer.addComponent(vis, "iframe");
+      if(PERMANENT.equalsIgnoreCase(entry.getVisibility()))
+      {
+        // create the visualizer and calc input
+        vis = this.visPlugin.createComponent(createInput());
+        vis.setVisible(true);
+        visContainer.addComponent(vis, "iframe");
+      }
+      else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
+      {
+
+        // build button for visualizer
+        btEntry = new Button(entry.getDisplayName());
+        btEntry.setIcon(ICON_COLLAPSE);
+        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+          + ChameleonTheme.BUTTON_SMALL);
+        btEntry.addListener((Button.ClickListener) this);
+        visContainer.addComponent(btEntry, "btEntry");
+
+
+        // create the visualizer and calc input
+        vis = this.visPlugin.createComponent(createInput());
+        vis.setVisible(true);
+        visContainer.addComponent(vis, "iframe");
+      }
+      else
+      {
+        // build button for visualizer
+        btEntry = new Button(entry.getDisplayName());
+        btEntry.setIcon(ICON_EXPAND);
+        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+          + ChameleonTheme.BUTTON_SMALL);
+        btEntry.addListener((Button.ClickListener) this);
+        visContainer.addComponent(btEntry, "btEntry");
+      }
     }
-
-    if (entry != null && entry.getVisibility().equalsIgnoreCase(ISVISIBLE))
-    {
-
-      // build button for visualizer
-      btEntry = new Button(entry.getDisplayName());
-      btEntry.setIcon(ICON_COLLAPSE);
-      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-        + ChameleonTheme.BUTTON_SMALL);
-      btEntry.addListener((Button.ClickListener) this);
-      visContainer.addComponent(btEntry, "btEntry");
-
-
-      // create the visualizer and calc input
-      vis = this.visPlugin.createComponent(createInput());
-      vis.setVisible(true);
-      visContainer.addComponent(vis, "iframe");
-    }
-
-    if (entry != null && entry.getVisibility().equalsIgnoreCase(NOTVISIBLE))
-    {
-
-      // build button for visualizer
-      btEntry = new Button(entry.getDisplayName());
-      btEntry.setIcon(ICON_EXPAND);
-      btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-        + ChameleonTheme.BUTTON_SMALL);
-      btEntry.addListener((Button.ClickListener) this);
-      visContainer.addComponent(btEntry, "btEntry");
-    }
-
 
   }
 
@@ -238,6 +237,22 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     }
 
     return input;
+  }
+  
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  {
+    if(visPlugin != null && vis != null)
+    {
+      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
+    }
+  }
+  
+  public void setSegmentationLayer(String segmentationName)
+  {
+    if(visPlugin != null && vis != null)
+    {
+      this.visPlugin.setSegmentationLayer(this.vis, segmentationName);
+    }
   }
 
   public ApplicationResource createResource(

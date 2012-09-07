@@ -16,14 +16,11 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
-import annis.service.objects.CorpusConfig;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -74,7 +71,7 @@ public class SingleResultPanel extends VerticalLayout implements
   private Map<String, String> markedExactMap;
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
-  private List<KWICPanel> kwicPanels;
+  private List<VisualizerPanel> visualizers;
   private List<VisualizerPanel> mediaVisualizer;
   private List<String> mediaIDs;
   private Button btInfo;
@@ -82,7 +79,6 @@ public class SingleResultPanel extends VerticalLayout implements
   private List<String> path;
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
-  private CorpusConfig corpusConfig;
   private List<SNode> token;
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -98,6 +94,7 @@ public class SingleResultPanel extends VerticalLayout implements
     this.resultNumber = resultNumber;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
+    
 
     calculateHelperVariables();
 
@@ -148,15 +145,10 @@ public class SingleResultPanel extends VerticalLayout implements
       }
       wasAttached = true;
 
-      // get corpus properties
-
-      corpusConfig =
-        Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
-
       ResolverEntry[] entries =
         resolverProvider.getResolverEntries(result);
       mediaIDs = mediaVisIds(entries);
-      List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+      visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
       mediaVisualizer = new ArrayList<VisualizerPanel>();
 
@@ -211,38 +203,21 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  //TODO apply this to new plugin system
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
-    if (kwicPanels != null)
+    for(VisualizerPanel p : visualizers)
     {
-      for (KWICPanel kwic : kwicPanels)
-      {
-//        removeComponent(kwic);
-      }
-
-      kwicPanels.clear();
-//      addKWICPanels();
+      p.setSegmentationLayer(segmentationName);
     }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-
-//    for (String visName : alwaysVisibleVis)
-//    {
-//      VisualizerPlugin vis = ps.getVisualizer(visName);
-//      vis.setVisibleTokenAnnosVisible(annos);
-//    }
-
-    if (kwicPanels != null)
-    {
-      for (KWICPanel kwic : kwicPanels)
-      {
-        kwic.setVisibleTokenAnnosVisible(annos);
-      }
-    }
+     for (VisualizerPanel p : visualizers)
+     {
+       p.setVisibleTokenAnnosVisible(annos);
+     }
   }
 
   private void calculateHelperVariables()

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer
+public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 {
 
   @Override
@@ -56,9 +56,15 @@ public class KWICPanel extends AbstractVisualizer
   }
 
   @Override
-  public Component createComponent(VisualizerInput visInput)
+  public KWICPanelImpl createComponent(VisualizerInput visInput)
   {
     return new KWICPanelImpl(visInput);
+  }
+
+  @Override
+  public void setVisibleTokenAnnosVisible(KWICPanelImpl visualizerImplementation, Set<String> annos)
+  {
+    visualizerImplementation.setVisibleTokenAnnosVisible(annos);
   }
 
   public class KWICPanelImpl extends Table implements ItemClickEvent.ItemClickListener
@@ -229,24 +235,16 @@ public class KWICPanel extends AbstractVisualizer
 
     }
 
-//  @Override
-//  public void setVisibleTokenAnnosVisible(Set<String> annos)
-//  {
-//    if (containerAnnos != null)
-//    {
-//      containerAnnos.removeAllItems();
-//      containerAnnos.addItem("tok");
-//      containerAnnos.addAll(annos);
-//    }
-//  }
-//
-//  @Override
-//  public Component createComponent(VisualizerInput visInput)
-//  {
-//    KWICPanel kWICPanel = new KWICPanel();
-//    kWICPanel.visInput = visInput;
-//    return kWICPanel;
-//  }
+    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    {
+      if (containerAnnos != null)
+      {
+        containerAnnos.removeAllItems();
+        containerAnnos.addItem("tok");
+        containerAnnos.addAll(annos);
+      }
+    }
+
     public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
     {
 

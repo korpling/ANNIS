@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers;
 
+import com.vaadin.ui.Component;
 import java.util.Set;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Set;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class AbstractVisualizer implements VisualizerPlugin
+public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>
 {
 
   /**
@@ -38,7 +39,13 @@ public abstract class AbstractVisualizer implements VisualizerPlugin
   }
 
   @Override
-  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos)
   {
+  }
+  
+  @Override
+  public void setSegmentationLayer(I visualizerImplementation, String segmentationName)
+  {
+    
   }
 }

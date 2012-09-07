@@ -7,3 +7,6 @@
 /.netbeans/
 /annis-service-implementation/.settings/
 target/
+/annis-kickstarter/.settings/
+/.settings/
+/doc/.settings/
