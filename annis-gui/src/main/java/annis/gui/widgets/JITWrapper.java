@@ -16,6 +16,9 @@
 package annis.gui.widgets;
 
 import annis.gui.widgets.gwt.client.VJITWrapper;
+import com.vaadin.terminal.PaintException;
+import com.vaadin.terminal.PaintTarget;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
 
 /**
@@ -23,7 +26,12 @@ import com.vaadin.ui.ClientWidget;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @ClientWidget(VJITWrapper.class)
-public class JITWrapper
+public class JITWrapper extends AbstractComponent
 {
-  
+
+  @Override
+  public void paint(PaintTarget target) throws PaintException
+  {
+    super.paint(target);
+  }
 }

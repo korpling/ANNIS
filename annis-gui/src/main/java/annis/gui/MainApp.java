@@ -18,6 +18,7 @@ package annis.gui;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.RST;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
@@ -282,6 +283,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(RST.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");

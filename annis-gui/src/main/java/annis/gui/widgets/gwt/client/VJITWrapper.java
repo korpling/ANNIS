@@ -39,7 +39,7 @@ public class VJITWrapper extends Widget implements Paintable
 
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
-  {    
+  {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

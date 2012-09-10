@@ -15,19 +15,18 @@
  */
 package annis.gui.visualizers.component;
 
-import annis.gui.resultview.VisualizerPanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import com.vaadin.ui.Component;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
+@PluginImplementation
 public class RST extends AbstractVisualizer<RST.RSTImpl>
 {
 
