@@ -388,7 +388,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         else
         {
-          log.warn("did not get a proper corpus graph for URI {0}",
+          log.warn("did not get a proper corpus graph for URI {}",
             subgraphRes.toString());
           result = null;
         }

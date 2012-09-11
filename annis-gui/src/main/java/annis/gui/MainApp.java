@@ -288,7 +288,7 @@ public class MainApp extends Application implements PluginSystem,
     if (basicPlugins.isDirectory())
     {
       pluginManager.addPluginsFrom(basicPlugins.toURI());
-      log.info("added plugins from {0}", basicPlugins.getPath());
+      log.info("added plugins from {}", basicPlugins.getPath());
     }
 
 
@@ -296,7 +296,7 @@ public class MainApp extends Application implements PluginSystem,
     if (globalPlugins != null)
     {
       pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
-      log.info("added plugins from {0}", globalPlugins);
+      log.info("added plugins from {}", globalPlugins);
     }
 
     StringBuilder listOfPlugins = new StringBuilder();
