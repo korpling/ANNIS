@@ -314,6 +314,7 @@ public class AnnisWebService
 
   @GET
   @Path("corpora")
+  @Produces("application/xml")
   public List<AnnisCorpus> corpora()
   {
     return annisDao.listCorpora();
@@ -321,6 +322,7 @@ public class AnnisWebService
 
   @GET
   @Path("corpora/{top}/config")
+  @Produces("application/xml")
   public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
   {
     Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
