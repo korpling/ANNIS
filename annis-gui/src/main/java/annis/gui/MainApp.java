@@ -18,7 +18,7 @@ package annis.gui;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
-import annis.gui.visualizers.component.RST;
+import annis.gui.visualizers.component.rst.RST;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;

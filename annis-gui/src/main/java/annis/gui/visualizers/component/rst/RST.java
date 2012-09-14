@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client;
+package annis.gui.visualizers.component.rst;
 
-import com.google.gwt.dom.client.*;
-import com.google.gwt.user.client.ui.Widget;
-import com.vaadin.terminal.gwt.client.ApplicationConnection;
-import com.vaadin.terminal.gwt.client.Paintable;
-import com.vaadin.terminal.gwt.client.UIDL;
+import annis.gui.visualizers.AbstractVisualizer;
+import annis.gui.visualizers.VisualizerInput;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class VJITWrapper extends Widget implements Paintable
+@PluginImplementation
+public class RST extends AbstractVisualizer<RSTImpl>
 {
-  
-  //dummy wrapper
-  public VJITWrapper()
+
+  @Override
+  public String getShortName()
   {
-    super();
-    
+    return "rst";
   }
 
   @Override
-  public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
+  public RSTImpl createComponent(VisualizerInput visInput)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
+    return new RSTImpl(visInput);
+  }  
 }

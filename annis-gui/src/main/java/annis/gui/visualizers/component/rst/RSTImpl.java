@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.component;
+package annis.gui.visualizers.component.rst;
 
-import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import annis.gui.widgets.gwt.client.VJITWrapper;
+import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,30 +27,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@PluginImplementation
-public class RST extends AbstractVisualizer<RST.RSTImpl>
+public class RSTImpl extends Panel
 {
+  
+  private final JITWrapper jit;
+  private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
-  @Override
-  public String getShortName()
+  public RSTImpl(VisualizerInput visInput)    
   {
-    return "rst";
-  }
-
-  @Override
-  public RSTImpl createComponent(VisualizerInput visInput)
-  {
-    return new RSTImpl(visInput);
-  }
-
-  public class RSTImpl extends JITWrapper
-  {
-
-    private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
-
-    private RSTImpl(VisualizerInput visInput)
-    {
-      log.info("initialized rest");
-    }
+    jit = new JITWrapper();
+    log.debug("initialize RSTImpl");
   }
 }
