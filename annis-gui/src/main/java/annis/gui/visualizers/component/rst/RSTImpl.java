@@ -29,13 +29,14 @@ import org.slf4j.LoggerFactory;
  */
 public class RSTImpl extends Panel
 {
-  
+
   private final JITWrapper jit;
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
-  public RSTImpl(VisualizerInput visInput)    
+  public RSTImpl(VisualizerInput visInput)
   {
     jit = new JITWrapper();
+    this.addComponent(jit);
     log.debug("initialize RSTImpl");
   }
 }
