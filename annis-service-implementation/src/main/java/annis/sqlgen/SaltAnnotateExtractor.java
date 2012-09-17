@@ -559,8 +559,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       rel.setSSource(nodeByPre.get(new RankID(componentID, parent)));
       if ("c".equals(type) && !(targetNode instanceof SToken))
       {
-        log.warn("invalid edge detected: target node ({0}) "
-          + "of a coverage relation (from: {1}, internal id {2}) was not a token",
+        log.warn("invalid edge detected: target node ({}) "
+          + "of a coverage relation (from: {}, internal id {}) was not a token",
           new Object[]
           {
             targetNode.getSName(), sourceNode.getSName(), "" + pre

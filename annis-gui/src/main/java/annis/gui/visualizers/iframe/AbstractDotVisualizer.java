@@ -50,7 +50,7 @@ public abstract class AbstractDotVisualizer extends WriterVisualizer
 
       createDotContent(input, dot);
 
-      log.debug("outputting dot graph:\n{0}", dot.toString());
+      log.debug("outputting dot graph:\n{}", dot.toString());
 
       stdin.append(dot);
       stdin.flush();
