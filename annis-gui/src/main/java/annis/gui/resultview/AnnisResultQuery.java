@@ -74,6 +74,7 @@ public class AnnisResultQuery implements Serializable
       {
         annisResource = annisResource.path("search").path("find")
           .queryParam("q", aql)
+          .queryParam("offset", "" + startIndex)
           .queryParam("limit", "" + count)         
           .queryParam("corpora", StringUtils.join(corpora, ","));
 
