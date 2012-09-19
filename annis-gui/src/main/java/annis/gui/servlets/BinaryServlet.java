@@ -45,8 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 public class BinaryServlet extends HttpServlet
 {
 
-  private static final long serialVersionUID = -8182635617256833563L;
-  private int slice = 200000; // max portion which is transfered over rmi
+  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
 
@@ -103,6 +102,7 @@ public class BinaryServlet extends HttpServlet
     String[] rangeTupel = range.split("-");
     int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
 
+    int slice;
     if (rangeTupel.length > 1)
     {
       slice = Integer.parseInt(rangeTupel[1]);
@@ -111,17 +111,17 @@ public class BinaryServlet extends HttpServlet
     {
       slice = bm.getLength();
     }
-
-    binary = binaryRes.path("" + (offset +1)).path("" + (slice - offset))
-      .get(AnnisBinary.class);
-
+    
+    int lengthToFetch = slice - offset;
+    
     response.setHeader("Content-Range", "bytes " + offset + "-"
       + (bm.getLength() - 1) + "/" + bm.getLength());
     response.setContentType(bm.getMimeType());
     response.setStatus(206);
-    response.setContentLength(binary.getBytes().length);
+    response.setContentLength(lengthToFetch);
 
-    out.write(binary.getBytes());
+    writeStepByStep(offset, lengthToFetch, binaryRes, out);
+    
   }
 
   private void responseStatus200(WebResource binaryRes, ServletOutputStream out,
@@ -157,8 +157,7 @@ public class BinaryServlet extends HttpServlet
 
     AnnisBinaryMetaData annisBinary = binaryRes.path("meta")
       .get(AnnisBinary.class);
-    slice = annisBinary.getLength();
-
+    
     int offset = 1;
     int length = annisBinary.getLength() - 1;
     
@@ -167,6 +166,21 @@ public class BinaryServlet extends HttpServlet
     if(bin != null)
     {
       out.write(bin.getBytes());
+    }
+  }
+  
+  private void writeStepByStep(int offset, int completeLength, WebResource binaryRes, ServletOutputStream out) throws IOException
+  {
+    int remaining = completeLength;
+    while(remaining > 0)
+    {
+      int stepLength = Math.min(MAX_LENGTH, remaining);
+      
+      AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
+      out.write(bin.getBytes());
+      
+      offset += stepLength;      
+      remaining = remaining - stepLength;
     }
   }
 }

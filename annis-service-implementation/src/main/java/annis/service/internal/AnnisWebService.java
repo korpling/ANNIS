@@ -397,15 +397,18 @@ public class AnnisWebService
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   @Produces("application/xml")
   public AnnisBinary binary(
-    @PathParam("top") String corpusName,
-    @PathParam("document") String toplevelCorpusName,
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset, 
     @PathParam("length") String rawLength)
   {
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
     
-    return annisDao.getBinary(corpusName, toplevelCorpusName, offset, length);
+//    log.info("fetching  " + (length/1024) + "kb (" + offset + "-" + (offset+length) + ") from binary "
+//      + toplevelCorpusName + "/" + corpusName);
+    
+    return annisDao.getBinary(toplevelCorpusName, corpusName, offset, length);
   }
   
   /**
