@@ -338,7 +338,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\" "
-                  + addTimeAttribute(element.getNodeId()) + "\""
+                  + addTimeAttribute(element.getNodeId()) 
                   + ">" + element.getValue() + "</td>");
               }
               else
