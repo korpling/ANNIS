@@ -51,6 +51,14 @@ public interface AnnisDao
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName);
 
+  /**
+   * Gets a part of a binary file plus meta data from database.
+   * @param toplevelCorpusName
+   * @param corpusName
+   * @param offset starts with 1
+   * @param length
+   * @return 
+   */
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);

@@ -389,7 +389,7 @@ public class AnnisWebService
    * Get an Annis Binary object identified by its id.
    * 
    * @param id
-   * @param rawOffset the part we want to start from
+   * @param rawOffset the part we want to start from, we start from 0
    * @param rawLength how many bytes we take
    * @return AnnisBinary
    */
@@ -408,7 +408,7 @@ public class AnnisWebService
 //    log.info("fetching  " + (length/1024) + "kb (" + offset + "-" + (offset+length) + ") from binary "
 //      + toplevelCorpusName + "/" + corpusName);
     
-    return annisDao.getBinary(toplevelCorpusName, corpusName, offset, length);
+    return annisDao.getBinary(toplevelCorpusName, corpusName, offset+1, length);
   }
   
   /**

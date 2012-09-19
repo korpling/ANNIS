@@ -158,15 +158,11 @@ public class BinaryServlet extends HttpServlet
     AnnisBinaryMetaData annisBinary = binaryRes.path("meta")
       .get(AnnisBinary.class);
     
-    int offset = 1;
-    int length = annisBinary.getLength() - 1;
+    int offset = 0;
+    int length = annisBinary.getLength();
     
-    AnnisBinary bin = binaryRes.path("" + offset).path("" + length).get(AnnisBinary.class);
-    
-    if(bin != null)
-    {
-      out.write(bin.getBytes());
-    }
+    writeStepByStep(offset, length, binaryRes, out);
+
   }
   
   private void writeStepByStep(int offset, int completeLength, WebResource binaryRes, ServletOutputStream out) throws IOException
