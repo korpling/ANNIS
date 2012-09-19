@@ -76,7 +76,7 @@ public class BinaryServlet extends HttpServlet
     
     WebResource binaryRes = annisRes.path("corpora")
       .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-      .path(documentName).path("binary"); 
+      .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
     
     if (range != null)
     {
@@ -161,9 +161,12 @@ public class BinaryServlet extends HttpServlet
 
     int offset = 1;
     int length = annisBinary.getLength() - 1;
-    out.write(
-      binaryRes.path("" + offset).path("" + length).get(AnnisBinary.class)
-      .getBytes()
-      );
+    
+    AnnisBinary bin = binaryRes.path("" + offset).path("" + length).get(AnnisBinary.class);
+    
+    if(bin != null)
+    {
+      out.write(bin.getBytes());
+    }
   }
 }
