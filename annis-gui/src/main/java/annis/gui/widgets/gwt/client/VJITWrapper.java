@@ -29,25 +29,11 @@ public class VJITWrapper extends Widget implements Paintable
 {
 
   private Document doc = Document.get();
-  /**
-   * The infovis has to be injected to an html element, so we create an an
-   * unique element identifier from this count value.
-   */
-  private static int count = 0;
-  private String elementID;
 
   //dummy wrapper
   public VJITWrapper()
   {
-
     super();
-
-    // build the html id
-    elementID = "jit_wrapper_" + count;
-    
-    // count the JITWrapper objects
-    count++;
-
   }
 
   @Override
