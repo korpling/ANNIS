@@ -18,15 +18,19 @@ package annis.service.internal;
 import java.io.IOException;
 import annis.AnnisBaseRunner;
 import annis.utils.Utils;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationFactory;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import java.io.File;
-import java.net.URI;
-import javax.ws.rs.core.UriBuilder;
-import org.glassfish.grizzly.http.server.HttpServer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -40,7 +44,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private static AnnisServiceRunner annisServiceRunner;
   private static boolean isShutdownRequested = false;
   private static Thread mainThread;
-  private HttpServer server;
+  private Server server;
 
   public static void main(String[] args) throws IOException
   {
@@ -158,20 +162,34 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     ctx.refresh();
 
 
-    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider", "annis.rest.provider");
-    IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
+    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider", "annis.rest.provider"    );
+    
+    final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
     int port = ctx.getBean(AnnisWebService.class).getPort();
-    URI baseURI = UriBuilder.fromUri("http://localhost").port(port).build();
     try
     {
-      server = GrizzlyServerFactory.createHttpServer(baseURI, rc, factory);
-    }
-    catch (IOException ex)
-    {
-      log.error("IOException at ANNIS service startup", ex);
-      isShutdownRequested = true;
+      server = new Server(port);
+            
+      ServletContextHandler context = 
+        new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+      context.setContextPath("/");
+      server.setHandler(context);
+      
+      ServletContainer jerseyContainer = new ServletContainer(rc)
+      {
+        @Override
+        protected void initiate(ResourceConfig rc, WebApplication wa)
+        {
+          wa.initiate(rc, factory);
+        }        
+      };
+      
+      ServletHolder holder = new ServletHolder(jerseyContainer);
+      
+      context.addServlet(holder, "/*");
+      
     }
     catch (IllegalArgumentException ex)
     {
