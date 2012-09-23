@@ -22,13 +22,15 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import java.io.File;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
@@ -187,8 +189,15 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       };
       
       ServletHolder holder = new ServletHolder(jerseyContainer);
-      
       context.addServlet(holder, "/*");
+      
+      // configure Apache Shiro with the web application
+      context.addEventListener(new EnvironmentLoaderListener());
+
+      EnumSet<DispatcherType> shiroDispatchers = EnumSet.of(
+        DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
+        DispatcherType.ERROR);
+      context.addFilter(ShiroFilter.class, "/*", shiroDispatchers);
       
     }
     catch (IllegalArgumentException ex)
