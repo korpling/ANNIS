@@ -21,9 +21,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Properties;
+import java.util.Set;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -109,9 +112,9 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
     result.append(" \nUNION \n");
     result.append(thirdUnion);
     result.append(" \nUNION \n");
-    result.append(fourthUnion);
+    result.append(fourthUnion);    
     result.append(" \nORDER BY \"order\" ;");
-
+    
     return cnctn.prepareStatement(result.toString());
   }
 
@@ -132,7 +135,7 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
   public List<ResolverEntry> extractData(ResultSet rs) throws SQLException, DataAccessException
   {
     List<ResolverEntry> result = new LinkedList<ResolverEntry>();
-
+    Set<RemoveIndexElement> removeEntries = new HashSet<RemoveIndexElement>();
 
     while (rs.next())
     {
@@ -167,10 +170,98 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
         rs.getString("visibility"),
         mappings,
         rs.getInt("order"));
-      result.add(e);
-
+      
+      if("removed".equals(e.getVisibility()))
+      {
+        RemoveIndexElement r = new RemoveIndexElement(e);
+        removeEntries.add(r);
+      }
+      else
+      {
+        result.add(e);
+      }
+    }
+    
+    // remove all entries which have a matching display_name, 
+    // namespace, element and vis_type
+    ListIterator<ResolverEntry> it = result.listIterator();
+    while(it.hasNext())
+    {
+      ResolverEntry entry = it.next();
+      RemoveIndexElement idx = new RemoveIndexElement(entry);
+      
+      if(removeEntries.contains(idx))
+      {
+        it.remove();
+      }
     }
 
     return result;
   }
+  
+  private static class RemoveIndexElement
+  {
+    public String namespace;
+    public ResolverEntry.ElementType element;
+    public String vis_type;
+    public String display_name;
+
+    public RemoveIndexElement()
+    {
+      
+    }
+    
+    public RemoveIndexElement(ResolverEntry e)
+    {
+      namespace = e.getNamespace();
+      element = e.getElement();
+      vis_type = e.getVisType();
+      display_name = e.getDisplayName();
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 5;
+      hash = 41 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+      hash = 41 * hash + (this.element != null ? this.element.hashCode() : 0);
+      hash = 41 * hash + (this.vis_type != null ? this.vis_type.hashCode() : 0);
+      hash = 41 * hash + (this.display_name != null ? this.display_name.hashCode() : 0);
+      return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (obj == null)
+      {
+        return false;
+      }
+      if (getClass() != obj.getClass())
+      {
+        return false;
+      }
+      final RemoveIndexElement other = (RemoveIndexElement) obj;
+      if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+      {
+        return false;
+      }
+      if (this.element != other.element)
+      {
+        return false;
+      }
+      if ((this.vis_type == null) ? (other.vis_type != null) : !this.vis_type.equals(other.vis_type))
+      {
+        return false;
+      }
+      if ((this.display_name == null) ? (other.display_name != null) : !this.display_name.equals(other.display_name))
+      {
+        return false;
+      }
+      return true;
+    }
+    
+  }
+  
 }
+
