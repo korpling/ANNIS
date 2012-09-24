@@ -707,8 +707,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     for (String table : tables)
     {
-//      jdbcTemplate.getJdbcOperations()
-//        .execute("DROP TABLE " + tableInStagingArea(table));
+      jdbcTemplate.getJdbcOperations()
+        .execute("DROP TABLE " + tableInStagingArea(table));
     }
 
   }
