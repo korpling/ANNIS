@@ -83,7 +83,6 @@ public class BinaryServlet extends HttpServlet
     }
     else
     {
-
       responseStatus200(binaryRes, out, response);
     }
 
