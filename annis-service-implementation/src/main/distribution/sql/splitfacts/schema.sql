@@ -151,6 +151,13 @@ CREATE VIEW corpus_info AS SELECT
 FROM 
   corpus_stats;
   
+  
+CREATE TYPE resolver_visibility AS ENUM (
+  'permanent', 
+  'visible',
+  'hidden',
+  'removed'
+);
 
 CREATE TABLE resolver_vis_map
 (
@@ -161,7 +168,7 @@ CREATE TABLE resolver_vis_map
   "element"    varchar CHECK (element = 'node' OR element = 'edge'),
   "vis_type"   varchar NOT NULL,
   "display_name"   varchar NOT NULL,
-  "visibility"    varchar NOT NULL CHECK (visibility = 'permanent' OR visibility = 'visible' OR visibility = 'hidden'),
+  "visibility"    resolver_visibility NOT NULL DEFAULT 'hidden',
   "order" bigint default '0',
   "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              

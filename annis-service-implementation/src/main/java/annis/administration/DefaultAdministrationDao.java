@@ -682,7 +682,7 @@ public class DefaultAdministrationDao implements AdministrationDao
           //FIXME DIRTY!!! find a better way instead of naming the column-names in code 
           sql.append(
             "(corpus, version, namespace, element, vis_type, display_name, visibility, \"order\", mappings)");
-          sql.append(" (SELECT * FROM ");
+          sql.append(" (SELECT corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, \"order\", mappings FROM ");
           sql.append(tableInStagingArea(table)).append(")");
         }
         else
