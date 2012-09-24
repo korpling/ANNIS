@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets.gwt.client;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
@@ -34,9 +35,13 @@ public class VJITWrapper extends Widget implements Paintable
    * unique element identifier from this count value.
    */
   private static int count = 0;
+  
   private String elementID;
+  private DivElement div;
+  
+  // the json data for the visualization
+  private String jsonData;
 
-  //dummy wrapper
   public VJITWrapper()
   {
     super();
@@ -48,15 +53,19 @@ public class VJITWrapper extends Widget implements Paintable
     count++;
 
     // wrapper for the visualization
-    DivElement div = doc.createDivElement();
+    div = doc.createDivElement();
     setElement(div);
     div.setId(elementID);
+    div.setInnerHTML(elementID);
 
   }
 
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (uidl.hasAttribute("testJSON"))
+    {
+      jsonData = uidl.getStringAttribute("testJSON");
+    }
   }
 }
