@@ -29,14 +29,35 @@ import com.vaadin.ui.ClientWidget;
 public class JITWrapper extends AbstractComponent
 {
 
+  String testJSON = "{"
+    + "id: 'node1',"
+    + "name: 'node1',"
+    + "data: {},"
+    + "children: [{"
+    + "id: 'node2',"
+    + "name: 'node2',"
+    + "data: {},"
+    + "children:[]"
+    + "},{"
+    + "id: 'node3',"
+    + "name: 'node3',"
+    + "data: {},"
+    + "children:[]"
+    + "}"
+    + "]"
+    + "}";
+
   public JITWrapper()
   {
     super();
   }
 
   @Override
-  public void paint(PaintTarget target) throws PaintException
+  public void paintContent(PaintTarget target)
+    throws PaintException
   {
-    super.paint(target);
+    super.paintContent(target);
+
+    target.addAttribute("testJSON", testJSON);
   }
 }
