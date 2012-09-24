@@ -29,24 +29,9 @@ import com.vaadin.ui.ClientWidget;
 public class JITWrapper extends AbstractComponent
 {
 
-  /**
-   * The infovis has to be injected to an html element, so we create an an
-   * unique element identifier from this count value.
-   */
-  private static int count = 0;
-  private String elementID;
-
   public JITWrapper()
   {
     super();
-
-    // build the html id
-    elementID = "jit_wrapper_" + count;
-
-    // count the JITWrapper objects
-    count++;
-    
-    
   }
 
   @Override
