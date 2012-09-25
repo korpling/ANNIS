@@ -26,6 +26,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.ArrayList;
@@ -68,8 +69,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
-    private List<AnnisNode> nodes;
-    private List<AnnisNode> token;
 
     public enum ElementType
     {
@@ -90,8 +89,13 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       List<String> annos = new LinkedList<String>(getAnnotationLevelSet(graph, 
         input.getNamespace()));
       
+      EList<SToken> token = graph.getSortedSTokenByText();
+      long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+      long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+      
       Map<String, ArrayList<Row>> rowsByAnnotation = 
-        parseSalt(input.getDocument().getSDocumentGraph(), annos);
+        parseSalt(input.getDocument().getSDocumentGraph(), annos, 
+          (int) startIndex, (int) endIndex);
       
       // we can now calculate the size of the grid
       int gridRowCount = 0;
@@ -100,7 +104,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         gridRowCount += rows.size();
       }
       setRows(gridRowCount);
-      setColumns(graph.getSTokens().size());
+      setColumns(token.size());
       
       // output every line
       int currentRow=0;
@@ -184,7 +188,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       return result;
     }
     
-    private Map<String, ArrayList<Row>> parseSalt(SDocumentGraph graph, List<String> annotationNames)
+    /**
+     * Converts Salt document graph to rows.
+     * 
+     * @param graph
+     * @param annotationNames
+     * @param startTokenIndex token index of the first token in the match
+     * @param endTokenIndex  token index of the last token in the match
+     * @return 
+     */
+    private Map<String, ArrayList<Row>> parseSalt(SDocumentGraph graph,
+      List<String> annotationNames, int startTokenIndex, int endTokenIndex)
     {
       // only look at annotations which were defined by the user
       Map<String, ArrayList<Row>> rowsByAnnotation = 
@@ -207,8 +221,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         long leftLong = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
         long rightLong = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
         
-        int left = (int) leftLong;
-        int right = (int) rightLong;
+        leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
+        rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
+        
+        int left = ((int) leftLong) - startTokenIndex;
+        int right = ((int) rightLong) - startTokenIndex;
         
         for(SAnnotation anno : span.getSAnnotations())
         {
