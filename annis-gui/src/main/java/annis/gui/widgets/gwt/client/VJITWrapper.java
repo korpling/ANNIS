@@ -15,7 +15,6 @@
  */
 package annis.gui.widgets.gwt.client;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
@@ -35,12 +34,12 @@ public class VJITWrapper extends Widget implements Paintable
    * unique element identifier from this count value.
    */
   private static int count = 0;
-  
   private String elementID;
   private DivElement div;
-  
   // the json data for the visualization
   private String jsonData;
+  // should set to true if $jit object is loaded
+  private boolean isJITInit = false;
 
   public VJITWrapper()
   {
@@ -57,15 +56,46 @@ public class VJITWrapper extends Widget implements Paintable
     setElement(div);
     div.setId(elementID);
     div.setInnerHTML(elementID);
-
   }
 
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
+
+    // This call should be made first.
+    // It handles sizes, captions, tooltips, etc. automatically.
+    if (client.updateComponent(this, uidl, true))
+    {
+      // If client.updateComponent returns true there has been no changes and we
+      // do not need to update anything.
+      return;
+    }
+
+
     if (uidl.hasAttribute("testJSON"))
     {
       jsonData = uidl.getStringAttribute("testJSON");
+      setupUpJIT();
     }
   }
+
+  /**
+   * Some internal jit setup stuff, copied from examples script
+   */
+  public native void setupUpJIT() /*-{
+   (function() {
+   var ua = navigator.userAgent,
+   iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
+   typeOfCanvas = typeof HTMLCanvasElement,
+   nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
+   textSupport = nativeCanvasSupport 
+   && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
+   //I'm setting this based on the fact that ExCanvas provides text support for IE
+   //and that as of today iPhone/iPad current text support is lame
+   labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
+   nativeTextSupport = labelType == 'Native';
+   useGradients = nativeCanvasSupport;
+   animate = !(iStuff || !nativeCanvasSupport);
+   })();
+   }-*/;
 }
