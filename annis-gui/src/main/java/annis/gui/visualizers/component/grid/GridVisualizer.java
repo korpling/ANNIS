@@ -19,10 +19,8 @@ import static annis.model.AnnisConstants.*;
 
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import annis.model.AnnisNode;
-import com.vaadin.ui.GridLayout;
+import annis.gui.widgets.AnnotationGrid;
 import com.vaadin.ui.Label;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
@@ -65,7 +63,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     return component;
   }
 
-  public static class GridVisualizerComponent extends GridLayout
+  public static class GridVisualizerComponent extends AnnotationGrid
   {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
@@ -103,8 +101,10 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       {
         gridRowCount += rows.size();
       }
-      setRows(gridRowCount);
-      setColumns(token.size());
+//      setRows(gridRowCount);
+//      setColumns(token.size());
+      
+      setRowsByAnnotation(rowsByAnnotation);
       
       // output every line
       int currentRow=0;
@@ -134,14 +134,15 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             lblEvent.setDescription(annotationSet.getKey());
 
             // clip events to displayed token range
-            int left =  (int) clip(e.getLeft(), 0, getColumns()-1);
-            int right = (int) clip(e.getRight(), 0, getColumns()-1);
-            addComponent(lblEvent, left, currentRow, right, currentRow);
+           // int left =  (int) clip(e.getLeft(), 0, getColumns()-1);
+           // int right = (int) clip(e.getRight(), 0, getColumns()-1);
+           // addComponent(lblEvent, left, currentRow, right, currentRow);
           } // for each event
           
           currentRow++;
         } // end for each row
       } // end for each annotation
+      
       
     }
     
