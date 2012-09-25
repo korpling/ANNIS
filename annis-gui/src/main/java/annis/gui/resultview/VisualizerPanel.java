@@ -30,6 +30,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -152,9 +153,21 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       if(PERMANENT.equalsIgnoreCase(entry.getVisibility()))
       {
         // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        addComponent(vis, "iframe");
+        try
+        {
+          vis = this.visPlugin.createComponent(createInput());
+          vis.setVisible(true);
+          addComponent(vis, "iframe");
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_WARNING_MESSAGE
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
       }
       else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
       {
@@ -167,7 +180,6 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
         btEntry.addListener((Button.ClickListener) this);
         addComponent(btEntry, "btEntry");
 
-
         // create the visualizer and calc input
         try
         {
@@ -177,6 +189,11 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
         }
         catch(Exception ex)
         {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_WARNING_MESSAGE
+          );
           log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
         }
       }
@@ -337,8 +354,20 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       // check if it's necessary to create input
       if (visPlugin != null && vis == null)
       {
-        vis = this.visPlugin.createComponent(createInput());
-        addComponent(vis, "iframe");
+        try
+        {
+          vis = this.visPlugin.createComponent(createInput());
+          addComponent(vis, "iframe");
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_WARNING_MESSAGE
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
