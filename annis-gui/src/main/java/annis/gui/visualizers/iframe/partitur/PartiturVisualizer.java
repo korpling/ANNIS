@@ -59,7 +59,7 @@ public class PartiturVisualizer extends WriterVisualizer
   @Override
   public String getShortName()
   {
-    return "grid";
+    return "iframegrid";
   }
 
   @Override

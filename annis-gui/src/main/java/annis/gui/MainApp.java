@@ -18,6 +18,7 @@ package annis.gui;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.grid.GridVisualizer;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
@@ -273,6 +274,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());

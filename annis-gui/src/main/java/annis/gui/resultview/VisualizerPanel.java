@@ -116,7 +116,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes()));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
-
+    
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -169,9 +169,16 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
 
 
         // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        addComponent(vis, "iframe");
+        try
+        {
+          vis = this.visPlugin.createComponent(createInput());
+          vis.setVisible(true);
+          addComponent(vis, "iframe");
+        }
+        catch(Exception ex)
+        {
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
       }
       else
       {
