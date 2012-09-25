@@ -15,7 +15,8 @@
  */
 package annis.gui.visualizers.component.grid;
 
-import annis.CommonHelper;
+import static annis.model.AnnisConstants.*;
+
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
@@ -25,11 +26,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -120,7 +118,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             @Override
             public int compare(GridEvent o1, GridEvent o2)
             {
-              return Integer.compare(o1.getLeft(), o2.getRight());
+              return Long.compare(o1.getLeft(), o2.getRight());
             }
           });
           
@@ -132,8 +130,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             lblEvent.setDescription(annotationSet.getKey());
 
             // clip events to displayed token range
-            int left =  clip(e.getLeft(), 0, getColumns()-1);
-            int right = clip(e.getRight(), 0, getColumns()-1);
+            int left =  (int) clip(e.getLeft(), 0, getColumns()-1);
+            int right = (int) clip(e.getRight(), 0, getColumns()-1);
             addComponent(lblEvent, left, currentRow, right, currentRow);
           } // for each event
           
@@ -143,7 +141,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
     }
     
-    private int clip(int value, int min, int max)
+    private long clip(long value, long min, long max)
     {
       if(value > max)
       {
@@ -205,31 +203,26 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       for(SSpan span : graph.getSSpans())
       {  
         // calculate the left and right values of a span
-        int left = Integer.MAX_VALUE;
-        int right = Integer.MIN_VALUE;
-        EList<SDataSourceSequence> overlappedSequences = graph.getOverlappedDSSequences(span, types);
-        if(overlappedSequences != null)
-        {
-          for(SDataSourceSequence seq : overlappedSequences)
-          {
-            left = Math.min(left, seq.getSStart());
-            right = Math.max(right, seq.getSEnd());
-          }
+        // TODO: howto get these numbers with Salt?
+        long leftLong = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
+        long rightLong = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
         
-          for(SAnnotation anno : span.getSAnnotations())
+        int left = (int) leftLong;
+        int right = (int) rightLong;
+        
+        for(SAnnotation anno : span.getSAnnotations())
+        {
+          ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
+          if(rows != null)
           {
-            ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
-            if(rows != null)
-            {
-              // only do something if the annotation was defined before
+            // only do something if the annotation was defined before
 
-              // 1. give each annotation of each span an own row
-              Row r = new Row();
-              r.addEvent(new GridEvent(left, right, anno.getSValueSTEXT()));
-              rows.add(r);
-            }
-          } // end for each annotation of span
-        } // end if there is an overlap 
+            // 1. give each annotation of each span an own row
+            Row r = new Row();
+            r.addEvent(new GridEvent(left, right, anno.getSValueSTEXT()));
+            rows.add(r);
+          }
+        } // end for each annotation of span
       } // end for each span
       
       // 2. merge rows when possible

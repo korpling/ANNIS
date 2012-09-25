@@ -1,5 +1,6 @@
 @import "../chameleon/styles.css";
 @import "base.css";
+@import "partitur.css";
 
 .control .v-panel-content {
   background-color: #ecf0f6;
