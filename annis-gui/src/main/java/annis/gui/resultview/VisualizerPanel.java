@@ -164,7 +164,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
           getWindow().showNotification(
             "Could not create visualizer " + visPlugin.getShortName(), 
             ex.toString(),
-            Window.Notification.TYPE_WARNING_MESSAGE
+            Window.Notification.TYPE_TRAY_NOTIFICATION
           );
           log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
         }
@@ -192,7 +192,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
           getWindow().showNotification(
             "Could not create visualizer " + visPlugin.getShortName(), 
             ex.toString(),
-            Window.Notification.TYPE_WARNING_MESSAGE
+            Window.Notification.TYPE_TRAY_NOTIFICATION
           );
           log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
         }
