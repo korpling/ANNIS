@@ -83,6 +83,7 @@ public class VJITWrapper extends Widget implements Paintable
    * Some internal jit setup stuff, copied from examples script
    */
   public native void setupUpJIT() /*-{
+   var labelType, useGradients, nativeTextSupport, animate;
    (function() {
    var ua = navigator.userAgent,
    iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
