@@ -66,7 +66,7 @@ public class Row
    */
   public boolean canMerge(Row other)
   {
-    return occupancySet.intersects(other.occupancySet);
+    return !occupancySet.intersects(other.occupancySet);
   }
   
   /** 
