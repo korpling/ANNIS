@@ -15,23 +15,40 @@
  */
 package annis.gui.visualizers.component.grid;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * An event has a right and left border (but might have holes)
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class GridEvent
 {
+  private String id;
   private int left;
   private int right;
   private String value;
+  private List<String> coveredIDs;
   
-  public GridEvent(int left, int right, String value)
+  public GridEvent(String id, int left, int right, String value)
   {
     this.left = left;
     this.right = right;
     this.value = value;
+    
+    this.coveredIDs = new LinkedList<String>();
   }
 
+  public String getId()
+  {
+    return id;
+  }
+
+  public void setId(String id)
+  {
+    this.id = id;
+  }
+  
   public int getLeft()
   {
     return left;
@@ -61,7 +78,10 @@ public class GridEvent
   {
     this.value = value;
   }
-  
-  
+
+  public List<String> getCoveredIDs()
+  {
+    return coveredIDs;
+  }
   
 }

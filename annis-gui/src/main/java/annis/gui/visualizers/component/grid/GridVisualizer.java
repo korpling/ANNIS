@@ -23,8 +23,11 @@ import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AnnotationGrid;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -104,12 +107,13 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
       // add tokens as row
       Row tokenRow = new Row();
+      int id=0;
       for(SToken t : token)
       {
         long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
           - startIndex;
         String text = CommonHelper.getSpannedText(t);
-        tokenRow.addEvent(new GridEvent((int) idx, (int) idx, text));
+        tokenRow.addEvent(new GridEvent(t.getSId(), (int) idx,(int) idx, text));
       }
       ArrayList<Row> tokenRowList = new ArrayList<Row>();
       tokenRowList.add(tokenRow);
@@ -211,7 +215,25 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
             // 1. give each annotation of each span an own row
             Row r = new Row();
-            r.addEvent(new GridEvent(left, right, anno.getSValueSTEXT()));
+            
+            GridEvent event = new GridEvent(span.getSId(), left, right,
+              anno.getSValueSTEXT());
+            
+            // calculate overlapped SToken
+            EList<Edge> outEdges = graph.getOutEdges(span.getSId());
+            if(outEdges != null)
+            {
+              for(Edge e : outEdges)
+              {
+                if(e instanceof SSpanningRelation)
+                {
+                  SSpanningRelation spanRel = (SSpanningRelation) e;
+                  event.getCoveredIDs().add(spanRel.getSId());
+                }
+              }
+            }
+            
+            r.addEvent(event);
             rows.add(r);
           }
         } // end for each annotation of span

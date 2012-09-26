@@ -66,6 +66,10 @@ public class AnnotationGrid extends AbstractComponent
             {
               target.addAttribute("style", new String[] {"token"});
             }
+            // define a list of covered token that are hightlighted whenever this
+            // event is hovered
+            target.addAttribute("highlight", event.getCoveredIDs().toArray());
+            
             target.endTag("event");
           }
           target.endTag("events");
