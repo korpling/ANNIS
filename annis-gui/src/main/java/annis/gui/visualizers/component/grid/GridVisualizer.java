@@ -15,15 +15,20 @@
  */
 package annis.gui.visualizers.component.grid;
 
+import annis.CommonHelper;
+import annis.gui.Helper;
 import static annis.model.AnnisConstants.*;
 
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AnnotationGrid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -63,10 +68,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     return component;
   }
 
-  public static class GridVisualizerComponent extends AnnotationGrid
+  public static class GridVisualizerComponent extends Panel
   {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
+    private AnnotationGrid grid;
 
     public enum ElementType
     {
@@ -80,7 +86,13 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
     public GridVisualizerComponent(VisualizerInput input)
     {
-      addStyleName("partitur_table");
+      setWidth("100%");
+      setHeight("-1");
+      ((VerticalLayout) getContent()).setSizeUndefined();
+      
+      grid = new AnnotationGrid();
+      grid.addStyleName("partitur_table");
+      addComponent(grid);
       
       SDocumentGraph graph = input.getDocument().getSDocumentGraph();
      
@@ -91,58 +103,25 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
       long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
       
-      Map<String, ArrayList<Row>> rowsByAnnotation = 
+      LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
         parseSalt(input.getDocument().getSDocumentGraph(), annos, 
           (int) startIndex, (int) endIndex);
       
-      // we can now calculate the size of the grid
-      int gridRowCount = 0;
-      for(ArrayList<Row> rows : rowsByAnnotation.values())
+      // add tokens as row
+      Row tokenRow = new Row();
+      for(SToken t : token)
       {
-        gridRowCount += rows.size();
+        long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
+          - startIndex;
+        String text = CommonHelper.getSpannedText(t);
+        tokenRow.addEvent(new GridEvent((int) idx, (int) idx, text));
       }
-//      setRows(gridRowCount);
-//      setColumns(token.size());
+      ArrayList<Row> tokenRowList = new ArrayList<Row>();
+      tokenRowList.add(tokenRow);
       
-      setRowsByAnnotation(rowsByAnnotation);
+      rowsByAnnotation.put("tok", tokenRowList);
       
-      // output every line
-      int currentRow=0;
-      for(Map.Entry<String, ArrayList<Row>> annotationSet : rowsByAnnotation.entrySet())
-      {
-        for(Row row : annotationSet.getValue())
-        {
-          // copy events
-          ArrayList<GridEvent> events = new ArrayList<GridEvent>(row.getEvents());
-          
-          // sort row events by their order (there are no conflicts so only "left"
-          // needs to be considered)
-          Collections.sort(events, new Comparator<GridEvent>() 
-          {
-            @Override
-            public int compare(GridEvent o1, GridEvent o2)
-            {
-              return Long.compare(o1.getLeft(), o2.getRight());
-            }
-          });
-          
-          
-          for(GridEvent e : row.getEvents())
-          {
-            Label lblEvent = new Label();
-            lblEvent.setValue(e.getValue());
-            lblEvent.setDescription(annotationSet.getKey());
-
-            // clip events to displayed token range
-           // int left =  (int) clip(e.getLeft(), 0, getColumns()-1);
-           // int right = (int) clip(e.getRight(), 0, getColumns()-1);
-           // addComponent(lblEvent, left, currentRow, right, currentRow);
-          } // for each event
-          
-          currentRow++;
-        } // end for each row
-      } // end for each annotation
-      
+      grid.setRowsByAnnotation(rowsByAnnotation);
       
     }
     
@@ -198,11 +177,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
      * @param endTokenIndex  token index of the last token in the match
      * @return 
      */
-    private Map<String, ArrayList<Row>> parseSalt(SDocumentGraph graph,
+    private LinkedHashMap<String, ArrayList<Row>> parseSalt(SDocumentGraph graph,
       List<String> annotationNames, int startTokenIndex, int endTokenIndex)
     {
       // only look at annotations which were defined by the user
-      Map<String, ArrayList<Row>> rowsByAnnotation = 
+      LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
         new LinkedHashMap<String, ArrayList<Row>>();
       
       for(String anno : annotationNames)

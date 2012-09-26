@@ -21,8 +21,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
@@ -44,6 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommonHelper
 {
+
   private final static Logger log = LoggerFactory.getLogger(CommonHelper.class);
 
   public static boolean containsRTLText(String str)
@@ -69,12 +74,12 @@ public class CommonHelper
     }
     return false;
   }
-  
+
   public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph)
   {
     List<SNode> token = new ArrayList<SNode>();
-    
-    if(segName == null)
+
+    if (segName == null)
     {
       // if no segmentation is given just return the sorted token list
       token.addAll(graph.getSortedSTokenByText());
@@ -83,63 +88,63 @@ public class CommonHelper
     {
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
-      
-      Map<SNode, SOrderRelation> outRelationForNode = 
+
+      Map<SNode, SOrderRelation> outRelationForNode =
         new HashMap<SNode, SOrderRelation>();
-      for(SOrderRelation rel : graph.getSOrderRelations())
+      for (SOrderRelation rel : graph.getSOrderRelations())
       {
-        if(rel.getSTypes().contains(segName))
+        if (rel.getSTypes().contains(segName))
         {
           SNode node = rel.getSSource();
           outRelationForNode.put(node, rel);
 
-          EList<Edge> inEdgesForSource = 
+          EList<Edge> inEdgesForSource =
             graph.getInEdges(node.getSId());
           boolean hasInOrderEdge = false;
-          for(Edge e : inEdgesForSource)
+          for (Edge e : inEdgesForSource)
           {
-            if(e instanceof SOrderRelation)
+            if (e instanceof SOrderRelation)
             {
               hasInOrderEdge = true;
               break;
             }
           } // for each ingoing edge
 
-          if(!hasInOrderEdge)
+          if (!hasInOrderEdge)
           {
             startNodes.add(rel.getSSource());
           }
         } // end if type is segName
       } // end for all order relations of graph
-      
+
 
       // add all nodes on the order relation chain beginning from the start node
-      for(SNode s : startNodes)
+      for (SNode s : startNodes)
       {
         SNode current = s;
-        while(current != null)
+        while (current != null)
         {
           token.add(current);
-          if(outRelationForNode.containsKey(current))
+          if (outRelationForNode.containsKey(current))
           {
             current = outRelationForNode.get(current).getSTarget();
           }
           else
           {
-            current = null; 
+            current = null;
           }
         }
       }
     }
-    
+
     return token;
   }
-  
+
   public static Set<String> getTokenAnnotationLevelSet(SDocumentGraph graph)
   {
     Set<String> result = new TreeSet<String>();
 
-    if(graph != null)
+    if (graph != null)
     {
       for (SToken n : graph.getSTokens())
       {
@@ -168,20 +173,20 @@ public class CommonHelper
 
     return result;
   }
-  
+
   public static Set<String> getOrderingTypes(SaltProject p)
   {
     Set<String> result = new TreeSet<String>();
-    
+
     for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
     {
       for (SDocument doc : corpusGraphs.getSDocuments())
       {
         SDocumentGraph g = doc.getSDocumentGraph();
-        if(g != null)
+        if (g != null)
         {
           EList<SOrderRelation> orderRelations = g.getSOrderRelations();
-          if(orderRelations != null)
+          if (orderRelations != null)
           {
             for (SOrderRelation rel : orderRelations)
             {
@@ -191,8 +196,33 @@ public class CommonHelper
         }
       }
     }
-    
+
     return result;
+  }
+
+  /**
+   * Gets the spannend/covered text for a token. This will get all
+   * {@link STextualRelation} edges for a {@link SToken} from the
+   * {@link SDocumentGraph} and calculates the appropiate substring from the
+   * {@link STextualDS}.
+   *
+   * @param tok
+   * @return
+   */
+  public static String getSpannedText(SToken tok)
+  {
+    SDocumentGraph graph = tok.getSDocumentGraph();
+
+    EList<Edge> edges = graph.getOutEdges(tok.getSId());
+    for(Edge e : edges)
+    {
+      if(e instanceof STextualRelation)
+      {
+        STextualRelation textRel = (STextualRelation) e;
+        return  textRel.getSTextualDS().getSText().substring(textRel.getSStart(), textRel.getSEnd());
+      }
+    }
+    return "";
   }
 
   public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
@@ -208,7 +238,6 @@ public class CommonHelper
       "getRootCorpora",
       new SGraphTraverseHandler()
       {
-
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId, SNode currNode, SRelation edge, SNode fromNode,
@@ -233,18 +262,18 @@ public class CommonHelper
       });
     return result;
   }
-  
+
   public static List<String> getCorpusPath(URI uri)
   {
     String rawPath = StringUtils.strip(uri.getRawPath(), "/ \t");
-    
+
     // split on raw path (so "/" in corpus names are still encoded)
     String[] path = rawPath.split("/");
-    
-    
+
+
     // decode every single part by itself
     ArrayList<String> result = new ArrayList<String>(path.length);
-    for(int i=0; i < path.length; i++)
+    for (int i = 0; i < path.length; i++)
     {
       try
       {
@@ -257,8 +286,7 @@ public class CommonHelper
         result.add(path[i]);
       }
     }
-    
+
     return result;
   }
-  
 }

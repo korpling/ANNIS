@@ -85,12 +85,9 @@ public class VAnnotationGrid extends Composite implements Paintable
     // Save the client side identifier (paintable id) for the widget
     paintableId = uidl.getId();
     
-    VConsole.log("VAnnotation grid will be updated");
-    
     UIDL rows = uidl.getChildByTagName("rows");
     if(rows != null)
     {
-      VConsole.log("rows where available");
       // clear all old table cells
       table.removeAllRows();
 
