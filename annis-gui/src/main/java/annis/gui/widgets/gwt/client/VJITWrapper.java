@@ -16,6 +16,9 @@
 package annis.gui.widgets.gwt.client;
 
 import com.google.gwt.dom.client.*;
+import com.google.gwt.json.client.JSONException;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
@@ -36,7 +39,7 @@ public class VJITWrapper extends Widget implements Paintable
   private static int count = 0;
   private String elementID;
   // the json data for the visualization
-  private String jsonData;
+  private JSONObject jsonData;
   protected String background = "#ECF0F6";
   protected String width = "600px";
   protected String height = "600px";
@@ -79,7 +82,7 @@ public class VJITWrapper extends Widget implements Paintable
 
     if (uidl.hasAttribute("testJSON"))
     {
-      jsonData = uidl.getStringAttribute("testJSON");
+      jsonData = parseStringToJSON(uidl.getStringAttribute("testJSON"));
     }
   }
 
@@ -159,4 +162,9 @@ public class VJITWrapper extends Widget implements Paintable
    st.onClick(st.root);
    //end;
    }-*/;
+  
+  public JSONObject parseStringToJSON(String jsonString)
+  {
+    return (JSONParser.parseStrict(jsonString).isObject());
+  }
 }
