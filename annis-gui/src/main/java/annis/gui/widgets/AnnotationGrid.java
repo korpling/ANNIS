@@ -58,9 +58,14 @@ public class AnnotationGrid extends AbstractComponent
           for(GridEvent event : row.getEvents())
           {
             target.startTag("event");
+            target.addAttribute("id", event.hashCode());
             target.addAttribute("left", event.getLeft());
             target.addAttribute("right", event.getRight());
             target.addAttribute("value", event.getValue());
+            if("tok".equals(anno.getKey()))
+            {
+              target.addAttribute("style", "token");
+            }
             target.endTag("event");
           }
           target.endTag("events");

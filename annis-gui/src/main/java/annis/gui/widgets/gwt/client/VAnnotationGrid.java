@@ -120,9 +120,16 @@ public class VAnnotationGrid extends Composite implements Paintable
             
             table.setWidget(i, col, label);
             formatter.setColSpan(i, col, (right-left+1));
-            formatter.addStyleName(i, col, "single_event");
+            
+            if(event.hasAttribute("style"))
+            {
+              formatter.addStyleName(i, col, event.getStringAttribute("style"));
+            }
+            else
+            {
+              formatter.addStyleName(i, col, "single_event");
+            }
           }
-
         }
       }
     }
