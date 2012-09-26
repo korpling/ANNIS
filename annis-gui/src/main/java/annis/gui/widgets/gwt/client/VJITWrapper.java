@@ -16,6 +16,7 @@
 package annis.gui.widgets.gwt.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
@@ -79,11 +80,20 @@ public class VJITWrapper extends Widget implements Paintable
       // If client.updateComponent returns true there has been no changes and we
       // do not need to update anything.
       return;
-    }
+    }    
 
     if (uidl.hasAttribute("testJSON"))
     {
       jsonData = parseStringToJSON(uidl.getStringAttribute("testJSON"));
+      if (jsonData != null)
+      {
+        GWT.log("jsonData: " + jsonData.toString());
+        treeInit(elementID, jsonData.getJavaScriptObject());
+      }
+      else
+      {
+        GWT.log("jsonData are null");
+      }
     }
   }
 
@@ -106,17 +116,9 @@ public class VJITWrapper extends Widget implements Paintable
    useGradients = nativeCanvasSupport;
    animate = !(iStuff || !nativeCanvasSupport);
    })();
-   }-*/;
+   }-*/; 
 
-  @Override
-  protected void onLoad()
-  {
-    super.onLoad();
-    treeInit(elementID, jsonData);
-  }
-
-    
-  public native void treeInit(String elementID, JSONObject jsonString) /*-{    
+  public native void treeInit(String elementID, JavaScriptObject jsonData) /*-{   
    //init Spacetree
    //Create a new ST instance
    var st = new $wnd.$jit.ST({
@@ -138,25 +140,9 @@ public class VJITWrapper extends Widget implements Paintable
    label.id = node.id;
    label.innerHTML = node.name;
    }
-   });
-   var jsonTEST = {
-   id: "node02",
-   name: "0.2",
-   data: {},
-   children: [{
-   id: "node03",
-   name: "0.3",
-   data: {},
-   children: []
-   },{
-   id: "node04",
-   name: "0.4",
-   data: {},
-   children: []
-   }]
-   };
+   });   
    //load json data
-   st.loadJSON(jsonTEST);
+   st.loadJSON(jsonData);
    //compute node positions and layout
    st.compute();
    //optional: make a translation of the tree    
@@ -164,18 +150,20 @@ public class VJITWrapper extends Widget implements Paintable
    st.onClick(st.root);
    //end;
    }-*/;
-  
+
   public JSONObject parseStringToJSON(String jsonString)
   {
     JSONObject json = null;
-  
-    try {
+
+    try
+    {
       json = JSONParser.parseStrict(jsonString).isObject();
     }
-    catch(JSONException ex){
+    catch (Exception ex)
+    {
       GWT.log("this json " + jsonString + " is not parsed", ex);
     }
-    
+
     return json;
   }
 }
