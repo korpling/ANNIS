@@ -123,7 +123,11 @@ public class VAnnotationGrid extends Composite implements Paintable
             
             if(event.hasAttribute("style"))
             {
-              formatter.addStyleName(i, col, event.getStringAttribute("style"));
+              String[] styles = event.getStringArrayAttribute("style");
+              for(String s : styles)
+              {
+                formatter.addStyleName(i, col, s);
+              }
             }
             else
             {

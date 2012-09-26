@@ -64,7 +64,7 @@ public class AnnotationGrid extends AbstractComponent
             target.addAttribute("value", event.getValue());
             if("tok".equals(anno.getKey()))
             {
-              target.addAttribute("style", "token");
+              target.addAttribute("style", new String[] {"token"});
             }
             target.endTag("event");
           }
