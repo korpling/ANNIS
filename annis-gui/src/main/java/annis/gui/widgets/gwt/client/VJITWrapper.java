@@ -134,8 +134,24 @@ public class VJITWrapper extends Widget implements Paintable
    label.innerHTML = node.name;
    }
    });
+   var jsonTEST = {
+   id: "node02",
+   name: "0.2",
+   data: {},
+   children: [{
+   id: "node03",
+   name: "0.3",
+   data: {},
+   children: []
+   },{
+   id: "node04",
+   name: "0.4",
+   data: {},
+   children: []
+   }]
+   };
    //load json data
-   st.loadJSON(jsonString);
+   st.loadJSON(jsonTEST);
    //compute node positions and layout
    st.compute();
    //optional: make a translation of the tree    
