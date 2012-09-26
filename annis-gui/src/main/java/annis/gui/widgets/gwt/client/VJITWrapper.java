@@ -56,16 +56,12 @@ public class VJITWrapper extends Widget implements Paintable
     DivElement wrapper = container.appendChild(doc.createDivElement());
     setElement(container);
 
-
     container.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
+    container.setAttribute("id", "container_" + elementID);
     wrapper.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
-
     wrapper.setAttribute("id", elementID);
 
     setupUpJIT();
-
-    // test tree init
-    testTreeInit(elementID);
   }
 
   @Override
@@ -108,13 +104,43 @@ public class VJITWrapper extends Widget implements Paintable
    })();
    }-*/;
 
-  private native void testTreeInit(String elementID) /*-{     
-   var json = {
-   id: "node02",
-   name: "0.2",
-   data: {},
-   children: []
-   };
-   //var st = new $wnd.$jit.ST();
+  @Override
+  protected void onLoad()
+  {
+    super.onLoad();
+  }
+
+    
+  public native void treeInit(String elementID, String jsonString) /*-{    
+   //init Spacetree
+   //Create a new ST instance
+   var st = new $wnd.$jit.ST({
+   'injectInto': elementID,
+   //add styles/shapes/colors
+   //to nodes and edges        
+   //set overridable=true if you want
+   //to set styles for nodes individually 
+   Node: {
+   overridable: true,
+   width: 60,
+   height: 20,
+   color: '#ccc'
+   },
+   onCreateLabel: function(label, node)
+   {
+   //add some styles to the node label
+   var style = label.style;
+   label.id = node.id;
+   label.innerHTML = node.name;
+   }
+   });
+   //load json data
+   st.loadJSON(jsonString);
+   //compute node positions and layout
+   st.compute();
+   //optional: make a translation of the tree    
+   //Emulate a click on the root node.
+   st.onClick(st.root);
+   //end;
    }-*/;
 }
