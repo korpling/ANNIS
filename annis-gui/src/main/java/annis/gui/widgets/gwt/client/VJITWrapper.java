@@ -35,11 +35,11 @@ public class VJITWrapper extends Widget implements Paintable
    */
   private static int count = 0;
   private String elementID;
-  private DivElement div;
   // the json data for the visualization
   private String jsonData;
-  // should set to true if $jit object is loaded
-  private boolean isJITInit = false;
+  protected String background = "#ECF0F6";
+  protected String width = "600px";
+  protected String height = "600px";
 
   public VJITWrapper()
   {
@@ -51,11 +51,21 @@ public class VJITWrapper extends Widget implements Paintable
     // count the JITWrapper objects
     count++;
 
-    // wrapper for the visualization
-    div = doc.createDivElement();
-    setElement(div);
-    div.setId(elementID);
-    div.setInnerHTML(elementID);
+    // container
+    DivElement container = doc.createDivElement();
+    DivElement wrapper = container.appendChild(doc.createDivElement());
+    setElement(container);
+
+
+    container.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
+    wrapper.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
+
+    wrapper.setAttribute("id", elementID);
+
+    setupUpJIT();
+
+    // test tree init
+    testTreeInit(elementID);
   }
 
   @Override
@@ -71,18 +81,16 @@ public class VJITWrapper extends Widget implements Paintable
       return;
     }
 
-
     if (uidl.hasAttribute("testJSON"))
     {
       jsonData = uidl.getStringAttribute("testJSON");
-      setupUpJIT();
     }
   }
 
   /**
    * Some internal jit setup stuff, copied from examples script
    */
-  public native void setupUpJIT() /*-{
+  private native void setupUpJIT() /*-{
    var labelType, useGradients, nativeTextSupport, animate;
    (function() {
    var ua = navigator.userAgent,
@@ -98,5 +106,15 @@ public class VJITWrapper extends Widget implements Paintable
    useGradients = nativeCanvasSupport;
    animate = !(iStuff || !nativeCanvasSupport);
    })();
+   }-*/;
+
+  private native void testTreeInit(String elementID) /*-{     
+   var json = {
+   id: "node02",
+   name: "0.2",
+   data: {},
+   children: []
+   };
+   //var st = new $wnd.$jit.ST();
    }-*/;
 }
