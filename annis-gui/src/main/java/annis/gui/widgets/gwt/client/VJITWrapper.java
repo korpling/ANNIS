@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets.gwt.client;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
@@ -111,10 +112,11 @@ public class VJITWrapper extends Widget implements Paintable
   protected void onLoad()
   {
     super.onLoad();
+    treeInit(elementID, jsonData);
   }
 
     
-  public native void treeInit(String elementID, String jsonString) /*-{    
+  public native void treeInit(String elementID, JSONObject jsonString) /*-{    
    //init Spacetree
    //Create a new ST instance
    var st = new $wnd.$jit.ST({
@@ -165,6 +167,15 @@ public class VJITWrapper extends Widget implements Paintable
   
   public JSONObject parseStringToJSON(String jsonString)
   {
-    return (JSONParser.parseStrict(jsonString).isObject());
+    JSONObject json = null;
+  
+    try {
+      json = JSONParser.parseStrict(jsonString).isObject();
+    }
+    catch(JSONException ex){
+      GWT.log("this json " + jsonString + " is not parsed", ex);
+    }
+    
+    return json;
   }
 }
