@@ -23,6 +23,7 @@ import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
+import annis.gui.visualizers.iframe.graph.DebugVisualizer;
 import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
 import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.iframe.media.AudioVisualizer;
@@ -273,6 +274,7 @@ public class MainApp extends Application implements PluginSystem,
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(DebugVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
