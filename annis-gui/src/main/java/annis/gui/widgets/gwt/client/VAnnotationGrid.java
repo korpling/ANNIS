@@ -15,15 +15,19 @@
  */
 package annis.gui.widgets.gwt.client;
 
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.TableCellElement;
+import com.google.gwt.dom.client.TableRowElement;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.Label;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
-import com.vaadin.terminal.gwt.client.VConsole;
 import com.vaadin.terminal.gwt.client.ui.VLabel;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -39,8 +43,11 @@ public class VAnnotationGrid extends Composite implements Paintable
   /** Reference to the server connection object. */
   ApplicationConnection gClient;
   
-  private FlexTable table;
+  private AnnotationGridTable table;
   private FlexTable.FlexCellFormatter formatter;
+  
+  private Map<Position, String> position2id;
+  private Map<String, String[]> highlighted;
   
   /**
    * The constructor should first call super() to initialize the component and
@@ -50,7 +57,7 @@ public class VAnnotationGrid extends Composite implements Paintable
   {
     super();
 
-    table = new FlexTable();
+    table = new AnnotationGridTable();
     formatter = table.getFlexCellFormatter();
     
     // we are wrapping the table element
@@ -59,7 +66,9 @@ public class VAnnotationGrid extends Composite implements Paintable
     // This method call of the Paintable interface sets the component
     // style name in DOM tree
     setStyleName(CLASSNAME);
-
+    
+    highlighted = new HashMap<String, String[]>();
+    position2id = new HashMap<Position, String>();
   }
 
   /**
@@ -90,6 +99,8 @@ public class VAnnotationGrid extends Composite implements Paintable
     {
       // clear all old table cells
       table.removeAllRows();
+      highlighted.clear();
+      position2id.clear();
 
       for(int i=0; i < rows.getChildCount(); i++)
       {
@@ -109,6 +120,7 @@ public class VAnnotationGrid extends Composite implements Paintable
           for(int j=0; j < events.getChildCount(); j++)
           {
             UIDL event = events.getChildUIDL(j);
+            String id = event.getStringAttribute("id");
             int left = event.getIntAttribute("left");
             int right = event.getIntAttribute("right");
             String value = event.getStringAttribute("value");
@@ -118,7 +130,11 @@ public class VAnnotationGrid extends Composite implements Paintable
             
             int col = left+1; // +1 because we also have a caption column
             
+            // add table cell
             table.setWidget(i, col, label);
+            position2id.put(new Position(i, col), id);
+            
+            // TODO: is this assumption correct?
             formatter.setColSpan(i, col, (right-left+1));
             
             if(event.hasAttribute("style"))
@@ -133,9 +149,119 @@ public class VAnnotationGrid extends Composite implements Paintable
             {
               formatter.addStyleName(i, col, "single_event");
             }
+            
+            // fill highlight map
+            if(event.hasAttribute("highlight"))
+            {
+              highlighted.put(id, event.getStringArrayAttribute("highlight"));
+            }
           }
         }
       }
     }
   }
+  
+  public static class Position
+  {
+    private int column, row;
+
+    public Position(int row, int column)
+    {
+      this.column = column;
+      this.row = row;
+    }
+
+    public int getColumn()
+    {
+      return column;
+    }
+
+    public void setColumn(int column)
+    {
+      this.column = column;
+    }
+
+    public int getRow()
+    {
+      return row;
+    }
+
+    public void setRow(int row)
+    {
+      this.row = row;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 7;
+      hash = 71 * hash + this.column;
+      hash = 71 * hash + this.row;
+      return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (obj == null)
+      {
+        return false;
+      }
+      if (getClass() != obj.getClass())
+      {
+        return false;
+      }
+      final Position other = (Position) obj;
+      if (this.column != other.column)
+      {
+        return false;
+      }
+      if (this.row != other.row)
+      {
+        return false;
+      }
+      return true;
+    }
+  }
+  
+  public class AnnotationGridTable extends FlexTable
+  {
+    
+    public AnnotationGridTable()
+    {
+      sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
+    }
+
+    @Override
+    public void onBrowserEvent(Event event)
+    {
+      Element td = getEventTargetCell(event);
+      if (td == null)
+      {
+        return;
+      }
+      
+      int row = TableRowElement.as(td.getParentElement()).getSectionRowIndex();
+      int column = TableCellElement.as(td).getCellIndex();
+      
+      String id = position2id.get(new Position(row, column));
+      String[] highlight4Cell = highlighted.get(id);
+      
+      // only do something if the cell is highlighting other cells
+      if(highlight4Cell != null && highlight4Cell.length > 0)
+      {
+        switch(event.getTypeInt())
+        {
+          case Event.ONMOUSEOVER:
+            td.addClassName("highlightedEvent");
+            break;
+          case Event.ONMOUSEOUT:
+            td.removeClassName("highlightedEvent");
+            break;
+        }
+      }
+    }
+    
+  }
+  
 }

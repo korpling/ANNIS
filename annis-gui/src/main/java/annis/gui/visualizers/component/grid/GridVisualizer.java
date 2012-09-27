@@ -107,7 +107,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
       // add tokens as row
       Row tokenRow = new Row();
-      int id=0;
       for(SToken t : token)
       {
         long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()

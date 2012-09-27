@@ -32,6 +32,7 @@ public class GridEvent
   
   public GridEvent(String id, int left, int right, String value)
   {
+    this.id = id;
     this.left = left;
     this.right = right;
     this.value = value;

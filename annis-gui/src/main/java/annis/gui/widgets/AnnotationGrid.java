@@ -58,7 +58,7 @@ public class AnnotationGrid extends AbstractComponent
           for(GridEvent event : row.getEvents())
           {
             target.startTag("event");
-            target.addAttribute("id", event.hashCode());
+            target.addAttribute("id", event.getId());
             target.addAttribute("left", event.getLeft());
             target.addAttribute("right", event.getRight());
             target.addAttribute("value", event.getValue());
