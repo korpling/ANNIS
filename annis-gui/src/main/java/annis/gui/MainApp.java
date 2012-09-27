@@ -34,6 +34,7 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
@@ -133,7 +134,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (JoranException ex)
     {
-      log.error("init loggin failed", ex);
+      log.error("init logging failed", ex);
     }
 
   }

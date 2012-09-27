@@ -17,6 +17,7 @@ package annis.gui.visualizers;
 
 import annis.gui.MainApp;
 import annis.gui.visualizers.component.KWICPanel;
+import com.vaadin.Application;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.List;
@@ -58,7 +59,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin
    * vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput);
+  public I createComponent(VisualizerInput visInput, Application application);
 
   /**
    * Checks if the Plugin needs the primary text source.

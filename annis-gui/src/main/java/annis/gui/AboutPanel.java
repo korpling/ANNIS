@@ -47,7 +47,7 @@ public class AboutPanel extends Panel
     if(logo_sfb_res == null)
     {
       logo_sfb_res = new ClassResource(AboutPanel.class,
-      "annis-logo.jpg", app);
+      "sfb-logo.jpg", app);
     }
     if(logo_annis_res == null)
     {

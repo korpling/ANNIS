@@ -16,25 +16,27 @@
 package annis.gui.visualizers.iframe.graph;
 
 import annis.gui.visualizers.VisualizerInput;
-import annis.gui.visualizers.iframe.AbstractDotVisualizer;
+import annis.gui.visualizers.component.AbstractDotVisualizer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Serializable;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.emf.common.util.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
-public class DebugVisualizer extends AbstractDotVisualizer
+public class DebugVisualizer extends AbstractDotVisualizer implements Serializable
 {
 
+  private final Logger log = LoggerFactory.getLogger(DebugVisualizer.class);
+  
   @Override
   public void createDotContent(VisualizerInput input, StringBuilder sb)
   {
@@ -52,7 +54,7 @@ public class DebugVisualizer extends AbstractDotVisualizer
     }
     catch (IOException ex)
     {
-      Logger.getLogger(DebugVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+      log.error("could not create temporary file for dot", ex);
     }
   }
 

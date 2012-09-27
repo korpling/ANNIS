@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.VConsole;
 import com.vaadin.terminal.gwt.client.ui.VLabel;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,77 +96,84 @@ public class VAnnotationGrid extends Composite implements Paintable
     // Save the client side identifier (paintable id) for the widget
     paintableId = uidl.getId();
     
-    UIDL rows = uidl.getChildByTagName("rows");
-    if(rows != null)
+    try
     {
-      // clear all old table cells
-      table.removeAllRows();
-      highlighted.clear();
-      position2id.clear();
-
-      for(int i=0; i < rows.getChildCount(); i++)
+      UIDL rows = uidl.getChildByTagName("rows");
+      if (rows != null)
       {
-        UIDL row = rows.getChildUIDL(i);
-        if("row".equals(row.getTag()))
-        {
-          String caption = row.getStringAttribute("caption");
-          String[] captionSplit = caption.split("::");
-          String name = captionSplit[captionSplit.length-1];
+        // clear all old table cells
+        table.removeAllRows();
+        highlighted.clear();
+        position2id.clear();
 
-          VLabel lblCaption = new VLabel(name);
-          table.setWidget(i, 0, lblCaption);
-          formatter.addStyleName(i, 0, "header");
-          
-          int colspanOffset = 0;
-          
-          UIDL events = row.getChildByTagName("events");
-          for(int j=0; j < events.getChildCount(); j++)
+        for (int i = 0; i < rows.getChildCount(); i++)
+        {
+          UIDL row = rows.getChildUIDL(i);
+          if ("row".equals(row.getTag()))
           {
-            UIDL event = events.getChildUIDL(j);
-            String id = event.getStringAttribute("id");
-            int left = event.getIntAttribute("left");
-            int right = event.getIntAttribute("right");
-            String value = event.getStringAttribute("value");
-            
-            VLabel label = new VLabel(value);
-            label.setTitle(caption);
-            
-            // +1 because we also have a caption column, subtract columns we
-            // jumped over by using colspan
-            int col = left+1-colspanOffset; 
-            
-            // add table cell
-            table.setWidget(i, col, label);
-            position2id.put(new Position(i, col), id);
-            
-            int colspan = right-left+1;
-            formatter.setColSpan(i, col, colspan);
-            if(colspan > 1)
+            String caption = row.getStringAttribute("caption");
+            String[] captionSplit = caption.split("::");
+            String name = captionSplit[captionSplit.length - 1];
+
+            VLabel lblCaption = new VLabel(name);
+            table.setWidget(i, 0, lblCaption);
+            formatter.addStyleName(i, 0, "header");
+
+            int colspanOffset = 0;
+
+            UIDL events = row.getChildByTagName("events");
+            for (int j = 0; j < events.getChildCount(); j++)
             {
-              colspanOffset += (colspan-1);
-            }
-            
-            if(event.hasAttribute("style"))
-            {
-              String[] styles = event.getStringArrayAttribute("style");
-              for(String s : styles)
+              UIDL event = events.getChildUIDL(j);
+              String id = event.getStringAttribute("id");
+              int left = event.getIntAttribute("left");
+              int right = event.getIntAttribute("right");
+              String value = event.getStringAttribute("value");
+
+              VLabel label = new VLabel(value);
+              label.setTitle(caption);
+
+              // +1 because we also have a caption column, subtract columns we
+              // jumped over by using colspan
+              int col = left + 1 - colspanOffset;
+
+              // add table cell
+              table.setWidget(i, col, label);
+              position2id.put(new Position(i, col), id);
+
+              int colspan = right - left + 1;
+              formatter.setColSpan(i, col, colspan);
+              if (colspan > 1)
               {
-                formatter.addStyleName(i, col, s);
+                colspanOffset += (colspan - 1);
               }
-            }
-            else
-            {
-              formatter.addStyleName(i, col, "single_event");
-            }
-            
-            // fill highlight map
-            if(event.hasAttribute("highlight"))
-            {
-              highlighted.put(id, event.getStringArrayAttribute("highlight"));
+
+              if (event.hasAttribute("style"))
+              {
+                String[] styles = event.getStringArrayAttribute("style");
+                for (String s : styles)
+                {
+                  formatter.addStyleName(i, col, s);
+                }
+              }
+              else
+              {
+                formatter.addStyleName(i, col, "single_event");
+              }
+
+              // fill highlight map
+              if (event.hasAttribute("highlight"))
+              {
+                highlighted.put(id, event.getStringArrayAttribute("highlight"));
+              }
             }
           }
         }
-      }
+      }// end if rows not null
+    }
+    catch (Exception ex)
+    {
+      VConsole.log(ex);
     }
   }
   
@@ -266,7 +274,10 @@ public class VAnnotationGrid extends Composite implements Paintable
             for(String targetID : targetIDs)
             {
               Position pos = position2id.inverse().get(targetID);
-              formatter.addStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+              if(pos != null)
+              {
+                formatter.addStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+              }
             }
             
             break;
@@ -275,13 +286,14 @@ public class VAnnotationGrid extends Composite implements Paintable
             for(String targetID : targetIDs)
             {
               Position pos = position2id.inverse().get(targetID);
-              formatter.removeStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+              if(pos != null)
+              {
+                formatter.removeStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+              }
             }
             break;
         }
       }
     }
-    
   }
-  
 }

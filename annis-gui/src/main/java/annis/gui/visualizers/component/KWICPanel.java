@@ -21,6 +21,7 @@ import annis.gui.resultview.VisualizerPanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.AbstractSelect;
@@ -55,7 +56,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   }
 
   @Override
-  public KWICPanelImpl createComponent(VisualizerInput visInput)
+  public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
   {
     return new KWICPanelImpl(visInput);
   }

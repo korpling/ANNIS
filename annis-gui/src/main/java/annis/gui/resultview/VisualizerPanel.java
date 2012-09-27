@@ -155,7 +155,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
         // create the visualizer and calc input
         try
         {
-          vis = this.visPlugin.createComponent(createInput());
+          vis = this.visPlugin.createComponent(createInput(), getApplication());
           vis.setVisible(true);
           addComponent(vis, "iframe");
         }
@@ -183,7 +183,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
         // create the visualizer and calc input
         try
         {
-          vis = this.visPlugin.createComponent(createInput());
+          vis = this.visPlugin.createComponent(createInput(), getApplication());
           vis.setVisible(true);
           addComponent(vis, "iframe");
         }
@@ -356,7 +356,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       {
         try
         {
-          vis = this.visPlugin.createComponent(createInput());
+          vis = this.visPlugin.createComponent(createInput(), getApplication());
           addComponent(vis, "iframe");
         }
         catch(Exception ex)

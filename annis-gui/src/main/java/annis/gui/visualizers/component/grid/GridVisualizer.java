@@ -21,11 +21,11 @@ import static annis.model.AnnisConstants.*;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AnnotationGrid;
+import com.vaadin.Application;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
@@ -62,7 +62,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   }
 
   @Override
-  public GridVisualizerComponent createComponent(VisualizerInput visInput)
+  public GridVisualizerComponent createComponent(VisualizerInput visInput, Application application)
   {
     GridVisualizerComponent component = new GridVisualizerComponent(visInput);
     return component;
@@ -204,6 +204,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       types.add(STYPE_NAME.STEXTUAL_RELATION);
       types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
       types.add(STYPE_NAME.SSEQUENTIAL_RELATION);
+      
+      int eventCounter = 0;
+      
       for(SSpan span : graph.getSSpans())
       {  
         // calculate the left and right values of a span
@@ -227,7 +230,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             // 1. give each annotation of each span an own row
             Row r = new Row();
             
-            GridEvent event = new GridEvent(span.getSId(), left, right,
+            String id = "event_" + eventCounter++;
+            GridEvent event = new GridEvent(id, left, right,
               anno.getSValueSTEXT());
             
             // check if the span is a matched node
