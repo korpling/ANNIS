@@ -116,7 +116,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     try
     {
-      root.put("children", node);
+      root.append("children", node);
     }
     catch (JSONException ex)
     {
