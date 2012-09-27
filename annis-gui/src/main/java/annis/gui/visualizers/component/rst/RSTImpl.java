@@ -18,14 +18,14 @@ package annis.gui.visualizers.component.rst;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import com.vaadin.ui.Panel;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Graph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.util.LinkedList;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.Stack;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,26 +36,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class RSTImpl extends Panel implements GraphTraverseHandler
+public class RSTImpl extends Panel implements SGraphTraverseHandler
 {
 
-  String testJSON = "{"
-    + "\"id\": \"node1\","
-    + "\"name\" : \"node1\","
-    + "\"data\": {},"
-    + "\"children\": [{"
-    + "\"id\": \"node2\","
-    + "\"name\": \"node2\","
-    + "\"data\": {},"
-    + "\"children\":[]"
-    + "},{"
-    + "\"id\": \"node3\","
-    + "\"name\": \"node3\","
-    + "\"data\": {},"
-    + "\"children\":[]"
-    + "}"
-    + "]"
-    + "}";
   private final JITWrapper jit;
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
   private Stack<JSONObject> st = new Stack<JSONObject>();
@@ -64,14 +47,40 @@ public class RSTImpl extends Panel implements GraphTraverseHandler
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
-    Graph graph = visInput.getDocument().getGraph();
-    EList<Node> nodes = graph.getRoots();
+    SDocumentGraph graph = visInput.getDocument().getSDocumentGraph();
+    EList<SNode> nodes = graph.getSRoots();
+    EList<SNode> rootSNodes = new BasicEList<SNode>();
+    final String ANNOTATION = "cat";
 
-    graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-      "generateJSON", this);
-
+    if (nodes != null)
+    {
+      for (SNode node : nodes)
+      {
+        for (SAnnotation anno : node.getSAnnotations())
+        {
+          log.debug("anno name {}, anno value {}", anno.getName(), anno.getValue());
+          
+          if (ANNOTATION.equals(anno.getName()))
+          {
+            rootSNodes.add(node);
+            log.debug("find root {} with {}", anno, ANNOTATION);
+            break;
+          }
+        }
+      }
+    }
     
-    log.info(result.toString());
+    if (rootSNodes.size() > 0)
+    {
+      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+    }
+    else
+    {
+      log.debug("does not find an annotation which matched {}", ANNOTATION);
+      graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+    }
+
+    log.debug("result json string: {}", result);
     return result.toString();
   }
 
@@ -85,46 +94,14 @@ public class RSTImpl extends Panel implements GraphTraverseHandler
 
   }
 
-  @Override
-  public void nodeReached(GRAPH_TRAVERSE_TYPE g, String string, Node current, Edge edge, Node fromNode, long l)
-  {
-    st.push(createJsonEntry(current));
-    log.info("pushed {}", st.toString());
-  }
-
-  @Override
-  public void nodeLeft(GRAPH_TRAVERSE_TYPE g, String string, Node current, Edge edge, Node fromNode, long l)
-  {
-    assert st.size() > 0;
-
-    if (st.size() == 1)
-    {
-      result = st.pop();
-    }
-    else
-    {
-      JSONObject node = st.pop();
-      appendChild(st.peek(), node);
-    }
-    
-    log.info("poped {}", st.toString());
-  }
-
-  @Override
-  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE g, String string, Edge edge, Node node, long l)
-  {
-    // all the graph should be traverse.
-    return true;
-  }
-
-  private JSONObject createJsonEntry(Node current)
+  private JSONObject createJsonEntry(SNode current)
   {
     JSONObject jsonData = new JSONObject();
 
     try
     {
-      jsonData.put("id", current.getId());
-      jsonData.put("name", current.getId());
+      jsonData.put("id", current.getSName());
+      jsonData.put("name", current.getSName());
       jsonData.put("data", "{}");
     }
     catch (JSONException ex)
@@ -147,5 +124,33 @@ public class RSTImpl extends Panel implements GraphTraverseHandler
     }
 
     return node;
+  }
+
+  @Override
+  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation sRelation, SNode fromNode, long order)
+  {
+    st.push(createJsonEntry(currNode));
+  }
+
+  @Override
+  public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation edge, SNode fromNode, long order)
+  {
+    assert st.size() > 0;
+
+    if (st.size() == 1)
+    {
+      result = st.pop();
+    }
+    else
+    {
+      JSONObject node = st.pop();
+      appendChild(st.peek(), node);
+    }
+  }
+
+  @Override
+  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation edge, SNode currNode, long order)
+  {
+    return true;
   }
 }
