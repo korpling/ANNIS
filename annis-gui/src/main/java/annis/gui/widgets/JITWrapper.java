@@ -28,29 +28,14 @@ import com.vaadin.ui.ClientWidget;
 @ClientWidget(VJITWrapper.class)
 public class JITWrapper extends AbstractComponent
 {
-
-  String testJSON = "{"
-    + "\"id\": \"node1\","
-    + "\"name\" : \"node1\","
-    + "\"data\": {},"
-    + "\"children\": [{"
-      + "\"id\": \"node2\","
-      + "\"name\": \"node2\","
-      + "\"data\": {},"
-      + "\"children\":[]"
-    + "},{"
-      + "\"id\": \"node3\","
-      + "\"name\": \"node3\","
-      + "\"data\": {},"
-      + "\"children\":[]"
-      + "}"
-    + "]"
-    + "}";
+  
+  private String visData = null;
 
   public JITWrapper()
   {
     super();
-  }
+  }  
+  
 
   @Override
   public void paintContent(PaintTarget target)
