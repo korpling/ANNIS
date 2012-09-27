@@ -10,11 +10,11 @@
     text-align:center;
 }
 
-.partitur_table .highlightedToken {
+.partitur_table .highlight-target {
     background-color:#faf755;
 }
 
-.partitur_table .highlightedEvent {
+.partitur_table .highlight-source {
     background-color:rgb(175,175,175);
 }
 

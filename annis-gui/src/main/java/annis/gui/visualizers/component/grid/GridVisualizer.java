@@ -23,6 +23,7 @@ import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AnnotationGrid;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -87,6 +88,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       setWidth("100%");
       setHeight("-1");
       ((VerticalLayout) getContent()).setSizeUndefined();
+      addStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
       grid = new AnnotationGrid();
       grid.addStyleName("partitur_table");
@@ -227,7 +229,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                 if(e instanceof SSpanningRelation)
                 {
                   SSpanningRelation spanRel = (SSpanningRelation) e;
-                  event.getCoveredIDs().add(spanRel.getSId());
+                  event.getCoveredIDs().add(spanRel.getSTarget().getSId());
                 }
               }
             }

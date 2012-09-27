@@ -15,6 +15,8 @@
  */
 package annis.gui.widgets.gwt.client;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableRowElement;
@@ -26,7 +28,6 @@ import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.ui.VLabel;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,7 +47,7 @@ public class VAnnotationGrid extends Composite implements Paintable
   private AnnotationGridTable table;
   private FlexTable.FlexCellFormatter formatter;
   
-  private Map<Position, String> position2id;
+  private BiMap<Position, String> position2id;
   private Map<String, String[]> highlighted;
   
   /**
@@ -68,7 +69,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     setStyleName(CLASSNAME);
     
     highlighted = new HashMap<String, String[]>();
-    position2id = new HashMap<Position, String>();
+    position2id = HashBiMap.create();
   }
 
   /**
@@ -245,18 +246,30 @@ public class VAnnotationGrid extends Composite implements Paintable
       int column = TableCellElement.as(td).getCellIndex();
       
       String id = position2id.get(new Position(row, column));
-      String[] highlight4Cell = highlighted.get(id);
+      String[] targetIDs = highlighted.get(id);
       
       // only do something if the cell is highlighting other cells
-      if(highlight4Cell != null && highlight4Cell.length > 0)
+      if(targetIDs != null && targetIDs.length > 0)
       {
         switch(event.getTypeInt())
         {
           case Event.ONMOUSEOVER:
-            td.addClassName("highlightedEvent");
+            td.addClassName("highlight-source");
+            
+            for(String targetID : targetIDs)
+            {
+              Position pos = position2id.inverse().get(targetID);
+              formatter.addStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+            }
+            
             break;
           case Event.ONMOUSEOUT:
-            td.removeClassName("highlightedEvent");
+            td.removeClassName("highlight-source");
+            for(String targetID : targetIDs)
+            {
+              Position pos = position2id.inverse().get(targetID);
+              formatter.removeStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+            }
             break;
         }
       }
