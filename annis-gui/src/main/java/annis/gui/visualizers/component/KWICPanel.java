@@ -315,10 +315,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
       public String getStyle(String layer, SNode token)
       {
-        BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
-        textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-
-
         if ("tok".equals(layer))
         {
 

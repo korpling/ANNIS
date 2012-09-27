@@ -32,6 +32,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -114,7 +115,16 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
           - startIndex;
         String text = CommonHelper.getSpannedText(t);
-        tokenRow.addEvent(new GridEvent(t.getSId(), (int) idx,(int) idx, text));
+        
+        GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
+        
+        // check if the token is a matched node
+        SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long match = featMatched == null ? null : featMatched.
+          getSValueSNUMERIC();
+        event.setMatch(match);
+        
+        tokenRow.addEvent(event);
       }
       ArrayList<Row> tokenRowList = new ArrayList<Row>();
       tokenRowList.add(tokenRow);
@@ -219,6 +229,12 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             
             GridEvent event = new GridEvent(span.getSId(), left, right,
               anno.getSValueSTEXT());
+            
+            // check if the span is a matched node
+            SFeature featMatched = span.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+            Long match = featMatched == null ? null : featMatched.
+              getSValueSNUMERIC();
+            event.setMatch(match);
             
             // calculate overlapped SToken
             EList<Edge> outEdges = graph.getOutEdges(span.getSId());

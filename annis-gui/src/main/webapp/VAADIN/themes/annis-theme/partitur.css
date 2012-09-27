@@ -38,41 +38,10 @@
 }
 
 td.single_event {
-    color:rgb(0,0,0);
     background-color:rgb(200,200,200);
     border-color:rgb(0,0,0);
     border-style:solid;
     border-width:1px;
-}
-
-td.begin_event {
-    color:rgb(0,0,0);
-    background-color:rgb(200,200,200);
-    border-color:rgb(0,0,0);
-    border-style:solid;
-    border-width:1px 0px 1px 1px;
-}
-
-td.end_event {
-    color:rgb(200,200,200);
-    background-color:rgb(200,200,200);
-    border-color:rgb(0,0,0);
-    border-style:solid;
-    border-width:1px 1px 1px 0px;
-}
-
-td.middle_event {
-    color:rgb(200,200,200);
-    background-color:rgb(200,200,200);
-    border-color:rgb(0,0,0);
-    border-style:solid;
-    border-width:1px 0px 1px 0px;
-}
-
-#partiture {
-  position: absolute;
-  left: 0pt;
-  top: 25pt;
 }
 
 .checkedItem:before {

@@ -28,6 +28,7 @@ public class GridEvent
   private int left;
   private int right;
   private String value;
+  private Long match;
   private List<String> coveredIDs;
   
   public GridEvent(String id, int left, int right, String value)
@@ -83,6 +84,16 @@ public class GridEvent
   public List<String> getCoveredIDs()
   {
     return coveredIDs;
+  }
+
+  public Long getMatch()
+  {
+    return match;
+  }
+
+  public void setMatch(Long match)
+  {
+    this.match = match;
   }
   
 }
