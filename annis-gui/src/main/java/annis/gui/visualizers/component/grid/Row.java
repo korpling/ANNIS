@@ -47,7 +47,7 @@ public class Row
   public boolean addEvent(GridEvent e)
   {
     BitSet eventOccupance = new BitSet(e.getRight());
-    eventOccupance.set(e.getLeft(), e.getRight());
+    eventOccupance.set(e.getLeft(), e.getRight()+1, true);
     if(occupancySet.intersects(eventOccupance))
     {
       return false;
