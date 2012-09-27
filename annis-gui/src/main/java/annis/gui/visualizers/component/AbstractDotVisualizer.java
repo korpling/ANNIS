@@ -42,7 +42,6 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractDotVisualizer.class);
-  public final int scale = 50;
   
   @Override
   public ImagePanel createComponent(final VisualizerInput visInput, Application application)
@@ -110,7 +109,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       // execute dot
       ProcessBuilder pBuilder = new ProcessBuilder(
         input.getMappings().getProperty("dotpath", "dot"),
-         "-s" + scale+ ".0", "-Tpng", 
+          "-Tpng", 
         tmpInput.getCanonicalPath());
      
       pBuilder.redirectOutput(tmpOutput);
