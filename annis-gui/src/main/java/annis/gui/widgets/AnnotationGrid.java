@@ -24,6 +24,8 @@ import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 
 /**
@@ -56,8 +58,19 @@ public class AnnotationGrid extends AbstractComponent
           target.startTag("row");
           target.addAttribute("caption", anno.getKey());
 
+          ArrayList<GridEvent> rowEvents = row.getEvents();
+          // sort the events by their natural order
+          Collections.sort(rowEvents, new Comparator<GridEvent>() 
+          {
+            @Override
+            public int compare(GridEvent o1, GridEvent o2)
+            {
+              return Integer.compare(o1.getLeft(), o2.getLeft());
+            }
+          });
+          
           target.startTag("events");
-          for (GridEvent event : row.getEvents())
+          for (GridEvent event : rowEvents)
           {
             target.startTag("event");
             target.addAttribute("id", event.getId());

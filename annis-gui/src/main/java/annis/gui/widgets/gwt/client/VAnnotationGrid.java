@@ -109,13 +109,14 @@ public class VAnnotationGrid extends Composite implements Paintable
         if("row".equals(row.getTag()))
         {
           String caption = row.getStringAttribute("caption");
-
           String[] captionSplit = caption.split("::");
           String name = captionSplit[captionSplit.length-1];
 
           VLabel lblCaption = new VLabel(name);
           table.setWidget(i, 0, lblCaption);
           formatter.addStyleName(i, 0, "header");
+          
+          int colspanOffset = 0;
           
           UIDL events = row.getChildByTagName("events");
           for(int j=0; j < events.getChildCount(); j++)
@@ -129,14 +130,20 @@ public class VAnnotationGrid extends Composite implements Paintable
             VLabel label = new VLabel(value);
             label.setTitle(caption);
             
-            int col = left+1; // +1 because we also have a caption column
+            // +1 because we also have a caption column, subtract columns we
+            // jumped over by using colspan
+            int col = left+1-colspanOffset; 
             
             // add table cell
             table.setWidget(i, col, label);
             position2id.put(new Position(i, col), id);
             
-            // TODO: is this assumption correct?
-            formatter.setColSpan(i, col, (right-left+1));
+            int colspan = right-left+1;
+            formatter.setColSpan(i, col, colspan);
+            if(colspan > 1)
+            {
+              colspanOffset += (colspan-1);
+            }
             
             if(event.hasAttribute("style"))
             {
