@@ -324,10 +324,16 @@ public class DefaultAdministrationDao implements AdministrationDao
           File resolver_vis_tab = new File(path, table + ".tab");
           BufferedReader bReader = new BufferedReader(
             new FileReader(resolver_vis_tab));
-          String[] entries = bReader.readLine().split("\t");
-          int cols = entries.length;
+          String firstLine = bReader.readLine();
+          
+          int cols = 9; // default number
+          if(firstLine != null)
+          {
+            String[] entries = bReader.readLine().split("\t");
+            cols = entries.length;            
+            log.debug("the first row: {} amount of cols: {}", entries, cols);
+          }
 
-          log.debug("the first row: {} amount of cols: {}", entries, cols);
 
           switch (cols)
           {
