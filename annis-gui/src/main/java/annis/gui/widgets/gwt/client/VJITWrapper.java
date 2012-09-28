@@ -160,7 +160,7 @@ public class VJITWrapper extends Widget implements Paintable
     {
       //add some styles to the node label
       var style = label.style;
-      label.id = node.id;
+      label.id = elementID + ':label:' + node.id;
       label.innerHTML = node.name;
     }
    
