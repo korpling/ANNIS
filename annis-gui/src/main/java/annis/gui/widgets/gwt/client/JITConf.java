@@ -29,6 +29,10 @@ import com.google.gwt.json.client.JSONValue;
 public class JITConf extends JSONObject
 {
 
+  protected JITConf()
+  {
+  }
+
   public void setProperty(String key, String value)
   {
     this.put(key, new JSONString(value));
@@ -43,11 +47,11 @@ public class JITConf extends JSONObject
   {
     this.put(key, new JSONNumber(value));
   }
-  
+
   public void setProperty(String key, JSONObject value)
-  {    
+  {
     this.put(key, value);
-  } 
+  }
 
   public JavaScriptObject getNativeJavascriptObject()
   {

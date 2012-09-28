@@ -43,7 +43,7 @@ public class JITWrapper extends AbstractComponent
   {
     super.paintContent(target);
 
-    target.addAttribute("testJSON", visData);
+    target.addAttribute("visData", visData);
   }
 
 

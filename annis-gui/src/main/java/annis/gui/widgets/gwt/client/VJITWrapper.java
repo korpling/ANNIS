@@ -40,8 +40,11 @@ public class VJITWrapper extends Widget implements Paintable
    */
   private static int count = 0;
   private String elementID;
+  private JITVisualization visualization;
   // the json data for the visualization
   private JSONObject jsonData;
+  private JITConf config;
+  // some css properties
   protected String background = "#ECF0F6";
   protected String width = "600px";
   protected String height = "600px";
@@ -66,13 +69,24 @@ public class VJITWrapper extends Widget implements Paintable
     wrapper.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
     wrapper.setAttribute("id", elementID);
 
-    setupUpJIT();
+    // initialize some browser compatibilies of jit
+    setupJIT();
+
+    config = new JITConf();
+    config.setProperty("injectInto", elementID);    
+
+    JITConf node = new JITConf();
+    node.setProperty("overridable", true);
+    node.setProperty("width", 200);
+    node.setProperty("height", 200);
+    node.setProperty("color", "#ccc");
+    config.setProperty("node", node);
   }
 
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
-
+    
     // This call should be made first.
     // It handles sizes, captions, tooltips, etc. automatically.
     if (client.updateComponent(this, uidl, true))
@@ -80,11 +94,20 @@ public class VJITWrapper extends Widget implements Paintable
       // If client.updateComponent returns true there has been no changes and we
       // do not need to update anything.
       return;
-    }    
+    }
 
-    if (uidl.hasAttribute("testJSON"))
+
+    if (uidl.hasAttribute("visData"))
     {
-      jsonData = parseStringToJSON(uidl.getStringAttribute("testJSON"));
+   
+      jsonData = parseStringToJSON(uidl.getStringAttribute("visData"));      
+      
+      // init the visualization
+      if (visualization == null)
+      {
+        visualization = visualizationInit(config.getJavaScriptObject());       
+      }
+
       if (jsonData != null)
       {
         GWT.log("jsonData: " + jsonData.toString());
@@ -100,7 +123,7 @@ public class VJITWrapper extends Widget implements Paintable
   /**
    * Some internal jit setup stuff, copied from examples script
    */
-  private native void setupUpJIT() /*-{
+  private native void setupJIT() /*-{
    var labelType, useGradients, nativeTextSupport, animate;
    (function() {
    var ua = navigator.userAgent,
@@ -116,11 +139,28 @@ public class VJITWrapper extends Widget implements Paintable
    useGradients = nativeCanvasSupport;
    animate = !(iStuff || !nativeCanvasSupport);
    })();
-   }-*/; 
+   }-*/;
+
+  public native JITVisualization visualizationInit(JavaScriptObject config)/*-{   
+    
+    // add some methods too config    
+    config.onCreateLabel = function(label, node)
+    {
+      //add some styles to the node label
+      var style = label.style;
+      label.id = node.id;
+      label.innerHTML = node.name;
+    }
+    
+    //init Spacetree
+    //Create a new ST instance
+    return $wnd.$jit.ST(config);    
+   }-*/;
+ 
 
   public native void treeInit(String elementID, JavaScriptObject jsonData) /*-{   
    //init Spacetree
-   //Create a new ST instance
+   //Create a new ST instance   
    var st = new $wnd.$jit.ST({
    'injectInto': elementID,
    //add styles/shapes/colors
