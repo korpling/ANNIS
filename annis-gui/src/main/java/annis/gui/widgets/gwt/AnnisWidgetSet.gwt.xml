@@ -10,7 +10,9 @@
 	<!-- Widgetset default theme -->
 	<!-- This is relative to widgetset_directory/public -->	
 	<stylesheet src="anniswidget/styles.css"/>
-
+  
+  <!-- JQuery makes our life easier -->
+  <script src="anniswidget/jquery-1.8.2.min.js" />
     <!--
      Uncomment the following to compile the widgetset for one browser only.
      This can reduce the GWT compilation time significantly when debugging.
