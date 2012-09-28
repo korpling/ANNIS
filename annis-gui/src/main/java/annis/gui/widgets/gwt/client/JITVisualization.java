@@ -19,21 +19,25 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Wraps the visualization to java class.
- * 
+ *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class JITVisualization extends JavaScriptObject
 {
-  
-  public native void onClick(JITVisualization vis) /*-{
+
+  protected JITVisualization()
+  {
+  }
+
+  final public native void onClick(JITVisualization vis) /*-{
    this.onClick(vis.root);
-  }-*/;  
-  
-  public native void compute() /*-{
+   }-*/;
+
+  final public native void compute() /*-{
    this.compute();
-  }-*/;  
-  
-  public native void loadJSON(JavaScriptObject json) /*-{
+   }-*/;
+
+  final public native void loadJSON(JavaScriptObject json) /*-{
    this.loadJSON(json);
-  }-*/;  
+   }-*/;
 }
