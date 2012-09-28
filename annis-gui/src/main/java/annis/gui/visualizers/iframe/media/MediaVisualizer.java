@@ -8,6 +8,7 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,8 @@ public abstract class MediaVisualizer extends WriterVisualizer
     try
     {       
       String binaryServletPath = input.getContextPath() + "/Binary?"
-        + "documentName=" + corpusPath.get(0)
-        + "&toplevelCorpusName=" + corpusPath.get(corpusPath.size()-1);
+        + "documentName=" + URLEncoder.encode(corpusPath.get(0), "UTF-8")
+        + "&toplevelCorpusName=" + URLEncoder.encode(corpusPath.get(corpusPath.size()-1), "UTF-8");
       writer.append("<!DOCTYPE html>");
       writer.append("<html>");
       writer.append("<head>");

@@ -76,7 +76,7 @@ public class BinaryServlet extends HttpServlet
     
     WebResource binaryRes = annisRes.path("corpora")
       .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-      .path(documentName).path("binary"); 
+      .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
     
     if (range != null)
     {
