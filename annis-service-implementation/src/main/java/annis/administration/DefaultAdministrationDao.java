@@ -329,7 +329,7 @@ public class DefaultAdministrationDao implements AdministrationDao
           int cols = 9; // default number
           if(firstLine != null)
           {
-            String[] entries = bReader.readLine().split("\t");
+            String[] entries = firstLine.split("\t");
             cols = entries.length;            
             log.debug("the first row: {} amount of cols: {}", entries, cols);
           }
