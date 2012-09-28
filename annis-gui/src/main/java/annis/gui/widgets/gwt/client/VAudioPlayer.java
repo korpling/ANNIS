@@ -20,6 +20,7 @@ import com.google.gwt.dom.client.Style;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.BrowserInfo;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.VConsole;
 
 /**
  *
@@ -34,6 +35,7 @@ public class VAudioPlayer extends VMediaPlayerBase
   {
     super(Document.get().createAudioElement());
     setStyleName(CLASSNAME);
+    
   }
 
   @Override
@@ -59,4 +61,12 @@ public class VAudioPlayer extends VMediaPlayerBase
       }
     }
   }
+
+  @Override
+  public String getMimeType()
+  {
+    return "audio/ogg";
+  }
+  
+  
 }

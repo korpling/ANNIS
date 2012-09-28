@@ -15,15 +15,18 @@
  */
 package annis.gui.widgets;
 
-import com.vaadin.terminal.gwt.client.ui.VAudio;
+import annis.gui.widgets.gwt.client.VAudioPlayer;
 import com.vaadin.ui.ClientWidget;
 
 /**
  * Audio player that implements the functions needed by ANNIS.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VAudio.class)
+@ClientWidget(VAudioPlayer.class)
 public class AudioPlayer extends MediaPlayerBase
 {
-  
+  public AudioPlayer(String resourceURL)
+  {
+    super(resourceURL);
+  }
 }

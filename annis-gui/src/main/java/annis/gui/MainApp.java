@@ -27,7 +27,7 @@ import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
 import annis.gui.visualizers.iframe.graph.DebugVisualizer;
 import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
 import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.iframe.media.AudioVisualizer;
+import annis.gui.visualizers.component.AudioVisualizer;
 import annis.gui.visualizers.iframe.media.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;

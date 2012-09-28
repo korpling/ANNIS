@@ -16,8 +16,8 @@
 package annis.gui.widgets.gwt.client;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.Element;
 import com.vaadin.terminal.gwt.client.Util;
 
 /**
@@ -32,9 +32,17 @@ public class VVideoPlayer extends VMediaPlayerBase
   {
     super(Document.get().createVideoElement());
     setStyleName(CLASSNAME);
+    
+    updateDimensionsWhenMetadataLoaded(getMedia());
+  }
+
+  @Override
+  public String getMimeType()
+  {
+    return "video/webm";
   }
   
-  private void updateSizeFromMetadata(double width, double height)
+  private void updateSizeFromMetadata(int width, int height)
   {
     getMedia().getStyle().setWidth(width, Style.Unit.PX);
     getMedia().getStyle().setHeight(height, Style.Unit.PX);
@@ -47,7 +55,7 @@ public class VVideoPlayer extends VMediaPlayerBase
       
       media.on('loadedmetadata', $entry(function(e) 
       {
-        self.@cannis.gui.widgets.gwt.client.VVideoPlayer::updateSizeFromMetadata(II)(el.videoWidth, el.videoHeight);
+        self.@annis.gui.widgets.gwt.client.VVideoPlayer::updateSizeFromMetadata(II)(el.videoWidth, el.videoHeight);
       }));
   }-*/;
 }

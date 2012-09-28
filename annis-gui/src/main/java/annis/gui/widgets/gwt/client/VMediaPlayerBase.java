@@ -15,12 +15,15 @@
  */
 package annis.gui.widgets.gwt.client;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.MediaElement;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.VConsole;
+import org.apache.commons.lang.NotImplementedException;
 
 /**
  *
@@ -28,14 +31,21 @@ import com.vaadin.terminal.gwt.client.UIDL;
  */
 public class VMediaPlayerBase extends Widget implements Paintable
 {
-  public static String ATTR_PLAY = "play";
-  public static String ATTR_PAUSE = "pause";
+  public static final String PLAY = "play";
+  public static final String PAUSE = "pause";
+  public static final String SOURCE_URL = "url";
+  
   private MediaElement media;
 
   public VMediaPlayerBase(MediaElement media)
   {
     this.media = media;
     setElement(this.media);
+    
+    media.setControls(true);
+    media.setAutoplay(false);
+    media.setPreload(MediaElement.PRELOAD_METADATA);
+    media.setLoop(false);
   }
   
   @Override
@@ -48,12 +58,18 @@ public class VMediaPlayerBase extends Widget implements Paintable
     
     if(media == null)
     {
+      VConsole.error("media not set!!!");
       return;
     }
     
-    if(uidl.hasAttribute(ATTR_PLAY))
+    if(uidl.hasAttribute(SOURCE_URL))
     {
-      String[] time = uidl.getStringArrayAttribute(ATTR_PLAY);
+      media.setSrc(uidl.getStringAttribute(SOURCE_URL));      
+    }
+    
+    if(uidl.hasAttribute(PLAY))
+    {
+      String[] time = uidl.getStringArrayAttribute(PLAY);
       if(time.length == 1)
       {
         media.setCurrentTime(Double.parseDouble(time[0]));
@@ -65,11 +81,20 @@ public class VMediaPlayerBase extends Widget implements Paintable
       }
       media.play();
     }
-    else if(uidl.hasAttribute(ATTR_PAUSE))
+    else if(uidl.hasAttribute(PAUSE))
     {
       media.pause();
     }
   }
+  
+  public String getMimeType()
+  {
+    Exception ex = new UnsupportedOperationException(
+      "Please overwrite and implement VMediaPlayerBase.getMimeType()");
+    VConsole.error(ex);
+    return null;
+  };
+  
   
   private native void setEndTimeOnce(Element elem, double endTime) 
   /*-{
@@ -86,7 +111,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
     {
       media[0].off(timeHandler);
     }); 
-  }*/;
+  }-*/;
 
   public MediaElement getMedia()
   {

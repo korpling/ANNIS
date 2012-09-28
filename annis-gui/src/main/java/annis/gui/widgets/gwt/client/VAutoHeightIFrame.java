@@ -172,6 +172,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
       iframe.setSrc(url);
     }
   }
+
   
   public final native String getContentType(Document doc) /*-{
     return doc.contentType;

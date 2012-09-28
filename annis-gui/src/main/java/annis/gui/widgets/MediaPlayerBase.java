@@ -20,6 +20,7 @@ import annis.gui.widgets.gwt.client.VMediaPlayerBase;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
+import java.net.URI;
 
 /**
  *
@@ -35,7 +36,14 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   private PlayerAction action;
   private Double startTime;
   private Double endTime;
-
+  private boolean sourcesAdded;
+  private String resourceURL;
+  
+  public MediaPlayerBase(String resourceURL)
+  {
+    this.resourceURL = resourceURL;
+  }
+  
   @Override
   public void play(double start)
   {
@@ -67,6 +75,12 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   {
     super.paintContent(target);
     
+    if(!sourcesAdded)
+    {
+      target.addAttribute("url", resourceURL);
+      sourcesAdded = true;
+    }
+    
     if(action == PlayerAction.play)
     {
       String[] args;
@@ -76,14 +90,14 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
       }
       else
       {
-        args = new String[] {"" + startTime, " + endTime"};
+        args = new String[] {"" + startTime, "" + endTime};
       }
-      target.addAttribute(VMediaPlayerBase.ATTR_PLAY, args);
+      target.addAttribute(VMediaPlayerBase.PLAY, args);
       action = PlayerAction.idle;
     }
     else if(action == PlayerAction.pause)
     {
-      target.addAttribute(VMediaPlayerBase.ATTR_PAUSE, true);
+      target.addAttribute(VMediaPlayerBase.PAUSE, true);
       action = PlayerAction.idle;
     }
   }
