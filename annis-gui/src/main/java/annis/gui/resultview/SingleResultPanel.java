@@ -168,8 +168,9 @@ public class SingleResultPanel extends CssLayout implements
           String id = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
-            token, visibleTokenAnnos, markedAndCovered, markedExactMap,
-            markedCoveredMap, text, id, this,
+            token, visibleTokenAnnos, markedAndCovered,
+            markedCoveredMap, markedExactMap, 
+            text, id, this,
             segmentationName, ps, allTexts.size() > 1);
 
 
