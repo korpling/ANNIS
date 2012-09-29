@@ -9,7 +9,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>annis-service-interface</artifactId>
+  <artifactId>annis-interfaces</artifactId>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,5 +65,5 @@
     </dependency>
     
   </dependencies>
-  <name>annis-service-interface</name>
+  <name>annis-interfaces</name>
 </project>
