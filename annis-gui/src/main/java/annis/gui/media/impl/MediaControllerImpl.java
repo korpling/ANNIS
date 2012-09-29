@@ -15,8 +15,10 @@
  */
 package annis.gui.media.impl;
 
+import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaPlayer;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +42,14 @@ public class MediaControllerImpl implements MediaController
    * Player that was last used by the user orderd by the result id.
    */
   private Map<String, MediaPlayer> lastUsedPlayer;
+  
+  private Map<MediaPlayer, VisualizationToggle> visToggle;
 
   public MediaControllerImpl()
   {
     mediaPlayers = new TreeMap<String, List<MediaPlayer>>();
     lastUsedPlayer = new TreeMap<String, MediaPlayer>();
+    visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
   }
 
   private MediaPlayer getPlayerForResult(String resultID)
@@ -72,8 +77,15 @@ public class MediaControllerImpl implements MediaController
   public void play(String resultID, double startTime)
   {
     MediaPlayer player = getPlayerForResult(resultID);
+    
     if (player != null)
     {
+      VisualizationToggle t = visToggle.get(player);
+      if(t != null)
+      {
+        t.toggleVisualizer(false);
+      }
+    
       player.play(startTime);
     }
   }
@@ -82,8 +94,14 @@ public class MediaControllerImpl implements MediaController
   public void play(String resultID, double startTime, double endTime)
   {
     MediaPlayer player = getPlayerForResult(resultID);
+    
     if (player != null)
     {
+      VisualizationToggle t = visToggle.get(player);
+      if(t != null)
+      {
+        t.toggleVisualizer(false);
+      }
       player.play(startTime, endTime);
     }
   }
@@ -101,7 +119,8 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void addMediaPlayer(MediaPlayer player, String resultID)
+  public void addMediaPlayer(MediaPlayer player, String resultID, 
+    VisualizationToggle toggle)
   {
     // some sanity checks
     if (resultID == null)
@@ -118,6 +137,9 @@ public class MediaControllerImpl implements MediaController
     // actually adding (we do not check if the player is already in the list)
     List<MediaPlayer> playerList = mediaPlayers.get(resultID);
     playerList.add(player);
+    
+    visToggle.put(player, toggle);
+    
   }
 
   @Override

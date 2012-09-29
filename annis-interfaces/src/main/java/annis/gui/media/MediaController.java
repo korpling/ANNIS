@@ -15,6 +15,7 @@
  */
 package annis.gui.media;
 
+import annis.gui.VisualizationToggle;
 import net.xeoh.plugins.base.Plugin;
 
 /**
@@ -53,7 +54,8 @@ public interface MediaController extends Plugin
    * @param player The instance.
    * @param resultID To which result this player belongs.
    */
-  public void addMediaPlayer(MediaPlayer player, String resultID);
+  public void addMediaPlayer(MediaPlayer player, String resultID, 
+    VisualizationToggle toggle);
   
   /**
    * Unregister all associated {@link MediaPlayer} instances.

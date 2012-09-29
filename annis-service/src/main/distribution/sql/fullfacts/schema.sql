@@ -148,7 +148,8 @@ CREATE TYPE resolver_visibility AS ENUM (
   'permanent', 
   'visible',
   'hidden',
-  'removed'
+  'removed',
+  'preloaded'
 );
 
 CREATE TABLE resolver_vis_map

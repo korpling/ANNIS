@@ -72,7 +72,7 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
 
     if (mediaController != null)
     {
-      mediaController.addMediaPlayer(player, input.getId());
+      mediaController.addMediaPlayer(player, input.getId(), input.getVisPanel());
     }
 
     return player;
