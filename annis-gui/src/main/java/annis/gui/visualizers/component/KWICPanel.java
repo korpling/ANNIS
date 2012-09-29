@@ -17,6 +17,7 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
+import annis.gui.media.MediaController;
 import annis.gui.resultview.VisualizerPanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
@@ -35,6 +36,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,9 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 {
+  
+  @InjectPlugin
+  public MediaController mediaController;
 
   @Override
   public String getShortName()
@@ -58,7 +63,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   @Override
   public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
   {
-    return new KWICPanelImpl(visInput);
+    return new KWICPanelImpl(visInput, mediaController);
   }
 
   @Override
@@ -85,11 +90,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     private static final String DUMMY_COLUMN = "dummyColumn";
     private BeanItemContainer<String> containerAnnos;
     private Map<SNode, Long> markedAndCovered;
-    private List<String> mediaIDs;
-    private List<VisualizerPanel> mediaVisualizer;
+    private MediaController mediaController;
+    
     // only used for media files
-    private String startTime;
-    private String endTime;
     private String[] media_annotations =
     {
       "time"
@@ -98,10 +101,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     
     private VisualizerInput visInput;
 
-    public KWICPanelImpl(VisualizerInput visInput)
+    public KWICPanelImpl(VisualizerInput visInput, MediaController mediaController)
     {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
+      this.mediaController = mediaController;
     }
 
     @Override
@@ -114,21 +118,16 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           visInput.getVisibleTokenAnnos(),
           visInput.getMarkedAndCovered(),
           visInput.getText(),
-          visInput.getMediaIDs(),
-          visInput.getMediaVisualizer(),
           visInput.getSegmentationName());
       }
     }
 
     private void initKWICPanel(SDocument result,
-      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text,
-      List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer, 
+      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text, 
       String segmentationName)
     {      
       this.result = result;
       this.markedAndCovered = markedAndCovered;
-      this.mediaIDs = mediaIDs;
-      this.mediaVisualizer = mediaVisualizer;
       this.addListener((ItemClickEvent.ItemClickListener) this);
       this.addStyleName("kwic");
       setSizeFull();
@@ -276,8 +275,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           visInput.getVisibleTokenAnnos(),
           markedAndCovered,
           visInput.getText(),
-          visInput.getMediaIDs(),
-          visInput.getMediaVisualizer(),
           segmentationName);
       }
     }
@@ -445,11 +442,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
             {
               if (media_anno.equals(a.getName()))
               {
-                String startTime = getStartTime((String) a.getValue());
-                String endTime = getEndTime((String) a.getValue());
-                startTime = trimTimeAnno(startTime);
-                endTime = trimTimeAnno(endTime);
-                return (startTime + "-" + endTime);
+                return a.getSValueSTEXT();
               }
             }
 
@@ -502,66 +495,27 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
         return;
       }
 
-      for (VisualizerPanel vis : mediaVisualizer)
+      if(time != null)
       {
-        vis.toggleVisualizer(false);
-      }
-
-      time = (time == null) ? "no time given" : time;
-      startTime = getStartTime(time);
-      endTime = getEndTime(time);
-      for (VisualizerPanel vp : mediaVisualizer)
-      {
-        vp.setKwicPanel(this);
-      }
-      startMediaVisualizers();
-    }
-
-    private String getStartTime(String time)
-    {
-      return time.split("-")[0];
-    }
-
-    private String getEndTime(String time)
-    {
-      String[] split = time.split("-");
-      if (split.length < 2)
-      {
-        return "undefined";
-      }
-      return time.split("-")[1];
-    }
-
-    public void startMediaVisualizers()
-    {
-      for (String id : mediaIDs)
-      {
-        String playCommand = ""
-          + "document.getElementById(\"" + id + "\")"
-          + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
-          + startTime + ", " + endTime + "); ";
-        getWindow().executeJavaScript(playCommand);
+        startMediaVisualizers(time);
       }
     }
 
-    private String trimTimeAnno(String time)
+    public void startMediaVisualizers(String time)
     {
-
-      if ("undefined".equals(time))
+      if(mediaController != null)
       {
-        return "";
+        String[] split = time.split("-");
+        if(split.length == 1)
+        {
+          mediaController.play(visInput.getId(), Double.parseDouble(split[0]));
+        }
+        else if(split.length == 2)
+        {
+          mediaController.play(visInput.getId(), 
+            Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+        }
       }
-
-      String[] timeArray = time.split("\\.");
-
-      if (timeArray.length < 2)
-      {
-        return time;
-      }
-
-      return timeArray[0] + "."
-        + timeArray[1].substring(0, (timeArray[1].length() < 3 ? timeArray[1].
-        length() : 2));
     }
   }
 }

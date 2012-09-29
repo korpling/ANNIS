@@ -77,9 +77,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanelImpl kwicPanel;
-  private List<String> mediaIDs;
   private String htmlID;
+  private String resultID;;
   private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
@@ -109,6 +108,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     @Deprecated Map<String, String> markedExactMap,
     STextualDS text,
     String htmlID,
+    String resultID,
     SingleResultPanel parent,
     String segmentationName,
     PluginSystem ps,
@@ -131,6 +131,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     this.text = text;
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
+    this.resultID = resultID;
 
     this.showTextID = showTextID;
 
@@ -219,7 +220,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
-    input.setId("" + rand.nextLong());
+    
+    input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
@@ -231,7 +233,6 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setText(text);
     input.setSegmentationName(segmentationName);
-    input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
     {
@@ -378,16 +379,10 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       if (vis != null)
       {
         vis.setVisible(false);
-        stopMediaVisualizers();
       }
 
       btEntry.setIcon(ICON_EXPAND);
     }
-  }
-
-  public void setKwicPanel(KWICPanelImpl kwicPanel)
-  {
-    this.kwicPanel = kwicPanel;
   }
 
   public String getHtmlID()
@@ -395,31 +390,4 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     return htmlID;
   }
 
-  public List<VisualizerPanel> getMediaVisualizer()
-  {
-    return mediaVisualizer;
-  }
-
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
-  {
-    this.mediaVisualizer = mediaVisualizer;
-  }
-
-  public void startMediaVisFromKWIC()
-  {
-    if (kwicPanel != null)
-    {
-      kwicPanel.startMediaVisualizers();
-      // set back to null, otherwise the movie will stop
-      kwicPanel = null;
-    }
-  }
-
-  private void stopMediaVisualizers()
-  {
-    String stopCommand = ""
-      + "document.getElementById(\"" + this.htmlID + "\")"
-      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
-    getWindow().executeJavaScript(stopCommand);
-  }
 }

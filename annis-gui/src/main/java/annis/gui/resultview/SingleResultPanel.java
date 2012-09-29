@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
@@ -149,8 +150,7 @@ public class SingleResultPanel extends CssLayout implements
         resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-      List<VisualizerPanel> mediaVisualizer = new ArrayList<VisualizerPanel>();
-      
+            
       token = result.getSDocumentGraph().getSortedSTokenByText();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
@@ -159,26 +159,20 @@ public class SingleResultPanel extends CssLayout implements
       markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       calulcateColorsForMarkedAndCoverd();
 
+      String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
+      
       for (int i = 0; i < entries.length; i++)
       {
         int textNr = 0;
         EList<STextualDS> allTexts = result.getSDocumentGraph().getSTextualDSs();
         for (STextualDS text : allTexts)
         {
-          String id = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
+          String htmlID = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
 
           VisualizerPanel p = new VisualizerPanel(entries[i], result,
             token, visibleTokenAnnos, markedAndCovered, markedExactMap,
-            markedCoveredMap, text, id, this,
+            markedCoveredMap, text, htmlID, resultID, this,
             segmentationName, ps, allTexts.size() > 1);
-
-
-          if ("media".equals(entries[i].getVisType())
-            || "video".equals(entries[i].getVisType())
-            || "audio".equals(entries[i].getVisType()))
-          {
-            mediaVisualizer.add(p);
-          }
 
           visualizers.add(p);
           Properties mappings = entries[i].getMappings();
@@ -194,7 +188,6 @@ public class SingleResultPanel extends CssLayout implements
       
       for (VisualizerPanel p : visualizers)
       {
-        p.setMediaVisualizer(mediaVisualizer);
         addComponent(p);
       }
 

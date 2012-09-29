@@ -123,7 +123,7 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<script src=\"" + input.getResourcePath(
         "jquery.noty.js") + "\"></script>");
       writer.append("<script>");
-      writer.append(convertToJavacSriptArray(input.getMediaIDs()));
+      writer.append(convertToJavacSriptArray(new LinkedList<String>()));
       writer.append("\nvar levelNames = [");
       int i = 0;
       for (String levelName : tierNames)
