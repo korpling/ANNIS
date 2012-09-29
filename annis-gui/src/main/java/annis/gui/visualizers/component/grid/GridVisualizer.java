@@ -15,12 +15,14 @@
  */
 package annis.gui.visualizers.component.grid;
 
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
 import static annis.model.AnnisConstants.*;
 
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import annis.gui.widgets.AnnotationGrid;
+import annis.gui.widgets.grid.AnnotationGrid;
 import com.vaadin.Application;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;

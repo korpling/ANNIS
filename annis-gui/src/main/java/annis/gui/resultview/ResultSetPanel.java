@@ -22,7 +22,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
-import com.google.gwt.http.client.Response;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -38,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
+import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.LoggerFactory;
@@ -343,7 +343,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         catch (UniformInterfaceException ex)
         {
-          if (ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
+          if (ex.getResponse().getStatus() != Response.Status.SERVICE_UNAVAILABLE.getStatusCode())
           {
             log.error(ex.getMessage(), ex);
             break;

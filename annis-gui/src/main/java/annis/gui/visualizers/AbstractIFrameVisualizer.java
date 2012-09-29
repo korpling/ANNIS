@@ -69,7 +69,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
     writeOutput(vis, outStream);
     resource = vis.getVisPanel().createResource(outStream, getContentType());
     String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
-    iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, vis.getVisPanel());
+    iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
     return iframe;
   }
 }
