@@ -38,6 +38,11 @@
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
           <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets</webappDirectory>
+          <runTarget>http://localhost:8080/annis-gui/app</runTarget>
+          <!-- <style>DETAILED</style> -->
+          <noServer>true</noServer>
+          <port>8080</port>
+          <compileReport>false</compileReport>
         </configuration>
         <executions>
           <execution>

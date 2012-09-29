@@ -107,7 +107,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
     media.on("timeupdate", timeHandler);
     media.on("pause", function()
     {
-      media[0].off(timeHandler);
+      media.off();
     }); 
   }-*/;
 
