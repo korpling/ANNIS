@@ -18,6 +18,7 @@ package annis.gui.visualizers.component.grid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
+import annis.gui.media.impl.TimeHelper;
 import static annis.model.AnnisConstants.*;
 
 import annis.gui.visualizers.AbstractVisualizer;
@@ -254,6 +255,18 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                   event.getCoveredIDs().add(spanRel.getSTarget().getSId());
                 }
               }
+            }
+            
+            // try to get time annotations
+            double[] startEndTime = TimeHelper.getOverlappedTime(span);
+            if(startEndTime.length == 1)
+            {
+              event.setStartTime(startEndTime[0]);
+            }
+            else if(startEndTime.length == 2)
+            {
+              event.setStartTime(startEndTime[0]);
+              event.setEndTime(startEndTime[1]);
             }
             
             r.addEvent(event);

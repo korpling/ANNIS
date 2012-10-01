@@ -75,6 +75,15 @@ public class AnnotationGrid extends AbstractComponent
             target.addAttribute("left", event.getLeft());
             target.addAttribute("right", event.getRight());
             target.addAttribute("value", event.getValue());
+            
+            if(event.getStartTime() != null)
+            {
+              target.addAttribute("startTime", event.getStartTime());
+              if(event.getEndTime() != null)
+              {
+                target.addAttribute("endTime", event.getEndTime());
+              }
+            }
 
             ArrayList<String> styles = getStyles(event, anno.getKey());
             if (styles.size() > 0)

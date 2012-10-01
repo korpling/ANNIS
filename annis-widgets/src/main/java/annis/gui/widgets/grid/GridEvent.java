@@ -30,6 +30,8 @@ public class GridEvent
   private String value;
   private Long match;
   private List<String> coveredIDs;
+  private Double startTime;
+  private Double endTime;
   
   public GridEvent(String id, int left, int right, String value)
   {
@@ -94,6 +96,26 @@ public class GridEvent
   public void setMatch(Long match)
   {
     this.match = match;
+  }
+
+  public Double getStartTime()
+  {
+    return startTime;
+  }
+
+  public void setStartTime(Double startTime)
+  {
+    this.startTime = startTime;
+  }
+
+  public Double getEndTime()
+  {
+    return endTime;
+  }
+  
+  public void setEndTime(Double endTime)
+  {
+    this.endTime = endTime;
   }
   
 }

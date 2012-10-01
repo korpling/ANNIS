@@ -15,74 +15,65 @@
  */
 package annis.gui.media.impl;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 
 /**
- *
+ * Helper class for getting time annotations on {@link SSpan} from
+ * the covered token.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class TimeHelper
 {
 
-  public static double[] getOverlappedTime(SNode node)
+  /**
+   * Get start and end time from the overlapped {@link SToken}. The minimum
+   * start time and maximum end times are choosen.
+   * @param node The span to start from.
+   * @return A double array, will have length of 0 if no time annotations where found,
+   *         one element of only start elements where found, 2 elements if both
+   *         start and end time are found.
+   */
+  public static double[] getOverlappedTime(SSpan node)
   {
     SGraph graph = node.getSGraph();
 
-    EList<SNode> startNodes = new BasicEList<SNode>();
-    startNodes.add(node);
-    
     final List<Double> startTimes = new LinkedList<Double>();
     final List<Double> endTimes = new  LinkedList<Double>();
     
-    graph.traverse(startNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_BREADTH_FIRST, "timehelpertraverse", new SGraphTraverseHandler()
+    EList<Edge> outEdges = graph.getOutEdges(node.getSId());
+    if(outEdges != null)
     {
-      @Override
-      public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation sRelation, SNode fromNode, long order)
+      for(Edge e : outEdges)
       {
-        SAnnotation anno = currNode.getSAnnotation("annis::time");
-        if(anno != null)
+        if(e instanceof SSpanningRelation)
         {
-          String[] split = anno.getSValueSTEXT().split("-");
-          if(split.length == 1)
-          {
-            startTimes.add(Double.parseDouble(split[0]));
-          }
-          if(split.length == 2)
-          {
-            endTimes.add(Double.parseDouble(split[1]));
-          }
-        }
-      }
-
-      @Override
-      public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation edge, SNode fromNode, long order)
-      {
-      }
-
-      @Override
-      public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation edge, SNode currNode, long order)
-      {
-        if(currNode != null)
-        {
-          SAnnotation anno = currNode.getSAnnotation("annis::time");
+          SToken tok = ((SSpanningRelation) e).getSToken();
+          
+          SAnnotation anno = tok.getSAnnotation("annis::time");
           if(anno != null)
           {
-            return false;
+            String[] split = anno.getSValueSTEXT().split("-");
+            if(split.length == 1)
+            {
+              startTimes.add(Double.parseDouble(split[0]));
+            }
+            if(split.length == 2)
+            {
+              endTimes.add(Double.parseDouble(split[1]));
+            }
           }
         }
-        return true;
       }
-    });
+    } // end for each out edges
     
     if(startTimes.size() > 0 && endTimes.size() > 0)
     {
