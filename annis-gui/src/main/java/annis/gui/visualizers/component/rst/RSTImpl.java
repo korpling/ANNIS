@@ -18,15 +18,19 @@ package annis.gui.visualizers.component.rst;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import com.vaadin.ui.Panel;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.FileOutputStream;
 import java.util.Stack;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -44,13 +48,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private Stack<JSONObject> st = new Stack<JSONObject>();
   // result of transform operation salt -> json
   private JSONObject result;
+  final String ANNOTATION_NAME = "cat";
+  final String ANNOTATION_VALUE = "group";
+  final String ANNOTATION_NAMESPACE = "default_ns";
+  private SDocumentGraph graph;
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
-    SDocumentGraph graph = visInput.getDocument().getSDocumentGraph();
+    graph = visInput.getDocument().getSDocumentGraph();
     EList<SNode> nodes = graph.getSRoots();
     EList<SNode> rootSNodes = new BasicEList<SNode>();
-    final String ANNOTATION = "cat";
+
 
     if (nodes != null)
     {
@@ -59,28 +67,44 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         for (SAnnotation anno : node.getSAnnotations())
         {
           log.debug("anno name {}, anno value {}", anno.getName(), anno.getValue());
-          
-          if (ANNOTATION.equals(anno.getName()))
+
+          if (ANNOTATION_NAME.equals(anno.getName()))
           {
             rootSNodes.add(node);
-            log.debug("find root {} with {}", anno, ANNOTATION);
+            log.debug("find root {} with {}", anno, ANNOTATION_NAME);
             break;
           }
         }
       }
     }
-    
+
+    Salt2DOT s2d = new Salt2DOT();
+    s2d.salt2Dot(graph, URI.createFileURI("/tmp/graph_" + graph.getSName() + ".dot"));
+
     if (rootSNodes.size() > 0)
     {
       graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
     }
     else
     {
-      log.debug("does not find an annotation which matched {}", ANNOTATION);
+      log.debug("does not find an annotation which matched {}", ANNOTATION_NAME);
       graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
     }
 
     log.debug("result json string: {}", result);
+
+    try
+    {
+
+      String path = "/tmp/" + graph.getSName() + ".js";
+      FileOutputStream out = new FileOutputStream(path);
+      out.write(result.toString().getBytes("UTF-8"));
+      out.close();
+    }
+    catch (Exception ex)
+    {
+      log.error("writing json failed", ex);
+    }
     return result.toString();
   }
 
@@ -100,8 +124,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     try
     {
-      jsonData.put("id", current.getSName());
-      jsonData.put("name", current.getSName());
+      jsonData.put("id", current.getSId());
+      jsonData.put("name", getAnnotationsAsParagraph(current));
       jsonData.put("data", "{}");
     }
     catch (JSONException ex)
@@ -129,6 +153,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   @Override
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation sRelation, SNode fromNode, long order)
   {
+
     st.push(createJsonEntry(currNode));
   }
 
@@ -136,6 +161,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation edge, SNode fromNode, long order)
   {
     assert st.size() > 0;
+
 
     if (st.size() == 1)
     {
@@ -149,8 +175,64 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   }
 
   @Override
-  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation edge, SNode currNode, long order)
+  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation incomingEdge, SNode currNode, long order)
   {
-    return true;
+
+    EList<Edge> edgeList;
+
+    //entry case
+    if (incomingEdge == null)
+    {
+      return true;
+    }
+
+    // get all edges between the fromNode und the currNode
+    edgeList = graph.getEdges(
+      incomingEdge.getSSource().getSId(),
+      incomingEdge.getSTarget().getSId());
+
+    if (edgeList.size() > 1)
+    {
+      EList<String> types = incomingEdge.getSTypes();
+      if (types != null && types.size() > 0)
+      {
+        return true;
+      }
+
+      return false;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  private boolean containsAnnotation(SNode node)
+  {
+    for (SAnnotation anno : node.getSAnnotations())
+    {
+      if (ANNOTATION_NAME.equals(anno.getName())
+        && ANNOTATION_VALUE.equals(anno.getValueString()))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String getAnnotationsAsParagraph(SNode node)
+  {
+    EList<SAnnotation> annos = node.getSAnnotations();
+    StringBuilder sb = new StringBuilder();
+
+    if (annos != null)
+    {
+      for (SAnnotation anno : annos)
+      {
+        sb.append(anno.getName()).append(":").append(anno.getValueString());
+      }
+    }
+
+    return sb.toString();
   }
 }
