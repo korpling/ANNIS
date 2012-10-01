@@ -95,7 +95,6 @@ public class BinaryServlet extends HttpServlet
   {
     AnnisBinaryMetaData bm = binaryRes.path("meta")
       .get(AnnisBinary.class);
-    AnnisBinary binary;
 
     // Range: byte=x-y | Range: byte=0-
     String[] rangeTupel = range.split("-");
