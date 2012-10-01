@@ -21,6 +21,7 @@ import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AudioPlayer;
 import com.vaadin.Application;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -72,7 +73,9 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
 
     if (mediaController != null)
     {
-      mediaController.addMediaPlayer(player, input.getId(), input.getVisPanel());
+      String sessionID = ((WebApplicationContext) application.getContext()).getHttpSession().getId();
+          
+      mediaController.addMediaPlayer(player, sessionID, input.getId(), input.getVisPanel());
     }
 
     return player;

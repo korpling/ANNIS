@@ -25,6 +25,7 @@ import annis.model.AnnisConstants;
 import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
@@ -505,14 +506,16 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     {
       if(mediaController != null)
       {
+        String sessionID = ((WebApplicationContext) getApplication().getContext()).getHttpSession().getId();
+          
         String[] split = time.split("-");
         if(split.length == 1)
         {
-          mediaController.play(visInput.getId(), Double.parseDouble(split[0]));
+          mediaController.play(sessionID, visInput.getId(), Double.parseDouble(split[0]));
         }
         else if(split.length == 2)
         {
-          mediaController.play(visInput.getId(), 
+          mediaController.play(sessionID, visInput.getId(), 
             Double.parseDouble(split[0]), Double.parseDouble(split[1]));
         }
       }

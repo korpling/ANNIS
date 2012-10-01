@@ -37,27 +37,29 @@ public class MediaControllerImpl implements MediaController
   /**
    * Map of all mediaplayers ordered by their result id.
    */
-  private Map<String, List<MediaPlayer>> mediaPlayers;
+  private Map<MediaPlayerID, List<MediaPlayer>> mediaPlayers;
   /**
    * Player that was last used by the user orderd by the result id.
    */
-  private Map<String, MediaPlayer> lastUsedPlayer;
+  private Map<MediaPlayerID, MediaPlayer> lastUsedPlayer;
   
   private Map<MediaPlayer, VisualizationToggle> visToggle;
 
   public MediaControllerImpl()
   {
-    mediaPlayers = new TreeMap<String, List<MediaPlayer>>();
-    lastUsedPlayer = new TreeMap<String, MediaPlayer>();
+    mediaPlayers = new TreeMap<MediaPlayerID, List<MediaPlayer>>();
+    lastUsedPlayer = new TreeMap<MediaPlayerID, MediaPlayer>();
     visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
   }
 
-  private MediaPlayer getPlayerForResult(String resultID)
+  private MediaPlayer getPlayerForResult(String sessionID, String resultID)
   {
-    List<MediaPlayer> allPlayers = mediaPlayers.get(resultID);
+    MediaPlayerID id = new MediaPlayerID(sessionID, resultID);
+    
+    List<MediaPlayer> allPlayers = mediaPlayers.get(id);
     if (allPlayers != null && allPlayers.size() > 0)
     {
-      MediaPlayer lastPlayer = lastUsedPlayer.get(resultID);
+      MediaPlayer lastPlayer = lastUsedPlayer.get(id);
       MediaPlayer player = null;
       if (lastPlayer == null)
       {
@@ -74,9 +76,9 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void play(String resultID, double startTime)
+  public void play(String sessionID,String resultID, double startTime)
   {
-    MediaPlayer player = getPlayerForResult(resultID);
+    MediaPlayer player = getPlayerForResult(sessionID, resultID);
     
     if (player != null)
     {
@@ -91,9 +93,9 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void play(String resultID, double startTime, double endTime)
+  public void play(String sessionID, String resultID, double startTime, double endTime)
   {
-    MediaPlayer player = getPlayerForResult(resultID);
+    MediaPlayer player = getPlayerForResult(sessionID, resultID);
     
     if (player != null)
     {
@@ -107,7 +109,7 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void pauseAll()
+  public void pauseAll(String sessionID)
   {
     for (List<MediaPlayer> playerList : mediaPlayers.values())
     {
@@ -119,23 +121,25 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void addMediaPlayer(MediaPlayer player, String resultID, 
+  public void addMediaPlayer(MediaPlayer player, String sessionID, String resultID, 
     VisualizationToggle toggle)
   {
     // some sanity checks
-    if (resultID == null)
+    if (resultID == null || sessionID == null)
     {
       return;
     }
+    
+    MediaPlayerID id = new MediaPlayerID(sessionID, resultID);
 
     // add new list if no player with this number yet
-    if (mediaPlayers.get(resultID) == null)
+    if (mediaPlayers.get(id) == null)
     {
-      mediaPlayers.put(resultID, new LinkedList<MediaPlayer>());
+      mediaPlayers.put(id, new LinkedList<MediaPlayer>());
     }
 
     // actually adding (we do not check if the player is already in the list)
-    List<MediaPlayer> playerList = mediaPlayers.get(resultID);
+    List<MediaPlayer> playerList = mediaPlayers.get(id);
     playerList.add(player);
     
     visToggle.put(player, toggle);
@@ -143,8 +147,9 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void clearMediaPlayers()
+  public void clearMediaPlayers(String sessionID)
   {
     mediaPlayers.clear();
   }
+  
 }
