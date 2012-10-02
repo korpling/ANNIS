@@ -20,8 +20,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableRowElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -105,7 +103,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     paintableId = uidl.getId();
     
     try
-    {
+    { 
       UIDL rows = uidl.getChildByTagName("rows");
       if (rows != null)
       {
@@ -123,11 +121,40 @@ public class VAnnotationGrid extends Composite implements Paintable
           }
         }
       }// end if rows not null
+      
+      // add end events if necessary to have a nicely aligned regular grid
+      int maxCellCount = 0;
+      for(int row = 0; row < table.getRowCount(); row++)
+      {
+        maxCellCount = Math.max(maxCellCount, getRealColumnCount(row));
+      }
+
+      for(int row = 0; row < table.getRowCount(); row++)
+      {
+        int isValue = getRealColumnCount(row);
+        
+        if(isValue < maxCellCount)
+        {
+          int diff = maxCellCount - isValue;
+          table.setHTML(row, table.getCellCount(row) + diff - 1, "");
+        }
+      }
+      
     }
     catch (Exception ex)
     {
       VConsole.log(ex);
     }
+  }
+  
+  private int getRealColumnCount(int row)
+  {
+    int result = 0;
+    for(int i=0; i < table.getCellCount(row); i++)
+    {
+      result += formatter.getColSpan(row, i);
+    }
+    return result;
   }
   
   private void addRow(UIDL row, int rowNumber)
