@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.media;
+package annis.gui.widgets;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import annis.gui.widgets.gwt.client.VVideoPlayer;
+import com.vaadin.ui.ClientWidget;
 
 /**
- *
- * @author thomas
+ * Audio player that implements the functions needed by ANNIS.
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@PluginImplementation
-public class AudioVisualizer extends MediaVisualizer
+@ClientWidget(VVideoPlayer.class)
+public class VideoPlayer extends MediaPlayerBase
 {
-
-  @Override
-  public String getTag()
+  public VideoPlayer(String resourceURL)
   {
-    return "iframeaudio";
+    super(resourceURL);
   }
-
-  @Override
-  public String getMediaMime()
-  {
-    return "audio/ogg";
-  }
-
-  @Override
-  public String getShortName()
-  {
-    return "audio";
-  }
-  
 }

@@ -31,7 +31,7 @@
 
 .partitur_table td.gap {
   background-image: url("hatching.png");
-  background-repeat: repeat-x;
+  background-repeat: repeat;
   border-style: solid;
   border-color: black;
 }
