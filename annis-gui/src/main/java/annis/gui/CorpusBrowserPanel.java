@@ -236,12 +236,12 @@ public class CorpusBrowserPanel extends Panel
       WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        result = service.path("corpora")
+        WebResource query = service.path("corpora")
           .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
           .path("annotations")
           .queryParam("fetchvalues", "true")
-          .queryParam("onlymostfrequentvalues", "true")
-          .get(new GenericType<List<AnnisAttribute>>(){});
+          .queryParam("onlymostfrequentvalues", "true");
+        result = query.get(new GenericType<List<AnnisAttribute>>(){});
       }
     }
     catch(Exception ex)

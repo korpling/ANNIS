@@ -25,10 +25,8 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -38,9 +36,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -169,9 +164,11 @@ public class SingleResultPanel extends CssLayout implements
         {
           String htmlID = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
 
-          VisualizerPanel p = new VisualizerPanel(entries[i], result,
-            token, visibleTokenAnnos, markedAndCovered, markedExactMap,
-            markedCoveredMap, text, htmlID, resultID, this,
+          VisualizerPanel p = new VisualizerPanel(
+            entries[i], result,
+            token, visibleTokenAnnos, markedAndCovered,
+            markedCoveredMap, markedExactMap, 
+            text, htmlID, resultID, this,
             segmentationName, ps, allTexts.size() > 1);
 
           visualizers.add(p);

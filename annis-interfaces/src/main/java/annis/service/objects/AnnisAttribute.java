@@ -65,8 +65,7 @@ public class AnnisAttribute implements Serializable
   
   public void setValueSet(Collection<String> values)
   {
-    this.distinctValues.clear();
-    this.distinctValues.addAll(values);
+    this.distinctValues = new LinkedHashSet<String>(values);
   }
 
   public String getName()

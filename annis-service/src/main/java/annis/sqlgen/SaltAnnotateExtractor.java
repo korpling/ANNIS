@@ -329,13 +329,13 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     String nodeAnnoName = stringValue(resultSet, NODE_ANNOTATION_TABLE, "name");
     if (!resultSet.wasNull())
     {
-      String fullName = nodeAnnoNameSpace == null ? "" : nodeAnnoNameSpace
-        + "::" + nodeAnnoName;
+      String fullName = (nodeAnnoNameSpace == null ? "" : (nodeAnnoNameSpace
+        + "::")) + nodeAnnoName;
       SAnnotation anno = node.getSAnnotation(fullName);
       if (anno == null)
       {
         anno = SaltFactory.eINSTANCE.createSAnnotation();
-        anno.setSNS(nodeAnnoNameSpace == null ? "" : nodeAnnoNameSpace);
+        anno.setSNS(nodeAnnoNameSpace);
         anno.setSName(nodeAnnoName);
         anno.setSValue(nodeAnnoValue);
         node.addSAnnotation(anno);
