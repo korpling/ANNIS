@@ -121,7 +121,6 @@
 
   </bean>
 
-
 	<!-- base bean for exported Database API for administration tasks -->
   <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
     <property name="scriptPath" value="${annis.script-path}"/>
@@ -129,6 +128,14 @@
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
     <property name="dbLayout" value="${annis.mode}" />
     <property name="dataSource" ref="dataSource" />
+    <property name="mimeTypeMapping">
+      <util:map>
+        <entry key="webm" value="video/webm"/>
+        <entry key="ogg" value="audio/ogg"/>
+        <entry key="wav" value="audio/wav"/>
+        <entry key="pdf" value="application/pdf"/>
+      </util:map>
+    </property>
   </bean>
 
   <!-- END EXPORTS -->

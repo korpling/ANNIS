@@ -21,9 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.activation.MimetypesFileTypeMap;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -32,25 +32,34 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
  *
  * @author benjamin
  */
-public class PreparedStatementCallbackImpl implements
+public class MediaImportPreparedStatementCallbackImpl implements
   PreparedStatementCallback<Boolean>
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(PreparedStatementCallbackImpl.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MediaImportPreparedStatementCallbackImpl.class);
   
   private FileInputStream fileStream;
   private File file;
   private String mimeType;
-  private int corpusRef;
+  private long corpusRef;
 
-  public PreparedStatementCallbackImpl(String absolutePath, String corpusRef)
+  public MediaImportPreparedStatementCallbackImpl(String absolutePath, long corpusRef, Map<String,String> mimeTypeMapping)
   {
     try
     {
       this.file = new File(absolutePath);
       fileStream = new FileInputStream(file);
-      this.mimeType = new MimetypesFileTypeMap().getContentType(file);
-      this.corpusRef = Integer.parseInt(corpusRef);
+      
+      String fileEnding = FilenameUtils.getExtension(absolutePath);
+      if(mimeTypeMapping.containsKey(fileEnding))
+      {
+        this.mimeType = mimeTypeMapping.get(fileEnding);
+      }
+      else
+      {
+        this.mimeType = new MimetypesFileTypeMap().getContentType(file);
+      }
+      this.corpusRef = corpusRef;
     }
     catch (FileNotFoundException ex)
     {
@@ -64,7 +73,7 @@ public class PreparedStatementCallbackImpl implements
   {
     // this method is not implemented for long as file-lenght, so we need to cast to int
     ps.setBinaryStream(1, fileStream, (int) file.length());
-    ps.setInt(2, this.corpusRef);
+    ps.setLong(2, this.corpusRef);
     ps.setLong(3, file.length());
     ps.setString(4, this.mimeType);
     ps.setString(5, file.getName());
