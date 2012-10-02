@@ -62,4 +62,9 @@ td.single_event {
 
 .speaker {
   background: url("speaker.svg") no-repeat right;
+  cursor: pointer;
+}
+
+.speaker div {
+  cursor: pointer;
 }

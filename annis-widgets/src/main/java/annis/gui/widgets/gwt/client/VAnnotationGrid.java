@@ -111,62 +111,7 @@ public class VAnnotationGrid extends Composite implements Paintable
           UIDL row = rows.getChildUIDL(i);
           if ("row".equals(row.getTag()))
           {
-            String caption = row.getStringAttribute("caption");
-            String[] captionSplit = caption.split("::");
-            String name = captionSplit[captionSplit.length - 1];
-
-            VLabel lblCaption = new VLabel(name);
-            table.setWidget(i, 0, lblCaption);
-            formatter.addStyleName(i, 0, "header");
-
-            int colspanOffset = 0;
-
-            UIDL events = row.getChildByTagName("events");
-            for (int j = 0; j < events.getChildCount(); j++)
-            {
-              UIDL event = events.getChildUIDL(j);
-              String id = event.getStringAttribute("id");
-              int left = event.getIntAttribute("left");
-              int right = event.getIntAttribute("right");
-              String value = event.getStringAttribute("value");
-
-              VLabel label = new VLabel(value);
-              label.setTitle(caption);
-
-              // +1 because we also have a caption column, subtract columns we
-              // jumped over by using colspan
-              int col = left + 1 - colspanOffset;
-
-              // add table cell
-              table.setWidget(i, col, label);
-              position2id.put(new Position(i, col), id);
-
-              int colspan = right - left + 1;
-              formatter.setColSpan(i, col, colspan);
-              if (colspan > 1)
-              {
-                colspanOffset += (colspan - 1);
-              }
-
-              if (event.hasAttribute("style"))
-              {
-                String[] styles = event.getStringArrayAttribute("style");
-                for (String s : styles)
-                {
-                  formatter.addStyleName(i, col, s);
-                }
-              }
-              else
-              {
-                formatter.addStyleName(i, col, "single_event");
-              }
-
-              // fill highlight map
-              if (event.hasAttribute("highlight"))
-              {
-                highlighted.put(id, event.getStringArrayAttribute("highlight"));
-              }
-            }
+            addRow(row, i);
           }
         }
       }// end if rows not null
@@ -174,6 +119,80 @@ public class VAnnotationGrid extends Composite implements Paintable
     catch (Exception ex)
     {
       VConsole.log(ex);
+    }
+  }
+  
+  private void addRow(UIDL row, int rowNumber)
+  {
+    String caption = row.getStringAttribute("caption");
+    String[] captionSplit = caption.split("::");
+    String name = captionSplit[captionSplit.length - 1];
+
+    VLabel lblCaption = new VLabel(name);
+    table.setWidget(rowNumber, 0, lblCaption);
+    formatter.addStyleName(rowNumber, 0, "header");
+
+    int colspanOffset = 0;
+
+    UIDL events = row.getChildByTagName("events");
+    for (int j = 0; j < events.getChildCount(); j++)
+    {
+      UIDL event = events.getChildUIDL(j);
+      String id = event.getStringAttribute("id");
+      int left = event.getIntAttribute("left");
+      int right = event.getIntAttribute("right");
+      String value = event.getStringAttribute("value");
+
+      VLabel label = new VLabel(value);
+      label.setTitle(caption);
+
+      // +1 because we also have a caption column, subtract columns we
+      // jumped over by using colspan
+      int col = left + 1 - colspanOffset;
+
+      // add table cell
+      table.setWidget(rowNumber, col, label);
+      position2id.put(new Position(rowNumber, col), id);
+
+      int colspan = right - left + 1;
+      formatter.setColSpan(rowNumber, col, colspan);
+      if (colspan > 1)
+      {
+        colspanOffset += (colspan - 1);
+      }
+
+      addStyleForEvent(event, rowNumber, col);
+      
+    }
+  }
+  
+  private void addStyleForEvent(UIDL event, int rowNumber, int col)
+  {
+    String id = event.getStringAttribute("id");
+    
+    // style given by the server component
+    if (event.hasAttribute("style"))
+    {
+      String[] styles = event.getStringArrayAttribute("style");
+      for (String s : styles)
+      {
+        formatter.addStyleName(rowNumber, col, s);
+      }
+    }
+    else
+    {
+      formatter.addStyleName(rowNumber, col, "single_event");
+    }
+
+    // fill highlight map
+    if (event.hasAttribute("highlight"))
+    {
+      highlighted.put(id, event.getStringArrayAttribute("highlight"));
+    }
+    
+    if(event.hasAttribute("startTime"))
+    {
+      formatter.addStyleName(rowNumber, col, "speaker");
     }
   }
   

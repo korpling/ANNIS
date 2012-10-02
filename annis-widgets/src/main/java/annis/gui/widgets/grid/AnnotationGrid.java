@@ -105,8 +105,6 @@ public class AnnotationGrid extends AbstractComponent
       target.endTag("rows");
     }
 
-    target.addAttribute("test", 100);
-
   }
 
   private ArrayList<String> getStyles(GridEvent event, String annoName)

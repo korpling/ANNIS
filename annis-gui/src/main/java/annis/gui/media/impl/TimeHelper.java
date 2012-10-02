@@ -68,6 +68,7 @@ public class TimeHelper
             }
             if(split.length == 2)
             {
+              startTimes.add(Double.parseDouble(split[0]));
               endTimes.add(Double.parseDouble(split[1]));
             }
           }
