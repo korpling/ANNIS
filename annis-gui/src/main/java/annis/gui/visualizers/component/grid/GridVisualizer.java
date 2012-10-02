@@ -18,6 +18,7 @@ package annis.gui.visualizers.component.grid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
+import annis.gui.media.MediaController;
 import annis.gui.media.impl.TimeHelper;
 import static annis.model.AnnisConstants.*;
 
@@ -25,6 +26,7 @@ import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.grid.AnnotationGrid;
 import com.vaadin.Application;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -46,6 +48,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -57,6 +60,9 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent>
 {
+  
+  @InjectPlugin
+  public MediaController mediaController;
 
   @Override
   public String getShortName()
@@ -67,7 +73,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   @Override
   public GridVisualizerComponent createComponent(VisualizerInput visInput, Application application)
   {
-    GridVisualizerComponent component = new GridVisualizerComponent(visInput);
+    GridVisualizerComponent component = new GridVisualizerComponent(visInput, mediaController);
     return component;
   }
 
@@ -76,6 +82,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
     private AnnotationGrid grid;
+    private VisualizerInput input;
+    private MediaController mediaController;
 
     public enum ElementType
     {
@@ -87,14 +95,25 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       noEvent
     }
 
-    public GridVisualizerComponent(VisualizerInput input)
+    public GridVisualizerComponent(VisualizerInput input, MediaController mediaController)
     {
+      this.input = input;
+      this.mediaController = mediaController;
+      
       setWidth("100%");
       setHeight("-1");
       ((VerticalLayout) getContent()).setSizeUndefined();
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
-      grid = new AnnotationGrid();
+    }
+
+    @Override
+    public void attach()
+    {
+      String sessionID = ((WebApplicationContext) getApplication().getContext()).getHttpSession().getId();
+      String resultID = input.getId();
+      
+      grid = new AnnotationGrid(mediaController, resultID, sessionID);
       grid.addStyleName("partitur_table");
       addComponent(grid);
       
@@ -135,8 +154,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       rowsByAnnotation.put("tok", tokenRowList);
       
       grid.setRowsByAnnotation(rowsByAnnotation);
-      
     }
+    
+    
     
     private long clip(long value, long min, long max)
     {

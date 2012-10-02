@@ -20,9 +20,12 @@ import com.google.common.collect.HashBiMap;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableRowElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
@@ -50,6 +53,8 @@ public class VAnnotationGrid extends Composite implements Paintable
   
   private BiMap<Position, String> position2id;
   private Map<String, String[]> highlighted;
+  private Map<Position, Double> startTimes;
+  private Map<Position, Double> endTimes;
   
   /**
    * The constructor should first call super() to initialize the component and
@@ -60,6 +65,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     super();
 
     table = new AnnotationGridTable();
+    
     formatter = table.getFlexCellFormatter();
     
     // we are wrapping the table element
@@ -71,8 +77,10 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     highlighted = new HashMap<String, String[]>();
     position2id = HashBiMap.create();
+    startTimes = new HashMap<Position, Double>();
+    endTimes = new HashMap<Position, Double>();
   }
-
+  
   /**
    * Called whenever an update is received from the server 
    */
@@ -193,6 +201,29 @@ public class VAnnotationGrid extends Composite implements Paintable
     if(event.hasAttribute("startTime"))
     {
       formatter.addStyleName(rowNumber, col, "speaker");
+      startTimes.put(new Position(rowNumber, col), event.getDoubleAttribute("startTime"));
+      if(event.hasAttribute("endTime"))
+      {
+        endTimes.put(new Position(rowNumber, col), event.getDoubleAttribute("endTime"));
+      }
+    }
+  }
+
+  public void onClick(int row, int col)
+  {
+    Position pos = new Position(row, col);
+    if(startTimes.containsKey(pos))
+    {
+      if(endTimes.containsKey(pos))
+      {
+        gClient.updateVariable(paintableId, "play", "" + startTimes.get(pos) + "-" + endTimes.get(pos)
+          , true);
+      }
+      else
+      {
+        gClient.updateVariable(paintableId, "play", "" + startTimes.get(pos), true);
+      }
+       
     }
   }
   
@@ -200,6 +231,11 @@ public class VAnnotationGrid extends Composite implements Paintable
   {
     private int column, row;
 
+    public Position(Cell cell)
+    {
+      this.column = cell.getCellIndex();
+      this.row = cell.getRowIndex();
+    }
     public Position(int row, int column)
     {
       this.column = column;
@@ -264,7 +300,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     public AnnotationGridTable()
     {
-      sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
+      sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONCLICK);
     }
 
     @Override
@@ -310,6 +346,9 @@ public class VAnnotationGrid extends Composite implements Paintable
                 formatter.removeStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
               }
             }
+            break;
+          case Event.ONCLICK:
+            onClick(row, column);
             break;
         }
       }

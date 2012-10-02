@@ -16,6 +16,7 @@
 package annis.gui.widgets.grid;
 
 import annis.gui.MatchedNodeColors;
+import annis.gui.media.MediaController;
 import annis.gui.widgets.gwt.client.VAnnotationGrid;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -35,10 +36,41 @@ public class AnnotationGrid extends AbstractComponent
 {
 
   private Map<String, ArrayList<Row>> rowsByAnnotation;
+  private MediaController mediaController;
+  private String sessionID;
+  private String resultID;
 
-  public AnnotationGrid()
+  public AnnotationGrid(MediaController mediaController, String resultID, String sessionID)
   {
+    this.mediaController = mediaController;
+    this.sessionID = sessionID;
+    this.resultID = resultID;
   }
+
+  @Override
+  public void changeVariables(Object source,
+    Map<String, Object> variables)
+  {
+    
+    if(variables.containsKey("play"))
+    {
+      if(mediaController != null && sessionID != null && resultID != null)
+      {
+        String playString = (String) variables.get("play");
+        String[] split = playString.split("-");
+        if(split.length == 1)
+        {
+          mediaController.play(sessionID, resultID, Double.parseDouble(split[0]));
+        }
+        else if(split.length == 2)
+        {
+          mediaController.play(sessionID, resultID, 
+            Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+        }
+      }
+    }
+  }
+  
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException
@@ -131,6 +163,7 @@ public class AnnotationGrid extends AbstractComponent
 
     return styles;
   }
+  
 
   public Map<String, ArrayList<Row>> getRowsByAnnotation()
   {
