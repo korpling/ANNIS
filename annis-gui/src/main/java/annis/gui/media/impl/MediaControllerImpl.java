@@ -21,6 +21,7 @@ import annis.gui.media.MediaPlayer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -44,12 +45,16 @@ public class MediaControllerImpl implements MediaController
   private Map<MediaPlayerID, MediaPlayer> lastUsedPlayer;
   
   private Map<MediaPlayer, VisualizationToggle> visToggle;
+  
+  private Map<String, List<MediaPlayerID>> sessionID2MediaPlayerID;
 
   public MediaControllerImpl()
   {
     mediaPlayers = new TreeMap<MediaPlayerID, List<MediaPlayer>>();
     lastUsedPlayer = new TreeMap<MediaPlayerID, MediaPlayer>();
     visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
+    
+    sessionID2MediaPlayerID = new HashMap<String, List<MediaPlayerID>>();
   }
 
   private MediaPlayer getPlayerForResult(String sessionID, String resultID)
@@ -78,6 +83,8 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void play(String sessionID,String resultID, double startTime)
   {
+    pauseAll(sessionID);
+    
     MediaPlayer player = getPlayerForResult(sessionID, resultID);
     
     if (player != null)
@@ -95,6 +102,8 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void play(String sessionID, String resultID, double startTime, double endTime)
   {
+    pauseAll(sessionID);
+    
     MediaPlayer player = getPlayerForResult(sessionID, resultID);
     
     if (player != null)
@@ -111,11 +120,20 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void pauseAll(String sessionID)
   {
-    for (List<MediaPlayer> playerList : mediaPlayers.values())
+    
+    List<MediaPlayerID> ids = sessionID2MediaPlayerID.get(sessionID);
+    if(ids != null)
     {
-      for (MediaPlayer player : playerList)
+      for(MediaPlayerID id : ids)
       {
-        player.pause();
+        List<MediaPlayer> allPlayers = mediaPlayers.get(id);
+        if(allPlayers != null)
+        {
+          for(MediaPlayer player : allPlayers)
+          {
+            player.pause();
+          }
+        }
       }
     }
   }
@@ -132,6 +150,12 @@ public class MediaControllerImpl implements MediaController
     
     MediaPlayerID id = new MediaPlayerID(sessionID, resultID);
 
+    if(sessionID2MediaPlayerID.get(sessionID) == null)
+    {
+      sessionID2MediaPlayerID.put(sessionID, new LinkedList<MediaPlayerID>());
+    }
+    sessionID2MediaPlayerID.get(sessionID).add(id);
+    
     // add new list if no player with this number yet
     if (mediaPlayers.get(id) == null)
     {
@@ -149,7 +173,15 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void clearMediaPlayers(String sessionID)
   {
-    mediaPlayers.clear();
+    List<MediaPlayerID> ids = sessionID2MediaPlayerID.get(sessionID);
+    if(ids != null)
+    {
+      for(MediaPlayerID id : ids)
+      {
+        mediaPlayers.remove(id);
+      }
+      sessionID2MediaPlayerID.remove(sessionID);
+    }
   }
   
 }

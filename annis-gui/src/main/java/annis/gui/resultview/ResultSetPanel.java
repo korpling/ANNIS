@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.media.MediaController;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
@@ -26,6 +27,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -117,6 +119,11 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   {
     super.attach();
 
+    // reset all registered media players    
+    MediaController mediaController = ps.getPluginManager().getPlugin(MediaController.class);
+    String sessionID = ((WebApplicationContext) getApplication().getContext()).getHttpSession().getId();
+    mediaController.clearMediaPlayers(sessionID);
+    
     String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
     final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
     // enable indicator in order to get refresh GUI regulary

@@ -68,6 +68,7 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   public void pause()
   {
     action = PlayerAction.pause;
+    requestRepaint();
   }
 
   @Override
