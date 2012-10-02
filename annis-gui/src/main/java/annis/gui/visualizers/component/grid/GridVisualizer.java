@@ -85,6 +85,10 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
+    
+    public static final String MAPPING_ANNOS_KEY = "annos";
+    public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
+    
     private AnnotationGrid grid;
     private VisualizerInput input;
     private MediaController mediaController;
@@ -126,6 +130,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       List<String> annos = new LinkedList<String>(getAnnotationLevelSet(graph, 
         input.getNamespace()));
       
+      String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
+      if(annosConfiguration != null && annosConfiguration.trim().length() > 0)
+      {
+        String[] split = annosConfiguration.split(",");
+        annos.clear();
+        for(String s : split)
+        {
+          annos.add(s.trim());
+        }
+      }
+      
       EList<SToken> token = graph.getSortedSTokenByText();
       long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
       long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
@@ -155,7 +170,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       ArrayList<Row> tokenRowList = new ArrayList<Row>();
       tokenRowList.add(tokenRow);
       
-      rowsByAnnotation.put("tok", tokenRowList);
+      if(Boolean.parseBoolean(
+        input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
+      {
+        rowsByAnnotation.put("tok", tokenRowList);
+      }
       
       grid.setRowsByAnnotation(rowsByAnnotation);
     }
@@ -251,6 +270,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         for(SAnnotation anno : span.getSAnnotations())
         {
           ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
+          if(rows == null)
+          {
+            // try again with only the name
+            rows = rowsByAnnotation.get(anno.getSName());
+          }
           if(rows != null)
           {
             // only do something if the annotation was defined before
