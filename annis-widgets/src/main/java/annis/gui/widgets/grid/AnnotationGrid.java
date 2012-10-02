@@ -147,6 +147,10 @@ public class AnnotationGrid extends AbstractComponent
     {
       styles.add("token");
     }
+    else if(event.isGap())
+    {
+      styles.add("gap");
+    }
     else
     {
       styles.add("single_event");

@@ -32,6 +32,7 @@ public class GridEvent
   private List<String> coveredIDs;
   private Double startTime;
   private Double endTime;
+  private boolean gap;
   
   public GridEvent(String id, int left, int right, String value)
   {
@@ -117,5 +118,23 @@ public class GridEvent
   {
     this.endTime = endTime;
   }
+
+  public boolean isGap()
+  {
+    return gap;
+  }
+
+  public void setGap(boolean gap)
+  {
+    this.gap = gap;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "" + id +  " -> " + value + " (" + left + "-" + right +")"; 
+  }
+  
+  
   
 }

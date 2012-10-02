@@ -39,10 +39,14 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -211,7 +215,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
      * @return 
      */
     private LinkedHashMap<String, ArrayList<Row>> parseSalt(SDocumentGraph graph,
-      List<String> annotationNames, int startTokenIndex, int endTokenIndex)
+      List<String> annotationNames, long startTokenIndex, long endTokenIndex)
     {
       // only look at annotations which were defined by the user
       LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
@@ -221,6 +225,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       {
         rowsByAnnotation.put(anno, new ArrayList<Row>());
       }
+      
       
       EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
       types.add(STYPE_NAME.SSPANNING_RELATION);
@@ -240,8 +245,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
         rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
         
-        int left = ((int) leftLong) - startTokenIndex;
-        int right = ((int) rightLong) - startTokenIndex;
+        int left = (int) (leftLong - startTokenIndex);
+        int right = (int) (rightLong - startTokenIndex);
         
         for(SAnnotation anno : span.getSAnnotations())
         {
@@ -301,8 +306,100 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         mergeAllRowsIfPossible(e.getValue());
       }
       
+      // 3. split up events if they have gaps
+      for(Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet())
+      {
+        for(Row r : e.getValue())
+        {
+          splitRowsOnGaps(r, graph, startTokenIndex, endTokenIndex);
+        }
+      }
       return rowsByAnnotation;
     }
+    
+    /**
+     * Splits events of a row if they contain a gap.
+     * Gaps are found using the token index (provided as ANNIS specific 
+     * {@link SFeature}. Inserted events have a special style to mark them as
+     * gaps.
+     * @param row 
+     * @param graph 
+     * @param startTokenIndex token index of the first token in the match
+     * @param endTokenIndex  token index of the last token in the match
+     */
+    private void splitRowsOnGaps(Row row, final SDocumentGraph graph, long startTokenIndex, long endTokenIndex)
+    {
+      ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+      while(itEvents.hasNext())
+      {
+        GridEvent event = itEvents.next();
+        
+        int lastTokenIndex = Integer.MIN_VALUE;
+        
+        // sort the coveredIDs
+        LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.getCoveredIDs());
+        Collections.sort(sortedCoveredToken, new Comparator<String>() {
+
+          @Override
+          public int compare(String o1, String o2)
+          {
+            SNode node1 = graph.getSNode(o1);
+            SNode node2 = graph.getSNode(o2);
+            
+            long tokenIndex1 = node1.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+            long tokenIndex2 = node2.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+            
+            return Long.compare(tokenIndex1, tokenIndex2);
+          }
+        });
+        
+        // first calculate all gaps
+        List<GridEvent> gaps = new LinkedList<GridEvent>();
+        for(String id : sortedCoveredToken)
+        {
+          
+          SNode node = graph.getSNode(id);
+          long tokenIndexRaw = node.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+          
+          tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
+
+          int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
+          int diff = tokenIndex - lastTokenIndex;
+
+          if(lastTokenIndex >= 0 && diff > 1)
+          {
+            // we detected a gap
+            GridEvent gap = new GridEvent(event.getId() + "_gap", 
+              lastTokenIndex+1, tokenIndex - 1, "");
+            gap.setGap(true);
+            gaps.add(gap);
+          }
+
+          lastTokenIndex = tokenIndex;
+        } // end for each covered token id
+        
+        GridEvent lastEvent = event;
+        for(GridEvent gap : gaps)
+        {
+          // shorten last event
+          lastEvent.setRight(gap.getLeft()-1);
+          
+          // insert the real gap
+          itEvents.add(gap);
+          
+          // insert a new event node that covers the rest of the event
+          GridEvent after = new GridEvent(event.getId() + "_after", 
+            gap.getRight()+1, event.getRight(), event.getValue());
+          after.getCoveredIDs().addAll(event.getCoveredIDs());
+          itEvents.add(after);
+          
+          // use this event for the next iteration
+          lastEvent = after;
+        }
+        
+      }
+    }
+    
     
     /**
      * Merges the rows.
