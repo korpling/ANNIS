@@ -30,23 +30,24 @@ public interface MediaController extends Plugin
 {
   /**
    * Play media file from a specific starting point.
-   * @param resultNumber The number of the result where the media player will be started
+   * 
+   * @param resultID The ID of the result where the media player will be started
    * @param startTime Where to start the playback in seconds.
    */
-  public void play(String sessionID, String resultID, double startTime);
+  public void play(String resultID, double startTime);
   
   /**
    * Play media file from a specific starting point to and endpoint.
-   * @param resultNumber The number of the result where the media player will be started
+   * @param resultID The ID of the result where the media player will be started
    * @param startTime Where to start the playback in seconds.
    * @param endTime Where to end the playback in seconds.
    */
-  public void play(String sessionID, String resultID, double startTime, double endTime);
+  public void play(String resultID, double startTime, double endTime);
   
   /**
    * Pause playback of the media file in all media players.
    */
-  public void pauseAll(String sessionID);
+  public void pauseAll();
   
   
   /**
@@ -54,11 +55,11 @@ public interface MediaController extends Plugin
    * @param player The instance.
    * @param resultID To which result this player belongs.
    */
-  public void addMediaPlayer(MediaPlayer player, String sessionID, String resultID, 
+  public void addMediaPlayer(MediaPlayer player, String resultID, 
     VisualizationToggle toggle);
   
   /**
    * Unregister all associated {@link MediaPlayer} instances.
    */
-  public void clearMediaPlayers(String sessionID);
+  public void clearMediaPlayers();
 }

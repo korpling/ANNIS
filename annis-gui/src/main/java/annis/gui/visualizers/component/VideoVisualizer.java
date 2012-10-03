@@ -17,9 +17,10 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import annis.gui.widgets.AudioPlayer;
 import annis.gui.widgets.VideoPlayer;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
@@ -42,7 +43,7 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
   private Logger log = LoggerFactory.getLogger(VideoVisualizer.class);
   
   @InjectPlugin
-  public MediaController mediaController;
+  public MediaControllerFactory mcFactory;
 
   @Override
   public String getShortName()
@@ -72,11 +73,10 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
     
     VideoPlayer player = new VideoPlayer(binaryServletPath);
 
-    if (mediaController != null)
+    if (mcFactory != null && application instanceof MediaControllerHolder)
     {
-      String sessionID = ((WebApplicationContext) application.getContext()).getHttpSession().getId();
-          
-      mediaController.addMediaPlayer(player, sessionID, input.getId(), input.getVisPanel());
+      mcFactory.getOrCreate((MediaControllerHolder) application)
+        .addMediaPlayer(player, input.getId(), input.getVisPanel());
     }
 
     return player;

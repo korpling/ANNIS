@@ -21,51 +21,54 @@ import annis.gui.media.MediaPlayer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Default {@link MediaController} implementation
- *
+ * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@PluginImplementation
 public class MediaControllerImpl implements MediaController
 {
 
   /**
    * Map of all mediaplayers ordered by their result id.
    */
-  private Map<MediaPlayerID, List<MediaPlayer>> mediaPlayers;
+  private Map<String, List<MediaPlayer>> mediaPlayers;
   /**
    * Player that was last used by the user orderd by the result id.
    */
-  private Map<MediaPlayerID, MediaPlayer> lastUsedPlayer;
-  
+  private Map<String, MediaPlayer> lastUsedPlayer;
   private Map<MediaPlayer, VisualizationToggle> visToggle;
-  
-  private Map<String, List<MediaPlayerID>> sessionID2MediaPlayerID;
 
+  /** Since everone can call us asynchronously we need a locking mechanism */
+  private ReadWriteLock lock = new ReentrantReadWriteLock();
+  
   public MediaControllerImpl()
   {
-    mediaPlayers = new TreeMap<MediaPlayerID, List<MediaPlayer>>();
-    lastUsedPlayer = new TreeMap<MediaPlayerID, MediaPlayer>();
-    visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
-    
-    sessionID2MediaPlayerID = new HashMap<String, List<MediaPlayerID>>();
+    lock.writeLock().lock();
+    try
+    {
+      mediaPlayers = new TreeMap<String, List<MediaPlayer>>();
+      lastUsedPlayer = new TreeMap<String, MediaPlayer>();
+      visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
+    }
+    finally
+    {
+      lock.writeLock().unlock();
+    }
   }
 
-  private MediaPlayer getPlayerForResult(String sessionID, String resultID)
+  private MediaPlayer getPlayerForResult(String resultID)
   {
-    MediaPlayerID id = new MediaPlayerID(sessionID, resultID);
-    
-    List<MediaPlayer> allPlayers = mediaPlayers.get(id);
+    List<MediaPlayer> allPlayers = mediaPlayers.get(resultID);
     if (allPlayers != null && allPlayers.size() > 0)
     {
-      MediaPlayer lastPlayer = lastUsedPlayer.get(id);
-      MediaPlayer player = null;
+      MediaPlayer lastPlayer = lastUsedPlayer.get(resultID);
+      MediaPlayer player;
       if (lastPlayer == null)
       {
         player = allPlayers.get(0);
@@ -81,107 +84,122 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void play(String sessionID,String resultID, double startTime)
+  public void play(String resultID, double startTime)
   {
-    pauseAll(sessionID);
-    
-    MediaPlayer player = getPlayerForResult(sessionID, resultID);
-    
-    if (player != null)
-    {
-      VisualizationToggle t = visToggle.get(player);
-      if(t != null)
-      {
-        t.toggleVisualizer(false);
-      }
-    
-      player.play(startTime);
-    }
-  }
+    pauseAll();
 
-  @Override
-  public void play(String sessionID, String resultID, double startTime, double endTime)
-  {
-    pauseAll(sessionID);
-    
-    MediaPlayer player = getPlayerForResult(sessionID, resultID);
-    
-    if (player != null)
+    lock.readLock().lock();
+    try
     {
-      VisualizationToggle t = visToggle.get(player);
-      if(t != null)
-      {
-        t.toggleVisualizer(false);
-      }
-      player.play(startTime, endTime);
-    }
-  }
+      MediaPlayer player = getPlayerForResult( resultID);
 
-  @Override
-  public void pauseAll(String sessionID)
-  {
-    
-    List<MediaPlayerID> ids = sessionID2MediaPlayerID.get(sessionID);
-    if(ids != null)
-    {
-      for(MediaPlayerID id : ids)
+      if (player != null)
       {
-        List<MediaPlayer> allPlayers = mediaPlayers.get(id);
-        if(allPlayers != null)
+        VisualizationToggle t = visToggle.get(player);
+        if (t != null)
         {
-          for(MediaPlayer player : allPlayers)
-          {
-            player.pause();
-          }
+          t.toggleVisualizer(false);
+        }
+
+        player.play(startTime);
+      }
+    }
+    finally
+    {
+      lock.readLock().unlock();
+    }
+  }
+
+  @Override
+  public void play(String resultID, double startTime, double endTime)
+  {
+    pauseAll();
+
+    lock.readLock().lock();
+    try
+    {
+      MediaPlayer player = getPlayerForResult(resultID);
+
+      if (player != null)
+      {
+        VisualizationToggle t = visToggle.get(player);
+        if (t != null)
+        {
+          t.toggleVisualizer(false);
+        }
+        player.play(startTime, endTime);
+      }
+    }
+    finally
+    {
+      lock.readLock().unlock();
+    }
+  }
+
+  @Override
+  public void pauseAll()
+  {
+    lock.readLock().lock();
+    try
+    {
+      for (List<MediaPlayer> playersForID : mediaPlayers.values())
+      {
+        for(MediaPlayer player : playersForID)
+        {
+          player.pause();
         }
       }
     }
+    finally
+    {
+      lock.readLock().unlock();
+    }
   }
 
   @Override
-  public void addMediaPlayer(MediaPlayer player, String sessionID, String resultID, 
+  public void addMediaPlayer(MediaPlayer player, String resultID,
     VisualizationToggle toggle)
   {
     // some sanity checks
-    if (resultID == null || sessionID == null)
+    if (resultID == null)
     {
       return;
     }
     
-    MediaPlayerID id = new MediaPlayerID(sessionID, resultID);
-
-    if(sessionID2MediaPlayerID.get(sessionID) == null)
+    lock.writeLock().lock();
+    try
     {
-      sessionID2MediaPlayerID.put(sessionID, new LinkedList<MediaPlayerID>());
-    }
-    sessionID2MediaPlayerID.get(sessionID).add(id);
-    
-    // add new list if no player with this number yet
-    if (mediaPlayers.get(id) == null)
-    {
-      mediaPlayers.put(id, new LinkedList<MediaPlayer>());
-    }
+      // add new list if no player with this number yet
+      if (mediaPlayers.get(resultID) == null)
+      {
+        mediaPlayers.put(resultID, new LinkedList<MediaPlayer>());
+      }
 
-    // actually adding (we do not check if the player is already in the list)
-    List<MediaPlayer> playerList = mediaPlayers.get(id);
-    playerList.add(player);
-    
-    visToggle.put(player, toggle);
-    
+      // actually adding (we do not check if the player is already in the list)
+      List<MediaPlayer> playerList = mediaPlayers.get(resultID);
+      playerList.add(player);
+
+      visToggle.put(player, toggle);
+    }
+    finally
+    {
+      lock.writeLock().unlock();
+    }
   }
 
   @Override
-  public void clearMediaPlayers(String sessionID)
+  public void clearMediaPlayers()
   {
-    List<MediaPlayerID> ids = sessionID2MediaPlayerID.get(sessionID);
-    if(ids != null)
+    lock.writeLock().lock();
+    try
     {
-      for(MediaPlayerID id : ids)
-      {
-        mediaPlayers.remove(id);
-      }
-      sessionID2MediaPlayerID.remove(sessionID);
+      mediaPlayers.clear();
+      visToggle.clear();
+      lastUsedPlayer.clear();
+    }
+    finally
+    {
+      lock.writeLock().unlock();
     }
   }
-  
 }

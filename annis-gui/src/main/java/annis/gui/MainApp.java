@@ -15,7 +15,9 @@
  */
 package annis.gui;
 
-import annis.gui.media.impl.MediaControllerImpl;
+import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerHolder;
+import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.grid.GridVisualizer;
@@ -69,7 +71,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener, HttpServletRequestListener, Serializable
+  UserChangeListener, HttpServletRequestListener, Serializable, MediaControllerHolder
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
@@ -82,6 +84,8 @@ public class MainApp extends Application implements PluginSystem,
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private Properties versionProperties;
+  
+  private transient MediaController mediaController;
 
   @Override
   public void init()
@@ -288,7 +292,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
     
-    pluginManager.addPluginsFrom(new ClassURI(MediaControllerImpl.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -395,5 +399,17 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void onRequestEnd(HttpServletRequest request, HttpServletResponse response)
   {
+  }
+
+  @Override
+  public MediaController getMediaController()
+  {
+    return mediaController;
+  }
+
+  @Override
+  public void setMediaController(MediaController mediaController)
+  {
+    this.mediaController = mediaController;
   }
 }

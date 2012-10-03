@@ -18,14 +18,14 @@ package annis.gui.visualizers.component;
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.media.MediaController;
-import annis.gui.resultview.VisualizerPanel;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
@@ -53,7 +53,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 {
   
   @InjectPlugin
-  public MediaController mediaController;
+  public MediaControllerFactory mcFactory;
 
   @Override
   public String getShortName()
@@ -64,7 +64,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   @Override
   public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
   {
-    return new KWICPanelImpl(visInput, mediaController);
+    MediaControllerHolder mcHolder = null;
+    if(application instanceof MediaControllerHolder)
+    {
+      mcHolder = (MediaControllerHolder) application;
+    }
+    return new KWICPanelImpl(visInput,
+      mcFactory.getOrCreate(mcHolder));
   }
 
   @Override
@@ -506,16 +512,15 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     {
       if(mediaController != null)
       {
-        String sessionID = ((WebApplicationContext) getApplication().getContext()).getHttpSession().getId();
           
         String[] split = time.split("-");
         if(split.length == 1)
         {
-          mediaController.play(sessionID, visInput.getId(), Double.parseDouble(split[0]));
+          mediaController.play(visInput.getId(), Double.parseDouble(split[0]));
         }
         else if(split.length == 2)
         {
-          mediaController.play(sessionID, visInput.getId(), 
+          mediaController.play(visInput.getId(), 
             Double.parseDouble(split[0]), Double.parseDouble(split[1]));
         }
       }
