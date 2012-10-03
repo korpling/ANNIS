@@ -37,13 +37,11 @@ public class AnnotationGrid extends AbstractComponent
 
   private Map<String, ArrayList<Row>> rowsByAnnotation;
   private MediaController mediaController;
-  private String sessionID;
   private String resultID;
 
-  public AnnotationGrid(MediaController mediaController, String resultID, String sessionID)
+  public AnnotationGrid(MediaController mediaController, String resultID)
   {
     this.mediaController = mediaController;
-    this.sessionID = sessionID;
     this.resultID = resultID;
   }
 
@@ -54,17 +52,17 @@ public class AnnotationGrid extends AbstractComponent
     
     if(variables.containsKey("play"))
     {
-      if(mediaController != null && sessionID != null && resultID != null)
+      if(mediaController != null && resultID != null)
       {
         String playString = (String) variables.get("play");
         String[] split = playString.split("-");
         if(split.length == 1)
         {
-          mediaController.play(sessionID, resultID, Double.parseDouble(split[0]));
+          mediaController.play(resultID, Double.parseDouble(split[0]));
         }
         else if(split.length == 2)
         {
-          mediaController.play(sessionID, resultID, 
+          mediaController.play(resultID, 
             Double.parseDouble(split[0]), Double.parseDouble(split[1]));
         }
       }

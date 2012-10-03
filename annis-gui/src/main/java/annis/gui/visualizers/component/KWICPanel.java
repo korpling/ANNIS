@@ -64,13 +64,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   @Override
   public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
   {
-    MediaControllerHolder mcHolder = null;
-    if(application instanceof MediaControllerHolder)
+    MediaController mediaController = null;
+    if(mcFactory != null && application instanceof MediaControllerHolder)
     {
-      mcHolder = (MediaControllerHolder) application;
+      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
     }
     return new KWICPanelImpl(visInput,
-      mcFactory.getOrCreate(mcHolder));
+      mediaController);
   }
 
   @Override

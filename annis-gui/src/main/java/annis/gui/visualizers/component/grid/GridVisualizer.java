@@ -19,6 +19,8 @@ import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
 import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.TimeHelper;
 import static annis.model.AnnisConstants.*;
 
@@ -66,7 +68,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 {
   
   @InjectPlugin
-  public MediaController mediaController;
+  public MediaControllerFactory mcFactory;
 
   @Override
   public String getShortName()
@@ -77,6 +79,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   @Override
   public GridVisualizerComponent createComponent(VisualizerInput visInput, Application application)
   {
+    MediaController mediaController = null;
+    if(mcFactory != null && application instanceof MediaControllerHolder)
+    {
+      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
+    }
     GridVisualizerComponent component = new GridVisualizerComponent(visInput, mediaController);
     return component;
   }
@@ -118,10 +125,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     @Override
     public void attach()
     {
-      String sessionID = ((WebApplicationContext) getApplication().getContext()).getHttpSession().getId();
       String resultID = input.getId();
       
-      grid = new AnnotationGrid(mediaController, resultID, sessionID);
+      grid = new AnnotationGrid(mediaController, resultID);
       grid.addStyleName("partitur_table");
       addComponent(grid);
       

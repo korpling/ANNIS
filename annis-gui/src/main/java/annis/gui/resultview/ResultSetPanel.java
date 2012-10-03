@@ -123,7 +123,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     // reset all registered media players    
     MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
-    mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
+    if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
+    {
+      mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
+    }
     
     String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
     final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
