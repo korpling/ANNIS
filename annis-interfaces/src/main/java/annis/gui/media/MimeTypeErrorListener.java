@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
-
-import annis.gui.widgets.gwt.client.VVideoPlayer;
-import com.vaadin.ui.ClientWidget;
+package annis.gui.media;
 
 /**
- * Audio player that implements the functions needed by ANNIS.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VVideoPlayer.class)
-public class VideoPlayer extends MediaPlayerBase
+public interface MimeTypeErrorListener
 {
-  public VideoPlayer(String resourceURL, String mimeType)
-  {
-    super(resourceURL, mimeType);
-  }
+  public void notifyCannotPlayMimeType(String mimeType);
 }

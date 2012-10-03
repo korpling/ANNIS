@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.TigerQueryBuilder;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
@@ -27,6 +28,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
+import com.vaadin.terminal.gwt.server.WebBrowser;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.*;
@@ -45,11 +47,12 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class SearchWindow extends Window
-  implements LoginForm.LoginListener, Screenshot.ScreenshotListener
+  implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
+  MimeTypeErrorListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
-  
+    
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
@@ -68,6 +71,8 @@ public class SearchWindow extends Window
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
   private String bugEMailAddress;
+  
+  private boolean warnedAboutMediaFormat = false;
 
   public SearchWindow(PluginSystem ps)
   {
@@ -370,6 +375,8 @@ public class SearchWindow extends Window
     int contextLeft,
     int contextRight, String segmentationLayer, int pageSize)
   {
+    warnedAboutMediaFormat = false;
+    
     // remove old result from view
     if (resultView != null)
     {
@@ -484,6 +491,52 @@ public class SearchWindow extends Window
       w.setResizable(true);
       addWindow(w);
       w.center();
+    }
+  }
+
+  @Override
+  public void notifyCannotPlayMimeType(String mimeType)
+  {
+    if(!warnedAboutMediaFormat)
+    {
+      String browserList = 
+        "<ul>"
+        + "<li>Mozilla Firefox: <a href=\"http://www.mozilla.org/firefox\" target=\"_blank\">http://www.mozilla.org/firefox</a></li>"
+        + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
+        + "<li>Opera: <a href=\"http://www.opera.com/\" target=\"_blank\">http://www.opera.com/</a></li>"
+        + "</ul>";
+      WebApplicationContext context = ((WebApplicationContext) getApplication()
+        .getContext());
+      WebBrowser browser = context.getBrowser();
+
+      // IE9 users can install a plugin
+      Set<String> supportedByIE9Plugin = new HashSet<String>();
+      supportedByIE9Plugin.add("video/webm");
+      supportedByIE9Plugin.add("audio/ogg");
+      supportedByIE9Plugin.add("video/ogg");
+
+      if (browser.isIE()
+        && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.contains(mimeType))
+      {
+        getWindow().showNotification("Media file type unsupported by your browser",
+          "Please install the WebM plugin for Internet Explorer 9 from "
+          + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
+          + " or use a browser from the following list "
+          + "(these are known to work with WebM or OGG files)<br/>"
+          + browserList,
+          Window.Notification.TYPE_ERROR_MESSAGE, true);
+      }
+      else
+      {
+        getWindow().showNotification("Media file type unsupported by your browser",
+          "Please use a browser from the following list "
+          + "(these are known to work with WebM or OGG files)<br/>"
+          + browserList,
+          Window.Notification.TYPE_ERROR_MESSAGE, true);
+      }
+
+      
+      warnedAboutMediaFormat=true;
     }
   }
 }

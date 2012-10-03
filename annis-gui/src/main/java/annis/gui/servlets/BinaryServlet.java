@@ -46,7 +46,7 @@ import org.apache.commons.lang.Validate;
 public class BinaryServlet extends HttpServlet
 {
 
-  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
+  private static final int MAX_LENGTH = 500*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
 

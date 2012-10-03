@@ -32,9 +32,16 @@ public class VMediaPlayerBase extends Widget implements Paintable
   public static final String PLAY = "play";
   public static final String PAUSE = "pause";
   public static final String SOURCE_URL = "url";
+  public static final String MIME_TYPE = "mime_type";
+  public static final String CANNOT_PLAY = "cannot_play";
   
   private MediaElement media;
-
+  
+  /** The client side widget identifier */
+  protected String paintableId;
+  /** Reference to the server connection object. */
+  ApplicationConnection gClient;
+  
   public VMediaPlayerBase(MediaElement media)
   {
     this.media = media;
@@ -54,6 +61,13 @@ public class VMediaPlayerBase extends Widget implements Paintable
       return;
     }
     
+    // Save reference to server connection object to be able to send
+    // user interaction later
+    this.gClient = client;
+
+    // Save the client side identifier (paintable id) for the widget
+    paintableId = uidl.getId();
+    
     if(media == null)
     {
       VConsole.error("media not set!!!");
@@ -62,8 +76,22 @@ public class VMediaPlayerBase extends Widget implements Paintable
     
     if(uidl.hasAttribute(SOURCE_URL))
     {
-      media.setSrc(uidl.getStringAttribute(SOURCE_URL));      
+      if(uidl.hasAttribute(MIME_TYPE))
+      {
+        VConsole.log("canPlayType value is \"" + media.canPlayType(uidl.getStringAttribute(MIME_TYPE)) + "\"");
+        // check for correct mime type
+        if(media.canPlayType(uidl.getStringAttribute(MIME_TYPE)).equals(MediaElement.CANNOT_PLAY))
+        {
+          VConsole.log("CANNOT PLAY!!!");
+          
+          gClient.updateVariable(paintableId, CANNOT_PLAY, true, true);
+          
+        }
+      }
+      media.setSrc(uidl.getStringAttribute(SOURCE_URL));
     }
+    
+    
     
     if(uidl.hasAttribute(PLAY))
     {

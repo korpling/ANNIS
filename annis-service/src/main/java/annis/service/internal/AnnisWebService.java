@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -404,7 +406,7 @@ public class AnnisWebService
   {
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
-
+    
     AnnisBinary bin = null;
     log.debug("fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
       + toplevelCorpusName + "/" + corpusName);
@@ -412,7 +414,6 @@ public class AnnisWebService
     bin = annisDao.getBinary(toplevelCorpusName, corpusName, offset + 1, length);
 
     log.debug("fetch successfully");
-
     return bin;
   }
   
@@ -431,7 +432,10 @@ public class AnnisWebService
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
   {
-    return annisDao.getBinary(toplevelCorpusName, documentName, 1, 1);
+    AnnisBinary bin = null;
+    bin = annisDao.getBinary(toplevelCorpusName, documentName, 1, 1);
+
+    return bin;
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

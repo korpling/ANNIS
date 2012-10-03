@@ -71,7 +71,7 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
       log.error("UTF-8 was not known as encoding, expect non-working video", ex);
     }
     
-    VideoPlayer player = new VideoPlayer(binaryServletPath);
+    VideoPlayer player = new VideoPlayer(binaryServletPath, "video/webm");
 
     if (mcFactory != null && application instanceof MediaControllerHolder)
     {

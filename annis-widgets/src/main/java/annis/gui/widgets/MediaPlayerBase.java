@@ -16,11 +16,12 @@
 package annis.gui.widgets;
 
 import annis.gui.media.MediaPlayer;
+import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.widgets.gwt.client.VMediaPlayerBase;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
-import java.net.URI;
+import java.util.Map;
 
 /**
  *
@@ -38,10 +39,12 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   private Double endTime;
   private boolean sourcesAdded;
   private String resourceURL;
+  private String mimeType;
   
-  public MediaPlayerBase(String resourceURL)
+  public MediaPlayerBase(String resourceURL, String mimeType)
   {
     this.resourceURL = resourceURL;
+    this.mimeType = mimeType;
   }
   
   @Override
@@ -72,6 +75,23 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   }
 
   @Override
+  public void changeVariables(Object source, Map<String, Object> variables)
+  {
+    super.changeVariables(source, variables);
+    
+    if(variables.containsKey("cannot_play") && (Boolean) variables.get("cannot_play") == true)
+    {     
+      
+      if(getWindow() instanceof MimeTypeErrorListener)
+      {
+        ((MimeTypeErrorListener) getWindow()).notifyCannotPlayMimeType(mimeType);
+      }
+    }
+  }
+  
+  
+
+  @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
     super.paintContent(target);
@@ -79,6 +99,7 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
     if(!sourcesAdded)
     {
       target.addAttribute("url", resourceURL);
+      target.addAttribute("mime_type", mimeType);
       sourcesAdded = true;
     }
     

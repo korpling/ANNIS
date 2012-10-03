@@ -25,8 +25,8 @@ import com.vaadin.ui.ClientWidget;
 @ClientWidget(VAudioPlayer.class)
 public class AudioPlayer extends MediaPlayerBase
 {
-  public AudioPlayer(String resourceURL)
+  public AudioPlayer(String resourceURL, String mimeType)
   {
-    super(resourceURL);
+    super(resourceURL, mimeType);
   }
 }

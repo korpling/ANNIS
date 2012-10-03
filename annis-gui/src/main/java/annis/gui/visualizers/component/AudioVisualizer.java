@@ -69,7 +69,7 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
       log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
     }
     
-    AudioPlayer player = new AudioPlayer(binaryServletPath);
+    AudioPlayer player = new AudioPlayer(binaryServletPath, "audio/ogg");
 
     if (mcFactory != null && application instanceof MediaControllerHolder)
     {
