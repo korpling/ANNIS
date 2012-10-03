@@ -294,6 +294,7 @@ public abstract class AnnisBaseRunner
 
     JoranConfigurator jc = new JoranConfigurator();
     jc.setContext(loggerContext);
+    loggerContext.reset();
     try
     {
       jc.doConfigure(System.getProperty("annis.home")

@@ -10,7 +10,7 @@
 <configuration>
   
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
-  
+    
   <appender name="QUERYLOG" class="ch.qos.logback.core.FileAppender">
     <file>${annis.home}/log/query.log</file>
     <encoder>
@@ -92,16 +92,14 @@
   <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>
   <logger name="annis.benchmarking" level="DEBUG"/>
   
-  <logger name="annis" level="DEBUG">
-    <appender-ref ref="DEBUG"/>
-  </logger>
-  
   <logger name="QueryLog" level="INFO">
     <appender-ref ref="QUERYLOG"/>
   </logger>
-  <root level="INFO">
+  
+  <root level="DEBUG">
     <appender-ref ref="LOGFILE"/>
     <appender-ref ref="ERROR"/>
+    <appender-ref ref="DEBUG"/>
   </root>
 
 </configuration>

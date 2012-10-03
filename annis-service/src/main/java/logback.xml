@@ -3,7 +3,7 @@
   
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
   
-  <root level="INFO">
+  <root level="DEBUG">
     <!-- no appenders yet -->
   </root>
 </configuration>
