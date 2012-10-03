@@ -31,6 +31,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.Validate;
 
 /**
  * This Servlet provides binary-files with a stream of partial-content. The
@@ -171,6 +172,7 @@ public class BinaryServlet extends HttpServlet
       int stepLength = Math.min(MAX_LENGTH, remaining);
       
       AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
+      Validate.isTrue(bin.getBytes().length == stepLength);
       out.write(bin.getBytes());
       
       offset += stepLength;      

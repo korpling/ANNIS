@@ -696,9 +696,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(byteHelper.SQL,
+    return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
       byteHelper.getArgs(toplevelCorpusName, corpusName, offset, length), 
-      byteHelper.ARG_TYPES, byteHelper);
+      ByteHelper.ARG_TYPES, byteHelper);
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()

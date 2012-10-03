@@ -77,7 +77,7 @@ public class AnnisWebService
   private WekaHelper wekaHelper;
   private int maxContext = 10;
   private int port = 5711;
-
+  
   /**
    * Log the successful initialization of this bean.
    *
@@ -404,11 +404,16 @@ public class AnnisWebService
   {
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
-    
-//    log.info("fetching  " + (length/1024) + "kb (" + offset + "-" + (offset+length) + ") from binary "
-//      + toplevelCorpusName + "/" + corpusName);
-    
-    return annisDao.getBinary(toplevelCorpusName, corpusName, offset+1, length);
+
+    AnnisBinary bin = null;
+    log.debug("fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
+      + toplevelCorpusName + "/" + corpusName);
+
+    bin = annisDao.getBinary(toplevelCorpusName, corpusName, offset + 1, length);
+
+    log.debug("fetch successfully");
+
+    return bin;
   }
   
   /**
