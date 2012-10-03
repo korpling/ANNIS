@@ -25,8 +25,8 @@
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>server.%d{yyyy-MM-dd}.log</FileNamePattern>
-      <!-- keep 7 days' worth of history -->
-      <MaxHistory>7</MaxHistory>
+      <!-- keep 1 days' worth of history -->
+      <MaxHistory>1</MaxHistory>
 
       <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <MaxFileSize>1MB</MaxFileSize>

@@ -15,8 +15,8 @@
  */
 package annis.gui.visualizers.iframe.dependency;
 
-import annis.MatchedNodeColors;
-import annis.gui.visualizers.iframe.AbstractDotVisualizer;
+import annis.gui.MatchedNodeColors;
+import annis.gui.visualizers.component.AbstractDotVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;

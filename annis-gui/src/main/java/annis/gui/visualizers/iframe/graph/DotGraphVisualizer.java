@@ -15,8 +15,8 @@
  */
 package annis.gui.visualizers.iframe.graph;
 
-import annis.MatchedNodeColors;
-import annis.gui.visualizers.iframe.AbstractDotVisualizer;
+import annis.gui.MatchedNodeColors;
+import annis.gui.visualizers.component.AbstractDotVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -33,7 +33,6 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
 {
   
   private VisualizerInput input;
-  private String outputFormat = "png";
   private int scale = 50;
   private StringBuilder dot;
   private boolean displayAllNamespaces = false;
@@ -296,17 +295,5 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     }
     w("\"");
     w("];\n");
-  }
-
-  @Override
-  public String getContentType()
-  {
-    return "image/png";
-  }
-
-  @Override
-  public String getCharacterEncoding()
-  {
-    return "ISO-8859-1";
   }
 }

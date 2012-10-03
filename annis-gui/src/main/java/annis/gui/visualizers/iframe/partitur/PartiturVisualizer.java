@@ -59,7 +59,7 @@ public class PartiturVisualizer extends WriterVisualizer
   @Override
   public String getShortName()
   {
-    return "grid";
+    return "iframegrid";
   }
 
   @Override
@@ -123,7 +123,7 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<script src=\"" + input.getResourcePath(
         "jquery.noty.js") + "\"></script>");
       writer.append("<script>");
-      writer.append(convertToJavacSriptArray(input.getMediaIDs()));
+      writer.append(convertToJavacSriptArray(new LinkedList<String>()));
       writer.append("\nvar levelNames = [");
       int i = 0;
       for (String levelName : tierNames)
@@ -338,7 +338,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\" "
-                  + addTimeAttribute(element.getNodeId()) + "\""
+                  + addTimeAttribute(element.getNodeId()) 
                   + ">" + element.getValue() + "</td>");
               }
               else

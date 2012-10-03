@@ -28,7 +28,7 @@ public class VideoVisualizer extends MediaVisualizer
   @Override
   public String getTag()
   {
-    return "video";
+    return "iframevideo";
   }
 
   @Override

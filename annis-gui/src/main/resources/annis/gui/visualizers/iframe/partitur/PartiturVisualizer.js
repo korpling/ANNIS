@@ -79,7 +79,10 @@ $(document).ready(function(){
       var iframe = window.parent.document.getElementById(mediaIDs[i]).
       getElementsByTagName("iframe")[0];
       if (iframe) // check if loaded
-        iframe.contentWindow.seekAndPlay(time.split("-")[0], time.split("-")[1]);
+      { 
+        var s = time.split("-");
+        iframe.contentWindow.seekAndPlay(s[0]*1, s[1]*1);
+      }
     }    
   }
 

@@ -17,9 +17,9 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.VisualizationToggle;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel.KWICPanelImpl;
 import annis.resolver.ResolverEntry;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.ApplicationResource;
@@ -29,7 +29,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -57,7 +57,8 @@ import org.slf4j.LoggerFactory;
  *
  * TODO test, if this works with mediaplayer
  */
-public class VisualizerPanel extends CustomLayout implements Button.ClickListener
+public class VisualizerPanel extends CustomLayout 
+  implements Button.ClickListener, VisualizationToggle
 {
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
@@ -76,9 +77,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanelImpl kwicPanel;
-  private List<String> mediaIDs;
   private String htmlID;
+  private String resultID;;
   private VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
@@ -87,7 +87,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
   private boolean showTextID;
   private final String PERMANENT = "permanent";
   private final String ISVISIBLE = "visible";
-  private final String NOTVISIBLE = "hidden";
+  private final String HIDDEN = "hidden";
+  private final String PRELOADED = "preloaded";
 
   private final static String htmlTemplate = 
     "<div id=\":id\"><div location=\"btEntry\"></div>"
@@ -108,6 +109,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     @Deprecated Map<String, String> markedExactMap,
     STextualDS text,
     String htmlID,
+    String resultID,
     SingleResultPanel parent,
     String segmentationName,
     PluginSystem ps,
@@ -116,7 +118,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes()));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
-
+    
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -130,6 +132,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     this.text = text;
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
+    this.resultID = resultID;
 
     this.showTextID = showTextID;
 
@@ -149,31 +152,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
 
     if(entry != null)
     {
-      if(PERMANENT.equalsIgnoreCase(entry.getVisibility()))
-      {
-        // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        addComponent(vis, "iframe");
-      }
-      else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
-      {
-        // build button for visualizer
-        btEntry = new Button(entry.getDisplayName() 
-          + (showTextID ? " (" + text.getSName() + ")" : ""));
-        btEntry.setIcon(ICON_COLLAPSE);
-        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-          + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addListener((Button.ClickListener) this);
-        addComponent(btEntry, "btEntry");
-
-
-        // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        addComponent(vis, "iframe");
-      }
-      else
+      
+      if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
         btEntry = new Button(entry.getDisplayName()
@@ -183,6 +163,48 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addListener((Button.ClickListener) this);
         addComponent(btEntry, "btEntry");
+      }
+      else
+      {
+        
+        if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
+          || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          // build button for visualizer
+          btEntry = new Button(entry.getDisplayName() 
+            + (showTextID ? " (" + text.getSName() + ")" : ""));
+          btEntry.setIcon(ICON_COLLAPSE);
+          btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+            + ChameleonTheme.BUTTON_SMALL);
+          btEntry.addListener((Button.ClickListener) this);
+          addComponent(btEntry, "btEntry");
+        }
+        
+        
+        // create the visualizer and calc input
+        try
+        {
+          vis = this.visPlugin.createComponent(createInput(), getApplication());
+          vis.setVisible(true);
+          addComponent(vis, "iframe");
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_TRAY_NOTIFICATION
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
+        
+        
+        if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          btEntry.setIcon(ICON_EXPAND);
+          vis.addStyleName("hidden");
+        }
+        
       }
     }
 
@@ -195,7 +217,8 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
-    input.setId("" + rand.nextLong());
+    
+    input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
@@ -207,7 +230,6 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setText(text);
     input.setSegmentationName(segmentationName);
-    input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
     {
@@ -316,6 +338,7 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
    * @param collapse when collapse is false, the Visualizer would never be
    * closed
    */
+  @Override
   public void toggleVisualizer(boolean collapse)
   {
 
@@ -330,28 +353,35 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
       // check if it's necessary to create input
       if (visPlugin != null && vis == null)
       {
-        vis = this.visPlugin.createComponent(createInput());
-        addComponent(vis, "iframe");
+        try
+        {
+          vis = this.visPlugin.createComponent(createInput(), getApplication());
+          addComponent(vis, "iframe");
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_WARNING_MESSAGE
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
       }
 
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);
+      vis.removeStyleName("hidden");
     }
     else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {
       if (vis != null)
       {
         vis.setVisible(false);
-        stopMediaVisualizers();
       }
 
       btEntry.setIcon(ICON_EXPAND);
     }
-  }
-
-  public void setKwicPanel(KWICPanelImpl kwicPanel)
-  {
-    this.kwicPanel = kwicPanel;
   }
 
   public String getHtmlID()
@@ -359,31 +389,4 @@ public class VisualizerPanel extends CustomLayout implements Button.ClickListene
     return htmlID;
   }
 
-  public List<VisualizerPanel> getMediaVisualizer()
-  {
-    return mediaVisualizer;
-  }
-
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
-  {
-    this.mediaVisualizer = mediaVisualizer;
-  }
-
-  public void startMediaVisFromKWIC()
-  {
-    if (kwicPanel != null)
-    {
-      kwicPanel.startMediaVisualizers();
-      // set back to null, otherwise the movie will stop
-      kwicPanel = null;
-    }
-  }
-
-  private void stopMediaVisualizers()
-  {
-    String stopCommand = ""
-      + "document.getElementById(\"" + this.htmlID + "\")"
-      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
-    getWindow().executeJavaScript(stopCommand);
-  }
 }

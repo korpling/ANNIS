@@ -151,11 +151,12 @@
   
   
   <modules>
-    <module>annis-service-interface</module>    
-    <module>annis-service-implementation</module>
+    <module>annis-interfaces</module>    
+    <module>annis-service</module>
     <module>annis-kickstarter</module>
     <module>annis-gui</module>
     <module>doc</module>
+    <module>annis-widgets</module>
   </modules>
     
 </project>

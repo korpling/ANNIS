@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>annis-all</artifactId>
+    <groupId>de.hu-berlin.german.korpling.annis</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+  </parent>
+  <groupId>de.hu-berlin.german.korpling.annis</groupId>
+  <artifactId>annis-widgets</artifactId>
+  <packaging>jar</packaging>
+  <version>3.0.0-SNAPSHOT</version>
+  <name>annis-widgets</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <vaadin.version>6.8.2</vaadin.version>
+    <gwt.version>2.3.0</gwt.version>
+    <gwt.plugin.version>2.3.0</gwt.plugin.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <excludes>
+            <exclude>VAADIN/widgetsets/WEB-INF/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>${gwt.plugin.version}</version>
+        <configuration>
+          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets</webappDirectory>
+          <runTarget>http://localhost:8080/annis-gui/app</runTarget>
+          <!-- <style>DETAILED</style> -->
+          <noServer>true</noServer>
+          <port>8080</port>
+          <compileReport>false</compileReport>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>resources</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>1.0.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>update-widgetset</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <!-- This is needed for the sources required by the GWT compiler to be included in the produced JARs -->
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>vaadin-addons</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwt.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>de.hu-berlin.german.korpling.annis</groupId>
+      <artifactId>annis-interfaces</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+    </dependency>    
+    
+    <!-- other widget sets we use -->
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>js-screenshot</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+      
+    <dependency>
+      <groupId>org.vaadin.hene.splitbutton</groupId>
+      <artifactId>splitbutton</artifactId>
+      <version>0.9.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>codemirror2</artifactId>
+      <version>2.2.4</version>
+    </dependency>
+      
+      
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-gwt</artifactId>
+      <version>12.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    
+  </dependencies>
+
+</project>

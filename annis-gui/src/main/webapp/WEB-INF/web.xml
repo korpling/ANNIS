@@ -13,7 +13,7 @@
   </context-param>
   <servlet>
     <servlet-name>MainApp</servlet-name>
-    <servlet-class>annis.gui.AnnisApplicationServlet</servlet-class>
+    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>annis.gui.MainApp</param-value>
@@ -42,6 +42,7 @@
       <param-value>thomas.krause@alumni.hu-berlin.de</param-value>
     </init-param>
 -->
+
   </servlet>
   <servlet>
     <servlet-name>CitationRedirectionServlet</servlet-name>

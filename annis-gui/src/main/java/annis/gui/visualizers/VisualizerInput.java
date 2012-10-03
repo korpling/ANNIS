@@ -56,7 +56,6 @@ public class VisualizerInput
   private Set<String> tokenAnnos;
   private STextualDS text;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
   private VisualizerPanel visPanel;
 
   public String getAnnisWebServiceURL()
@@ -317,22 +316,6 @@ public class VisualizerInput
   }
 
   /**
-   * returns the media visualizer ids. We insert the iframe in a div block with
-   * this id: "resolver-resultNum-numOfVis"
-   *
-   * @return
-   */
-  public List<String> getMediaIDs()
-  {
-    List<String> res = new LinkedList<String>();
-    for(VisualizerPanel p : getMediaVisualizer())
-    {
-      res.add(p.getHtmlID());
-    }
-    return res;
-  }
-
-  /**
    * should contains a list of all token of a the which is available with
    * {@link VisualizerInput#getSResult()}.
    */
@@ -393,21 +376,6 @@ public class VisualizerInput
   public String getSegmentationName()
   {
     return segmentationName;
-  }
-
-  /**
-   * All available visualizer for this result.
-   *
-   * @param mediaVisualizer
-   */
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
-  {
-    this.mediaVisualizer = mediaVisualizer;
-  }
-
-  public List<VisualizerPanel> getMediaVisualizer()
-  {
-    return mediaVisualizer;
   }
 
   /**
