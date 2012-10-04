@@ -217,9 +217,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   @Override
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation incomingEdge, SNode currNode, long order)
-  {
-
-    EList<Edge> edgeList;
+  {    
+    EList<String> sTypes;
 
     //entry case
     if (incomingEdge == null)
@@ -227,25 +226,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       return true;
     }
 
-    // get all edges between the fromNode und the currNode
-    edgeList = graph.getEdges(
-      incomingEdge.getSSource().getSId(),
-      incomingEdge.getSTarget().getSId());
-
-    // check if there exists edges
-    if (edgeList != null && edgeList.size() > 0)
+    /**
+     * check whether the edge has an sType or not, because there are always two
+     * edges in the example rst corpus
+     */
+    if ((sTypes = incomingEdge.getSTypes()) != null && sTypes.size() > 0)
     {
-      EList<String> types = incomingEdge.getSTypes();
-
-      if (types != null && types.size() > 0)
-      {
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }    
+      return true;
+    }
     else
     {
       return false;
