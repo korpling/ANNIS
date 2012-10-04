@@ -377,6 +377,9 @@ public class VAnnotationGrid extends Composite implements Paintable
           case Event.ONCLICK:
             onClick(row, column);
             break;
+          default:
+            // do nothing
+            break;
         }
       }
     }

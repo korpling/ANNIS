@@ -17,6 +17,7 @@ package annis.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -180,12 +181,12 @@ public class AnnotationGraph implements Serializable
 
 	public String[] getPath()
 	{
-		return path;
+		return Arrays.copyOf(path, path.length);
 	}
 
 	public void setPath(String[] path)
 	{
-		this.path = path;
+		this.path = Arrays.copyOf(path, path.length);
 	}
 
 }

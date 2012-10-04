@@ -71,4 +71,33 @@ public class Precedence extends RangedJoin
       + minDistance + ", "
       + maxDistance + ")";
   }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final Precedence other = (Precedence) obj;
+    
+    if ((this.segmentationName == null) ? (other.segmentationName != null) : !this.segmentationName.equals(other.segmentationName))
+    {
+      return false;
+    }
+    return super.equals(obj);
+  }
+  
+  
 }

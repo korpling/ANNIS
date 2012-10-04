@@ -16,6 +16,7 @@
 package annis.service.objects;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -26,17 +27,15 @@ public class AnnisBinary extends AnnisBinaryMetaData implements Serializable
 
   public byte[] getBytes()
   {
-    return bytes;
+    return Arrays.copyOf(bytes, bytes.length);
   }
 
-  
-  
   public void setBytes(byte[] bytes)
   {
     if (bytes == null)
     {
       throw new RuntimeException("didn't get bytes");
     }
-    this.bytes = bytes;
+    this.bytes = Arrays.copyOf(bytes, bytes.length);
   }
 }

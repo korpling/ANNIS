@@ -93,7 +93,7 @@ public class AnnotationGrid extends AbstractComponent
             @Override
             public int compare(GridEvent o1, GridEvent o2)
             {
-              return new Integer(o1.getLeft()).compareTo(o2.getLeft());
+              return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
             }
           });
           
