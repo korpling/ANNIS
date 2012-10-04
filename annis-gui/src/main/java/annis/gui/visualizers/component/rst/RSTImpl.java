@@ -224,14 +224,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   }
 
   @Override
-  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SRelation incomingEdge, SNode currNode, long order)
-  {    
+  public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+    String traversalId, SRelation incomingEdge, SNode currNode, long order)
+  {
     EList<String> sTypes;
 
-    //entry case
+
+    //entry case 
     if (incomingEdge == null)
     {
       return true;
+    }
+
+    // token data structures are not needed
+    if (currNode instanceof SToken)
+    {
+      return false;
     }
 
     /**
