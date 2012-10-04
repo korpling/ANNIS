@@ -50,7 +50,10 @@ public class DebugVisualizer extends AbstractDotVisualizer implements Serializab
       
       sb.append(FileUtils.readFileToString(tmpFile));
       
-      tmpFile.delete();
+      if(!tmpFile.delete())
+      {
+        log.warn("Cannot delete " + tmpFile.getAbsolutePath());
+      }
     }
     catch (IOException ex)
     {

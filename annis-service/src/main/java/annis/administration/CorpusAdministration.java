@@ -28,6 +28,7 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.exceptions.AnnisException;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +173,7 @@ public class CorpusAdministration
       "database.properties");
     try
     {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+      BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));
       writer.write("# database configuration\n");
       writer.write("datasource.driver=org.postgresql.Driver\n");
       writer.write("datasource.url=jdbc:postgresql://" + host + ":" + port + "/"

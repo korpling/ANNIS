@@ -389,7 +389,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         parent.updateSegmentationLayer(segmentationLayerSet);
         parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-        if (p.getSCorpusGraphs().size() > 0
+        if (p != null && p.getSCorpusGraphs().size() > 0
           && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
         {
           result =

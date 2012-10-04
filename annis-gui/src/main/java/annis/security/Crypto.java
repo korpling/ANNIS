@@ -33,12 +33,12 @@ public class Crypto
     md.update(s.getBytes("UTF-8"));
     byte[] digest = md.digest();
 
-    String hashVal = "";
+    StringBuilder sbHashVal = new StringBuilder();
     for(byte b : digest)
     {
-      hashVal += String.format("%02x", b);
+      sbHashVal.append(String.format("%02x", b));
     }
     
-    return hashVal;
+    return sbHashVal.toString();
   }
 }

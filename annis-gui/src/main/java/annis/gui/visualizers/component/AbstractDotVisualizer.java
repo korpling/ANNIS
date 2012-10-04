@@ -146,7 +146,10 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       fileInput.close();
       
       // cleanup
-      tmpInput.delete();
+      if(!tmpInput.delete())
+      {
+        log.warn("Cannot delete " + tmpInput.getAbsolutePath());
+      }
 
     }
     catch (Exception ex)

@@ -56,6 +56,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -426,8 +427,8 @@ public class AnnisRunner extends AnnisBaseRunner
     // CSV output
     try
     {
-      CSVWriter csv = new CSVWriter(new FileWriter(new File(
-        "annis_benchmark_result.csv")));
+      CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
+        "annis_benchmark_result.csv"), "UTF-8"));
 
       String[] header = new String[]
       {
@@ -496,7 +497,7 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            Writer w = new FileWriter(dropCaches);
+            Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");
             w.write("3");
             w.close();
           }
@@ -963,7 +964,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       ByteArrayOutputStream outStream = new ByteArrayOutputStream();
       resource.save(outStream, null);
-      return new String(outStream.toByteArray());
+      return new String(outStream.toByteArray(), "UTF-8");
 
     }
     catch (IOException ex)

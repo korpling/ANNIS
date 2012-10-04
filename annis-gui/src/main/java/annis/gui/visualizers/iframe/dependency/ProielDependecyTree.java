@@ -200,6 +200,10 @@ public class ProielDependecyTree extends AbstractDotVisualizer
               shape = "hexagon";
               label = posAnno;
               break;
+            default:
+              shape = "circle";
+              label = posAnno;
+              break;
           }
         }
       }

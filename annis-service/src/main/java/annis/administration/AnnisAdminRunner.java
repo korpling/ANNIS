@@ -36,8 +36,6 @@ import org.springframework.core.io.Resource;
 import annis.AnnisBaseRunner;
 import annis.UsageException;
 import annis.corpuspathsearch.Search;
-import annis.dao.AnnisDao;
-import annis.service.objects.AnnisCorpus;
 import annis.utils.Utils;
 import java.io.File;
 import java.util.LinkedList;
@@ -353,7 +351,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     BufferedReader reader = null;
     try
     {
-      reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+      reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
       for (String line = reader.readLine(); line != null; line = reader.readLine())
       {
         System.out.println(line);

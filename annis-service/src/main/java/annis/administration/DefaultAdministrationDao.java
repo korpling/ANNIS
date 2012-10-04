@@ -326,6 +326,7 @@ public class DefaultAdministrationDao implements AdministrationDao
           // count cols for detecting old resolver_vis_map table format
           JdbcOperations sqlOps = jdbcTemplate.getJdbcOperations();
           File resolver_vis_tab = new File(path, table + ".tab");
+          
           BufferedReader bReader = new BufferedReader(
             new FileReader(resolver_vis_tab));
           String firstLine = bReader.readLine();

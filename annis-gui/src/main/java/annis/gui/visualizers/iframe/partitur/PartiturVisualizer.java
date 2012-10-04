@@ -170,7 +170,7 @@ public class PartiturVisualizer extends WriterVisualizer
           }
         }
 
-        String[] currentarray = new String[0]; //Saves annotation-ids of the current row
+        String[] currentarray; //Saves annotation-ids of the current row
 
         while (!indexlist.isEmpty())
         { //Create Rows until all Annotations fit in

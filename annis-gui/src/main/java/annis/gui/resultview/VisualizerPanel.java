@@ -115,7 +115,7 @@ public class VisualizerPanel extends CustomLayout
     PluginSystem ps,
     boolean showTextID) throws IOException
   {
-    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes()));
+    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes("UTF-8")));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
     
@@ -291,7 +291,7 @@ public class VisualizerPanel extends CustomLayout
       {
         return new ByteArrayInputStream(byteStream.toByteArray());
       }
-    }, entry.getVisType() + "_" + Math.abs(rand.nextLong()), getApplication());
+    }, entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
     r.setMIMEType(mimeType);
 
     return r;

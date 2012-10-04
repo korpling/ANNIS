@@ -287,7 +287,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     }
 
     
-    public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
+    public static class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
     {
 
       public String generateDescription(String layer, SToken token)
@@ -367,7 +367,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       }
     }
 
-    public class GapColumnGenerator implements Table.ColumnGenerator
+    public static class GapColumnGenerator implements Table.ColumnGenerator
     {
 
       public Object generateCell(String layer)

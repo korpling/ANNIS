@@ -445,71 +445,73 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   @Override
   public void handleAction(Action action, Object sender, Object target)
   {
-    AddRemoveAction a = (AddRemoveAction) action;
-
-    Map<String, AnnisCorpus> set = corpusSets.get(a.getCorpusSet());
-    Map<String, AnnisCorpus> allCorpora = corpusSets.get(ALL_CORPORA);
-
-    if (a.type == ActionType.Remove)
+    if(action instanceof AddRemoveAction)
     {
-      set.remove(a.getCorpusId());
-      if (set.isEmpty())
+      AddRemoveAction a = (AddRemoveAction) action;
+
+      Map<String, AnnisCorpus> set = corpusSets.get(a.getCorpusSet());
+      Map<String, AnnisCorpus> allCorpora = corpusSets.get(ALL_CORPORA);
+
+      if (a.type == ActionType.Remove)
       {
-        // remove the set itself when it gets empty
-        corpusSets.remove(a.getCorpusSet());
-        cbSelection.removeItem(a.getCorpusSet());
-        cbSelection.select(ALL_CORPORA);
-      }
-    }
-    else if (a.type == ActionType.Add)
-    {
-      set.put(a.getCorpusId(), allCorpora.get(a.getCorpusId()));
-    }
-
-    // save to file
-    Application app = getApplication();
-    if (app instanceof MainApp)
-    {
-      AnnisSecurityManager sm = ((MainApp) app).getSecurityManager();
-      AnnisUser user = (AnnisUser) app.getUser();
-
-      LinkedList<String> keys = new LinkedList<String>(
-        user.stringPropertyNames());
-
-      for (String key : keys)
-      {
-        if (key.startsWith(CORPUSSET_PREFIX))
+        set.remove(a.getCorpusId());
+        if (set.isEmpty())
         {
-          user.remove(key);
+          // remove the set itself when it gets empty
+          corpusSets.remove(a.getCorpusSet());
+          cbSelection.removeItem(a.getCorpusSet());
+          cbSelection.select(ALL_CORPORA);
+        }
+      }
+      else if (a.type == ActionType.Add)
+      {
+        set.put(a.getCorpusId(), allCorpora.get(a.getCorpusId()));
+      }
+
+      // save to file
+      Application app = getApplication();
+      if (app instanceof MainApp)
+      {
+        AnnisSecurityManager sm = ((MainApp) app).getSecurityManager();
+        AnnisUser user = (AnnisUser) app.getUser();
+
+        LinkedList<String> keys = new LinkedList<String>(
+          user.stringPropertyNames());
+
+        for (String key : keys)
+        {
+          if (key.startsWith(CORPUSSET_PREFIX))
+          {
+            user.remove(key);
+          }
+        }
+
+        for (Map.Entry<String, Map<String, AnnisCorpus>> entry : corpusSets.
+          entrySet())
+        {
+          if (!ALL_CORPORA.equals(entry.getKey()))
+          {
+            String key = CORPUSSET_PREFIX + entry.getKey();
+            String value = StringUtils.join(entry.getValue().keySet(), ",");
+
+            user.setProperty(key, value);
+          }
+        }
+
+        try
+        {
+          sm.storeUserProperties(user);
+        }
+        catch (Exception ex)
+        {
+          log.error(null,
+            ex);
         }
       }
 
-      for (Map.Entry<String, Map<String, AnnisCorpus>> entry : corpusSets.
-        entrySet())
-      {
-        if (!ALL_CORPORA.equals(entry.getKey()))
-        {
-          String key = CORPUSSET_PREFIX + entry.getKey();
-          String value = StringUtils.join(entry.getValue().keySet(), ",");
-
-          user.setProperty(key, value);
-        }
-      }
-
-      try
-      {
-        sm.storeUserProperties(user);
-      }
-      catch (Exception ex)
-      {
-        log.error(null,
-          ex);
-      }
+      // update view
+      updateCorpusList();
     }
-
-    // update view
-    updateCorpusList();
-
   }
 
   public static class CorpusSorter extends DefaultItemSorter

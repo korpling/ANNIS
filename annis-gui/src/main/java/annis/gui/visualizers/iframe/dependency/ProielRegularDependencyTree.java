@@ -253,8 +253,8 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     }
     else
     {
-      String srcId = srcNode == null ? "root" : "" + srcNode.getId();
-      String destId = destNode == null ? "root" : "" + destNode.getId();
+      String srcId = "" + srcNode.getId();
+      String destId = "" + destNode.getId();
 
       // get the edge annotation
       StringBuilder sbAnno = new StringBuilder();

@@ -62,7 +62,7 @@ public enum MatchedNodeColors
 
   private String twoDigitHex(int i)
   {
-    String result = Integer.toHexString(i).toLowerCase(Locale.ENGLISH);
+    String result = Integer.toHexString(i).toLowerCase(new Locale("en"));
 
     if(result.length() > 2)
     {
