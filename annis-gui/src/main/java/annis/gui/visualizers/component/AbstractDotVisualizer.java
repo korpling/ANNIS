@@ -98,9 +98,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
     {
       File tmpInput = File.createTempFile("annis-dot-input", ".dot");
       tmpInput.deleteOnExit();
-      File tmpOutput = File.createTempFile("annis-dot-output", ".png");
-      tmpOutput.deleteOnExit();
-     
+      
       // write out input file
       StringBuilder dotContent = new StringBuilder();
       createDotContent(input, dotContent);
@@ -112,7 +110,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
           "-Tpng", 
         tmpInput.getCanonicalPath());
      
-      pBuilder.redirectOutput(tmpOutput);
+      pBuilder.redirectErrorStream(false);
       Process process = pBuilder.start();
       
       int resultCode = process.waitFor();
@@ -139,7 +137,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       }
       
       // read in file
-      FileInputStream fileInput = new FileInputStream(tmpOutput);
+      InputStream fileInput = process.getInputStream();
       for(int chr=fileInput.read(); chr != -1; chr = fileInput.read())
       {
         outstream.write(chr);
@@ -149,7 +147,6 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       
       // cleanup
       tmpInput.delete();
-      tmpOutput.delete();
 
     }
     catch (Exception ex)

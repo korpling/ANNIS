@@ -379,7 +379,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             long tokenIndex1 = node1.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
             long tokenIndex2 = node2.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
             
-            return Long.compare(tokenIndex1, tokenIndex2);
+            return new Long(tokenIndex1).compareTo(tokenIndex2);
           }
         });
         
