@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Servlet provides binary-files with a stream of partial-content. The
@@ -45,50 +47,73 @@ import org.apache.commons.lang3.Validate;
  */
 public class BinaryServlet extends HttpServlet
 {
+  
+  private final Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 500*1024; // max portion which is transfered over REST at once
+  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException
+    throws ServletException
   {
 
     // get Parameter from url, actually it' s only the corpusId
     Map<String, String[]> binaryParameter = request.getParameterMap();
     toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     documentName = binaryParameter.get("documentName")[0];
-    ServletOutputStream out = response.getOutputStream();
-
-
-    String range = request.getHeader("Range");
-
-    ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
-    Client c = Client.create(rc);
-        
-    String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
-    if(annisServiceURL == null)
-    {
-      throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
-    }
-    WebResource annisRes = c.resource(annisServiceURL);
     
-    WebResource binaryRes = annisRes.path("corpora")
-      .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-      .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
-    
-    if (range != null)
+    ServletOutputStream out = null;
+    try
     {
-      responseStatus206(binaryRes, out, response, range);
-    }
-    else
-    {
-      responseStatus200(binaryRes, out, response);
-    }
+      out = response.getOutputStream();
 
-    out.flush();
-    out.close();
+      String range = request.getHeader("Range");
+
+      ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
+      Client c = Client.create(rc);
+
+      String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
+      if(annisServiceURL == null)
+      {
+        throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
+      }
+      WebResource annisRes = c.resource(annisServiceURL);
+
+      WebResource binaryRes = annisRes.path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
+        .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
+
+      if (range != null)
+      {
+        responseStatus206(binaryRes, out, response, range);
+      }
+      else
+      {
+        responseStatus200(binaryRes, out, response);
+      }
+      
+      out.flush();
+    }
+    catch(IOException ex)
+    {
+      log.debug("IOException in BinaryServlet", ex);
+    }
+    finally
+    {
+      if(out != null)
+      {
+        try
+        {
+          out.close();
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
+    }
   }
 
   private void responseStatus206(WebResource binaryRes, ServletOutputStream out,
@@ -174,6 +199,7 @@ public class BinaryServlet extends HttpServlet
       AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
       Validate.isTrue(bin.getBytes().length == stepLength);
       out.write(bin.getBytes());
+      out.flush();
       
       offset += stepLength;      
       remaining = remaining - stepLength;
