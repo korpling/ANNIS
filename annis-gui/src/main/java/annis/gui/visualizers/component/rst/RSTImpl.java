@@ -21,7 +21,12 @@ import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -118,19 +123,56 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   }
 
-  private JSONObject createJsonEntry(SNode current)
+  private JSONObject createJsonEntry(SNode currNode)
   {
     JSONObject jsonData = new JSONObject();
+    StringBuilder sb = new StringBuilder();
+    EList<SToken> token = new BasicEList<SToken>();
+    EList<Edge> edges;
+
+    if (currNode instanceof SStructure)
+    {
+
+      edges = currNode.getSGraph().getOutEdges(currNode.getSId());
+
+      // get all tokens directly dominated tokens and build a string
+      for (Edge e : edges)
+      {
+        SRelation sedge;
+
+        if (e instanceof SRelation)
+        {
+          sedge = (SRelation) e;
+        }
+        else
+        {
+          log.error("wrong type of edge for {}", e);
+          continue;
+        }
+
+        if (sedge.getSTarget() instanceof SToken)
+        {
+          token.add((SToken) sedge.getSTarget());
+        }
+      }
+
+      // build strings
+      for (SToken node : token)
+      {
+        sb.append(getText(node));
+        log.debug("append: {}", getText(node) == null ? "is empty" : getText(node));
+      }
+    }
 
     try
     {
-      jsonData.put("id", current.getSId());
-      jsonData.put("name", getAnnotationsAsParagraph(current));
+      jsonData.put("id", currNode.getSId());
+      jsonData.put("name", token.size() == 0 ? "no token" : sb.toString());
       jsonData.put("data", "{}");
     }
     catch (JSONException ex)
     {
-      log.error("problems create entry for {}", current, ex);
+      log.error("problems create entry for {}", currNode, ex);
     }
 
     return jsonData;
@@ -162,7 +204,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     assert st.size() > 0;
 
-
     if (st.size() == 1)
     {
       result = st.pop();
@@ -191,48 +232,65 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       incomingEdge.getSSource().getSId(),
       incomingEdge.getSTarget().getSId());
 
-    if (edgeList.size() > 1)
+    // check if there exists edges
+    if (edgeList != null && edgeList.size() > 0)
     {
       EList<String> types = incomingEdge.getSTypes();
+
       if (types != null && types.size() > 0)
       {
         return true;
       }
-
-      return false;
-    }
+      else
+      {
+        return false;
+      }
+    }    
     else
     {
       return false;
     }
   }
 
-  private boolean containsAnnotation(SNode node)
+  /**
+   * Gets the overlapping token as string from a node, which is direct dominated
+   * by this node.
+   *
+   * @param currNode
+   * @return is null, if there is no relation to a token, or there is more then
+   * one STEXT is overlapped by this node
+   */
+  private String getText(SToken currNode)
   {
-    for (SAnnotation anno : node.getSAnnotations())
-    {
-      if (ANNOTATION_NAME.equals(anno.getName())
-        && ANNOTATION_VALUE.equals(anno.getValueString()))
-      {
-        return true;
-      }
-    }
-    return false;
-  }
+    EList<STYPE_NAME> relationTypes = new BasicEList<STYPE_NAME>();
+    relationTypes.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+    EList<SDataSourceSequence> sSequences = currNode.getSDocumentGraph().
+      getOverlappedDSSequences(currNode, relationTypes);
 
-  private String getAnnotationsAsParagraph(SNode node)
-  {
-    EList<SAnnotation> annos = node.getSAnnotations();
-    StringBuilder sb = new StringBuilder();
+    log.debug("sSequences {}", sSequences.toString());
 
-    if (annos != null)
+    // only support one text for spanns
+    if (sSequences == null || sSequences.size() != 1)
     {
-      for (SAnnotation anno : annos)
-      {
-        sb.append(anno.getName()).append(":").append(anno.getValueString());
-      }
+      log.error("rst supports only one text and only text level");
+      return null;
     }
 
-    return sb.toString();
+    // check if it is a text data structure
+    if (sSequences.get(0).getSSequentialDS() instanceof STextualDS)
+    {
+
+      STextualDS text = ((STextualDS) sSequences.get(0).getSSequentialDS());
+      int start = sSequences.get(0).getSStart();
+      int end = sSequences.get(0).getSEnd();
+      return text.getSText().substring(start, end);
+    }
+
+    // something fundamentally goes wrong
+    log.error("{} instead of {}",
+      sSequences.get(0).getSSequentialDS().getClass().getName(),
+      STextualDS.class.getName());
+
+    return null;
   }
 }
