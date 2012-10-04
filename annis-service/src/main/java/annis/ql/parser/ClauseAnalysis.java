@@ -91,8 +91,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
@@ -797,7 +795,6 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
   private String lhsStr(PLingOp node)
   {
-    ALinguisticConstraintExpr constraint = (ALinguisticConstraintExpr) node.parent();
     return token(((ALinguisticConstraintExpr) node.parent()).getLhs());
   }
 

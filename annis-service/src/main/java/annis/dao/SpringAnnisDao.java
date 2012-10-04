@@ -18,7 +18,6 @@ package annis.dao;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +62,8 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.FileInputStream;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +111,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
-  private final class ExplainSqlGenerator implements
+  private static final class ExplainSqlGenerator implements
     SqlGenerator<QueryData, String>
   {
 
@@ -428,9 +429,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         if (conf.isFile())
         {
           Properties p = new Properties();
+          FileInputStream confStream = null;
           try
           {
-            p.load(new FileReader(conf));
+            confStream = new FileInputStream(conf);
+            p.load(confStream);
             for (Map.Entry<Object, Object> e : p.entrySet())
             {
               result.put(e.getKey().toString(), e.getValue().toString());
@@ -440,6 +443,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           {
             log.warn("could not load corpus configuration file "
               + conf.getAbsolutePath(), ex);
+          }
+          finally
+          {
+            if(confStream != null)
+            {
+              try
+              {
+                confStream.close();
+              }
+              catch (IOException ex)
+              {
+                log.warn(null, ex);
+              }
+            }
           }
         }
       } // end if conf is a directory
@@ -475,16 +492,31 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public boolean checkDatabaseVersion() throws AnnisException
   {
+    Connection conn = null;
     try
     {
-      DatabaseMetaData meta = 
-        getJdbcTemplate().getDataSource().getConnection().getMetaData();
+      conn = getJdbcTemplate().getDataSource().getConnection();
+      DatabaseMetaData meta = conn.getMetaData();
       
       log.info("major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName());
     }
     catch (SQLException ex)
     {
       log.error("could not get database version", ex);
+    }
+    finally
+    {
+      if(conn != null)
+      {
+        try
+        {
+          conn.close();
+        }
+        catch (SQLException ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
     return false;
   }
@@ -698,7 +730,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
       byteHelper.getArgs(toplevelCorpusName, corpusName, offset, length), 
-      ByteHelper.ARG_TYPES, byteHelper);
+      ByteHelper.getArgTypes(), byteHelper);
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()

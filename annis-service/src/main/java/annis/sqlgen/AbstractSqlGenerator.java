@@ -174,15 +174,19 @@ public abstract class AbstractSqlGenerator<T>
         {
           return 0;
         }
-        if (o1 == null && o2 != null)
+        else if (o1 == null && o2 != null)
         {
           return -1;
         }
-        if (o1 != null && o2 == null)
+        else if (o1 != null && o2 == null)
         {
           return 1;
         }
-        return o1.toString().compareTo(o2.toString());
+        else if(o1 != null && o2 != null)
+        {
+          return o1.toString().compareTo(o2.toString());
+        }
+        throw new IllegalArgumentException("Could not compare " + o1 + " with " + o2);
       }
     });
 

@@ -395,9 +395,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
     for (Map<String, Object> row : table)
     {
-      for (String column : row.keySet())
+      for (Map.Entry<String, Object> e : row.entrySet())
       {
-        final Object value = row.get(column);
+        String column = e.getKey();
+        final Object value = e.getValue();
         if (value == null)
         {
           continue;

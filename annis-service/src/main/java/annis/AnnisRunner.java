@@ -53,12 +53,12 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -791,8 +791,6 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     QueryData queryData = analyzeQuery(saltIds, "subgraph");
 
-
-
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
@@ -861,7 +859,8 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       ObjectMapper om = new ObjectMapper();
       AnnotationIntrospector ai = new JaxbAnnotationIntrospector();
-      om.getDeserializationConfig().withAnnotationIntrospector(ai);
+      DeserializationConfig config = om.getDeserializationConfig().withAnnotationIntrospector(ai);
+      om.setDeserializationConfig(config);
       om.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
 
       System.out.println(om.writeValueAsString(annotations));
@@ -900,7 +899,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doText(String textID)
   {
-    long l = Long.parseLong(textID);
     SaltProject p = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
     System.out.println(printSaltAsXMI(p));
   }

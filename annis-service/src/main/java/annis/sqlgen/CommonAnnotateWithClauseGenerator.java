@@ -181,17 +181,13 @@ public class CommonAnnotateWithClauseGenerator
   {
     String indent2 = indent + TABSTOP;
     String indent3 = indent2 + TABSTOP;
-    String indent4 = indent3 + TABSTOP;
-
+    
     SolutionKey<?> key = createSolutionKey();
     // use copy constructor in order not to mess up the global TableAccessStrategy bean
     TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
     tas.addTableAlias("solutions", matchesName);
     List<String> keyColumns =
       key.generateOuterQueryColumns(tas, alternative.size());
-
-
-    TableAccessStrategy tables = tables(null);
 
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("nearestseg AS\n");

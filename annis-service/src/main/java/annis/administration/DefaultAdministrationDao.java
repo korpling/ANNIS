@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import org.apache.commons.io.FilenameUtils;
@@ -328,8 +329,9 @@ public class DefaultAdministrationDao implements AdministrationDao
           File resolver_vis_tab = new File(path, table + ".tab");
           
           BufferedReader bReader = new BufferedReader(
-            new FileReader(resolver_vis_tab));
+            new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
           String firstLine = bReader.readLine();
+          bReader.close();
           
           int cols = 9; // default number
           if (firstLine != null)
@@ -432,10 +434,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       // check column number by reading first line
       File nodeTabFile = new File(path, "node.tab");
       BufferedReader reader =
-        new BufferedReader(new FileReader(nodeTabFile));
+        new BufferedReader(new InputStreamReader(new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
+      reader.close();
       
-      int columnNumber = firstLine.split("\t").length;
+      
+      int columnNumber = firstLine == null ? 13 : firstLine.split("\t").length;
       if (columnNumber == 13)
       {
         // new node table with segmentations
@@ -946,22 +950,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args)
   {
     // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
-    Map parameters = args != null ? args.getValues() : new HashMap();
+    Map<String, Object> parameters = args != null ? args.getValues() : new HashMap();
     BufferedReader reader = null;
     try
     {
       StringBuilder sqlBuf = new StringBuilder();
-      reader = new BufferedReader(new FileReader(resource.getFile()));
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(resource.getFile()), "UTF-8"));
       for (String line = reader.readLine(); line != null; line =
           reader.readLine())
       {
         sqlBuf.append(line).append("\n");
       }
       String sql = sqlBuf.toString();
-      for (Object placeHolder : parameters.keySet())
+      for (Entry<String, Object> placeHolderEntry : parameters.entrySet())
       {
-        String key = placeHolder.toString();
-        String value = parameters.get(placeHolder).toString();
+        String key = placeHolderEntry.getKey();
+        String value = placeHolderEntry.getValue().toString();
         log.debug("substitution for parameter '" + key + "' in SQL script: "
           + value);
         

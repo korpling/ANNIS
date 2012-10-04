@@ -108,12 +108,12 @@ public class Utils
     md.update(s.getBytes("UTF-8"));
     byte[] digest = md.digest();
 
-    String hashVal = "";
+    StringBuilder hashVal = new StringBuilder();
     for (byte b : digest)
     {
-      hashVal += String.format("%02x", b);
+      hashVal.append(String.format("%02x", b));
     }
 
-    return hashVal;
+    return hashVal.toString();
   }
 }

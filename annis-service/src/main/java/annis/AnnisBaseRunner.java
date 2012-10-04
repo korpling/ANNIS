@@ -137,7 +137,10 @@ public abstract class AnnisBaseRunner
 
     ConsoleReader console = new ConsoleReader();
     File annisDir = new File(System.getProperty("user.home") + "/.annis/");
-    annisDir.mkdirs();
+    if(!annisDir.mkdirs())
+    {
+      log.warn("could not create directory " + annisDir.getAbsolutePath());
+    }
 
     history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setHistory(history);

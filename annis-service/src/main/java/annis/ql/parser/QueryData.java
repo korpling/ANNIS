@@ -26,8 +26,6 @@ import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 public class QueryData implements Cloneable

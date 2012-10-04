@@ -43,9 +43,10 @@ import annis.dao.AnnotatedSpan;
 import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author thomas
@@ -57,6 +58,7 @@ public class MatrixSqlGenerator
   WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>,
   OrderByClauseSqlGenerator<QueryData>
 {
+  private final Logger log = LoggerFactory.getLogger(MatrixSqlGenerator.class);
 
   @Deprecated
   private String matchedNodesViewName;
@@ -360,7 +362,14 @@ public class MatrixSqlGenerator
 
           if (value != null)
           {
-            value = new String(Base64.decodeBase64(value));
+            try
+            {
+              value = new String(Base64.decodeBase64(value), "UTF-8");
+            }
+            catch (UnsupportedEncodingException ex)
+            {
+              log.error(null, ex);
+            }
           }
 
           result.add(new annis.model.Annotation(namespace, name, value));

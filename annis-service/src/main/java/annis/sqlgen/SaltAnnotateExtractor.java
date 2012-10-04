@@ -503,7 +503,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     SLayer layer, long parent, long pre,
     Map<RankID, SNode> nodeByPre)
   {
-    SRelation rel = null;;
+    SRelation rel = null;
     // create new relation
     if ("d".equals(type))
     {
@@ -531,6 +531,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       SPointingRelation pointingrel = SaltFactory.eINSTANCE.createSPointingRelation();
       rel = pointingrel;
+    }
+    else
+    {
+      throw new IllegalArgumentException("Invalid type " + type + " for new Edge"); 
     }
 
     try

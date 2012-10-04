@@ -4,6 +4,7 @@ import annis.service.objects.AnnisBinary;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -13,7 +14,7 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
   
-  public static final int[] ARG_TYPES = new int [] {
+  private static final int[] ARG_TYPES = new int [] {
     Types.INTEGER, Types.INTEGER,
     Types.VARCHAR, Types.VARCHAR
   };
@@ -31,6 +32,11 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
       + "  sub.pre >= top.pre AND sub.post <= top.post AND\n"
       + "  sub.id = corpus_ref";
   ;
+  
+  public static int[] getArgTypes()
+  {
+    return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
+  }
   
   public Object[] getArgs(String toplevelCorpusName, String corpusName, int offset, int length)
   {

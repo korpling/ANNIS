@@ -6,9 +6,11 @@ package annis.corpuspathsearch;
 
 import au.com.bytecode.opencsv.CSVReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -64,9 +66,8 @@ public class Search
         try
         {
           // open the file
-          CSVReader csv = new CSVReader(new FileReader(path), '\t');
-          String[] line = null;
-
+          CSVReader csv = new CSVReader(new InputStreamReader(new FileInputStream(path), "UTF-8"), '\t');
+          String[] line;
           int maxPost = Integer.MIN_VALUE;
           int minPre = Integer.MAX_VALUE;
 

@@ -38,7 +38,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   private static final Logger log = LoggerFactory.getLogger(AnnisServiceRunner.class);
   private static AnnisServiceRunner annisServiceRunner;
-  private static boolean isShutdownRequested = false;
+  private boolean isShutdownRequested = false;
   private static Thread mainThread;
   private HttpServer server;
 
@@ -68,7 +68,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       annisServiceRunner.start();
 
-      if(!isShutdownRequested)
+      if(!annisServiceRunner.isShutdownRequested)
       {
         closeSystemStreams();
       }
@@ -82,14 +82,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       annisServiceRunner.start();
     }
 
-    if(!isShutdownRequested)
+    if(!annisServiceRunner.isShutdownRequested)
     {
       addShutdownHook();
     }
     
     try
     {
-      while (!isShutdownRequested)
+      while (!annisServiceRunner.isShutdownRequested)
       {
         Thread.sleep(1000);
       }
@@ -104,7 +104,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   /**
    * shutdown the AnnisService - ensure that current work load finishes
    */
-  public static void shutdown()
+  public void shutdown()
   {
     log.info("Shutting down...");
     isShutdownRequested = true;
@@ -134,7 +134,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       @Override
       public void run()
       {
-        AnnisServiceRunner.shutdown();
+        annisServiceRunner.shutdown();
       }
     });
   }

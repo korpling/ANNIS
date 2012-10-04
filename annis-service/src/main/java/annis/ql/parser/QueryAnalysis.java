@@ -48,13 +48,11 @@ public class QueryAnalysis
     
     queryData.setCorpusList(new ArrayList<Long>(corpusList));
 		
-    List<PExpr> clauses = new LinkedList<PExpr>();
-
 		// split statement into list of clauses
 
     DnfTransformer dnfTransformer = getDnfTransformer();
     statement.apply(dnfTransformer);
-    clauses = dnfTransformer.listClauses(statement);
+    List<PExpr> clauses = dnfTransformer.listClauses(statement);
 
 		log.debug(clauses.size() + " clause(s) in statement");
 		
