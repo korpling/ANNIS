@@ -8,13 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Object>
   implements SelectClauseSqlGenerator<QueryData>,
@@ -30,7 +29,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   public Object extractData(ResultSet rs) throws SQLException,
     DataAccessException
   {
-    throw new NotImplementedException(
+    throw new UnsupportedOperationException(
       "BUG: inner query result is evaluated by outer query");
   }
 

@@ -24,7 +24,7 @@ import annis.ql.node.AAnnotationSearchExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
 import annis.ql.node.ATextSearchExpr;
 import annis.ql.node.Node;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class SearchExpressionCounter extends DepthFirstAdapter
 {

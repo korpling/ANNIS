@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -41,34 +40,34 @@ public class TestAnnotateSqlGenerator
     public Integer extractData(ResultSet arg0) throws SQLException,
         DataAccessException
     {
-      throw new NotImplementedException();
+      throw new UnsupportedOperationException();
     }
 
     @Override
     public String selectClause(QueryData queryData,
       List<QueryNode> alternative, String indent)
     {
-      throw new NotImplementedException();
+      throw new UnsupportedOperationException();
     }
 
     @Override
     public String fromClause(QueryData queryData,
       List<QueryNode> alternative, String indent)
     {
-      throw new NotImplementedException();
+      throw new UnsupportedOperationException();
     }
 
     @Override
     public String getTextQuery(long textID)
     {
-      throw new NotImplementedException();
+      throw new UnsupportedOperationException();
     }
 
     @Override
     public String getDocumentQuery(String toplevelCorpusName,
       String documentName)
     {
-      throw new NotImplementedException();
+      throw new UnsupportedOperationException();
     }
   };
   
@@ -149,7 +148,7 @@ public class TestAnnotateSqlGenerator
    * It is the responsibility of the code that uses this class to make sure
    * that a fresh key management instance is generated when necessary.
    */
-  @Test(expected=NotImplementedException.class)
+  @Test(expected=UnsupportedOperationException.class)
   public void shouldBailIfGetAnnisKeyMethodIsNotOverwritten()
   {
     // given

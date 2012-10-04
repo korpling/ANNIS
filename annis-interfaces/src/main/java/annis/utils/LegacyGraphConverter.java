@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
 import annis.service.objects.AnnisResultSetImpl;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 

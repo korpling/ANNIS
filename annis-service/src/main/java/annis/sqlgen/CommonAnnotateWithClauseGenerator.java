@@ -21,8 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import static annis.sqlgen.TableAccessStrategy.*;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
@@ -48,7 +47,7 @@ public class CommonAnnotateWithClauseGenerator
    */
   protected SolutionKey<?> createSolutionKey()
   {
-    throw new NotImplementedException(
+    throw new UnsupportedOperationException(
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
@@ -329,7 +328,7 @@ public class CommonAnnotateWithClauseGenerator
     }
     else
     {
-      throw new NotImplementedException("No implementation for island policy "
+      throw new UnsupportedOperationException("No implementation for island policy "
         + islandsPolicy.toString());
     }
 

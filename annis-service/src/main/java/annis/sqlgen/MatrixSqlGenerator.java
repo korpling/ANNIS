@@ -16,7 +16,6 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.CORPUS_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.TEXT_TABLE;
@@ -34,11 +33,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
@@ -46,7 +44,7 @@ import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
 import java.util.LinkedList;
-import org.apache.commons.lang.NotImplementedException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -73,7 +71,7 @@ public class MatrixSqlGenerator
    */
   protected SolutionKey<?> createSolutionKey()
   {
-    throw new NotImplementedException(
+    throw new UnsupportedOperationException(
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 

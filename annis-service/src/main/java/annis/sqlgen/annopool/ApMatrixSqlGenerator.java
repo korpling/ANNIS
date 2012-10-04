@@ -21,7 +21,7 @@ import annis.ql.parser.QueryData;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *

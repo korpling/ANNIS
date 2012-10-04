@@ -17,8 +17,8 @@ package annis.sqlgen;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import annis.model.QueryNode.TextMatching;
 

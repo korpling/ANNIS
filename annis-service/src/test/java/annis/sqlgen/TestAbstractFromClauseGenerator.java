@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Spy;
@@ -49,7 +48,7 @@ public class TestAbstractFromClauseGenerator {
 			@Override
 			public String fromClause(QueryData queryData, List<QueryNode> alternative,
 					String indent) {
-				throw new NotImplementedException("This AbstractFromClauseGenerator is only used for testing purposes");
+				throw new UnsupportedOperationException("This AbstractFromClauseGenerator is only used for testing purposes");
 			}
 			
 			@Override

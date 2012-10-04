@@ -30,7 +30,7 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;

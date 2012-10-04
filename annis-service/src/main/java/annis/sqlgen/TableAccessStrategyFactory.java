@@ -15,8 +15,6 @@
  */
 package annis.sqlgen;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import annis.model.QueryNode;
 
 public class TableAccessStrategyFactory {
@@ -28,7 +26,7 @@ public class TableAccessStrategyFactory {
 	}
 	
 	protected TableAccessStrategy createTableAccessStrategy() {
-		throw new NotImplementedException("BUG: This method needs to be overwritten by ancestors or through Spring");
+		throw new UnsupportedOperationException("BUG: This method needs to be overwritten by ancestors or through Spring");
 	}
 
 }

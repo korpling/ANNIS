@@ -18,8 +18,8 @@ package annis.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import static annis.sqlgen.SqlConstraints.sqlString;

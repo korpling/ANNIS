@@ -21,8 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
@@ -69,7 +68,7 @@ public abstract class AnnotateSqlGenerator<T>
    */
   protected SolutionKey<?> createSolutionKey()
   {
-    throw new NotImplementedException(
+    throw new UnsupportedOperationException(
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 

@@ -30,7 +30,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -67,7 +66,7 @@ public class TestAbstractUnionSqlGenerator {
 			@Override
 			public Object extractData(ResultSet rs) throws SQLException,
 					DataAccessException {
-				throw new NotImplementedException("This SqlGenerator is only used for test purposes.");
+				throw new UnsupportedOperationException("This SqlGenerator is only used for test purposes.");
 			}
 		};
 		initMocks(this);

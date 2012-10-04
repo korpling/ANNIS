@@ -17,7 +17,7 @@ package annis.gui;
 
 import java.awt.Color;
 import java.util.Locale;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Colors for matched nodes. The names and color values correspond to the

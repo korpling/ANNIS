@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 import annis.model.AnnisNode;
 import annis.service.objects.AnnisAttribute;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ListAnnotationsSqlHelper implements ResultSetExtractor
 {

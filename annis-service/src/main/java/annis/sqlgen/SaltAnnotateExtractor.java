@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
@@ -417,7 +416,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     else
     {
-      throw new NotImplementedException("no node creation possible for class: "
+      throw new UnsupportedOperationException("no node creation possible for class: "
         + clazz.getName());
     }
     moveNodeProperties(oldNode, node, oldNode.getSGraph());
@@ -657,7 +656,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   
   protected SolutionKey<?> createSolutionKey()
   {
-    throw new NotImplementedException(
+    throw new UnsupportedOperationException(
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
