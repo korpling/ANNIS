@@ -150,17 +150,25 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
           continue;
         }
 
-        if (sedge.getSTarget() instanceof SToken)
+        /**
+         * Check if the SRelation points at a SToken and in this case check if,
+         * only follow the edge with sType for avoiding double entries of SToken
+         * in the token list
+         */
+        if (sedge.getSTarget() instanceof SToken
+          && sedge.getSTypes() != null
+          && sedge.getSTypes().size() > 0)
         {
           token.add((SToken) sedge.getSTarget());
         }
       }
 
       // build strings
-      for (SToken node : token)
+      for (SToken tok : token)
       {
-        sb.append(getText(node));
-        log.debug("append: {}", getText(node) == null ? "is empty" : getText(node));
+        String text = getText(tok);
+        sb.append(text);
+        log.debug("append: {}", text);
       }
     }
 
