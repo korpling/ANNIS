@@ -197,8 +197,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     try
     {
       jsonData.put("id", currNode.getSId());
-      jsonData.put("name", token.size() == 0 ? "no token" : sb.toString());
-      jsonData.put("data", "{}");
+      jsonData.put("name", currNode.getSName());
+      jsonData.put("data", token.size() == 0 ? "{}" : sb.toString());
     }
     catch (JSONException ex)
     {
