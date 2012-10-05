@@ -42,6 +42,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The Visualizer Plugin for RST-Visualization.
+ *
+ * This class is used for generating for Generating a JSON-object which is
+ * passed to the JITWrapper.
+ *
+ * Particularity: The pointing relations are provided as dominance edges from
+ * salt which are typed as "edge".
+ *
+ * The RST-Data-Model contains sentences in nodes with annotation value segment.
+ * The segments are descends of nodes with annotation value group and the
+ * relations names are span or multiunc.
+ *
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
