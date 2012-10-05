@@ -48,7 +48,8 @@ import org.slf4j.LoggerFactory;
  * passed to the JITWrapper.
  *
  * Particularity: The pointing relations are provided as dominance edges from
- * salt which are typed as "edge".
+ * salt which are typed as "edge" and carry a couple of annotation values, but
+ * not "span" and "multinuc".
  *
  * The RST-Data-Model contains sentences in nodes with annotation value segment.
  * The segments are descends of nodes with annotation value group and the
@@ -65,10 +66,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private Stack<JSONObject> st = new Stack<JSONObject>();
   // result of transform operation salt -> json
   private JSONObject result;
-  final String ANNOTATION_NAME = "cat";
-  final String ANNOTATION_VALUE = "group";
-  final String ANNOTATION_NAMESPACE = "default_ns";
-  final String EDGE_TYPE_POINTING_REL = "edge";
+  private final String ANNOTATION_NAME = "cat";
+  final String[] ANNOTATION_VALUES =
+  {
+    "span", "multinuc"
+  };
+  private final String DANGEROUS_RELATION = "edge";
   private SDocumentGraph graph;
 
   private String transformSaltToJSON(VisualizerInput visInput)
@@ -269,9 +272,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       /**
        * the pointing relations are modelled as dominance relations with type
-       * "edges", so we will have to exclude the "point relation" here
+       * "edge" and do not carry the annotation "span" or "multinuc", so we will
+       * have to exclude the "point relation" here
        */
-      if (sTypes.size() == 1 && EDGE_TYPE_POINTING_REL.equals(sTypes.get(0)))
+      if (sTypes.size() == 1
+        && DANGEROUS_RELATION.equals(sTypes.get(0))
+        && this.detectWrongAnnotaton(incomingEdge))
       {
         return false;
       }
@@ -329,5 +335,26 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       STextualDS.class.getName());
 
     return null;
+  }
+
+  /**
+   * Returns false if the edge contains an annotation with value
+   * {@link RSTImpl#EDGE_TYPE_POINTING_REL}.
+   */
+  private boolean detectWrongAnnotaton(SRelation edge)
+  {
+    EList<SAnnotation> annos = edge.getSAnnotations();
+
+    for (SAnnotation anno : annos)
+    {
+      for (String value : ANNOTATION_VALUES)
+      {
+        if (value.equals(anno.getValueString()))
+        {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }
