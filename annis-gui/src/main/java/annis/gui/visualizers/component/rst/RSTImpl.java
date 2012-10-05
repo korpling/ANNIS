@@ -310,10 +310,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       return null;
     }
 
-    // check if it is a text data structure
+    /**
+     * Check if it is a text data structure. As described in the salt manual in
+     * chapter "5.8 More specific nodes and relations" the start and end point
+     * of a range of token is stored in superordinate node of type SSequentialDS
+     */
     if (sSequences.get(0).getSSequentialDS() instanceof STextualDS)
     {
-
       STextualDS text = ((STextualDS) sSequences.get(0).getSSequentialDS());
       int start = sSequences.get(0).getSStart();
       int end = sSequences.get(0).getSEnd();
