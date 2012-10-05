@@ -19,6 +19,8 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -100,19 +102,15 @@ public class BinaryServlet extends HttpServlet
     {
       log.debug("IOException in BinaryServlet", ex);
     }
-    finally
+    catch(ClientHandlerException ex)
     {
-      if(out != null)
-      {
-        try
-        {
-          out.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
+      log.error(null, ex);
+      response.setStatus(500);
+    }
+    catch(UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      response.setStatus(500);
     }
   }
 
