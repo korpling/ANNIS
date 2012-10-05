@@ -22,15 +22,14 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import java.io.File;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -176,6 +175,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
       server.setHandler(context);
+      server.setThreadPool(new ExecutorThreadPool());
       
       ServletContainer jerseyContainer = new ServletContainer(rc)
       {

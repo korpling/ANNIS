@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.Map;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -55,7 +56,22 @@ public class BinaryServlet extends HttpServlet
   private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
+  
+  private Client client;
 
+  @Override
+  public void init(ServletConfig config) throws ServletException
+  {
+    super.init(config);
+    
+    ClientConfig cc = new DefaultClientConfig(SaltProjectProvider.class);
+    cc.getProperties().put(ClientConfig.PROPERTY_THREADPOOL_SIZE, 10);
+    cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 500);
+    client = Client.create(cc);
+  }
+
+  
+  
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException
@@ -73,15 +89,13 @@ public class BinaryServlet extends HttpServlet
 
       String range = request.getHeader("Range");
 
-      ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
-      Client c = Client.create(rc);
 
       String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
       if(annisServiceURL == null)
       {
         throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
       }
-      WebResource annisRes = c.resource(annisServiceURL);
+      WebResource annisRes = client.resource(annisServiceURL);
 
       WebResource binaryRes = annisRes.path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
