@@ -68,6 +68,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   final String ANNOTATION_NAME = "cat";
   final String ANNOTATION_VALUE = "group";
   final String ANNOTATION_NAMESPACE = "default_ns";
+  final String EDGE_TYPE_POINTING_REL = "edge";
   private SDocumentGraph graph;
 
   private String transformSaltToJSON(VisualizerInput visInput)
@@ -176,11 +177,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       }
 
       // build strings
-      for (SToken tok : token)
+      for (int i = 0; i < token.size(); i++)
       {
-        String text = getText(tok);
-        sb.append(text);
-        log.debug("append: {}", text);
+        String text = getText(token.get(i));
+        if (i < token.size() - 1)
+        {
+          sb.append(text).append(" ");
+        }
+        else
+        {
+          sb.append(text);
+        }
       }
     }
 
@@ -260,7 +267,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
      */
     if ((sTypes = incomingEdge.getSTypes()) != null && sTypes.size() > 0)
     {
-      return true;
+      /**
+       * the pointing relations are modelled as dominance relations with type
+       * "edges", so we will have to exclude the "point relation" here
+       */
+      if (sTypes.size() == 1 && EDGE_TYPE_POINTING_REL.equals(sTypes.get(0)))
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
     }
     else
     {
