@@ -72,6 +72,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     "span", "multinuc"
   };
   private final String DANGEROUS_RELATION = "edge";
+  /**
+   * Create a unique id, for every RSTImpl instance, for building an unique html
+   * id, in the DOM.
+   */
+  private static int count = 0;
+  private final String visId;
   private SDocumentGraph graph;
 
   private String transformSaltToJSON(VisualizerInput visInput)
@@ -126,17 +132,24 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       log.error("writing json failed", ex);
     }
+//    getWindow().executeJavaScript("console.log(" + result.toString() + ");");
     return result.toString();
   }
 
   public RSTImpl(VisualizerInput visInput)
   {
+
+    //build id and increase count for every instance
+    visId = "rst_" + count;
+    count++;
+
+    // get the jit wrapper;
     jit = new JITWrapper();
     this.addComponent(jit);
 
+    // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
     jit.requestRepaint();
-
   }
 
   private JSONObject createJsonEntry(SNode currNode)
@@ -196,9 +209,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     try
     {
-      jsonData.put("id", currNode.getSId());
+      // build unique id, cause is used for an unique html element id.
+      jsonData.put("id", "node_" + visId + "_" + currNode.getSId());
       jsonData.put("name", currNode.getSName());
-      jsonData.put("data", token.size() == 0 ? "{}" : sb.toString());
+      if (token.size() > 0)
+      {
+        jsonData.put("data", new JSONObject("{sentence : \"" + sb.toString() + "\"}"));
+      }
+      else
+      {
+        jsonData.put("data", new JSONObject("{}"));
+      }
     }
     catch (JSONException ex)
     {
