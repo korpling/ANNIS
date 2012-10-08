@@ -45,9 +45,9 @@ public class VJITWrapper extends Widget implements Paintable
   private JSONObject jsonData;
   private JITConf config;
   // some css properties
-  protected String background = "#ECF0F6";
-  protected String width = "900px";
-  protected String height = "600px";
+  protected final String background = "#ECF0F6";
+  protected final String width = "900px";
+  protected final String height = "600px";
 
   public VJITWrapper()
   {
@@ -136,7 +136,10 @@ public class VJITWrapper extends Widget implements Paintable
 
   public native JITVisualization visualizationInit(JavaScriptObject config)/*-{
 
-    var st = {};    
+    // save this reference for reading inner fields in functions
+    var saveThis = this;
+
+    var st = {};
 
     //This method is called on DOM label creation.
     //Use this method to add event handlers and styles to
@@ -191,6 +194,11 @@ public class VJITWrapper extends Widget implements Paintable
           //how many children it has
           node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
         }
+      }
+      // if node contains a sentence, set it too the background color
+      if (node.data.sentence)
+      {
+        node.data.$color = saveThis.@annis.gui.widgets.gwt.client.VJITWrapper::background;
       }
     };
 
