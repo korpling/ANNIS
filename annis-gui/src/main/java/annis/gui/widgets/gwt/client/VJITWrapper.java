@@ -39,6 +39,7 @@ public class VJITWrapper extends Widget implements Paintable
    */
   private static int count = 0;
   private final String elementID;
+  // javascript overlay object for the visualization
   private JITVisualization visualization;
   // the json data for the visualization
   private JSONObject jsonData;
@@ -87,20 +88,20 @@ public class VJITWrapper extends Widget implements Paintable
       // do not need to update anything.
       return;
     }
-   
+
 
     if (uidl.hasAttribute("visData"))
     {
 
       jsonData = parseStringToJSON(uidl.getStringAttribute("visData"));
-     
+
       if (visualization == null)
       {
         visualization = visualizationInit(config.getJavaScriptObject());
       }
 
       if (jsonData != null)
-      {          
+      {
         visualization.loadJSON(jsonData.getJavaScriptObject());
         visualization.compute();
         visualization.onClick(visualization);
@@ -122,7 +123,7 @@ public class VJITWrapper extends Widget implements Paintable
    iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
    typeOfCanvas = typeof HTMLCanvasElement,
    nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-   textSupport = nativeCanvasSupport 
+   textSupport = nativeCanvasSupport
    && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
    //I'm setting this based on the fact that ExCanvas provides text support for IE
    //and that as of today iPhone/iPad current text support is lame
@@ -133,21 +134,88 @@ public class VJITWrapper extends Widget implements Paintable
    })();
    }-*/;
 
-  public native JITVisualization visualizationInit(JavaScriptObject config)/*-{   
-    
-    // add some methods too config    
-    config['onCreateLabel'] = function(label, node)
-    {
-      //add some styles to the node label
-      var style = label.style;
-      label.id = node.id;
-      label.innerHTML = node.name;
-    }
+  public native JITVisualization visualizationInit(JavaScriptObject config)/*-{
 
-    //init Spacetree
-    //Create a new ST instance
-    return new $wnd.$jit.ST(config);    
-  }-*/;  
+    var st = {};    
+
+    //This method is called on DOM label creation.
+    //Use this method to add event handlers and styles to
+    //your node.
+    config['onCreateLabel'] = function(label, node){
+
+      label.id = node.id;
+
+      // put the sentences into the label
+      console.log(node.data);
+      if(node.data.sentence){
+        label.innerHTML = node.data.sentence;
+      }
+      else{
+        label.innerHTML = node.name;
+      }
+
+      label.onclick = function(){
+        st.onClick(node.id);
+      };
+
+      //set label styles
+      var style = label.style;
+      style.width = 60 + 'px';
+      style.height = 17 + 'px';
+      style.cursor = 'pointer';
+      style.color = '#333';
+      style.fontSize = '0.8em';
+      style.textAlign= 'center';
+      style.paddingTop = '3px';
+    };
+
+    //This method is called right before plotting
+    //a node. It's useful for changing an individual node
+    //style properties before plotting it.
+    //The data properties prefixed with a dollar
+    //sign will override the global node style properties.
+    config['onBeforePlotNode'] = function(node){
+      //add some color to the nodes in the path between the
+      //root node and the selected node.
+      if (node.selected) {
+        node.data.$color = "#ff7";
+      }
+      else {
+        delete node.data.$color;
+        //if the node belongs to the last plotted level
+        if(!node.anySubnode("exist")) {
+          //count children number
+          var count = 0;
+          node.eachSubnode(function(n) { count++; });
+          //assign a node color based on
+          //how many children it has
+          node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
+        }
+      }
+    };
+
+    //This method is called right before plotting
+    //an edge. It's useful for changing an individual edge
+    //style properties before plotting it.
+    //Edge data proprties prefixed with a dollar sign will
+    //override the Edge global style properties.
+    config['onBeforePlotLine'] = function(adj){
+      if (adj.nodeFrom.selected && adj.nodeTo.selected) {
+        adj.data.$color = "#eed";
+        adj.data.$lineWidth = 3;
+      }
+      else {
+        delete adj.data.$color;
+        delete adj.data.$lineWidth;
+      }
+    };
+
+    //set animation transition type
+    config['transition'] = $wnd.$jit.Trans.Quart.easeInOut;
+
+    st = new $wnd.$jit.ST(config);
+    return st;
+   }-*/;
 
   public JSONObject parseStringToJSON(String jsonString)
   {
@@ -169,12 +237,23 @@ public class VJITWrapper extends Widget implements Paintable
   {
     config = new JITConf();
     config.setProperty("injectInto", elementID);
+    config.setProperty("orientation", "top");
+    config.setProperty("levelsToShow", 3);
 
+
+
+    // node config
     JITConf node = new JITConf();
     node.setProperty("overridable", true);
-    node.setProperty("width", "auto");
-    node.setProperty("height", "auto");
+    node.setProperty("width", 60);
+    node.setProperty("height", 20);
     node.setProperty("color", "#ccc");
-    config.setProperty("node", node);
+    config.setProperty("Node", node);
+
+    JITConf edge = new JITConf();
+    edge.setProperty("type", "bezier");
+    edge.setProperty("overridable", true);
+    config.setProperty("Edge", edge);
+
   }
 }
