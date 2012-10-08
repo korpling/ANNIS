@@ -18,7 +18,7 @@ package annis.gui.widgets.gwt.client;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * Wraps the visualization to java class.
+ * Wraps the visualization into a java class.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -30,14 +30,14 @@ public class JITVisualization extends JavaScriptObject
   }
 
   final public native void onClick(JITVisualization vis) /*-{
-   this.onClick(vis.root);
-   }-*/;
+     this.onClick(vis.root);
+  }-*/;
 
   final public native void compute() /*-{
-   this.compute();
-   }-*/;
+     this.compute();
+  }-*/;
 
-  final public native void loadJSON(JavaScriptObject json) /*-{
-   this.loadJSON(json);
-   }-*/;
+  final native void loadJSON(JavaScriptObject json) /*-{
+    this.loadJSON(json);
+  }-*/;
 }

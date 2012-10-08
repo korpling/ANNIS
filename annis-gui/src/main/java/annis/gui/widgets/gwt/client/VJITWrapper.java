@@ -18,7 +18,6 @@ package annis.gui.widgets.gwt.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.*;
-import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,7 +45,7 @@ public class VJITWrapper extends Widget implements Paintable
   private JITConf config;
   // some css properties
   protected String background = "#ECF0F6";
-  protected String width = "600px";
+  protected String width = "900px";
   protected String height = "600px";
 
   public VJITWrapper()
@@ -88,27 +87,23 @@ public class VJITWrapper extends Widget implements Paintable
       // do not need to update anything.
       return;
     }
-
+   
 
     if (uidl.hasAttribute("visData"))
     {
 
       jsonData = parseStringToJSON(uidl.getStringAttribute("visData"));
-
-      // TODO init the visualization
-//      if (visualization == null)
-//      {
-//        visualization = visualizationInit(config.getJavaScriptObject());
-//      }
+     
+      if (visualization == null)
+      {
+        visualization = visualizationInit(config.getJavaScriptObject());
+      }
 
       if (jsonData != null)
-      {
-        GWT.log("jsonData: " + jsonData.toString());
-        treeInit(elementID, jsonData.getJavaScriptObject(), config.getJavaScriptObject());
-        // does not work.
-//        visualization.loadJSON(jsonData.getJavaScriptObject());
-//        visualization.compute();
-//        visualization.onClick(visualization);
+      {          
+        visualization.loadJSON(jsonData.getJavaScriptObject());
+        visualization.compute();
+        visualization.onClick(visualization);
       }
       else
       {
@@ -140,44 +135,19 @@ public class VJITWrapper extends Widget implements Paintable
 
   public native JITVisualization visualizationInit(JavaScriptObject config)/*-{   
     
-   // add some methods too config    
-   config['onCreateLabel'] = function(label, node)
-   {
-   //add some styles to the node label
-   var style = label.style;
-   label.id = node.id;
-   label.innerHTML = node.name;
-   }
-    
-   //init Spacetree
-   //Create a new ST instance
-   return $wnd.$jit.ST(config);    
-   }-*/;
-
-  @Deprecated
-  public native void treeInit(String elementID, JavaScriptObject jsonData, JavaScriptObject config) /*-{   
+    // add some methods too config    
     config['onCreateLabel'] = function(label, node)
     {
       //add some styles to the node label
       var style = label.style;
-      label.id = elementID + ':label:' + node.id;
+      label.id = node.id;
       label.innerHTML = node.name;
     }
-   
-   //init Spacetree
-   //Create a new ST instance   
-   var st = new $wnd.$jit.ST(config);   
-   
-   //load json data
-   st.loadJSON(jsonData);
-   
-   //compute node positions and layout
-   st.compute();
-   
-   //Emulate a click on the root node.
-   st.onClick(st.root);
-   //end;
-   }-*/;
+
+    //init Spacetree
+    //Create a new ST instance
+    return new $wnd.$jit.ST(config);    
+  }-*/;  
 
   public JSONObject parseStringToJSON(String jsonString)
   {
@@ -202,8 +172,8 @@ public class VJITWrapper extends Widget implements Paintable
 
     JITConf node = new JITConf();
     node.setProperty("overridable", true);
-    node.setProperty("width", 200);
-    node.setProperty("height", 200);
+    node.setProperty("width", "auto");
+    node.setProperty("height", "auto");
     node.setProperty("color", "#ccc");
     config.setProperty("node", node);
   }
