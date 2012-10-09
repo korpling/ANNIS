@@ -395,6 +395,11 @@ public class VisualizerPanel extends CustomLayout
 
       btEntry.setIcon(ICON_EXPAND);
     }
+    else if(callback != null && vis instanceof LoadableVisualizer)
+    {
+      // direct call callback since the visualizer is already open
+      callback.visualizerLoaded((LoadableVisualizer) vis);
+    }
   }
 
   public String getHtmlID()
