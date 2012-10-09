@@ -17,6 +17,7 @@ package annis.gui.visualizers.component.rst;
 
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
+import com.google.gwt.json.client.JSONValue;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -72,6 +73,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     "span", "multinuc"
   };
   private final String DANGEROUS_RELATION = "edge";
+  private final static String TYPE = "type";
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
@@ -212,14 +214,23 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       // build unique id, cause is used for an unique html element id.
       jsonData.put("id", "node_" + visId + "_" + currNode.getSId());
       jsonData.put("name", currNode.getSName());
+
+      // additional data for labelling edges and rendering sentences
+      JSONObject data = new JSONObject();
+      String type = getIncomingEdgeTypeAnnotation(currNode);
+
       if (token.size() > 0)
       {
-        jsonData.put("data", new JSONObject("{sentence : \"" + sb.toString() + "\"}"));
+        data.put("sentence", sb.toString());
       }
-      else
+
+      if (type != null)
       {
-        jsonData.put("data", new JSONObject("{}"));
+        data.put("edgeType", type);
       }
+
+      jsonData.put("data", data);
+
     }
     catch (JSONException ex)
     {
@@ -377,5 +388,32 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       }
     }
     return true;
+  }
+
+  private String getIncomingEdgeTypeAnnotation(SNode node)
+  {
+    EList<Edge> edges = node.getSGraph().getOutEdges(node.getId());
+
+    for (Edge edge : edges)
+    {
+
+      if (edge instanceof SRelation)
+      {
+        EList<String> sTypes = ((SRelation) edge).getSTypes();
+
+
+        if (sTypes != null && sTypes.size() > 0)
+        {
+          EList<SAnnotation> annos = ((SRelation) edge).getSAnnotations();
+          //TODO find the difference between name and type
+          if (annos != null && annos.size() > 0)
+          {
+            return annos.get(0).getSValueSTEXT();
+          }
+        }
+      }
+    }
+
+    return null;
   }
 }
