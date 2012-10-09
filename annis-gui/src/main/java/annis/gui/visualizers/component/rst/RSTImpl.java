@@ -37,6 +37,7 @@ import java.util.Stack;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -217,16 +218,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
       // additional data for labelling edges and rendering sentences
       JSONObject data = new JSONObject();
-      String type = getIncomingEdgeTypeAnnotation(currNode);
+      JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
 
       if (token.size() > 0)
       {
         data.put("sentence", sb.toString());
       }
 
-      if (type != null)
+      if (edgesJSON != null)
       {
-        data.put("edgeType", type);
+        data.put("edges", edgesJSON);
       }
 
       jsonData.put("data", data);
@@ -390,30 +391,42 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return true;
   }
 
-  private String getIncomingEdgeTypeAnnotation(SNode node)
+  private JSONArray getIncomingEdgeTypeAnnotation(SNode node) throws JSONException
   {
     EList<Edge> edges = node.getSGraph().getOutEdges(node.getId());
+    EList<String> sTypes;
+    EList<SAnnotation> annos;
+    JSONArray edgeData = new JSONArray();    
 
     for (Edge edge : edges)
     {
 
       if (edge instanceof SRelation)
       {
-        EList<String> sTypes = ((SRelation) edge).getSTypes();
+        sTypes = ((SRelation) edge).getSTypes();
 
 
         if (sTypes != null && sTypes.size() > 0)
         {
-          EList<SAnnotation> annos = ((SRelation) edge).getSAnnotations();
-          //TODO find the difference between name and type
-          if (annos != null && annos.size() > 0)
+          JSONObject jsonEdge = new JSONObject();
+          edgeData.put(jsonEdge);
+          // asume that only one sType is defined
+          jsonEdge.put("sType", sTypes.get(0));
+          jsonEdge.put("from", node.getSId());
+          jsonEdge.put("to", ((SNode) ((SRelation) edge).getTarget()).getSId());
+          annos = ((SRelation) edge).getSAnnotations();
+
+          if (annos != null)
           {
-            return annos.get(0).getSValueSTEXT();
+            for (SAnnotation anno : annos)
+            {
+              jsonEdge.append("annotation", anno.getSValueSTEXT());
+            }
           }
         }
       }
     }
 
-    return null;
+    return edgeData;
   }
 }
