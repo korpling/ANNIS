@@ -399,7 +399,10 @@ public class VisualizerPanel extends CustomLayout
       
       btEntry.setIcon(ICON_COLLAPSE);    
       vis.setVisible(true);
-      addComponent(vis, "iframe");
+      if(getComponent("iframe") == null)
+      {
+        addComponent(vis, "iframe");
+      }
     }
     else
     {
@@ -407,14 +410,11 @@ public class VisualizerPanel extends CustomLayout
       
       if (vis != null)
       {
-//        if(vis instanceof MediaPlayer)
-//        {
-//          // stop, so it doesn't make a sound or uses any resources 
-//          // (like open HTTP requests)
-//          ((MediaPlayer) vis).stop();
-//        }
         vis.setVisible(false);
-        removeComponent(vis);
+        if(vis instanceof MediaPlayer)
+        {
+          removeComponent(vis);
+        }
       }
 
       btEntry.setIcon(ICON_EXPAND);
