@@ -119,6 +119,15 @@ public abstract class MediaPlayerBase extends AbstractComponent
       }
     }
   }
+
+  @Override
+  public void detach()
+  {
+    super.detach();
+    
+    wasLoaded = false;
+    sourcesAdded = false;
+  }
   
   
 

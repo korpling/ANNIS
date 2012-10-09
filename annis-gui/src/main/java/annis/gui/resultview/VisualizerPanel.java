@@ -369,7 +369,6 @@ public class VisualizerPanel extends CustomLayout
         try
         {
           vis = createComponent();
-          addComponent(vis, "iframe");
         }
         catch(Exception ex)
         {
@@ -400,6 +399,7 @@ public class VisualizerPanel extends CustomLayout
       
       btEntry.setIcon(ICON_COLLAPSE);    
       vis.setVisible(true);
+      addComponent(vis, "iframe");
     }
     else
     {
@@ -414,6 +414,7 @@ public class VisualizerPanel extends CustomLayout
 //          ((MediaPlayer) vis).stop();
 //        }
         vis.setVisible(false);
+        removeComponent(vis);
       }
 
       btEntry.setIcon(ICON_EXPAND);

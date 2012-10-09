@@ -55,6 +55,17 @@ public class VMediaPlayerBase extends Widget implements Paintable
     media.setLoop(false);
    
   }
+
+  @Override
+  protected void onUnload()
+  {
+    // stop playing and remove source so that the browser is really not holding
+    // any HTTP request open (hopefully)
+    media.pause();
+    media.setSrc("");
+  }
+  
+  
   
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
