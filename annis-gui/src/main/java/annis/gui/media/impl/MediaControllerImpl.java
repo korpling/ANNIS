@@ -87,7 +87,7 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void play(String resultID, final double startTime)
   {
-    pauseAll();
+//    pauseAll();
 
     lock.readLock().lock();
     try
@@ -96,10 +96,12 @@ public class MediaControllerImpl implements MediaController
 
       if (player != null)
       {
+        closeOtherPlayers(player);
+
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(false, new LoadableVisualizer.Callback() {
+          t.toggleVisualizer(true, new LoadableVisualizer.Callback() {
 
             @Override
             public void visualizerLoaded(LoadableVisualizer origin)
@@ -120,19 +122,22 @@ public class MediaControllerImpl implements MediaController
   @Override
   public void play(String resultID, final double startTime, final double endTime)
   {
-    pauseAll();
+//    pauseAll();
 
     lock.readLock().lock();
     try
     {
       final MediaPlayer player = getPlayerForResult(resultID);
 
+      
       if (player != null)
       {
+        closeOtherPlayers(player);
+        
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(false, new LoadableVisualizer.Callback() 
+          t.toggleVisualizer(true, new LoadableVisualizer.Callback() 
           {
             @Override
             public void visualizerLoaded(LoadableVisualizer origin)
@@ -149,6 +154,24 @@ public class MediaControllerImpl implements MediaController
     }
   }
 
+  public void closeOtherPlayers(MediaPlayer doNotCloseThisOne)
+  {
+    for (List<MediaPlayer> playersForID : mediaPlayers.values())
+    {
+      for (MediaPlayer player : playersForID)
+      {
+        if (player != doNotCloseThisOne)
+        {
+          VisualizationToggle t = visToggle.get(player);
+          if (t != null)
+          {
+            t.toggleVisualizer(false, null);
+          }
+        }
+      }
+    }
+  }
+  
   @Override
   public void pauseAll()
   {

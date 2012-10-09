@@ -25,6 +25,9 @@ public interface LoadableVisualizer
   
   public void clearCallbacks();
   
+  /** Return true if visualizer is ready. */
+  public boolean isLoaded();
+  
   public interface Callback
   {
     public void visualizerLoaded(LoadableVisualizer origin); 

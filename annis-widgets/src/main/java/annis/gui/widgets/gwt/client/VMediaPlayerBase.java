@@ -17,12 +17,10 @@ package annis.gui.widgets.gwt.client;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.MediaElement;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
-import com.vaadin.terminal.gwt.client.Util;
 import com.vaadin.terminal.gwt.client.VConsole;
 
 /**
@@ -33,6 +31,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
 {
   public static final String PLAY = "play";
   public static final String PAUSE = "pause";
+  public static final String STOP = "stop";
   public static final String SOURCE_URL = "url";
   public static final String MIME_TYPE = "mime_type";
   public static final String CANNOT_PLAY = "cannot_play";
@@ -117,6 +116,11 @@ public class VMediaPlayerBase extends Widget implements Paintable
     {
       media.pause();
     }
+    else if(uidl.hasAttribute(STOP))
+    {
+      media.pause();
+      media.setSrc("");
+    }
   }
   
   public String getMimeType()
@@ -127,14 +131,14 @@ public class VMediaPlayerBase extends Widget implements Paintable
     return null;
   };
   
-    private void metaDataWasLoaded()
+  private void metaDataWasLoaded()
+  {
+    if (gClient != null && paintableId != null)
     {
-      if(gClient != null && paintableId != null)
-      {
-        gClient.updateVariable(paintableId, PLAYER_LOADED, true, true);
-      }
+      gClient.updateVariable(paintableId, PLAYER_LOADED, true, true);
     }
-    
+  }
+
   
   
   private native void setEndTimeOnce(Element elem, double endTime) 

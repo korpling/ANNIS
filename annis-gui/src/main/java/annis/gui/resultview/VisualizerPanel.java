@@ -219,6 +219,7 @@ public class VisualizerPanel extends CustomLayout
     VisualizerInput input = createInput();
     
     Component c = this.visPlugin.createComponent(input, application);
+    c.setVisible(false);
     
     return c;
   }
@@ -342,21 +343,26 @@ public class VisualizerPanel extends CustomLayout
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(true, null);
+    toggleVisualizer(!visualizerIsVisible(), null);
   }
 
-  /**
-   * Opens and closes visualizer.
-   *
-   * @param collapse when collapse is false, the Visualizer would never be
-   * closed
-   */
   @Override
-  public void toggleVisualizer(boolean collapse, LoadableVisualizer.Callback callback)
+  public boolean visualizerIsVisible()
   {
-    if (btEntry.getIcon() == ICON_EXPAND)
+    if(vis == null || !vis.isVisible())
     {
+      return false;
+    }
+    return true;
+  }
 
+  
+  @Override
+  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
+  {
+    
+    if (visible)
+    {
       // check if it's necessary to create input
       if (visPlugin != null && vis == null)
       {
@@ -364,7 +370,6 @@ public class VisualizerPanel extends CustomLayout
         {
           vis = createComponent();
           addComponent(vis, "iframe");
-          
         }
         catch(Exception ex)
         {
@@ -376,30 +381,44 @@ public class VisualizerPanel extends CustomLayout
           log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
         }
       }
-      
+      // end if create input was needed
       
       if(callback != null && vis instanceof LoadableVisualizer)
       {
-        ((LoadableVisualizer) vis).addOnLoadCallBack(callback);
+        LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+        if(loadableVis.isLoaded())
+        {
+          // direct call callback since the visualizer is already ready
+          callback.visualizerLoaded((LoadableVisualizer) vis);
+        }
+        else
+        {
+          // add listener when player was fully loaded
+          loadableVis.addOnLoadCallBack(callback);
+        }
       }
-
-      btEntry.setIcon(ICON_COLLAPSE);
+      
+      btEntry.setIcon(ICON_COLLAPSE);    
       vis.setVisible(true);
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
+    else
     {
+      // hide
+      
       if (vis != null)
       {
+//        if(vis instanceof MediaPlayer)
+//        {
+//          // stop, so it doesn't make a sound or uses any resources 
+//          // (like open HTTP requests)
+//          ((MediaPlayer) vis).stop();
+//        }
         vis.setVisible(false);
       }
 
       btEntry.setIcon(ICON_EXPAND);
     }
-    else if(callback != null && vis instanceof LoadableVisualizer)
-    {
-      // direct call callback since the visualizer is already open
-      callback.visualizerLoaded((LoadableVisualizer) vis);
-    }
+
   }
 
   public String getHtmlID()

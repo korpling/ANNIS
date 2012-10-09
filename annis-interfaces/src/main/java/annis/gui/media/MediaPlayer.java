@@ -41,4 +41,9 @@ public interface MediaPlayer
    * Pause playback of the media file.
    */
   public void pause();
+  
+  /**
+   * Stop playback and release resources.
+   */
+  public void stop();
 }

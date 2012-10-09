@@ -21,6 +21,7 @@ import annis.gui.widgets.gwt.client.VMediaPlayerBase;
 import annis.visualizers.LoadableVisualizer;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.terminal.gwt.client.VConsole;
 import com.vaadin.ui.AbstractComponent;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class MediaPlayerBase extends AbstractComponent
 
   public enum PlayerAction
   {
-    idle, play, pause
+    idle, play, pause, stop
   }
   private PlayerAction action;
   private Double startTime;
@@ -44,6 +45,7 @@ public abstract class MediaPlayerBase extends AbstractComponent
   private boolean sourcesAdded;
   private String resourceURL;
   private String mimeType;
+  private boolean wasLoaded;
   
   private Set<Callback> callbacks;
   
@@ -52,6 +54,7 @@ public abstract class MediaPlayerBase extends AbstractComponent
     this.resourceURL = resourceURL;
     this.mimeType = mimeType;
     this.callbacks = new HashSet<Callback>();
+    this.wasLoaded = false;
   }
   
   
@@ -84,6 +87,16 @@ public abstract class MediaPlayerBase extends AbstractComponent
   }
 
   @Override
+  public void stop()
+  {
+    action = PlayerAction.stop;
+    
+    requestRepaint();
+  }
+  
+  
+
+  @Override
   public void changeVariables(Object source, Map<String, Object> variables)
   {
     super.changeVariables(source, variables);
@@ -99,6 +112,7 @@ public abstract class MediaPlayerBase extends AbstractComponent
     
     if((Boolean) variables.get(VMediaPlayerBase.PLAYER_LOADED) == Boolean.TRUE)
     {
+      wasLoaded = true;
       for(Callback c : callbacks)
       {
         c.visualizerLoaded(this);
@@ -113,12 +127,13 @@ public abstract class MediaPlayerBase extends AbstractComponent
   {
     super.paintContent(target);
     
-    if(!sourcesAdded)
+    if(target.isFullRepaint())
     {
-      target.addAttribute(VMediaPlayerBase.SOURCE_URL, resourceURL);
-      target.addAttribute(VMediaPlayerBase.MIME_TYPE, mimeType);
-      sourcesAdded = true;
+      sourcesAdded = false;
+      wasLoaded = false;
     }
+    
+    boolean sourcesNeeded = true;
     
     if(action == PlayerAction.play)
     {
@@ -139,6 +154,23 @@ public abstract class MediaPlayerBase extends AbstractComponent
       target.addAttribute(VMediaPlayerBase.PAUSE, true);
       action = PlayerAction.idle;
     }
+    else if(action == PlayerAction.stop)
+    {
+      target.addAttribute(VMediaPlayerBase.STOP, true);
+      action = PlayerAction.idle;   
+      // re-add source the next time someone wants to play something
+      sourcesAdded = false;
+      sourcesNeeded = false;
+    }
+    
+    if(sourcesNeeded && !sourcesAdded)
+    {
+      target.addAttribute(VMediaPlayerBase.SOURCE_URL, resourceURL);
+      target.addAttribute(VMediaPlayerBase.MIME_TYPE, mimeType);
+      sourcesAdded = true;
+    }
+    
+    
   }
 
   @Override
@@ -153,10 +185,11 @@ public abstract class MediaPlayerBase extends AbstractComponent
     this.callbacks.clear();
   }
 
-  
-  
-  
-  
-  
+  @Override
+  public boolean isLoaded()
+  {
+    return wasLoaded;
+  }
+
   
 }

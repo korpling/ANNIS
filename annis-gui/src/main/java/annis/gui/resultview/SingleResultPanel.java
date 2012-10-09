@@ -190,7 +190,7 @@ public class SingleResultPanel extends CssLayout implements
 
       for (VisualizerPanel p : openVisualizers)
       {
-        p.toggleVisualizer(false, null);
+        p.toggleVisualizer(true, null);
       }
       
     }

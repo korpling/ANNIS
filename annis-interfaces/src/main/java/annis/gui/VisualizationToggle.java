@@ -24,10 +24,12 @@ import annis.visualizers.LoadableVisualizer;
 public interface VisualizationToggle
 {
   /**
-   * Opens and closes visualizer.
+   * Shows and hides the visualizer.
    *
-   * @param collapse when collapse is false, the Visualizer would never be
-   * closed
+   * @param visible 
    */
-  public void toggleVisualizer(boolean collapse, LoadableVisualizer.Callback callback);
+  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback);
+  
+  /** Returns wether the visualization is visible. */
+  public boolean visualizerIsVisible();
 }
