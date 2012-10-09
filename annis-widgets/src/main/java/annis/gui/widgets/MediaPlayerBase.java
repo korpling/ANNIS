@@ -127,6 +127,9 @@ public abstract class MediaPlayerBase extends AbstractComponent
     
     wasLoaded = false;
     sourcesAdded = false;
+    
+    startTime = null;
+    endTime = null;
   }
   
   
