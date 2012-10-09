@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
-
-import annis.visualizers.LoadableVisualizer;
+package annis.visualizers;
 
 /**
- *
- * @author thomas
+ * A visualizer that can callback their owners when their are loaded.
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public interface VisualizationToggle
+public interface LoadableVisualizer
 {
-  /**
-   * Opens and closes visualizer.
-   *
-   * @param collapse when collapse is false, the Visualizer would never be
-   * closed
-   */
-  public void toggleVisualizer(boolean collapse, LoadableVisualizer.Callback callback);
+  public void addOnLoadCallBack(Callback callback);
+  
+  public void clearCallbacks();
+  
+  public interface Callback
+  {
+    public void visualizerLoaded(LoadableVisualizer origin); 
+  }
 }

@@ -18,6 +18,7 @@ package annis.gui.media.impl;
 import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaPlayer;
+import annis.visualizers.LoadableVisualizer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,24 +85,30 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void play(String resultID, double startTime)
+  public void play(String resultID, final double startTime)
   {
     pauseAll();
 
     lock.readLock().lock();
     try
     {
-      MediaPlayer player = getPlayerForResult( resultID);
+      final MediaPlayer player = getPlayerForResult( resultID);
 
       if (player != null)
       {
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(false);
+          t.toggleVisualizer(false, new LoadableVisualizer.Callback() {
+
+            @Override
+            public void visualizerLoaded(LoadableVisualizer origin)
+            {
+              player.play(startTime);
+            }
+          });
         }
 
-        player.play(startTime);
       }
     }
     finally
@@ -111,23 +118,29 @@ public class MediaControllerImpl implements MediaController
   }
 
   @Override
-  public void play(String resultID, double startTime, double endTime)
+  public void play(String resultID, final double startTime, final double endTime)
   {
     pauseAll();
 
     lock.readLock().lock();
     try
     {
-      MediaPlayer player = getPlayerForResult(resultID);
+      final MediaPlayer player = getPlayerForResult(resultID);
 
       if (player != null)
       {
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(false);
+          t.toggleVisualizer(false, new LoadableVisualizer.Callback() 
+          {
+            @Override
+            public void visualizerLoaded(LoadableVisualizer origin)
+            {
+              player.play(startTime, endTime);
+            }
+          });
         }
-        player.play(startTime, endTime);
       }
     }
     finally

@@ -18,10 +18,15 @@ package annis.gui.resultview;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.VisualizationToggle;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
+import annis.gui.media.MediaPlayer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
+import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.Application;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
@@ -55,7 +60,6 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
- * TODO test, if this works with mediaplayer
  */
 public class VisualizerPanel extends CustomLayout 
   implements Button.ClickListener, VisualizationToggle
@@ -83,7 +87,6 @@ public class VisualizerPanel extends CustomLayout
   private Set<String> visibleTokenAnnos;
   private STextualDS text;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
   private boolean showTextID;
   private final String PERMANENT = "permanent";
   private final String ISVISIBLE = "visible";
@@ -184,7 +187,7 @@ public class VisualizerPanel extends CustomLayout
         // create the visualizer and calc input
         try
         {
-          vis = this.visPlugin.createComponent(createInput(), getApplication());
+          vis = createComponent();
           vis.setVisible(true);
           addComponent(vis, "iframe");
         }
@@ -202,12 +205,22 @@ public class VisualizerPanel extends CustomLayout
         if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
-          vis.addStyleName("hidden");
+          vis.setVisible(false);
         }
         
       }
     }
 
+  }
+  
+  private Component createComponent()
+  {
+    Application application = getApplication();
+    VisualizerInput input = createInput();
+    
+    Component c = this.visPlugin.createComponent(input, application);
+    
+    return c;
   }
 
   private VisualizerInput createInput()
@@ -299,20 +312,20 @@ public class VisualizerPanel extends CustomLayout
 
   private SaltProject getText(String toplevelCorpusName, String documentName)
   {
-    SaltProject text = null;
+    SaltProject txt = null;
     try
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      text = annisResource.path("graphs").path(toplevelCorpusName).path(
+      txt = annisResource.path("graphs").path(toplevelCorpusName).path(
         documentName).get(SaltProject.class);
     }
     catch (Exception e)
     {
       log.error("General remote service exception", e);
     }
-    return text;
+    return txt;
   }
 
   @Override
@@ -329,7 +342,7 @@ public class VisualizerPanel extends CustomLayout
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(true);
+    toggleVisualizer(true, null);
   }
 
   /**
@@ -339,14 +352,8 @@ public class VisualizerPanel extends CustomLayout
    * closed
    */
   @Override
-  public void toggleVisualizer(boolean collapse)
+  public void toggleVisualizer(boolean collapse, LoadableVisualizer.Callback callback)
   {
-
-    if (resource != null && collapse)
-    {
-      getApplication().removeResource(resource);
-    }
-
     if (btEntry.getIcon() == ICON_EXPAND)
     {
 
@@ -355,8 +362,9 @@ public class VisualizerPanel extends CustomLayout
       {
         try
         {
-          vis = this.visPlugin.createComponent(createInput(), getApplication());
+          vis = createComponent();
           addComponent(vis, "iframe");
+          
         }
         catch(Exception ex)
         {
@@ -368,10 +376,15 @@ public class VisualizerPanel extends CustomLayout
           log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
         }
       }
+      
+      
+      if(callback != null && vis instanceof LoadableVisualizer)
+      {
+        ((LoadableVisualizer) vis).addOnLoadCallBack(callback);
+      }
 
       btEntry.setIcon(ICON_COLLAPSE);
       vis.setVisible(true);
-      vis.removeStyleName("hidden");
     }
     else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
     {

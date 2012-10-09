@@ -18,16 +18,20 @@ package annis.gui.widgets;
 import annis.gui.media.MediaPlayer;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.widgets.gwt.client.VMediaPlayerBase;
+import annis.visualizers.LoadableVisualizer;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public abstract class MediaPlayerBase extends AbstractComponent implements MediaPlayer
+public abstract class MediaPlayerBase extends AbstractComponent 
+  implements MediaPlayer, LoadableVisualizer
 {
 
   public enum PlayerAction
@@ -41,11 +45,16 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   private String resourceURL;
   private String mimeType;
   
+  private Set<Callback> callbacks;
+  
   public MediaPlayerBase(String resourceURL, String mimeType)
   {
     this.resourceURL = resourceURL;
     this.mimeType = mimeType;
+    this.callbacks = new HashSet<Callback>();
   }
+  
+  
   
   @Override
   public void play(double start)
@@ -79,12 +88,20 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
   {
     super.changeVariables(source, variables);
     
-    if(variables.containsKey("cannot_play") && (Boolean) variables.get("cannot_play") == true)
+    if((Boolean) variables.get(VMediaPlayerBase.CANNOT_PLAY) == Boolean.TRUE)
     {     
       
       if(getWindow() instanceof MimeTypeErrorListener)
       {
         ((MimeTypeErrorListener) getWindow()).notifyCannotPlayMimeType(mimeType);
+      }
+    }
+    
+    if((Boolean) variables.get(VMediaPlayerBase.PLAYER_LOADED) == Boolean.TRUE)
+    {
+      for(Callback c : callbacks)
+      {
+        c.visualizerLoaded(this);
       }
     }
   }
@@ -98,8 +115,8 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
     
     if(!sourcesAdded)
     {
-      target.addAttribute("url", resourceURL);
-      target.addAttribute("mime_type", mimeType);
+      target.addAttribute(VMediaPlayerBase.SOURCE_URL, resourceURL);
+      target.addAttribute(VMediaPlayerBase.MIME_TYPE, mimeType);
       sourcesAdded = true;
     }
     
@@ -123,6 +140,23 @@ public abstract class MediaPlayerBase extends AbstractComponent implements Media
       action = PlayerAction.idle;
     }
   }
+
+  @Override
+  public void addOnLoadCallBack(Callback callback)
+  {
+    this.callbacks.add(callback);
+  }
+
+  @Override
+  public void clearCallbacks()
+  {
+    this.callbacks.clear();
+  }
+
+  
+  
+  
+  
   
   
 }

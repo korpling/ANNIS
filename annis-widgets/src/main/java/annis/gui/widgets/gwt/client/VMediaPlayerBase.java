@@ -17,10 +17,12 @@ package annis.gui.widgets.gwt.client;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.MediaElement;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.Util;
 import com.vaadin.terminal.gwt.client.VConsole;
 
 /**
@@ -34,6 +36,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
   public static final String SOURCE_URL = "url";
   public static final String MIME_TYPE = "mime_type";
   public static final String CANNOT_PLAY = "cannot_play";
+  public static final String PLAYER_LOADED = "player_loaded";
   
   private MediaElement media;
   
@@ -51,6 +54,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
     media.setAutoplay(false);
     media.setPreload(MediaElement.PRELOAD_METADATA);
     media.setLoop(false);
+   
   }
   
   @Override
@@ -76,6 +80,8 @@ public class VMediaPlayerBase extends Widget implements Paintable
     
     if(uidl.hasAttribute(SOURCE_URL))
     {
+      registerMetadataLoadedEvent(media);
+      
       if(uidl.hasAttribute(MIME_TYPE))
       {
         VConsole.log("canPlayType value is \"" + media.canPlayType(uidl.getStringAttribute(MIME_TYPE)) + "\"");
@@ -121,6 +127,15 @@ public class VMediaPlayerBase extends Widget implements Paintable
     return null;
   };
   
+    private void metaDataWasLoaded()
+    {
+      if(gClient != null && paintableId != null)
+      {
+        gClient.updateVariable(paintableId, PLAYER_LOADED, true, true);
+      }
+    }
+    
+  
   
   private native void setEndTimeOnce(Element elem, double endTime) 
   /*-{
@@ -137,6 +152,17 @@ public class VMediaPlayerBase extends Widget implements Paintable
     {
       media.off();
     }); 
+  }-*/;
+  
+  private native void registerMetadataLoadedEvent(Element el)
+  /*-{
+      var media = $wnd.$(el);
+      var self = this;
+      
+      media.on('loadedmetadata', $entry(function(e) 
+      {
+        self.@annis.gui.widgets.gwt.client.VMediaPlayerBase::metaDataWasLoaded()();
+      }));
   }-*/;
 
   public MediaElement getMedia()
