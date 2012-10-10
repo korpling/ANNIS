@@ -392,6 +392,7 @@ public class VisualizerPanel extends CustomLayout
         }
         else
         {
+          loadableVis.clearCallbacks();
           // add listener when player was fully loaded
           loadableVis.addOnLoadCallBack(callback);
         }
