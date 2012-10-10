@@ -28,7 +28,6 @@ import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.grid.AnnotationGrid;
 import com.vaadin.Application;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -55,6 +54,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -336,7 +336,16 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         mergeAllRowsIfPossible(e.getValue());
       }
       
-      // 3. split up events if they have gaps
+      // 3. sort events on one row by left token index
+      for(Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet())
+      {
+        for(Row r : e.getValue())
+        {
+          sortEventsByTokenIndex(r);
+        }
+      }
+      
+      // 4. split up events if they have gaps
       for(Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet())
       {
         for(Row r : e.getValue())
@@ -368,13 +377,26 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         
         // sort the coveredIDs
         LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.getCoveredIDs());
-        Collections.sort(sortedCoveredToken, new Comparator<String>() {
-
+        Collections.sort(sortedCoveredToken, new Comparator<String>() 
+        {
           @Override
           public int compare(String o1, String o2)
           {
             SNode node1 = graph.getSNode(o1);
             SNode node2 = graph.getSNode(o2);
+            
+            if (node1 == node2)
+            {
+              return 0;
+            }
+            if (node1 == null)
+            {
+              return -1;
+            }
+            if (node2 == null)
+            {
+              return +1;
+            }
             
             long tokenIndex1 = node1.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
             long tokenIndex2 = node2.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
@@ -428,6 +450,36 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         }
         
       }
+    }
+    
+    /**
+     * Sort events of a row.
+     * The sorting is depending on the left value of the event
+     * @param row 
+     */
+    private void sortEventsByTokenIndex(Row row)
+    {
+      Collections.sort(row.getEvents(), new Comparator<GridEvent>() 
+      {
+        @Override
+        public int compare(GridEvent o1, GridEvent o2)
+        {
+          if (o1 == o2)
+          {
+            return 0;
+          }
+          if (o1 == null)
+          {
+            return -1;
+          }
+          if (o2 == null)
+          {
+            return +1;
+          }
+          
+          return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
+        }
+      });
     }
     
     
