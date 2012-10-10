@@ -213,7 +213,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     try
     {
       // build unique id, cause is used for an unique html element id.
-      jsonData.put("id", "node_" + visId + "_" + currNode.getSId());
+      jsonData.put("id", getUniqueStringId(currNode));
       jsonData.put("name", currNode.getSName());
 
       // additional data for labelling edges and rendering sentences
@@ -393,27 +393,38 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   private JSONArray getIncomingEdgeTypeAnnotation(SNode node) throws JSONException
   {
-    EList<Edge> edges = node.getSGraph().getOutEdges(node.getId());
+    EList<Edge> edges = node.getSGraph().getInEdges(node.getId());
     EList<String> sTypes;
     EList<SAnnotation> annos;
-    JSONArray edgeData = new JSONArray();    
+    JSONArray edgeData = new JSONArray();
 
     for (Edge edge : edges)
     {
+
 
       if (edge instanceof SRelation)
       {
         sTypes = ((SRelation) edge).getSTypes();
 
 
-        if (sTypes != null && sTypes.size() > 0)
+        if (sTypes != null && sTypes.size() > 0 && isPointingRelation(edge))
         {
           JSONObject jsonEdge = new JSONObject();
           edgeData.put(jsonEdge);
           // asume that only one sType is defined
           jsonEdge.put("sType", sTypes.get(0));
-          jsonEdge.put("from", node.getSId());
-          jsonEdge.put("to", ((SNode) ((SRelation) edge).getTarget()).getSId());
+          jsonEdge.put("from", getUniqueStringId(node));
+
+          if (((SRelation) edge).getTarget() instanceof SNode)
+          {
+            jsonEdge.put("to",
+              getUniqueStringId((SNode) ((SRelation) edge).getSource()));
+          }
+          else
+          {
+            throw new JSONException("could not cast to SNode");
+          }
+
           annos = ((SRelation) edge).getSAnnotations();
 
           if (annos != null)
@@ -428,5 +439,35 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     }
 
     return edgeData;
+  }
+
+  // used for html ids
+  private String getUniqueStringId(SNode node)
+  {
+    return visId + "_" + node.getSName();
+  }
+
+  private boolean isPointingRelation(Edge edge)
+  {
+    EList<SAnnotation> annos;
+    if (edge instanceof SRelation)
+    {
+      annos = ((SRelation) edge).getSAnnotations();
+
+      if (annos != null)
+      {
+        for (SAnnotation anno : annos)
+        {
+          for (String span : ANNOTATION_VALUES)
+          {
+            if (span.equals(anno.getSValueSTEXT()))
+            {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
 }
