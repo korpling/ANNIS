@@ -430,23 +430,22 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           lastTokenIndex = tokenIndex;
         } // end for each covered token id
         
-        GridEvent lastEvent = event;
         for(GridEvent gap : gaps)
         {
+          // remember the old right value
+          int oldRight = event.getRight();
+          
           // shorten last event
-          lastEvent.setRight(gap.getLeft()-1);
+          event.setRight(gap.getLeft()-1);
           
           // insert the real gap
           itEvents.add(gap);
           
           // insert a new event node that covers the rest of the event
           GridEvent after = new GridEvent(event.getId() + "_after", 
-            gap.getRight()+1, event.getRight(), event.getValue());
+            gap.getRight()+1, oldRight, event.getValue());
           after.getCoveredIDs().addAll(event.getCoveredIDs());
           itEvents.add(after);
-          
-          // use this event for the next iteration
-          lastEvent = after;
         }
         
       }
