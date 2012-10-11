@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>6.8.2</vaadin.version>
+    <vaadin.version>6.8.4</vaadin.version>
     <gwt.version>2.3.0</gwt.version>
     <gwt.plugin.version>2.2.0</gwt.plugin.version>
   </properties>
@@ -75,7 +75,7 @@
         <configuration>
           <!-- if you don't specify any modules, the plugin will find them -->
           <!-- <modules> <module>annis.gui.widgets.gwt.MyWidgetSet</module> </modules> -->
-          <webappDirectory>${project.build.directory}/${project.build.finalName}/VAADIN/widgetsets</webappDirectory>
+          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets</webappDirectory>
           <!-- On Mac running Snow Leopard, add "-d32" -->
           <!-- This causes error messages (but build works) in phase "package": two processes would use the same debug 
             port -->
