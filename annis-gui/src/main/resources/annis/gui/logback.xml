@@ -21,7 +21,7 @@
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg \(%file:%line\)%n</Pattern>
     </layout>
 
-    <file>${webappHome}/log/annis-gui.log</file>
+    <file>${webappHome}/WEB-INF/log/annis-gui.log</file>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>server.%d{yyyy-MM-dd}.log</FileNamePattern>
