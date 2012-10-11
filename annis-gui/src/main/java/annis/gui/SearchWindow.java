@@ -24,6 +24,7 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.ThemeResource;
@@ -253,11 +254,15 @@ public class SearchWindow extends Window
   {
     super.attach();
 
-    this.bugEMailAddress = getApplication().getProperty("bug-e-mail");
-    if("".equals(this.bugEMailAddress))
+    String bugmail = getApplication().getProperty("bug-e-mail");
+    if(bugmail != null && !bugmail.isEmpty() 
+      && !bugmail.startsWith("${")
+      && new EmailValidator("").isValid(bugmail))
     {
-      this.bugEMailAddress = null;
+      this.bugEMailAddress = bugmail;
     }
+    
+    
     btBugReport.setVisible(this.bugEMailAddress != null);
     
     initSecurityManager();

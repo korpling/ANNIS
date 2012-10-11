@@ -44,6 +44,24 @@
     <plugins>
    
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <webResources>
+            <webResource>
+              <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+              <includes>
+                <include>web.xml</include>
+              </includes>
+              <targetPath>WEB-INF</targetPath>
+              <filtering>true</filtering>
+            </webResource>
+          </webResources>
+        </configuration>
+      </plugin>
+      
+      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>2.6</version>
         <executions>
