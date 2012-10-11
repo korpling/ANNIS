@@ -18,11 +18,12 @@ package annis.gui;
 import com.vaadin.Application;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import javax.activation.FileDataSource;
 import org.apache.commons.mail.*;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +44,7 @@ public class ReportBugPanel extends Panel
   private TextField txtMail;
   private Button btSubmit;
   private Button btCancel;
-  private final Lock screenDumpLock = new ReentrantLock();
-
+  
   public ReportBugPanel(Application app, final String bugEMailAddress, final byte[] screenImage)
   {
     
@@ -192,27 +192,26 @@ public class ReportBugPanel extends Panel
       sbMsg.append(form.getField("description").getValue().toString());
       mail.setMsg(sbMsg.toString());
 
-      screenDumpLock.lock();
-      try
+      if (screenImage != null)
       {
-        if (screenImage != null)
+        try
         {
-          try
-          {
-            mail.attach(new ByteArrayDataSource(screenImage, "image/png"),
-              "screendump.png", "");
-         }
-          catch (IOException ex)
-          {
-           log.error(null, ex);
-          }
+          mail.attach(new ByteArrayDataSource(screenImage, "image/png"),
+            "screendump.png", "Screenshot of the browser content at time of bug report");
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+        
+        WebApplicationContext context = (WebApplicationContext) getApplication().getContext();
+        File logfile = new File(context.getHttpSession().getServletContext().getRealPath("/WEB-INF/log/annis-gui.log"));
+        if(logfile.exists() && logfile.isFile() && logfile.canRead())
+        {
+          mail.attach(new FileDataSource(logfile), "annis-gui.log", "Logfile of the GUI (shared by all users)");
         }
       }
-      finally
-      {
-        screenDumpLock.unlock();
-      }
-
+    
       mail.send();
 
     }

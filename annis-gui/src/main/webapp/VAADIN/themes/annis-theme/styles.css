@@ -119,6 +119,11 @@ textarea.query {
   color: rgb(255,69,0);
 }
 
+.v-form-errormessage {
+  color: red;
+  font-weight: bold;
+}
+
 /* HACKS (or workarounds for browser/vaadin bugs) */
 
 /* 
