@@ -123,6 +123,7 @@ public class SearchWindow extends Window
 
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
     btBugReport.addListener(new Button.ClickListener()
     {
@@ -130,13 +131,13 @@ public class SearchWindow extends Window
       @Override
       public void buttonClick(ClickEvent event)
       {
-
+        btBugReport.setCaption("bug report is initialized...");
+        
         // make screenshot
         screenShot.makeScreenshot(finalThis);
-
       }
     });
-
+    
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
     lblUserName.setHeight("-1px");
@@ -484,6 +485,9 @@ public class SearchWindow extends Window
   @Override
   public void screenshotReceived(byte[] imageData)
   {
+    btBugReport.setEnabled(true);
+    btBugReport.setCaption("Report Bug");
+    
     if(bugEMailAddress != null)
     {
       ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
