@@ -27,7 +27,7 @@
      for webkit based browsers including Google Chrome.
     -->
     
-   <set-property name="user.agent" value="gecko1_8,safari"/>
+<!--   <set-property name="user.agent" value="gecko1_8,safari"/> -->
     
     <inherits name="com.google.common.collect.Collect" />
     
