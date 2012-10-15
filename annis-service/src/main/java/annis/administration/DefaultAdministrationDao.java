@@ -275,6 +275,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     
     insertCorpus();
     
+    computeSegmentationNames(corpusID);
     computeCorpusPath(corpusID);
     
     createAnnotations(corpusID);
@@ -678,6 +679,14 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("computing path information of the corpus tree for corpus with ID "
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
+  }
+  
+  void computeSegmentationNames(long toplevelCorpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", toplevelCorpusID);
+    log.info("colllecting all segmentation names available in the toplevel corpus with ID "
+      + toplevelCorpusID);
+    executeSqlFromScript("compute_segmentation_names.sql", args);
   }
   
   protected void adjustRankPrePost()

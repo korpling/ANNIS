@@ -15,7 +15,8 @@ CREATE TABLE corpus
   pre        bigint NOT NULL UNIQUE,
   post       bigint NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
-  path_name  varchar[]
+  path_name  varchar[],
+  seg_names varchar[] -- list of all segmentation names in this corpus (only set for toplevel corpora)
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
