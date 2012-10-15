@@ -52,9 +52,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -94,6 +95,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(GridVisualizerComponent.class);
     
     public static final String MAPPING_ANNOS_KEY = "annos";
+    public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
     
     private AnnotationGrid grid;
@@ -144,6 +146,30 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         for(String s : split)
         {
           annos.add(s.trim());
+        }
+      }
+      
+      // filter annotation names by regular expression if this was given as mapping
+      String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+      if(regexFilterRaw != null)
+      {
+        try
+        {
+          Pattern regexFilter = Pattern.compile(regexFilterRaw);
+          ListIterator<String> itAnnos = annos.listIterator();
+          while(itAnnos.hasNext())
+          {
+            String a = itAnnos.next();
+            // remove entry if not matching
+            if(!regexFilter.matcher(a).matches())
+            {
+              itAnnos.remove();
+            }
+          }
+        }
+        catch(PatternSyntaxException ex)
+        {
+          log.warn("invalid regular expression in mapping for grid visualizer", ex);
         }
       }
       
