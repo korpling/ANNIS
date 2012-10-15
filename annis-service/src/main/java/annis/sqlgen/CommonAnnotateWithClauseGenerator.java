@@ -204,10 +204,10 @@ public class CommonAnnotateWithClauseGenerator
         sb.append(k);
       }
       sb.append(", matches.n,\n");
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(" - ").append(annoQueryData.
+      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_index")).append(" - ").append(annoQueryData.
         getLeft()).append(" AS \"min\",\n");
       sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE,
-        "seg_right")).append(" + ").append(annoQueryData.getRight()).append(
+        "seg_index")).append(" + ").append(annoQueryData.getRight()).append(
         " AS \"max\",\n");
       sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
         " AS \"text\", \n");
@@ -349,9 +349,9 @@ public class CommonAnnotateWithClauseGenerator
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(
       " = ").append(coveredName).append(".\"corpus\" AND\n");
 
-    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_left")).append(
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_index")).append(
       " <= ").append(coveredName).append(".\"max\" AND\n");
-    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_right")).append(
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_index")).append(
       " >= ").append(coveredName).append(".\"min\" AND\n");
     
     sb.append(indent3).append("(").append(coveredName)

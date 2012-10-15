@@ -135,15 +135,10 @@ CREATE INDEX idx__facts_seg_name_index__:id
   USING btree
   (seg_name);
 
-CREATE INDEX idx__facts_seg_left_index__:id
+CREATE INDEX idx__facts_seg_index_index__:id
   ON facts_:id
   USING btree
-  (seg_left);
-
-CREATE INDEX idx__facts_seg_right_index__:id
-  ON facts_:id
-  USING btree
-  (seg_right);
+  (seg_index);
 
 CREATE INDEX idx__facts_span__:id
   ON facts_:id

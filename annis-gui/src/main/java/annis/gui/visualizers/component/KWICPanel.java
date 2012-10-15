@@ -189,7 +189,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
         SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
           segmentationName == null ? AnnisConstants.FEAT_TOKENINDEX
-          : AnnisConstants.FEAT_SEGLEFT);
+          : AnnisConstants.FEAT_SEGINDEX);
 
         if (tokenText == text)
         {

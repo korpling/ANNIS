@@ -79,8 +79,7 @@ CREATE TABLE facts_node (
   left_token integer,
   right_token integer,
   seg_name varchar,
-  seg_left integer,
-  seg_right integer,
+  seg_index integer,
   node_anno_ref bigint REFERENCES annotation_pool(id),
   n_sample boolean,
   PRIMARY KEY (fid)

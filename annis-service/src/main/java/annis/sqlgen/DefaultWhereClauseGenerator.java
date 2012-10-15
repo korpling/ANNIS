@@ -24,7 +24,6 @@ import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
@@ -47,7 +46,6 @@ import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
-import annis.sqlgen.model.RangedJoin;
 import annis.sqlgen.model.RankTableJoin;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
@@ -244,8 +242,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     int min = join.getMinDistance();
     int max = join.getMaxDistance();
 
-    String left = join.getSegmentationName() == null ? "left_token" : "seg_left";
-    String right = join.getSegmentationName() == null ? "right_token" : "seg_right";
+    String left = join.getSegmentationName() == null ? "left_token" : "seg_index";
+    String right = join.getSegmentationName() == null ? "right_token" : "seg_index";
     
     // we are using a special segmentation
     if(join.getSegmentationName() != null)

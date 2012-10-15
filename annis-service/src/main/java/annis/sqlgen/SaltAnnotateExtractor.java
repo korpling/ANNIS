@@ -294,8 +294,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
       addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
       addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
-      addLongSFeature(node, resultSet, FEAT_SEGLEFT, "node", "seg_left");
-      addLongSFeature(node, resultSet, FEAT_SEGRIGHT, "node", "seg_right");
+      addLongSFeature(node, resultSet, FEAT_SEGINDEX, "node", "seg_index");
       addStringSFeature(node, resultSet, FEAT_SEGNAME, "node", "seg_name");
      
       
@@ -345,19 +344,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     String segName = stringValue(resultSet, "node", "seg_name");
     if(segName != null)
     {
-      long left = longValue(resultSet, "node", "seg_left");
-      long right = longValue(resultSet, "node", "seg_right");
+      long left = longValue(resultSet, "node", "seg_index");
       // only nodes that might be valid leafs
       // since we are sorting everything by preorder the real leafs will be the
       // last ones
-      if(left == right)
+      if(!nodeBySegmentationPath.containsKey(segName))
       {
-        if(!nodeBySegmentationPath.containsKey(segName))
-        {
-          nodeBySegmentationPath.put(segName, new TreeMap<Long, String>());
-        }
-        nodeBySegmentationPath.get(segName).put(left, node.getSId());
-      } // end if       
+        nodeBySegmentationPath.put(segName, new TreeMap<Long, String>());
+      }
+      nodeBySegmentationPath.get(segName).put(left, node.getSId());
+
     }
     
     // TODO: what more do we have to do?

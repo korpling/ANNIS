@@ -92,8 +92,7 @@ INSERT INTO facts_node_:id
   left_token,
   right_token,
   seg_name,
-  seg_left,
-  seg_right,
+  seg_index,
   node_anno_ref,
   n_sample
 )
@@ -119,8 +118,7 @@ FROM
     _node.left_token AS left_token,
     _node.right_token AS right_token,
     _node.seg_name AS seg_name,
-    _node.seg_left AS seg_left,
-    _node.seg_right AS seg_right,
+    _node.seg_left AS seg_index,
     (SELECT id FROM annotation_pool_:id AS na 
       WHERE na.namespace IS NOT DISTINCT FROM _node_annotation.namespace
         AND na."name" = _node_annotation."name"

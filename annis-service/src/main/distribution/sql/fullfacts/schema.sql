@@ -66,8 +66,7 @@ CREATE TABLE facts
   left_token  integer,
   right_token  integer,
   seg_name varchar,
-  seg_left integer,
-  seg_right integer,
+  seg_index integer,
 
   pre        bigint,
   post      bigint,
