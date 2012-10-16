@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.dao.objects.AnnotatedMatch;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.util.HashMap;

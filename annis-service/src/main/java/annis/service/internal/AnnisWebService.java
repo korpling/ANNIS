@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
+import annis.dao.objects.AnnotatedMatch;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;

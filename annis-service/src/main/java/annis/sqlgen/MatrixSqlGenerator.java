@@ -38,8 +38,8 @@ import org.apache.commons.lang3.Validate;
 
 import org.springframework.dao.DataAccessException;
 
-import annis.dao.AnnotatedMatch;
-import annis.dao.AnnotatedSpan;
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
 import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;

@@ -26,7 +26,7 @@ import org.apache.commons.lang3.Validate;
 
 
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
+import annis.dao.objects.AnnotatedMatch;
 import annis.service.objects.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
