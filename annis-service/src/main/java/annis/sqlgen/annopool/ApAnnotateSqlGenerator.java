@@ -22,12 +22,10 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
 

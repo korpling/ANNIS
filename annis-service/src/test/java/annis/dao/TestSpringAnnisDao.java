@@ -161,6 +161,7 @@ public class TestSpringAnnisDao
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));
     assertThat(springManagedDao.getMetaDataFilter(), is(not(nullValue())));
+    assertThat(springManagedDao.getFrequencySqlGenerator(), is(not(nullValue())));
   }
 
   // retrieve annotation graph for a complete text

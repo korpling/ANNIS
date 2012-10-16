@@ -221,6 +221,27 @@ limitations under the License.
     <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
     <property name="orderByClauseSqlGenerator" ref="matrixSqlGenerator" />
   </bean>
+  
+  <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
+        parent="tableAccessStrategyFactory" lazy-init="true">
+    
+    <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
+    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
+
+    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
+    
+  </bean>
 
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor" lazy-init="true"/>
 

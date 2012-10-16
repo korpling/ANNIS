@@ -55,6 +55,7 @@ import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -82,6 +83,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private SaltAnnotateExtractor saltAnnotateExtractor;
   private MatrixSqlGenerator matrixSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
+  private FrequencySqlGenerator frequencySqlGenerator;
   // configuration
   private int timeout;
   // fn: corpus id -> corpus name
@@ -744,4 +746,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.annotateSqlGenerator = annotateSqlGenerator;
   }
+
+  public FrequencySqlGenerator getFrequencySqlGenerator()
+  {
+    return frequencySqlGenerator;
+  }
+
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
+  {
+    this.frequencySqlGenerator = frequencySqlGenerator;
+  }
+  
 }

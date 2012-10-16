@@ -16,9 +16,15 @@
 package annis.sqlgen;
 
 import annis.dao.objects.FrequencyTable;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DataAccessException;
 
@@ -27,7 +33,12 @@ import org.springframework.dao.DataAccessException;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
+  implements WhereClauseSqlGenerator<QueryData>, SelectClauseSqlGenerator<QueryData>,
+  GroupByClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>
 {
+  
+  private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
+  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
 
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -60,5 +71,80 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     
     return result;
   }
+  
+  @Override
+  public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
+  @Override
+  public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public String groupByAttributes(QueryData queryData, List<QueryNode> alternative)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(indent).append("(\n");
+    sb.append(indent);
+
+    sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(indent).append(") AS solutions,\n");
+
+    sb.append(indent).append(TABSTOP);
+    // really ugly
+    sb.append(
+      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
+
+    sb.append("\n");
+    
+    return sb.toString();
+  }
+  
+  protected void addFromOuterJoins(StringBuilder sb, QueryData queryData, 
+    TableAccessStrategy tas, String indent)
+  {
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ");
+    sb.append(CORPUS_ANNOTATION_TABLE);
+    sb.append(" ON (");
+    sb.append(tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
+    sb.append(" = ");
+    sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
+    sb.append(")");
+  }
+
+
+  public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
+  {
+    return innerQuerySqlGenerator;
+  }
+
+  public void setInnerQuerySqlGenerator(SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
+  {
+    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+  }
+
+  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
+  {
+    return tableJoinsInFromClauseGenerator;
+  }
+
+  public void setTableJoinsInFromClauseGenerator(TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
+  {
+    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
+  }
+
+  
   
 }
