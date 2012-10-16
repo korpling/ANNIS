@@ -16,12 +16,48 @@
 package annis.sqlgen.extensions;
 
 import annis.sqlgen.FrequencySqlGenerator;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * This is an extension to be used as argument for {@link FrequencySqlGenerator}
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyTableQueryData extends ArrayList<String>
+public class FrequencyTableQueryData extends ArrayList<FrequencyTableQueryData.Entry>
 {
+  public static enum Type
+  {
+    span, annotation
+  }
+  
+  public static class Entry implements Serializable
+  {
+    private Type type;
+    private String key;
+
+    
+    
+    public Type getType()
+    {
+      return type;
+    }
+
+    public void setType(Type type)
+    {
+      this.type = type;
+    }
+
+    public String getKey()
+    {
+      return key;
+    }
+
+    public void setKey(String key)
+    {
+      this.key = key;
+    }
+    
+    
+  }
+  
 }
