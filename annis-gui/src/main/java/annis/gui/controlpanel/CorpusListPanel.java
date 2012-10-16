@@ -52,6 +52,7 @@ import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -546,7 +547,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     if (tblCorpora != null)
     {
-      tblCorpora.setValue(corpora.keySet());
+      tblCorpora.setValue(new HashSet<String>(corpora.keySet()));
     }
   }
 
