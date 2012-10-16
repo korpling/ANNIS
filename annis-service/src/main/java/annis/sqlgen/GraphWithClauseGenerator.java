@@ -15,6 +15,8 @@
  */
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.SaltURIs;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;

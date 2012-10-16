@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 

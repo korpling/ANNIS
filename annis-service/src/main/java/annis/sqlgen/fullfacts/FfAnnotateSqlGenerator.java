@@ -19,7 +19,7 @@ package annis.sqlgen.fullfacts;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;

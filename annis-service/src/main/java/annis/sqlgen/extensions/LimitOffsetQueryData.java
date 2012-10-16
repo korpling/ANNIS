@@ -13,19 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
-
-import annis.ql.parser.QueryData;
-
-import java.net.URI;
-import java.util.ArrayList;
+package annis.sqlgen.extensions;
 
 /**
- * This class is only a wrapper to transport the salt ids with the
- * {@link QueryData} class as extension.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author benjamin
  */
-public class SaltURIs extends ArrayList<URI>
+public class LimitOffsetQueryData
 {
+
+  private int offset;
+  private int limit;
+
+  public LimitOffsetQueryData(int offset, int limit)
+  {
+    this.offset = offset;
+    this.limit = limit;
+  }
+
+  public int getLimit()
+  {
+    return limit;
+  }
+
+  public int getOffset()
+  {
+    return offset;
+  }
+  
+  public boolean isPaged()
+  {
+    return offset != 0 || limit != 0;
+  }
 }

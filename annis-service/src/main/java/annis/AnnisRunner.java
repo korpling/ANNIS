@@ -15,6 +15,7 @@
  */
 package annis;
 
+import annis.sqlgen.extensions.SaltURIs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -39,9 +40,9 @@ import annis.service.objects.AnnisCorpus;
 
 import annis.sqlgen.*;
 
-import annis.sqlgen.AnnotateQueryData;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
 
 import annis.utils.Utils;
