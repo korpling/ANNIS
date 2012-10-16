@@ -22,6 +22,16 @@ Start
          abc]]>
       </value>
     </entry>
+    <entry key="tok=/abc/">
+      <value><![CDATA[
+Start
+   AAnnotationSearchExpr
+      tok
+      AEqualAnnoValue
+         ARegexpTextSpec
+            abc]]>
+      </value>
+    </entry>
   </util:map>
 	
 	<util:list id="good">

@@ -548,13 +548,14 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     QueryNode target = newNode();
 
-    QueryAnnotation anno = new QueryAnnotation(token(node.getAnnoNamespace()), token(node.getAnnoType()));
+    QueryAnnotation anno = new QueryAnnotation(token(node.getAnnoNamespace()), 
+      token(node.getAnnoType()));
 
     if("tok".equals(anno.getName()))
     {
       // special handling for explicit token search
       target.setToken(true);
-      if(anno.getValue() != null)
+      if(node.getAnnoValue() != null)
       {
         QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
         String text = textFromAnnoValue(node.getAnnoValue());

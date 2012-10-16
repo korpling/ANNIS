@@ -162,8 +162,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doDoc("TueBa-D/Z.6.0 in.tuebadz-6_anaphora_1079");
-
+    doCount("phon_t=\"äh\"");
   }
 
   public void doParse(String annisQuery)
