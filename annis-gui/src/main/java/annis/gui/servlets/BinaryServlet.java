@@ -51,26 +51,34 @@ import org.slf4j.LoggerFactory;
 public class BinaryServlet extends HttpServlet
 {
   
-  private final Logger log = LoggerFactory.getLogger(BinaryServlet.class);
+  private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
   private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
   
-  private Client client;
+  private transient Client client;
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     super.init(config);
-    
-    ClientConfig cc = new DefaultClientConfig(SaltProjectProvider.class);
-    cc.getProperties().put(ClientConfig.PROPERTY_THREADPOOL_SIZE, 10);
-    cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 500);
-    client = Client.create(cc);
+    checkAndCreateClient();
   }
 
-  
+  /**
+   * Checks if client is set and if not creates a new one
+   */
+  private void checkAndCreateClient()
+  {
+    if(client == null)
+    {
+      ClientConfig cc = new DefaultClientConfig(SaltProjectProvider.class);
+      cc.getProperties().put(ClientConfig.PROPERTY_THREADPOOL_SIZE, 10);
+      cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 500);
+      client = Client.create(cc);
+    }
+  }
   
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -95,6 +103,8 @@ public class BinaryServlet extends HttpServlet
       {
         throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
       }
+      
+      checkAndCreateClient();
       WebResource annisRes = client.resource(annisServiceURL);
 
       WebResource binaryRes = annisRes.path("corpora")
