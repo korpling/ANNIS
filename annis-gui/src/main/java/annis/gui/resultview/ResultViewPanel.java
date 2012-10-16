@@ -34,6 +34,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -129,7 +130,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void attach()
   {
     try{
-    query = new AnnisResultQuery(corpora.keySet(), aql, getApplication());
+    query = new AnnisResultQuery(new HashSet<String>(corpora.keySet()), aql, getApplication());
     createPage(0, pageSize);
 
     super.attach();
