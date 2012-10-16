@@ -17,7 +17,9 @@ package annis.sqlgen;
 
 import annis.dao.objects.FrequencyTable;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -30,7 +32,33 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    FrequencyTable result = new FrequencyTable();
+    
+    ResultSetMetaData meta = rs.getMetaData();
+    
+    while(rs.next())
+    {
+      Validate.isTrue(meta.getColumnCount() > 1, 
+        "frequency table extractor needs at least 2 columns");
+      
+      Validate.isTrue(
+        "count".equalsIgnoreCase(meta.getColumnName(meta.getColumnCount())),
+        "last column name must be \"count\"");
+      
+      long count = rs.getLong("count");      
+      String[] tupel = new String[meta.getColumnCount()-2];
+      
+      for(int i=1; i <= tupel.length; i++)
+      {
+        String colName = meta.getColumnName(i);
+        tupel[i-1] = colName;
+      } // end for each column (except last "count" column) 
+      
+      result.addEntry(new FrequencyTable.Entry(tupel, count));
+      
+    } // end for complete result
+    
+    return result;
   }
   
 }
