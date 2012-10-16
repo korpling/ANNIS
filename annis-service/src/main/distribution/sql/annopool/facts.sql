@@ -137,7 +137,7 @@ FROM
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
-    (_node.token_index IS NOT NULL) AS is_token,
+    (_node.token_index IS NOT NULL AND _node.seg_name IS NULL) AS is_token,
     _node.continuous AS continuous,
     _node.span AS span,
     _node.left_token AS left_token,

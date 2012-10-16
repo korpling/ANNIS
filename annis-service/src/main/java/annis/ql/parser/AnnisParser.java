@@ -58,7 +58,6 @@ public class AnnisParser
   {
     postProcessors = new ArrayList<DepthFirstAdapter>();
     postProcessors.add(new NodeSearchNormalizer());
-    postProcessors.add(new TokenSearchNormalizer());
     postProcessors.add(new QueryValidator());
     internalParser = new InternalParser();
   }

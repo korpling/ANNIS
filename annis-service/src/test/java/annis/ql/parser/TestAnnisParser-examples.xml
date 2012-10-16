@@ -7,11 +7,22 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 		
 	<util:map id="exampleSyntaxTrees">
-
-<entry key="tok"><value><![CDATA[Start
-   ATextSearchExpr]]></value></entry>
-
-	</util:map>
+    <entry key="tok">
+      <value><![CDATA[
+Start
+   AAnnotationSearchExpr
+      tok]]>
+      </value>
+    </entry>
+    <entry key="/abc/">
+      <value><![CDATA[
+Start
+   ATextSearchExpr
+      ARegexpTextSpec
+         abc]]>
+      </value>
+    </entry>
+  </util:map>
 	
 	<util:list id="good">
 		<value><![CDATA[/das/]]></value>

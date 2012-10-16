@@ -77,7 +77,6 @@ public class TestAnnisParser implements ApplicationContextAware {
 	private void assertCorrectPostProcessorList(AnnisParser parser) {
 		List<DepthFirstAdapter> postProcessors = parser.getPostProcessors();
 		assertThat(postProcessors, hasInstance(NodeSearchNormalizer.class));
-		assertThat(postProcessors, hasInstance(TokenSearchNormalizer.class));
 		assertThat(postProcessors, hasInstance(QueryValidator.class));
 	}
 	

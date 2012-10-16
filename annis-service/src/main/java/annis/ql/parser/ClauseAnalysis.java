@@ -550,17 +550,32 @@ public class ClauseAnalysis extends DepthFirstAdapter
 
     QueryAnnotation anno = new QueryAnnotation(token(node.getAnnoNamespace()), token(node.getAnnoType()));
 
-    if (node.getAnnoValue() != null)
+    if("tok".equals(anno.getName()))
     {
-      QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
-      String text = textFromAnnoValue(node.getAnnoValue());
+      // special handling for explicit token search
+      target.setToken(true);
+      if(anno.getValue() != null)
+      {
+        QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
+        String text = textFromAnnoValue(node.getAnnoValue());
+        
+        target.setSpannedText(text, textMatching);
+      }
+    } // end if "tok" is annotation name
+    else
+    {
+      // normal annotation
+      if (node.getAnnoValue() != null)
+      {
+        QueryNode.TextMatching textMatching = textMatchingFromAnnoValue(node.getAnnoValue());
+        String text = textFromAnnoValue(node.getAnnoValue());
 
-      anno.setValue(text);
-      anno.setTextMatching(textMatching);
-    }
-    
-    target.addNodeAnnotation(anno);
+        anno.setValue(text);
+        anno.setTextMatching(textMatching);
+      }
 
+      target.addNodeAnnotation(anno);
+    } // end else 
   }
 
   @Override
@@ -568,11 +583,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     QueryNode context = newNode();
 
-    if (node.getTextSpec() == null)
-    {
-      context.setToken(true);
-    }
-    else if (node.getTextSpec() instanceof AWildTextSpec)
+    Validate.notNull(node.getTextSpec(), 
+      "a text search expression always needs a text specification");
+    
+    if (node.getTextSpec() instanceof AWildTextSpec)
     {
       context.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),
         QueryNode.TextMatching.EXACT_EQUAL);
@@ -590,6 +604,10 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     QueryNode target = newNode();
 
+    Validate.notNull(node.getTextSpec(), 
+      "a negative text search expression always needs a text specification");
+    
+    
     if (node.getTextSpec() instanceof AWildTextSpec)
     {
       target.setSpannedText(((AWildTextSpec) node.getTextSpec()).getText().getText(),

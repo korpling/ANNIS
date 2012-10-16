@@ -564,7 +564,7 @@ public class TestDefaultWhereClauseGenerator
     generator.setUseIsTokenColumn(false);
     node23.setToken(true);
     // then
-    checkWhereConditions(isNotNull("_node23.span"));
+    checkWhereConditions(isNotNull("_node23.span"), isNull("_node23.seg_name"));
   }
 
   // WHERE condition for root node

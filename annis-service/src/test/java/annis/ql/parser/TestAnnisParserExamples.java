@@ -77,7 +77,7 @@ public class TestAnnisParserExamples {
                 // replace the unix line ending from the SVN with the systems line ending
                 // (the dump tree will use the system line ending and the examples were created under linux)
                 String provided = example.getSyntaxTree().replaceAll("\n", System.getProperty("line.separator"));
-		assertEquals("wrong syntax tree for: " + example.getQuery(),provided, actual);
+		assertEquals("wrong syntax tree for: " + example.getQuery(),provided.trim(), actual.trim());
 	}
 
 	@Theory

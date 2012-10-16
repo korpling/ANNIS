@@ -560,6 +560,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     {
       conditions.add(isNotNull(tables(node).aliasedColumn(NODE_TABLE,
         "span")));
+      conditions.add(isNull(tables(node).aliasedColumn(NODE_TABLE,
+        "seg_name")));
     }
   }
 

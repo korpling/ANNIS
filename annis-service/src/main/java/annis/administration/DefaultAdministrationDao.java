@@ -269,6 +269,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeLevel();
     computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
+    computeSpanFromSegmentation();
     
     applyConstraints();
     analyzeStagingTables();
@@ -717,6 +718,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       "SELECT MAX(toplevel_corpus) FROM _node");
     log.info("new corpus ID is " + result);
     return result;
+  }
+  
+  void computeSpanFromSegmentation()
+  {
+    log.info("computing span value for segmentation nodes");
+    executeSqlFromScript("span_from_segmentation.sql");
   }
   
   void updateCorpusStatsId(long corpusId)
