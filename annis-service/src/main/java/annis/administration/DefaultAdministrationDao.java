@@ -821,8 +821,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
     jdbcTemplate.getJdbcOperations().execute("ANALYZE facts_" + corpusID);
-    log.info("analyzing general facts table");
-    jdbcTemplate.getJdbcOperations().execute("ANALYZE facts");
   }
   
   void createFacts(long corpusID)
