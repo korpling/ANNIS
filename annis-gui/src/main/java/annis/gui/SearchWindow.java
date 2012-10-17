@@ -431,7 +431,7 @@ public class SearchWindow extends Window
               + "var setTarget = function() {" + "var uri = '"
               + appUri
               + "loginHandler"
-              + "'; var f = document.getElementById('loginf');"
+              + "'; var f = document.getElementById('loginf-annis');"
               + "document.forms[0].action = uri;document.forms[0].username.focus();};"
               + ""
               + "var styles = window.parent.document.styleSheets;"
@@ -453,7 +453,7 @@ public class SearchWindow extends Window
               + "<div class='v-app v-app-loginpage' style=\"background:transparent;\">"
               + "<iframe name='logintarget' style='width:0;height:0;"
               + "border:0;margin:0;padding:0;'></iframe>"
-              + "<form id='loginf' target='logintarget' onkeypress=\"submitOnEnter(event)\" method=\"post\">"
+              + "<form id='loginf-annis' target='logintarget' onkeypress=\"submitOnEnter(event)\" method=\"post\">"
               + "<div>"
               + getUsernameCaption()
               + "</div><div >"
