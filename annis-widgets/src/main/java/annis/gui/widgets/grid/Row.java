@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets.grid;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 
@@ -22,7 +23,7 @@ import java.util.BitSet;
  * Represents one row in the grid view
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class Row
+public class Row implements Serializable
 {
   private ArrayList<GridEvent> events;
   private BitSet occupancySet;
