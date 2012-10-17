@@ -69,7 +69,7 @@ public class SingleResultPanel extends CssLayout implements
   private Map<String, String> markedExactMap;
   private ResolverProvider resolverProvider;
   private PluginSystem ps;
-  private List<VisualizerPanel> visualizers;
+  private transient List<VisualizerPanel> visualizers;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
@@ -207,18 +207,24 @@ public class SingleResultPanel extends CssLayout implements
         result.getSDocumentGraph());
     markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
     
-    for(VisualizerPanel p : visualizers)
+    if(visualizers != null)
     {
-      p.setSegmentationLayer(segmentationName, markedAndCovered);
+      for(VisualizerPanel p : visualizers)
+      {
+        p.setSegmentationLayer(segmentationName, markedAndCovered);
+      }
     }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-     for (VisualizerPanel p : visualizers)
-     {
-       p.setVisibleTokenAnnosVisible(annos);
-     }
+    if(visualizers != null)
+    {
+      for (VisualizerPanel p : visualizers)
+      {
+        p.setVisibleTokenAnnosVisible(annos);
+      }
+    }
   }
 
   private void calculateHelperVariables()
