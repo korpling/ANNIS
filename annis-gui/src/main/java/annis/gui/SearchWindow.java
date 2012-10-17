@@ -512,7 +512,6 @@ public class SearchWindow extends Window
         "<ul>"
         + "<li>Mozilla Firefox: <a href=\"http://www.mozilla.org/firefox\" target=\"_blank\">http://www.mozilla.org/firefox</a></li>"
         + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
-        + "<li>Opera: <a href=\"http://www.opera.com/\" target=\"_blank\">http://www.opera.com/</a></li>"
         + "</ul>";
       WebApplicationContext context = ((WebApplicationContext) getApplication()
         .getContext());

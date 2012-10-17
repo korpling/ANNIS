@@ -19,7 +19,6 @@ import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaPlayer;
 import annis.visualizers.LoadableVisualizer;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class MediaControllerImpl implements MediaController, Serializable
+public class MediaControllerImpl implements MediaController
 {
 
   /**
@@ -86,14 +85,14 @@ public class MediaControllerImpl implements MediaController, Serializable
   }
 
   @Override
-  public void play(String resultID, final double startTime)
+  public void play(String resultID, double startTime)
   {
 //    pauseAll();
 
     lock.readLock().lock();
     try
     {
-      final MediaPlayer player = getPlayerForResult( resultID);
+      MediaPlayer player = getPlayerForResult( resultID);
 
       if (player != null)
       {
@@ -102,14 +101,7 @@ public class MediaControllerImpl implements MediaController, Serializable
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(true, new LoadableVisualizer.Callback() {
-
-            @Override
-            public void visualizerLoaded(LoadableVisualizer origin)
-            {
-              player.play(startTime);
-            }
-          });
+          t.toggleVisualizer(true, new CallbackImpl(player, startTime, null));
         }
 
       }
@@ -121,15 +113,14 @@ public class MediaControllerImpl implements MediaController, Serializable
   }
 
   @Override
-  public void play(String resultID, final double startTime, final double endTime)
+  public void play(String resultID, double startTime, double endTime)
   {
 //    pauseAll();
 
     lock.readLock().lock();
     try
     {
-      final MediaPlayer player = getPlayerForResult(resultID);
-
+      MediaPlayer player = getPlayerForResult(resultID);
       
       if (player != null)
       {
@@ -138,14 +129,7 @@ public class MediaControllerImpl implements MediaController, Serializable
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
-          t.toggleVisualizer(true, new LoadableVisualizer.Callback() 
-          {
-            @Override
-            public void visualizerLoaded(LoadableVisualizer origin)
-            {
-              player.play(startTime, endTime);
-            }
-          });
+          t.toggleVisualizer(true, new CallbackImpl(player, startTime, endTime));
         }
       }
     }
@@ -238,5 +222,37 @@ public class MediaControllerImpl implements MediaController, Serializable
     {
       lock.writeLock().unlock();
     }
+  }
+  
+  public static class CallbackImpl implements LoadableVisualizer.Callback
+  {
+    
+    private MediaPlayer player;
+    private Double startTime;
+    private Double endTime;
+
+    public CallbackImpl(MediaPlayer player, Double startTime, Double endTime)
+    {
+      this.player = player;
+      this.startTime = startTime;
+      this.endTime = endTime;
+    }
+
+    @Override
+    public void visualizerLoaded(LoadableVisualizer origin)
+    {
+      if(player != null && startTime != null)
+      {
+        if(endTime == null)
+        {
+          player.play(startTime);
+        }
+        else
+        {
+          player.play(startTime, endTime);
+        }
+      }
+    }
+    
   }
 }

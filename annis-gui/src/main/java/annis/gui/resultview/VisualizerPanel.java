@@ -18,8 +18,6 @@ package annis.gui.resultview;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.MediaPlayer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
@@ -72,20 +70,20 @@ public class VisualizerPanel extends CustomLayout
     "icon-expand.gif");
   private ApplicationResource resource = null;
   private Component vis;
-  private SDocument result;
-  private PluginSystem ps;
+  private transient SDocument result;
+  private transient PluginSystem ps;
   private ResolverEntry entry;
   private Random rand = new Random();
-  private Map<SNode, Long> markedAndCovered;
-  private List<SToken> token;
+  private transient Map<SNode, Long> markedAndCovered;
+  private transient List<SToken> token;
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
   private String htmlID;
   private String resultID;;
-  private VisualizerPlugin visPlugin;
+  private transient VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
-  private STextualDS text;
+  private transient STextualDS text;
   private String segmentationName;
   private boolean showTextID;
   private final String PERMANENT = "permanent";
@@ -147,20 +145,20 @@ public class VisualizerPanel extends CustomLayout
   public void attach()
   {
 
-    if (visPlugin == null)
+    if (visPlugin == null && ps != null)
     {
       entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    if(entry != null)
+    if(entry != null && visPlugin != null)
     {
       
       if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
         btEntry = new Button(entry.getDisplayName()
-          + (showTextID ? " (" + text.getSName() + ")" : ""));
+          + (showTextID && text != null ? " (" + text.getSName() + ")" : ""));
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
@@ -175,7 +173,7 @@ public class VisualizerPanel extends CustomLayout
         {
           // build button for visualizer
           btEntry = new Button(entry.getDisplayName() 
-            + (showTextID ? " (" + text.getSName() + ")" : ""));
+            + (showTextID && text != null ? " (" + text.getSName() + ")" : ""));
           btEntry.setIcon(ICON_COLLAPSE);
           btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
             + ChameleonTheme.BUTTON_SMALL);
@@ -209,12 +207,17 @@ public class VisualizerPanel extends CustomLayout
         }
         
       }
-    }
+    } // end if entry not null
 
   }
   
   private Component createComponent()
   {
+    if(visPlugin == null)
+    {
+      return null;
+    }
+    
     Application application = getApplication();
     VisualizerInput input = createInput();
     
@@ -254,8 +257,8 @@ public class VisualizerPanel extends CustomLayout
       input.setResourcePathTemplate(template);
     }
 
-    if (visPlugin.isUsingText()
-      && result.getSDocumentGraph().getSNodes().size() > 0)
+    if (visPlugin != null && visPlugin.isUsingText()
+      && result != null && result.getSDocumentGraph().getSNodes().size() > 0)
     {
       SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
@@ -292,20 +295,14 @@ public class VisualizerPanel extends CustomLayout
   }
 
   public ApplicationResource createResource(
-    final ByteArrayOutputStream byteStream,
+    ByteArrayOutputStream byteStream,
     String mimeType)
   {
 
     StreamResource r;
 
-    r = new StreamResource(new StreamResource.StreamSource()
-    {
-      @Override
-      public InputStream getStream()
-      {
-        return new ByteArrayInputStream(byteStream.toByteArray());
-      }
-    }, entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
+    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream), 
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
@@ -426,6 +423,29 @@ public class VisualizerPanel extends CustomLayout
   public String getHtmlID()
   {
     return htmlID;
+  }
+  
+  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
+  {
+    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+    private transient ByteArrayOutputStream byteStream;
+
+    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
+    {
+      this.byteStream = byteStream;
+    }
+    
+    @Override
+    public InputStream getStream()
+    {
+      if(byteStream == null)
+      {
+        log.error("byte stream was null");
+        return null;
+      }
+      return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+    
   }
 
 }

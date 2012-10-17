@@ -15,9 +15,11 @@
  */
 package annis.gui.servlets;
 
+import annis.gui.controlpanel.CorpusListPanel;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,8 +42,15 @@ public class CitationRedirectionServlet extends HttpServlet
     {
       URI uri = new URI(req.getRequestURI());
       req.getSession().setAttribute("citation", uri.getPath());
-
-      resp.sendRedirect(req.getContextPath() + "/?citation");
+      
+      String addtionalParams = "";
+      if(req.getParameter(CorpusListPanel.CORPUSSET_PARAM) != null)
+      {
+        addtionalParams += "&" + CorpusListPanel.CORPUSSET_PARAM 
+          + "=" 
+          + URLEncoder.encode(req.getParameter(CorpusListPanel.CORPUSSET_PARAM), "UTF-8");
+      }
+      resp.sendRedirect(req.getContextPath() + "/?citation" + addtionalParams);
     }
     catch(URISyntaxException ex)
     {

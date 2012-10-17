@@ -15,6 +15,8 @@
  */
 package annis.visualizers;
 
+import java.io.Serializable;
+
 /**
  * A visualizer that can callback their owners when their are loaded.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
@@ -28,7 +30,7 @@ public interface LoadableVisualizer
   /** Return true if visualizer is ready. */
   public boolean isLoaded();
   
-  public interface Callback
+  public interface Callback extends Serializable
   {
     public void visualizerLoaded(LoadableVisualizer origin); 
   }

@@ -16,14 +16,12 @@
 package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
-import annis.gui.media.MediaController;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.VideoPlayer;
 import com.vaadin.Application;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;

@@ -35,6 +35,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.event.Action;
+import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
@@ -66,13 +67,14 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class CorpusListPanel extends Panel implements UserChangeListener,
-  AbstractSelect.NewItemHandler, ValueChangeListener, Action.Handler
+  AbstractSelect.NewItemHandler, Action.Handler, ParameterHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
   
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   public static final String ALL_CORPORA = "All";
+  public static final String CORPUSSET_PARAM= "corpusset";
   public static final String CORPUSSET_PREFIX = "corpusset_";
 
   public enum ActionType
@@ -114,7 +116,14 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     cbSelection.setNewItemsAllowed(true);
     cbSelection.setNewItemHandler((AbstractSelect.NewItemHandler) this);
     cbSelection.setImmediate(true);
-    cbSelection.addListener((ValueChangeListener) this);
+    cbSelection.addListener(new ValueChangeListener() 
+    {
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      {
+        updateCorpusList();
+      }
+    });
 
     selectionLayout.addComponent(cbSelection);
     selectionLayout.setExpandRatio(cbSelection, 1.0f);
@@ -199,12 +208,34 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   public void attach()
   {
     super.attach();
-
+    
+    getWindow().addParameterHandler(this);
     getApplication().addListener((UserChangeListener) this);
 
     tblCorpora.setSortContainerPropertyId("name");
     updateCorpusSetList();
-
+  }
+  
+  
+  @Override
+  public void handleParameters(Map<String, String[]> parameters)
+  {
+    String[] param = parameters.get(CORPUSSET_PARAM);
+    if(param != null && param.length > 0)
+    {
+      String selectedSet = param[0];
+      Item item = cbSelection.getItem(selectedSet);
+      if(item == null)
+      {
+        getWindow().showNotification("Could not find corpus set \"" + selectedSet + "\"", "", 
+          Notification.TYPE_WARNING_MESSAGE);
+      }
+      {
+        cbSelection.setValue(selectedSet);
+      }
+      
+      updateCorpusList();
+    }
   }
   
   private void updateCorpusSetList()
@@ -396,12 +427,6 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         }
       }
     }
-  }
-
-  @Override
-  public void valueChange(ValueChangeEvent event)
-  {
-    updateCorpusList();
   }
 
   @Override

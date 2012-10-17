@@ -15,18 +15,17 @@
  */
 package annis.gui.visualizers.component.grid;
 
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.TimeHelper;
-import static annis.model.AnnisConstants.*;
-
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
+import static annis.model.AnnisConstants.*;
 import com.vaadin.Application;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -56,6 +55,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -99,8 +99,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
     
     private AnnotationGrid grid;
-    private VisualizerInput input;
-    private MediaController mediaController;
+    private transient VisualizerInput input;
+    private transient MediaController mediaController;
 
     public enum ElementType
     {
@@ -127,16 +127,70 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     @Override
     public void attach()
     {
+      if(input != null)
+      {
       String resultID = input.getId();
       
-      grid = new AnnotationGrid(mediaController, resultID);
-      grid.addStyleName("partitur_table");
-      addComponent(grid);
+        grid = new AnnotationGrid(mediaController, resultID);
+        grid.addStyleName("partitur_table");
+        addComponent(grid);
+
+        SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+
+        List<String> annos = computeDisplayAnnotations(graph);
+
+        EList<SToken> token = graph.getSortedSTokenByText();
+        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+        long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+
+        LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
+          parseSalt(input.getDocument().getSDocumentGraph(), annos, 
+            (int) startIndex, (int) endIndex);
+
+        // add tokens as row
+        Row tokenRow = new Row();
+        for(SToken t : token)
+        {
+          long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
+            - startIndex;
+          String text = CommonHelper.getSpannedText(t);
+
+          GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
+
+          // check if the token is a matched node
+          SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.
+            getSValueSNUMERIC();
+          event.setMatch(match);
+
+          tokenRow.addEvent(event);
+        }
+        ArrayList<Row> tokenRowList = new ArrayList<Row>();
+        tokenRowList.add(tokenRow);
+
+        if(Boolean.parseBoolean(
+          input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
+        {
+          rowsByAnnotation.put("tok", tokenRowList);
+        }
+
+        grid.setRowsByAnnotation(rowsByAnnotation);
+      } // end if input not null
+    }
+    
+    /**
+     * Returns 
+     * @return 
+     */
+    private List<String> computeDisplayAnnotations(SDocumentGraph graph)
+    {
+      if(input == null)
+      {
+        return new LinkedList<String>();
+      }
       
-      SDocumentGraph graph = input.getDocument().getSDocumentGraph();
-     
-      List<String> annos = new LinkedList<String>(getAnnotationLevelSet(graph, 
-        input.getNamespace()));
+      Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace());
+      List<String> annos = new LinkedList<String>(annoPool);
       
       String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
       if(annosConfiguration != null && annosConfiguration.trim().length() > 0)
@@ -145,11 +199,37 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         annos.clear();
         for(String s : split)
         {
-          annos.add(s.trim());
+          s = s.trim();
+          // is regular expression?
+          if(s.startsWith("/") && s.endsWith("/"))
+          {
+            // go over all remaining items in our pool of all annotations and
+            // check if they match
+            Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+            
+            LinkedList<String> matchingAnnos = new LinkedList<String>();
+            for(String a : annoPool)
+            {
+              if(regex.matcher(a).matches())
+              {
+                matchingAnnos.add(a);
+              }
+            }
+            
+            annos.addAll(matchingAnnos);
+            annoPool.removeAll(matchingAnnos);
+            
+          }
+          else
+          {
+            annos.add(s);
+            annoPool.remove(s);
+          }
         }
       }
       
-      // filter annotation names by regular expression if this was given as mapping
+      // filter already found annotation names by regular expression 
+      // if this was given as mapping
       String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
       if(regexFilterRaw != null)
       {
@@ -172,43 +252,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           log.warn("invalid regular expression in mapping for grid visualizer", ex);
         }
       }
-      
-      EList<SToken> token = graph.getSortedSTokenByText();
-      long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-      long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-      
-      LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
-        parseSalt(input.getDocument().getSDocumentGraph(), annos, 
-          (int) startIndex, (int) endIndex);
-      
-      // add tokens as row
-      Row tokenRow = new Row();
-      for(SToken t : token)
-      {
-        long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
-          - startIndex;
-        String text = CommonHelper.getSpannedText(t);
-        
-        GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
-        
-        // check if the token is a matched node
-        SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-        event.setMatch(match);
-        
-        tokenRow.addEvent(event);
-      }
-      ArrayList<Row> tokenRowList = new ArrayList<Row>();
-      tokenRowList.add(tokenRow);
-      
-      if(Boolean.parseBoolean(
-        input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
-      {
-        rowsByAnnotation.put("tok", tokenRowList);
-      }
-      
-      grid.setRowsByAnnotation(rowsByAnnotation);
+      return annos;
     }
     
     
