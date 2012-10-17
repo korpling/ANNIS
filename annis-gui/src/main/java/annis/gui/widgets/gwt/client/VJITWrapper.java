@@ -295,8 +295,10 @@ public class VJITWrapper extends Widget implements Paintable
     $wnd.$jit.ST.Plot.EdgeTypes.implement({
       'edgeLabel': {
         'render': function(adj, canvas) {
-
-            var edges = adj.nodeTo.data.edges;
+            var edges = adj.nodeTo.data.edges,
+            fromNode = adj.nodeFrom,
+            toNode = adj.nodeTo,
+            isAlreadyConnected = false;
 
 
             for (var i = 0; i < edges.length; i++)
@@ -308,20 +310,28 @@ public class VJITWrapper extends Widget implements Paintable
                         return x && !(y == "span" || y == "multinuc");
                     }, true);
 
-                if(isPointingRel){
-
+                if(isPointingRel)
+                {
                     var orn = this.getOrientation(adj),
                     node = st.graph.getNode(edge.to),
                     child = st.graph.getNode(edge.from),
                     dim = adj.getData('dim');
-
                     this.edgeTypes.edgeLabel.drawArrow(node, child, dim,
-                                                           true, canvas,
-                                                           this.viz, orn);
+                                                       true, canvas,
+                                                       this.viz, orn);
+
+                    if (node === fromNode && child === toNode
+                       || node === toNode && child == fromNode)
+                    {
+                        isAlreadyConnected = true;
+                    }
                 }
             }
 
-            this.edgeTypes.bezier.render.call(this, adj, canvas);
+            if (!isAlreadyConnected)
+            {
+                this.edgeTypes.line.render.call(this, adj, canvas);
+            }
         },
         'drawArrow' : function (node, child, dim, swap, canvas, viz, orn)
         {
