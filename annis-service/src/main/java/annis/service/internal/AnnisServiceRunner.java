@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import java.io.IOException;
 import annis.AnnisBaseRunner;
+import annis.exceptions.AnnisException;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -45,7 +46,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private static Thread mainThread;
   private Server server;
 
-  public static void main(String[] args) throws IOException
+  public static void main(String[] args) throws Exception
   {
     
     boolean daemonMode = false;
@@ -69,7 +70,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       File pidFile = new File(System.getProperty("annisservice.pid_file"));
       pidFile.deleteOnExit();
 
-      annisServiceRunner.start();
+      annisServiceRunner.start(false);
 
       if(!annisServiceRunner.isShutdownRequested)
       {
@@ -82,7 +83,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.info("Running in Debug mode");
 
-      annisServiceRunner.start();
+      annisServiceRunner.start(false);
     }
 
     if(!annisServiceRunner.isShutdownRequested)
@@ -142,7 +143,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     });
   }
 
-  public void createWebServer()
+  private void createWebServer()
   {
 
     // create beans
@@ -204,9 +205,13 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   }
 
-  private void start()
+  /**
+   * Creates and starts the server
+   * @param rethrowExceptions Set to true if you want to get exceptions re-thrown to parent 
+   */
+  public void start(boolean rethrowExceptions) throws Exception
   {
-    log.info("Starting up...");
+    log.info("Starting up REST...");
 
     try
     {
@@ -224,6 +229,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("could not start ANNIS REST service", ex);
       isShutdownRequested = true;
+      
+      if(rethrowExceptions)
+      {
+        if(!(ex instanceof AnnisException) && ex.getCause() instanceof AnnisException)
+        {
+          throw((AnnisException) ex.getCause());
+        }
+        else
+        {
+          throw(ex);
+        }
+      }
     }
 
 
