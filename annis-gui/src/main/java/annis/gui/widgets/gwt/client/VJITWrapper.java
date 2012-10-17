@@ -140,6 +140,220 @@ public class VJITWrapper extends Widget implements Paintable
     var saveThis = this;
 
     var st = {};
+    
+      
+    // Override label rendering, add edge labels. It assumes that,
+    // there is only one pointing relation.     
+    $wnd.$jit.ST.Label.HTML.implement({
+
+        'plotLabel' : function(canvas, node, controller) {
+
+            var edgeLabelPrefix = "edge_",
+            id = node.id,
+            fromNode = node,
+            toNode = node.data.edges.length > 0 ? st.graph.getNode(node.data.edges[0].to) : {},
+            tag = this.getLabel(id),
+            tag_edge = this.getLabel(edgeLabelPrefix + id);
+
+            if(!tag && !(tag = document.getElementById(id))) {
+                tag = document.createElement('div');
+                var container = this.getLabelContainer();
+                tag.id = id;
+                tag.className = 'node';
+                tag.style.position = 'absolute';
+                controller.onCreateLabel(tag, node);
+                container.appendChild(tag);
+                this.labels[node.id] = tag;
+            }
+
+            this.placeLabel(tag, node, controller);
+
+            if(!tag_edge
+               && !(tag_edge = document.getElementById(edgeLabelPrefix+id))
+               && node.data.edges.length > 0)
+            {
+                tag_edge = document.createElement('div');
+                var container = this.getLabelContainer();
+
+                tag_edge.id = edgeLabelPrefix+id;
+                tag_edge.className = 'edge';
+                tag_edge.style.position = 'absolute'
+                container.appendChild(tag_edge);
+                tag_edge.innerHTML = node.data.edges[0].annotation[0];
+                // set styles
+                tag_edge.style.align = node.getLabelData('textAlign');
+                tag_edge.style.font = node.getLabelData('style') + ' ' + node.getLabelData('size') + 'px ' + node.getLabelData('family');
+
+                this.labels[edgeLabelPrefix+node.id] = tag_edge;
+            }
+
+            if (tag_edge)
+            {
+                this.placeEdgeLabel(tag_edge, fromNode, toNode, controller);
+            }
+
+        },
+
+        'placeEdgeLabel' : function(tag, fromNode, toNode, controller)
+        {
+            var pos = fromNode.pos.getc(true),
+            posToNode = toNode.pos.getc(true),
+            config = this.viz.config,
+            dim = config.Node,
+            canvas = this.viz.canvas,
+            w = fromNode.getData('width'),
+            h = fromNode.getData('height'),
+            radius = canvas.getSize(),
+            labelPos, orn;
+
+            var ox = canvas.translateOffsetX,
+            oy = canvas.translateOffsetY,
+            sx = canvas.scaleOffsetX,
+            sy = canvas.scaleOffsetY,
+            posx = Math.round(pos.x + posToNode.x) / 2 * sx + ox,
+            posy = Math.round(pos.y + posToNode.y) / 2 * sy + oy;
+
+            if(dim.align == "center") {
+                // look, if the label have to be placed right or under
+                // the edge
+                if (fromNode._depth == toNode._depth)
+                {
+                    labelPos= {
+                        x: Math.round(posx - (w / 2) + radius.width/2),
+                        y: Math.round(posy - 20 + radius.height/2)
+                    };
+                } else
+                {
+                    labelPos= {
+                        x: Math.round(posx + 20 + radius.width/2),
+                        y: Math.round(posy + radius.height/2)
+                    };
+
+                }
+            } else if (dim.align == "left") {
+                orn = config.orientation;
+                if(orn == "bottom" || orn == "top") {
+                    labelPos= {
+                        x: Math.round(posx - w / 2 + radius.width/2),
+                        y: Math.round(posy + radius.height/2)
+                    };
+                } else {
+                    labelPos= {
+                        x: Math.round(posx + radius.width/2),
+                        y: Math.round(posy - h / 2 + radius.height/2)
+                    };
+                }
+            } else if(dim.align == "right") {
+                orn = config.orientation;
+                if(orn == "bottom" || orn == "top") {
+                    labelPos= {
+                        x: Math.round(posx - w / 2 + radius.width/2),
+                        y: Math.round(posy - h + radius.height/2)
+                    };
+                } else {
+                    labelPos= {
+                        x: Math.round(posx - w + radius.width/2),
+                        y: Math.round(posy - h / 2 + radius.height/2)
+                    };
+                }
+            } else throw "align: not implemented";
+
+
+
+            var style = tag.style;
+            style.left = labelPos.x + 'px';
+            style.top  = labelPos.y + 'px';
+            style.display = this.fitsInCanvas(labelPos, canvas)? '' : 'none';
+            controller.onPlaceLabel(tag, fromNode);
+        }
+    });
+
+    //implement an edge type
+    $wnd.$jit.ST.Plot.EdgeTypes.implement({
+      'edgeLabel': {
+        'render': function(adj, canvas) {
+
+            var edges = adj.nodeTo.data.edges;
+
+
+            for (var i = 0; i < edges.length; i++)
+            {
+                var edge = edges[i];
+                var isPointingRel = edge.annotation.reduce(
+                    function(x,y)
+                    {
+                        return x && !(y == "span" || y == "multinuc");
+                    }, true);
+
+                if(isPointingRel){
+
+                    var orn = this.getOrientation(adj),
+                    node = st.graph.getNode(edge.to),
+                    child = st.graph.getNode(edge.from),
+                    dim = adj.getData('dim');
+
+                    this.edgeTypes.edgeLabel.drawArrow(node, child, dim, 
+                                                           true, canvas, 
+                                                           this.viz, orn);
+                }
+            }
+
+            this.edgeTypes.bezier.render.call(this, adj, canvas);
+        },
+        'drawArrow' : function (node, child, dim, swap, canvas, viz, orn)
+        {
+            var ctx = canvas.getCtx();
+
+            // invert edge direction
+            if (swap) {
+                var tmp = node;
+                node = child;
+                child = tmp;
+            }
+
+            var from = viz.geom.getEdge(node, 'end', orn),
+            to = viz.geom.getEdge(child, 'end', orn);
+
+            posNode = node.pos.getc(true);
+            posChild = child.pos.getc(true);
+
+            //TODO check orientation
+            if (posNode.y == posChild.y)
+            {
+                if (posNode.x < posChild.x)
+                {
+                    var tmp = from;
+                    from = to;
+                    to = tmp;            
+                }
+            }
+            else {
+                to = viz.geom.getEdge(child, 'begin', orn);
+            }
+
+            //draw line
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.bezierCurveTo(from.x, from.y, to.x, to.y, to.x, to.y);
+            ctx.stroke();
+
+            // draw arrow
+            var vect = new $wnd.$jit.Complex(to.x - from.x, to.y - from.y);
+            vect.$scale(dim / vect.norm());
+            var intermediatePoint = new $wnd.$jit.Complex(to.x - vect.x, to.y - vect.y),
+            normal = new $wnd.$jit.Complex(-vect.y / 2, vect.x / 2),
+            v1 = intermediatePoint.add(normal),
+            v2 = intermediatePoint.$add(normal.$scale(-1));
+
+            ctx.beginPath();
+            ctx.moveTo(v1.x, v1.y);
+            ctx.lineTo(v2.x, v2.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.closePath();
+            ctx.fill();
+        } 
+      }
+    });
 
     //This method is called on DOM label creation.
     //Use this method to add event handlers and styles to
@@ -148,8 +362,7 @@ public class VJITWrapper extends Widget implements Paintable
 
       label.id = node.id;
 
-      // put the sentences into the label
-      console.log(node.data);
+      // put the sentences into the label      
       if(node.data.sentence){
         label.innerHTML = node.data.sentence;
       }
@@ -247,7 +460,7 @@ public class VJITWrapper extends Widget implements Paintable
     config.setProperty("injectInto", elementID);
     config.setProperty("orientation", "top");
     config.setProperty("levelsToShow", 3);
-
+    config.setProperty("siblingOffset", 200);
 
 
     // node config
@@ -255,13 +468,25 @@ public class VJITWrapper extends Widget implements Paintable
     node.setProperty("overridable", true);
     node.setProperty("width", 60);
     node.setProperty("height", 20);
-    node.setProperty("color", "#ccc");
+    node.setProperty("color", "#aaa");
     config.setProperty("Node", node);
 
+    // edges config
     JITConf edge = new JITConf();
-    edge.setProperty("type", "bezier");
+    edge.setProperty("type", "edgeLabel");
     edge.setProperty("overridable", true);
     config.setProperty("Edge", edge);
+    
+    // navigation config
+    JITConf navigation = new JITConf();
+    navigation.setProperty("enable", true);
+    navigation.setProperty("panning", true);
+    config.setProperty("Navigation", navigation);
+    
+    //label config
+    JITConf label = new JITConf();
+    label.setProperty("overridable", true);
+    config.setProperty("Label", label);
 
   }
 }
