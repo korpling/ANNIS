@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets.grid;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * An event has a right and left border (but might have holes)
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class GridEvent
+public class GridEvent implements Serializable
 {
   private String id;
   private int left;

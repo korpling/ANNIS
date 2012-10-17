@@ -99,8 +99,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
     
     private AnnotationGrid grid;
-    private VisualizerInput input;
-    private MediaController mediaController;
+    private transient VisualizerInput input;
+    private transient MediaController mediaController;
 
     public enum ElementType
     {
@@ -127,52 +127,55 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     @Override
     public void attach()
     {
+      if(input != null)
+      {
       String resultID = input.getId();
       
-      grid = new AnnotationGrid(mediaController, resultID);
-      grid.addStyleName("partitur_table");
-      addComponent(grid);
-      
-      SDocumentGraph graph = input.getDocument().getSDocumentGraph();
-     
-      List<String> annos = computeDisplayAnnotations(graph);
-      
-      EList<SToken> token = graph.getSortedSTokenByText();
-      long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-      long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-      
-      LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
-        parseSalt(input.getDocument().getSDocumentGraph(), annos, 
-          (int) startIndex, (int) endIndex);
-      
-      // add tokens as row
-      Row tokenRow = new Row();
-      for(SToken t : token)
-      {
-        long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
-          - startIndex;
-        String text = CommonHelper.getSpannedText(t);
-        
-        GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
-        
-        // check if the token is a matched node
-        SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-        event.setMatch(match);
-        
-        tokenRow.addEvent(event);
-      }
-      ArrayList<Row> tokenRowList = new ArrayList<Row>();
-      tokenRowList.add(tokenRow);
-      
-      if(Boolean.parseBoolean(
-        input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
-      {
-        rowsByAnnotation.put("tok", tokenRowList);
-      }
-      
-      grid.setRowsByAnnotation(rowsByAnnotation);
+        grid = new AnnotationGrid(mediaController, resultID);
+        grid.addStyleName("partitur_table");
+        addComponent(grid);
+
+        SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+
+        List<String> annos = computeDisplayAnnotations(graph);
+
+        EList<SToken> token = graph.getSortedSTokenByText();
+        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+        long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+
+        LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
+          parseSalt(input.getDocument().getSDocumentGraph(), annos, 
+            (int) startIndex, (int) endIndex);
+
+        // add tokens as row
+        Row tokenRow = new Row();
+        for(SToken t : token)
+        {
+          long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
+            - startIndex;
+          String text = CommonHelper.getSpannedText(t);
+
+          GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
+
+          // check if the token is a matched node
+          SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.
+            getSValueSNUMERIC();
+          event.setMatch(match);
+
+          tokenRow.addEvent(event);
+        }
+        ArrayList<Row> tokenRowList = new ArrayList<Row>();
+        tokenRowList.add(tokenRow);
+
+        if(Boolean.parseBoolean(
+          input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
+        {
+          rowsByAnnotation.put("tok", tokenRowList);
+        }
+
+        grid.setRowsByAnnotation(rowsByAnnotation);
+      } // end if input not null
     }
     
     /**
@@ -181,6 +184,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
      */
     private List<String> computeDisplayAnnotations(SDocumentGraph graph)
     {
+      if(input == null)
+      {
+        return new LinkedList<String>();
+      }
+      
       Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace());
       List<String> annos = new LinkedList<String>(annoPool);
       

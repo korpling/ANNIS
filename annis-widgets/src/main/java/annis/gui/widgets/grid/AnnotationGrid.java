@@ -36,7 +36,7 @@ public class AnnotationGrid extends AbstractComponent
 {
 
   private Map<String, ArrayList<Row>> rowsByAnnotation;
-  private MediaController mediaController;
+  private transient MediaController mediaController;
   private String resultID;
 
   public AnnotationGrid(MediaController mediaController, String resultID)
