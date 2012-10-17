@@ -139,21 +139,44 @@ public class VJITWrapper extends Widget implements Paintable
     // save this reference for reading inner fields in functions
     var saveThis = this;
 
-    var st = {};
-    
-      
+    // is used for building unique ids for edge Labels
+    var EDGE_LABEL_PREFIX = "edge_";
+
+    // the visualization reference
+    var st;
+
+    // Override the hiding method, because we want to hide edge labels
+    // too.
+    $wnd.$jit.ST.Label.HTML.implement({
+        hideLabel: function(node, show) {
+            node = $wnd.$jit.util.splat(node);
+            var st = show ? "" : "none", lab, that = this;
+            $wnd.$jit.util.each(node, function(n) {
+                var lab = that.getLabel(n.id);
+                if (lab) {
+                    lab.style.display = st;
+                }
+                lab = that.getLabel(EDGE_LABEL_PREFIX + n.id);
+                if(lab) {
+                    lab.style.display = st;
+                }
+            });
+        }
+    });
+
+
+
     // Override label rendering, add edge labels. It assumes that,
-    // there is only one pointing relation.     
+    // there is only one pointing relation.
     $wnd.$jit.ST.Label.HTML.implement({
 
         'plotLabel' : function(canvas, node, controller) {
 
-            var edgeLabelPrefix = "edge_",
-            id = node.id,
+            var id = node.id,
             fromNode = node,
             toNode = node.data.edges.length > 0 ? st.graph.getNode(node.data.edges[0].to) : {},
             tag = this.getLabel(id),
-            tag_edge = this.getLabel(edgeLabelPrefix + id);
+            tag_edge = this.getLabel(EDGE_LABEL_PREFIX + id);
 
             if(!tag && !(tag = document.getElementById(id))) {
                 tag = document.createElement('div');
@@ -169,13 +192,13 @@ public class VJITWrapper extends Widget implements Paintable
             this.placeLabel(tag, node, controller);
 
             if(!tag_edge
-               && !(tag_edge = document.getElementById(edgeLabelPrefix+id))
+               && !(tag_edge = document.getElementById(EDGE_LABEL_PREFIX+id))
                && node.data.edges.length > 0)
             {
                 tag_edge = document.createElement('div');
                 var container = this.getLabelContainer();
 
-                tag_edge.id = edgeLabelPrefix+id;
+                tag_edge.id = EDGE_LABEL_PREFIX+id;
                 tag_edge.className = 'edge';
                 tag_edge.style.position = 'absolute'
                 container.appendChild(tag_edge);
@@ -184,7 +207,7 @@ public class VJITWrapper extends Widget implements Paintable
                 tag_edge.style.align = node.getLabelData('textAlign');
                 tag_edge.style.font = node.getLabelData('style') + ' ' + node.getLabelData('size') + 'px ' + node.getLabelData('family');
 
-                this.labels[edgeLabelPrefix+node.id] = tag_edge;
+                this.labels[EDGE_LABEL_PREFIX+node.id] = tag_edge;
             }
 
             if (tag_edge)
@@ -292,8 +315,8 @@ public class VJITWrapper extends Widget implements Paintable
                     child = st.graph.getNode(edge.from),
                     dim = adj.getData('dim');
 
-                    this.edgeTypes.edgeLabel.drawArrow(node, child, dim, 
-                                                           true, canvas, 
+                    this.edgeTypes.edgeLabel.drawArrow(node, child, dim,
+                                                           true, canvas,
                                                            this.viz, orn);
                 }
             }
@@ -324,7 +347,7 @@ public class VJITWrapper extends Widget implements Paintable
                 {
                     var tmp = from;
                     from = to;
-                    to = tmp;            
+                    to = tmp;
                 }
             }
             else {
@@ -351,7 +374,7 @@ public class VJITWrapper extends Widget implements Paintable
             ctx.lineTo(to.x, to.y);
             ctx.closePath();
             ctx.fill();
-        } 
+        }
       }
     });
 
@@ -362,7 +385,7 @@ public class VJITWrapper extends Widget implements Paintable
 
       label.id = node.id;
 
-      // put the sentences into the label      
+      // put the sentences into the label
       if(node.data.sentence){
         label.innerHTML = node.data.sentence;
       }
@@ -422,7 +445,7 @@ public class VJITWrapper extends Widget implements Paintable
     //override the Edge global style properties.
     config['onBeforePlotLine'] = function(adj){
       if (adj.nodeFrom.selected && adj.nodeTo.selected) {
-        adj.data.$color = "#eed";
+        adj.data.$color = "#000";
         adj.data.$lineWidth = 3;
       }
       else {
@@ -476,13 +499,13 @@ public class VJITWrapper extends Widget implements Paintable
     edge.setProperty("type", "edgeLabel");
     edge.setProperty("overridable", true);
     config.setProperty("Edge", edge);
-    
+
     // navigation config
     JITConf navigation = new JITConf();
     navigation.setProperty("enable", true);
     navigation.setProperty("panning", true);
     config.setProperty("Navigation", navigation);
-    
+
     //label config
     JITConf label = new JITConf();
     label.setProperty("overridable", true);
