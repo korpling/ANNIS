@@ -63,19 +63,19 @@ public class SingleResultPanel extends CssLayout implements
   private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
-  private SDocument result;
-  private Map<SNode, Long> markedAndCovered;
+  private transient SDocument result;
+  private transient Map<SNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
   private ResolverProvider resolverProvider;
-  private PluginSystem ps;
+  private transient PluginSystem ps;
   private List<VisualizerPanel> visualizers;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
-  private List<SToken> token;
+  private transient List<SToken> token;
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -135,7 +135,7 @@ public class SingleResultPanel extends CssLayout implements
     try
     {
 
-      if (wasAttached)
+      if (wasAttached || result == null)
       {
         return;
       }
@@ -203,13 +203,16 @@ public class SingleResultPanel extends CssLayout implements
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
-    List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
-        result.getSDocumentGraph());
-    markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-    
-    for(VisualizerPanel p : visualizers)
+
+    if(result != null)
     {
-      p.setSegmentationLayer(segmentationName, markedAndCovered);
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+          result.getSDocumentGraph());
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      for (VisualizerPanel p : visualizers)
+      {
+        p.setSegmentationLayer(segmentationName, markedAndCovered);
+      }
     }
   }
 
@@ -226,46 +229,52 @@ public class SingleResultPanel extends CssLayout implements
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
 
-    SDocumentGraph g = result.getSDocumentGraph();
-    if (g != null)
+    if(result != null)
     {
-      for (SNode n : result.getSDocumentGraph().getSNodes())
+      SDocumentGraph g = result.getSDocumentGraph();
+      if (g != null)
       {
-
-        SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-
-        if (match != null)
+        for (SNode n : result.getSDocumentGraph().getSNodes())
         {
-          int color = Math.max(0, Math.min((int) match.longValue() - 1,
-            MatchedNodeColors.values().length - 1));
-          SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-          if (feat != null)
-          {
-            markedExactMap.put("" + feat.getSValueSNUMERIC(),
-              MatchedNodeColors.values()[color].name());
-          }
-        }
 
-      }
-    }
+          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.
+            getSValueSNUMERIC();
+
+          if (match != null)
+          {
+            int color = Math.max(0, Math.min((int) match.longValue() - 1,
+              MatchedNodeColors.values().length - 1));
+            SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+            if (feat != null)
+            {
+              markedExactMap.put("" + feat.getSValueSNUMERIC(),
+                MatchedNodeColors.values()[color].name());
+            }
+          }
+
+        }
+      } // end if g not null
+    } // end if result not null
   }
 
   private void calulcateColorsForMarkedAndCoverd()
   {
-    for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
+    if(markedAndCovered != null)
     {
-      int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
-        - 1,
-        MatchedNodeColors.values().length - 1));
-      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      if (feat != null)
+      for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
       {
-        markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
-          MatchedNodeColors.values()[color].name());
-      }
-    }
+        int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
+          - 1,
+          MatchedNodeColors.values().length - 1));
+        SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
+        if (feat != null)
+        {
+          markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
+            MatchedNodeColors.values()[color].name());
+        }
+      } // end for each entry in markedAndCoverd
+    } // end if markedAndCovered not null
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
@@ -337,7 +346,7 @@ public class SingleResultPanel extends CssLayout implements
   @Override
   public void buttonClick(ClickEvent event)
   {
-    if (event.getButton() == btInfo)
+    if (event.getButton() == btInfo && result != null)
     {
       Window infoWindow = new Window("Info for " + result.getSId());
 
