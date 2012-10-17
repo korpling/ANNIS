@@ -15,18 +15,17 @@
  */
 package annis.gui.visualizers.component.grid;
 
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
 import annis.CommonHelper;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.TimeHelper;
-import static annis.model.AnnisConstants.*;
-
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
+import static annis.model.AnnisConstants.*;
 import com.vaadin.Application;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -56,6 +55,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -135,43 +135,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
       SDocumentGraph graph = input.getDocument().getSDocumentGraph();
      
-      List<String> annos = new LinkedList<String>(getAnnotationLevelSet(graph, 
-        input.getNamespace()));
-      
-      String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
-      if(annosConfiguration != null && annosConfiguration.trim().length() > 0)
-      {
-        String[] split = annosConfiguration.split(",");
-        annos.clear();
-        for(String s : split)
-        {
-          annos.add(s.trim());
-        }
-      }
-      
-      // filter annotation names by regular expression if this was given as mapping
-      String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
-      if(regexFilterRaw != null)
-      {
-        try
-        {
-          Pattern regexFilter = Pattern.compile(regexFilterRaw);
-          ListIterator<String> itAnnos = annos.listIterator();
-          while(itAnnos.hasNext())
-          {
-            String a = itAnnos.next();
-            // remove entry if not matching
-            if(!regexFilter.matcher(a).matches())
-            {
-              itAnnos.remove();
-            }
-          }
-        }
-        catch(PatternSyntaxException ex)
-        {
-          log.warn("invalid regular expression in mapping for grid visualizer", ex);
-        }
-      }
+      List<String> annos = computeDisplayAnnotations(graph);
       
       EList<SToken> token = graph.getSortedSTokenByText();
       long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
@@ -209,6 +173,78 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       }
       
       grid.setRowsByAnnotation(rowsByAnnotation);
+    }
+    
+    /**
+     * Returns 
+     * @return 
+     */
+    private List<String> computeDisplayAnnotations(SDocumentGraph graph)
+    {
+      Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace());
+      List<String> annos = new LinkedList<String>(annoPool);
+      
+      String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
+      if(annosConfiguration != null && annosConfiguration.trim().length() > 0)
+      {
+        String[] split = annosConfiguration.split(",");
+        annos.clear();
+        for(String s : split)
+        {
+          s = s.trim();
+          // is regular expression?
+          if(s.startsWith("/") && s.endsWith("/"))
+          {
+            // go over all remaining items in our pool of all annotations and
+            // check if they match
+            Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+            
+            LinkedList<String> matchingAnnos = new LinkedList<String>();
+            for(String a : annoPool)
+            {
+              if(regex.matcher(a).matches())
+              {
+                matchingAnnos.add(a);
+              }
+            }
+            
+            annos.addAll(matchingAnnos);
+            annoPool.removeAll(matchingAnnos);
+            
+          }
+          else
+          {
+            annos.add(s);
+            annoPool.remove(s);
+          }
+        }
+      }
+      
+      // filter already found annotation names by regular expression 
+      // if this was given as mapping
+      String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+      if(regexFilterRaw != null)
+      {
+        try
+        {
+          Pattern regexFilter = Pattern.compile(regexFilterRaw);
+          ListIterator<String> itAnnos = annos.listIterator();
+          while(itAnnos.hasNext())
+          {
+            String a = itAnnos.next();
+            // remove entry if not matching
+            if(!regexFilter.matcher(a).matches())
+            {
+              itAnnos.remove();
+            }
+          }
+        }
+        catch(PatternSyntaxException ex)
+        {
+          log.warn("invalid regular expression in mapping for grid visualizer", ex);
+        }
+      }
+      return annos;
     }
     
     
