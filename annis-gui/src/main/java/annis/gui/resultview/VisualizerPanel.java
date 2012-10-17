@@ -295,20 +295,14 @@ public class VisualizerPanel extends CustomLayout
   }
 
   public ApplicationResource createResource(
-    final ByteArrayOutputStream byteStream,
+    ByteArrayOutputStream byteStream,
     String mimeType)
   {
 
     StreamResource r;
 
-    r = new StreamResource(new StreamResource.StreamSource()
-    {
-      @Override
-      public InputStream getStream()
-      {
-        return new ByteArrayInputStream(byteStream.toByteArray());
-      }
-    }, entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
+    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream), 
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
@@ -429,6 +423,29 @@ public class VisualizerPanel extends CustomLayout
   public String getHtmlID()
   {
     return htmlID;
+  }
+  
+  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
+  {
+    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+    private transient ByteArrayOutputStream byteStream;
+
+    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
+    {
+      this.byteStream = byteStream;
+    }
+    
+    @Override
+    public InputStream getStream()
+    {
+      if(byteStream == null)
+      {
+        log.error("byte stream was null");
+        return null;
+      }
+      return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+    
   }
 
 }

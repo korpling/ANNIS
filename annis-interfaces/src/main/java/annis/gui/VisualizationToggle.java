@@ -16,12 +16,13 @@
 package annis.gui;
 
 import annis.visualizers.LoadableVisualizer;
+import java.io.Serializable;
 
 /**
  *
  * @author thomas
  */
-public interface VisualizationToggle
+public interface VisualizationToggle extends Serializable
 {
   /**
    * Shows and hides the visualizer.

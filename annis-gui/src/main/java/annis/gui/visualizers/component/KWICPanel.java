@@ -98,7 +98,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     private static final String DUMMY_COLUMN = "dummyColumn";
     private BeanItemContainer<String> containerAnnos;
     private transient Map<SNode, Long> markedAndCovered;
-    private MediaController mediaController;
+    private transient MediaController mediaController;
     
     // only used for media files
     private String[] media_annotations =

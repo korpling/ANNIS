@@ -15,6 +15,8 @@
  */
 package annis.gui.media;
 
+import java.io.Serializable;
+
 /**
  * Classes that implement this interface are representing media players in 
  * the GUI.
@@ -22,7 +24,7 @@ package annis.gui.media;
  * player interface.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public interface MediaPlayer
+public interface MediaPlayer extends Serializable
 {
   /**
    * Play media file from a specific starting point.
