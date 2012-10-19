@@ -469,12 +469,20 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return edgeData;
   }
 
-  // used for html ids
+  /**
+   * Build a unique HTML id.
+   */
   private String getUniqueStringId(SNode node)
   {
     return visId + "_" + node.getSName();
   }
 
+  /**
+   * The salt graph does not contain pointing relations, so we have to check, if
+   * the edge annotation contains at least one of this
+   * {@link RSTImpl#ANNOTATION_VALUES}.
+   *
+   */
   private boolean isPointingRelation(Edge edge)
   {
     EList<SAnnotation> annos;
