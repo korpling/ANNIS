@@ -201,7 +201,19 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       // build strings
       for (int i = 0; i < token.size(); i++)
       {
-        String text = getText(token.get(i));
+        SToken tok = token.get(i);
+        String text = getText(tok);
+        String color = getHTMLColor(tok);
+
+        if (color != null)
+        {
+          sb.append("<span style=\"color : ").append(color).append(";\">");
+        }
+        else
+        {
+          sb.append("<span>");
+        }
+
         if (i < token.size() - 1)
         {
           sb.append(text).append(" ");
@@ -210,6 +222,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         {
           sb.append(text);
         }
+
+        sb.append("</span>");
       }
     }
 
@@ -226,19 +240,15 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       // since we have found some tokens, it must be a sentence in RST.
       if (token.size() > 0)
       {
+
         data.put("sentence", sb.toString());
 
+        String color = null;
         if (markedAndCovered != null
-          && markedAndCovered.containsKey(token.get(0)))
+          && markedAndCovered.containsKey(token.get(0))
+          && (color = getHTMLColor(token.get(0))) != null)
         {
-          /**
-           * Since the range in markedAndCovered is from 1 up to 8, we have to
-           * decrease the value, for matching the colors in KWIC.
-           */
-          int color = (int) (long) markedAndCovered.get(token.get(0));
-          color = Math.min(color > 0 ? color - 1 : color,
-            MatchedNodeColors.values().length - 1);
-          data.put("color", MatchedNodeColors.values()[color].getHTMLColor());
+          data.put("color", color);
         }
       }
 
@@ -487,5 +497,30 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       }
     }
     return true;
+  }
+
+  /**
+   * Checks, if a specific token is marked as matching token and returns a HTML
+   * color string.
+   *
+   * @return is null when token is not marked
+   */
+  private String getHTMLColor(SToken token)
+  {
+
+    if (!markedAndCovered.containsKey(token))
+    {
+      return null;
+    }
+
+    /**
+     * Since the range in markedAndCovered is from 1 up to 8, we have to
+     * decrease the value, for matching the colors in KWIC.
+     */
+    int color = (int) (long) markedAndCovered.get(token);
+    color = Math.min(color > 0 ? color - 1 : color,
+      MatchedNodeColors.values().length - 1);
+
+    return MatchedNodeColors.values()[color].getHTMLColor();
   }
 }
