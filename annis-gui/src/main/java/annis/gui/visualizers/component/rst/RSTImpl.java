@@ -15,9 +15,9 @@
  */
 package annis.gui.visualizers.component.rst;
 
+import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import com.google.gwt.json.client.JSONValue;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -33,6 +33,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHand
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
+import java.util.Map;
 import java.util.Stack;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -82,10 +83,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private static int count = 0;
   private final String visId;
   private SDocumentGraph graph;
+  private Map<SNode, Long> markedAndCovered;
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
     graph = visInput.getDocument().getSDocumentGraph();
+    markedAndCovered = visInput.getMarkedAndCovered();
     EList<SNode> nodes = graph.getSRoots();
     EList<SNode> rootSNodes = new BasicEList<SNode>();
 
@@ -220,10 +223,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       JSONObject data = new JSONObject();
       JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
 
+      // since we have found some tokens, it must be a sentence in RST.
       if (token.size() > 0)
       {
         data.put("sentence", sb.toString());
+
+        if (markedAndCovered != null
+          && markedAndCovered.containsKey(token.get(0)))
+        {
+
+          int color = Math.min(
+            (int) (long) markedAndCovered.get(token.get(0)),
+            MatchedNodeColors.values().length - 1);
+          data.put("color", MatchedNodeColors.values()[color].getHTMLColor());
+        }
       }
+
 
       if (edgesJSON != null)
       {
