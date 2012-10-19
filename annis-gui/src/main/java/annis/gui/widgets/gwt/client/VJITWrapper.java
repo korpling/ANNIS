@@ -395,6 +395,22 @@ public class VJITWrapper extends Widget implements Paintable
 
       label.id = node.id;
 
+      //set label styles
+      var style = label.style;
+      style.width = 60 + 'px';
+      style.height = 17 + 'px';
+      style.cursor = 'pointer';
+      style.color = '#333';
+      style.fontSize = '0.8em';
+      style.textAlign= 'center';
+      style.paddingTop = '3px';
+
+      // mark the label with color
+      if (node.data.color)
+      {
+        label.style.color = node.data.color;
+      }
+
       // put the sentences into the label
       if(node.data.sentence){
         label.innerHTML = node.data.sentence;
@@ -406,16 +422,6 @@ public class VJITWrapper extends Widget implements Paintable
       label.onclick = function(){
         st.onClick(node.id);
       };
-
-      //set label styles
-      var style = label.style;
-      style.width = 60 + 'px';
-      style.height = 17 + 'px';
-      style.cursor = 'pointer';
-      style.color = '#333';
-      style.fontSize = '0.8em';
-      style.textAlign= 'center';
-      style.paddingTop = '3px';
     };
 
     //This method is called right before plotting

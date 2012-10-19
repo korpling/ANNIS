@@ -129,9 +129,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     try
     {
 
-      String path = "/tmp/" + graph.getSName() + ".js";
+      String path = "/tmp/" + "json.js";
       FileOutputStream out = new FileOutputStream(path);
-      out.write(result.toString().getBytes("UTF-8"));
+      out.write(("var json = " + result).toString().getBytes("UTF-8"));
       out.close();
     }
     catch (Exception ex)
@@ -231,9 +231,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         if (markedAndCovered != null
           && markedAndCovered.containsKey(token.get(0)))
         {
-
-          int color = Math.min(
-            (int) (long) markedAndCovered.get(token.get(0)),
+          /**
+           * Since the range in markedAndCovered is from 1 up to 8, we have to
+           * decrease the value, for matching the colors in KWIC.
+           */
+          int color = (int) (long) markedAndCovered.get(token.get(0));
+          color = Math.min(color > 0 ? color - 1 : color,
             MatchedNodeColors.values().length - 1);
           data.put("color", MatchedNodeColors.values()[color].getHTMLColor());
         }
