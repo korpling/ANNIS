@@ -162,7 +162,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doCount("phon_t=\"äh\"");
+    doSql("count pos=\"NE\" & lemma=\"Zossen\" & pos=\"ADV\" & tok & #1 _=_ #2 & #2 .* #3 & #3 _=_ #4");
   }
 
   public void doParse(String annisQuery)

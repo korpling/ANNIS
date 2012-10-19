@@ -25,6 +25,7 @@ import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
@@ -52,6 +53,8 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import java.util.LinkedList;
+import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
@@ -75,6 +78,55 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   
   private AnnotationConditionProvider annoCondition;
   
+  
+  
+  void joinOnNode(List<String> conditions, QueryNode node, QueryNode target,
+    String operator, String leftColumn, String rightColumn)
+  {
+    conditions.add(join(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn)));
+  }
+
+  void betweenJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String leftColumn, String rightColumn, int min, int max)
+  {
+    conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
+      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+  }
+
+  void numberJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String operator, String leftColumn, String rightColumn,
+    int offset)
+  {
+    conditions.add(numberJoin(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn), offset));
+  }
+  
+    
+  /**
+   * Explicitly disallow reflexivity.
+   * 
+   * Can be used if the other conditions allow reflexivity but the operator not.
+   * Two results are not equal if they are different nodes or differnt annotations
+   * of the same node.
+   * @param conditions
+   * @param node
+   * @param target 
+   */
+  private void notReflexive(List<String> conditions,
+    QueryNode node, QueryNode target)
+  {
+    Validate.isTrue(node != target, "notReflexive(...) implies that source "
+      + "and target node are not the same, but someone is violating this constraint!");
+    LinkedList<String> or = new LinkedList<String>();
+    joinOnNode(or, node, target, "<>", "id", "id");
+    annoCondition.addAnnotationsNotEqualConditions(or, node, target, tables(node), tables(target));
+
+    conditions.add("(" + StringUtils.join(or.iterator(), " OR ") + ")");
+  }
+
   
   private void addComponentPredicates(List<String> conditions, QueryNode node,
     final String edgeType, String componentName)
@@ -200,30 +252,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       tables(target).aliasedColumn(NODE_TABLE, tokenBoarder), innerSelect));
   }
 
-  void joinOnNode(List<String> conditions, QueryNode node, QueryNode target,
-    String operator, String leftColumn, String rightColumn)
-  {
-    conditions.add(join(operator,
-      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
-      aliasedColumn(NODE_TABLE, rightColumn)));
-  }
-
-  void betweenJoinOnNode(List<String> conditions, QueryNode node,
-    QueryNode target, String leftColumn, String rightColumn, int min, int max)
-  {
-    conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
-      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
-  }
-
-  void numberJoinOnNode(List<String> conditions, QueryNode node,
-    QueryNode target, String operator, String leftColumn, String rightColumn,
-    int offset)
-  {
-    conditions.add(numberJoin(operator,
-      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
-      aliasedColumn(NODE_TABLE, rightColumn), offset));
-  }
-
   @Override
   protected void addAnnotationConditions(List<String> conditions,
     QueryNode node, int index, QueryAnnotation annotation, String table,
@@ -288,9 +316,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode target, QueryNode node, RightOverlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, ">=", "right", "right");
-    joinOnNode(conditions, target, node, ">=", "right", "left");
-    joinOnNode(conditions, node, target, ">=", "left", "left");
+    joinOnNode(conditions, node, target, ">=", "right_token", "right_token");
+    joinOnNode(conditions, target, node, ">=", "right_token", "left_token");
+    joinOnNode(conditions, node, target, ">=", "left_token", "left_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -298,9 +327,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode target, QueryNode node, LeftOverlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "<=", "left", "left");
-    joinOnNode(conditions, target, node, "<=", "left", "right");
-    joinOnNode(conditions, node, target, "<=", "right", "right");
+    joinOnNode(conditions, node, target, "<=", "left_token", "left_token");
+    joinOnNode(conditions, target, node, "<=", "left_token", "right_token");
+    joinOnNode(conditions, node, target, "<=", "right_token", "right_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -308,8 +338,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode target, Overlap join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "<=", "left", "right");
-    joinOnNode(conditions, target, node, "<=", "left", "right");
+    joinOnNode(conditions, node, target, "<=", "left_token", "right_token");
+    joinOnNode(conditions, target, node, "<=", "left_token", "right_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -317,13 +348,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, QueryNode target, Inclusion join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "<=", "left", "left");
-    joinOnNode(conditions, node, target, ">=", "right", "right");
+    joinOnNode(conditions, node, target, "<=", "left_token", "left_token");
+    joinOnNode(conditions, node, target, ">=", "right_token", "right_token");
     if (optimizeInclusion)
     {
-      joinOnNode(conditions, target, node, "<=", "left", "right");
-      joinOnNode(conditions, target, node, ">=", "right", "left");
+      joinOnNode(conditions, target, node, "<=", "left_token", "right_token");
+      joinOnNode(conditions, target, node, ">=", "right_token", "left_token");
     }
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -331,7 +363,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, QueryNode target, RightAlignment join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "=", "right", "right");
+    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -339,7 +372,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, QueryNode target, LeftAlignment join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "=", "left", "left");
+    joinOnNode(conditions, node, target, "=", "left_token", "left_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -354,8 +388,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode target, SameSpan join, QueryData queryData)
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
-    joinOnNode(conditions, node, target, "=", "left", "left");
-    joinOnNode(conditions, node, target, "=", "right", "right");
+    joinOnNode(conditions, node, target, "=", "left_token", "left_token");
+    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    notReflexive(conditions, node, target);
   }
 
   @Override
@@ -564,7 +599,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         "seg_name")));
     }
   }
-
+  
   @Override
   protected void addSpanConditions(List<String> conditions,
     QueryData queryData, QueryNode node)

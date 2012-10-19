@@ -86,8 +86,8 @@ public class TableAccessStrategy {
 	public String aliasedTable(String table, int count) {
 		if (node != null) {
 			// sanity checks
-			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
-				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
+//			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
+//				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
 			if (table.equals(EDGE_ANNOTATION_TABLE) && count > node.getEdgeAnnotations().size())
 				throw new IllegalArgumentException("access to edge annotation table out of range: " + count);
 			if (table.equals(NODE_TABLE) && count > 1)

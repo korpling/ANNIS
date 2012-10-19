@@ -19,26 +19,21 @@ import annis.dao.AnnisDao;
 import annis.dao.SpringAnnisDao;
 import annis.ql.parser.QueryData;
 import annis.test.TestHelper;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Resource;
-import org.junit.Assume;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeNotNull;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeTrue;;
-
-import org.springframework.dao.DataAccessException;
 
 /**
  * This will execute tests on a real database and check if the counts are OK.

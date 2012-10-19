@@ -20,10 +20,13 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
+import static annis.sqlgen.SqlConstraints.join;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
  *
@@ -106,4 +109,20 @@ public class ApAnnotationConditionProvider implements
     
     conditions.add(cond);
   }
+
+  @Override
+  public void addAnnotationsNotEqualConditions(List<String> conditions, 
+    QueryNode node, QueryNode target, TableAccessStrategy tasNode,
+    TableAccessStrategy tasTarget)
+  {
+    Validate.isTrue(node != target, "addAnnotationsNotEqualConditions(...) implies that source "
+      + "and target nodes are not the same, but someone is violating this constraint!");
+    Validate.isTrue(tasNode != tasTarget, "addAnnotationsNotEqualConditions(...) implies that source "
+      + "and target table access strategies are not the same, but someone is violating this constraint!");
+    conditions.add(join("<>", tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref"), 
+      tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "anno_ref")));
+  }
+
+  
+  
 }

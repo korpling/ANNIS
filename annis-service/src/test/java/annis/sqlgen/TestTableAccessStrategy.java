@@ -296,12 +296,6 @@ public class TestTableAccessStrategy {
 		tableAccessStrategy.aliasedTable(RANK_TABLE, 2);
 	}
 
-	// throw exception if trying to access a table for an unknown node annotation
-	@Test(expected=IllegalArgumentException.class)
-	public void nodeAnnotationsUnknownAnnotation() {
-		when(node23.getNodeAnnotations()).thenReturn(annotations);
-		tableAccessStrategy.aliasedTable(NODE_ANNOTATION_TABLE, 4);
-	}
 	
 	// throw exception if trying to access a table for an unknown edge annotation
 	@Test(expected=IllegalArgumentException.class)

@@ -15,16 +15,17 @@
  */
 package annis.sqlgen.fullfacts;
 
-import static annis.sqlgen.SqlConstraints.sqlString;
-import static annis.sqlgen.SqlConstraints.join;
-
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
+import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import java.util.List;
+
 
 /**
  *
@@ -56,4 +57,17 @@ public class FfAnnotateConditionProvider implements
         sqlString(annotation.getValue(), textMatching)));
     }
   }
+
+  @Override
+  public void addAnnotationsNotEqualConditions(List<String> conditions, QueryNode node, QueryNode target, TableAccessStrategy tasNode,
+    TableAccessStrategy tasTarget)
+  {
+    conditions.add(join("<>", tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "name"), 
+      tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "name")));
+    conditions.add(join("<>", tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace"), 
+      tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace")));
+  }
+
+  
+  
 }
