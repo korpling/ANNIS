@@ -15,12 +15,10 @@
  */
 package annis.gui;
 
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.ClassResource;
-import com.vaadin.terminal.FileResource;
-import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Button.ClickEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -37,23 +35,11 @@ public class AboutPanel extends Panel
 {
   
   private static final Logger log = LoggerFactory.getLogger(AboutPanel.class);
-
-  private static ClassResource logo_sfb_res;
-  private static ClassResource logo_annis_res;
+    
   private VerticalLayout layout;
   
-  public AboutPanel(Application app)
+  public AboutPanel()
   {
-    if(logo_sfb_res == null)
-    {
-      logo_sfb_res = new ClassResource(AboutPanel.class,
-      "sfb-logo.jpg", app);
-    }
-    if(logo_annis_res == null)
-    {
-      logo_annis_res = new ClassResource(AboutPanel.class,
-      "annis-logo-128.png", app);
-    }
     setSizeFull();
     
     layout = (VerticalLayout) getContent();
@@ -65,16 +51,16 @@ public class AboutPanel extends Panel
   public void attach()
   {
     super.attach();
-
+ 
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();
-    logoAnnis.setSource(logo_annis_res);
+    logoAnnis.setSource(new ThemeResource("annis-logo-128.png"));
     logoAnnis.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoAnnis);
     
     Embedded logoSfb = new Embedded();
-    logoSfb.setSource(logo_sfb_res);
+    logoSfb.setSource(new ThemeResource("sfb-logo.jpg"));
     logoSfb.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoSfb);
     

@@ -107,7 +107,7 @@ public class SearchWindow extends Window
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About ANNIS", new AboutPanel(getApplication()));
+        Window w = new Window("About ANNIS", new AboutPanel());
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
