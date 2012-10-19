@@ -95,6 +95,39 @@ public class CountTest
     
   }
   
+  @Test
+  public void testNonReflexivityPcc2()
+  {
+    assumeTrue(pcc2CorpusID.size() > 0);
+    
+    String[] operatorsToTest = new String[] 
+    {
+      ".", ".*", ">", ">*", "_=_", "_i_" , "_o_", "_l_", "_r_", "->dep", "->dep *",
+      ">@l", ">@r", "$", "$*"
+    };
+
+    // get token count as reference
+    int tokenCount = countPcc2("tok");
+    
+    for(String op : operatorsToTest)
+    {
+      int tokResult =  countPcc2("tok & tok & #1 " + op + " #2");
+      assertFalse("\"" + op + "\" operator should be non-reflexive", 
+        tokenCount == tokResult);
+    }
+  }
+  
+  @Test
+  public void testReflexivityPcc2()
+  {
+    // get token count as reference
+    int tokenCount = countPcc2("tok");
+    
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 = #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 = #2"));
+  }
+  
+  
   private int countPcc2(String aql)
   {
     QueryData qd = annisDao.parseAQL(aql, pcc2CorpusID);

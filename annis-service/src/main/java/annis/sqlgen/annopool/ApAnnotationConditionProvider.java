@@ -114,7 +114,7 @@ public class ApAnnotationConditionProvider implements
   public void addAnnotationsNotEqualConditions(List<String> conditions, 
     QueryNode node, QueryNode target, TableAccessStrategy tasNode,
     TableAccessStrategy tasTarget)
-  {
+  { 
     Validate.isTrue(node != target, "addAnnotationsNotEqualConditions(...) implies that source "
       + "and target nodes are not the same, but someone is violating this constraint!");
     Validate.isTrue(tasNode != tasTarget, "addAnnotationsNotEqualConditions(...) implies that source "
