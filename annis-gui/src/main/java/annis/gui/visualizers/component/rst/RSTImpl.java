@@ -64,26 +64,55 @@ import org.slf4j.LoggerFactory;
 public class RSTImpl extends Panel implements SGraphTraverseHandler
 {
 
+  // implements the AbstractComponent and talks to the VJITWrapperWidget
   private final JITWrapper jit;
-  private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
+
+  // traversing stack for build the json tree
   private Stack<JSONObject> st = new Stack<JSONObject>();
+
   // result of transform operation salt -> json
   private JSONObject result;
-  private final String ANNOTATION_NAME = "cat";
+
+  // filter root nodes with this annotation key
+  private final String ANNOTATION_KEY = "cat";
+
+  // used for filtering dominating edges and detecting pointing relations
   final String[] ANNOTATION_VALUES =
   {
     "span", "multinuc"
   };
-  private final String DANGEROUS_RELATION = "edge";
-  private final static String TYPE = "type";
+
+  // sType for the pointing relation
+  private final String POINTING_RELATION = "edge";
+
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
    */
   private static int count = 0;
+
   private final String visId;
+
   private SDocumentGraph graph;
+
   private Map<SNode, Long> markedAndCovered;
+
+  private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
+
+  public RSTImpl(VisualizerInput visInput)
+  {
+
+    // build id and increase count for every instance
+    visId = "rst_" + count;
+    count++;
+
+    jit = new JITWrapper();
+    this.addComponent(jit);
+
+    // send the json to the widget
+    jit.setVisData(transformSaltToJSON(visInput));
+    jit.requestRepaint();
+  }
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
@@ -99,12 +128,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       {
         for (SAnnotation anno : node.getSAnnotations())
         {
-          log.debug("anno name {}, anno value {}", anno.getName(), anno.getValue());
+          log.debug("anno name {}, anno value {}", anno.getName(), anno.
+            getValue());
 
-          if (ANNOTATION_NAME.equals(anno.getName()))
+          if (ANNOTATION_KEY.equals(anno.getName()))
           {
             rootSNodes.add(node);
-            log.debug("find root {} with {}", anno, ANNOTATION_NAME);
+            log.debug("find root {} with {}", anno, ANNOTATION_KEY);
             break;
           }
         }
@@ -112,16 +142,19 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     }
 
     Salt2DOT s2d = new Salt2DOT();
-    s2d.salt2Dot(graph, URI.createFileURI("/tmp/graph_" + graph.getSName() + ".dot"));
+    s2d.salt2Dot(graph, URI.createFileURI(
+      "/tmp/graph_" + graph.getSName() + ".dot"));
 
     if (rootSNodes.size() > 0)
     {
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "jsonBuild", this);
     }
     else
     {
-      log.debug("does not find an annotation which matched {}", ANNOTATION_NAME);
-      graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+      log.debug("does not find an annotation which matched {}", ANNOTATION_KEY);
+      graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "jsonBuild", this);
     }
 
     log.debug("result json string: {}", result);
@@ -138,24 +171,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       log.error("writing json failed", ex);
     }
-//    getWindow().executeJavaScript("console.log(" + result.toString() + ");");
+
     return result.toString();
-  }
-
-  public RSTImpl(VisualizerInput visInput)
-  {
-
-    //build id and increase count for every instance
-    visId = "rst_" + count;
-    count++;
-
-    // get the jit wrapper;
-    jit = new JITWrapper();
-    this.addComponent(jit);
-
-    // send the json to the widget
-    jit.setVisData(transformSaltToJSON(visInput));
-    jit.requestRepaint();
   }
 
   private JSONObject createJsonEntry(SNode currNode)
@@ -284,14 +301,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   }
 
   @Override
-  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation sRelation, SNode fromNode, long order)
+  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+    SNode currNode, SRelation sRelation, SNode fromNode, long order)
   {
 
     st.push(createJsonEntry(currNode));
   }
 
   @Override
-  public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, SRelation edge, SNode fromNode, long order)
+  public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+    SNode currNode, SRelation edge, SNode fromNode, long order)
   {
     assert st.size() > 0;
 
@@ -313,7 +332,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     EList<String> sTypes;
 
 
-    //entry case 
+    //entry case
     if (incomingEdge == null)
     {
       return true;
@@ -337,7 +356,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
        * have to exclude the "point relation" here
        */
       if (sTypes.size() == 1
-        && DANGEROUS_RELATION.equals(sTypes.get(0))
+        && POINTING_RELATION.equals(sTypes.get(0))
         && this.detectWrongAnnotaton(incomingEdge))
       {
         return false;
