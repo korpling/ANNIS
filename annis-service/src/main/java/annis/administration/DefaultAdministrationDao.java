@@ -440,7 +440,8 @@ public class DefaultAdministrationDao implements AdministrationDao
       reader.close();
       
       
-      int columnNumber = firstLine == null ? 13 : firstLine.split("\t").length;
+      int columnNumber = firstLine == null ? 13 : 
+        StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
       if (columnNumber == 13)
       {
         // new node table with segmentations
