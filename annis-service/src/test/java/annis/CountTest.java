@@ -102,7 +102,7 @@ public class CountTest
     
     String[] operatorsToTest = new String[] 
     {
-      ".", ".*", ">", ">*", "_=_", "_i_" , "_o_", "_l_", "_r_", "->dep", "->dep *",
+      ".", ".*", ">", ">*", "_i_" , "_o_", "_l_", "_r_", "->dep", "->dep *",
       ">@l", ">@r", "$", "$*"
     };
 
@@ -125,6 +125,9 @@ public class CountTest
     
     assertEquals(tokenCount, countPcc2("tok & tok & #1 = #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 = #2"));
+    
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
   }
   
   

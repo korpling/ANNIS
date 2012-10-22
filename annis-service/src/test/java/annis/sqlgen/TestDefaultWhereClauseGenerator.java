@@ -526,10 +526,7 @@ public class TestDefaultWhereClauseGenerator
       join("=", "_node23.text_ref", "_node42.text_ref"),
       join("<=", "_node23.left_token", "_node42.left_token"),
       join(">=", "_node23.right_token", "_node42.right_token"),
-      "("
-        + join("<>", "_node23.id", "_node42.id") + " OR "
-        + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-      + ")"
+      join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -548,10 +545,7 @@ public class TestDefaultWhereClauseGenerator
         join("<=", "_node42.left_token", "_node23.right_token"),
         join(">=", "_node23.right_token", "_node42.right_token"),
         join(">=", "_node42.right_token", "_node23.left_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -709,11 +703,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "_node23.right_token", "_node42.right_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("=", "_node23.right_token", "_node42.right_token")
     );
   }
 
@@ -724,10 +714,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addJoin(new LeftAlignment(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -738,10 +725,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addJoin(new RightAlignment(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.right_token", "_node42.right_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -754,10 +738,7 @@ public class TestDefaultWhereClauseGenerator
         join("<=", "_node23.left_token", "_node42.left_token"),
         join("<=", "_node42.left_token", "_node23.right_token"),
         join("<=", "_node23.right_token", "_node42.right_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -771,10 +752,7 @@ public class TestDefaultWhereClauseGenerator
         join(">=", "_node23.right_token", "_node42.right_token"),
         join(">=", "_node42.right_token", "_node23.left_token"),
         join(">=", "_node23.left_token", "_node42.left_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -786,10 +764,7 @@ public class TestDefaultWhereClauseGenerator
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("<=", "_node23.left_token", "_node42.right_token"),
         join("<=", "_node42.left_token", "_node23.right_token"),
-        "("
-          + join("<>", "_node23.id", "_node42.id") + " OR "
-          + join("<>", "_annotation23.anno_ref", "_annotation42.anno_ref")
-        + ")"
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 

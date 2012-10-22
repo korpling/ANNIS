@@ -57,17 +57,4 @@ public class FfAnnotateConditionProvider implements
         sqlString(annotation.getValue(), textMatching)));
     }
   }
-
-  @Override
-  public void addAnnotationsNotEqualConditions(List<String> conditions, QueryNode node, QueryNode target, TableAccessStrategy tasNode,
-    TableAccessStrategy tasTarget)
-  {
-    conditions.add(join("<>", tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "name"), 
-      tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "name")));
-    conditions.add(join("<>", tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace"), 
-      tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace")));
-  }
-
-  
-  
 }

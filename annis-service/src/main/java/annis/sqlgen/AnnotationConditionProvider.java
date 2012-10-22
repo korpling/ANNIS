@@ -42,17 +42,4 @@ public interface AnnotationConditionProvider
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData, TableAccessStrategy tas);
   
-  /**
-   * Add all conditions that indicate that the <b>node</b> annotations of two nodes are not the same.
-   * The annotation will be assumed not to be the same if <b>ANY</b> added condition is true.
-   * @param conditions 
-   * @param node Source node
-   * @param target Target node
-   * @param tasNode Needed to get the table name for the source node
-   * @param tasTarget Needed to get the table name for the target node
-   */
-  public void addAnnotationsNotEqualConditions(List<String> conditions, 
-    QueryNode node, QueryNode target,
-    TableAccessStrategy tasNode, TableAccessStrategy tasTarget);
-  
 }

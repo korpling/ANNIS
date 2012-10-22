@@ -109,8 +109,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
    * Explicitly disallow reflexivity.
    * 
    * Can be used if the other conditions allow reflexivity but the operator not.
-   * Two results are not equal if they are different nodes or differnt annotations
-   * of the same node.
+   * Two results are not equal if they are different nodes. 
+   * 
    * @param conditions
    * @param node
    * @param target 
@@ -120,11 +120,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     Validate.isTrue(node != target, "notReflexive(...) implies that source "
       + "and target node are not the same, but someone is violating this constraint!");
-    LinkedList<String> or = new LinkedList<String>();
-    joinOnNode(or, node, target, "<>", "id", "id");
-    annoCondition.addAnnotationsNotEqualConditions(or, node, target, tables(node), tables(target));
-
-    conditions.add("(" + StringUtils.join(or.iterator(), " OR ") + ")");
+    joinOnNode(conditions, node, target, "<>", "id", "id");
   }
 
   
@@ -390,7 +386,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
     joinOnNode(conditions, node, target, "=", "right_token", "right_token");
-    notReflexive(conditions, node, target);
   }
 
   @Override
