@@ -89,9 +89,6 @@ public class TestDefaultWhereClauseGenerator
   // object under test: the adapter to that node
   private DefaultWhereClauseGenerator generator;
 
-  // dummy annotation set
-  @Mock private Set<QueryAnnotation> annotations;
-
   // which side to attach component predicates (name and edgeType)
   // in an edge operation
   @DataPoints
@@ -108,38 +105,41 @@ public class TestDefaultWhereClauseGenerator
     node23 = new QueryNode(23);
     node42 = new QueryNode(42);
 
-    final TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
-    tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
-    tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
-    tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
-    tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
-    tableAccessStrategy
-        .addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
-    tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "namespace",
-        "node_annotation_namespace");
-    tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "name",
-        "node_annotation_name");
-    tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "value",
-        "node_annotation_value");
-    tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "namespace",
-        "edge_annotation_namespace");
-    tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "name",
-        "edge_annotation_name");
-    tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "value",
-        "edge_annotation_value");
-    generator = new DefaultWhereClauseGenerator()
-    {
-      @Override
-      protected TableAccessStrategy createTableAccessStrategy()
-      {
-        return tableAccessStrategy;
-      }
-    };
+    
+    generator = new TestWhereClauseGenerator();
     generator.setAnnoCondition(new ApAnnotationConditionProvider());
-
-    // simulate three annotations
-    when(annotations.size()).thenReturn(3);
    
+  }
+  
+  private static class TestWhereClauseGenerator extends DefaultWhereClauseGenerator
+  {
+    @Override
+    protected TableAccessStrategy createTableAccessStrategy()
+    {
+      TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
+      tableAccessStrategy.addTableAlias(NODE_TABLE, "_node");
+      tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_component");
+      tableAccessStrategy.addTableAlias(RANK_TABLE, "_rank");
+      tableAccessStrategy.addTableAlias(NODE_ANNOTATION_TABLE, "_annotation");
+      tableAccessStrategy
+        .addTableAlias(EDGE_ANNOTATION_TABLE, "_rank_annotation");
+      tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "namespace",
+        "node_annotation_namespace");
+      tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "anno_ref",
+        "anno_ref");
+      tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "name",
+        "node_annotation_name");
+      tableAccessStrategy.addColumnAlias(NODE_ANNOTATION_TABLE, "value",
+        "node_annotation_value");
+      tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "namespace",
+        "edge_annotation_namespace");
+      tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "name",
+        "edge_annotation_name");
+      tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "value",
+        "edge_annotation_value");
+      return tableAccessStrategy;
+    }
+    
   }
 
   // helper method to check create component predicates (name, edgeType)
@@ -522,9 +522,12 @@ public class TestDefaultWhereClauseGenerator
   public void shouldGenerateWhereConditionsForInclusion()
   {
     node23.addJoin(new Inclusion(node42));
-    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.left", "_node42.left"),
-        join(">=", "_node23.right", "_node42.right"));
+    checkWhereConditions(
+      join("=", "_node23.text_ref", "_node42.text_ref"),
+      join("<=", "_node23.left_token", "_node42.left_token"),
+      join(">=", "_node23.right_token", "_node42.right_token"),
+      join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   /**
@@ -538,10 +541,12 @@ public class TestDefaultWhereClauseGenerator
     // when
     node23.addJoin(new Inclusion(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.left", "_node42.left"),
-        join("<=", "_node42.left", "_node23.right"),
-        join(">=", "_node23.right", "_node42.right"),
-        join(">=", "_node42.right", "_node23.left"));
+        join("<=", "_node23.left_token", "_node42.left_token"),
+        join("<=", "_node42.left_token", "_node23.right_token"),
+        join(">=", "_node23.right_token", "_node42.right_token"),
+        join(">=", "_node42.right_token", "_node23.left_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   /**
@@ -625,6 +630,30 @@ public class TestDefaultWhereClauseGenerator
   }
   
   @Test
+  public void whereClauseForNodeAnnotation2Nodes()
+  {
+    node23.addNodeAnnotation(new QueryAnnotation("namespace1", "name1"));
+    node23.addNodeAnnotation(new QueryAnnotation("namespace2", "name2"));
+    
+    node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3"));
+    node42.addNodeAnnotation(new QueryAnnotation("namespace4", "name4"));
+    
+    // does not make any sense, but an simple enough condition :)
+    node23.addJoin(new Identical(node42));
+    
+    
+    checkWhereConditions(node23,
+      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
+      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', NULL, NULL, ARRAY[], 'node'))",
+      "_node23.id = _node42.id"
+    );
+    checkWhereConditions(node42,
+      "_annotation42_1.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, NULL, ARRAY[], 'node'))",
+      "_annotation42_2.anno_ref= ANY(getAnno('namespace4', 'name4', NULL, NULL, ARRAY[], 'node'))"
+    );
+  }
+  
+  @Test
   public void whereClauseForNodeAnnotationNot()
   {
     node23.addNodeAnnotation(new QueryAnnotation("namespace2", "name2",
@@ -673,8 +702,9 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("=", "_node23.left", "_node42.left"),
-        join("=", "_node23.right", "_node42.right"));
+        join("=", "_node23.left_token", "_node42.left_token"),
+        join("=", "_node23.right_token", "_node42.right_token")
+    );
   }
 
   // WHERE condition for _l_
@@ -683,7 +713,9 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new LeftAlignment(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("=", "_node23.left", "_node42.left"));
+        join("=", "_node23.left_token", "_node42.left_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   // WHERE condition for _r_
@@ -692,7 +724,9 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new RightAlignment(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("=", "_node23.right", "_node42.right"));
+        join("=", "_node23.right_token", "_node42.right_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   // WHERE condition for _ol_
@@ -701,9 +735,11 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new LeftOverlap(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.left", "_node42.left"),
-        join("<=", "_node42.left", "_node23.right"),
-        join("<=", "_node23.right", "_node42.right"));
+        join("<=", "_node23.left_token", "_node42.left_token"),
+        join("<=", "_node42.left_token", "_node23.right_token"),
+        join("<=", "_node23.right_token", "_node42.right_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   // WHERE condition for _or_
@@ -713,9 +749,11 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new RightOverlap(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join(">=", "_node23.right", "_node42.right"),
-        join(">=", "_node42.right", "_node23.left"),
-        join(">=", "_node23.left", "_node42.left"));
+        join(">=", "_node23.right_token", "_node42.right_token"),
+        join(">=", "_node42.right_token", "_node23.left_token"),
+        join(">=", "_node23.left_token", "_node42.left_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   // WHERE condition for _o_
@@ -724,8 +762,10 @@ public class TestDefaultWhereClauseGenerator
   {
     node23.addJoin(new Overlap(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        join("<=", "_node23.left", "_node42.right"),
-        join("<=", "_node42.left", "_node23.right"));
+        join("<=", "_node23.left_token", "_node42.right_token"),
+        join("<=", "_node42.left_token", "_node23.right_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
   }
 
   @Test

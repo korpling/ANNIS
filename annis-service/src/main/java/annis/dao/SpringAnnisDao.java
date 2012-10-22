@@ -501,7 +501,21 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       conn = getJdbcTemplate().getDataSource().getConnection();
       DatabaseMetaData meta = conn.getMetaData();
       
-      log.info("major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName());
+      log.debug("database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName() + "]");
+      
+      if(!"PostgreSQL".equalsIgnoreCase(meta.getDatabaseProductName()))
+      {
+        throw new AnnisException("You did provide a database connection to a "
+          + "database that is not PostgreSQL. Please note that this will "
+          + "not work.");
+      }
+      if(meta.getDatabaseMajorVersion() < 9 
+        || (meta.getDatabaseMajorVersion() == 9 && meta.getDatabaseMinorVersion() < 2))
+      {
+        throw new AnnisException("Wrong PostgreSQL version installed. Please "
+          + "install at least PostgreSQL 9.2 (current installed version is "
+          + meta.getDatabaseProductVersion() + ")");
+      }
     }
     catch (SQLException ex)
     {

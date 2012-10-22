@@ -15,16 +15,17 @@
  */
 package annis.sqlgen.fullfacts;
 
-import static annis.sqlgen.SqlConstraints.sqlString;
-import static annis.sqlgen.SqlConstraints.join;
-
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
+import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import java.util.List;
+
 
 /**
  *

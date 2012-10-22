@@ -21,13 +21,25 @@ import annis.ql.parser.QueryData;
 import java.util.List;
 
 /**
- *
- * @author thomas
+ * Implements method to allow different modes to have different behavior
+ * how to add annotation constraints to the generated SQL.
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public interface AnnotationConditionProvider
 {
 
+  /**
+   * Adds annotation conditions for a single node.
+   * @param conditions Condition list where the conditions should be added to
+   * @param node Node which has annotations
+   * @param index Index for a specific annotation
+   * @param annotation The annotation to add
+   * @param table Table to operate on
+   * @param queryData {@link QueryData} of the query
+   * @param tas {@link TableAccessStrategy} for the given node.
+   */
   public void addAnnotationConditions(List<String> conditions,
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData, TableAccessStrategy tas);
+  
 }

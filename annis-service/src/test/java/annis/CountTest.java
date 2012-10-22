@@ -19,26 +19,21 @@ import annis.dao.AnnisDao;
 import annis.dao.SpringAnnisDao;
 import annis.ql.parser.QueryData;
 import annis.test.TestHelper;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Resource;
-import org.junit.Assume;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeNotNull;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeTrue;;
-
-import org.springframework.dao.DataAccessException;
 
 /**
  * This will execute tests on a real database and check if the counts are OK.
@@ -99,6 +94,42 @@ public class CountTest
     assertEquals(1, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent #1 & cat=\"NP\" & node & #4 >[func=\"OA\"] #3 & #3 _i_ #2"));
     
   }
+  
+  @Test
+  public void testNonReflexivityPcc2()
+  {
+    assumeTrue(pcc2CorpusID.size() > 0);
+    
+    String[] operatorsToTest = new String[] 
+    {
+      ".", ".*", ">", ">*", "_i_" , "_o_", "_l_", "_r_", "->dep", "->dep *",
+      ">@l", ">@r", "$", "$*"
+    };
+
+    // get token count as reference
+    int tokenCount = countPcc2("tok");
+    
+    for(String op : operatorsToTest)
+    {
+      int tokResult =  countPcc2("tok & tok & #1 " + op + " #2");
+      assertFalse("\"" + op + "\" operator should be non-reflexive", 
+        tokenCount == tokResult);
+    }
+  }
+  
+  @Test
+  public void testReflexivityPcc2()
+  {
+    // get token count as reference
+    int tokenCount = countPcc2("tok");
+    
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 = #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 = #2"));
+    
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
+  }
+  
   
   private int countPcc2(String aql)
   {

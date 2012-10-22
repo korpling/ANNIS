@@ -86,6 +86,7 @@ public class MainApp extends Application implements PluginSystem,
   private Properties versionProperties;
   
   private transient MediaController mediaController;
+ 
 
   @Override
   public void init()
