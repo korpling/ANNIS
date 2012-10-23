@@ -31,10 +31,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.TreeSet;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -91,11 +94,58 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
    */
   private static int count = 0;
 
+  // unique id for every instance of RSTImpl
   private final String visId;
 
+  // result graph
   private SDocumentGraph graph;
 
+  // all marked tokens of the result graph
   private Map<SNode, Long> markedAndCovered;
+
+  private final String SENTENCE_LEFT = "sentence_left";
+
+  private final String SENTENCE_RIGHT = "sentence_right";
+
+  /**
+   * Sorted list of all SStructures which overlapped a sentence. It's used for
+   * mapping the sentence to a number by the order of the SStructures in the
+   * list.
+   */
+  private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
+    new Comparator<SStructure>()
+    {
+      private int getStartPosition(SStructure s)
+      {
+        EList<STYPE_NAME> relationTypes = new BasicEList<STYPE_NAME>();
+        relationTypes.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+        EList<SDataSourceSequence> sSequences = s.getSDocumentGraph().
+          getOverlappedDSSequences(s, relationTypes);
+
+
+        log.debug("sSequences {}", sSequences.toString());
+
+        // only support one text for spanns
+        if (sSequences == null || sSequences.size() != 1)
+        {
+          log.error("rst supports only one text and only text level");
+          return -1;
+        }
+
+        if (sSequences.get(0).getSSequentialDS() instanceof STextualDS)
+        {
+          return sSequences.get(0).getSStart();
+        }
+
+        return -1;
+      }
+
+      @Override
+      public int compare(SStructure t, SStructure t1)
+      {
+        return getStartPosition(t) - getStartPosition(t1);
+      }
+    });
 
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
@@ -148,11 +198,66 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     if (rootSNodes.size() > 0)
     {
       graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "getSentences", new SGraphTraverseHandler()
+      {
+        @Override
+        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SNode currNode, SRelation sRelation,
+          SNode fromNode, long order)
+        {
+        }
+
+        @Override
+        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+          long order)
+        {
+          if (currNode instanceof SStructure && isSegment(currNode))
+          {
+            sentences.add((SStructure) currNode);
+          }
+        }
+
+        @Override
+        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SRelation edge, SNode currNode, long order)
+        {
+
+          // entry case
+          if (edge == null)
+          {
+            return true;
+          }
+
+          // token are not needed
+          if (currNode instanceof SToken)
+          {
+            return false;
+          }
+
+          return checkIncomingEdge(edge);
+        }
+      });
+
+      //decorate segments with sentence number
+      int i = 0;
+      for (SStructure sentence : sentences)
+      {
+        sentence.createSProcessingAnnotation(
+          "phraseIntervall", SENTENCE_LEFT, Integer.toString(i));
+        sentence.createSProcessingAnnotation(
+          "phraseIntervall", SENTENCE_RIGHT, Integer.toString(i));
+
+        i++;
+      }
+
+      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
         "jsonBuild", this);
     }
     else
     {
-      log.debug("does not find an annotation which matched {}", ANNOTATION_KEY);
+      log.debug("does not find an annotation which matched {}",
+        ANNOTATION_KEY);
       graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
         "jsonBuild", this);
     }
@@ -275,8 +380,21 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         data.put("edges", edgesJSON);
       }
 
-      jsonData.put("data", data);
+      if (isSegment(currNode))
+      {
 
+        int l = Integer.parseInt(currNode.
+          getSProcessingAnnotation("phraseIntervall::" + SENTENCE_LEFT).
+          getValueString());
+        int r = Integer.parseInt(currNode.getSProcessingAnnotation(
+          "phraseIntervall::" + SENTENCE_RIGHT).getValueString());
+
+        data.put(SENTENCE_LEFT, l);
+        data.put(SENTENCE_RIGHT, r);
+
+      }
+
+      jsonData.put("data", data);
     }
     catch (JSONException ex)
     {
@@ -301,10 +419,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   }
 
   @Override
-  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+    String traversalId,
     SNode currNode, SRelation sRelation, SNode fromNode, long order)
   {
-
     st.push(createJsonEntry(currNode));
   }
 
@@ -320,8 +438,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     }
     else
     {
-      JSONObject node = st.pop();
-      appendChild(st.peek(), node);
+      JSONObject jsonNode = st.pop();
+      setSentenceSpan(jsonNode, st.peek());
+      appendChild(st.peek(), jsonNode);
     }
   }
 
@@ -344,37 +463,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       return false;
     }
 
-    /**
-     * check whether the edge has an sType or not, because there are always two
-     * edges in the example rst corpus
-     */
-    if ((sTypes = incomingEdge.getSTypes()) != null && sTypes.size() > 0)
-    {
-      /**
-       * the pointing relations are modelled as dominance relations with type
-       * "edge" and do not carry the annotation "span" or "multinuc", so we will
-       * have to exclude the "point relation" here
-       */
-      if (sTypes.size() == 1
-        && POINTING_RELATION.equals(sTypes.get(0))
-        && this.detectWrongAnnotaton(incomingEdge))
-      {
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-    }
-    else
-    {
-      return false;
-    }
+    return checkIncomingEdge(incomingEdge);
   }
 
   /**
-   * Gets the overlapping token as string from a node, which is direct dominated
-   * by this node.
+   * Gets the overlapping token as string from a node, which are direct
+   * dominated by this node.
    *
    * @param currNode
    * @return is null, if there is no relation to a token, or there is more then
@@ -549,5 +643,103 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       MatchedNodeColors.values().length - 1);
 
     return MatchedNodeColors.values()[color].getHTMLColor();
+  }
+
+  /**
+   * Returns false, if the incoming edge does not contain any sType or if it has
+   * an sType "edge" and not the annotation "span" and "multinuc".
+   */
+  private boolean checkIncomingEdge(SRelation incomingEdge)
+  {
+
+    EList<String> sTypes;
+
+    /**
+     * check whether the edge has an sType or not, because there are always two
+     * edges in the example rst corpus
+     */
+    if ((sTypes = incomingEdge.getSTypes()) != null && sTypes.size() > 0)
+    {
+      /**
+       * the pointing relations are modelled as dominance relations with type
+       * "edge" and do not carry the annotation "span" or "multinuc", so we will
+       * have to exclude the "point relation" here
+       */
+      if (sTypes.size() == 1
+        && POINTING_RELATION.equals(sTypes.get(0))
+        && this.detectWrongAnnotaton(incomingEdge))
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  /**
+   * Checks, if there exists an SRelation which targets a SToken.
+   */
+  private boolean isSegment(SNode currNode)
+  {
+    EList<Edge> edges = currNode.getSGraph().
+      getOutEdges(currNode.getSId());
+
+    if (edges != null)
+    {
+      for (Edge edge : edges)
+      {
+        if (edge.getTarget() instanceof SToken)
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Sets the sentence_left and sentence_right properties of the data object of
+   * parent to the min/max of the currNode.
+   */
+  private void setSentenceSpan(JSONObject cNode, JSONObject parent)
+  {
+    try
+    {
+      JSONObject data = cNode.getJSONObject("data");
+
+      int leftPosC = data.getInt(SENTENCE_LEFT);
+      int rightPosC = data.getInt(SENTENCE_RIGHT);
+
+      data = parent.getJSONObject("data");
+
+      if (data.has(SENTENCE_LEFT))
+      {
+        data.put(SENTENCE_LEFT, Math.min(leftPosC, data.getInt(SENTENCE_LEFT)));
+      }
+      else
+      {
+        data.put(SENTENCE_LEFT, leftPosC);
+      }
+
+      if (data.has(SENTENCE_RIGHT))
+      {
+        data.put(SENTENCE_RIGHT,
+          Math.max(rightPosC, data.getInt(SENTENCE_RIGHT)));
+      }
+      else
+      {
+        data.put(SENTENCE_RIGHT, rightPosC);
+      }
+    }
+    catch (JSONException ex)
+    {
+      log.debug("error while setting left and right position for sentences", ex);
+    }
   }
 }
