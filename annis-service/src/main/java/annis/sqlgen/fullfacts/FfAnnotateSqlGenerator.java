@@ -18,6 +18,7 @@ package annis.sqlgen.fullfacts;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.AbstractFromClauseGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SolutionKey;
@@ -149,6 +150,7 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 
     // really ugly
     sb.append(indent).append(TABSTOP).append(
+      
       getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
     sb.append(",\n");
     sb.append(indent).append(TABSTOP).append(TableAccessStrategy.CORPUS_TABLE);
