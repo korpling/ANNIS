@@ -18,11 +18,9 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-import static annis.sqlgen.AbstractFromClauseGenerator.tableAliasDefinition;
 import static annis.sqlgen.TableAccessStrategy.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -40,57 +38,50 @@ public class TableJoinsInFromClauseSqlGenerator
   public String fromClauseForNode(QueryNode node, boolean leftJoin) 
   {
     TableAccessStrategy tas = tables(node);
-    return fromClauseForNode(tas.getTableAliases(), tas.getColumnAliases(), 
-      node, leftJoin);
-  }
-  
-	public static String fromClauseForNode(Map<String, String> tableAliases,
-    Map<String, Map<String,String>> columnAliases,
-    QueryNode node, boolean leftJoin) 
-  {
+    
 		StringBuilder sb = new StringBuilder();
 		
 		// every node uses the node table
-		sb.append(tableAliasDefinition(tableAliases, node, NODE_TABLE, 1));
+		sb.append(tableAliasDefinition(node, NODE_TABLE, 1));
 		
 		// rank table
-		if (usesRankTable(node) && !isMaterialized(tableAliases, RANK_TABLE, NODE_TABLE)) 
+		if (usesRankTable(node) && !tas.isMaterialized(RANK_TABLE, NODE_TABLE)) 
     {
 			sb.append(" ");
-			sb.append(joinDefinition(tableAliases, columnAliases, node, RANK_TABLE, "node_ref", NODE_TABLE, "id", false));
+			sb.append(joinDefinition(node, RANK_TABLE, "node_ref", NODE_TABLE, "id", false));
 		}
 		
 		// component table
-		if (usesComponentTable(node) && ! isMaterialized(tableAliases, COMPONENT_TABLE, RANK_TABLE)) {
+		if (usesComponentTable(node) && ! tas.isMaterialized(COMPONENT_TABLE, RANK_TABLE)) {
 			sb.append(" ");
-			sb.append(joinDefinition(tableAliases, columnAliases, node, COMPONENT_TABLE, "id", RANK_TABLE, "component_ref", false));
+			sb.append(joinDefinition(node, COMPONENT_TABLE, "id", RANK_TABLE, "component_ref", false));
 		}
 		
 		// node annotations
 		if (usesNodeAnnotationTable(node)) {
-			int start = isMaterialized(tableAliases, NODE_ANNOTATION_TABLE, NODE_TABLE) ? 2 : 1;
+			int start = tas.isMaterialized(NODE_ANNOTATION_TABLE, NODE_TABLE) ? 2 : 1;
 			int size = node != null ? node.getNodeAnnotations().size() : 1;
 			for (int i = start; i <= size; ++i) {
 				sb.append(" ");
-				sb.append(joinDefinition(tableAliases, columnAliases, node, NODE_ANNOTATION_TABLE, "node_ref", NODE_TABLE, "id", i, leftJoin));
+				sb.append(joinDefinition(node, NODE_ANNOTATION_TABLE, "node_ref", NODE_TABLE, "id", i, leftJoin));
 			}
 		}
 		
 		// add node annotation table if it is required by the SELECT clause, but not materialized with node table
 		if (!usesNodeAnnotationTable(node) && node.getNodeAnnotations().size() > 0 && 
-				!isMaterialized(tableAliases, NODE_ANNOTATION_TABLE, NODE_TABLE)) {
+				!tas.isMaterialized(NODE_ANNOTATION_TABLE, NODE_TABLE)) {
 			sb.append(" ");
-			sb.append(joinDefinition(tableAliases, columnAliases, node, NODE_ANNOTATION_TABLE, "node_ref", NODE_TABLE, "id", leftJoin));
+			sb.append(joinDefinition(node, NODE_ANNOTATION_TABLE, "node_ref", NODE_TABLE, "id", leftJoin));
 		}
 		
 		// edge annotations
 		if (usesEdgeAnnotationTable(node)) 
     {
-			int start = isMaterialized(tableAliases, EDGE_ANNOTATION_TABLE, RANK_TABLE) ? 2 : 1;
+			int start = tas.isMaterialized(EDGE_ANNOTATION_TABLE, RANK_TABLE) ? 2 : 1;
 			int size = node != null ? node.getEdgeAnnotations().size() : 1;
 			for (int i = start; i <= size; ++i) {
 				sb.append(" ");
-				sb.append(joinDefinition(tableAliases, columnAliases, node, 
+				sb.append(joinDefinition(node, 
           EDGE_ANNOTATION_TABLE, "rank_ref", RANK_TABLE, "pre", i, leftJoin));
 			}
 		}
@@ -100,38 +91,29 @@ public class TableJoinsInFromClauseSqlGenerator
 
 	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn) 
   {
-    TableAccessStrategy tas = tables(node);
-		return joinDefinition(tas.getTableAliases(), tas.getColumnAliases() ,node, table, column, joinedTable, joinedColumn, false);
+		return joinDefinition(node, table, column, joinedTable, joinedColumn, false);
 	}
 
-	protected static String joinDefinition(Map<String, String> tableAliases,
-    Map<String, Map<String,String>> columnAliases,
-    QueryNode node, String table, String column, String joinedTable, String joinedColumn, boolean leftJoin) 
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn, boolean leftJoin) 
   {
-		return joinDefinition(tableAliases, columnAliases, node, table, column, joinedTable, joinedColumn, 1, leftJoin);
+		return joinDefinition(node, table, column, joinedTable, joinedColumn, 1, leftJoin);
 	}
 
-	protected static String joinDefinition(Map<String, String> tableAliases,
-    Map<String, Map<String,String>> columnAliases,
-    QueryNode node, String table, String column, String joinedTable, String joinedColumn, int count) 
+	protected String joinDefinition(QueryNode node, String table, String column, String joinedTable, String joinedColumn, int count, boolean leftJoin) 
   {
-		return joinDefinition(tableAliases, columnAliases, node, table, column, joinedTable, joinedColumn, count, false);
-	}
-
-	protected static String joinDefinition(Map<String, String> tableAliases,
-    Map<String, Map<String,String>> columnAliases,
-    QueryNode node, String table, String column, String joinedTable, String joinedColumn, int count, boolean leftJoin) 
-  {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		if (leftJoin) {
 			sb.append("LEFT OUTER ");
 		}
+    
+    TableAccessStrategy tas = tables(node);
+    
 		sb.append("JOIN ");
-		sb.append(tableAliasDefinition(tableAliases, node, table, count));
+		sb.append(tableAliasDefinition( node, table, count));
 		sb.append(" ON (");
-		sb.append(aliasedColumn(tableAliases, columnAliases, node, table, column, count));
+		sb.append(aliasedColumn(tas.getTableAliases(), tas.getColumnAliases(), node, table, column, count));
 		sb.append(" = ");
-		sb.append(aliasedColumn(tableAliases, columnAliases, node, joinedTable, joinedColumn));
+		sb.append(aliasedColumn(tas.getTableAliases(), tas.getColumnAliases(), node, joinedTable, joinedColumn));
 		sb.append(")");
 		return sb.toString();
 	}

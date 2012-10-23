@@ -38,7 +38,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
 {
   
   private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
-  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
 
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -93,6 +92,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent)
   {
+    TableAccessStrategy tas = tables(null);
+    
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");
@@ -102,9 +103,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     sb.append(indent).append(") AS solutions,\n");
 
     sb.append(indent).append(TABSTOP);
-    // really ugly
     sb.append(
-      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
+      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));;
 
     sb.append("\n");
     
@@ -134,17 +134,5 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   {
     this.innerQuerySqlGenerator = innerQuerySqlGenerator;
   }
-
-  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
-  {
-    return tableJoinsInFromClauseGenerator;
-  }
-
-  public void setTableJoinsInFromClauseGenerator(TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
-  {
-    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
-  }
-
-  
   
 }

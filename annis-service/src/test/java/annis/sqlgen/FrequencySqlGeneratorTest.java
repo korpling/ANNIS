@@ -47,7 +47,6 @@ public class FrequencySqlGeneratorTest
   private FrequencySqlGenerator generator = new FrequencySqlGenerator();
   
   @Mock private SqlGenerator<QueryData, ?> innerSqlGenerator = mock(SqlGenerator.class);
-  @Mock private TableJoinsInFromClauseSqlGenerator tableJoins = mock(TableJoinsInFromClauseSqlGenerator.class);
   @Mock private QueryData queryData;
   @Mock private FrequencyTableQueryData freqTableQueryData;
   @Mock private QueryNode queryNode;
@@ -58,11 +57,9 @@ public class FrequencySqlGeneratorTest
     initMocks(this);
     
     generator.setInnerQuerySqlGenerator(innerSqlGenerator);
-    generator.setTableJoinsInFromClauseGenerator(tableJoins);
     
     given(queryData.getExtensions()).willReturn(new HashSet(Arrays.asList(freqTableQueryData)));
     given(innerSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
-    given(tableJoins.fromClauseForNode(any(QueryNode.class), anyBoolean())).willReturn("<fromclausefornode>");
     
     alternative.add(queryNode);
     given(queryData.getMaxWidth()).willReturn(3);

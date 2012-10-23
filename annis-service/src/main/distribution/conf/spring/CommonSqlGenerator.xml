@@ -205,7 +205,6 @@ limitations under the License.
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
-    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
     <property name="fromClauseSqlGenerators">
@@ -226,7 +225,6 @@ limitations under the License.
         parent="tableAccessStrategyFactory" lazy-init="true">
     
     <property name="innerQuerySqlGenerator" ref="findSqlGenerator" />
-    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
     <property name="fromClauseSqlGenerators">
@@ -301,8 +299,6 @@ limitations under the License.
     
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
-
-    <property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="fromClauseSqlGenerators">

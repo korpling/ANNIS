@@ -29,7 +29,7 @@ public abstract class AbstractFromClauseGenerator
       return tableAliasDefinition(tables(node).getTableAliases(), node, table, count);
     }
   
-	  protected static String tableAliasDefinition(
+	  public static String tableAliasDefinition(
       Map<String, String> tableAliases, QueryNode node, String table, int count)
 	  {
 	    StringBuilder sb = new StringBuilder();
