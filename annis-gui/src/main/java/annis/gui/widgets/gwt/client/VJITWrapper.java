@@ -411,12 +411,18 @@ public class VJITWrapper extends Widget implements Paintable
         label.style.color = node.data.color;
       }
 
-      // put the sentences into the label
-      if(node.data.sentence){
-        label.innerHTML = node.data.sentence;
+      // put the sentences or sentences number into the label
+      var data = node.data;
+      if(data.sentence)
+      {
+        label.innerHTML = data.sentence;
       }
-      else{
-        label.innerHTML = node.name;
+      else if (data.sentence_left && data.sentence_right)
+      {
+        label.innerHTML = data.sentence_left + ' - ' + data.sentence_right;
+      }
+      else {
+        label.innerHTML = "sentence not in context";
       }
 
       label.onclick = function(){
@@ -448,7 +454,8 @@ public class VJITWrapper extends Widget implements Paintable
         }
       }
       // if node contains a sentence, set it too the background color
-      if (node.data.sentence)
+      if (node.data.sentence
+          || !(node.data.sentence_left && node.data.sentence_right))
       {
         node.data.$color = saveThis.@annis.gui.widgets.gwt.client.VJITWrapper::background;
       }
