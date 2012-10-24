@@ -28,6 +28,8 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
@@ -192,6 +194,9 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       
       ServletHolder holder = new ServletHolder(jerseyContainer);
       context.addServlet(holder, "/*");
+      
+      context.setInitParameter("shiroConfigLocations", 
+        "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
       
       // configure Apache Shiro with the web application
       context.addEventListener(new EnvironmentLoaderListener());

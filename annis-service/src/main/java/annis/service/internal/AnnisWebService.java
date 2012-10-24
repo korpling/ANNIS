@@ -55,6 +55,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,9 +103,18 @@ public class AnnisWebService
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
+    
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:count:" + c);
+    }
+    
+    
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
     int count = annisDao.count(data);
@@ -125,6 +137,13 @@ public class AnnisWebService
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:annotate:" + c);
+    }
+    
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
     int left = Math.min(maxContext, Integer.parseInt(leftRaw));
@@ -155,6 +174,14 @@ public class AnnisWebService
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:find:" + c);
+    }
+    
+    
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
 
@@ -178,6 +205,14 @@ public class AnnisWebService
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
+    
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:matrix:" + c);
+    }
+    
     
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     
@@ -267,6 +302,13 @@ public class AnnisWebService
       corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
     }
     
+    Subject user = SecurityUtils.getSubject();
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:subgraph:" + c);
+    }
+    
+    
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
     
     data.setCorpusList(corpusIDs);
@@ -282,6 +324,10 @@ public class AnnisWebService
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
+    
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:subgraph:" + toplevelCorpusName);
+    
     try
     {
       long start = new Date().getTime();
@@ -325,6 +371,10 @@ public class AnnisWebService
   @Produces("application/xml")
   public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:config:" + toplevelName);
+
+    
     Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
     CorpusConfig result = new CorpusConfig();
     result.setConfig(tmp);
@@ -340,6 +390,9 @@ public class AnnisWebService
     @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues
   )
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:annotations:" + toplevelCorpus);
+    
     List<String> list = new LinkedList<String>();
     list.add(toplevelCorpus);
     List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
@@ -368,6 +421,9 @@ public class AnnisWebService
   public List<Annotation> getMetadata(
     @PathParam("top") String toplevelCorpusName)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + toplevelCorpusName);
+    
     return annisDao.listCorpusAnnotations(toplevelCorpusName);
   }
 
@@ -378,6 +434,9 @@ public class AnnisWebService
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + toplevelCorpusName);
+    
     if(documentName == null)
     {
       documentName = toplevelCorpusName;
@@ -402,6 +461,9 @@ public class AnnisWebService
     @PathParam("offset") String rawOffset, 
     @PathParam("length") String rawLength)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:binary:" + toplevelCorpusName);
+    
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
     
@@ -430,6 +492,9 @@ public class AnnisWebService
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:binary:" + toplevelCorpusName);
+    
     AnnisBinary bin = null;
     bin = annisDao.getBinary(toplevelCorpusName, documentName, 1, 1);
 
