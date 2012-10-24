@@ -28,7 +28,7 @@ public class AudioVisualizer extends MediaVisualizer
   @Override
   public String getTag()
   {
-    return "audio";
+    return "iframeaudio";
   }
 
   @Override

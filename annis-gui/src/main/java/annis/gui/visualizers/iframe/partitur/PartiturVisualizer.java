@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -59,7 +59,7 @@ public class PartiturVisualizer extends WriterVisualizer
   @Override
   public String getShortName()
   {
-    return "grid";
+    return "iframegrid";
   }
 
   @Override
@@ -123,7 +123,7 @@ public class PartiturVisualizer extends WriterVisualizer
       writer.append("<script src=\"" + input.getResourcePath(
         "jquery.noty.js") + "\"></script>");
       writer.append("<script>");
-      writer.append(convertToJavacSriptArray(input.getMediaIDs()));
+      writer.append(convertToJavacSriptArray(new LinkedList<String>()));
       writer.append("\nvar levelNames = [");
       int i = 0;
       for (String levelName : tierNames)
@@ -170,7 +170,7 @@ public class PartiturVisualizer extends WriterVisualizer
           }
         }
 
-        String[] currentarray = new String[0]; //Saves annotation-ids of the current row
+        String[] currentarray; //Saves annotation-ids of the current row
 
         while (!indexlist.isEmpty())
         { //Create Rows until all Annotations fit in
@@ -338,7 +338,7 @@ public class PartiturVisualizer extends WriterVisualizer
                   + "\"  " //tier =tier, event.getValue()= element.name
                   + "onMouseOver=\"toggleAnnotation(this, true);\" "
                   + "onMouseOut=\"toggleAnnotation(this, false);\" "
-                  + addTimeAttribute(element.getNodeId()) + "\""
+                  + addTimeAttribute(element.getNodeId()) 
                   + ">" + element.getValue() + "</td>");
               }
               else

@@ -219,7 +219,7 @@ public class PartiturParser implements Serializable
     }
   }
 
-  public static class ResultElement
+  public static class ResultElement implements Serializable
   {
 
     private String id;

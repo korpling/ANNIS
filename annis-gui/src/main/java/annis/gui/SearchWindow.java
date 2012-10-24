@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.TigerQueryBuilder;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
@@ -23,20 +24,24 @@ import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
+import com.vaadin.terminal.gwt.server.WebBrowser;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
-import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.netomi.vaadin.screenshot.Screenshot;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +50,12 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class SearchWindow extends Window
-  implements LoginForm.LoginListener, Screenshot.ScreenshotListener
+  implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
+  MimeTypeErrorListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
-  
+    
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private Pattern citationPattern =
@@ -68,6 +74,8 @@ public class SearchWindow extends Window
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
   private String bugEMailAddress;
+  
+  private boolean warnedAboutMediaFormat = false;
 
   public SearchWindow(PluginSystem ps)
   {
@@ -99,7 +107,7 @@ public class SearchWindow extends Window
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About ANNIS", new AboutPanel(getApplication()));
+        Window w = new Window("About ANNIS", new AboutPanel());
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
@@ -117,6 +125,7 @@ public class SearchWindow extends Window
 
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
     btBugReport.addListener(new Button.ClickListener()
     {
@@ -124,13 +133,13 @@ public class SearchWindow extends Window
       @Override
       public void buttonClick(ClickEvent event)
       {
-
+        btBugReport.setCaption("bug report is initialized...");
+        
         // make screenshot
         screenShot.makeScreenshot(finalThis);
-
       }
     });
-
+    
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("100%");
     lblUserName.setHeight("-1px");
@@ -248,11 +257,15 @@ public class SearchWindow extends Window
   {
     super.attach();
 
-    this.bugEMailAddress = getApplication().getProperty("bug-e-mail");
-    if("".equals(this.bugEMailAddress))
+    String bugmail = getApplication().getProperty("bug-e-mail");
+    if(bugmail != null && !bugmail.isEmpty() 
+      && !bugmail.startsWith("${")
+      && new EmailValidator("").isValid(bugmail))
     {
-      this.bugEMailAddress = null;
+      this.bugEMailAddress = bugmail;
     }
+    
+    
     btBugReport.setVisible(this.bugEMailAddress != null);
     
     initSecurityManager();
@@ -370,6 +383,8 @@ public class SearchWindow extends Window
     int contextLeft,
     int contextRight, String segmentationLayer, int pageSize)
   {
+    warnedAboutMediaFormat = false;
+    
     // remove old result from view
     if (resultView != null)
     {
@@ -394,7 +409,71 @@ public class SearchWindow extends Window
 
     if (windowLogin == null)
     {
-      LoginForm login = new LoginForm();
+      LoginForm login = new LoginForm()
+      {
+
+        /**
+         * Custom implementation which uses a more distinctive name for the password field
+         */
+        @Override
+        protected byte[] getLoginHTML()
+        {
+           String appUri = getApplication().getURL().toString()
+            + getWindow().getName() + "/";
+
+          try
+          {
+            return ("<!DOCTYPE html PUBLIC \"-//W3C//DTD "
+              + "XHTML 1.0 Transitional//EN\" "
+              + "\"http://www.w3.org/TR/xhtml1/"
+              + "DTD/xhtml1-transitional.dtd\">\n" + "<html>"
+              + "<head><script type='text/javascript'>"
+              + "var setTarget = function() {" + "var uri = '"
+              + appUri
+              + "loginHandler"
+              + "'; var f = document.getElementById('loginf-annis');"
+              + "document.forms[0].action = uri;document.forms[0].username.focus();};"
+              + ""
+              + "var styles = window.parent.document.styleSheets;"
+              + "for(var j = 0; j < styles.length; j++) {\n"
+              + "if(styles[j].href) {"
+              + "var stylesheet = document.createElement('link');\n"
+              + "stylesheet.setAttribute('rel', 'stylesheet');\n"
+              + "stylesheet.setAttribute('type', 'text/css');\n"
+              + "stylesheet.setAttribute('href', styles[j].href);\n"
+              + "document.getElementsByTagName('head')[0].appendChild(stylesheet);\n"
+              + "}"
+              + "}\n"
+              + "function submitOnEnter(e) { var keycode = e.keyCode || e.which;"
+              + " if (keycode == 13) {document.forms[0].submit();}  } \n"
+              + "</script>"
+              + "</head><body onload='setTarget();' style='margin:0;padding:0; background:transparent;' class=\""
+              + ApplicationConnection.GENERATED_BODY_CLASSNAME
+              + "\">"
+              + "<div class='v-app v-app-loginpage' style=\"background:transparent;\">"
+              + "<iframe name='logintarget' style='width:0;height:0;"
+              + "border:0;margin:0;padding:0;'></iframe>"
+              + "<form id='loginf-annis' target='logintarget' onkeypress=\"submitOnEnter(event)\" method=\"post\">"
+              + "<div>"
+              + getUsernameCaption()
+              + "</div><div >"
+              + "<input class='v-textfield' style='display:block;' type='text' name='username'></div>"
+              + "<div>"
+              + getPasswordCaption()
+              + "</div>"
+              + "<div><input class='v-textfield' style='display:block;' type='password' name='annis-gui-password'></div>"
+              + "<div><div onclick=\"document.forms[0].submit();\" tabindex=\"0\" class=\"v-button\" role=\"button\" ><span class=\"v-button-wrap\"><span class=\"v-button-caption\">"
+              + getLoginButtonCaption()
+              + "</span></span></div></div></form></div>" + "</body></html>")
+              .getBytes("UTF-8");
+          }
+          catch (UnsupportedEncodingException e)
+          {
+            throw new RuntimeException("UTF-8 encoding not avalable", e);
+          }
+        }
+        
+      };
       login.addListener((LoginForm.LoginListener) this);
 
       windowLogin = new Window("Login");
@@ -415,7 +494,7 @@ public class SearchWindow extends Window
     {
       AnnisUser newUser = securityManager.login(event.getLoginParameter(
         "username"),
-        event.getLoginParameter("password"), true);
+        event.getLoginParameter("annis-gui-password"), true);
       getApplication().setUser(newUser);
       showNotification("Logged in as \"" + newUser.getUserName() + "\"",
         Window.Notification.TYPE_TRAY_NOTIFICATION);
@@ -472,6 +551,9 @@ public class SearchWindow extends Window
   @Override
   public void screenshotReceived(byte[] imageData)
   {
+    btBugReport.setEnabled(true);
+    btBugReport.setCaption("Report Bug");
+    
     if(bugEMailAddress != null)
     {
       ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
@@ -484,6 +566,51 @@ public class SearchWindow extends Window
       w.setResizable(true);
       addWindow(w);
       w.center();
+    }
+  }
+
+  @Override
+  public void notifyCannotPlayMimeType(String mimeType)
+  {
+    if(!warnedAboutMediaFormat)
+    {
+      String browserList = 
+        "<ul>"
+        + "<li>Mozilla Firefox: <a href=\"http://www.mozilla.org/firefox\" target=\"_blank\">http://www.mozilla.org/firefox</a></li>"
+        + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
+        + "</ul>";
+      WebApplicationContext context = ((WebApplicationContext) getApplication()
+        .getContext());
+      WebBrowser browser = context.getBrowser();
+
+      // IE9 users can install a plugin
+      Set<String> supportedByIE9Plugin = new HashSet<String>();
+      supportedByIE9Plugin.add("video/webm");
+      supportedByIE9Plugin.add("audio/ogg");
+      supportedByIE9Plugin.add("video/ogg");
+
+      if (browser.isIE()
+        && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.contains(mimeType))
+      {
+        getWindow().showNotification("Media file type unsupported by your browser",
+          "Please install the WebM plugin for Internet Explorer 9 from "
+          + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
+          + " or use a browser from the following list "
+          + "(these are known to work with WebM or OGG files)<br/>"
+          + browserList,
+          Window.Notification.TYPE_ERROR_MESSAGE, true);
+      }
+      else
+      {
+        getWindow().showNotification("Media file type unsupported by your browser",
+          "Please use a browser from the following list "
+          + "(these are known to work with WebM or OGG files)<br/>"
+          + browserList,
+          Window.Notification.TYPE_ERROR_MESSAGE, true);
+      }
+
+      
+      warnedAboutMediaFormat=true;
     }
   }
 }

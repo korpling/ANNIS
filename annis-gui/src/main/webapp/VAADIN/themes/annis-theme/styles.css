@@ -1,6 +1,10 @@
 @import "../chameleon/styles.css";
 @import "base.css";
+@import "partitur.css";
 
+.hidden {
+  display: none;
+}
 .control .v-panel-content {
   background-color: #ecf0f6;
 }
@@ -113,6 +117,11 @@ textarea.query {
 }
 .v-table-cell-content-match_8 {
   color: rgb(255,69,0);
+}
+
+.v-form-errormessage {
+  color: red;
+  font-weight: bold;
 }
 
 /* HACKS (or workarounds for browser/vaadin bugs) */

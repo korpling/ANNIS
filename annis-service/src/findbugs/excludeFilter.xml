@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- False positive Filter for FindBugs -->
+
+<FindBugsFilter>
+  <!-- automatically generated or external code that we can't influence -->
+  <Match>
+    <Or>
+      <Class name="annis.ql.parser.Parser"/>
+      <Class name="de.deutschdiachrondigital.dddquery.parser.Parser"/>
+      <Class name="annis.ql.lexer.Lexer"/>
+      <Class name="de.deutschdiachrondigital.dddquery.lexer.Lexer"/>
+    </Or>
+  </Match>
+  
+  <Match>
+    <Bug category="EXPERIMENTAL" />
+  </Match>
+  
+</FindBugsFilter>

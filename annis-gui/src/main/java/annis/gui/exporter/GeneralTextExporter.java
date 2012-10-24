@@ -34,7 +34,7 @@ import java.io.Writer;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 public class GeneralTextExporter implements Exporter, Serializable

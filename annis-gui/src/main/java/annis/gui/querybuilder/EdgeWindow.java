@@ -29,7 +29,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 public class EdgeWindow extends Panel implements Button.ClickListener
 {
   
-  protected static final String[] EDGE_OPERATORS = new String[]
+  private static final String[] EDGE_OPERATORS = new String[]
   {
     ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
     "_l_", "'_r_", "_o_", "_ol_", "_or_"

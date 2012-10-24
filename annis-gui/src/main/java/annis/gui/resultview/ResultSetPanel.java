@@ -18,15 +18,18 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
-import com.google.gwt.http.client.Response;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -38,8 +41,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -117,6 +121,13 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   {
     super.attach();
 
+    // reset all registered media players    
+    MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
+    if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
+    {
+      mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
+    }
+    
     String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
     final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
     // enable indicator in order to get refresh GUI regulary
@@ -343,7 +354,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         catch (UniformInterfaceException ex)
         {
-          if (ex.getResponse().getStatus() != Response.SC_SERVICE_UNAVAILABLE)
+          if (ex.getResponse().getStatus() != Response.Status.SERVICE_UNAVAILABLE.getStatusCode())
           {
             log.error(ex.getMessage(), ex);
             break;
@@ -378,7 +389,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         parent.updateSegmentationLayer(segmentationLayerSet);
         parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-        if (p.getSCorpusGraphs().size() > 0
+        if (p != null && p.getSCorpusGraphs().size() > 0
           && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
         {
           result =

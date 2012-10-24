@@ -15,17 +15,22 @@
  */
 package annis.gui;
 
+import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerHolder;
+import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.grid.GridVisualizer;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
+import annis.gui.visualizers.iframe.graph.DebugVisualizer;
 import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
 import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.iframe.media.AudioVisualizer;
-import annis.gui.visualizers.iframe.media.VideoVisualizer;
+import annis.gui.visualizers.component.AudioVisualizer;
+import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
 import annis.security.AnnisSecurityManager;
@@ -66,7 +71,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener, HttpServletRequestListener, Serializable
+  UserChangeListener, HttpServletRequestListener, Serializable, MediaControllerHolder
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
@@ -79,6 +84,9 @@ public class MainApp extends Application implements PluginSystem,
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private Properties versionProperties;
+  
+  private transient MediaController mediaController;
+ 
 
   @Override
   public void init()
@@ -131,7 +139,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (JoranException ex)
     {
-      log.error("init loggin failed", ex);
+      log.error("init logging failed", ex);
     }
 
   }
@@ -272,7 +280,9 @@ public class MainApp extends Application implements PluginSystem,
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(DebugVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
@@ -282,6 +292,8 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
+    
+    pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -388,5 +400,17 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void onRequestEnd(HttpServletRequest request, HttpServletResponse response)
   {
+  }
+
+  @Override
+  public MediaController getMediaController()
+  {
+    return mediaController;
+  }
+
+  @Override
+  public void setMediaController(MediaController mediaController)
+  {
+    this.mediaController = mediaController;
   }
 }

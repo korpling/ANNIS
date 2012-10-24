@@ -18,6 +18,9 @@ package annis.cache;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cache based on temporary files. All files will deleted when this object
@@ -26,6 +29,8 @@ import java.util.Map;
 public class FilesystemCache implements Cache
 {
 
+  private final Logger log = LoggerFactory.getLogger(FilesystemCache.class);
+  
   private String namespace;
   private Map<String, File> fileMap;
 
@@ -53,9 +58,10 @@ public class FilesystemCache implements Cache
    */
   public String get(String key) throws CacheException
   {
+    BufferedReader in = null;
     try
     {
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(getFile(key)), "UTF-8"));
+      in = new BufferedReader(new InputStreamReader(new FileInputStream(getFile(key)), "UTF-8"));
       String line;
       StringBuffer sBuffer = new StringBuffer();
       while ((line = in.readLine()) != null)
@@ -67,6 +73,20 @@ public class FilesystemCache implements Cache
     {
       throw new CacheException(e.getMessage());
     }
+    finally
+    {
+      if(in != null)
+      {
+        try
+        {
+          in.close();
+        }
+        catch (IOException ex)
+        {
+          throw new CacheException(ex.getMessage());
+        }
+      }
+    }
   }
 
   /* (non-Javadoc)
@@ -74,7 +94,14 @@ public class FilesystemCache implements Cache
    */
   public void put(String key, String value)
   {
-    this.put(key, value.getBytes());
+    try
+    {
+      this.put(key, value.getBytes("UTF-8"));
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+    }
   }
 
   /* (non-Javadoc)
@@ -157,7 +184,10 @@ public class FilesystemCache implements Cache
       {
         if (f.exists() && f.canWrite())
         {
-          f.delete();
+          if(!f.delete())
+          {
+            log.warn("Cannot delete " + f.getAbsolutePath());
+          }
         }
       } catch (Exception ex)
       {

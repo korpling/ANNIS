@@ -5,8 +5,7 @@ chmod u+x buildbot_scripts/stopService.sh
 ./buildbot_scripts/stopService.sh /opt/annis/trunk
 
 # Copy the the Annis webapp
-chmod u+x buildbot_scripts/copyWebapp.sh
-buildbot_scripts/copyWebapp.sh /srv/tomcat/Annis-trunk
+cp annis-gui/target/annis-gui.war /srv/tomcat/annis3.war
 
 # Copy Annis Service
 chmod u+x buildbot_scripts/copyService.sh

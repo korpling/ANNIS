@@ -20,7 +20,7 @@ import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 public class WekaExporter implements Exporter, Serializable

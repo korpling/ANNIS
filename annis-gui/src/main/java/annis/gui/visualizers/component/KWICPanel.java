@@ -17,14 +17,18 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
-import annis.gui.resultview.VisualizerPanel;
+import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerFactory;
+import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -34,6 +38,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -47,6 +52,9 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 {
+  
+  @InjectPlugin
+  public MediaControllerFactory mcFactory;
 
   @Override
   public String getShortName()
@@ -55,9 +63,15 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   }
 
   @Override
-  public KWICPanelImpl createComponent(VisualizerInput visInput)
+  public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
   {
-    return new KWICPanelImpl(visInput);
+    MediaController mediaController = null;
+    if(mcFactory != null && application instanceof MediaControllerHolder)
+    {
+      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
+    }
+    return new KWICPanelImpl(visInput,
+      mediaController);
   }
 
   @Override
@@ -80,27 +94,26 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(KWICPanelImpl.class);
-    private SDocument result;
+    private transient SDocument result;
     private static final String DUMMY_COLUMN = "dummyColumn";
     private BeanItemContainer<String> containerAnnos;
-    private Map<SNode, Long> markedAndCovered;
-    private List<String> mediaIDs;
-    private List<VisualizerPanel> mediaVisualizer;
+    private transient Map<SNode, Long> markedAndCovered;
+    private transient MediaController mediaController;
+    
     // only used for media files
-    private String startTime;
-    private String endTime;
     private String[] media_annotations =
     {
       "time"
     };
     private List<Object> generatedColumns;
     
-    private VisualizerInput visInput;
+    private transient VisualizerInput visInput;
 
-    public KWICPanelImpl(VisualizerInput visInput)
+    public KWICPanelImpl(VisualizerInput visInput, MediaController mediaController)
     {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
+      this.mediaController = mediaController;
     }
 
     @Override
@@ -113,21 +126,17 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           visInput.getVisibleTokenAnnos(),
           visInput.getMarkedAndCovered(),
           visInput.getText(),
-          visInput.getMediaIDs(),
-          visInput.getMediaVisualizer(),
           visInput.getSegmentationName());
       }
     }
+    
 
     private void initKWICPanel(SDocument result,
-      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text,
-      List<String> mediaIDs, List<VisualizerPanel> mediaVisualizer, 
+      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text, 
       String segmentationName)
     {      
       this.result = result;
       this.markedAndCovered = markedAndCovered;
-      this.mediaIDs = mediaIDs;
-      this.mediaVisualizer = mediaVisualizer;
       this.addListener((ItemClickEvent.ItemClickListener) this);
       this.addStyleName("kwic");
       setSizeFull();
@@ -182,7 +191,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
         SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
           segmentationName == null ? AnnisConstants.FEAT_TOKENINDEX
-          : AnnisConstants.FEAT_SEGLEFT);
+          : AnnisConstants.FEAT_SEGINDEX);
 
         if (tokenText == text)
         {
@@ -203,15 +212,15 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           //add a column for each token
           try
           {
-            addGeneratedColumn(t, new KWICPanelImpl.TokenColumnGenerator(t, segmentationName));
-            generatedColumns.add(t);
-            setColumnExpandRatio(t, 0.0f);
+            addGeneratedColumn(t.getSId(), new KWICPanelImpl.TokenColumnGenerator(t, segmentationName));
+            generatedColumns.add(t.getSId());
+            setColumnExpandRatio(t.getSId(), 0.0f);
           }
           catch (IllegalArgumentException ex)
           {
             log.error("unknown", ex);
           }
-          visible.add(t);
+          visible.add(t.getSId());
 
 
           if (featTokenIndex != null)
@@ -275,8 +284,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
           visInput.getVisibleTokenAnnos(),
           markedAndCovered,
           visInput.getText(),
-          visInput.getMediaIDs(),
-          visInput.getMediaVisualizer(),
           segmentationName);
       }
     }
@@ -285,9 +292,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     public class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
     {
 
-      public String generateDescription(String layer, SToken token)
+      public String generateDescription(String layer, SNode node)
       {
-        SAnnotation a = token.getSAnnotation(layer);
+        SAnnotation a = node.getSAnnotation(layer);
         if (a != null)
         {
           return a.getQName();
@@ -299,33 +306,37 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       @Override
       public String generateDescription(Component source, Object itemId, Object propertyId)
       {
-        if (propertyId != null && propertyId instanceof SToken)
+        if(result == null)
         {
-          return generateDescription((String) itemId, (SToken) propertyId);
-        }
-        else
-        {
+          log.error("TooltipGenerator was restored from serialization and "
+            + "can not generate new cells");
           return null;
         }
+        
+        if (propertyId != null && propertyId instanceof String)
+        {
+          SNode node  = result.getSDocumentGraph().getSNode((String) propertyId);
+          if(node != null)
+          {
+            return generateDescription((String) itemId, node);
+          }
+        }
+        return null;
       }
     }
 
     public class KWICStyleGenerator implements Table.CellStyleGenerator
     {
 
-      public String getStyle(String layer, SNode token)
+      public String getStyle(String layer, SNode node)
       {
-        BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
-        textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-
-
         if ("tok".equals(layer))
         {
 
-          if (markedAndCovered.containsKey(token))
+          if (markedAndCovered != null && markedAndCovered.containsKey(node))
           {
             // add color
-            return MatchedNodeColors.colorClassByMatch(markedAndCovered.get(token));
+            return MatchedNodeColors.colorClassByMatch(markedAndCovered.get(node));
           }
           else
           {
@@ -334,7 +345,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
         }
         else
         {
-          SAnnotation a = token.getSAnnotation(layer);
+          SAnnotation a = node.getSAnnotation(layer);
           if (a != null)
           {
             for (String media_anno : media_annotations)
@@ -355,18 +366,27 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       @Override
       public String getStyle(Object itemId, Object propertyId)
       {
-        if (propertyId != null && propertyId instanceof SNode)
+         if (result == null)
         {
-          return getStyle((String) itemId, (SNode) propertyId);
-        }
-        else
-        {
+          log.error("KWICStyleGenerator was restored from serialization and "
+            + "can not generate new cells");
           return null;
+          
         }
+        if (propertyId != null && propertyId instanceof String)
+        {
+          SNode node = result.getSDocumentGraph().getSNode((String) propertyId);
+          if(node != null)
+          {
+            return getStyle((String) itemId, node);
+          }
+        }
+        
+        return null;
       }
     }
 
-    public class GapColumnGenerator implements Table.ColumnGenerator
+    public static class GapColumnGenerator implements Table.ColumnGenerator
     {
 
       public Object generateCell(String layer)
@@ -389,8 +409,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     public class TokenColumnGenerator implements Table.ColumnGenerator
     {
 
-      private Map<String, SAnnotation> annotationsByQName;
-      private SNode token;
+      private transient Map<String, SAnnotation> annotationsByQName;
+      private transient SNode token;
       private String segmentationName;
 
       public TokenColumnGenerator(SNode token, String segmentationName)
@@ -411,6 +431,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
       public Object generateCell(String layer)
       {
+        
+        if(result == null || token == null || annotationsByQName == null)
+        {
+          log.error("TokenColumnGenerator was restored from serialization and "
+            + "can not generate new cells");
+          return new Label("ERROR");
+        }
 
         BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
         textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
@@ -448,11 +475,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
             {
               if (media_anno.equals(a.getName()))
               {
-                String startTime = getStartTime((String) a.getValue());
-                String endTime = getEndTime((String) a.getValue());
-                startTime = trimTimeAnno(startTime);
-                endTime = trimTimeAnno(endTime);
-                return (startTime + "-" + endTime);
+                return a.getSValueSTEXT();
               }
             }
 
@@ -505,66 +528,28 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
         return;
       }
 
-      for (VisualizerPanel vis : mediaVisualizer)
+      if(time != null)
       {
-        vis.toggleVisualizer(false);
-      }
-
-      time = (time == null) ? "no time given" : time;
-      startTime = getStartTime(time);
-      endTime = getEndTime(time);
-      for (VisualizerPanel vp : mediaVisualizer)
-      {
-        vp.setKwicPanel(this);
-      }
-      startMediaVisualizers();
-    }
-
-    private String getStartTime(String time)
-    {
-      return time.split("-")[0];
-    }
-
-    private String getEndTime(String time)
-    {
-      String[] split = time.split("-");
-      if (split.length < 2)
-      {
-        return "undefined";
-      }
-      return time.split("-")[1];
-    }
-
-    public void startMediaVisualizers()
-    {
-      for (String id : mediaIDs)
-      {
-        String playCommand = ""
-          + "document.getElementById(\"" + id + "\")"
-          + ".getElementsByTagName(\"iframe\")[0].contentWindow.seekAndPlay("
-          + startTime + ", " + endTime + "); ";
-        getWindow().executeJavaScript(playCommand);
+        startMediaVisualizers(time);
       }
     }
 
-    private String trimTimeAnno(String time)
+    public void startMediaVisualizers(String time)
     {
-
-      if ("undefined".equals(time))
+      if(mediaController != null && visInput != null)
       {
-        return "";
+          
+        String[] split = time.split("-");
+        if(split.length == 1)
+        {
+          mediaController.play(visInput.getId(), Double.parseDouble(split[0]));
+        }
+        else if(split.length == 2)
+        {
+          mediaController.play(visInput.getId(), 
+            Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+        }
       }
-
-      String[] timeArray = time.split("\\.");
-
-      if (timeArray.length < 2)
-      {
-        return time;
-      }
-
-      return timeArray[0] + "."
-        + timeArray[1].substring(0, (timeArray[1].length() < 3 ? timeArray[1].
-        length() : 2));
     }
   }
 }

@@ -119,7 +119,7 @@ public class TimeHelper
       endTime = getNextEndTime(rightNode);
     }
 
-    return ("time=" + startTime + "-" + endTime);
+    return ("time=\"" + startTime + "-" + endTime + "\"");
   }
 
   private String getNextEndTime(AnnisNode rightNode)

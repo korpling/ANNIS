@@ -31,6 +31,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -152,13 +154,20 @@ public class ExportPanel extends Panel implements Button.ClickListener
           @Override
           public void run()
           {
-            exporter.convertText(queryPanel.getQuery(),
-              Integer.parseInt((String) cbLeftContext.getValue()),
-              Integer.parseInt((String) cbRightContext.getValue()),
-              corpusListPanel.getSelectedCorpora(),
-              null, (String) txtParameters.getValue(), 
-              Helper.getAnnisWebResource(getApplication()),
-              new OutputStreamWriter(out));
+            try
+            {
+              exporter.convertText(queryPanel.getQuery(),
+                Integer.parseInt((String) cbLeftContext.getValue()),
+                Integer.parseInt((String) cbRightContext.getValue()),
+                corpusListPanel.getSelectedCorpora(),
+                null, (String) txtParameters.getValue(),
+                Helper.getAnnisWebResource(getApplication()),
+                new OutputStreamWriter(out, "UTF-8"));
+            }
+            catch (UnsupportedEncodingException ex)
+            {
+              log.error(null, ex);
+            }
           }
         }).start();
 
@@ -170,7 +179,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
           {
             return in;
           }
-        }, exporterName + "_" + Math.abs(rand.nextLong()), getApplication());
+        }, exporterName + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
 
         getWindow().open(
           new ExternalResource(getApplication().getRelativeLocation(resource),"application/x-unknown"));
