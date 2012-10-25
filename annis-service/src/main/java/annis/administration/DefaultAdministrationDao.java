@@ -16,8 +16,10 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
+import annis.security.AnnisUserConfig;
 import java.io.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -99,6 +101,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   };
   private String dbLayout;
 
+  /**
+   * Called when Spring configuration finished
+   */
+  public void init()
+  {
+  }
+  
   ///// Subtasks of creating the database
   @Override
   public void dropDatabase(String database)
@@ -916,6 +925,14 @@ public class DefaultAdministrationDao implements AdministrationDao
     return listIndexDefinitions(false);
   }
 
+  @Override
+  @Transactional(readOnly=true)
+  public AnnisUserConfig getUserConfig(String userName)
+  {
+    
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
   ///// Helpers
   private List<String> importedAndCreatedTables()
   {

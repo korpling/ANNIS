@@ -7,9 +7,14 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
   <import resource="Common.xml" />
-   
-   <!-- AnnisWebService -->
-  <bean id="annisWebService" class="annis.service.internal.AnnisWebService" init-method="init" lazy-init="true">
+  
+  <!-- QueryService -->
+  <bean id="adminService" class="annis.service.internal.AdminService" init-method="init" lazy-init="true">
+    <property name="adminDao" ref="administrationDao"/>
+  </bean> 
+  
+  <!-- QueryService -->
+  <bean id="queryService" class="annis.service.internal.QueryService" init-method="init" lazy-init="true">
     <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />

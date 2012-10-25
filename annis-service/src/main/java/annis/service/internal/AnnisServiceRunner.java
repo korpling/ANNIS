@@ -172,7 +172,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
-    int port = ctx.getBean(AnnisWebService.class).getPort();
+    int port = ctx.getBean(QueryService.class).getPort();
     try
     {
       server = new Server(port);

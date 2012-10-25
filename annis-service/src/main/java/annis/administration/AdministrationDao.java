@@ -16,6 +16,7 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
+import annis.security.AnnisUserConfig;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -54,5 +55,7 @@ public interface AdministrationDao
   
   public boolean executeSqlFromScript(String script);
   public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
+  
+  public AnnisUserConfig getUserConfig(String userName);
   
 }

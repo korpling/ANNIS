@@ -64,16 +64,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Methods for querying the database.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels
  */
 @Component
 @Path("/annis")
-public class AnnisWebService
+public class QueryService
 {
 
-  private final static Logger log = LoggerFactory.getLogger(AnnisWebService.class);
+  private final static Logger log = LoggerFactory.getLogger(QueryService.class);
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
   private AnnisDao annisDao;
   private WekaHelper wekaHelper;
