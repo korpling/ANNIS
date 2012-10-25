@@ -120,6 +120,8 @@ public class CountTest
   @Test
   public void testReflexivityPcc2()
   {
+    assumeTrue(pcc2CorpusID.size() > 0);
+    
     // get token count as reference
     int tokenCount = countPcc2("tok");
     
