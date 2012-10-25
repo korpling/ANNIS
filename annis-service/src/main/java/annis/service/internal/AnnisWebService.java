@@ -56,7 +56,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -363,7 +362,18 @@ public class AnnisWebService
   @Produces("application/xml")
   public List<AnnisCorpus> corpora()
   {
-    return annisDao.listCorpora();
+    List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+    List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+    // filter by which corpora the user is allowed to access
+    Subject user = SecurityUtils.getSubject();
+    for(AnnisCorpus c : allCorpora)
+    {
+      if(user.isPermitted("query:*:" + c.getName()))
+      {
+        allowedCorpora.add(c);
+      }
+    }
+    return allowedCorpora;
   }
 
   @GET
