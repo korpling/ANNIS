@@ -41,6 +41,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -129,10 +136,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void attach()
   {
-    try{
-    query = new AnnisResultQuery(new HashSet<String>(corpora.keySet()), aql, getApplication());
-    createPage(0, pageSize);
-
+    try
+    {
+      query = new AnnisResultQuery(new HashSet<String>(corpora.keySet()), aql, getApplication());
+      createPage(0, pageSize);
     super.attach();
     }
     catch (Exception ex)
@@ -149,7 +156,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void createPage(final int start, final int limit)
   {
-
     if (query != null)
     {
       progressResult.setEnabled(true);
@@ -161,11 +167,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
       
       final ResultViewPanel finalThis = this;
 
-      Runnable r = new Runnable()
+      
+      Callable<List<Match>> r = new Callable<List<Match>>() 
       {
-
+ 
         @Override
-        public void run()
+        public List<Match> call()
         {
           try
           {
@@ -178,26 +185,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
                 user = (AnnisUser) getApplication().getUser();
               }
             }
-            
-            List<Match> result = query.loadBeans(start, limit, user);
-
-            synchronized(getApplication()) 
-            {
-              if (resultPanel != null)
-              {
-                mainLayout.removeComponent(resultPanel);
-              }
-              resultPanel = new ResultSetPanel(result, start, ps,
-                contextLeft, contextRight, 
-                currentSegmentationLayer, finalThis);
-
-              mainLayout.addComponent(resultPanel);
-              mainLayout.setExpandRatio(resultPanel, 1.0f);
-              mainLayout.setExpandRatio(progressResult, 0.0f);
-
-              resultPanel.setVisible(true);
-            }
-            
+            return query.loadBeans(start, limit, user);
           }
           catch (AnnisQLSemanticsException ex)
           {
@@ -236,12 +224,63 @@ public class ResultViewPanel extends Panel implements PagingCallback
               progressResult.setVisible(false);
               progressResult.setEnabled(false);
             }
-          }
+          }        
+          return null;  
         }
       };
-      Thread t = new Thread(r);
-      t.start();
+      
+      FutureTask<List<Match>> task = new FutureTask<List<Match>>(r)
+      {
+        @Override
+        protected void done()
+        {
+          if(isCancelled())
+          {
+            return;
+          }
+          
+          try
+          {
+            List<Match> result = get();
+            if(result == null)
+            {
+              return;
+            }
+            
+            synchronized (getApplication())
+            {
+              if (resultPanel != null)
+              {
+                mainLayout.removeComponent(resultPanel);
+              }
+              resultPanel = new ResultSetPanel(result, start, ps,
+                contextLeft, contextRight,
+                currentSegmentationLayer, finalThis);
 
+              mainLayout.addComponent(resultPanel);
+              mainLayout.setExpandRatio(resultPanel, 1.0f);
+              mainLayout.setExpandRatio(progressResult, 0.0f);
+
+              resultPanel.setVisible(true);
+            }
+            
+          }
+          catch (Exception ex)
+          {
+            log.error("Could not get result of future task", ex);
+            synchronized(getApplication()) 
+            {
+              paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+            }
+          }
+          
+        }
+      };
+      
+      Executor exec = Executors.newSingleThreadExecutor();
+      exec.execute(task);
+      
+      
     }
   }
 

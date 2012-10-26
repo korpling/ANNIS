@@ -53,7 +53,6 @@ public class VisualizerInput
   private String resourcePathTemplate = "%s";
   private List<SToken> token;
   private Set<String> tokenAnnos;
-  private STextualDS text;
   private String segmentationName;
   private VisualizerPanel visPanel;
 
@@ -352,16 +351,6 @@ public class VisualizerInput
   public Set<String> getVisibleTokenAnnos()
   {
     return this.tokenAnnos;
-  }
-
-  public void setText(STextualDS text)
-  {
-    this.text = text;
-  }
-
-  public STextualDS getText()
-  {
-    return this.text;
   }
 
   public void setSegmentationName(String segmentationName)
