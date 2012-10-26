@@ -17,9 +17,13 @@ package annis.service.internal;
 
 import annis.administration.AdministrationDao;
 import annis.security.AnnisUserConfig;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Component;
@@ -29,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Component
-@Path("/annis-admin")
+@Path("annis-admin")
 public class AdminService
 {
   private AdministrationDao adminDao;
@@ -43,7 +47,24 @@ public class AdminService
   public AnnisUserConfig getUserConfig()
   {
     Subject user = SecurityUtils.getSubject();
-    return adminDao.getUserConfig((String) user.getPrincipal());
+    return adminDao.retrieveUserConfig((String) user.getPrincipal());
+  }
+  
+  /**
+   * Sets the user configuration for the currentl logged in user.
+   */
+  @POST
+  @Path("userconfig")
+  @Consumes("application/xml")
+  public Response setUserConfig(JAXBElement<AnnisUserConfig> config)
+  {
+    Subject user = SecurityUtils.getSubject();
+    if(user.isAuthenticated())
+    {
+      adminDao.storeUserConfig(config.getValue());      
+      return Response.ok().build();
+    }
+    return Response.status(Response.Status.FORBIDDEN).build();
   }
   
   public AdministrationDao getAdminDao()

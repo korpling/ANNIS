@@ -19,14 +19,13 @@ import annis.exceptions.AnnisException;
 import annis.security.AnnisUserConfig;
 import java.io.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,18 +35,19 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,12 +101,17 @@ public class DefaultAdministrationDao implements AdministrationDao
     "media_files"
   };
   private String dbLayout;
+  
+  private ObjectMapper jsonMapper = new ObjectMapper();
 
   /**
    * Called when Spring configuration finished
    */
   public void init()
   {
+    // the json should be as compact as possible in the database
+    jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
+      false);
   }
   
   ///// Subtasks of creating the database
@@ -847,10 +852,55 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly=true)
-  public AnnisUserConfig getUserConfig(String userName)
+  public AnnisUserConfig retrieveUserConfig(final String userName)
   {
+    String sql = "SELECT * FROM user_config WHERE id=?";
+    AnnisUserConfig config = jdbcTemplate.query(sql, new Object[] {userName}, 
+      new ResultSetExtractor<AnnisUserConfig>()
+      {
+        @Override
+        public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
+        {
+          // default to empty config
+          AnnisUserConfig c = new AnnisUserConfig();
+          c.setName(userName);
+          
+          if(rs.next())
+          {
+            try
+            {
+              c = jsonMapper.readValue(rs.getAsciiStream("config"), AnnisUserConfig.class);
+            }
+            catch (IOException ex)
+            {
+              log.error("Could not parse JSON that is stored in database (user configuration)", ex);
+            }
+          }
+          return c;
+        }}
+    );
     
-    throw new UnsupportedOperationException("Not supported yet.");
+    return config;
+  }
+  
+  @Override
+  @Transactional(readOnly=true)
+  public void storeUserConfig(AnnisUserConfig config)
+  {
+    String sqlDelete = "DELETE FROM user_config WHERE id=?";
+    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
+    try
+    {
+      String[] sql = new String[] {sqlDelete, sqlInsert};
+      List<Object[]> args = new LinkedList<Object[]>();
+      args.add(new Object[]{config.getName()});
+      args.add(new Object[]{config.getName(), jsonMapper.writeValueAsString(config)});
+      jdbcTemplate.batchUpdate(sqlInsert, args);
+    }
+    catch (IOException ex)
+    {
+      log.error("Cannot serialize user config JSON for database.", ex);
+    }
   }
   
   ///// Helpers

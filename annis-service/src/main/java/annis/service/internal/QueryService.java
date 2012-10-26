@@ -69,7 +69,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels
  */
 @Component
-@Path("/annis")
+@Path("annis-query")
 public class QueryService
 {
 

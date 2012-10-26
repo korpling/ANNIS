@@ -196,3 +196,10 @@ FROM
     LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
 ) as tmp
 ;
+
+CREATE TABLE user_config
+(
+  id varchar NOT NULL,
+  config json,
+  PRIMARY KEY(id)
+);

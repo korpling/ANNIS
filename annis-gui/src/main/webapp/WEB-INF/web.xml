@@ -9,7 +9,7 @@
   <context-param>
     <description>URL of the Annis REST WebService</description>
     <param-name>AnnisWebService.URL</param-name>
-    <param-value>http://localhost:5711/annis</param-value>
+    <param-value>http://localhost:5711/annis-query</param-value>
   </context-param>
   <servlet>
     <servlet-name>MainApp</servlet-name>

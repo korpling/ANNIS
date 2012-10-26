@@ -119,6 +119,12 @@ FROM
 ) as tmp
 ;
 
+CREATE TABLE user_config
+(
+  id varchar NOT NULL,
+  config json,
+  PRIMARY KEY(id)
+);
 
 -- can't be run inside transaction
 -- VACUUM ANALYZE facts;

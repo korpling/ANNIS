@@ -55,6 +55,7 @@ public interface AdministrationDao
   public boolean executeSqlFromScript(String script);
   public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
   
-  public AnnisUserConfig getUserConfig(String userName);
+  public AnnisUserConfig retrieveUserConfig(String userName);
+  public void storeUserConfig(AnnisUserConfig config);
   
 }

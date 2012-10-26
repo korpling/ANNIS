@@ -8,8 +8,8 @@
 
   <import resource="Common.xml" />
   
-  <!-- QueryService -->
-  <bean id="adminService" class="annis.service.internal.AdminService" init-method="init" lazy-init="true">
+  <!-- AdminService -->
+  <bean id="adminService" class="annis.service.internal.AdminService" lazy-init="true">
     <property name="adminDao" ref="administrationDao"/>
   </bean> 
   

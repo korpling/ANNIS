@@ -15,6 +15,7 @@
  */
 package annis.security;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -29,7 +30,7 @@ public class AnnisUserConfig
 {
   private String name;
   
-  private Map<String, List<String>> corpusSets;
+  private Map<String, ArrayList<String>> corpusSets;
 
   public String getName()
   {
@@ -42,12 +43,12 @@ public class AnnisUserConfig
   }
 
   @XmlElementWrapper(name="corpusSets")
-  public Map<String, List<String>> getCorpusSets()
+  public Map<String, ArrayList<String>> getCorpusSets()
   {
     return corpusSets;
   }
 
-  public void setCorpusSets(Map<String, List<String>> corpusSets)
+  public void setCorpusSets(Map<String, ArrayList<String>> corpusSets)
   {
     this.corpusSets = corpusSets;
   }
