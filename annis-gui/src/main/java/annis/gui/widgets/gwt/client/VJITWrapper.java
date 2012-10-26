@@ -417,12 +417,12 @@ public class VJITWrapper extends Widget implements Paintable
       {
         label.innerHTML = data.sentence;
       }
-      else if (data.sentence_left && data.sentence_right)
+      else if (data.sentence_left != undefined && data.sentence_right != undefined)
       {
         label.innerHTML = data.sentence_left + ' - ' + data.sentence_right;
       }
       else {
-        label.innerHTML = "sentence not in context";
+        label.innerHTML = node.name;
       }
 
       label.onclick = function(){
