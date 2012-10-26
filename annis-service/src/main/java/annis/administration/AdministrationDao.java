@@ -46,7 +46,6 @@ public interface AdministrationDao
   public void importCorpus(String path);
   
   public List<Map<String, Object>> listCorpusStats();
-  public List<Map<String, Object>> listTableStats();
   public List<String> listUsedIndexes();
   public List<String> listUnusedIndexes();
   
