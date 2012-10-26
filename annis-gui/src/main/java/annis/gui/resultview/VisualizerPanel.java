@@ -240,7 +240,7 @@ public class VisualizerPanel extends CustomLayout
     {
       Executor exec = Executors.newSingleThreadExecutor();
       exec.execute(task);
-      c = task.get(15, TimeUnit.SECONDS);
+      c = task.get(60, TimeUnit.SECONDS);
       c.setVisible(false);
     }
     catch (InterruptedException ex)
@@ -404,6 +404,7 @@ public class VisualizerPanel extends CustomLayout
       {
         try
         {
+          
           vis = createComponent();
         }
         catch(Exception ex)
