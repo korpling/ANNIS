@@ -184,9 +184,11 @@ public class VisualizerPanel extends CustomLayout
         try
         {
           vis = createComponent();
-          Validate.notNull(vis);
-          vis.setVisible(true);
-          addComponent(vis, "iframe");
+          if(vis != null)
+          {
+            vis.setVisible(true);
+            addComponent(vis, "iframe");
+          }
         }
         catch(Exception ex)
         {
@@ -403,7 +405,6 @@ public class VisualizerPanel extends CustomLayout
         try
         {
           vis = createComponent();
-          Validate.notNull(vis);
         }
         catch(Exception ex)
         {
