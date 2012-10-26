@@ -41,6 +41,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.util.TreeSet;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -74,6 +75,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // fn: edge pre order value -> edge
       Map<RankID, SNode> nodeByPre = new HashMap<RankID, SNode>();
 
+      TreeSet<Long> allTextIDs = new TreeSet<Long>();
       TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
       TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
       TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath =
@@ -103,7 +105,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           // create the text for the last graph
           if (graph != null && document != null)
           {
-            createPrimaryText(graph, tokenTexts, tokenByIndex);
+            createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
             setMatchedIDs(document, keyNameList);
             addOrderingRelations(graph, nodeBySegmentationPath);
           }
@@ -151,7 +153,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         } // end if new key
 
         // get node data
-        SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
+        SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath, key, keyNameList);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long componentID = longValue(resultSet, RANK_TABLE, "component_id");
@@ -165,7 +167,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // the last match needs a primary text, too
       if (graph != null)
       {
-        createPrimaryText(graph, tokenTexts, tokenByIndex);
+        createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
         setMatchedIDs(document, keyNameList);
         addOrderingRelations(graph, nodeBySegmentationPath);
       }
@@ -215,12 +217,12 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
   }
 
-  private void createPrimaryText(SDocumentGraph graph,
-    TreeMap<Long, String> tokenTexts, TreeMap<Long, SToken> tokenByIndex)
+  private void createSinglePrimaryText(SDocumentGraph graph, long textID,
+    TreeMap<Long, String> tokenTexts,  TreeMap<Long, SToken> tokenByIndex)
   {
     STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
     graph.addSNode(textDataSource);
-
+    
     StringBuilder sbText = new StringBuilder();
     Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
       iterator();
@@ -228,28 +230,42 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       Map.Entry<Long, String> e = itToken.next();
       SToken tok = tokenByIndex.get(e.getKey());
-
-      STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
-      textRel.setSSource(tok);
-      textRel.setSTarget(textDataSource);
-      textRel.setSStart(sbText.length());
-      textRel.setSEnd(sbText.length() + e.getValue().length());
-
-      textRel.setSTextualDS(textDataSource);
-      graph.addSRelation(textRel);
-
-      sbText.append(e.getValue());
-      if (itToken.hasNext())
+      
+      if(tok.getSFeature(ANNIS_NS, FEAT_TEXTREF).getSValueSNUMERIC() == textID)
       {
-        sbText.append(" ");
+        STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
+        textRel.setSSource(tok);
+        textRel.setSTarget(textDataSource);
+        textRel.setSStart(sbText.length());
+        textRel.setSEnd(sbText.length() + e.getValue().length());
+
+        textRel.setSTextualDS(textDataSource);
+        graph.addSRelation(textRel);
+
+        sbText.append(e.getValue());
+        if (itToken.hasNext())
+        {
+          sbText.append(" ");
+        }
       }
     }
 
     textDataSource.setSText(sbText.toString());
   }
+  
+  private void createPrimaryTexts(SDocumentGraph graph,
+    TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts, 
+    TreeMap<Long, SToken> tokenByIndex)
+  {
+    for(long textID : allTextIDs)
+    {
+      createSinglePrimaryText(graph, textID, tokenTexts, tokenByIndex);
+    }
+    
+  }
 
   private SNode createOrFindNewNode(ResultSet resultSet,
-    SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
+    SDocumentGraph graph, TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
     SolutionKey<?> key,
@@ -307,6 +323,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         keyNameList[matchedNode-1] = node.getSName();
       }
 
+      // map layer
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
       EList<SLayer> layerList = graph.getSLayerByName(namespace);
       SLayer layer = (layerList != null && layerList.size() > 0)
@@ -318,6 +335,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         graph.addSLayer(layer);
       }
       node.getSLayers().add(layer);
+      
+      long textRef = longValue(resultSet, NODE_TABLE, "text_ref");
+      allTextIDs.add(textRef);
+      
     }
 
     String nodeAnnoValue =

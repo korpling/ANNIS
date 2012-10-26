@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,8 +55,8 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
-  private static ThreadLocal<XMLParserPool> xmlParserPool = 
-    new ThreadLocal<XMLParserPool>();
+  private static XMLParserPool xmlParserPool = 
+    new XMLParserPoolImpl();
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,
@@ -124,25 +125,12 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     IOException,
     WebApplicationException
   {
-    ResourceSet resourceSet = new ResourceSetImpl();
-    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
-      SaltCommonPackage.eINSTANCE);
+   
+    XMIResourceImpl resource = createResource();
+    load(resource, entityStream);
     
-    
-    XMIResourceImpl resource = new XMIResourceImpl();
-    resourceSet.getResources().add(resource);
-    
-    if(xmlParserPool.get() == null)
-    {
-      xmlParserPool.set(new XMLParserPoolImpl());
-    }
-    
-    Map<Object,Object> options = resource.getDefaultLoadOptions();
-    options.put(XMLResource.OPTION_USE_PARSER_POOL, xmlParserPool.get());
-    options.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
-    resource.load(entityStream, null);
-
     SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
+    
     
     for(EObject o : resource.getContents())
     {
@@ -154,5 +142,33 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     }
     
     return project;
+  }
+  
+  private XMIResourceImpl createResource()
+  {
+    
+    XMIResourceImpl resource = new XMIResourceImpl();
+    
+    ResourceSet resourceSet = new ResourceSetImpl();
+    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
+      SaltCommonPackage.eINSTANCE);
+
+    resourceSet.getResources().add(resource);
+    
+    Map<Object,Object> options = resource.getDefaultLoadOptions();
+    options.put(XMLResource.OPTION_USE_PARSER_POOL, xmlParserPool);
+    options.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
+    
+    return resource;
+  }
+  
+  private void load(XMIResourceImpl resource, InputStream entityStream) throws IOException
+  {
+    Map<Object,Object> options = resource.getDefaultLoadOptions();
+    
+    options.put(XMLResource.OPTION_USE_PARSER_POOL, xmlParserPool);
+    options.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
+    
+    resource.load(entityStream, null);
   }
 }

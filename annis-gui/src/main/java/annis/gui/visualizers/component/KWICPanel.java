@@ -28,8 +28,10 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
@@ -50,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
+public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 {
   
   @InjectPlugin
@@ -63,34 +65,103 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
   }
 
   @Override
-  public KWICPanelImpl createComponent(VisualizerInput visInput, Application application)
+  public KWICInterface createComponent(VisualizerInput visInput, Application application)
   {
     MediaController mediaController = null;
     if(mcFactory != null && application instanceof MediaControllerHolder)
     {
       mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
     }
-    return new KWICPanelImpl(visInput,
-      mediaController);
+    
+    EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
+    
+    // having the KWIC nested in a panel can slow down rendering
+    if(texts.size() == 1)
+    {
+      // directly return the single non-nested KWIC panel
+      return new KWICPanelImpl(visInput, mediaController, texts.get(0));
+    }
+    else
+    {
+      // return a more complicated implementation which can handle several texts
+      return new KWICMultipleTextImpl(visInput,mediaController);
+    }
   }
 
   @Override
-  public void setVisibleTokenAnnosVisible(KWICPanelImpl visualizerImplementation, Set<String> annos)
+  public void setVisibleTokenAnnosVisible(KWICInterface visualizerImplementation, Set<String> annos)
   {
     visualizerImplementation.setVisibleTokenAnnosVisible(annos);
   }
   
   
   @Override
-  public void setSegmentationLayer(KWICPanelImpl visualizerImplementation, 
+  public void setSegmentationLayer(KWICInterface visualizerImplementation, 
     String segmentationName, Map<SNode, Long> markedAndCovered)
   {
     visualizerImplementation.setSegmentationLayer(segmentationName, markedAndCovered);
   }
   
+  /**
+   * A KWIC (Keyword in context) visualization shows the token of the match and their context
+   * in a table like view.
+   * This is the basic interface for different variants of the KWIC panel implementation.
+   */
+  public interface KWICInterface extends Component
+  {
+    public void setVisibleTokenAnnosVisible(Set<String> annos);
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered);
+  }
+  
+  /**
+   * Implementation that can display several texts but has slower rendering due
+   * to an extra div.
+   */
+  public static class KWICMultipleTextImpl extends CssLayout
+    implements KWICInterface
+  {
+    private List<KWICPanelImpl> kwicPanels;
+    public KWICMultipleTextImpl(VisualizerInput visInput, MediaController mediaController)
+    {
+      this.kwicPanels = new LinkedList<KWICPanelImpl>();
+      if(visInput != null)
+      {
+        EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
+        for(STextualDS t : texts)
+        {
+          KWICPanelImpl kwic = new KWICPanelImpl(visInput, mediaController, t);
+          kwicPanels.add(kwic);
+          
+          addComponent(kwic);
+        }
+      }
+    }
+    
+    @Override
+    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    {
+      for(KWICPanelImpl kwic : kwicPanels)
+      {
+        kwic.setVisibleTokenAnnosVisible(annos);
+      }
+    }
+    
+    @Override
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
+    {
+      for(KWICPanelImpl kwic : kwicPanels)
+      {
+        kwic.setSegmentationLayer(segmentationName, markedAndCovered);
+      } 
+    }
+  } // end class KWICMultipleTextImpl
   
 
-  public static class KWICPanelImpl extends Table implements ItemClickEvent.ItemClickListener
+  /**
+   * Implementation for one single text.
+   */
+  public static class KWICPanelImpl extends Table 
+    implements ItemClickEvent.ItemClickListener, KWICInterface
   {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(KWICPanelImpl.class);
@@ -108,12 +179,14 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
     private List<Object> generatedColumns;
     
     private transient VisualizerInput visInput;
+    private transient STextualDS text;
 
-    public KWICPanelImpl(VisualizerInput visInput, MediaController mediaController)
+    public KWICPanelImpl(VisualizerInput visInput, MediaController mediaController, STextualDS text)
     {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
       this.mediaController = mediaController;
+      this.text = text;
     }
 
     @Override
@@ -123,16 +196,15 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       if (visInput != null)
       {
         initKWICPanel(visInput.getSResult(),
-          visInput.getVisibleTokenAnnos(),
-          visInput.getMarkedAndCovered(),
-          visInput.getText(),
-          visInput.getSegmentationName());
+            visInput.getVisibleTokenAnnos(),
+            visInput.getMarkedAndCovered(),
+            visInput.getSegmentationName());
       }
     }
     
 
     private void initKWICPanel(SDocument result,
-      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, STextualDS text, 
+      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered, 
       String segmentationName)
     {      
       this.result = result;
@@ -254,6 +326,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
     }
 
+    @Override
     public void setVisibleTokenAnnosVisible(Set<String> annos)
     {
       if (containerAnnos != null)
@@ -264,6 +337,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       }
     }
     
+    @Override
     public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
     {
       // delete old columns
@@ -283,8 +357,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
         initKWICPanel(visInput.getSResult(),
           visInput.getVisibleTokenAnnos(),
           markedAndCovered,
-          visInput.getText(),
           segmentationName);
+
       }
     }
 

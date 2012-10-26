@@ -48,7 +48,6 @@ import java.util.Random;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -158,29 +157,22 @@ public class SingleResultPanel extends CssLayout implements
       
       for (int i = 0; i < entries.length; i++)
       {
-        int textNr = 0;
-        EList<STextualDS> allTexts = result.getSDocumentGraph().getSTextualDSs();
-        for (STextualDS text : allTexts)
+        String htmlID = "resolver-" + resultNumber + "_" +  i;
+
+        VisualizerPanel p = new VisualizerPanel(
+          entries[i], result,
+          token, visibleTokenAnnos, markedAndCovered,
+          markedCoveredMap, markedExactMap, 
+          htmlID, resultID, this,
+          segmentationName, ps);
+
+        visualizers.add(p);
+        Properties mappings = entries[i].getMappings();
+        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
         {
-          String htmlID = "resolver-" + resultNumber + "_" + textNr +  "-" + i;
+          openVisualizers.add(p);
+        }
 
-          VisualizerPanel p = new VisualizerPanel(
-            entries[i], result,
-            token, visibleTokenAnnos, markedAndCovered,
-            markedCoveredMap, markedExactMap, 
-            text, htmlID, resultID, this,
-            segmentationName, ps, allTexts.size() > 1);
-
-          visualizers.add(p);
-          Properties mappings = entries[i].getMappings();
-          if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
-          {
-            openVisualizers.add(p);
-          }
-          
-          textNr++;
-          
-        } // end for each text
       } // for each resolver entry
       
       for (VisualizerPanel p : visualizers)
