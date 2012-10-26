@@ -884,18 +884,15 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
   
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly=false)
   public void storeUserConfig(AnnisUserConfig config)
   {
     String sqlDelete = "DELETE FROM user_config WHERE id=?";
-    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
+    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?::json)";
     try
     {
-      String[] sql = new String[] {sqlDelete, sqlInsert};
-      List<Object[]> args = new LinkedList<Object[]>();
-      args.add(new Object[]{config.getName()});
-      args.add(new Object[]{config.getName(), jsonMapper.writeValueAsString(config)});
-      jdbcTemplate.batchUpdate(sqlInsert, args);
+      jdbcTemplate.update(sqlDelete, config.getName());
+      jdbcTemplate.update(sqlInsert, config.getName(), jsonMapper.writeValueAsString(config));
     }
     catch (IOException ex)
     {

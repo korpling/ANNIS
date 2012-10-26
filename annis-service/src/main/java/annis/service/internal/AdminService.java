@@ -47,6 +47,7 @@ public class AdminService
   public AnnisUserConfig getUserConfig()
   {
     Subject user = SecurityUtils.getSubject();
+    user.checkPermission("admin:read:userconfig");
     return adminDao.retrieveUserConfig((String) user.getPrincipal());
   }
   
@@ -59,12 +60,11 @@ public class AdminService
   public Response setUserConfig(JAXBElement<AnnisUserConfig> config)
   {
     Subject user = SecurityUtils.getSubject();
-    if(user.isAuthenticated())
-    {
-      adminDao.storeUserConfig(config.getValue());      
+    user.checkPermission("admin:write:userconfig");
+    
+    adminDao.storeUserConfig(config.getValue());      
       return Response.ok().build();
-    }
-    return Response.status(Response.Status.FORBIDDEN).build();
+    
   }
   
   public AdministrationDao getAdminDao()
