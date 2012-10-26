@@ -122,11 +122,14 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
 
       if (visInput != null)
       {
-        initKWICPanel(visInput.getSResult(),
-          visInput.getVisibleTokenAnnos(),
-          visInput.getMarkedAndCovered(),
-          visInput.getText(),
-          visInput.getSegmentationName());
+        for(STextualDS text : visInput.getSResult().getSDocumentGraph().getSTextualDSs())
+        {
+          initKWICPanel(visInput.getSResult(),
+            visInput.getVisibleTokenAnnos(),
+            visInput.getMarkedAndCovered(),
+            text,
+            visInput.getSegmentationName());
+        }
       }
     }
     
@@ -280,11 +283,14 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICPanelImpl>
       generatedColumns = new LinkedList<Object>();
       if (visInput != null)
       {
-        initKWICPanel(visInput.getSResult(),
-          visInput.getVisibleTokenAnnos(),
-          markedAndCovered,
-          visInput.getText(),
-          segmentationName);
+        for(STextualDS text : visInput.getSResult().getSDocumentGraph().getSTextualDSs())
+        {
+          initKWICPanel(visInput.getSResult(),
+            visInput.getVisibleTokenAnnos(),
+            markedAndCovered,
+            text,
+            segmentationName);
+        }
       }
     }
 
