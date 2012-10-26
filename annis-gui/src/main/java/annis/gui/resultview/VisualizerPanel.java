@@ -432,10 +432,10 @@ public class VisualizerPanel extends CustomLayout
           loadableVis.addOnLoadCallBack(callback);
         }
       }
-      
-      btEntry.setIcon(ICON_COLLAPSE);    
+          
       if(vis != null)
       {
+        btEntry.setIcon(ICON_COLLAPSE);
         vis.setVisible(true);
         if(getComponent("iframe") == null)
         {
