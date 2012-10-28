@@ -15,64 +15,20 @@
  */
 package annis.security;
 
-import annis.service.objects.AnnisCorpus;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
+import com.sun.jersey.api.client.Client;
 
-public class AnnisUser extends Properties
+public class AnnisUser
 {
-
-  public final static String SURNAME = "surname";
-  public final static String GIVEN_NAME = "given_name";
-  public final static String GROUPS = "groups";
-  public final static String PASSWORD = "password";
-  
-  
-  private Map<String, AnnisCorpus> corpusList;
+  private transient Client client;
   private String userName = "";
   
-  public String getSurName()
-  {
-    return getProperty(SURNAME);
-  }
 
-  public void setSurName(String firstName)
+  public AnnisUser(String userName, Client client)
   {
-    setProperty(SURNAME, firstName);
-  }
-
-  /** (Almost) empty constructor, use this to load a stored property file*/
-  public AnnisUser(String userName)
-  {
-    this.corpusList = new TreeMap<String,AnnisCorpus>();
     this.userName = userName;
+    this.client = client;
   }
 
-  /** legacy construct */
-  public AnnisUser(String userName, String surName, String givenName)
-  {
-    this.corpusList = new TreeMap<String,AnnisCorpus>();
-    this.userName = userName;
-    setSurName(surName);
-    setGivenName(givenName);
-  }
-
-  public Map<String, AnnisCorpus> getCorpusList()
-  {
-    return corpusList;
-  }
-
-  public void setCorpusList(Map<String, AnnisCorpus> corpusList)
-  {
-    this.corpusList = corpusList;
-  }
-
-  public Set<String> getCorpusNameList()
-  {
-    return corpusList.keySet();
-  }
   
   public String getUserName()
   {
@@ -84,52 +40,14 @@ public class AnnisUser extends Properties
     this.userName = userName;
   }
 
-  public String getGivenName()
+  public Client getClient()
   {
-    return getProperty(GIVEN_NAME);
+    return client;
   }
 
-  public void setGivenName(String givenName)
+  public void setClient(Client client)
   {
-    setProperty(GIVEN_NAME, givenName);
+    this.client = client;
   }
-
-  public String getPassword()
-  {
-    return getProperty(PASSWORD);
-  }
-
-  public void setPassword(String password)
-  {
-    setProperty(PASSWORD, password);
-  }
-
-  @Override
-  public boolean equals(Object obj)
-  {
-    if(obj == null)
-    {
-      return false;
-    }
-    if(getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final AnnisUser other = (AnnisUser) obj;
-    if((this.userName == null) ? (other.userName != null) : !this.userName.equals(other.userName))
-    {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  public int hashCode()
-  {
-    int hash = 7;
-    hash = 83 * hash + (this.userName != null ? this.userName.hashCode() : 0);
-    return hash;
-  }
-  
   
 }

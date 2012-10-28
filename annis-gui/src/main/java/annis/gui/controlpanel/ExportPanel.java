@@ -31,8 +31,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -132,16 +130,6 @@ public class ExportPanel extends Panel implements Button.ClickListener
         {
           getWindow().showNotification("Please select a corpus",
             Notification.TYPE_WARNING_MESSAGE);
-          return;
-        }
-
-        // check corpus access
-        AnnisUser user = (AnnisUser) getApplication().getUser();
-        if(user == null || !user.getCorpusNameList().containsAll(
-          corpusListPanel.getSelectedCorpora().keySet()))
-        {
-          getWindow().showNotification("Illegal corpus access",
-            Notification.TYPE_ERROR_MESSAGE);
           return;
         }
 

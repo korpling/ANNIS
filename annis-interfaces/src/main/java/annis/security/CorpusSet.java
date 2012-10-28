@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,16 +32,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class CorpusSet implements Serializable
 {
   
-  private List<String> corpora = new LinkedList<String>();
+  private Set<String> corpora = new TreeSet<String>();
   private String name = ""; 
 
   @XmlElement(name="corpus")
-  public List<String> getCorpora()
+  public Set<String> getCorpora()
   {
     return corpora;
   }
 
-  public void setCorpora(List<String> corpora)
+  public void setCorpora(Set<String> corpora)
   {
     this.corpora = corpora;
   }

@@ -34,11 +34,21 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Component
-@Path("annis-admin")
+@Path("annis/admin")
 public class AdminService
 {
   private AdministrationDao adminDao;
 
+  @GET
+  @Path("is-authenticated")
+  @Produces("text/plain")
+  public String isAuthenticated()
+  {
+    Subject user = SecurityUtils.getSubject();
+    
+    return Boolean.toString(user.isAuthenticated());
+  }
+  
   /**
    * Get the user configuration for the currentl logged in user.
    */

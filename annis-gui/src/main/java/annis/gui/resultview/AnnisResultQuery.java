@@ -18,7 +18,6 @@ package annis.gui.resultview;
 import annis.service.objects.Match;
 import annis.gui.Helper;
 import annis.security.AnnisUser;
-import annis.security.IllegalCorpusAccessException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -50,22 +49,9 @@ public class AnnisResultQuery implements Serializable
     this.app = app;
   }
 
-  public List<Match> loadBeans(int startIndex, int count, AnnisUser user) throws
-    IllegalCorpusAccessException
+  public List<Match> loadBeans(int startIndex, int count, AnnisUser user)
   {
-    // check corpus selection by logged in user
-
-    Set<String> filteredCorpora = new TreeSet<String>(corpora);
-    if (user != null)
-    {
-      filteredCorpora.retainAll(user.getCorpusNameList());
-    }
-
-    if (filteredCorpora.size() != corpora.size())
-    {
-      throw new IllegalCorpusAccessException("illegal corpus access");
-    }
-
+    
     List<Match> result = new LinkedList<Match>();
     if (app != null)
     {

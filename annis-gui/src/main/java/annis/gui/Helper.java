@@ -16,13 +16,15 @@
 package annis.gui;
 
 import annis.provider.SaltProjectProvider;
+import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
@@ -34,6 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -43,24 +49,68 @@ import org.slf4j.LoggerFactory;
 public class Helper
 {
   
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
-  private static ThreadLocal<WebResource> annisWebResource = new ThreadLocal<WebResource>();
+  public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
   
-  public static WebResource createAnnisWebResource(String uri)
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
+  private static Client anonymousClient;
+  
+  
+  /**
+   * Creates an authentificiated REST client 
+   * @param userName
+   * @param password
+   * @return A newly created client.
+   */
+  public static Client createRESTClient(String userName, String password)
   {
-    ClientConfig rc = new DefaultClientConfig();
+    
+    DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
-    Client c = Client.create(rc);
-    return c.resource(uri);
+    
+    if(userName != null && password != null)
+    {
+      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY, 
+        new UsernamePasswordCredentials(userName, password));
+      
+      rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, 
+        credentialsProvider);
+      rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+    }
+    
+    Client c = ApacheHttpClient4.create(rc);
+    return c;
+  }
+  
+  /**
+   * Create a REST web service client which is not authentificated.
+   * @return A newly created client.
+   */
+  public static Client createRESTClient()
+  {
+    return createRESTClient(null, null);
   }
 
   public static WebResource getAnnisWebResource(Application app)
   {
-    if(annisWebResource.get() == null)
+    // get URI used by the application
+    String uri = app.getProperty(KEY_WEB_SERVICE_URL);
+    
+    // if already authentificated the REST client is set as the "user" property
+    Object user  = app.getUser();
+    if(user != null && user instanceof AnnisUser)
     {
-      annisWebResource.set(createAnnisWebResource(app.getProperty("AnnisWebService.URL")));
+      return ((AnnisUser) user).getClient().resource(uri);
     }
-    return annisWebResource.get();
+    
+    // use the anonymous client
+    if(anonymousClient == null)
+    {
+      // anonymous client not created yet
+      anonymousClient = createRESTClient();
+    }
+    
+    return anonymousClient.resource(uri);
   }
 
 
