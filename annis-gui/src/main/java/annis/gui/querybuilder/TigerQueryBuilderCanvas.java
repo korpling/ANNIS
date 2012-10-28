@@ -118,7 +118,7 @@ public class TigerQueryBuilderCanvas extends Panel
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("corpora").path(corpus).path("annotations")
+            service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "true")
               .get(new GenericType<List<AnnisAttribute>>() {})

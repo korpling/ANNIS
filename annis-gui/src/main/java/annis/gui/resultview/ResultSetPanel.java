@@ -235,8 +235,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
 
-      WebResource resResolver = Helper.getAnnisWebResource(getApplication()).
-        path("resolver");
+      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
+        .path("query").path("resolver");
 
       for (SingleResolverRequest r : resolverRequests)
       {
@@ -425,7 +425,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       WebResource res = Helper.getAnnisWebResource(getApplication());
       if (res != null)
       {
-        res = res.path("search/subgraph").queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight);
+        res = res.path("query/search/subgraph").queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight);
 
         if (segmentationName != null)
         {

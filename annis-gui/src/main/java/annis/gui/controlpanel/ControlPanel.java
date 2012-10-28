@@ -118,17 +118,14 @@ public class ControlPanel extends Panel
 
   public void executeQuery()
   {
-    if (getApplication() != null && getApplication().getUser() == null)
-    {
-      getWindow().showNotification("Please login first",
-        Window.Notification.TYPE_WARNING_MESSAGE);
-    }
-    else if (getApplication() != null && corpusList != null && queryPanel
+    if (getApplication() != null && corpusList != null && queryPanel
       != null)
     {
  
       lastQuery = queryPanel.getQuery();
-      if (lastCorpusSelection.isEmpty())
+      lastCorpusSelection = corpusList.getSelectedCorpora();
+      
+      if (lastCorpusSelection == null || lastCorpusSelection.isEmpty())
       {
         getWindow().showNotification("Please select a corpus",
           Window.Notification.TYPE_WARNING_MESSAGE);
@@ -143,7 +140,7 @@ public class ControlPanel extends Panel
 
       HistoryEntry e = new HistoryEntry();
       e.setQuery(lastQuery);
-      e.setCorpora(getSelectedCorpora());
+      e.setCorpora(lastCorpusSelection);
 
       // remove it first in order to let it appear on the beginning of the list
       history.remove(e);
@@ -193,7 +190,7 @@ public class ControlPanel extends Panel
       {
         try
         {
-          count = Integer.parseInt(res.path("search").path("count").queryParam(
+          count = Integer.parseInt(res.path("query").path("search").path("count").queryParam(
             "q", lastQuery).queryParam("corpora",
             StringUtils.join(lastCorpusSelection, ",")).get(
             String.class));

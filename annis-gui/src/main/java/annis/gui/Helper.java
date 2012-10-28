@@ -40,6 +40,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -67,6 +68,9 @@ public class Helper
     DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
     
+    rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER, 
+        new ThreadSafeClientConnManager());
+    
     if(userName != null && password != null)
     {
       CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -76,6 +80,7 @@ public class Helper
       rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, 
         credentialsProvider);
       rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+      
     }
     
     Client c = ApacheHttpClient4.create(rc);
@@ -181,8 +186,8 @@ public class Helper
     
     try
     {
-      corpusConfig = Helper.getAnnisWebResource(app).path("corpora").
-        path(URLEncoder.encode(corpus, "UTF-8"))
+      corpusConfig = Helper.getAnnisWebResource(app).path("query")
+        .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
         .path("config").get(CorpusConfig.class);
     }
     catch(UnsupportedEncodingException ex)

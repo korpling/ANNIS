@@ -107,7 +107,7 @@ public class BinaryServlet extends HttpServlet
       checkAndCreateClient();
       WebResource annisRes = client.resource(annisServiceURL);
 
-      WebResource binaryRes = annisRes.path("corpora")
+      WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
 

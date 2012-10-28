@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.service.objects.Match;
 import annis.gui.Helper;
 import annis.security.AnnisUser;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -58,18 +59,22 @@ public class AnnisResultQuery implements Serializable
       WebResource annisResource = Helper.getAnnisWebResource(app);
       try
       {
-        annisResource = annisResource.path("search").path("find")
+        annisResource = annisResource.path("query").path("search").path("find")
           .queryParam("q", aql)
           .queryParam("offset", "" + startIndex)
           .queryParam("limit", "" + count)         
           .queryParam("corpora", StringUtils.join(corpora, ","));
 
-       result = annisResource.get(new GenericType<List<Match>>() {});
+        result = annisResource.get(new GenericType<List<Match>>() {});
       }
       catch (UniformInterfaceException ex)
       {
         log.error(
           ex.getResponse().getEntity(String.class), ex);
+      }
+      catch (ClientHandlerException ex)
+      {
+        log.error("could not execute REST call to query matches", ex);
       }
     }
     return result;

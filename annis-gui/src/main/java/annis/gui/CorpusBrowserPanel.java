@@ -236,7 +236,7 @@ public class CorpusBrowserPanel extends Panel
       WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        WebResource query = service.path("corpora")
+        WebResource query = service.path("query").path("corpora")
           .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
           .path("annotations")
           .queryParam("fetchvalues", "true")

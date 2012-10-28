@@ -18,8 +18,6 @@ package annis.gui.controlpanel;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.gui.Helper;
-import annis.gui.MainApp;
-import annis.security.AnnisUser;
 import annis.security.AnnisUserConfig;
 import annis.security.CorpusSet;
 import annis.service.objects.AnnisCorpus;
@@ -27,7 +25,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
 import com.vaadin.data.Item;
@@ -53,15 +50,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -88,7 +82,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   private Table tblCorpora;
   private ControlPanel controlPanel;
   private ComboBox cbSelection;
-  private AnnisUserConfig userConfig = new AnnisUserConfig();
+  private transient AnnisUserConfig userConfig;
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
 
   public CorpusListPanel(ControlPanel controlPanel)
@@ -238,24 +232,24 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   
   private void updateCorpusSetList(boolean showLoginMessage)
   {
-    if(queryServerForCorpusList())
+    if(queryServerForCorpusList() && userConfig != null)
     {
       if(getApplication().getUser() == null)
       {
         if(showLoginMessage)
         {
-          getWindow().showNotification(
+          if(userConfig.getCorpusSets().isEmpty())
+          {
+            getWindow().showNotification("No corpora found. Please login "
+                + "(use button at upper right corner) to see more corpora.",
+                Notification.TYPE_HUMANIZED_MESSAGE);
+          }
+          else
+          {
+            getWindow().showNotification(
               "You can login (use button at upper right corner) to see more corpora",
               Notification.TYPE_TRAY_NOTIFICATION);
-        }
-      }
-      else
-      {
-        if(userConfig.getCorpusSets().isEmpty())
-        {
-          getWindow().showNotification("No corpora found. Please login "
-              + "(use button at upper right corner) to see more corpora.",
-              Notification.TYPE_HUMANIZED_MESSAGE);
+          }
         }
       }
 
@@ -293,12 +287,12 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     corpusContainer.removeAllItems();
     String selectedCorpusSet = (String) cbSelection.getValue();
     
-    if (selectedCorpusSet == null)
+    if (selectedCorpusSet == null || ALL_CORPORA.equals(selectedCorpusSet))
     {
       // add all corpora
       corpusContainer.addAll(allCorpora);
     }
-    else
+    else if(userConfig != null)
     {
       int idx = userConfig.getCorpusSets().indexOf(selectedCorpusSet);
       if(idx >= 0)
@@ -370,7 +364,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   @Override
   public void addNewItem(String newItemCaption)
   {
-    if (!cbSelection.containsId(newItemCaption))
+    if (!cbSelection.containsId(newItemCaption) && this.userConfig != null)
     {
       cbSelection.addItem(newItemCaption);
       cbSelection.setValue(newItemCaption);
@@ -413,21 +407,24 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       return new Action[0];
     }
     
-    for (CorpusSet entry : userConfig.getCorpusSets())
+    if(userConfig != null)
     {
-      for(String corpusFromSet : entry.getCorpora())
+      for (CorpusSet entry : userConfig.getCorpusSets())
       {
-        if(corpusFromSet.equals(corpusName))
+        for(String corpusFromSet : entry.getCorpora())
         {
-          // add possibility to remove
-          result.add(new AddRemoveAction(ActionType.Remove, entry.getName(),
-            corpusName, "Remove from " + entry.getName()));
-        }
-        else
-        {
-          // add possibility to add
-          result.add(new AddRemoveAction(ActionType.Add, entry.getName(),
-            corpusName, "Add to " + entry.getName()));
+          if(corpusFromSet.equals(corpusName))
+          {
+            // add possibility to remove
+            result.add(new AddRemoveAction(ActionType.Remove, entry.getName(),
+              corpusName, "Remove from " + entry.getName()));
+          }
+          else
+          {
+            // add possibility to add
+            result.add(new AddRemoveAction(ActionType.Add, entry.getName(),
+              corpusName, "Add to " + entry.getName()));
+          }
         }
       }
     }
@@ -438,7 +435,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   @Override
   public void handleAction(Action action, Object sender, Object target)
   {
-    if (action instanceof AddRemoveAction)
+    if (action instanceof AddRemoveAction && this.userConfig != null)
     {
       AddRemoveAction a = (AddRemoveAction) action;
 

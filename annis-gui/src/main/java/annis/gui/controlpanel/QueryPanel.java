@@ -229,7 +229,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     try
     {
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      String result = annisResource.path("check").queryParam("q", query)
+      String result = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
       if ("ok".equalsIgnoreCase(result))
       {

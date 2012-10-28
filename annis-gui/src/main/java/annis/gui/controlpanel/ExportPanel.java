@@ -149,7 +149,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
                 Integer.parseInt((String) cbRightContext.getValue()),
                 corpusListPanel.getSelectedCorpora(),
                 null, (String) txtParameters.getValue(),
-                Helper.getAnnisWebResource(getApplication()),
+                Helper.getAnnisWebResource(getApplication()).path("query"),
                 new OutputStreamWriter(out, "UTF-8"));
             }
             catch (UnsupportedEncodingException ex)
