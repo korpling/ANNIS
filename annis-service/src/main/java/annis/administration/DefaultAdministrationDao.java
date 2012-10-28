@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,10 +34,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +108,9 @@ public class DefaultAdministrationDao implements AdministrationDao
    */
   public void init()
   {
+    
+    AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
+    jsonMapper.setAnnotationIntrospector(introspector);
     // the json should be as compact as possible in the database
     jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
       false);
@@ -861,6 +863,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         @Override
         public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
         {
+          
           // default to empty config
           AnnisUserConfig c = new AnnisUserConfig();
           c.setName(userName);
@@ -869,7 +872,7 @@ public class DefaultAdministrationDao implements AdministrationDao
           {
             try
             {
-              c = jsonMapper.readValue(rs.getAsciiStream("config"), AnnisUserConfig.class);
+              c = jsonMapper.readValue(rs.getString("config"), AnnisUserConfig.class);
             }
             catch (IOException ex)
             {

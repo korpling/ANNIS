@@ -18,19 +18,32 @@ package annis.security;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Properties of an ANNIS user as stored in the configuration.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
-public class AnnisUserConfig implements Serializable
+public class CorpusSet implements Serializable
 {
-  private String name;
   
-  private List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+  private List<String> corpora = new LinkedList<String>();
+  private String name = ""; 
+
+  @XmlElement(name="corpus")
+  public List<String> getCorpora()
+  {
+    return corpora;
+  }
+
+  public void setCorpora(List<String> corpora)
+  {
+    this.corpora = corpora;
+  }
 
   public String getName()
   {
@@ -41,17 +54,5 @@ public class AnnisUserConfig implements Serializable
   {
     this.name = name;
   }
-  
-  @XmlElement(name="corpus-set")
-  public List<CorpusSet> getCorpusSets()
-  {
-    return corpusSets;
-  }
 
-  public void setCorpusSets(List<CorpusSet> corpusSets)
-  {
-    this.corpusSets = corpusSets;
-  }
-  
-  
 }

@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import annis.administration.AdministrationDao;
 import annis.security.AnnisUserConfig;
+import annis.security.CorpusSet;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -48,6 +49,7 @@ public class AdminService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:read:userconfig");
+    
     return adminDao.retrieveUserConfig((String) user.getPrincipal());
   }
   
