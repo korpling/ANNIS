@@ -890,12 +890,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Transactional(readOnly=false)
   public void storeUserConfig(AnnisUserConfig config)
   {
-    String sqlDelete = "DELETE FROM user_config WHERE id=?";
+    String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
     String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?::json)";
     try
     {
-      jdbcTemplate.update(sqlDelete, config.getName());
-      jdbcTemplate.update(sqlInsert, config.getName(), jsonMapper.writeValueAsString(config));
+      String jsonVal = jsonMapper.writeValueAsString(config);
+    
+      // if no row was affected there is no entry yet and we should create one
+      if(jdbcTemplate.update(sqlUpdate, config.getName(), jsonVal) == 0)
+      {
+        jdbcTemplate.update(sqlInsert, config.getName(), jsonVal);
+      }
     }
     catch (IOException ex)
     {

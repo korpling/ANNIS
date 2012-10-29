@@ -239,7 +239,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       {
         if(showLoginMessage)
         {
-          if(userConfig.getCorpusSets().isEmpty())
+          if(allCorpora.isEmpty())
           {
             getWindow().showNotification("No corpora found. Please login "
                 + "(use button at upper right corner) to see more corpora.",
@@ -248,7 +248,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
           else
           {
             getWindow().showNotification(
-              "You can login (use button at upper right corner) to see more corpora",
+              "You can login (use button at upper right corner) to get access to more corpora",
               Notification.TYPE_TRAY_NOTIFICATION);
           }
         }
@@ -388,7 +388,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         newSet.setName(newItemCaption);
         this.userConfig.getCorpusSets().add(newSet);
         // store the config on the server
-        rootRes.path("admin").path("userconfig").put(this.userConfig);
+        rootRes.path("admin").path("userconfig").post(this.userConfig);
 
         // update everything else
         updateCorpusTable();
