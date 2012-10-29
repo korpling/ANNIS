@@ -328,9 +328,9 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     try
     {
+      loadFromRemote();
+      
       WebResource rootRes = Helper.getAnnisWebResource(getApplication());
-      userConfig = rootRes.path("admin").path("userconfig").get(
-        AnnisUserConfig.class);
       allCorpora = rootRes.path("query").path("corpora")
         .get(new GenericType<List<AnnisCorpus>>(){});
 
@@ -376,6 +376,20 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     updateCorpusSetList();
   }
+  
+  private void loadFromRemote()
+  {
+    WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+    // get the current corpus configuration
+    this.userConfig = rootRes.path("admin").path("userconfig").get(AnnisUserConfig.class);
+  }
+  
+  private void storeChangesRemote()
+  {
+     WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+    // store the config on the server
+    rootRes.path("admin").path("userconfig").post(this.userConfig);
+  }
 
   @Override
   public void addNewItem(String newItemCaption)
@@ -387,15 +401,13 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
 
       try
       {
-        WebResource rootRes = Helper.getAnnisWebResource(getApplication());
-        // get the current corpus configuration
-        this.userConfig = rootRes.path("admin").path("userconfig").get(AnnisUserConfig.class);
+        loadFromRemote();
         // add new corpus set to the config
         CorpusSet newSet = new CorpusSet();
         newSet.setName(newItemCaption);
         this.userConfig.getCorpusSets().add(newSet);
         // store the config on the server
-        rootRes.path("admin").path("userconfig").post(this.userConfig);
+        storeChangesRemote();
 
         // update everything else
         updateCorpusTable();
@@ -483,6 +495,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
           set.getCorpora().add(a.getCorpusId());
         }
 
+        storeChangesRemote();
+        
         // update view
         updateCorpusTable();
       }
