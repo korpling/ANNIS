@@ -93,7 +93,7 @@ public class QueryService
     annisDao.checkDatabaseVersion();
     
     // log a message after successful startup
-    log.info("AnnisWebService loaded.");
+    log.info("ANNIS QueryService loaded.");
   }
 
   @GET
