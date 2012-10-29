@@ -50,6 +50,8 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISUserRealm.class);
   
   private String resourcePath;
+  private String defaultUserRole = "user";
+  private String anonymousUser = "anonymous";
 
   public ANNISUserRealm()
   {
@@ -115,6 +117,10 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
     
     Set<String> roles = new TreeSet<String>();
     roles.add(userName);  
+    if(!userName.equals(anonymousUser))
+    {
+      roles.add(defaultUserRole);
+    }
     
     if(userProps != null)
     {
@@ -129,7 +135,16 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException
   {
     Validate.isInstanceOf(String.class, token.getPrincipal());
-    Properties userProps = getPropertiesForUser((String) token.getPrincipal());
+    
+    String userName = (String) token.getPrincipal();
+    if(userName.equals(anonymousUser))
+    {
+      // for anonymous users the user name equals the Password, so hash the user name
+      Sha256Hash hash = new Sha256Hash(userName);
+      return new SimpleAuthenticationInfo(userName, hash.getBytes(), ANNISUserRealm.class.getName());
+    }
+    
+    Properties userProps = getPropertiesForUser(userName);
     if(userProps != null)
     {
       String password = userProps.getProperty("password");
@@ -146,8 +161,8 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
             Validate.isTrue(simpleHash.getIterations() == 1, "Hash iteration count must be 1 for every password hash!");
 
             // actually set the information from the user file
-            SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(token.
-              getPrincipal(),
+            SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
+              userName,
               simpleHash.getBytes(), ANNISUserRealm.class.getName());
             info.setCredentialsSalt(simpleHash.getSalt());
             return info;
@@ -175,6 +190,26 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   public void setResourcePath(String resourcePath)
   {
     this.resourcePath = resourcePath;
+  }
+
+  public String getDefaultUserRole()
+  {
+    return defaultUserRole;
+  }
+
+  public void setDefaultUserRole(String defaultUserRole)
+  {
+    this.defaultUserRole = defaultUserRole;
+  }
+
+  public String getAnonymousUser()
+  {
+    return anonymousUser;
+  }
+
+  public void setAnonymousUser(String anonymousUser)
+  {
+    this.anonymousUser = anonymousUser;
   }
   
 }
