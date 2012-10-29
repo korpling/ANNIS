@@ -244,9 +244,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       for (SStructure sentence : sentences)
       {
         sentence.createSProcessingAnnotation(
-          "phraseIntervall", SENTENCE_LEFT, Integer.toString(i));
+          null, SENTENCE_LEFT, Integer.toString(i));
         sentence.createSProcessingAnnotation(
-          "phraseIntervall", SENTENCE_RIGHT, Integer.toString(i));
+          null, SENTENCE_RIGHT, Integer.toString(i));
 
         i++;
       }
@@ -384,10 +384,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       {
 
         int l = Integer.parseInt(currNode.
-          getSProcessingAnnotation("phraseIntervall::" + SENTENCE_LEFT).
+          getSProcessingAnnotation(SENTENCE_LEFT).
           getValueString());
         int r = Integer.parseInt(currNode.getSProcessingAnnotation(
-          "phraseIntervall::" + SENTENCE_RIGHT).getValueString());
+          SENTENCE_RIGHT).getValueString());
 
         data.put(SENTENCE_LEFT, l);
         data.put(SENTENCE_RIGHT, r);
