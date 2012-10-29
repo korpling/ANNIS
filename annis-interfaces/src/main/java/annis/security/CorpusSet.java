@@ -16,12 +16,9 @@
 package annis.security;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -56,4 +53,31 @@ public class CorpusSet implements Serializable
     this.name = name;
   }
 
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final CorpusSet other = (CorpusSet) obj;
+    if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
+    {
+      return false;
+    }
+    return true;
+  }
+  
 }

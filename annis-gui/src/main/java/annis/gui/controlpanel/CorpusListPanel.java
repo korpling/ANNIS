@@ -286,23 +286,30 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   private void updateCorpusTable()
   {
     corpusContainer.removeAllItems();
-    String selectedCorpusSet = (String) cbSelection.getValue();
+    String selectedCorpusSetName = (String) cbSelection.getValue();
     
-    if (selectedCorpusSet == null || ALL_CORPORA.equals(selectedCorpusSet))
+    if (selectedCorpusSetName == null || ALL_CORPORA.equals(selectedCorpusSetName))
     {
       // add all corpora
       corpusContainer.addAll(allCorpora);
     }
     else if(userConfig != null)
     {
-      int idx = userConfig.getCorpusSets().indexOf(selectedCorpusSet);
-      if(idx >= 0)
+      // TODO: use map
+      CorpusSet selectedCS = null;
+      for(CorpusSet cs : userConfig.getCorpusSets())
       {
-        CorpusSet cs = userConfig.getCorpusSets().get(idx);
+        if(cs.getName().equals(selectedCorpusSetName))
+        {
+          selectedCS = cs;
+        }
+      }
+      if(selectedCS != null)
+      {
         LinkedList<AnnisCorpus> shownCorpora = new LinkedList<AnnisCorpus>();
         for(AnnisCorpus c : allCorpora)
         {
-          if(cs.getCorpora().contains(c.getName()))
+          if(selectedCS.getCorpora().contains(c.getName()))
           {
             shownCorpora.add(c);
           }
@@ -410,6 +417,12 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     String corpusName = (String) target;
     LinkedList<Action> result = new LinkedList<Action>();
 
+    if(target == null)
+    {
+      // no action for empty space
+      return new Action[0];
+    }
+    
     if (getApplication().getUser() == null)
     {
       // we can't change anything if we are not logged in so don't even try
@@ -420,20 +433,19 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     {
       for (CorpusSet entry : userConfig.getCorpusSets())
       {
-        for(String corpusFromSet : entry.getCorpora())
+        if(entry.getCorpora().contains(corpusName))
         {
-          if(corpusFromSet.equals(corpusName))
-          {
-            // add possibility to remove
-            result.add(new AddRemoveAction(ActionType.Remove, entry.getName(),
-              corpusName, "Remove from " + entry.getName()));
-          }
-          else
-          {
-            // add possibility to add
-            result.add(new AddRemoveAction(ActionType.Add, entry.getName(),
-              corpusName, "Add to " + entry.getName()));
-          }
+          AddRemoveAction action = new AddRemoveAction(ActionType.Remove, entry,
+            corpusName, "Remove from " + entry.getName());
+          // add possibility to remove
+          result.add(action);
+        }
+        else
+        {
+          AddRemoveAction action = new AddRemoveAction(ActionType.Add, entry,
+            corpusName, "Add to " + entry.getName());
+          // add possibility to add
+          result.add(action);
         }
       }
     }
@@ -448,6 +460,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     {
       AddRemoveAction a = (AddRemoveAction) action;
 
+
       int idx = this.userConfig.getCorpusSets().indexOf(a.getCorpusSet());
       if (idx > -1)
       {
@@ -461,7 +474,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
             // remove the set itself when it gets empty
             this.userConfig.getCorpusSets().remove(set);
         
-            cbSelection.removeItem(a.getCorpusSet());
+            cbSelection.removeItem(a.getCorpusSet().getName());
             cbSelection.select(ALL_CORPORA);
           }
         }
@@ -578,10 +591,10 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
 
     private ActionType type;
-    private String corpusSet;
+    private CorpusSet corpusSet;
     private String corpusId;
 
-    public AddRemoveAction(ActionType type, String corpusSet, String corpusId,
+    public AddRemoveAction(ActionType type, CorpusSet corpusSet, String corpusId,
       String caption)
     {
       super(caption);
@@ -600,9 +613,12 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       return corpusId;
     }
 
-    public String getCorpusSet()
+    public CorpusSet getCorpusSet()
     {
       return corpusSet;
     }
+
+    
+    
   }
 }
