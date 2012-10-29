@@ -17,8 +17,8 @@ package annis.gui.beans;
 
 import annis.service.objects.AnnisCorpus;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -100,10 +100,10 @@ public class CorpusBrowserEntry implements CitationProvider, Serializable
   }
 
   @Override
-  public Map<String, AnnisCorpus> getCorpora()
+  public Set<String> getCorpora()
   {
-    Map<String, AnnisCorpus> result = new HashMap<String, AnnisCorpus>();
-    result.put(corpus.getName(), corpus);
+    Set<String> result = new HashSet<String>();
+    result.add(corpus.getName());
     return result;
   }
 

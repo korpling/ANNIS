@@ -15,11 +15,10 @@
  */
 package annis.gui.exporter;
 
-import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +29,14 @@ public class WekaExporter implements Exporter, Serializable
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
+    Set<String> corpora, String keysAsString, String argsAsString,
     WebResource annisResource, Writer out)
   {
     //this is a full result export
     try
     {
       String result = annisResource.path("search").path("matrix")
-        .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
+        .queryParam("corpora", StringUtils.join(corpora, ","))
         .queryParam("q", queryAnnisQL).get(String.class);
       out.append(result);
       out.flush();

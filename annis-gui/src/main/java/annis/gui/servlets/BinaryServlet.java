@@ -15,6 +15,8 @@
  */
 package annis.gui.servlets;
 
+import annis.gui.Helper;
+import annis.gui.MainApp;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
@@ -24,6 +26,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.vaadin.terminal.gwt.server.AbstractWebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
@@ -34,6 +37,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,28 +61,12 @@ public class BinaryServlet extends HttpServlet
   private String toplevelCorpusName;
   private String documentName;
   
-  private transient Client client;
-
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     super.init(config);
-    checkAndCreateClient();
   }
 
-  /**
-   * Checks if client is set and if not creates a new one
-   */
-  private void checkAndCreateClient()
-  {
-    if(client == null)
-    {
-      ClientConfig cc = new DefaultClientConfig(SaltProjectProvider.class);
-      cc.getProperties().put(ClientConfig.PROPERTY_THREADPOOL_SIZE, 10);
-      cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 500);
-      client = Client.create(cc);
-    }
-  }
   
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -104,9 +92,9 @@ public class BinaryServlet extends HttpServlet
         throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
       }
       
-      checkAndCreateClient();
-      WebResource annisRes = client.resource(annisServiceURL);
-
+      HttpSession session = request.getSession();
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
+      
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 

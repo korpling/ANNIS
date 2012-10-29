@@ -95,14 +95,17 @@ public class Helper
   {
     return createRESTClient(null, null);
   }
-
-  public static WebResource getAnnisWebResource(Application app)
+  
+  /**
+   * Gets or creates a web resource to the ANNIS service.
+   *
+   * @param uri The URI where the service can be found
+   * @param user The user object or null (should be of type {@link AnnisUser}).
+   * @return A reference to the ANNIS service root resource.
+   */
+  public static WebResource getAnnisWebResource(String uri, Object user)
   {
-    // get URI used by the application
-    String uri = app.getProperty(KEY_WEB_SERVICE_URL);
     
-    // if already authentificated the REST client is set as the "user" property
-    Object user  = app.getUser();
     if(user != null && user instanceof AnnisUser)
     {
       return ((AnnisUser) user).getClient().resource(uri);
@@ -116,6 +119,26 @@ public class Helper
     }
     
     return anonymousClient.resource(uri);
+  }
+
+  /**
+   * Gets or creates a web resource to the ANNIS service.
+   *
+   * This is a convinience wrapper to {@link #getAnnisWebResource(java.lang.String, java.lang.Object) }
+   * that gets all the needed information from the Vaadin {@link Application}
+   * 
+   * @param app  The Vaadin application.
+   * @return A reference to the ANNIS service root resource.
+   */
+  public static WebResource getAnnisWebResource(Application app)
+  {
+    // get URI used by the application
+    String uri = app.getProperty(KEY_WEB_SERVICE_URL);
+    
+    // if already authentificated the REST client is set as the "user" property
+    Object user  = app.getUser();
+    
+    return getAnnisWebResource(uri, user);
   }
 
 
@@ -164,19 +187,6 @@ public class Helper
     }
     return "ERROR";
   }
-
-  public static Map<Long, AnnisCorpus> calculateID2Corpus(
-    Map<String, AnnisCorpus> corpusMap)
-  {
-    TreeMap<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
-    for (AnnisCorpus c : corpusMap.values())
-    {
-      result.put(c.getId(), c);
-    }
-    return result;
-  }
-  
-  
   
   public static CorpusConfig getCorpusConfig(String corpus, 
     Application app, Window window)
