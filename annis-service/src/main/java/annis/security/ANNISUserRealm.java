@@ -55,7 +55,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   {
     // define a default credentials matcher
     HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(Sha256Hash.ALGORITHM_NAME);
-    matcher.setHashIterations(200);
+    matcher.setHashIterations(1);
     setCredentialsMatcher(matcher);
   }
   
@@ -110,18 +110,19 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals)
   {
     Validate.isInstanceOf(String.class, principals.getPrimaryPrincipal());
-    Properties userProps = getPropertiesForUser((String) principals.getPrimaryPrincipal());
+    String userName = (String) principals.getPrimaryPrincipal();
+    Properties userProps = getPropertiesForUser(userName);
+    
+    Set<String> roles = new TreeSet<String>();
+    roles.add(userName);  
     
     if(userProps != null)
     {
       String groupsRaw = userProps.getProperty("groups", "").trim();
-      Set<String> roles = new TreeSet<String>();
       roles.addAll(Arrays.asList(groupsRaw.split("\\s*,\\s*")));
     
-      return  new SimpleAuthorizationInfo(roles);
     }
-    // TODO: would it be better to return null here?
-    return new SimpleAuthorizationInfo();
+    return new SimpleAuthorizationInfo(roles);
   }
 
   @Override
@@ -134,19 +135,29 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
       String password = userProps.getProperty("password");
       if(password != null)
       {
-
-        Shiro1CryptFormat fmt = new Shiro1CryptFormat();
-        Hash hashCredentials = fmt.parse(password);
-        if(hashCredentials instanceof SimpleHash)
+        if(password.startsWith("$"))
         {
-          SimpleHash simpleHash = (SimpleHash) hashCredentials;
-          // actually set the information from the user file
-          SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(token.
-            getPrincipal(),
-            simpleHash.getBytes(), ANNISUserRealm.class.
-            getName());
-          info.setCredentialsSalt(simpleHash.getSalt());
-          
+          Shiro1CryptFormat fmt = new Shiro1CryptFormat();
+          Hash hashCredentials = fmt.parse(password);
+          if(hashCredentials instanceof SimpleHash)
+          {
+            SimpleHash simpleHash = (SimpleHash) hashCredentials;
+
+            Validate.isTrue(simpleHash.getIterations() == 1, "Hash iteration count must be 1 for every password hash!");
+
+            // actually set the information from the user file
+            SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(token.
+              getPrincipal(),
+              simpleHash.getBytes(), ANNISUserRealm.class.getName());
+            info.setCredentialsSalt(simpleHash.getSalt());
+            return info;
+          }
+        }
+        else
+        {
+          // fallback unsalted hex hash
+          SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
+            token.getPrincipal(), password, ANNISUserRealm.class.getName());
           return info;
         }
         
