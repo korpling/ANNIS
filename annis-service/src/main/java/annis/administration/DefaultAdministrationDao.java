@@ -897,7 +897,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       String jsonVal = jsonMapper.writeValueAsString(config);
     
       // if no row was affected there is no entry yet and we should create one
-      if(jdbcTemplate.update(sqlUpdate, config.getName(), jsonVal) == 0)
+      if(jdbcTemplate.update(sqlUpdate, jsonVal, config.getName()) == 0)
       {
         jdbcTemplate.update(sqlInsert, config.getName(), jsonVal);
       }

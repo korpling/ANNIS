@@ -113,20 +113,18 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   {
     Validate.isInstanceOf(String.class, principals.getPrimaryPrincipal());
     String userName = (String) principals.getPrimaryPrincipal();
-    Properties userProps = getPropertiesForUser(userName);
+    
     
     Set<String> roles = new TreeSet<String>();
     roles.add(userName);  
     if(!userName.equals(anonymousUser))
     {
-      roles.add(defaultUserRole);
-    }
+      Properties userProps = getPropertiesForUser(userName);
     
-    if(userProps != null)
-    {
       String groupsRaw = userProps.getProperty("groups", "").trim();
       roles.addAll(Arrays.asList(groupsRaw.split("\\s*,\\s*")));
-    
+      
+      roles.add(defaultUserRole);
     }
     return new SimpleAuthorizationInfo(roles);
   }
