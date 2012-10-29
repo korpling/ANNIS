@@ -26,6 +26,7 @@ import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
@@ -173,7 +174,11 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     int port = ctx.getBean(QueryService.class).getPort();
     try
     {
-      server = new Server(port);
+      // only allow connections from localhost
+      // if the administrator wants to allow external acccess he *has* to
+      // use a HTTP proxy which also should use SSL encryption
+      InetSocketAddress addr = new InetSocketAddress("localhost", port);
+      server = new Server(addr);
             
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
