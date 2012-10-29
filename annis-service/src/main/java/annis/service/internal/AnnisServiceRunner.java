@@ -26,11 +26,12 @@ import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
+import java.net.Inet4Address;
+import java.net.InetSocketAddress;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -170,7 +171,11 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     int port = ctx.getBean(AnnisWebService.class).getPort();
     try
     {
-      server = new Server(port);
+      // only allow connections from localhost
+      // if the administrator wants to allow external acccess he *has* to
+      // use a HTTP proxy which also should use SSL encryption
+      InetSocketAddress addr = new InetSocketAddress("localhost", port);
+      server = new Server(addr);
             
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
