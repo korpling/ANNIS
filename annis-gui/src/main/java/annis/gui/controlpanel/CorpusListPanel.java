@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -338,11 +339,19 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
     catch (UniformInterfaceException ex)
     {
-      log.error(
-        null, ex);
-      getWindow().showNotification("Remote exception: "
-        + ex.getLocalizedMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
+      if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+      {
+        getWindow().showNotification("You are not authorized to get the corpus list.", ex.getMessage(), 
+          Notification.TYPE_WARNING_MESSAGE);
+      }
+      else
+      {
+        log.error(
+          null, ex);
+        getWindow().showNotification("Remote exception: "
+          + ex.getLocalizedMessage(),
+          Notification.TYPE_TRAY_NOTIFICATION);
+      }
     }
     catch (Exception ex)
     {
