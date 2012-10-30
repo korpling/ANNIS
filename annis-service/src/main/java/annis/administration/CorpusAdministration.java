@@ -150,11 +150,6 @@ public class CorpusAdministration
     return administrationDao.listCorpusStats();
   }
 
-  public List<Map<String, Object>> listTableStats()
-  {
-    return administrationDao.listTableStats();
-  }
-
   public List<String> listUsedIndexes()
   {
     return administrationDao.listUsedIndexes();

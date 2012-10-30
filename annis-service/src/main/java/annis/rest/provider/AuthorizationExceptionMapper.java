@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.security;
+package annis.rest.provider;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+import org.apache.shiro.authz.AuthorizationException;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class IllegalCorpusAccessException extends Exception
+@Provider
+public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorizationException>
 {
 
-  /**
-   * Creates a new instance of <code>IllegalCorpusAccessException</code> without detail message.
-   */
-  public IllegalCorpusAccessException()
+  @Override
+  public Response toResponse(AuthorizationException ex)
   {
+    Response r = Response.status(Response.Status.FORBIDDEN)
+      .entity(ex.getMessage()).build();
+    return r;
   }
-
-  /**
-   * Constructs an instance of <code>IllegalCorpusAccessException</code> with the specified detail message.
-   * @param msg the detail message.
-   */
-  public IllegalCorpusAccessException(String msg)
-  {
-    super(msg);
-  }
+  
 }

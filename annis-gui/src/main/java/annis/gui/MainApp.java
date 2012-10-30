@@ -33,7 +33,6 @@ import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
-import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -246,28 +245,9 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void setUser(Object user)
   {
-    if (user == null || !(user instanceof AnnisUser))
-    {
-      try
-      {
-        user = getWindowSearch().getSecurityManager().login(AnnisSecurityManager.FALLBACK_USER,
-          AnnisSecurityManager.FALLBACK_USER, true);
-      }
-      catch (Exception ex)
-      {
-        log.error(null, ex);
-      }
-    }
     super.setUser(user);
 
     getWindowSearch().updateUserInformation();
-  }
-
-  @Override
-  public AnnisUser getUser()
-  {
-    Object u = super.getUser();
-    return (AnnisUser) u;
   }
 
   private void initPlugins()
@@ -361,11 +341,6 @@ public class MainApp extends Application implements PluginSystem,
   {
     HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
     session.setAttribute(USER_KEY, event.getNewUser());
-  }
-
-  public AnnisSecurityManager getSecurityManager()
-  {
-    return getWindowSearch().getSecurityManager();
   }
 
   @Override

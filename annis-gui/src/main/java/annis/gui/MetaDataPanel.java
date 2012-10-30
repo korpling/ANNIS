@@ -96,7 +96,7 @@ public class MetaDataPanel extends Panel
     WebResource res = Helper.getAnnisWebResource(getApplication());
     try
     {
-      res = res.path("corpora")
+      res = res.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
       if (documentName != null)
       {
