@@ -124,7 +124,7 @@ public class SearchOptionsPanel extends Panel
         try
         {
           attributes.addAll(
-            service.path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+            service.path("query").path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
             .path("annotations").queryParam(
             "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
             get(new GenericType<List<AnnisAttribute>>()

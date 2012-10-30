@@ -23,7 +23,6 @@ import annis.gui.PluginSystem;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
-import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
@@ -34,20 +33,15 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -62,7 +56,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
-  private Map<String, AnnisCorpus> corpora;
+  private Set<String> corpora;
   private int contextLeft, contextRight, pageSize;
   private AnnisResultQuery query;
   private ProgressIndicator progressResult;
@@ -73,7 +67,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private String currentSegmentationLayer;
   private VerticalLayout mainLayout;
 
-  public ResultViewPanel(String aql, Map<String, AnnisCorpus> corpora,
+  public ResultViewPanel(String aql, Set<String> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int pageSize,
     PluginSystem ps)
   {
@@ -138,7 +132,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   {
     try
     {
-      query = new AnnisResultQuery(new HashSet<String>(corpora.keySet()), aql, getApplication());
+      query = new AnnisResultQuery(corpora, aql, getApplication());
       createPage(0, pageSize);
     super.attach();
     }

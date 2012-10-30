@@ -24,6 +24,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -99,7 +100,7 @@ public class HistoryPanel extends Panel
     
     if(parent != null)
     {
-      parent.setQuery(e.getQuery(), e.getCorpora());
+      parent.setQuery(e.getQuery(), new HashSet<String>(e.getCorpora()));
     }
   }
 }

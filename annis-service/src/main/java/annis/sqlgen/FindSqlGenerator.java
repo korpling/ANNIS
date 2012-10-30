@@ -31,7 +31,7 @@ import org.springframework.dao.DataAccessException;
 import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.service.internal.AnnisWebService;
+import annis.service.internal.QueryService;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Generates identifers for salt which are needed for the
- * {@link AnnisWebService#subgraph(java.lang.String, java.lang.String, java.lang.String)}
+ * {@link QueryService#subgraph(java.lang.String, java.lang.String, java.lang.String)}
  *
  * @author Benjamin Weißenfels
  */
