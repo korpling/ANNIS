@@ -702,9 +702,20 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private boolean isSegment(SNode currNode)
   {
 
-    SAnnotation anno = currNode.getSAnnotation(
-      ANNOTATION_NAMESPACE + "::" + ANNOTATION_KEY);
-    return (anno == null ? false : "segment".equals(anno.getSValueSTEXT()) ? true : false);
+    EList<Edge> edges = currNode.getSGraph().getOutEdges(currNode.getSId());
+
+    if (edges != null && edges.size() > 0)
+    {
+      for (Edge edge : edges)
+      {
+        if (edge.getTarget() instanceof SToken)
+        {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
