@@ -76,6 +76,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // result of transform operation salt -> json
   private JSONObject result;
 
+  // Default annotation namespace
+  private final String ANNOTATION_NAMESPACE = "default_ns";
+
   // filter root nodes with this annotation key
   private final String ANNOTATION_KEY = "cat";
 
@@ -103,9 +106,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // all marked tokens of the result graph
   private Map<SNode, Long> markedAndCovered;
 
-  private final String SENTENCE_LEFT = "sentence_left";
+  // namespace for SProcessingAnnotation sentence index
+  static private final String SENTENCE_INDEX = "sentence_index";
 
-  private final String SENTENCE_RIGHT = "sentence_right";
+  static private final String SENTENCE_LEFT = "sentence_left";
+
+  static private final String SENTENCE_RIGHT = "sentence_right";
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
@@ -143,7 +149,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       @Override
       public int compare(SStructure t, SStructure t1)
       {
-        return getStartPosition(t) - getStartPosition(t1);
+        int t_idx = getStartPosition(t);
+        int t2_idx = getStartPosition(t1);
+
+        if (t_idx < t2_idx)
+        {
+          return -1;
+        }
+        else
+        {
+          return 1;
+        }
       }
     });
 
@@ -172,6 +188,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     EList<SNode> rootSNodes = new BasicEList<SNode>();
 
 
+    Salt2DOT s2d = new Salt2DOT();
+    s2d.salt2Dot(graph, URI.createFileURI(
+      "/tmp/graph_" + graph.getSName() + ".dot"));
+
     if (nodes != null)
     {
       for (SNode node : nodes)
@@ -190,10 +210,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         }
       }
     }
-
-    Salt2DOT s2d = new Salt2DOT();
-    s2d.salt2Dot(graph, URI.createFileURI(
-      "/tmp/graph_" + graph.getSName() + ".dot"));
 
     if (rootSNodes.size() > 0)
     {
@@ -244,10 +260,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       for (SStructure sentence : sentences)
       {
         sentence.createSProcessingAnnotation(
-          null, SENTENCE_LEFT, Integer.toString(i));
-        sentence.createSProcessingAnnotation(
-          null, SENTENCE_RIGHT, Integer.toString(i));
-
+          SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
         i++;
       }
 
@@ -355,7 +368,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       jsonData.put("id", getUniqueStringId(currNode));
       jsonData.put("name", currNode.getSName());
 
-      // additional data for labelling edges and rendering sentences
+      /**
+       * additional data oject for labelling edges and also labelling and
+       * rendering sentences
+       */
       JSONObject data = new JSONObject();
       JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
 
@@ -380,18 +396,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         data.put("edges", edgesJSON);
       }
 
-      if (isSegment(currNode))
+      if (currNode instanceof SStructure
+        && isSegment(currNode))
       {
 
-        int l = Integer.parseInt(currNode.
-          getSProcessingAnnotation(SENTENCE_LEFT).
+        SProcessingAnnotation sentence_idx = currNode.
+          getSProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
+        int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.
           getValueString());
-        int r = Integer.parseInt(currNode.getSProcessingAnnotation(
-          SENTENCE_RIGHT).getValueString());
 
-        data.put(SENTENCE_LEFT, l);
-        data.put(SENTENCE_RIGHT, r);
-
+        data.put(SENTENCE_LEFT, index);
+        data.put(SENTENCE_RIGHT, index);
       }
 
       jsonData.put("data", data);
@@ -448,7 +463,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
     String traversalId, SRelation incomingEdge, SNode currNode, long order)
   {
-    EList<String> sTypes;
 
 
     //entry case
@@ -687,20 +701,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
    */
   private boolean isSegment(SNode currNode)
   {
-    EList<Edge> edges = currNode.getSGraph().
-      getOutEdges(currNode.getSId());
 
-    if (edges != null)
-    {
-      for (Edge edge : edges)
-      {
-        if (edge.getTarget() instanceof SToken)
-        {
-          return true;
-        }
-      }
-    }
-    return false;
+    SAnnotation anno = currNode.getSAnnotation(
+      ANNOTATION_NAMESPACE + "::" + ANNOTATION_KEY);
+    return (anno == null ? false : "segment".equals(anno.getSValueSTEXT()) ? true : false);
   }
 
   /**
