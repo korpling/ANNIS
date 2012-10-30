@@ -152,7 +152,7 @@ mvn -DskipTests=true install</programlisting>
                     Configure the path to this location in the <filename>conf/shiro.info</filename>
                     configuration file of the ANNIS service. The default path is
                         <filename>/etc/annis/user_config_trunk/</filename> and must be changed at
-                    two locations in the configuration
+                        <emphasis role="italic">two locations</emphasis> in the configuration
                     file.<programlisting>[main]
 annisRealm = annis.security.ANNISUserRealm
 <emphasis role="bold">annisRealm.resourcePath=/etc/annis/user_config_trunk/</emphasis>
