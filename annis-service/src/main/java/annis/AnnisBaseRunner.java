@@ -314,7 +314,7 @@ public abstract class AnnisBaseRunner
 
     PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
     consoleEncoder.setContext(loggerContext);
-    consoleEncoder.setPattern("%level - %msg [%d, %r ms] %n");
+    consoleEncoder.setPattern("%level - %msg [%C{1} - %d, ms] %n");
     consoleEncoder.start();
 
     ThresholdFilter consoleFilter = new ThresholdFilter();
