@@ -6,7 +6,6 @@ usage:
   annis-admin import PATH [PATH ...]
   annis-admin delete CORPUS_ID [CORPUS_ID ...]
   annis-admin list
-  annis-admin stats
   annis-admin indexes
 
 * init:    Initialize a PostgreSQL database for Annis and 
@@ -40,7 +39,5 @@ usage:
     Specify the IDs of one or more corpora as arguments.
 
 * list:    List all top-level corpora.
-
-* stats:  Count entries in tables.
 
 * indexes:  Show definitions of used and unused indexes.

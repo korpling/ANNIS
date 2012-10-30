@@ -16,6 +16,7 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
+import annis.security.AnnisUserConfig;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -45,7 +46,6 @@ public interface AdministrationDao
   public void importCorpus(String path);
   
   public List<Map<String, Object>> listCorpusStats();
-  public List<Map<String, Object>> listTableStats();
   public List<String> listUsedIndexes();
   public List<String> listUnusedIndexes();
   
@@ -54,5 +54,8 @@ public interface AdministrationDao
   
   public boolean executeSqlFromScript(String script);
   public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
+  
+  public AnnisUserConfig retrieveUserConfig(String userName);
+  public void storeUserConfig(AnnisUserConfig config);
   
 }

@@ -14,7 +14,7 @@
   <appender name="QUERYLOG" class="ch.qos.logback.core.FileAppender">
     <file>${annis.home}/log/query.log</file>
     <encoder>
-      <pattern>%date{ISO8601} - %m</pattern>
+      <pattern>%date{ISO8601} - %m%n</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
@@ -87,6 +87,9 @@
   </appender>
   
   <logger name="org.springframework" level="WARN"/>
+  <logger name="org.apache.shiro" level="WARN"/>
+  <logger name="com.sun.jersey" level="WARN" />
+  <logger name="net.sf.ehcache" level="WARN" />
   <logger name="annis.administration.CorpusAdministration" level="INFO"/>
   <logger name="annis.administrations" level="WARN"/>
   <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>

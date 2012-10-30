@@ -31,8 +31,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -135,16 +133,6 @@ public class ExportPanel extends Panel implements Button.ClickListener
           return;
         }
 
-        // check corpus access
-        AnnisUser user = (AnnisUser) getApplication().getUser();
-        if(user == null || !user.getCorpusNameList().containsAll(
-          corpusListPanel.getSelectedCorpora().keySet()))
-        {
-          getWindow().showNotification("Illegal corpus access",
-            Notification.TYPE_ERROR_MESSAGE);
-          return;
-        }
-
         final PipedOutputStream out = new PipedOutputStream();
         final PipedInputStream in = new PipedInputStream(out);
 
@@ -161,7 +149,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
                 Integer.parseInt((String) cbRightContext.getValue()),
                 corpusListPanel.getSelectedCorpora(),
                 null, (String) txtParameters.getValue(),
-                Helper.getAnnisWebResource(getApplication()),
+                Helper.getAnnisWebResource(getApplication()).path("query"),
                 new OutputStreamWriter(out, "UTF-8"));
             }
             catch (UnsupportedEncodingException ex)
