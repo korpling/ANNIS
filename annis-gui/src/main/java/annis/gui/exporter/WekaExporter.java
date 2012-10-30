@@ -16,6 +16,7 @@
 package annis.gui.exporter;
 
 import com.sun.jersey.api.client.WebResource;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Set;
@@ -35,10 +36,23 @@ public class WekaExporter implements Exporter, Serializable
     //this is a full result export
     try
     {
-      String result = annisResource.path("search").path("matrix")
+      InputStream result = annisResource.path("search").path("matrix")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL).get(String.class);
-      out.append(result);
+        .queryParam("q", queryAnnisQL).get(InputStream.class);
+      
+      try
+      {
+        int c;
+        while( (c = result.read()) > -1)
+        {
+          out.write(c);
+        }
+      }
+      finally
+      {
+        result.close();
+      }
+      
       out.flush();
     }
     catch (Exception ex)
