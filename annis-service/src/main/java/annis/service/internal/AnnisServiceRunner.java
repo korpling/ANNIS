@@ -49,6 +49,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private boolean isShutdownRequested = false;
   private static Thread mainThread;
   private Server server;
+  
+  private boolean useAuthentification = true;
 
   public static void main(String[] args) throws Exception
   {
@@ -197,13 +199,21 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       
       ServletHolder holder = new ServletHolder(jerseyContainer);
       context.addServlet(holder, "/*");
+
       
-      context.setInitParameter("shiroConfigLocations", 
+      if(useAuthentification)
+      {
+        context.setInitParameter("shiroConfigLocations",
         "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
+      }
+      else
+      {
+        context.setInitParameter("shiroConfigLocations",
+        "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
+      }
       
       // configure Apache Shiro with the web application
       context.addEventListener(new EnvironmentLoaderListener());
-
       EnumSet<DispatcherType> shiroDispatchers = EnumSet.of(
         DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
         DispatcherType.ERROR);
@@ -260,7 +270,27 @@ public class AnnisServiceRunner extends AnnisBaseRunner
         }
       }
     }
-
-
   }
+
+  /**
+   * True if authorization is enabled.
+   * @return 
+   */
+  public boolean isUseAuthentification()
+  {
+    return useAuthentification;
+  }
+
+  /**
+   * Set wether you want to protect the service using authentification.
+   * 
+   * Default value is true.
+   * @param useAuthentification True if service should be authentificated, false if not.
+   */
+  public void setUseAuthentification(boolean useAuthentification)
+  {
+    this.useAuthentification = useAuthentification;
+  }
+  
+  
 }
