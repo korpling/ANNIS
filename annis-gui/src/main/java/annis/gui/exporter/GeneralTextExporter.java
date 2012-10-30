@@ -111,6 +111,7 @@ public class GeneralTextExporter implements Exporter, Serializable
         args.put(key, val);
       }
 
+      final int stepSize = 10;
       int offset = 0;
       while (offset == 0 || (queryResult != null
         && queryResult.getSCorpusGraphs().size() > 0))
@@ -120,7 +121,7 @@ public class GeneralTextExporter implements Exporter, Serializable
         {
           queryResult = annisResource.path("search").path("annotate")
             .queryParam("q", queryAnnisQL)
-            .queryParam("limit", "" + 50)
+            .queryParam("limit", "" + stepSize)
             .queryParam("offset", "" + offset)
             .queryParam("left", "" + contextLeft)
             .queryParam("right", "" + contextRight)
@@ -138,7 +139,7 @@ public class GeneralTextExporter implements Exporter, Serializable
           args, out, offset);
 
         out.flush();
-        offset = offset + 50;
+        offset += stepSize;
 
       }
 
