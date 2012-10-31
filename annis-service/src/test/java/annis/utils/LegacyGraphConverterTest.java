@@ -32,6 +32,7 @@ import annis.model.Edge;
 import annis.sqlgen.*;
 import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.apache.commons.collections.ListUtils;
 import org.springframework.context.annotation.PropertySource;
 
 /**
@@ -120,6 +121,7 @@ public class LegacyGraphConverterTest
       List<AnnisNode> nodeListResult = graphResult.getNodes();
 
       assertEquals(nodeListExpected.size(), nodeListResult.size());
+      
 
       Collections.sort(nodeListExpected, new Comparator<AnnisNode>()
       {
@@ -174,10 +176,10 @@ public class LegacyGraphConverterTest
     Set<Edge> out1 = n1.getOutgoingEdges();
     Set<Edge> out2 = n2.getOutgoingEdges();
 
-    assertEquals(out1.size(), out2.size());
+    assertEquals("number of outgoing edges must be equal for [" + n1.toString() + "]", out1.size(), out2.size());
     for (Edge e1 : out1)
     {
-      assertTrue(out2.contains(e1));
+      assertTrue("edge [" + e1 +"] must be contained in outgoing edges",out2.contains(e1));
       for (Edge e2 : out2)
       {
         if (e1.getPre() == e2.getPre())

@@ -24,4 +24,6 @@ public class AnnisConstants
   public static final String FEAT_TOKENINDEX = "tokenindex";
   public static final String FEAT_SEGINDEX = "segindex";
   public static final String FEAT_SEGNAME = "segname";
+  public static final String FEAT_ARTIFICIAL_DOMINANCE_COMPONENT = "artificialdominancecomponent";
+  public static final String FEAT_ARTIFICIAL_DOMINANCE_PRE = "artificialdominancepre";
 }
