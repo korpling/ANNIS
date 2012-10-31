@@ -34,6 +34,7 @@ import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   
   private boolean useAuthentification = true;
 
+  public AnnisServiceRunner()
+  {
+    this.useAuthentification = 
+      Boolean.parseBoolean(System.getProperty("annis.secure", "true"));
+  }
+  
   public static void main(String[] args) throws Exception
   {
     
@@ -211,6 +218,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
         context.setInitParameter("shiroConfigLocations",
         "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
+      
+      EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
+      context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
+      // enable compression
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+      //  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+      ///  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
       
       // configure Apache Shiro with the web application
       context.addEventListener(new EnvironmentLoaderListener());
