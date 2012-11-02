@@ -24,23 +24,28 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
+import annis.service.objects.SaltURIGroup;
+import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +60,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-  private BeanItemContainer<Match> container;
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
   private String segmentationName;
@@ -65,9 +69,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private ResultViewPanel parent;
   private List<Match> matches;
   private Set<String> tokenAnnotationLevelSet =
-    Collections.synchronizedSet(new HashSet<String>());
+    Collections.synchronizedSet(new TreeSet<String>());
   private Set<String> segmentationLayerSet =
-    Collections.synchronizedSet(new HashSet<String>());
+    Collections.synchronizedSet(new TreeSet<String>());
   private ProgressIndicator indicator;
   private VerticalLayout layout;
 
@@ -101,8 +105,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     layout.setMargin(false);
     addStyleName("result-view");
 
-    container = new BeanItemContainer<Match>(Match.class, this.matches);
-
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(true);
     indicator.setValue(0f);
@@ -126,58 +128,97 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
     }
     
-    String propBatchSize = getApplication().getProperty("result-fetch-batchsize");
-    final int batchSize = propBatchSize == null ? 5 : Integer.parseInt(propBatchSize);
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 
     ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
 
-    Runnable run = new AllResultsFetcher(batchSize);
-    singleExecutor.submit(run);
-
-  }
-
-  private Map<Integer, Future<SingleResultPanel>> loadNextResultBatch(int batchSize,
-    int offset, ExecutorService executorService, WebResource resWithoutMatch)
-  {
-
-    Map<Integer, Future<SingleResultPanel>> tasks =
-      Collections.synchronizedMap(new HashMap<Integer, Future<SingleResultPanel>>());
-
-    ListIterator<Match> it = matches.listIterator(offset);
-    while (it.hasNext() && (it.nextIndex() - offset) < batchSize)
+    Callable<SaltProject> run = new AllResultsFetcher();
+    FutureTask<SaltProject> task = new FutureTask<SaltProject>(
+      run)
     {
-      int i = it.nextIndex();
-      Match m = it.next();
-
-      List<String> encodedSaltIDs = new LinkedList<String>();
-      for (String s : m.getSaltIDs())
+      @Override
+      protected void done()
       {
-        try
+        synchronized(getApplication())
         {
-          encodedSaltIDs.add(URLEncoder.encode(s, "UTF-8"));
-        }
-        catch (UnsupportedEncodingException ex)
-        {
-          log.error(null, ex);
+          try
+          {
+            displayQueryResult(get());
+          }
+          catch (InterruptedException ex)
+          {
+            log.error(null, ex);
+          }
+          catch (ExecutionException ex)
+          {
+            log.error(null, ex);
+          }
         }
       }
-
-      // get subgraph for match
-      WebResource res =
-        resWithoutMatch.queryParam("q", StringUtils.join(encodedSaltIDs, ","));
-
-      if (res != null)
+    };
+    
+    singleExecutor.submit(task);
+  }
+  
+  private void displayQueryResult(SaltProject p)
+  {
+    try
+    {
+      if (p == null || p.getSCorpusGraphs() == null)
       {
-        Future<SingleResultPanel> f =
-          lazyLoadResultPanel(executorService, res, i, this);
-        tasks.put(i, f);
+        getWindow().showNotification("Could not get subgraphs",
+          Window.Notification.TYPE_TRAY_NOTIFICATION);
+      }
+      else
+      {
+        updateVariables(p);
+        resultPanelList = createPanels(p);
       }
     }
+    catch (Exception ex)
+    {
+      log.error(null, ex);
+    }
 
-    return tasks;
+    indicator.setEnabled(false);
+    indicator.setVisible(false);
+
+    for (SingleResultPanel panel : resultPanelList)
+    {
+      layout.addComponent(panel);
+    }
+
   }
+  
+  private void updateVariables(SaltProject p)
+  {
+    segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
+    tokenAnnotationLevelSet.addAll(CommonHelper.
+      getTokenAnnotationLevelSet(p));
+
+    parent.updateSegmentationLayer(segmentationLayerSet);
+    parent.updateTokenAnnos(tokenAnnotationLevelSet);
+  }
+  
+  private List<SingleResultPanel> createPanels(SaltProject p)
+  {
+    List<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
+    
+    int i=0;
+    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+    {
+      SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
+        i++, this, ps, tokenAnnotationLevelSet, segmentationName);
+      
+      panel.setWidth("100%");
+      panel.setHeight("-1px");
+
+      result.add(panel);
+    }
+    return result;
+  }
+
 
   @Override
   public ResolverEntry[] getResolverEntries(SDocument doc)
@@ -311,185 +352,83 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  private Future<SingleResultPanel> lazyLoadResultPanel(
-    final ExecutorService executorService,
-    final WebResource subgraphRes, final int offset,
-    final ResolverProvider rsProvider)
-  {
-    final int resultNumber = start + offset;
-
-    Callable<SingleResultPanel> run =
-      new SingleResultFetcher(subgraphRes, resultNumber, rsProvider);
-
-    return executorService.submit(run);
-  }
-
-  public class SingleResultFetcher implements Callable<SingleResultPanel>
+  public class AllResultsFetcher implements Callable<SaltProject>
   {
 
-    private WebResource subgraphRes;
-    private int resultNumber;
-    private ResolverProvider rsProvider;
-
-    public SingleResultFetcher(WebResource subgraphRes, int resultNumber, ResolverProvider rsProvider)
+    public AllResultsFetcher()
     {
-      this.subgraphRes = subgraphRes;
-      this.resultNumber = resultNumber;
-      this.rsProvider = rsProvider;
     }
-
-    @Override
-    public SingleResultPanel call()
+    
+    private SaltProject executeQuery(WebResource subgraphRes,
+      SubgraphQuery query)
     {
-      // load result asynchronous
       SaltProject p = null;
-      int tries = 0;
-      while (p == null && tries < 100)
+      try
       {
-        try
-        {
-          p = subgraphRes.get(SaltProject.class);
-        }
-        catch (UniformInterfaceException ex)
-        {
-          if (ex.getResponse().getStatus() != Response.Status.SERVICE_UNAVAILABLE.getStatusCode())
-          {
-            log.error(ex.getMessage(), ex);
-            break;
-          }
-          // wait some time
-          try
-          {
-            Thread.sleep(500);
-          }
-          catch (InterruptedException ex1)
-          {
-            log.error(null, ex1);
-          }
-        }
-        catch (Exception ex)
-        {
-          log.error(ex.getMessage(), ex);
-          break;
-        }
-        tries++;
+        p = subgraphRes.post(SaltProject.class, query);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(ex.getMessage(), ex);
       }
 
       Validate.notNull(p);
 
-      SingleResultPanel result;
-      // get synchronized again in order not to confuse Vaadin
-      synchronized (getApplication())
-      {
-        segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
-        tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
-
-        parent.updateSegmentationLayer(segmentationLayerSet);
-        parent.updateTokenAnnos(tokenAnnotationLevelSet);
-
-        if (p != null && p.getSCorpusGraphs().size() > 0
-          && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
-        {
-          result =
-            new SingleResultPanel(
-            p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-            resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
-        }
-        else
-        {
-          log.warn("did not get a proper corpus graph for URI {}",
-            subgraphRes.toString());
-          result = null;
-        }
-      }
-      return result;
-    }
-  }
-
-  public class AllResultsFetcher implements Runnable
-  {
-
-    private int batchSize;
-
-    public AllResultsFetcher(int batchSize)
-    {
-      this.batchSize = batchSize;
+      return p;
     }
 
-    @Override
-    public void run()
+    private SubgraphQuery prepareQuery()
     {
-      ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
+      SubgraphQuery query = new SubgraphQuery();
 
-
-      WebResource res = Helper.getAnnisWebResource(getApplication());
-      if (res != null)
+      query.setLeft(contextLeft);
+      query.setRight(contextRight);
+      if (segmentationName != null)
       {
-        res = res.path("query/search/subgraph").queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight);
-
-        if (segmentationName != null)
-        {
-          res = res.queryParam("seglayer", segmentationName);
-        }
-
-
-        for (int offset = 0; offset < matches.size(); offset += batchSize)
-        {
-          Map<Integer, Future<SingleResultPanel>> tasks =
-            loadNextResultBatch(batchSize, offset, executorService, res);
-
-          waitForTasks(tasks, offset);
-
-        }
+        query.setSegmentationLayer(segmentationName);
       }
 
-      synchronized (getApplication())
-      {
-        indicator.setEnabled(false);
-        indicator.setVisible(false);
+      SaltURIGroupSet saltURIs = new SaltURIGroupSet();
 
-        for (SingleResultPanel panel : resultPanelList)
-        {
-          layout.addComponent(panel);
-        }
-      }
-    }
-
-    private void waitForTasks(Map<Integer, Future<SingleResultPanel>> tasks, int offset)
-    {
-      // wait until all tasks are done
-      for (int i = offset; i < offset + batchSize; i++)
+      ListIterator<Match> it = matches.listIterator();
+      int i = 0;
+      while (it.hasNext())
       {
-        if (tasks.containsKey(i))
+        Match m = it.next();
+        SaltURIGroup urisForMatch = new SaltURIGroup();
+
+        for (String s : m.getSaltIDs())
         {
-          Future<SingleResultPanel> future = tasks.get(i);
           try
           {
-            SingleResultPanel panel = future.get();
-            if (panel == null)
-            {
-              synchronized (getApplication())
-              {
-                getWindow().showNotification("Could not get subgraph " + i,
-                  Window.Notification.TYPE_TRAY_NOTIFICATION);
-              }
-            }
-            else
-            {
-              // add the panel
-
-              panel.setWidth("100%");
-              panel.setHeight("-1px");
-
-              resultPanelList.add(panel);
-            }
+            urisForMatch.getUris().add(new URI(s));
           }
-          catch (Exception ex)
+          catch (URISyntaxException ex)
           {
             log.error(null, ex);
           }
         }
+        saltURIs.getGroups().put(++i, urisForMatch);
       }
+
+      query.setMatches(saltURIs);
+      return query;
     }
+    
+    @Override
+    public SaltProject call() throws Exception
+    {
+      
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+      if (res != null)
+      {
+        res = res.path("query/search/subgraph");
+        SubgraphQuery query = prepareQuery();
+        return executeQuery(res, query);
+      }
+      return null;
+    }
+
+ 
   } // end class AllResultsFetcher
 }

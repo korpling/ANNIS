@@ -35,6 +35,7 @@
     </rollingPolicy>
   </appender>
   
+  <logger name="org.apache" level="WARN"/>
   <logger name="com.sun.jersey.core.spi.component.ProviderServices" level="WARN"/>
 
   <root level="DEBUG">

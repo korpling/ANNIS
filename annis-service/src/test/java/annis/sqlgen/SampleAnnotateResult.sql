@@ -80,3 +80,47 @@ ORDER BY solutions.n, facts.pre
 );
 
 select * from mymatch;
+
+-------------------------------------
+-- alternative: load from CSV file --
+-------------------------------------
+
+DROP TABLE IF EXISTS mymatch;
+CREATE TEMPORARY TABLE mymatch
+(
+  key bigint[],
+  matchstart integer,
+  n bigint,
+  id bigint,
+  text_ref bigint,
+  corpus_ref bigint,
+  toplevel_corpus bigint,
+  node_namespace character varying,
+  node_name character varying,
+  "left" integer,
+  "right" integer,
+  token_index integer,
+  is_token boolean,
+  continuous boolean,
+  span character varying,
+  left_token integer,
+  right_token integer,
+  pre bigint,
+  post bigint,
+  parent bigint,
+  root boolean,
+  level bigint,
+  component_id bigint,
+  edge_type character(1),
+  edge_name character varying,
+  edge_namespace character varying,
+  node_annotation_namespace character varying,
+  node_annotation_name character varying,
+  node_annotation_value character varying,
+  edge_annotation_namespace character varying,
+  edge_annotation_name character varying,
+  edge_annotation_value character varying,
+  path character varying[]
+);
+
+COPY mymatch FROM '/home/thomas/annis/annis-service/src/test/java/annis/sqlgen/SampleAnnotateResult.csv' (FORMAT 'csv', HEADER, DELIMITER ';')

@@ -32,9 +32,11 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.SaltURIGroup;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
-import annis.sqlgen.SaltURIs;
+import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.SubgraphQuery;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
@@ -47,7 +49,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -187,7 +191,13 @@ public class QueryService
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-    return annisDao.find(data);
+    
+    long start = new Date().getTime();
+    List<Match> matches = annisDao.find(data);
+    long end = new Date().getTime();
+    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    
+    return matches;
   }
   
   
@@ -240,65 +250,37 @@ public class QueryService
    * @param rightRaw right context parameter
    * @return the graph of this hit.
    */
-  @GET
+  @POST
   @Path("search/subgraph")
-  @Produces("application/xml")
-  public SaltProject subgraph(@QueryParam("q") String saltIDs,
-    @DefaultValue("5") @QueryParam("left") String leftRaw,
-    @DefaultValue("5") @QueryParam("right") String rightRaw,
-    @QueryParam("seglayer") String segmentationLayer)
-  {
-    String[] ids;
-    List<URI> saltURI = new SaltURIs();
-    QueryData data = new QueryData();
-    int left = Integer.parseInt(leftRaw);
-    int right = Integer.parseInt(rightRaw);
-  
-    data.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
-
-    // some robustness stuff
-    if (saltIDs == null)
+  @Produces({"application/xml", "application/xmi+xml" ,"application/xmi+binary"})
+  public SaltProject subgraph(final SubgraphQuery query)
+  { 
+     // some robustness stuff
+    if (query == null)
     {
       throw new WebApplicationException(
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
-        "missing required parameter 'q'").build());
+        "missing required request body").build());
     }
-
-    // check if this is a valid URI
-    ids = saltIDs.split("\\s*,\\s*");
-    for (String id : ids)
-    {
-      try
-      {
-        URI saltID = new URI(id);
-        saltURI.add(saltID);
-
-        if (saltID.getScheme() == null
-          || !saltID.getScheme().equals("salt"))
-        {
-          throw new WebApplicationException(
-            Response.status(Response.Status.BAD_REQUEST).type(
-            MediaType.TEXT_PLAIN).entity(
-            "the scheme is not the salt identifier scheme").build());
-        }
-      }
-      catch (URISyntaxException ex)
-      {
-        String msg = id + " is not a valid salt scheme";
-        log.error(msg, ex);
-      }
-    }
-
     
-    // collect list of used corpora and created pseudo QueryNodes for each URI
+    QueryData data = new QueryData();
+   
+    data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(), query.getSegmentationLayer()));
+ 
     Set<String> corpusNames = new TreeSet<String>();
-    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(saltURI.size());
-    for(java.net.URI u : saltURI)
+    
+    for(SaltURIGroup singleMatch : query.getMatches().getGroups().values())
     {
-      pseudoNodes.add(new QueryNode());
+      // collect list of used corpora and created pseudo QueryNodes for each URI
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.getUris().size());
+      for (java.net.URI u : singleMatch.getUris())
+      {
+        pseudoNodes.add(new QueryNode());
+        corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
+      }
       
-      corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
+      data.addAlternative(pseudoNodes);
     }
     
     Subject user = SecurityUtils.getSubject();
@@ -307,19 +289,22 @@ public class QueryService
       user.checkPermission("query:subgraph:" + c);
     }
     
-    
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
+    List<String> corpusNamesList = new LinkedList<String>(corpusNames);
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
     
     data.setCorpusList(corpusIDs);
-    data.addAlternative(pseudoNodes);
+    data.addExtension(query.getMatches());
+    long start = new Date().getTime();
+    SaltProject p = annisDao.graph(data);
+    long end = new Date().getTime();
+    logQuery("SUBGRAPH", "", corpusNamesList, end - start);
     
-    data.addExtension(saltURI);
-    return annisDao.graph(data);
+    return p;
   }
 
   @GET
   @Path("graphs/{top}/{doc}")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml" ,"application/xmi+binary"})
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {

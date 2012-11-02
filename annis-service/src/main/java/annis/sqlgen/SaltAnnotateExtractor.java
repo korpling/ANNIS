@@ -34,6 +34,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -41,7 +42,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.TreeSet;
+import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -105,6 +109,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           // create the text for the last graph
           if (graph != null && document != null)
           {
+            removeArtificialDominancesEdges(graph);
             createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
             setMatchedIDs(document, keyNameList);
             addOrderingRelations(graph, nodeBySegmentationPath);
@@ -167,6 +172,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // the last match needs a primary text, too
       if (graph != null)
       {
+        removeArtificialDominancesEdges(graph);
         createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
         setMatchedIDs(document, keyNameList);
         addOrderingRelations(graph, nodeBySegmentationPath);
@@ -178,6 +184,74 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     return project;
+  }
+  
+  /**
+   * Removes all dominance edges with empty name, where an other edge with name,
+   * the same namespace and the same source and target nodes exists.
+   * @param graph 
+   */
+  private void removeArtificialDominancesEdges(SDocumentGraph graph)
+  {
+    ListIterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().listIterator();
+    List<SDominanceRelation> edgesToRemove = new LinkedList<SDominanceRelation>();
+    while(itDomReal.hasNext())
+    {
+      SDominanceRelation rel = itDomReal.next();
+      
+      SFeature featCompID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
+      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+
+      
+      boolean allNull = true;
+      EList<String> types = rel.getSTypes();
+      if(types != null)
+      {
+        for(String s : types)
+        {
+          if(s != null)
+          {
+            allNull = false;
+            break;
+          }
+        }
+      } // end if types not null
+      if (allNull)
+      {
+        EList<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
+          getSTarget().getSId());
+        if (mirrorEdges != null && mirrorEdges.size() > 1)
+        {
+          for (Edge mirror : mirrorEdges)
+          {
+            if (mirror != rel && featCompID != null)
+            {
+              SRelation mirrorRel = (SRelation) mirror;
+              mirrorRel.createSFeature(
+                ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
+                featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+              mirrorRel.createSFeature(
+                ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
+                featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+            }
+          }
+          // remove this edge
+          edgesToRemove.add(rel);
+        }
+      }
+    }
+    
+    // actually remove the edges
+    for(SDominanceRelation rel : edgesToRemove)
+    {
+      EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
+      for(SLayer layer : layersOfRel)
+      {
+        layer.getSRelations().remove(rel);
+      }
+      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );;
+    }
+    
   }
   
   private void addOrderingRelations(SDocumentGraph graph,
@@ -635,7 +709,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     long componentID = longValue(resultSet, RANK_TABLE, "component_id");
     String edgeNamespace = stringValue(resultSet, COMPONENT_TABLE, "namespace");
     String edgeName = stringValue(resultSet, COMPONENT_TABLE, "name");
-
     String type = stringValue(resultSet, COMPONENT_TABLE, "type");
 
     SStructuredNode sourceNode = 
