@@ -21,7 +21,6 @@ import annis.gui.visualizers.VisualizerInput;
 import com.vaadin.Application;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Embedded;
-import com.vaadin.ui.Panel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -105,13 +104,23 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       FileUtils.writeStringToFile(tmpInput, dotContent.toString());
      
       // execute dot
-      ProcessBuilder pBuilder = new ProcessBuilder(
-        input.getMappings().getProperty("dotpath", "dot"),
+      String dotPath = input.getMappings().getProperty("dotpath", "dot");
+      ProcessBuilder pBuilder = new ProcessBuilder(dotPath,
           "-Tpng", 
         tmpInput.getCanonicalPath());
      
+      
       pBuilder.redirectErrorStream(false);
       Process process = pBuilder.start();
+     
+      InputStream inputFromProcess = process.getInputStream();
+      for(int chr=inputFromProcess.read(); chr != -1; chr = inputFromProcess.read())
+      {
+        outstream.write(chr);
+      }
+      
+      inputFromProcess.close();
+      
       
       int resultCode = process.waitFor();
       
@@ -136,14 +145,6 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
         }
       }
       
-      // read in file
-      InputStream fileInput = process.getInputStream();
-      for(int chr=fileInput.read(); chr != -1; chr = fileInput.read())
-      {
-        outstream.write(chr);
-      }
-      
-      fileInput.close();
       
       // cleanup
       if(!tmpInput.delete())
