@@ -299,7 +299,13 @@ public class SearchWindow extends Window
       List<AnnisCorpus> userCorpora =
         res.path("query").path("corpora").
         get(new GenericType<List<AnnisCorpus>>(){});
-      selectedCorpora.retainAll(userCorpora);
+      LinkedList<String> userCorporaStrings = new LinkedList<String>();
+      for(AnnisCorpus c : userCorpora)
+      {
+        userCorporaStrings.add(c.getName());
+      }
+      
+      selectedCorpora.retainAll(userCorporaStrings);
 
       // CLEFT and CRIGHT
       if (m.group(4) != null && m.group(6) != null)
