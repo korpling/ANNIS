@@ -191,7 +191,13 @@ public class QueryService
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-    return annisDao.find(data);
+    
+    long start = new Date().getTime();
+    List<Match> matches = annisDao.find(data);
+    long end = new Date().getTime();
+    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    
+    return matches;
   }
   
   
