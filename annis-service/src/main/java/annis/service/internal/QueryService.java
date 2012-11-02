@@ -25,7 +25,6 @@ import annis.dao.AnnotatedMatch;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
-import annis.provider.SaltProjectProvider;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -35,7 +34,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
-import annis.sqlgen.SaltURIs;
+import annis.service.objects.SaltURIs;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.net.URI;
@@ -250,7 +249,10 @@ public class QueryService
     @QueryParam("seglayer") String segmentationLayer)
   {
     String[] ids;
-    List<URI> saltURI = new SaltURIs();
+    SaltURIs saltURIs = new SaltURIs();
+    ArrayList<URI> singleMatch = new ArrayList<URI>();
+    saltURIs.put(1, singleMatch);
+    
     QueryData data = new QueryData();
     int left = Integer.parseInt(leftRaw);
     int right = Integer.parseInt(rightRaw);
@@ -273,7 +275,7 @@ public class QueryService
       try
       {
         URI saltID = new URI(id);
-        saltURI.add(saltID);
+        singleMatch.add(saltID);
 
         if (saltID.getScheme() == null
           || !saltID.getScheme().equals("salt"))
@@ -294,8 +296,8 @@ public class QueryService
     
     // collect list of used corpora and created pseudo QueryNodes for each URI
     Set<String> corpusNames = new TreeSet<String>();
-    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(saltURI.size());
-    for(java.net.URI u : saltURI)
+    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.size());
+    for(java.net.URI u : singleMatch)
     {
       pseudoNodes.add(new QueryNode());
       
@@ -314,7 +316,7 @@ public class QueryService
     data.setCorpusList(corpusIDs);
     data.addAlternative(pseudoNodes);
     
-    data.addExtension(saltURI);
+    data.addExtension(saltURIs);
     return annisDao.graph(data);
   }
 

@@ -15,6 +15,7 @@
  */
 package annis;
 
+import annis.service.objects.SaltURIs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -53,6 +54,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.io.output.FileWriterWithEncoding;
@@ -162,7 +164,7 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doDebug(String ignore)
   {
-    doSql("count pos=\"NE\" & lemma=\"Zossen\" & pos=\"ADV\" & tok & #1 _=_ #2 & #2 .* #3 & #3 _=_ #4");
+    doSql("subgraph salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2");
   }
 
   public void doParse(String annisQuery)
@@ -1095,48 +1097,54 @@ public class AnnisRunner extends AnnisBaseRunner
     this.metaDataFilter = metaDataFilter;
   }
 
-  private QueryData extractSaltIds(String saltIds)
+  private QueryData extractSaltIds(String param)
   {
     QueryData queryData = new QueryData();
-    SaltURIs uris = new SaltURIs();
-    for (String id : saltIds.split("\\s"))
-    {
-      java.net.URI uri;
-      try
-      {
-        uri = new java.net.URI(id);
-
-        if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
-        {
-          throw new URISyntaxException("not a salt id", uri.toString());
-        }
-      }
-      catch (URISyntaxException ex)
-      {
-        log.error(null, ex);
-        continue;
-      }
-
-      uris.add(uri);
-    }
+    SaltURIs saltIDs = new SaltURIs();
     
-    // collect list of used corpora and created pseudo QueryNodes for each URI
     Set<String> corpusNames = new TreeSet<String>();
-    List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(uris.size());
-    for(java.net.URI u : uris)
+   
+    int i = 0;
+    for(String group : param.split("\\s*;\\s*"))
     {
-      pseudoNodes.add(new QueryNode());
-      
-      corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
-    }
+      ArrayList<java.net.URI> urisForGroup = new ArrayList<java.net.URI>();
     
+      for (String id : group.split("[,\\s]+"))
+      {
+        java.net.URI uri;
+        try
+        {
+          uri = new java.net.URI(id);
+
+          if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
+          {
+            throw new URISyntaxException("not a salt id", uri.toString());
+          }
+        }
+        catch (URISyntaxException ex)
+        {
+          log.error(null, ex);
+          continue;
+        }
+        urisForGroup.add(uri);
+      }
+      
+      // collect list of used corpora and created pseudo QueryNodes for each URI
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.size());
+      for (java.net.URI u : urisForGroup)
+      {
+        pseudoNodes.add(new QueryNode());
+        corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
+      }
+      queryData.addAlternative(pseudoNodes);
+      saltIDs.put(++i, urisForGroup);
+    }
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
     
     queryData.setCorpusList(corpusIDs);
-    queryData.addAlternative(pseudoNodes);
 
-    log.debug(uris.toString());
-    queryData.addExtension(uris);
+    log.debug(saltIDs.toString());
+    queryData.addExtension(saltIDs);
     return queryData;
   }
 }

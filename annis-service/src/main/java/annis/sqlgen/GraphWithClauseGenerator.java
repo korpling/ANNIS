@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.service.objects.SaltURIs;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -28,7 +29,10 @@ import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
@@ -45,37 +49,19 @@ import java.util.Collections;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
-
-  @Override
-  protected String getMatchesWithClause(QueryData queryData,
-    List<QueryNode> alternative, String indent)
+  private String singleMatchClause(int matchNumber, List<URI> saltURIs, 
+    TableAccessStrategy tas, AnnotateQueryData annotateQueryData, 
+    List<Long> corpusList, int numOfNodes,
+    String indent)
   {
-    TableAccessStrategy tas = createTableAccessStrategy();
-
-    StringBuilder sb = new StringBuilder();
-
     String indent2 = indent + TABSTOP;
-    String indent3 = indent2 + TABSTOP;
-
-    List<AnnotateQueryData> extensions =
-      queryData.getExtensions(AnnotateQueryData.class);
-    AnnotateQueryData annotateQueryData = extensions.isEmpty()
-      ? new AnnotateQueryData(5, 5) : extensions.get(0);
-
-    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
-    // only work with the first element
-    Validate.isTrue(!listOfSaltURIs.isEmpty());
-
-    SaltURIs saltURIs = listOfSaltURIs.get(0);
-
-    sb.append(indent).append("matches AS\n");
-    sb.append(indent).append("(\n");
-
+    StringBuilder sb = new StringBuilder();
+    
     // SELECT
-    sb.append(indent2).append("SELECT\n");
-    sb.append(indent3).append("1 AS n, \n").append(indent3);
+    sb.append(indent).append("SELECT\n");
+    sb.append(indent2).append(matchNumber).append(" AS n, \n").append(indent2);
 
-    for (int i = 1; i <= alternative.size(); i++)
+    for (int i = 1; i <= numOfNodes; i++)
     {
       // factsN.id AS idN
       sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
@@ -111,64 +97,64 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
         .append(tas.columnName(NODE_TABLE, "node_name"))
         .append(" AS ").append("name").append(i);
 
-      if (i == alternative.size())
+      if (i == numOfNodes)
       {
         sb.append("\n");
       }
       else
       {
-        sb.append(", \n").append(indent3);
+        sb.append(", \n").append(indent2);
       }
     }
 
     // FROM
-    sb.append(indent2).append("FROM\n");
-    for (int i = 1; i <= alternative.size(); i++)
+    sb.append(indent).append("FROM\n");
+    for (int i = 1; i <= numOfNodes; i++)
     {
-      sb.append(indent3)
+      sb.append(indent2)
         .append(tas.tableName(NODE_TABLE)).append(" AS ")
         .append("facts").append(i).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
         .append("corpus").append(i);
 
-      if (i == alternative.size())
+      if (i == numOfNodes)
       {
         sb.append("\n");
       }
       else
       {
-        sb.append(",\n").append(indent3);
+        sb.append(",\n").append(indent2);
       }
 
     }
 
     // WHERE
-    sb.append(indent2).append("WHERE\n");
-    for (int i = 1; i <= alternative.size(); i++)
+    sb.append(indent).append("WHERE\n");
+    for (int i = 1; i <= numOfNodes; i++)
     {
       URI uri = saltURIs.get(i - 1);
 
       // check for corpus/document by it's path
-      sb.append(indent3)
+      sb.append(indent2)
         .append("corpus").append(i).append(".path_name = ")
         .append(generatePathName(uri)).append(" AND\n");
 
       // join the found corpus/document to the facts table
-      sb.append(indent3)
+      sb.append(indent2)
         .append("facts").append(i).append(".corpus_ref = ")
         .append("corpus").append(i).append(".id AND\n");
 
       // filter the node with the right name
-      sb.append(indent3)
+      sb.append(indent2)
         .append("facts").append(i).append(".node_name = ")
         .append("'").append(uri.getFragment()).append("'").append(" AND\n");
 
       // use the toplevel partioning
-      sb.append(indent3)
+      sb.append(indent2)
         .append("facts").append(i).append(".toplevel_corpus IN ( ")
-        .append(StringUtils.join(queryData.getCorpusList(), ",")).append(") ");
+        .append(StringUtils.join(corpusList, ",")).append(") ");
 
-      if (i < alternative.size())
+      if (i < numOfNodes)
       {
         sb.append("AND\n");
       }
@@ -179,8 +165,50 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     }
 
     // LIMIT to one row
-    sb.append(indent2).append("LIMIT 1\n");
+    sb.append(indent).append("LIMIT 1\n");
+    
+    return sb.toString();
+  }
 
+  @Override
+  protected String getMatchesWithClause(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    TableAccessStrategy tas = createTableAccessStrategy();
+
+    StringBuilder sb = new StringBuilder();
+
+    String indent2 = indent + TABSTOP;
+
+    List<AnnotateQueryData> extensions =
+      queryData.getExtensions(AnnotateQueryData.class);
+    AnnotateQueryData annotateQueryData = extensions.isEmpty()
+      ? new AnnotateQueryData(5, 5) : extensions.get(0);
+
+    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+
+    SaltURIs saltURIs = listOfSaltURIs.get(0);
+
+    sb.append(indent).append("matches AS\n");
+    sb.append(indent).append("(\n");
+
+    LinkedList<String> clauses = new LinkedList<String>();
+   
+    for(Map.Entry<Integer, ArrayList<URI>> e : saltURIs.entrySet())
+    {
+      clauses.add(
+        indent2 + "(\n"+
+        singleMatchClause(e.getKey(), e.getValue(), tas, annotateQueryData,
+          queryData.getCorpusList(),alternative.size(), indent2 + TABSTOP)
+        + indent2 + ")\n"
+      );
+    }
+    
+    String seperator =indent2 + "UNION ALL\n";
+    sb.append(StringUtils.join(clauses, seperator));
+    
     // end WITH inner select
     sb.append(indent).append(")");
 
