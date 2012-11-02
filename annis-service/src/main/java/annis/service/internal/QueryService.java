@@ -25,6 +25,7 @@ import annis.dao.AnnotatedMatch;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
+import annis.provider.SaltProjectProvider;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -242,7 +243,7 @@ public class QueryService
    */
   @GET
   @Path("search/subgraph")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml" ,"application/xmi+binary"})
   public SaltProject subgraph(@QueryParam("q") String saltIDs,
     @DefaultValue("5") @QueryParam("left") String leftRaw,
     @DefaultValue("5") @QueryParam("right") String rightRaw,
@@ -319,7 +320,7 @@ public class QueryService
 
   @GET
   @Path("graphs/{top}/{doc}")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml" ,"application/xmi+binary"})
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
