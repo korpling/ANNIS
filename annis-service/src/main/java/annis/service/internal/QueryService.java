@@ -289,11 +289,17 @@ public class QueryService
       user.checkPermission("query:subgraph:" + c);
     }
     
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
+    List<String> corpusNamesList = new LinkedList<String>(corpusNames);
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
     
     data.setCorpusList(corpusIDs);
     data.addExtension(query.getMatches());
-    return annisDao.graph(data);
+    long start = new Date().getTime();
+    SaltProject p = annisDao.graph(data);
+    long end = new Date().getTime();
+    logQuery("SUBGRAPH", "", corpusNamesList, end - start);
+    
+    return p;
   }
 
   @GET
