@@ -16,19 +16,34 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * This class is only a wrapper to transport the salt ids with the
- * {@link QueryData} class as extension.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
-public class SaltURIs extends TreeMap<Integer, ArrayList<URI>> implements Serializable
+public class SaltURIGroup implements Serializable
 {
+  private List<URI> uris;
+
+  public SaltURIGroup()
+  {
+    uris = new ArrayList<URI>();
+  }
+  
+  public List<URI> getUris()
+  {
+    return uris;
+  }
+
+  public void setUris(List<URI> uris)
+  {
+    this.uris = uris;
+  }
+  
+  
 }

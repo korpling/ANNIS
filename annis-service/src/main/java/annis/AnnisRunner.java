@@ -15,7 +15,7 @@
  */
 package annis;
 
-import annis.service.objects.SaltURIs;
+import annis.service.objects.SaltURIGroupSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +37,7 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.SaltURIGroup;
 
 import annis.sqlgen.*;
 
@@ -1100,14 +1101,14 @@ public class AnnisRunner extends AnnisBaseRunner
   private QueryData extractSaltIds(String param)
   {
     QueryData queryData = new QueryData();
-    SaltURIs saltIDs = new SaltURIs();
+    SaltURIGroupSet saltIDs = new SaltURIGroupSet();
     
     Set<String> corpusNames = new TreeSet<String>();
    
     int i = 0;
     for(String group : param.split("\\s*;\\s*"))
     {
-      ArrayList<java.net.URI> urisForGroup = new ArrayList<java.net.URI>();
+      SaltURIGroup urisForGroup = new SaltURIGroup();
     
       for (String id : group.split("[,\\s]+"))
       {
@@ -1126,18 +1127,18 @@ public class AnnisRunner extends AnnisBaseRunner
           log.error(null, ex);
           continue;
         }
-        urisForGroup.add(uri);
+        urisForGroup.getUris().add(uri);
       }
       
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.size());
-      for (java.net.URI u : urisForGroup)
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.getUris().size());
+      for (java.net.URI u : urisForGroup.getUris())
       {
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
       queryData.addAlternative(pseudoNodes);
-      saltIDs.put(++i, urisForGroup);
+      saltIDs.getGroups().put(++i, urisForGroup);
     }
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
     

@@ -15,10 +15,11 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.SaltURIs;
+import annis.service.objects.SaltURIGroupSet;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.SaltURIGroup;
 import java.net.URI;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -185,22 +186,22 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     AnnotateQueryData annotateQueryData = extensions.isEmpty()
       ? new AnnotateQueryData(5, 5) : extensions.get(0);
 
-    List<SaltURIs> listOfSaltURIs = queryData.getExtensions(SaltURIs.class);
+    List<SaltURIGroupSet> listOfSaltURIs = queryData.getExtensions(SaltURIGroupSet.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
 
-    SaltURIs saltURIs = listOfSaltURIs.get(0);
+    SaltURIGroupSet saltURIs = listOfSaltURIs.get(0);
 
     sb.append(indent).append("matches AS\n");
     sb.append(indent).append("(\n");
 
     LinkedList<String> clauses = new LinkedList<String>();
    
-    for(Map.Entry<Integer, ArrayList<URI>> e : saltURIs.entrySet())
+    for(Map.Entry<Integer, SaltURIGroup> e : saltURIs.getGroups().entrySet())
     {
       clauses.add(
         indent2 + "(\n"+
-        singleMatchClause(e.getKey(), e.getValue(), tas, annotateQueryData,
+        singleMatchClause(e.getKey(), e.getValue().getUris(), tas, annotateQueryData,
           queryData.getCorpusList(),alternative.size(), indent2 + TABSTOP)
         + indent2 + ")\n"
       );

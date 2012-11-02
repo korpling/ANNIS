@@ -24,6 +24,9 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
+import annis.service.objects.SaltURIGroup;
+import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -31,14 +34,18 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -138,42 +145,44 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
   }
 
-  private Map<Integer, Future<SingleResultPanel>> loadNextResultBatch(int batchSize,
-    int offset, ExecutorService executorService, WebResource resWithoutMatch)
+  private Map<Integer, Future<List<SingleResultPanel>>> loadNextResultBatch(int batchSize,
+    int offset, ExecutorService executorService, WebResource res, SubgraphQuery query)
   {
 
-    Map<Integer, Future<SingleResultPanel>> tasks =
-      Collections.synchronizedMap(new HashMap<Integer, Future<SingleResultPanel>>());
+    Map<Integer, Future<List<SingleResultPanel>>> tasks =
+      Collections.synchronizedMap(new HashMap<Integer, Future<List<SingleResultPanel>>>());
 
+    SaltURIGroupSet saltURIs = new SaltURIGroupSet();
+    
     ListIterator<Match> it = matches.listIterator(offset);
+    int i=0;
     while (it.hasNext() && (it.nextIndex() - offset) < batchSize)
     {
-      int i = it.nextIndex();
       Match m = it.next();
 
-      List<String> encodedSaltIDs = new LinkedList<String>();
+      SaltURIGroup urisForMatch = new SaltURIGroup();
+      
       for (String s : m.getSaltIDs())
       {
         try
         {
-          encodedSaltIDs.add(URLEncoder.encode(s, "UTF-8"));
+          urisForMatch.getUris().add(new URI(s));
         }
-        catch (UnsupportedEncodingException ex)
+        catch (URISyntaxException ex)
         {
           log.error(null, ex);
         }
       }
-
-      // get subgraph for match
-      WebResource res =
-        resWithoutMatch.queryParam("q", StringUtils.join(encodedSaltIDs, ","));
-
-      if (res != null)
-      {
-        Future<SingleResultPanel> f =
-          lazyLoadResultPanel(executorService, res, i, this);
-        tasks.put(i, f);
-      }
+      saltURIs.getGroups().put(++i, urisForMatch);
+    }
+    
+    query.setMatches(saltURIs);
+    
+    if (res != null)
+    {
+      Future<List<SingleResultPanel>> f =
+        lazyLoadResultPanel(executorService, res, query, offset, this);
+      tasks.put(offset, f);
     }
 
     return tasks;
@@ -311,35 +320,40 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  private Future<SingleResultPanel> lazyLoadResultPanel(
+  private Future<List<SingleResultPanel>> lazyLoadResultPanel(
     final ExecutorService executorService,
-    final WebResource subgraphRes, final int offset,
+    final WebResource subgraphRes, 
+    final SubgraphQuery query, 
+    final int offset,
     final ResolverProvider rsProvider)
   {
     final int resultNumber = start + offset;
 
-    Callable<SingleResultPanel> run =
-      new SingleResultFetcher(subgraphRes, resultNumber, rsProvider);
+    Callable<List<SingleResultPanel>> run =
+      new SingleResultFetcher(subgraphRes, query, resultNumber, rsProvider);
 
     return executorService.submit(run);
   }
 
-  public class SingleResultFetcher implements Callable<SingleResultPanel>
+  public class SingleResultFetcher implements Callable<List<SingleResultPanel>>
   {
 
     private WebResource subgraphRes;
-    private int resultNumber;
+    private int offset;
+    private SubgraphQuery query;
     private ResolverProvider rsProvider;
 
-    public SingleResultFetcher(WebResource subgraphRes, int resultNumber, ResolverProvider rsProvider)
+    public SingleResultFetcher(WebResource subgraphRes, SubgraphQuery query,
+      int offset, ResolverProvider rsProvider)
     {
       this.subgraphRes = subgraphRes;
-      this.resultNumber = resultNumber;
+      this.offset = offset;
       this.rsProvider = rsProvider;
+      this.query = query;
     }
 
     @Override
-    public SingleResultPanel call()
+    public List<SingleResultPanel> call()
     {
       // load result asynchronous
       SaltProject p = null;
@@ -348,7 +362,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         try
         {
-          p = subgraphRes.get(SaltProject.class);
+          p = subgraphRes.post(SaltProject.class, query);
         }
         catch (UniformInterfaceException ex)
         {
@@ -377,7 +391,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
       Validate.notNull(p);
 
-      SingleResultPanel result;
+      LinkedList<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
       // get synchronized again in order not to confuse Vaadin
       synchronized (getApplication())
       {
@@ -387,13 +401,20 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         parent.updateSegmentationLayer(segmentationLayerSet);
         parent.updateTokenAnnos(tokenAnnotationLevelSet);
 
-        if (p != null && p.getSCorpusGraphs().size() > 0
-          && p.getSCorpusGraphs().get(0).getSDocuments().size() > 0)
+        int resultNumber=offset;
+        if (p != null && p.getSCorpusGraphs().size() > 0)
         {
-          result =
-            new SingleResultPanel(
-            p.getSCorpusGraphs().get(0).getSDocuments().get(0),
-            resultNumber, rsProvider, ps, parent.getVisibleTokenAnnos(), segmentationName);
+          for(SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+          {
+            if(corpusGraph.getSDocuments() != null && corpusGraph.getSDocuments().size() > 0)
+            {
+              result.add(
+                new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
+                resultNumber++, rsProvider, ps, 
+                parent.getVisibleTokenAnnos(), segmentationName)
+              );
+            }
+          }
         }
         else
         {
@@ -421,22 +442,25 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       ExecutorService executorService = Executors.newFixedThreadPool(batchSize);
 
-
+      SubgraphQuery query = new SubgraphQuery();
+      
       WebResource res = Helper.getAnnisWebResource(getApplication());
       if (res != null)
       {
-        res = res.path("query/search/subgraph").queryParam("left", "" + contextLeft).queryParam("right", "" + contextRight);
+        res = res.path("query/search/subgraph");
 
+        query.setLeft(contextLeft);
+        query.setRight(contextRight);
         if (segmentationName != null)
         {
-          res = res.queryParam("seglayer", segmentationName);
+          query.setSegmentationLayer(segmentationName);
         }
 
 
         for (int offset = 0; offset < matches.size(); offset += batchSize)
         {
-          Map<Integer, Future<SingleResultPanel>> tasks =
-            loadNextResultBatch(batchSize, offset, executorService, res);
+          Map<Integer, Future<List<SingleResultPanel>>> tasks =
+            loadNextResultBatch(batchSize, offset, executorService, res, query);
 
           waitForTasks(tasks, offset);
 
@@ -455,33 +479,35 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       }
     }
 
-    private void waitForTasks(Map<Integer, Future<SingleResultPanel>> tasks, int offset)
+    private void waitForTasks(Map<Integer, Future<List<SingleResultPanel>>> tasks, int offset)
     {
       // wait until all tasks are done
       for (int i = offset; i < offset + batchSize; i++)
       {
         if (tasks.containsKey(i))
         {
-          Future<SingleResultPanel> future = tasks.get(i);
+          Future<List<SingleResultPanel>> future = tasks.get(i);
           try
           {
-            SingleResultPanel panel = future.get();
-            if (panel == null)
+            List<SingleResultPanel> result = future.get();
+            if (result == null)
             {
               synchronized (getApplication())
               {
-                getWindow().showNotification("Could not get subgraph " + i,
+                getWindow().showNotification("Could not get subgraphs " + i,
                   Window.Notification.TYPE_TRAY_NOTIFICATION);
               }
             }
             else
             {
               // add the panel
+              for(SingleResultPanel panel : result)
+              {
+                panel.setWidth("100%");
+                panel.setHeight("-1px");
 
-              panel.setWidth("100%");
-              panel.setHeight("-1px");
-
-              resultPanelList.add(panel);
+                resultPanelList.add(panel);
+              }
             }
           }
           catch (Exception ex)
