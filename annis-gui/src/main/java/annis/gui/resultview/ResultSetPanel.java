@@ -39,15 +39,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +59,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-  private BeanItemContainer<Match> container;
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
   private String segmentationName;
@@ -107,8 +103,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     layout.setMargin(false);
     addStyleName("result-view");
-
-    container = new BeanItemContainer<Match>(Match.class, this.matches);
 
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(true);
