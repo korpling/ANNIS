@@ -46,6 +46,9 @@ import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
 import annis.service.objects.AnnisResultSetImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -88,8 +91,6 @@ public class LegacyGraphConverter
 
   public static AnnotationGraph convertToAnnotationGraph(SDocument document)
   {
-    AnnotationGraph result = null;
-
     List<String> matchedIDs = new ArrayList<String>();
     SFeature featMatchedIDs = document.getSFeature(ANNIS_NS,
       FEAT_MATCHEDIDS);
@@ -99,7 +100,7 @@ public class LegacyGraphConverter
         Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
-    result = convertToAnnotationGraph(docGraph, matchedIDs);
+    AnnotationGraph result = convertToAnnotationGraph(docGraph, matchedIDs);
 
     return result;
   }
@@ -188,46 +189,76 @@ public class LegacyGraphConverter
 
       if (featPre != null)
       {
-        Edge aEdge = new Edge();
-        aEdge.setSource(allNodes.get(rel.getSource()));
-        aEdge.setDestination(allNodes.get(rel.getTarget()));
-
-        aEdge.setEdgeType(EdgeType.UNKNOWN);
-        aEdge.setPre(featPre.getSValueSNUMERIC());
-        aEdge.setComponentID(featComponentID.getSValueSNUMERIC());
-
-        aEdge.setNamespace(rel.getSLayers().get(0).getSName());
-        aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
-          ? rel.getSTypes().get(0) : null);
-
-        if (rel instanceof SDominanceRelation)
+        addEdge(rel, featPre.getSValueSNUMERIC(), featComponentID.getSValueSNUMERIC(),
+          allNodes, annoGraph);
+      }
+    }
+    
+    // add edges with empty edge name for every dominance edge
+    for(SDominanceRelation rel : docGraph.getSDominanceRelations())
+    {
+      SFeature featComp = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT);
+      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE);
+      if(featComp != null && featPre != null)
+      {
+        SDominanceRelation newRel = SaltFactory.eINSTANCE.createSDominanceRelation();
+        newRel.setSSource(rel.getSSource());
+        newRel.setSTarget(rel.getSTarget());
+        for(SLayer layer : rel.getSLayers())
         {
-          aEdge.setEdgeType(EdgeType.DOMINANCE);
+          newRel.getSLayers().add(layer);
         }
-        else if (rel instanceof SPointingRelation)
+        for(SAnnotation anno : rel.getSAnnotations())
         {
-          aEdge.setEdgeType(EdgeType.POINTING_RELATION);
+          newRel.addSAnnotation(anno);
         }
-        else if (rel instanceof SSpanningRelation)
-        {
-          aEdge.setEdgeType(EdgeType.COVERAGE);
-        }
-
-        for (SAnnotation sAnno : rel.getSAnnotations())
-        {
-          aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
-            sAnno.getSValueSTEXT()));
-        }
-
-        annoGraph.addEdge(aEdge);
-        aEdge.getDestination().addIncomingEdge(aEdge);
-        if(aEdge.getSource() != null)
-        {
-          aEdge.getSource().addOutgoingEdge(aEdge);
-        }
+        addEdge(newRel, featPre.getSValueSNUMERIC(), featComp.getSValueSNUMERIC(), allNodes, annoGraph);
       }
     }
 
     return annoGraph;
   }
+  
+  private static void addEdge(SRelation rel, long pre, long componentID, 
+    Map<Node, AnnisNode> allNodes, AnnotationGraph annoGraph)
+  {
+    Edge aEdge = new Edge();
+    aEdge.setSource(allNodes.get(rel.getSource()));
+    aEdge.setDestination(allNodes.get(rel.getTarget()));
+
+    aEdge.setEdgeType(EdgeType.UNKNOWN);
+    aEdge.setPre(pre);
+    aEdge.setComponentID(componentID);
+
+    aEdge.setNamespace(rel.getSLayers().get(0).getSName());
+    aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
+      ? rel.getSTypes().get(0) : null);
+
+    if (rel instanceof SDominanceRelation)
+    {
+      aEdge.setEdgeType(EdgeType.DOMINANCE);
+    }
+    else if (rel instanceof SPointingRelation)
+    {
+      aEdge.setEdgeType(EdgeType.POINTING_RELATION);
+    }
+    else if (rel instanceof SSpanningRelation)
+    {
+      aEdge.setEdgeType(EdgeType.COVERAGE);
+    }
+
+    for (SAnnotation sAnno : rel.getSAnnotations())
+    {
+      aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
+        sAnno.getSValueSTEXT()));
+    }
+
+    annoGraph.addEdge(aEdge);
+    aEdge.getDestination().addIncomingEdge(aEdge);
+    if(aEdge.getSource() != null)
+    {
+      aEdge.getSource().addOutgoingEdge(aEdge);
+    }
+  }
+  
 }

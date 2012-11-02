@@ -325,12 +325,12 @@ public class SaltAnnotateExtractorTest
     e = g.getSLayerByName("tiger").get(0).getSRelations();
     ECollections.sort(e, new EdgeComparator());
 
-    assertEquals(34, e.size());
+    assertEquals(17, e.size());
 
-    assertEquals("const_59", e.get(19).getSSource().getSName());
-    assertEquals("tok_160", e.get(19).getSTarget().getSName());
-    assertEquals("const_61", e.get(33).getSSource().getSName());
-    assertEquals("tok_156", e.get(33).getSTarget().getSName());
+    assertEquals("const_59", e.get(9).getSSource().getSName());
+    assertEquals("tok_160", e.get(9).getSTarget().getSName());
+    assertEquals("const_61", e.get(16).getSSource().getSName());
+    assertEquals("tok_156", e.get(16).getSTarget().getSName());
 
     // urml, only control samples //
     e = g.getSLayerByName("urml").get(0).getSRelations();
