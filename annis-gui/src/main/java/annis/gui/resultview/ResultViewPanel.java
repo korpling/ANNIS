@@ -247,7 +247,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
               {
                 mainLayout.removeComponent(resultPanel);
               }
-              resultPanel = new ResultSetPanel(result, start, ps,
+              resultPanel = new ResultSetPanel(result, ps,
                 contextLeft, contextRight,
                 currentSegmentationLayer, finalThis);
 

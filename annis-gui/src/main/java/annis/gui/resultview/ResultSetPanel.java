@@ -32,10 +32,10 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -44,8 +44,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +61,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
   private String segmentationName;
-  private int start;
+  
   private int contextLeft;
   private int contextRight;
   private ResultViewPanel parent;
@@ -75,14 +73,13 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private ProgressIndicator indicator;
   private VerticalLayout layout;
 
-  public ResultSetPanel(List<Match> matches, int start, PluginSystem ps,
+  public ResultSetPanel(List<Match> matches, PluginSystem ps,
     int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent)
   {
     this.ps = ps;
     this.segmentationName = segmentationName;
-    this.start = start;
     this.contextLeft = contextLeft;
     this.contextRight = contextRight;
     this.parent = parent;
@@ -165,12 +162,19 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   {
     try
     {
-      if (p == null || p.getSCorpusGraphs() == null)
+      if (p == null)
       {
         getWindow().showNotification("Could not get subgraphs",
           Window.Notification.TYPE_TRAY_NOTIFICATION);
       }
-      else
+      else if( p.getSCorpusGraphs() == null || p.getSCorpusGraphs().size() == 0)
+      {
+        // nothing to show since we have an empty result
+        Label lblNoResult = new Label("No matches found.");
+        lblNoResult.setSizeUndefined();
+        layout.addComponent(lblNoResult);
+        layout.setComponentAlignment(lblNoResult, Alignment.TOP_CENTER);
+      }
       {
         updateVariables(p);
         resultPanelList = createPanels(p);
@@ -424,7 +428,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         res = res.path("query/search/subgraph");
         SubgraphQuery query = prepareQuery();
-        return executeQuery(res, query);
+        if(query.getMatches().getGroups().size() > 0)
+        {
+          return executeQuery(res, query);
+        }
+        else
+        {
+          SaltProject emptyProject = SaltFactory.eINSTANCE.createSaltProject();
+          
+          
+          return emptyProject;
+        }
       }
       return null;
     }
