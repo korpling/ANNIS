@@ -32,6 +32,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -54,7 +55,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.apache.commons.lang3.Validate;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,9 @@ public class VisualizerPanel extends CustomLayout
 
   private final static String htmlTemplate = 
     "<div id=\":id\"><div location=\"btEntry\"></div>"
-    + "<div location=\"iframe\"></div></div>";
+    + "<div location=\"progress\"></div>"
+    + "<div location=\"iframe\"></div>"
+    + "</div>";
     
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -225,44 +228,8 @@ public class VisualizerPanel extends CustomLayout
     final Application application = getApplication();
     final VisualizerInput input = createInput();
     
-    FutureTask<Component> task = new FutureTask<Component>(new Callable<Component>() 
-    {
-
-      @Override
-      public Component call() throws Exception
-      {
-        return visPlugin.createComponent(input, application);
-      }
-    });
-    
-    Component c = null;
-    try
-    {
-      Executor exec = Executors.newSingleThreadExecutor();
-      exec.execute(task);
-      c = task.get(60, TimeUnit.SECONDS);
-      c.setVisible(false);
-    }
-    catch (InterruptedException ex)
-    {
-      getWindow().showNotification("Could not create visualizer", ex.getMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-      log.error(null, ex);
-    }
-    catch (ExecutionException ex)
-    {
-      log.error(null, ex);
-      getWindow().showNotification("Could not create visualizer", ex.getMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-    }
-    catch (TimeoutException ex)
-    {
-      getWindow().showNotification("Timeout when creating visualizer", ex.getMessage(), Window.Notification.TYPE_ERROR_MESSAGE);
-      log.error(null, ex);
-    }
-    finally
-    {
-      task.cancel(true);
-    }
-    
+    Component c = visPlugin.createComponent(input, application);
+    c.setVisible(false);
     
     return c;
   }
@@ -391,59 +358,98 @@ public class VisualizerPanel extends CustomLayout
     }
     return true;
   }
+  
+  private void loadVisualizer(final LoadableVisualizer.Callback callback)
+  {
+    // check if it's necessary to create input
+    if (visPlugin != null)
+    {
+      Executor exec = Executors.newSingleThreadExecutor();
+      FutureTask<Component> future = new FutureTask<Component>(new LoadComponentTask())
+      {
+
+        @Override
+        public void run()
+        {
+          try
+          {
+            super.run();
+            // wait maximum 60 seconds
+            vis = get(60, TimeUnit.SECONDS);
+            synchronized (getApplication())
+            {
+              if (callback != null && vis instanceof LoadableVisualizer)
+              {
+                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+                if (loadableVis.isLoaded())
+                {
+                  // direct call callback since the visualizer is already ready
+                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                }
+                else
+                {
+                  loadableVis.clearCallbacks();
+                  // add listener when player was fully loaded
+                  loadableVis.addOnLoadCallBack(callback);
+                }
+              }
+              
+              removeComponent("progress");
+
+              if (vis != null)
+              {
+                vis.setVisible(true);
+                if (getComponent("iframe") == null)
+                {
+                  addComponent(vis, "iframe");
+                }
+              }
+            }
+          }
+          catch (InterruptedException ex)
+          {
+            log.error("Visualizer creation interrupted " + visPlugin.getShortName(), ex);
+          }
+          catch (ExecutionException ex)
+          {
+            log.error("Exception when creating visualizer " + visPlugin.getShortName(), ex);
+          }
+          catch (TimeoutException ex)
+          {
+            log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
+            synchronized(getApplication())
+            {
+              getWindow().showNotification(
+                "Could not create visualizer " + visPlugin.getShortName(),
+                ex.toString(),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            cancel(true);
+          }
+        } 
+      };
+      exec.execute(future);
+      
+      
+      btEntry.setIcon(ICON_COLLAPSE);
+      ProgressIndicator progress = new ProgressIndicator();
+      progress.setIndeterminate(true);
+      progress.setVisible(true);
+      progress.setEnabled(true);
+      progress.setPollingInterval(100);
+      addComponent(progress, "progress");
+    }
+    // end if create input was needed
+
+  } // end loadVisualizer
 
   
   @Override
   public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
   {
-    
     if (visible)
     {
-      // check if it's necessary to create input
-      if (visPlugin != null && vis == null)
-      {
-        try
-        {
-          
-          vis = createComponent();
-        }
-        catch(Exception ex)
-        {
-          getWindow().showNotification(
-            "Could not create visualizer " + visPlugin.getShortName(), 
-            ex.toString(),
-            Window.Notification.TYPE_WARNING_MESSAGE
-          );
-          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
-        }
-      }
-      // end if create input was needed
-      
-      if(callback != null && vis instanceof LoadableVisualizer)
-      {
-        LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-        if(loadableVis.isLoaded())
-        {
-          // direct call callback since the visualizer is already ready
-          callback.visualizerLoaded((LoadableVisualizer) vis);
-        }
-        else
-        {
-          loadableVis.clearCallbacks();
-          // add listener when player was fully loaded
-          loadableVis.addOnLoadCallBack(callback);
-        }
-      }
-          
-      if(vis != null)
-      {
-        btEntry.setIcon(ICON_COLLAPSE);
-        vis.setVisible(true);
-        if(getComponent("iframe") == null)
-        {
-          addComponent(vis, "iframe");
-        }
-      }
+      loadVisualizer(callback);
     }
     else
     {
@@ -466,6 +472,23 @@ public class VisualizerPanel extends CustomLayout
   public String getHtmlID()
   {
     return htmlID;
+  }
+  
+  public class LoadComponentTask implements Callable<Component>
+  {
+    @Override
+    public Component call() throws Exception
+    {
+      // only create component if not already created
+      if(vis == null)
+      {
+        return createComponent();
+      }
+      else
+      {
+        return vis;
+      }
+    }
   }
   
   public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
