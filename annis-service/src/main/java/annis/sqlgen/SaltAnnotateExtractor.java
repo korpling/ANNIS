@@ -227,12 +227,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
             if (mirror != rel && featCompID != null)
             {
               SRelation mirrorRel = (SRelation) mirror;
-              mirrorRel.createSFeature(
-                ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
-                featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
-              mirrorRel.createSFeature(
-                ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
-                featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+              
+              if(mirrorRel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT) == null)
+              {
+                mirrorRel.createSFeature(
+                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
+                  featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+                mirrorRel.createSFeature(
+                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
+                  featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+              }
             }
           }
           // remove this edge
