@@ -117,7 +117,6 @@ public class QueryService
       user.checkPermission("query:count:" + c);
     }
     
-    
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
     int count = annisDao.count(data);

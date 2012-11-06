@@ -134,7 +134,7 @@ public class ReportBugPanel extends Panel
         {
           getWindow().showNotification("Could not send bug report", ex.
             getMessage(),
-            Window.Notification.TYPE_ERROR_MESSAGE);
+            Window.Notification.TYPE_WARNING_MESSAGE);
         }
       }
     });

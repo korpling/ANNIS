@@ -202,15 +202,24 @@ public class ControlPanel extends Panel
             if (ex.getResponse().getStatus() == 400)
             {
               window.showNotification(
-                ex.getResponse().getEntity(String.class), "parsing error",
-                Window.Notification.TYPE_ERROR_MESSAGE);
+                "parsing error",
+                ex.getResponse().getEntity(String.class),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            else if(ex.getResponse().getStatus() == 504) // gateway timeout
+            {
+               window.showNotification(
+                "Timeout: query execution took too long.",
+                "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
+                Window.Notification.TYPE_WARNING_MESSAGE);
             }
             else
             {
               window.showNotification(
-                ex.getResponse().getEntity(String.class), "unknown error " + ex.
+                "unknown error " + ex.
                 getResponse().getStatus(),
-                Window.Notification.TYPE_ERROR_MESSAGE);
+                ex.getResponse().getEntity(String.class),
+                Window.Notification.TYPE_WARNING_MESSAGE);
             }
           }
         }

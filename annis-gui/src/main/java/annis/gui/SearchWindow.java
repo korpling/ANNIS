@@ -505,20 +505,20 @@ public class SearchWindow extends Window
     catch (ClientHandlerException ex)
     {
       showNotification("Authentification error: " + ex.getMessage(),
-        Window.Notification.TYPE_ERROR_MESSAGE);
+        Window.Notification.TYPE_WARNING_MESSAGE);
     }
     catch(UniformInterfaceException ex)
     {
       if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
       {
         getWindow().showNotification("Username or password wrong", ex.getMessage(), 
-          Notification.TYPE_ERROR_MESSAGE);
+          Notification.TYPE_WARNING_MESSAGE);
       }
       else
       {
         log.error(null, ex);
         showNotification("Unexpected exception: " + ex.getMessage(),
-          Window.Notification.TYPE_ERROR_MESSAGE);
+          Window.Notification.TYPE_WARNING_MESSAGE);
       }
     }
     catch (Exception ex)
@@ -526,7 +526,7 @@ public class SearchWindow extends Window
       log.error(null, ex);
 
       showNotification("Unexpected exception: " + ex.getMessage(),
-        Window.Notification.TYPE_ERROR_MESSAGE);
+        Window.Notification.TYPE_WARNING_MESSAGE);
     }
     finally
     {
@@ -601,7 +601,7 @@ public class SearchWindow extends Window
           + " or use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_ERROR_MESSAGE, true);
+          Window.Notification.TYPE_WARNING_MESSAGE, true);
       }
       else
       {
@@ -609,7 +609,7 @@ public class SearchWindow extends Window
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_ERROR_MESSAGE, true);
+          Window.Notification.TYPE_WARNING_MESSAGE, true);
       }
 
       

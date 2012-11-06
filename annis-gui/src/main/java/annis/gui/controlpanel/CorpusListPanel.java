@@ -418,7 +418,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
           "could not store new corpus set", ex);
         getWindow().showNotification("Could not store new corpus set: "
           + ex.getLocalizedMessage(),
-          Notification.TYPE_ERROR_MESSAGE);
+          Notification.TYPE_WARNING_MESSAGE);
       }
     } // end if new item
   }
