@@ -106,9 +106,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout = new VerticalLayout();
     
     indicator = new ProgressIndicator();
-    indicator.setIndeterminate(true);
+    indicator.setIndeterminate(false);
     indicator.setValue(0f);
-    indicator.setPollingInterval(250);
+    indicator.setPollingInterval(100);
     indicator.setCaption("fetching subgraphs");
     indicator.setSizeUndefined();
     
@@ -421,7 +421,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         res = res.path("query/search/subgraph");
 
-        int i=firstMatchOffset; 
+        List<SaltProject> results = new LinkedList<SaltProject>();
+        
+        int j=0;
+        SaltProject lastProject = null;
         for(Match m : matches)
         {
           List<Match> sub = new LinkedList<Match>();
@@ -432,17 +435,31 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             SaltProject p = executeQuery(res, query);
             if(p != null)
             {
-              synchronized(getApplication())
-              {
-                addQueryResult(p, i++);
-              }
+              lastProject = p;
+              results.add(p);
             } 
           }
           else
           {
             allSuccessfull = false;
           }
+          
+          synchronized(getApplication())
+          {
+            
+            if(lastProject != null)
+            {
+              addQueryResult(lastProject, j+firstMatchOffset);
+            }
+            indicator.setValue((double) j++ / (double) matches.size());
+            if(j == matches.size())
+            {
+              indicator.setValue(1.0f);
+              indicator.setCaption("Rendering in browser");
+            }
+          }
         }
+        
       }
       return allSuccessfull;
     }
