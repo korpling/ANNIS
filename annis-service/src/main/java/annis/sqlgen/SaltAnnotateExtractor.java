@@ -531,10 +531,50 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       to.getSLayers().add(l);
     }
     from.getSLayers().clear();
-
+ 
+    EList<Edge> inEdges =  graph.getInEdges(from.getSId());
+    for(Edge e : inEdges)
+    {
+      if(e instanceof SRelation)
+      {
+        graph.removeEdge(e);
+      }
+    }
+    EList<Edge> outEdges =  graph.getOutEdges(from.getSId());
+    for(Edge e : outEdges)
+    {
+      if(e instanceof SRelation)
+      {
+        graph.removeEdge(e);
+      }
+    }
+    
     Validate.isTrue(graph.removeNode(from));
-
     graph.addNode(to);
+    
+    // fix old edges
+    if(inEdges != null)
+    {
+      for(Edge e : inEdges)
+      {
+        if(e instanceof SRelation)
+        {
+          ((SRelation) e).setSTarget(to);
+          graph.addSRelation((SRelation) e);
+        }
+      }
+    }
+    if(outEdges != null)
+    {
+      for(Edge e : outEdges)
+      {
+        if(e instanceof SRelation)
+        {
+          ((SRelation) e).setSSource(to);
+          graph.addSRelation((SRelation) e);
+        }
+      }
+    }
 
     for (SAnnotation anno : from.getSAnnotations())
     {
@@ -634,7 +674,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
     try
     {
-      rel.getSLayers().add(layer);
       rel.addSType(edgeName);
 
 
@@ -665,6 +704,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         rel.setSTarget(targetNode);
         graph.addSRelation(rel);
       }
+      
+      rel.getSLayers().add(layer);
+      
     }
     catch (SaltException ex)
     {

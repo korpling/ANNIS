@@ -252,7 +252,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
               {
                 resultPanel = new ResultSetPanel(result, ps,
                   contextLeft, contextRight,
-                  currentSegmentationLayer, finalThis);
+                  currentSegmentationLayer, finalThis, start);
 
                 mainLayout.addComponent(resultPanel);
                 mainLayout.setExpandRatio(resultPanel, 1.0f);
