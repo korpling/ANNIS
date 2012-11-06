@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -72,6 +71,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private Set<String> segmentationLayerSet =
     Collections.synchronizedSet(new TreeSet<String>());
   private ProgressIndicator indicator;
+  private VerticalLayout indicatorLayout;
   private CssLayout layout;
 
   public ResultSetPanel(List<Match> matches, PluginSystem ps,
@@ -103,14 +103,22 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("result-view");
 
+    indicatorLayout = new VerticalLayout();
+    
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(true);
     indicator.setValue(0f);
     indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
-    indicator.addStyleName("fetch-result-indicator");
-
-    layout.addComponent(indicator);
+    indicator.setSizeUndefined();
+    
+    indicatorLayout.addComponent(indicator);
+    indicatorLayout.setWidth("100%");
+    indicatorLayout.setHeight("-1px");
+    indicatorLayout.setComponentAlignment(indicator, Alignment.TOP_CENTER);
+    indicatorLayout.setVisible(true);
+    
+    layout.addComponent(indicatorLayout);
   }
 
   @Override
@@ -143,16 +151,12 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         {
           indicator.setEnabled(false);
           indicator.setVisible(false);
+          indicatorLayout.setVisible(false);
         }
       }
     };
     
     singleExecutor.submit(task);
-  }
-  
-  private int calculatePanelWidth()
-  {
-    return  getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25;
   }
   
   private void addQueryResult(SaltProject p, int offset)
@@ -179,8 +183,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       resultPanelList.add(panel);
       // insert just before the indicator
-      int indicatorIndex = layout.getComponentIndex(indicator);
-      layout.addComponent(panel, indicatorIndex);
+      int indicatorIndex = layout.getComponentIndex(indicatorLayout);
+      layout.addComponent(panel);
     }
   }
   
@@ -416,7 +420,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       if (res != null)
       {
         res = res.path("query/search/subgraph");
-        
+
         int i=firstMatchOffset; 
         for(Match m : matches)
         {
