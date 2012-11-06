@@ -139,18 +139,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         synchronized(getApplication())
         {
-          try
-          {
-            displayQueryResult(get());
-          }
-          catch (InterruptedException ex)
-          {
-            log.error(null, ex);
-          }
-          catch (ExecutionException ex)
-          {
-            log.error(null, ex);
-          }
+          indicator.setEnabled(false);
+          indicator.setVisible(false);
         }
       }
     };
@@ -158,8 +148,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     singleExecutor.submit(task);
   }
   
-  private void displayQueryResult(SaltProject p)
+  private void addQueryResult(SaltProject p)
   {
+    List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
     {
       if (p == null)
@@ -167,17 +158,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         getWindow().showNotification("Could not get subgraphs",
           Window.Notification.TYPE_TRAY_NOTIFICATION);
       }
-      else if( p.getSCorpusGraphs() == null || p.getSCorpusGraphs().size() == 0)
-      {
-        // nothing to show since we have an empty result
-        Label lblNoResult = new Label("No matches found.");
-        lblNoResult.setSizeUndefined();
-        layout.addComponent(lblNoResult);
-        layout.setComponentAlignment(lblNoResult, Alignment.TOP_CENTER);
-      }
       {
         updateVariables(p);
-        resultPanelList = createPanels(p);
+        newPanels = createPanels(p);
       }
     }
     catch (Exception ex)
@@ -185,11 +168,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       log.error(null, ex);
     }
 
-    indicator.setEnabled(false);
-    indicator.setVisible(false);
-
-    for (SingleResultPanel panel : resultPanelList)
+    for (SingleResultPanel panel : newPanels)
     {
+      resultPanelList.add(panel);
       layout.addComponent(panel);
     }
 
@@ -377,6 +358,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       }
 
       Validate.notNull(p);
+      
+      addQueryResult(p);
+
 
       return p;
     }

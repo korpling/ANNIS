@@ -27,6 +27,7 @@ import annis.service.objects.Match;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
@@ -247,15 +248,26 @@ public class ResultViewPanel extends Panel implements PagingCallback
               {
                 mainLayout.removeComponent(resultPanel);
               }
-              resultPanel = new ResultSetPanel(result, ps,
-                contextLeft, contextRight,
-                currentSegmentationLayer, finalThis);
+              if(result.size() > 0)
+              {
+                resultPanel = new ResultSetPanel(result, ps,
+                  contextLeft, contextRight,
+                  currentSegmentationLayer, finalThis);
 
-              mainLayout.addComponent(resultPanel);
-              mainLayout.setExpandRatio(resultPanel, 1.0f);
-              mainLayout.setExpandRatio(progressResult, 0.0f);
+                mainLayout.addComponent(resultPanel);
+                mainLayout.setExpandRatio(resultPanel, 1.0f);
+                mainLayout.setExpandRatio(progressResult, 0.0f);
 
-              resultPanel.setVisible(true);
+                resultPanel.setVisible(true);
+              }
+              else
+              {
+                    // nothing to show since we have an empty result
+                Label lblNoResult = new Label("No matches found.");
+                lblNoResult.setSizeUndefined();
+                mainLayout.addComponent(lblNoResult);
+                mainLayout.setComponentAlignment(lblNoResult, Alignment.TOP_CENTER);
+              }
             }
             
           }
