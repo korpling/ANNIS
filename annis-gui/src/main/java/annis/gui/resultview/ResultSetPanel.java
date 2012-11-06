@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -44,7 +43,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -132,8 +130,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
 
-    Callable<SaltProject> run = new AllResultsFetcher();
-    FutureTask<SaltProject> task = new FutureTask<SaltProject>(
+    Callable<Boolean> run = new AllResultsFetcher();
+    FutureTask<Boolean> task = new FutureTask<Boolean>(
       run)
     {
       @Override
@@ -150,7 +148,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     singleExecutor.submit(task);
   }
   
-  private void addQueryResult(SaltProject p)
+  private void addQueryResult(SaltProject p, int offset)
   {
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
@@ -162,7 +160,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       }
       {
         updateVariables(p);
-        newPanels = createPanels(p);
+        newPanels = createPanels(p, offset);
       }
     }
     catch (Exception ex)
@@ -173,9 +171,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SingleResultPanel panel : newPanels)
     {
       resultPanelList.add(panel);
-      layout.addComponent(panel);
+      // insert just before the indicator
+      int indicatorIndex = layout.getComponentIndex(indicator);
+      layout.addComponent(panel, indicatorIndex);
     }
-
   }
   
   private void updateVariables(SaltProject p)
@@ -188,7 +187,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     parent.updateTokenAnnos(tokenAnnotationLevelSet);
   }
   
-  private List<SingleResultPanel> createPanels(SaltProject p)
+  private List<SingleResultPanel> createPanels(SaltProject p, int offset)
   {
     List<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
     
@@ -196,7 +195,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
-        i + firstMatchOffset, this, ps, tokenAnnotationLevelSet, segmentationName);
+        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName);
       i++;
       
       panel.setWidth("100%");
@@ -340,7 +339,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  public class AllResultsFetcher implements Callable<SaltProject>
+  public class AllResultsFetcher implements Callable<Boolean>
   {
 
     public AllResultsFetcher()
@@ -360,15 +359,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         log.error(ex.getMessage(), ex);
       }
 
-      Validate.notNull(p);
-      
-      addQueryResult(p);
-
-
       return p;
     }
 
-    private SubgraphQuery prepareQuery()
+    private SubgraphQuery prepareQuery(List<Match> matchesToPrepare)
     {
       SubgraphQuery query = new SubgraphQuery();
 
@@ -381,7 +375,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
       SaltURIGroupSet saltURIs = new SaltURIGroupSet();
 
-      ListIterator<Match> it = matches.listIterator();
+      ListIterator<Match> it = matchesToPrepare.listIterator();
       int i = 0;
       while (it.hasNext())
       {
@@ -407,27 +401,39 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
     
     @Override
-    public SaltProject call() throws Exception
+    public Boolean call() throws Exception
     {
+      boolean allSuccessfull = true;
       
       WebResource res = Helper.getAnnisWebResource(getApplication());
       if (res != null)
       {
         res = res.path("query/search/subgraph");
-        SubgraphQuery query = prepareQuery();
-        if(query.getMatches().getGroups().size() > 0)
+        
+        int i=firstMatchOffset; 
+        for(Match m : matches)
         {
-          return executeQuery(res, query);
-        }
-        else
-        {
-          SaltProject emptyProject = SaltFactory.eINSTANCE.createSaltProject();
-          
-          
-          return emptyProject;
+          List<Match> sub = new LinkedList<Match>();
+          sub.add(m);
+          SubgraphQuery query = prepareQuery(sub);
+          if(query.getMatches().getGroups().size() > 0)
+          {
+            SaltProject p = executeQuery(res, query);
+            if(p != null)
+            {
+              synchronized(getApplication())
+              {
+                addQueryResult(p, i++);
+              }
+            } 
+          }
+          else
+          {
+            allSuccessfull = false;
+          }
         }
       }
-      return null;
+      return allSuccessfull;
     }
 
  
