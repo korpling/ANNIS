@@ -79,6 +79,8 @@ public class SearchWindow extends Window
   
   private boolean warnedAboutMediaFormat = false;
 
+  public final static int CONTROL_PANEL_WIDTH = 360;
+  
   public SearchWindow(PluginSystem ps)
   {
     super("ANNIS Corpus Search");
@@ -193,7 +195,7 @@ public class SearchWindow extends Window
     ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
 
     control = new ControlPanel(this);
-    control.setWidth(30f, Layout.UNITS_EM);
+    control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);
 

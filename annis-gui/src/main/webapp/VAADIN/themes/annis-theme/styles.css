@@ -24,6 +24,10 @@
   padding: 0px;
 }
 
+.result-view .v-panel-content-result-view {
+  overflow-y: scroll;
+}
+
 .single-result .v-table-cell-content {
   padding: 0px 6px;
 }

@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.SearchWindow;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.resolver.ResolverEntry;
@@ -31,6 +32,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -70,7 +72,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private Set<String> segmentationLayerSet =
     Collections.synchronizedSet(new TreeSet<String>());
   private ProgressIndicator indicator;
-  private VerticalLayout layout;
+  private CssLayout layout;
 
   public ResultSetPanel(List<Match> matches, PluginSystem ps,
     int contextLeft, int contextRight,
@@ -92,8 +94,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setSizeFull();
-
-    layout = (VerticalLayout) getContent();
+    
+    layout = new CssLayout();
+    setContent(layout);
+//    layout = (VerticalLayout) getContent();
     layout.setWidth("100%");
     layout.setHeight("-1px");
 
@@ -109,7 +113,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator.setCaption("fetching subgraphs");
 
     layout.addComponent(indicator);
-    layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
+//    layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
 
   }
 
@@ -117,7 +121,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   public void attach()
   {
     super.attach();
-
+    
+//    layout.setWidth(getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25, UNITS_PIXELS);
+    
     // reset all registered media players    
     MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
     if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
@@ -140,12 +146,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         synchronized(getApplication())
         {
           indicator.setEnabled(false);
-          indicator.setVisible(false);
+//          indicator.setVisible(false);
         }
       }
     };
     
     singleExecutor.submit(task);
+  }
+  
+  private int calculatePanelWidth()
+  {
+    return  getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25;
   }
   
   private void addQueryResult(SaltProject p, int offset)
