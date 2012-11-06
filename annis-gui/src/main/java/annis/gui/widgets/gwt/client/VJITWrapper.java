@@ -296,6 +296,7 @@ public class VJITWrapper extends Widget implements Paintable
       'edgeLabel': {
         'render': function(adj, canvas) {
             var edges = adj.nodeTo.data.edges,
+            invisibleRelations = adj.nodeFrom.data.invisibleRelations;
             fromNode = adj.nodeFrom,
             toNode = adj.nodeTo,
             isAlreadyConnected = false;
@@ -326,6 +327,16 @@ public class VJITWrapper extends Widget implements Paintable
                         isAlreadyConnected = true;
                     }
                 }
+            }
+
+            // if toNode is member of the invisibleRelation
+            // property plot nothing
+            for (var j = 0; j < invisibleRelations.length; j++)
+            {
+              if (invisibleRelations[j] === toNode.id)
+              {
+                return;
+              }
             }
 
             if (!isAlreadyConnected)

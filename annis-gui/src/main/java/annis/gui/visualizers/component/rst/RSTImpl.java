@@ -369,15 +369,15 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     try
     {
       // build unique id, cause is used for an unique html element id.
-      jsonData.put("id", getUniqueStringId(currNode));
+      jsonData.put("id", getUniStrId(currNode));
       jsonData.put("name", currNode.getSName());
 
       /**
-       * additional data oject for labelling edges and also labelling and
-       * rendering sentences
+       * additional data oject for edge labels and rendering sentences
        */
       JSONObject data = new JSONObject();
       JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
+      JSONArray invisRel = getInvisibleRelatedNodes(currNode);
 
       // since we have found some tokens, it must be a sentence in RST.
       if (token.size() > 0)
@@ -398,6 +398,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       if (edgesJSON != null)
       {
         data.put("edges", edgesJSON);
+      }
+
+      if (invisRel != null)
+      {
+        data.put("invisibleRelations", invisRel);
       }
 
       if (currNode instanceof SStructure && isSegment(currNode))
@@ -550,47 +555,82 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return true;
   }
 
+  private JSONArray getInvisibleRelatedNodes(SNode node)
+  {
+    JSONArray nodeIds = new JSONArray();
+    EList<Edge> out = node.getSGraph().getOutEdges(node.getSId());
+
+    /**
+     * notice the node which are targets of edges which contains an annotation
+     * with the key "type"
+     */
+    if (out != null)
+    {
+      for (Edge edge : out)
+      {
+        if (!(edge instanceof SRelation))
+        {
+          continue;
+        }
+
+        if (hasAnnoKey(((SRelation) edge), "type")
+          && ((SRelation) edge).getTarget() instanceof SNode)
+        {
+          nodeIds.put(getUniStrId(((SNode) ((SRelation) edge).getTarget())));
+        }
+      }
+
+    }
+    return nodeIds;
+
+  }
+
   private JSONArray getIncomingEdgeTypeAnnotation(SNode node) throws JSONException
   {
-    EList<Edge> edges = node.getSGraph().getInEdges(node.getId());
+    EList<Edge> in = node.getSGraph().getInEdges(node.getId());
     EList<String> sTypes;
     EList<SAnnotation> annos;
     JSONArray edgeData = new JSONArray();
 
-    for (Edge edge : edges)
+
+    // check if there is a pointing relation
+    if (in != null)
     {
-
-
-      if (edge instanceof SRelation)
+      for (Edge edge : in)
       {
-        sTypes = ((SRelation) edge).getSTypes();
 
 
-        if (sTypes != null && sTypes.size() > 0 && isPointingRelation(edge))
+        if (edge instanceof SRelation)
         {
-          JSONObject jsonEdge = new JSONObject();
-          edgeData.put(jsonEdge);
-          // asume that only one sType is defined
-          jsonEdge.put("sType", sTypes.get(0));
-          jsonEdge.put("from", getUniqueStringId(node));
+          sTypes = ((SRelation) edge).getSTypes();
 
-          if (((SRelation) edge).getTarget() instanceof SNode)
-          {
-            jsonEdge.put("to",
-              getUniqueStringId((SNode) ((SRelation) edge).getSource()));
-          }
-          else
-          {
-            throw new JSONException("could not cast to SNode");
-          }
 
-          annos = ((SRelation) edge).getSAnnotations();
-
-          if (annos != null)
+          if (sTypes != null && sTypes.size() > 0 && isPointingRelation(edge))
           {
-            for (SAnnotation anno : annos)
+            JSONObject jsonEdge = new JSONObject();
+            edgeData.put(jsonEdge);
+            // asume that only one sType is defined
+            jsonEdge.put("sType", sTypes.get(0));
+            jsonEdge.put("from", getUniStrId(node));
+
+            if (((SRelation) edge).getTarget() instanceof SNode)
             {
-              jsonEdge.append("annotation", anno.getSValueSTEXT());
+              jsonEdge.put("to",
+                getUniStrId((SNode) ((SRelation) edge).getSource()));
+            }
+            else
+            {
+              throw new JSONException("could not cast to SNode");
+            }
+
+            annos = ((SRelation) edge).getSAnnotations();
+
+            if (annos != null)
+            {
+              for (SAnnotation anno : annos)
+              {
+                jsonEdge.append("annotation", anno.getSValueSTEXT());
+              }
             }
           }
         }
@@ -603,7 +643,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   /**
    * Build a unique HTML id.
    */
-  private String getUniqueStringId(SNode node)
+  private String getUniStrId(SNode node)
   {
     return visId + "_" + node.getSName();
   }
@@ -827,5 +867,25 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
+  }
+
+  private boolean hasAnnoKey(SRelation edge, String type)
+  {
+    EList<SAnnotation> annos = edge.getSAnnotations();
+    for (SAnnotation anno : annos)
+    {
+      if (edge.getSTypes() != null && type.equals(anno.getSName()))
+      {
+        for (String annoValue : ANNOTATION_VALUES)
+        {
+          if (annoValue.equals(anno.getSValueSTEXT()))
+          {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }
