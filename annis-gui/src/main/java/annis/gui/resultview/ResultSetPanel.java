@@ -97,13 +97,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     
     layout = new CssLayout();
     setContent(layout);
-//    layout = (VerticalLayout) getContent();
-    layout.setWidth("100%");
-    layout.setHeight("-1px");
+    layout.addStyleName("result-view-css");
 
 
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    layout.setMargin(false);
     addStyleName("result-view");
 
     indicator = new ProgressIndicator();
@@ -111,10 +108,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator.setValue(0f);
     indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
+    indicator.addStyleName("fetch-result-indicator");
 
     layout.addComponent(indicator);
-//    layout.setComponentAlignment(indicator, Alignment.BOTTOM_CENTER);
-
   }
 
   @Override
@@ -146,7 +142,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         synchronized(getApplication())
         {
           indicator.setEnabled(false);
-//          indicator.setVisible(false);
+          indicator.setVisible(false);
         }
       }
     };
