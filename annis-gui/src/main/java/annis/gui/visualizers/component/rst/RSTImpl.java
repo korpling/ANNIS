@@ -34,7 +34,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -396,8 +400,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         data.put("edges", edgesJSON);
       }
 
-      if (currNode instanceof SStructure
-        && isSegment(currNode))
+      if (currNode instanceof SStructure && isSegment(currNode))
       {
 
         SProcessingAnnotation sentence_idx = currNode.
@@ -424,6 +427,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     try
     {
       root.append("children", node);
+      setSentenceSpan(node, root);
+      sortChildren(root);
     }
     catch (JSONException ex)
     {
@@ -454,7 +459,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     else
     {
       JSONObject jsonNode = st.pop();
-      setSentenceSpan(jsonNode, st.peek());
       appendChild(st.peek(), jsonNode);
     }
   }
@@ -756,5 +760,72 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       log.debug("error while setting left and right position for sentences", ex);
     }
+  }
+
+  /**
+   * Sorts the children of root by the the sentence indizes. Since the sentence
+   * indizes are calculated with the token indizes, some sentences have no
+   * sentences indizes, because sometimes token nodes are out of context.
+   *
+   * A kind of insertion sort would be better than the used mergesort.
+   *
+   * And it is a pity that the {@link JSONArray} has no interface to sort the
+   * underlying {@link Array}.
+   *
+   */
+  private void sortChildren(JSONObject root) throws JSONException
+  {
+    JSONArray children = root.getJSONArray("children");
+    List<JSONObject> childrenSorted = new ArrayList<JSONObject>(
+      children.length() + 1);
+
+    for (int i = 0; i < children.length(); i++)
+    {
+      childrenSorted.add(children.getJSONObject(i));
+    }
+
+    Collections.sort(childrenSorted, new Comparator<Object>()
+    {
+      @Override
+      public int compare(Object o1, Object o2)
+      {
+        int o1IdxLeft = 0;
+        int o1IdxRight = 0;
+        int o2IdxLeft = 0;
+        int o2IdxRight = 0;
+        try
+        {
+          o1IdxLeft = ((JSONObject) o1).getJSONObject("data").getInt(
+            SENTENCE_LEFT);
+          o1IdxRight = ((JSONObject) o1).getJSONObject("data").getInt(
+            SENTENCE_RIGHT);
+          o2IdxLeft = ((JSONObject) o2).getJSONObject("data").getInt(
+            SENTENCE_LEFT);
+          o2IdxRight = ((JSONObject) o2).getJSONObject("data").getInt(
+            SENTENCE_RIGHT);
+        }
+        catch (JSONException ex)
+        {
+          log.error("Could not compare sentence indizes.", ex);
+        }
+
+        if (o1IdxLeft + o1IdxRight > o2IdxLeft + o2IdxRight)
+        {
+          return 1;
+        }
+
+        if (o1IdxLeft + o1IdxRight == o2IdxLeft + o2IdxRight)
+        {
+          return 0;
+        }
+        else
+        {
+          return -1;
+        }
+      }
+    });
+
+    children = new JSONArray(childrenSorted);
+    root.put("children", children);
   }
 }
