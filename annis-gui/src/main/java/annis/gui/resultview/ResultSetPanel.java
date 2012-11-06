@@ -32,6 +32,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -125,6 +126,16 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   public void attach()
   {
     super.attach();
+    
+    getWindow().addListener(new Window.ResizeListener() 
+    {
+
+      @Override
+      public void windowResized(ResizeEvent e)
+      {
+        layout.requestRepaintAll();
+      }
+    });
     
 //    layout.setWidth(getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25, UNITS_PIXELS);
     

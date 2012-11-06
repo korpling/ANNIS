@@ -88,7 +88,9 @@ public class SearchWindow extends Window
     this.ps = ps;
     
     setName("search");
-
+    // always get the resize events directly
+    setImmediate(true);
+    
     getContent().setSizeFull();
     ((VerticalLayout) getContent()).setMargin(false);
 
