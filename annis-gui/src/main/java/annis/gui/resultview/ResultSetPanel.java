@@ -61,6 +61,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private List<SingleResultPanel> resultPanelList;
   private PluginSystem ps;
   private String segmentationName;
+  private int firstMatchOffset;
   
   private int contextLeft;
   private int contextRight;
@@ -76,7 +77,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   public ResultSetPanel(List<Match> matches, PluginSystem ps,
     int contextLeft, int contextRight,
     String segmentationName,
-    ResultViewPanel parent)
+    ResultViewPanel parent, int firstMatchOffset)
   {
     this.ps = ps;
     this.segmentationName = segmentationName;
@@ -84,6 +85,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.contextRight = contextRight;
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
+    this.firstMatchOffset = firstMatchOffset;
 
     resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
@@ -213,7 +215,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
-        i++, this, ps, tokenAnnotationLevelSet, segmentationName);
+        i + firstMatchOffset, this, ps, tokenAnnotationLevelSet, segmentationName);
+      i++;
       
       panel.setWidth("100%");
       panel.setHeight("-1px");
