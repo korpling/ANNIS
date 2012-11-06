@@ -248,6 +248,11 @@ public class ResultViewPanel extends Panel implements PagingCallback
               {
                 mainLayout.removeComponent(resultPanel);
               }
+              
+              progressResult.setEnabled(false);              
+              progressResult.setVisible(false);
+              mainLayout.setExpandRatio(progressResult, 0.0f);
+              
               if(result.size() > 0)
               {
                 resultPanel = new ResultSetPanel(result, ps,
@@ -256,17 +261,17 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
                 mainLayout.addComponent(resultPanel);
                 mainLayout.setExpandRatio(resultPanel, 1.0f);
-                mainLayout.setExpandRatio(progressResult, 0.0f);
 
                 resultPanel.setVisible(true);
               }
               else
               {
-                    // nothing to show since we have an empty result
+                // nothing to show since we have an empty result
                 Label lblNoResult = new Label("No matches found.");
                 lblNoResult.setSizeUndefined();
                 mainLayout.addComponent(lblNoResult);
-                mainLayout.setComponentAlignment(lblNoResult, Alignment.TOP_CENTER);
+                mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
+                mainLayout.setExpandRatio(lblNoResult, 1.0f);
               }
             }
             

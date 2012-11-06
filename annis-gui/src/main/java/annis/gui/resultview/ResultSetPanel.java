@@ -109,7 +109,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator = new ProgressIndicator();
     indicator.setIndeterminate(false);
     indicator.setValue(0f);
-    indicator.setPollingInterval(100);
+    indicator.setPollingInterval(250);
     indicator.setCaption("fetching subgraphs");
     indicator.setSizeUndefined();
     
@@ -432,8 +432,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         res = res.path("query/search/subgraph");
 
-        List<SaltProject> results = new LinkedList<SaltProject>();
-        
         int j=0;
         SaltProject lastProject = null;
         for(Match m : matches)
@@ -447,7 +445,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             if(p != null)
             {
               lastProject = p;
-              results.add(p);
             } 
           }
           else
