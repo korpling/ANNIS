@@ -776,8 +776,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private void sortChildren(JSONObject root) throws JSONException
   {
     JSONArray children = root.getJSONArray("children");
-    List<JSONObject> childrenSorted = new ArrayList<JSONObject>(
-      children.length() + 1);
+    List<JSONObject> childrenSorted = new ArrayList<JSONObject>(children.
+      length());
 
     for (int i = 0; i < children.length(); i++)
     {
