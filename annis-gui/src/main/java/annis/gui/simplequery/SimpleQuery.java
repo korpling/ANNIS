@@ -22,7 +22,6 @@ import com.vaadin.ui.HorizontalLayout;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.simplequery.VerticalNode;
 import annis.gui.simplequery.AddMenu;
-import annis.gui.dddqb.DDDqbCanvas;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
@@ -57,7 +56,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(DDDqbCanvas.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   
   public SimpleQuery(ControlPanel cp)
   {
@@ -125,7 +124,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     WebResource service = Helper.getAnnisWebResource(application);
 
     // get current corpus selection
-    Map<String, AnnisCorpus> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getSelectedCorpora();
 
     if (service != null)
     {
@@ -133,7 +132,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       {
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
         
-        for(String corpus : corpusSelection.keySet())
+        for(String corpus : corpusSelection)
         {
           atts.addAll(
             service.path("corpora").path(corpus).path("annotations")
@@ -167,7 +166,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     WebResource service = Helper.getAnnisWebResource(application);
 
     // get current corpus selection
-    Map<String, AnnisCorpus> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getSelectedCorpora();
 
     if (service != null)
     {
@@ -175,7 +174,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       {
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
         
-        for(String corpus : corpusSelection.keySet())
+        for(String corpus : corpusSelection)
         {
           atts.addAll(
             service.path("corpora").path(corpus).path("annotations")
