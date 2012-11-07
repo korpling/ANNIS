@@ -13,6 +13,7 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
  #2 import: level for dominance edges might be not set
 
 [Enhancements]
+ #54 Count number of documents which have tupels matching the query.
  #53 Sort results by the token order of the matches
  #52 Vaadin based GUI
  #33 Re-organize ANNIS manual
@@ -30,5 +31,3 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
  #48 Improving the speed of the subgraph query
  #44 Move authentification and authorization from frontend to service
  #37 Allow to migrate corpora in database initialization
-
-
