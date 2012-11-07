@@ -17,6 +17,7 @@ package annis.gui.beans;
 
 import annis.service.objects.AnnisCorpus;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -25,7 +26,7 @@ import java.util.Map;
 public interface CitationProvider
 {
   public String getQuery();
-  public Map<String,AnnisCorpus> getCorpora();
+  public Set<String> getCorpora();
   public int getLeftContext();
   public int getRightContext();
   

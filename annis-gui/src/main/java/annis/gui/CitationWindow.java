@@ -15,14 +15,13 @@
  */
 package annis.gui;
 
-import annis.service.objects.AnnisCorpus;
 import com.vaadin.Application;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -33,7 +32,7 @@ public class CitationWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow(Application app, String query, Map<String, AnnisCorpus> corpora, 
+  public CitationWindow(Application app, String query, Set<String> corpora, 
     int contextLeft, int contextRight)
   {
     super("Citation");
@@ -41,7 +40,7 @@ public class CitationWindow extends Window
     VerticalLayout wLayout = (VerticalLayout) getContent();
     wLayout.setSizeFull();
     
-    List<String> corpusNames = new LinkedList<String>(corpora.keySet());
+    List<String> corpusNames = new LinkedList<String>(corpora);
     String url = Helper.generateCitation(app, 
       query, corpusNames, contextLeft, contextRight);
     TextArea txtCitation = new TextArea();

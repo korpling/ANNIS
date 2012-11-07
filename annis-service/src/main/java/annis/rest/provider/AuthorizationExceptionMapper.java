@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.rest.provider;
 
-import annis.ql.parser.QueryData;
-
-import java.net.URI;
-import java.util.ArrayList;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+import org.apache.shiro.authz.AuthorizationException;
 
 /**
- * This class is only a wrapper to transport the salt ids with the
- * {@link QueryData} class as extension.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SaltURIs extends ArrayList<URI>
+@Provider
+public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorizationException>
 {
+
+  @Override
+  public Response toResponse(AuthorizationException ex)
+  {
+    Response r = Response.status(Response.Status.FORBIDDEN)
+      .entity(ex.getMessage()).build();
+    return r;
+  }
+  
 }

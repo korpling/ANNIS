@@ -100,14 +100,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if ("list".equals(command))
     {
       doList();
-
-      // command: stats
-    }
-    else if ("stats".equals(command))
-    {
-      doStats();
-
-      // command: indexes
     }
     else if ("indexes".equals(command))
     {
@@ -328,10 +320,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     printTable(stats);
   }
 
-  private void doStats()
-  {
-    printTable(corpusAdministration.listTableStats());
-  }
 
   private void doIndexes()
   {

@@ -80,6 +80,7 @@ public class MainFrame extends javax.swing.JFrame
 
       // starts RMI service at bean creation
       AnnisServiceRunner runner = new AnnisServiceRunner();
+      runner.setUseAuthentification(false);
       runner.start(true);
     }
 
@@ -95,7 +96,16 @@ public class MainFrame extends javax.swing.JFrame
       List<String> listWebXMLOverride = new LinkedList<String>();
       listWebXMLOverride.add(webxmlOverrride);
       context.setOverrideDescriptors(listWebXMLOverride);
-
+      
+      // Exclude some jersey classes explicitly from the web application classpath.
+      // If they still exists some automatic dependency resolution of Jersey will
+      // fail.
+      // Whenever we add new dependencies on jersey classes for the service but 
+      // not for the GUI and "Missing dependency" errors occur, add the classes
+      // to the server class list
+      context.addServerClass("com.sun.jersey.json.");
+      context.addServerClass("com.sun.jersey.server.");
+      
       jetty.setHandler(context);
 
       // start

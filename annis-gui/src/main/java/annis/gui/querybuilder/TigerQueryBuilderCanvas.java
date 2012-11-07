@@ -19,7 +19,6 @@ import annis.gui.Helper;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.event.dd.DragAndDropEvent;
@@ -108,7 +107,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource(getApplication());
 
     // get current corpus selection
-    Map<String, AnnisCorpus> corpusSelection = controlPanel.getSelectedCorpora();
+    Set<String> corpusSelection = controlPanel.getSelectedCorpora();
 
     if (service != null)
     {
@@ -116,10 +115,10 @@ public class TigerQueryBuilderCanvas extends Panel
       {
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
         
-        for(String corpus : corpusSelection.keySet())
+        for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("corpora").path(corpus).path("annotations")
+            service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "true")
               .get(new GenericType<List<AnnisAttribute>>() {})

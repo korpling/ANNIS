@@ -31,7 +31,7 @@
             emulator. To install the ANNIS server: 
             <procedure>
                 <step>
-                    <para>Install a PostgreSQL 9.1 server for your operating system from <link
+                    <para>Install a PostgreSQL 9.2 server for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password you set during the
@@ -125,16 +125,117 @@ mvn -DskipTests=true install</programlisting>
                         </link></para>
                 </step>
             </procedure></para>
-        <para>The latest instructions for compiling and installing the ANNIS Server can also be
-            found at: <link
-                xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation "
-                >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Documentation
-            </link></para>
         <para>We also <emphasis role="bold">strongly recommend</emphasis> reconfiguring the Postgres
             server’s default settings as described here: <link
                 xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL"
                 >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/PostgreSQL</link>
         </para>
+    </section>
+    <section>
+        <title>ANNIS back-end service</title>
+        <section>
+            <title>User Configuration</title>
+            <para>ANNIS has an authentication system which allows to handle multiple users which
+                will see different corpora depending on which groups the user is part of. Behind the
+                scenes ANNIS uses the <link xlink:href="http://shiro.apache.org/">Apache
+                    Shiro</link> security framework. Per default ANNIS uses a file based
+                authentication and authorization approach where some configuration files with an
+                ANNIS specific layout are evaluated. This section will discuss how to manage this
+                configuration. Additionally, the adminstrator can also directly adjust the contents
+                of the <filename>conf/shiro.ini</filename> configuration file. This allows a much
+                more individual configuration and the usage of external authorization services like
+                LDAP. </para>
+            
+            <section>
+                <title>Configuration file location</title>
+                <para>There is a central location where the user configuration files are stored.
+                    Configure the path to this location in the <filename>conf/shiro.info</filename>
+                    configuration file of the ANNIS service. The default path is
+                        <filename>/etc/annis/user_config_trunk/</filename> and must be changed at
+                        <emphasis role="italic">two locations</emphasis> in the configuration
+                    file.<programlisting>[main]
+annisRealm = annis.security.ANNISUserRealm
+<emphasis role="bold">annisRealm.resourcePath=/etc/annis/user_config_trunk/</emphasis>
+annisRealm.authenticationCachingEnabled = true
+
+globalPermResolver = annis.security.ANNISRolePermissionResolver
+<emphasis role="bold">globalPermResolver.resourcePath = /etc/annis/user_config_trunk/</emphasis>
+</programlisting></para>
+            </section>
+            <section>
+                <title>User and group files</title>
+                <procedure>
+                    <step>
+                        <para>Create a file "groups" in the user-configuration directory (e.g.
+                            <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
+group2=pcc3
+group3=tiger1
+demo=pcc2,falko</programlisting>This
+                            example means that a member of group group1 will have access to corpora
+                            with the names pcc3,falko, tiger2 (corpus names can be displayed with
+                            "<command>annis-admin.sh list</command>").</para>
+                    </step>
+                    <step>
+                        <para>Create a subdirectory <filename>users</filename></para>
+                    </step>
+                    <step>
+                        <para>You have the create a file for each user inside the
+                                <filename>users</filename> subdirectory where the user's name is
+                                <emphasis role="italic">exactly</emphasis> the file name (no file endings).<programlisting>groups=group1,group3
+password=$shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]
+given_name=userGivenName
+surname=userSurname</programlisting><itemizedlist>
+                                <listitem>
+                                    <para>A superuser who has access to every corpus can be created
+                                        with "groups=*"</para>
+                                </listitem>
+                                <listitem>
+                                    <para><code>given_name</code> and <code>surname</code> can be
+                                        anything</para>
+                                </listitem>
+                                <listitem>
+                                    <para>The password must be hashed with SHA256 (one iteration and
+                                        using a Salt) and formatted in the <classname><link
+                                                xlink:href="http://shiro.apache.org/static/current/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html"
+                                                >Shiro1CryptFormat</link></classname>. </para>
+                                    <para>The easiest way to generate the passwort hash is to use
+                                            the<link
+                                            xlink:href="http://shiro.apache.org/command-line-hasher.html"
+                                            > Apache Shiro command line hasher</link> which can be
+                                        downloaded from <link
+                                            xlink:href="http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution"
+                                            >http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution</link>. </para>
+                                    <para>
+                                        <procedure>
+                                            <step>
+                                                <para>Execute <command>java -jar
+                                                  shiro-tools-hasher-1.2.1-cli.jar -i 1 -p</command>
+                                                  from the command line (the jar-file must be in the
+                                                  working directory)</para>
+                                            </step>
+                                            <step>
+                                                <para>Type the password</para>
+                                            </step>
+                                            <step>
+                                                <para>Retype the password</para>
+                                            </step>
+                                            <step>
+                                                <para>It will produce the following
+                                                  output:<screen>$ java -jar shiro-tools-hasher-1.2.1-cli.jar -i 1 -p
+Password to hash: 
+Password to hash (confirm): 
+$shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
+                                                  last line is what you have to insert into the
+                                                  password field.</para>
+                                            </step>
+                                        </procedure>
+                                    </para>
+                                </listitem>
+                            </itemizedlist></para>
+                    </step>
+                </procedure>
+            </section>
+        </section>
     </section>
     <section>
         <title>Front-end web application</title>
@@ -155,94 +256,7 @@ mvn -DskipTests=true install</programlisting>
                executor="tomcatThreadPool" /></programlisting></para>
             </section>
         </section>
-        <section>
-            <title>User Configuration</title>
-            <para>ANNIS has an authentication system which allows to handle multiple users which
-                will see different corpora depending on which groups the user is part of.
-                Authentication is done by "Security Managers". ANNIS used to bundle several
-                security managers but since the ANNIS version 3 only the
-                    <classname>SimpleSecurityManager</classname> still exists.</para>
         
-            <section>
-                <title>Configuration file location</title>
-                <para>The <classname>SimpleSecurityManager</classname> needs to now where the
-                    configuration files are located. Configure this in the web application context
-                    configuration file <filename>annis-gui/WEB-INF/web.xml</filename>. The default
-                    path is
-                    <filename>/etc/annis/user_config_trunk/</filename><programlisting>&lt;init-param&gt;
- &lt;param-name&gt;config_path&lt;/param-name&gt;
- &lt;param-value&gt;/etc/annis/user_config_trunk/&lt;/param-value&gt;
-&lt;/init-param&gt;</programlisting></para>
-            </section>
-            <section>
-                <title>User and group files</title>
-                <procedure>
-                    <step>
-                        <para>Create a file "groups" in the user-configuration directory (e.g.
-                                <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
-group2=pcc3
-group3=tiger1
-demo=pcc2,falko</programlisting>This
-                            example means that a member of group group1 will have access to corpora
-                            with the names pcc3,falko, tiger2 (corpus names can be displayed with
-                                "<command>annis-admin.sh list</command>").</para>
-                    </step>
-                    <step>
-                        <para>Create a subdirectory <filename>users</filename></para>
-                    </step>
-                    <step>
-                        <para>You have the create a file for each user inside the
-                                <filename>users</filename> subdirectory where the user's name is
-                                <emphasis role="italic">exactly</emphasis> the file name (no file endings).<programlisting>groups=group1,group3
-password=f4e3947ed543ada4488cdc7f64db000b988d0fee2682833194fe183567d4c45e
-given_name=userGivenName
-surname=userSurname</programlisting><itemizedlist>
-                                <listitem>
-                                    <para>A superuser who has access to every corpus can be created
-                                        with "groups=*"</para>
-                                </listitem>
-                                <listitem>
-                                    <para><code>given_name</code> and <code>surname</code> can be
-                                        anything</para>
-                                </listitem>
-                                <listitem>
-                                    <para>The password must be hashed with SHA256<note>
-                                            <para>When using Linux you can use the
-                                                  <command>sha256sum</command> command line program
-                                                to generate the password hashs.<procedure>
-                                                  <step>
-                                                  <para>Execute <command>sha256sum</command> from
-                                                  the command line</para>
-                                                  </step>
-                                                  <step>
-                                                  <para>Type the password</para>
-                                                  </step>
-                                                  <step>
-                                                  <para>Press <keycombo>
-                                                  <keycap>CTRL</keycap>
-                                                  <keycap>D</keycap>
-                                                  </keycombo> two (!) times</para>
-                                                  </step>
-                                                  <step>
-                                                  <para>It will produce the following
-                                                  output:<screen>$ sha256sum 
-testpassword9f735e0df9a1ddc702bf0a1a7b83033f9f[...]</screen>The
-                                                  text directly after the password (in this case
-                                                  "testpassword") is the encrypted hash
-                                                  value.</para>
-                                                  </step>
-                                                </procedure></para>
-                                        </note></para>
-                                </listitem>
-                                <listitem>
-                                    <para>The Java web-server needs write access to the user files
-                                        in order to be able to store the corpus groups.</para>
-                                </listitem>
-                            </itemizedlist></para>
-                    </step>
-                </procedure>
-            </section>
-        </section>
         <section>
             <title>Configuring Visualizations </title>
             <section>

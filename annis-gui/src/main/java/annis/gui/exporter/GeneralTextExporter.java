@@ -44,7 +44,7 @@ public class GeneralTextExporter implements Exporter, Serializable
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
+    Set<String> corpora, String keysAsString, String argsAsString,
     WebResource annisResource, Writer out)
   {
     try
@@ -60,7 +60,7 @@ public class GeneralTextExporter implements Exporter, Serializable
         keys.add("tok");
         List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
         
-        for(String corpus : corpora.keySet())
+        for(String corpus : corpora)
         {
           attributes.addAll(
             annisResource.path("corpora")
@@ -111,6 +111,7 @@ public class GeneralTextExporter implements Exporter, Serializable
         args.put(key, val);
       }
 
+      final int stepSize = 10;
       int offset = 0;
       while (offset == 0 || (queryResult != null
         && queryResult.getSCorpusGraphs().size() > 0))
@@ -120,11 +121,11 @@ public class GeneralTextExporter implements Exporter, Serializable
         {
           queryResult = annisResource.path("search").path("annotate")
             .queryParam("q", queryAnnisQL)
-            .queryParam("limit", "" + 50)
+            .queryParam("limit", "" + stepSize)
             .queryParam("offset", "" + offset)
             .queryParam("left", "" + contextLeft)
             .queryParam("right", "" + contextRight)
-            .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
+            .queryParam("corpora", StringUtils.join(corpora, ","))
             .get(SaltProject.class);
         }
         catch (UniformInterfaceException ex)
@@ -138,7 +139,7 @@ public class GeneralTextExporter implements Exporter, Serializable
           args, out, offset);
 
         out.flush();
-        offset = offset + 50;
+        offset += stepSize;
 
       }
 
