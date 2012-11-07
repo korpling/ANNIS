@@ -152,7 +152,6 @@ public class TestSpringAnnisDao
       is(not(nullValue())));
     assertThat(springManagedDao.getListAnnotationsSqlHelper(),
       is(not(nullValue())));
-    assertThat(springManagedDao.getCountExtractor(), is(not(nullValue())));
 
     // new
     assertThat(springManagedDao.getQueryAnalysis(), is(not(nullValue())));

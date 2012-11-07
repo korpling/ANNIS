@@ -16,35 +16,40 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-
-import java.util.Map;
-import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * This class is only a wrapper to transport the salt ids with the
- * {@link QueryData} class as extension.
- *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * This class represents the result of a COUNT query in ANNIS.
+ * 
+ * It provides the number of matched node-tuples and the number of distinct
+ * documents where there matches occured.
+ * 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
-public class SaltURIGroupSet implements Serializable
+public class Count implements Serializable
 {
-  private Map<Integer, SaltURIGroup> groups;
-  
-  public SaltURIGroupSet()
+  private int tupelMatched;
+  private int documentsMatched;
+
+  public int getTupelMatched()
   {
-    groups = new TreeMap<Integer, SaltURIGroup>();
+    return tupelMatched;
   }
 
-  public Map<Integer, SaltURIGroup> getGroups()
+  public void setTupelMatched(int tupelMatched)
   {
-    return groups;
+    this.tupelMatched = tupelMatched;
   }
 
-  public void setGroups(Map<Integer, SaltURIGroup> groups)
+  public int getDocumentsMatched()
   {
-    this.groups = groups;
+    return documentsMatched;
+  }
+
+  public void setDocumentsMatched(int documentsMatched)
+  {
+    this.documentsMatched = documentsMatched;
   }
   
   
