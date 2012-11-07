@@ -23,9 +23,10 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.Count;
 
 
-public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
+public class CountSqlGenerator extends AbstractSqlGenerator<Count>
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
 
 	@SuppressWarnings("rawtypes")
@@ -33,15 +34,26 @@ public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	
 	@Override
 	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {
-		return "\n" + indent + TABSTOP + "count(*)";
+		return "\n" + indent + TABSTOP + "count(*) AS tupleCount, count(distinct corpus_ref) AS docCount";
 	}
 
 	@Override
-	public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+	public Count extractData(ResultSet rs) throws SQLException, DataAccessException {
 		int sum = 0;
+    
+    Count c = new Count();
+    
+    int tupleSum = 0;
+    int docSum = 0;
 		while (rs.next())
-			sum += rs.getInt(1);
-		return sum;	
+    {
+			tupleSum += rs.getInt("tupleCount");
+      docSum += rs.getInt("docCount");
+    }
+    c.setTupelMatched(tupleSum);
+    c.setDocumentsMatched(docSum);
+    
+		return c;	
 	}
 
 	@Override
