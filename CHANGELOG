@@ -1,7 +1,10 @@
 Version 3.0.0-beta.2
 ====================
 
-first public beta release in the new improved ANNIS 3.0 release series
+First public beta release in the new improved ANNIS 3.0 release series.
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 
 [Bugs]
  #31 Regex behavior in Falko metadata is incorrect
