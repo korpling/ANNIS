@@ -38,11 +38,6 @@
     <property name="password" value="$dao{datasource.password}"/>
   </bean>
 
-
-  <bean id="countExtractor" class="annis.dao.CountExtractor" lazy-init="true">
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-  </bean>
-
 	<!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
 
@@ -114,8 +109,7 @@
     </property>
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-    <property name="countExtractor" ref="countExtractor"/>
-
+    
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
 

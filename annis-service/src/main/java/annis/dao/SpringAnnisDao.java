@@ -50,6 +50,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Count;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
@@ -167,7 +168,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // / new
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
-  private CountExtractor countExtractor;
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
   private AnnotateSqlGenerator graphExtractor;
@@ -261,7 +261,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public int count(QueryData queryData)
+  public Count count(QueryData queryData)
   {
     return executeQueryFunction(queryData, countSqlGenerator);
   }
@@ -641,16 +641,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     ListCorpusByNameDaoHelper listCorpusByNameDaoHelper)
   {
     this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
-  }
-
-  public CountExtractor getCountExtractor()
-  {
-    return countExtractor;
-  }
-
-  public void setCountExtractor(CountExtractor countExtractor)
-  {
-    this.countExtractor = countExtractor;
   }
 
   public AnnotateSqlGenerator getGraphExtractor()
