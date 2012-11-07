@@ -18,7 +18,6 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.SearchWindow;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.resolver.ResolverEntry;
@@ -55,6 +54,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultSetPanel.class);
+
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
@@ -110,7 +110,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicator.setIndeterminate(false);
     indicator.setValue(0f);
     indicator.setPollingInterval(250);
-    indicator.setCaption("fetching subgraphs");
     indicator.setSizeUndefined();
     
     indicatorLayout.addComponent(indicator);
@@ -166,7 +165,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
       }
     };
-    
     singleExecutor.submit(task);
   }
   
@@ -442,6 +440,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           if(query.getMatches().getGroups().size() > 0)
           {
             SaltProject p = executeQuery(res, query);
+            
             if(p != null)
             {
               lastProject = p;
@@ -463,7 +462,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             if(j == matches.size())
             {
               indicator.setValue(1.0f);
-              indicator.setCaption("Rendering in browser");
             }
           }
         }
