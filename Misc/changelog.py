@@ -14,7 +14,7 @@ enhancements = []
 other = []
 
 for issue in j:
-	title = "#{0} {1} (reported by {2})".format(issue["number"], issue["title"], issue["user"]["login"])
+	title = " #{0} {1}".format(issue["number"], issue["title"])
 	if len(issue["labels"]) > 0:
 		if issue["labels"][0]["name"] == "bug":
 			bugs.append(title)

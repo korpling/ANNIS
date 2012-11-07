@@ -30,77 +30,26 @@
     </section>
 
     <section>
-        <title>New Features in Version 2.2.1</title>
-        <para>
-            <emphasis role="bold">Features:</emphasis>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para>Subcorpus and document path for each hit can be shown in search result
-                        list</para>
-                </listitem>
-                <listitem>
-                    <para>Metadata coming from documents, subcorpora and top level corpora is sorted
-                        separately in the metadata display</para>
-                </listitem>
-                <listitem>
-                    <para>New grid-tree visualizer for a span visualization of hierarchical
-                        structures (e.g. topological fields in German; see Section
-                        see Administration Guide "Configuring Visualizations")</para>
-                </listitem>
-                <listitem>
-                    <para>More intuitive search button position in GUI and other small GUI
-                        improvements</para>
-                </listitem>
-                <listitem>
-                    <para>Updated tutorial</para>
-                </listitem>
-                <listitem>
-                    <para>Faster import when large corpora are already in the system</para>
-                </listitem>
-            </itemizedlist>
-            <emphasis role="bold">Bugfixes:</emphasis>
-            <itemizedlist spacing="compact">
-                <listitem>
-                    <para>Support for JDK 7</para>
-                </listitem>
-                <listitem>
-                    <para>Fixed import bug which could disrupt queries of the sort >secedge m,n (see
-                            <link xlink:href="https://bugs.launchpad.net/bugs/870108"
-                            >https://bugs.launchpad.net/bugs/870108</link>) </para>
-                </listitem>
-                <listitem>
-                    <para>Fixed bugs in some forms of query disjunction with ‘|’</para>
-                </listitem>
-                <listitem>
-                    <para>Fixed resizing of visualizers in Chrome browsers</para>
-                </listitem>
-                <listitem>
-                    <para>Fixed escaping of characters in WEKA export</para>
-                </listitem>
-            </itemizedlist> (For change logs of previous version see their respective distributions
-            or user guides) </para>
-    </section>
-
-    <section>
         <title>Installing a Local Version (<application>ANNIS Kickstarter</application>)</title>
 
         <para> Local users who do not wish to make their corpora available online can install ANNIS
             Kickstarter under most versions of Linux, Windows and Mac OS. To install Kickstarter
             follow these steps:<procedure>
                 <step>
-                    <para>Download and install PostgreSQL 9.1 for your operating system from <link
+                    <para>Download and install PostgreSQL 9.2 for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password</emphasis> you set during the
-                        installation.
-                        <note><para>Under Linux, you might have to set the
-                            PostgreSQL password manually. E.g. on Ubuntu you can achieve this with by running the following
-                            commands:</para>
+                        installation. <note>
+                            <para>Under Linux, you might have to set the PostgreSQL password
+                                manually. E.g. on Ubuntu you can achieve this with by running the
+                                following commands:</para>
                             <para>
                                 <programlisting>sudo -u postgres psql
 \password
-\q</programlisting></para></note>
-                        After installation, PostgreSQL may automatically launch the
+\q</programlisting>
+                            </para>
+                        </note> After installation, PostgreSQL may automatically launch the
                         PostgreSQL Stack Builder to download additional components – you can safely
                         skip this step and cancel the Stack Builder if you wish. You may need to
                         restart your OS if the Postgres installer tells you to. </para>
