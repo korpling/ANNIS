@@ -326,12 +326,18 @@ function initSpaceTree(config) {
   //The data properties prefixed with a dollar
   //sign will override the global node style properties.
   config['onBeforePlotNode'] = function(node){
+
+    // if node contains a sentence
+    if (node.data.sentence)
+    {
+      return;
+    }
+
     //add some color to the nodes in the path between the
     //root node and the selected node.
     if (node.selected) {
       node.data.$color = "#ff7";
-    }
-    else {
+    } else {
       delete node.data.$color;
       //if the node belongs to the last plotted level
       if(!node.anySubnode("exist")) {
@@ -345,12 +351,6 @@ function initSpaceTree(config) {
         node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
       }
     }
-    // if node contains a sentence, set it too the background color
-    if (node.data.sentence
-      || !(node.data.sentence_left && node.data.sentence_right))
-      {
-//        node.data.$color = saveThis.@annis.gui.widgets.gwt.client.VJITWrapper::background;
-      }
   };
 
   //This method is called right before plotting

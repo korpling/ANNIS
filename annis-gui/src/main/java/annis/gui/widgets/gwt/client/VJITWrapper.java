@@ -33,20 +33,28 @@ public class VJITWrapper extends Widget implements Paintable
 {
 
   private Document doc = Document.get();
+
   /**
    * The infovis has to be injected to an html element, so we create an an
    * unique element identifier from this count value.
    */
   private static int count = 0;
+
   private final String elementID;
+
   // javascript overlay object for the visualization
   private JITVisualization visualization;
+
   // the json data for the visualization
   private JSONObject jsonData;
+
   private JITConf config;
+
   // some css properties
   protected final String background = "#ECF0F6";
+
   protected final String width = "900px";
+
   protected final String height = "600px";
 
   public VJITWrapper()
@@ -64,9 +72,11 @@ public class VJITWrapper extends Widget implements Paintable
     DivElement wrapper = container.appendChild(doc.createDivElement());
     setElement(container);
 
-    container.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
+    container.setAttribute("style",
+      "background:" + background + "; width:" + width + "; height:" + height);
     container.setAttribute("id", "container_" + elementID);
-    wrapper.setAttribute("style", "background:" + background + "; width:" + width + "; height:" + height);
+    wrapper.setAttribute("style",
+      "background:" + background + "; width:" + width + "; height:" + height);
     wrapper.setAttribute("id", elementID);
 
     // initialize some browser compatibilies of jit
@@ -135,7 +145,7 @@ public class VJITWrapper extends Widget implements Paintable
    }-*/;
 
   public native JITVisualization visualizationInit(JavaScriptObject config)/*-{
-    return $wnd.initSpaceTree(config);
+   return $wnd.initSpaceTree(config);
    }-*/;
 
   public JSONObject parseStringToJSON(String jsonString)
@@ -168,7 +178,7 @@ public class VJITWrapper extends Widget implements Paintable
     node.setProperty("overridable", true);
     node.setProperty("width", 60);
     node.setProperty("height", 20);
-    node.setProperty("color", "#aaa");
+    node.setProperty("color", background);
     config.setProperty("Node", node);
 
     // edges config
@@ -187,6 +197,5 @@ public class VJITWrapper extends Widget implements Paintable
     JITConf label = new JITConf();
     label.setProperty("overridable", true);
     config.setProperty("Label", label);
-
   }
 }
