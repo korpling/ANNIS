@@ -227,10 +227,13 @@ public class ControlPanel extends Panel
 
       synchronized(getApplication()) 
       {
-        queryPanel.setStatus("" + count.getTupelMatched() + " matches <br/>in " + count.getDocumentsMatched() + " documents" );
-        searchWindow.updateQueryCount(count.getTupelMatched());
+        queryPanel.setCountIndicatorEnabled(false);
+        if(count != null)
+        {
+          queryPanel.setStatus("" + count.getTupelMatched() + " matches <br/>in " + count.getDocumentsMatched() + " documents" );
+          searchWindow.updateQueryCount(count.getTupelMatched());
+        }
       }
-      queryPanel.setCountIndicatorEnabled(false);
     }
 
     public int getCount()
