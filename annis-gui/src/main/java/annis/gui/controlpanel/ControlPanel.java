@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
+import annis.service.objects.Count;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.PaintException;
@@ -174,7 +175,7 @@ public class ControlPanel extends Panel
   private class CountThread extends Thread
   {
 
-    private int count = -1;
+    private Count count = null;
 
     @Override
     public void run()
@@ -190,10 +191,9 @@ public class ControlPanel extends Panel
       {
         try
         {
-          count = Integer.parseInt(res.path("query").path("search").path("count").queryParam(
+          count = res.path("query").path("search").path("count").queryParam(
             "q", lastQuery).queryParam("corpora",
-            StringUtils.join(lastCorpusSelection, ",")).get(
-            String.class));
+            StringUtils.join(lastCorpusSelection, ",")).get(Count.class);
         }
         catch (UniformInterfaceException ex)
         {
@@ -227,15 +227,18 @@ public class ControlPanel extends Panel
 
       synchronized(getApplication()) 
       {
-        queryPanel.setStatus("" + count + " matches");
-        searchWindow.updateQueryCount(count);
+        queryPanel.setCountIndicatorEnabled(false);
+        if(count != null)
+        {
+          queryPanel.setStatus("" + count.getTupelMatched() + " matches <br/>in " + count.getDocumentsMatched() + " documents" );
+          searchWindow.updateQueryCount(count.getTupelMatched());
+        }
       }
-      queryPanel.setCountIndicatorEnabled(false);
     }
 
     public int getCount()
     {
-      return count;
+      return count.getTupelMatched();
     }
   }
 }

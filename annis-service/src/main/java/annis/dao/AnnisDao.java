@@ -28,6 +28,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Count;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.Map;
@@ -65,8 +66,7 @@ public interface AnnisDao
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
-  // new 
-  int count(QueryData queryData);
+  Count count(QueryData queryData);
 
   List<Match> find(QueryData queryData);
 

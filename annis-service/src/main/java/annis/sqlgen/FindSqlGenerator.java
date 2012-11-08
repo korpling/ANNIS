@@ -77,7 +77,6 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
         + " AS node_name" + i);
       ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
         + " AS path_name" + i);
-
       if (tblAccessStr.usesRankTable())
       {
         isDistinct = true;
@@ -91,6 +90,10 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "toplevel_corpus"));
+
+    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+      "corpus_ref"));
+
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(ids, ", ");
