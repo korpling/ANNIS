@@ -15,16 +15,21 @@
  */
 package annis;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -56,6 +61,7 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Count;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
@@ -160,6 +166,62 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   ///// Commands
+  public void doBenchmarkFile(String filename) 
+  {
+    try
+    {
+      BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+      Map<String, Integer> queryRun = new HashMap<String, Integer>();
+      Map<String, Integer> queryId = new HashMap<String, Integer>();
+      int maxId = 0;
+      for (String line = reader.readLine(); line != null; line = reader.readLine()) 
+      {
+        // get the id of this query
+        if ( ! queryId.containsKey(line) )
+        {
+          ++maxId;
+          queryId.put(line, maxId);
+        }
+        int id = queryId.get(line);
+        // get the repetition of this query
+        if ( ! queryRun.containsKey(line) )
+        {
+          queryRun.put(line, 0);
+        }
+        int run = queryRun.get(line) + 1;
+        queryRun.put(line, run);
+        String[] split = line.split(" ", 2);
+        String queryFunction = split[0];
+        String annisQuery = split[1];
+        QueryData queryData = analyzeQuery(annisQuery, queryFunction);
+        if ("count".equals(queryFunction))
+        {
+          long start = new Date().getTime();
+          try {
+            Count count = annisDao.count(queryData);
+            int result = count.getTupelMatched();
+            long end = new Date().getTime();
+            long runtime = end - start;
+            Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+            System.out.println(StringUtils.join(output, "\t"));
+          } catch (RuntimeException e) {
+            String result = "ERROR";
+            long end = new Date().getTime();
+            long runtime = end - start;
+            Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+            System.out.println(StringUtils.join(output, "\t"));
+          }
+        }
+      }
+    } catch (FileNotFoundException e)
+    {
+      error(e);
+    } catch (IOException e)
+    {
+      error(e);
+    }
+  }
+
   public void doDebug(String ignore)
   {
     doSql("subgraph salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2");
@@ -729,7 +791,8 @@ public class AnnisRunner extends AnnisBaseRunner
       benchmarks.add(new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
         queryData));
     }
-    out.println("NOTICE: corpus = " + queryData.getCorpusList());
+    // printing of NOTICE conflicts with benchmarkFile
+    // out.println("NOTICE: corpus = " + queryData.getCorpusList());
 
     return queryData;
   }
