@@ -15,19 +15,38 @@
  */
 package annis;
 
-import annis.service.objects.SaltURIGroupSet;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
-import annis.service.objects.Match;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
@@ -37,40 +56,18 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
-
-import annis.sqlgen.*;
-
+import annis.service.objects.SaltURIGroupSet;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
-
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.io.*;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import org.apache.commons.io.output.FileWriterWithEncoding;
-
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -83,7 +80,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
-  private AnnotateSqlGenerator graphSqlGenerator;
+  private AnnotateSqlGenerator<?> graphSqlGenerator;
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -104,7 +101,7 @@ public class AnnisRunner extends AnnisBaseRunner
   /**
    * @return the graphSqlGenerator
    */
-  public AnnotateSqlGenerator getGraphSqlGenerator()
+  public AnnotateSqlGenerator<?> getGraphSqlGenerator()
   {
     return graphSqlGenerator;
   }
@@ -112,7 +109,7 @@ public class AnnisRunner extends AnnisBaseRunner
   /**
    * @param graphSqlGenerator the graphSqlGenerator to set
    */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
+  public void setGraphSqlGenerator(AnnotateSqlGenerator<?> graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
@@ -753,8 +750,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     else
     {
-      WekaHelper helper = new WekaHelper();
-      out.println(helper.exportAsArff(matches));
+      out.println(WekaHelper.exportAsArff(matches));
     }
   }
 
@@ -934,13 +930,6 @@ public class AnnisRunner extends AnnisBaseRunner
   private void printAsTable(List<? extends Object> list, String... fields)
   {
     out.println(new TableFormatter().formatAsTable(list, fields));
-  }
-
-  private QueryData parse(String input)
-  {
-
-    return annisDao.parseAQL(input, getCorpusList());
-
   }
 
   private String printSaltAsXMI(SaltProject project)
