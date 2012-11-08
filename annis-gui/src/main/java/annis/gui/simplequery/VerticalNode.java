@@ -17,6 +17,7 @@ package annis.gui.simplequery;
 
 import com.vaadin.ui.MenuBar;
 import java.util.Collection;
+import java.util.Set;
 import com.vaadin.ui.VerticalLayout;
 import annis.gui.simplequery.SearchBox;
 import annis.gui.simplequery.AddMenu;
@@ -29,13 +30,18 @@ import annis.gui.simplequery.SimpleQuery;
  */
 public class VerticalNode extends Panel
 {
+  
+  private Set<String> annonames;
+  private SimpleQuery sq;
+  
   public VerticalNode(int id, String ebene, SimpleQuery sq)
   {
         
+    this.sq = sq;
     VerticalLayout v = new VerticalLayout();
     SearchBox sb = new SearchBox(id, ebene, sq); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
-    Collection<String> annonames = sq.getAvailableAnnotationNames();
+    annonames = sq.getAvailableAnnotationNames();
     AddMenu am = new AddMenu(sb, annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     v.addComponent(sb);

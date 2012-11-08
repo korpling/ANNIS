@@ -35,11 +35,13 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 import org.slf4j.LoggerFactory;
 
@@ -117,11 +119,11 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     }
   }
   
-  public Collection<String> getAvailableAnnotationNames()
+public Set<String> getAvailableAnnotationNames()
   {
-    Collection<String> result = new TreeSet<String>();
-    Application application = getApplication();
-    WebResource service = Helper.getAnnisWebResource(application);
+    Set<String> result = new TreeSet<String>();
+
+    WebResource service = Helper.getAnnisWebResource(getApplication());
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -135,7 +137,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("corpora").path(corpus).path("annotations")
+            service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "true")
               .get(new GenericType<List<AnnisAttribute>>() {})
@@ -162,8 +164,8 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   public Collection<String> getAvailableAnnotationLevels(String meta)
   {
     Collection<String> result = new TreeSet<String>();
-    Application application = getApplication();
-    WebResource service = Helper.getAnnisWebResource(application);
+
+    WebResource service = Helper.getAnnisWebResource(getApplication());
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -177,7 +179,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("corpora").path(corpus).path("annotations")
+            service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "true")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})

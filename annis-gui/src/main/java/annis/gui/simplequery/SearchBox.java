@@ -45,7 +45,7 @@ public class SearchBox extends Panel
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
     
-    ComboBox l = new ComboBox();
+    ComboBox l = new ComboBox(ebene);
     l.setInputPrompt(ebene);
     l.setWidth("100px");
 
