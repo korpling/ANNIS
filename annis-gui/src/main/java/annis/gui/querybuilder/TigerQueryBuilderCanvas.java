@@ -68,6 +68,7 @@ public class TigerQueryBuilderCanvas extends Panel
     edges = new ArrayList<EdgeWindow>();
 
     setSizeFull();
+    setImmediate(true);
 
     area = new AbsoluteLayout();
     area.setWidth("2000px");
@@ -79,6 +80,7 @@ public class TigerQueryBuilderCanvas extends Panel
     canvas = new SimpleCanvas();
     canvas.setWidth("2000px");
     canvas.setHeight("2000px");
+    canvas.addStyleName("tigerquery-builder-canvas");
 
     handler = new AbsoluteDropHandler(this, area);
 
@@ -249,6 +251,7 @@ public class TigerQueryBuilderCanvas extends Panel
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
         e.setWidth("70px");
         e.setHeight("50px");
+        e.addStyleName("tigerquery-builder-overlay");
         edges.add(e);
         area.addComponent(e);
         updateLinesAndEdgePositions();
@@ -281,8 +284,10 @@ public class TigerQueryBuilderCanvas extends Panel
     wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
     wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
     wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
-
-    area.addComponent(wrapper, "top:" + (40 * (number + 1)) + "px;left:10px");
+    wrapper.addStyleName("tigerquery-builder-overlay");
+    wrapper.setImmediate(true);
+    
+    area.addComponent(wrapper, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
     updateQuery();
   }
 
@@ -364,6 +369,7 @@ public class TigerQueryBuilderCanvas extends Panel
       if (parent != null)
       {
         parent.updateLinesAndEdgePositions();
+        parent.requestRepaint();
       }
 
     }

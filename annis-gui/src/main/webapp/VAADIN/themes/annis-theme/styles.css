@@ -101,6 +101,13 @@ textarea.query {
   font-family: monospace;
 }
 
+.tigerquery-builder-canvas {
+  z-index: 0;
+}
+.tigerquery-builder-overlay {
+  z-index: 10;
+}
+
 /* matched node colors by match index*/
 .v-table-cell-content-match_1 {
   color: rgb(255,0,0);

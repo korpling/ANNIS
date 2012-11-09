@@ -90,6 +90,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "Then define a destination node by clicking its \"Dock\" "
       + "button.<br>You can cancel the action by clicking this button "
       + "(\"Cancel\") again.");
+    btEdge.setImmediate(true);
     
     toolbar.addComponent(btEdge);
     btAdd = new Button("Add");
