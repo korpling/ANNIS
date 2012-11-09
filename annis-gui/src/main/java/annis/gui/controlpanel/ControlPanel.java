@@ -230,7 +230,11 @@ public class ControlPanel extends Panel
         queryPanel.setCountIndicatorEnabled(false);
         if(count != null)
         {
-          queryPanel.setStatus("" + count.getTupelMatched() + " matches <br/>in " + count.getDocumentsMatched() + " documents" );
+          String documentString = count.getDocumentsMatched() > 1 ? "documents" : "document";
+          String matchesString = count.getTupelMatched() > 1 ? "matches" : "match";
+          
+          queryPanel.setStatus("" + count.getTupelMatched() + " " + matchesString 
+            + " <br/>in " + count.getDocumentsMatched() + " " + documentString );
           searchWindow.updateQueryCount(count.getTupelMatched());
         }
       }
