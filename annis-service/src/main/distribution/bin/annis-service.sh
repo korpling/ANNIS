@@ -87,7 +87,7 @@ status() {
 
 case "$1" in
 	run)
-		java -Dfile.encoding=UTF-8 -Dannis.home="$ANNIS_HOME" -cp "$classpath" annis.service.internal.AnnisServiceRunner
+		java -Dfile.encoding=UTF-8 -Dannis.home="$ANNIS_HOME" -Dannis.nosecurity="$ANNIS_NOSECURITY" -cp "$classpath" annis.service.internal.AnnisServiceRunner
 		;;
 	stop)
 		stop 
