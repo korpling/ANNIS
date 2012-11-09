@@ -32,6 +32,7 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -368,8 +369,12 @@ public class TigerQueryBuilderCanvas extends Panel
 
       if (parent != null)
       {
+        
+        parent.getWindow().showNotification("Dropped");
+        
         parent.updateLinesAndEdgePositions();
         parent.requestRepaint();
+        
       }
 
     }

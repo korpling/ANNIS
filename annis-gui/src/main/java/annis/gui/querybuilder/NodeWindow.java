@@ -19,6 +19,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -50,6 +51,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   private Button btAdd;
   private Button btClear;
   private Button btClose;
+  private Button btMove;
   private HorizontalLayout toolbar;
   private List<ConstraintLayout> constraints;
   private boolean prepareEdgeDock;
@@ -81,8 +83,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.setHeight("-1px");
     addComponent(toolbar);
 
+    btMove = new Button();
+    btMove.setIcon(new ThemeResource("tango-icons/16x16/view-fullscreen.png"));
+    btMove.setDescription("Move window");
+    btMove.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    toolbar.addComponent(btMove);
+    
     btEdge = new Button("Edge");
-    btEdge.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btEdge.addListener((Button.ClickListener) this);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
@@ -93,8 +100,9 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btEdge.setImmediate(true);
     
     toolbar.addComponent(btEdge);
-    btAdd = new Button("Add");
-    btAdd.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAdd = new Button();
+    btAdd.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"));
+    btAdd.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btAdd.addListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
       + "Every condition will constraint the node described by this window. "
@@ -102,15 +110,18 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "values of the annotation a node needs to have.");
     
     toolbar.addComponent(btAdd);
-    btClear = new Button("Clear");
-    btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClear = new Button();
+    btClear.setIcon(new ThemeResource("tango-icons/16x16/edit-clear.png"));
+    btClear.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btClear.addListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
       
     toolbar.addComponent(btClear);
 
-    btClose = new Button("X");
-    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClose = new Button();
+    btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btClose.setDescription("Close");
+    btClose.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
@@ -181,6 +192,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
       }
     }
   }
+
+  public Button getBtMove()
+  {
+    return btMove;
+  }
+  
+  
 
   public int getID()
   {
