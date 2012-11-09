@@ -50,7 +50,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.Count;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountSqlGenerator;
@@ -261,7 +261,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public Count count(QueryData queryData)
+  public MatchAndDocumentCount count(QueryData queryData)
   {
     return executeQueryFunction(queryData, countSqlGenerator);
   }

@@ -32,7 +32,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.Count;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
@@ -120,7 +120,7 @@ public class QueryService
     
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
-    Count count = annisDao.count(data);
+    MatchAndDocumentCount count = annisDao.count(data);
     long end = new Date().getTime();
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();

@@ -136,6 +136,6 @@ public class CountTest
   private int countPcc2(String aql)
   {
     QueryData qd = annisDao.parseAQL(aql, pcc2CorpusID);
-    return annisDao.count(qd).getTupelMatched();
+    return annisDao.count(qd).getMatchCount();
   }
 }
