@@ -18,7 +18,7 @@ package annis.gui.visualizers.component.rst;
 import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import com.google.gwt.resources.client.ClientBundle;
+import annis.model.AnnisConstants;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -30,6 +30,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
@@ -128,38 +129,39 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       private int getStartPosition(SStructure s)
       {
-        EList<STYPE_NAME> relationTypes = new BasicEList<STYPE_NAME>();
-        relationTypes.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-        EList<SDataSourceSequence> sSequences = s.getSDocumentGraph().
-          getOverlappedDSSequences(s, relationTypes);
+        EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
 
-
-        log.debug("sSequences {}", sSequences.toString());
-
-        // only support one text for spanns
-        if (sSequences == null || sSequences.size() != 1)
+        for (Edge e : out)
         {
-          log.error("rst supports only one text and only text level");
-          return -1;
+          if (e instanceof SRelation
+            && ((SRelation) e).getTarget() instanceof SToken)
+          {
+            SToken tok = ((SToken) ((SRelation) e).getTarget());
+            SFeature sf = tok.getSFeature(
+              AnnisConstants.ANNIS_NS + "::" + AnnisConstants.FEAT_LEFTTOKEN);
+            return Integer.parseInt(sf.getSValueSTEXT());
+          }
         }
 
-        if (sSequences.get(0).getSSequentialDS() instanceof STextualDS)
-        {
-          return sSequences.get(0).getSStart();
-        }
-
-        return -1;
+        SFeature sf = s.getSFeature(
+          AnnisConstants.ANNIS_NS + "::" + AnnisConstants.FEAT_LEFTTOKEN);
+        return Integer.parseInt(sf.getSValueSTEXT());
       }
 
       @Override
-      public int compare(SStructure t, SStructure t1)
+      public int compare(SStructure t1, SStructure t2)
       {
-        int t_idx = getStartPosition(t);
-        int t2_idx = getStartPosition(t1);
+        int t1Idx = getStartPosition(t1);
+        int t2Idx = getStartPosition(t2);
 
-        if (t_idx < t2_idx)
+        if (t1Idx < t2Idx)
         {
           return -1;
+        }
+
+        if (t1Idx == t2Idx)
+        {
+          return 0;
         }
         else
         {
