@@ -66,7 +66,9 @@ public interface AnnisDao
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
 
-  MatchAndDocumentCount count(QueryData queryData);
+  int count(QueryData queryData);
+
+  MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData);
 
   List<Match> find(QueryData queryData);
 

@@ -17,7 +17,6 @@
 package annis.service.internal;
 
 import annis.CommonHelper;
-import java.net.URISyntaxException;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
@@ -36,11 +35,9 @@ import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
-import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphQuery;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -50,7 +47,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -120,7 +116,7 @@ public class QueryService
     
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
-    MatchAndDocumentCount count = annisDao.count(data);
+    MatchAndDocumentCount count = annisDao.countMatchesAndDocuments(data);
     long end = new Date().getTime();
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
