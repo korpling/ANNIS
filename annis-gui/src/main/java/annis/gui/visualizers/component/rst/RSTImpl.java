@@ -18,6 +18,7 @@ package annis.gui.visualizers.component.rst;
 import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
+import com.google.gwt.resources.client.ClientBundle;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -427,13 +428,46 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return jsonData;
   }
 
-  private JSONObject appendChild(JSONObject root, JSONObject node)
+  private JSONObject appendChild(JSONObject root, JSONObject node,
+    SNode currSnode)
   {
     try
     {
-      root.append("children", node);
-      setSentenceSpan(node, root);
-      sortChildren(root);
+      boolean isAppendedToParent = false;
+      EList<Edge> in = currSnode.getSGraph().getInEdges(currSnode.getSId());
+      if (in != null)
+      {
+        SRelation sEdge;
+
+        for (Edge e : in)
+        {
+          if (e instanceof SRelation
+            && ((SRelation) e).getSource() instanceof SNode
+            && isSegment(((SNode) ((SRelation) e).getSource()))
+            && !isSegment(currSnode))
+          {
+            JSONObject tmp = st.pop();
+
+            st.peek().append("children", node);
+            setSentenceSpan(node, st.peek());
+            sortChildren(st.peek());
+            st.peek().getJSONObject("data").append("invisibleRelations",
+              getUniStrId(currSnode));
+
+            st.push(tmp);
+            isAppendedToParent = true;
+            break;
+          }
+        }
+      }
+
+      if (!isAppendedToParent)
+      {
+        root.append("children", node);
+        setSentenceSpan(node, root);
+        sortChildren(root);
+      }
+
     }
     catch (JSONException ex)
     {
@@ -464,7 +498,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     else
     {
       JSONObject jsonNode = st.pop();
-      appendChild(st.peek(), jsonNode);
+      appendChild(st.peek(), jsonNode, currNode);
     }
   }
 
