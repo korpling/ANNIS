@@ -57,11 +57,11 @@ import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.AnnisParser;
+import annis.ql.parser.ParserException;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.Count;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
@@ -168,58 +168,76 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doBenchmarkFile(String filename) 
   {
-    try
-    {
+    try {
       BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
-      Map<String, Integer> queryRun = new HashMap<String, Integer>();
-      Map<String, Integer> queryId = new HashMap<String, Integer>();
-      int maxId = 0;
-      for (String line = reader.readLine(); line != null; line = reader.readLine()) 
+      try
       {
-        // get the id of this query
-        if ( ! queryId.containsKey(line) )
+        Map<String, Integer> queryRun = new HashMap<String, Integer>();
+        Map<String, Integer> queryId = new HashMap<String, Integer>();
+        int maxId = 0;
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) 
         {
-          ++maxId;
-          queryId.put(line, maxId);
-        }
-        int id = queryId.get(line);
-        // get the repetition of this query
-        if ( ! queryRun.containsKey(line) )
-        {
-          queryRun.put(line, 0);
-        }
-        int run = queryRun.get(line) + 1;
-        queryRun.put(line, run);
-        String[] split = line.split(" ", 2);
-        String queryFunction = split[0];
-        String annisQuery = split[1];
-        QueryData queryData = analyzeQuery(annisQuery, queryFunction);
-        if ("count".equals(queryFunction))
-        {
-          long start = new Date().getTime();
+          // get the id of this query
+          if ( ! queryId.containsKey(line) )
+          {
+            ++maxId;
+            queryId.put(line, maxId);
+          }
+          int id = queryId.get(line);
+          // get the repetition of this query
+          if ( ! queryRun.containsKey(line) )
+          {
+            queryRun.put(line, 0);
+          }
+          int run = queryRun.get(line) + 1;
+          queryRun.put(line, run);
+          String[] split = line.split(" ", 2);
+          String queryFunction = split[0];
+          String annisQuery = split[1];
+          boolean error = false;
+          QueryData queryData = null;
           try {
-            Count count = annisDao.count(queryData);
-            int result = count.getTupelMatched();
-            long end = new Date().getTime();
-            long runtime = end - start;
-            Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
-            System.out.println(StringUtils.join(output, "\t"));
-          } catch (RuntimeException e) {
-            String result = "ERROR";
-            long end = new Date().getTime();
-            long runtime = end - start;
-            Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
-            System.out.println(StringUtils.join(output, "\t"));
+            queryData = analyzeQuery(annisQuery, queryFunction);
+          } catch (RuntimeException e)
+          {
+            error = true;
+          }
+          if ("count".equals(queryFunction))
+          {
+            long start = new Date().getTime();
+            if (!error)
+            {
+              try {
+                int result = annisDao.count(queryData);
+                long end = new Date().getTime();
+                long runtime = end - start;
+                Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+                System.out.println(StringUtils.join(output, "\t"));
+              } catch (RuntimeException e) {
+                error = true;
+              }
+            }
+            if (error)
+            {
+              String result = "ERROR";
+              long end = new Date().getTime();
+              long runtime = end - start;
+              Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+              System.out.println(StringUtils.join(output, "\t"));
+            }
           }
         }
+      } finally
+      {
+        if (reader != null)
+        {
+           reader.close();
+        }
       }
-    } catch (FileNotFoundException e)
-    {
-      error(e);
-    } catch (IOException e)
-    {
-      error(e);
-    }
+      } catch (IOException e)
+      {
+        error(e);
+      }
   }
 
   public void doDebug(String ignore)
