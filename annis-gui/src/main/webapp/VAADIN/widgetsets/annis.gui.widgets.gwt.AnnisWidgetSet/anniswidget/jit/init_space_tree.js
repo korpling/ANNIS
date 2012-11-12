@@ -216,11 +216,10 @@ function initSpaceTree(config) {
           if(isPointingRel)
           {
             var orn = this.getOrientation(adj),
-            node = st.graph.getNode(edge.to),
-            child = st.graph.getNode(edge.from),
+            node = st.graph.getNode(edge.from),
+            child = st.graph.getNode(edge.to),
             dim = adj.getData('dim');
-            this.edgeTypes.edgeLabel.drawArrow(node, child, dim,
-              true, canvas,
+            this.edgeTypes.edgeLabel.drawArrow(node, child, dim, false, canvas,
               this.viz, orn);
 
             if (node === fromNode && child === toNode
@@ -313,19 +312,19 @@ function initSpaceTree(config) {
         posNode = node.pos.getc(true);
         posChild = child.pos.getc(true);
 
-        //TODO check orientation
-        if (posNode.y == posChild.y)
-        {
-          if (posNode.x < posChild.x)
-          {
-            var tmp = from;
-            from = to;
-            to = tmp;
-          }
-        }
-        else {
-          to = viz.geom.getEdge(child, 'begin', orn);
-        }
+        //        //TODO check orientation
+        //        if (posNode.y == posChild.y)
+        //        {
+        //          if (posNode.x < posChild.x)
+        //          {
+        //            var tmp = from;
+        //            from = to;
+        //            to = tmp;
+        //          }
+        //        }
+        //        else {
+        //          to = viz.geom.getEdge(child, 'begin', orn);
+        //        }
 
         //draw line
         ctx.beginPath();

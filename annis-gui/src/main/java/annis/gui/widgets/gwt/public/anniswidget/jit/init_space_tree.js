@@ -113,7 +113,7 @@ function initSpaceTree(config) {
       sx = canvas.scaleOffsetX,
       sy = canvas.scaleOffsetY,
       posx = Math.round(pos.x + posToNode.x) / 2 * sx + ox,
-      posy = Math.round(pos.y + posToNode.y) / 2 * sy + oy;
+      posy = Math.round(pos.y + posToNode.y) / 2 * sy + oy - 20;
 
       if(dim.align == "center") {
         // look, if the label have to be placed right or under
@@ -124,13 +124,11 @@ function initSpaceTree(config) {
             x: Math.round(posx - (w / 2) + radius.width/2),
             y: Math.round(posy - 20 + radius.height/2)
           };
-        } else
-{
+        } else {
           labelPos= {
             x: Math.round(posx + 20 + radius.width/2),
             y: Math.round(posy + radius.height/2)
           };
-
         }
       } else if (dim.align == "left") {
         orn = config.orientation;
@@ -170,6 +168,32 @@ function initSpaceTree(config) {
     }
   });
 
+  // add some methods to Node
+  $jit.Graph.Node.implement({
+    // searching recursive for the most left/right child
+    'getMostChild' : function(dir)
+    {
+      var children = this.getSubnodes([1, 1]);
+
+      if (children.length == 0)
+      {
+        return this;
+      }
+      else {
+        if ('left' === dir)
+        {
+          return children[0].getMostChild(dir);
+        }
+        else if ('right' === dir)
+        {
+          return children[children.length - 1].getMostChild(dir);
+        } else {
+          throw "direction not implemented";
+        }
+      }
+    }
+  });
+
   //implement an edge type
   $jit.ST.Plot.EdgeTypes.implement({
     'edgeLabel': {
@@ -179,7 +203,6 @@ function initSpaceTree(config) {
         fromNode = adj.nodeFrom,
         toNode = adj.nodeTo,
         isAlreadyConnected = false;
-
 
         for (var i = 0; i < edges.length; i++)
         {
@@ -220,9 +243,48 @@ function initSpaceTree(config) {
 
         if (!isAlreadyConnected)
         {
-          this.edgeTypes.line.render.call(this, adj, canvas);
+          this.edgeTypes.edgeLabel.drawHorizontalEdge(fromNode, dim, canvas,
+            this.viz, orn);
+          this.edgeTypes.edgeLabel.drawVerticalEdge(toNode, dim, canvas,
+            this.viz, orn);
         }
       },
+
+      'drawHorizontalEdge' : function(node, dim, canvas, viz, orn)
+      {
+        var mostLeftChild = node.getMostChild('left'),
+        mostRightChild = node.getMostChild('right'),
+        posNode = node.pos.getc(true),
+        posLeftChild = mostLeftChild.pos.getc(true),
+        posRightChild = mostRightChild.pos.getc(true),
+        w = node.getData('width') / 2,
+        h = node.getData('height') / 2,
+        ctx = canvas.getCtx();
+
+        ctx.moveTo(posLeftChild.x - w, posNode.y);
+        ctx.lineTo(posRightChild.x + w, posNode.y);
+        ctx.stroke();
+      },
+
+      'drawVerticalEdge' : function(node, dim, canvas, viz, orn)
+      {
+        var parents = node.getParents();
+
+        // only one parent should exist
+        if (parents.length != 1)
+        {
+          return;
+        }
+
+        var posNode = node.pos.getc(true),
+        posParent = parents[0].pos.getc(true),
+        ctx = canvas.getCtx();
+
+        ctx.moveTo(posNode.x, posNode.y);
+        ctx.lineTo(posNode.x, posParent.y);
+        ctx.stroke();
+      },
+
       'drawArrow' : function (node, child, dim, swap, canvas, viz, orn)
       {
         var ctx = canvas.getCtx();
@@ -236,6 +298,17 @@ function initSpaceTree(config) {
 
         var from = viz.geom.getEdge(node, 'end', orn),
         to = viz.geom.getEdge(child, 'end', orn);
+
+        var controllPoint = {};
+        if (from.x != to.x)
+        {
+          controllPoint.x = (from.x + to.x) / 2;
+          controllPoint.y = from.y - 2 * dim;
+        } else {
+          controllPoint.x = from.x + 2 * dim;
+          controllPoint.y = (from.y + to.y) / 2;
+        }
+
 
         posNode = node.pos.getc(true);
         posChild = child.pos.getc(true);
@@ -257,11 +330,11 @@ function initSpaceTree(config) {
         //draw line
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
-        ctx.bezierCurveTo(from.x, from.y, to.x, to.y, to.x, to.y);
+        ctx.quadraticCurveTo(controllPoint.x, controllPoint.y, to.x, to.y, to.x, to.y);
         ctx.stroke();
 
         // draw arrow
-        var vect = new $jit.Complex(to.x - from.x, to.y - from.y);
+        var vect = new $jit.Complex(to.x - controllPoint.x, to.y - controllPoint.y);
         vect.$scale(dim / vect.norm());
         var intermediatePoint = new $jit.Complex(to.x - vect.x, to.y - vect.y),
         normal = new $jit.Complex(-vect.y / 2, vect.x / 2),
@@ -303,70 +376,19 @@ function initSpaceTree(config) {
 
     // put the sentences or sentences number into the label
     var data = node.data;
+    if (data.sentence_left != undefined && data.sentence_right != undefined)
+    {
+      label.innerHTML = data.sentence_left + ' - ' + data.sentence_right + '<br/>';
+    }
+
     if(data.sentence)
     {
-      label.innerHTML = data.sentence;
-    }
-    else if (data.sentence_left != undefined && data.sentence_right != undefined)
-    {
-      label.innerHTML = data.sentence_left + ' - ' + data.sentence_right;
-    }
-    else {
-      label.innerHTML = node.name;
+      label.innerHTML += data.sentence;
     }
 
     label.onclick = function(){
       st.onClick(node.id);
     };
-  };
-
-  //This method is called right before plotting
-  //a node. It's useful for changing an individual node
-  //style properties before plotting it.
-  //The data properties prefixed with a dollar
-  //sign will override the global node style properties.
-  config['onBeforePlotNode'] = function(node){
-
-    // if node contains a sentence
-    if (node.data.sentence)
-    {
-      return;
-    }
-
-    //add some color to the nodes in the path between the
-    //root node and the selected node.
-    if (node.selected) {
-      node.data.$color = "#ff7";
-    } else {
-      delete node.data.$color;
-      //if the node belongs to the last plotted level
-      if(!node.anySubnode("exist")) {
-        //count children number
-        var count = 0;
-        node.eachSubnode(function(n) {
-          count++;
-        });
-        //assign a node color based on
-        //how many children it has
-        node.data.$color = ['#aaa', '#baa', '#caa', '#daa', '#eaa', '#faa'][count];
-      }
-    }
-  };
-
-  //This method is called right before plotting
-  //an edge. It's useful for changing an individual edge
-  //style properties before plotting it.
-  //Edge data proprties prefixed with a dollar sign will
-  //override the Edge global style properties.
-  config['onBeforePlotLine'] = function(adj){
-    if (adj.nodeFrom.selected && adj.nodeTo.selected) {
-      adj.data.$color = "#000";
-      adj.data.$lineWidth = 3;
-    }
-    else {
-      delete adj.data.$color;
-      delete adj.data.$lineWidth;
-    }
   };
 
   //set animation transition type
