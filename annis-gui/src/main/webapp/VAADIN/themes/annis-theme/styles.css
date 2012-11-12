@@ -52,6 +52,9 @@
   cursor: pointer;
 }
 
+.drag-source-enabled {
+  cursor: move;
+}
 
 .toolbar .v-panel-content {
   background-color: #ecf0f6;

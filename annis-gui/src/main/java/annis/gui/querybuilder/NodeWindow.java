@@ -85,13 +85,14 @@ public class NodeWindow extends Panel implements Button.ClickListener
 
     btMove = new Button();
     btMove.setIcon(new ThemeResource("tango-icons/16x16/view-fullscreen.png"));
-    btMove.setDescription("Move window");
-    btMove.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btMove.setDescription("<strong>Move window</strong><br />Hold button and move mouse to move the window.");
+    btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
     
     btEdge = new Button("Edge");
     btEdge.addListener((Button.ClickListener) this);
+    btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
       + "two nodes click this button first. "
@@ -99,11 +100,11 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "button.<br>You can cancel the action by clicking this button "
       + "(\"Cancel\") again.");
     btEdge.setImmediate(true);
-    
     toolbar.addComponent(btEdge);
+    
     btAdd = new Button();
     btAdd.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"));
-    btAdd.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
       + "Every condition will constraint the node described by this window. "
@@ -113,7 +114,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btAdd);
     btClear = new Button();
     btClear.setIcon(new ThemeResource("tango-icons/16x16/edit-clear.png"));
-    btClear.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
       
@@ -121,8 +122,8 @@ public class NodeWindow extends Panel implements Button.ClickListener
 
     btClose = new Button();
     btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
-    btClose.setDescription("Close");
-    btClose.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btClose.setDescription("<strong>Close</strong><br />Close this node description window");
+    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
@@ -136,6 +137,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btClear.setVisible(!prepare);
     btClose.setVisible(!prepare);
     btAdd.setVisible(!prepare);
+    btMove.setVisible(!prepare);
 
     if(prepare)
     {
