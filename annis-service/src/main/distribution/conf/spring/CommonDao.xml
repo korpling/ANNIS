@@ -85,6 +85,7 @@
     <property name="timeout" value="${annis.sql-timeout}"/>
 
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
+    <property name="countMatchesAndDocumentsSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
     <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
     <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>

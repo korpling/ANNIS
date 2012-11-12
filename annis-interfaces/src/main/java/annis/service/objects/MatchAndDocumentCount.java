@@ -19,37 +19,37 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * This class represents the result of a COUNT query in ANNIS.
+ * This class represents the result of a COUNT MATCHES AND DOCUMENTS query in ANNIS.
  * 
- * It provides the number of matched node-tuples and the number of distinct
- * documents where there matches occured.
+ * It provides the number of query matches and the number of distinct
+ * documents where these matches occurred.
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
-public class Count implements Serializable
+public class MatchAndDocumentCount implements Serializable
 {
-  private int tupelMatched;
-  private int documentsMatched;
+  private int matchCount;
+  private int documentCount;
 
-  public int getTupelMatched()
+  public int getMatchCount()
   {
-    return tupelMatched;
+    return matchCount;
   }
 
-  public void setTupelMatched(int tupelMatched)
+  public void setMatchCount(int tupelMatched)
   {
-    this.tupelMatched = tupelMatched;
+    this.matchCount = tupelMatched;
   }
 
-  public int getDocumentsMatched()
+  public int getDocumentCount()
   {
-    return documentsMatched;
+    return documentCount;
   }
 
-  public void setDocumentsMatched(int documentsMatched)
+  public void setDocumentCount(int documentsMatched)
   {
-    this.documentsMatched = documentsMatched;
+    this.documentCount = documentsMatched;
   }
   
   

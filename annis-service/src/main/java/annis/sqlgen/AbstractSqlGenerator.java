@@ -277,13 +277,13 @@ public abstract class AbstractSqlGenerator<T>
     this.groupByClauseSqlGenerator = groupByClauseSqlGenerator;
   }
 
-  public WithClauseSqlGenerator getWithClauseSqlGenerator()
+  public WithClauseSqlGenerator<QueryData> getWithClauseSqlGenerator()
   {
     return withClauseSqlGenerator;
   }
 
   public void setWithClauseSqlGenerator(
-    WithClauseSqlGenerator withClauseSqlGenerator)
+    WithClauseSqlGenerator<QueryData> withClauseSqlGenerator)
   {
     this.withClauseSqlGenerator = withClauseSqlGenerator;
   }
