@@ -84,13 +84,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
     addComponent(toolbar);
 
     btMove = new Button();
-    btMove.setIcon(new ThemeResource("tango-icons/16x16/view-fullscreen.png"));
-    btMove.setDescription("<strong>Move window</strong><br />Hold button and move mouse to move the window.");
+    btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
+    btMove.setDescription("<strong>Move window</strong><br />Click, hold and move mouse to move the window.");
     btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
     
-    btEdge = new Button("Edge");
+    btEdge = new Button("Add Edge");
     btEdge.addListener((Button.ClickListener) this);
     btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
@@ -103,7 +103,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btEdge);
     
     btAdd = new Button();
-    btAdd.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"));
+    btAdd.setIcon(new ThemeResource("tango-icons/22x22/list-add.png"));
     btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
@@ -113,7 +113,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     
     toolbar.addComponent(btAdd);
     btClear = new Button();
-    btClear.setIcon(new ThemeResource("tango-icons/16x16/edit-clear.png"));
+    btClear.setIcon(new ThemeResource("tango-icons/22x22/edit-clear.png"));
     btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
@@ -121,12 +121,14 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btClear);
 
     btClose = new Button();
-    btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btClose.setIcon(new ThemeResource("tango-icons/22x22/process-stop.png"));
     btClose.setDescription("<strong>Close</strong><br />Close this node description window");
     btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
+    toolbar.setComponentAlignment(btMove, Alignment.MIDDLE_LEFT);
+    toolbar.setComponentAlignment(btEdge, Alignment.MIDDLE_CENTER);
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
   }
 
@@ -145,7 +147,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else
     {
-      btEdge.setCaption("Edge");
+      btEdge.setCaption("Add Edge");
     }
   }
 
