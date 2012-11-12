@@ -141,9 +141,17 @@ public abstract class AnnisBaseRunner
 
     ConsoleReader console = new ConsoleReader();
     File annisDir = new File(System.getProperty("user.home") + "/.annis/");
-    if(!annisDir.mkdirs())
+    String annisDirPath = annisDir.getAbsolutePath();
+    if (!annisDir.exists())
     {
-      log.warn("could not create directory " + annisDir.getAbsolutePath());
+      log.info("Creating directory: " + annisDirPath);
+      if(!annisDir.mkdirs())
+      {
+        log.warn("Could not create directory: " + annisDirPath);
+      }
+    } else if (!annisDir.isDirectory())
+    {
+      log.warn("Could not create directory because a file with the same name already exists: " + annisDirPath);
     }
 
     history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
