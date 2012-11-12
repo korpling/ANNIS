@@ -17,6 +17,7 @@ package annis.gui.querybuilder;
 
 import annis.gui.Helper;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.GenericType;
@@ -53,7 +54,7 @@ public class TigerQueryBuilderCanvas extends Panel
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(TigerQueryBuilderCanvas.class);
   private SimpleCanvas canvas;
-  private Map<NodeWindow, DragAndDropWrapper> nodes;
+  private Map<NodeWindow, GripDragComponent> nodes;
   private List<EdgeWindow> edges;
   private AbsoluteLayout area;
   private AbsoluteDropHandler handler;
@@ -65,7 +66,7 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     this.controlPanel = controlPanel;
 
-    nodes = new HashMap<NodeWindow, DragAndDropWrapper>();
+    nodes = new HashMap<NodeWindow, GripDragComponent>();
     edges = new ArrayList<EdgeWindow>();
 
     setSizeFull();
@@ -151,8 +152,8 @@ public class TigerQueryBuilderCanvas extends Panel
 
     for (EdgeWindow e : edges)
     {
-      DragAndDropWrapper w1 = nodes.get(e.getSource());
-      DragAndDropWrapper w2 = nodes.get(e.getTarget());
+      GripDragComponent w1 = nodes.get(e.getSource());
+      GripDragComponent w2 = nodes.get(e.getTarget());
 
       ComponentPosition p1 = area.getPosition(w1);
       ComponentPosition p2 = area.getPosition(w2);
@@ -278,17 +279,22 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     final NodeWindow n = new NodeWindow(number++, this);
 
-    DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-    nodes.put(n, wrapper);
-
-
-    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
-    wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
-    wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
-    wrapper.addStyleName("tigerquery-builder-overlay");
-    wrapper.setImmediate(true);
-    
-    area.addComponent(wrapper, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
+//    DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
+//    nodes.put(n, wrapper);
+//
+//
+//    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
+//    wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
+//    wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
+//    wrapper.addStyleName("tigerquery-builder-overlay");
+//    wrapper.setImmediate(true);
+  
+    GripDragComponent panel = new GripDragComponent(n);
+    panel.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
+    panel.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
+    nodes.put(n, panel);
+    area.addComponent(panel, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
+//    area.addComponent(wrapper, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
     updateQuery();
   }
 
@@ -320,7 +326,7 @@ public class TigerQueryBuilderCanvas extends Panel
     }
     edges.clear();
 
-    for (DragAndDropWrapper w : nodes.values())
+    for (GripDragComponent w : nodes.values())
     {
       area.removeComponent(w);
     }
@@ -347,7 +353,7 @@ public class TigerQueryBuilderCanvas extends Panel
     @Override
     public void drop(DragAndDropEvent event)
     {
-      WrapperTransferable t = (WrapperTransferable) event.getTransferable();
+      GripDragComponent.MouseEventTransferable t = (GripDragComponent.MouseEventTransferable) event.getTransferable();
       WrapperTargetDetails details = (WrapperTargetDetails) event.
         getTargetDetails();
 
@@ -363,15 +369,12 @@ public class TigerQueryBuilderCanvas extends Panel
 
       // Move the component in the absolute layout
       ComponentPosition pos =
-        layout.getPosition(t.getSourceComponent());
+        layout.getPosition(t.getSourceComponent().getParent());
       pos.setLeftValue(pos.getLeftValue() + xChange);
       pos.setTopValue(pos.getTopValue() + yChange);
 
       if (parent != null)
-      {
-        
-        parent.getWindow().showNotification("Dropped");
-        
+      { 
         parent.updateLinesAndEdgePositions();
         parent.requestRepaint();
         

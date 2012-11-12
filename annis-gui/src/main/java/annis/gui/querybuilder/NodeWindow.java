@@ -87,6 +87,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btMove.setIcon(new ThemeResource("tango-icons/16x16/view-fullscreen.png"));
     btMove.setDescription("Move window");
     btMove.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
     
     btEdge = new Button("Edge");
