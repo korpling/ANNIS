@@ -47,11 +47,11 @@ public class SearchOptionsPanel extends Panel
   private ComboBox cbResultsPerPage;
   private ComboBox cbSegmentation;
   // TODO: make this configurable
-  protected static final String[] PREDEFINED_PAGE_SIZES = new String[]
+  private static final String[] PREDEFINED_PAGE_SIZES = new String[]
   {
     "1", "2", "5", "10", "15", "20", "25"
   };
-  protected static final String[] PREDEFINED_CONTEXTS = new String[]
+  static final String[] PREDEFINED_CONTEXTS = new String[]
   {
     "0", "1", "2", "5", "10"
   };
@@ -124,7 +124,7 @@ public class SearchOptionsPanel extends Panel
         try
         {
           attributes.addAll(
-            service.path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+            service.path("query").path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
             .path("annotations").queryParam(
             "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
             get(new GenericType<List<AnnisAttribute>>()

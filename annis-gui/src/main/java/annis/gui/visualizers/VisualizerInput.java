@@ -26,7 +26,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -54,9 +53,7 @@ public class VisualizerInput
   private String resourcePathTemplate = "%s";
   private List<SToken> token;
   private Set<String> tokenAnnos;
-  private STextualDS text;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
   private VisualizerPanel visPanel;
 
   public String getAnnisWebServiceURL()
@@ -317,22 +314,6 @@ public class VisualizerInput
   }
 
   /**
-   * returns the media visualizer ids. We insert the iframe in a div block with
-   * this id: "resolver-resultNum-numOfVis"
-   *
-   * @return
-   */
-  public List<String> getMediaIDs()
-  {
-    List<String> res = new LinkedList<String>();
-    for(VisualizerPanel p : getMediaVisualizer())
-    {
-      res.add(p.getHtmlID());
-    }
-    return res;
-  }
-
-  /**
    * should contains a list of all token of a the which is available with
    * {@link VisualizerInput#getSResult()}.
    */
@@ -372,16 +353,6 @@ public class VisualizerInput
     return this.tokenAnnos;
   }
 
-  public void setText(STextualDS text)
-  {
-    this.text = text;
-  }
-
-  public STextualDS getText()
-  {
-    return this.text;
-  }
-
   public void setSegmentationName(String segmentationName)
   {
     this.segmentationName = segmentationName;
@@ -393,21 +364,6 @@ public class VisualizerInput
   public String getSegmentationName()
   {
     return segmentationName;
-  }
-
-  /**
-   * All available visualizer for this result.
-   *
-   * @param mediaVisualizer
-   */
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
-  {
-    this.mediaVisualizer = mediaVisualizer;
-  }
-
-  public List<VisualizerPanel> getMediaVisualizer()
-  {
-    return mediaVisualizer;
   }
 
   /**

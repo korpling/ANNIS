@@ -15,8 +15,8 @@
  */
 package annis.gui.visualizers.iframe.dependency;
 
-import annis.MatchedNodeColors;
-import annis.gui.visualizers.iframe.AbstractDotVisualizer;
+import annis.gui.MatchedNodeColors;
+import annis.gui.visualizers.component.AbstractDotVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -198,6 +198,10 @@ public class ProielDependecyTree extends AbstractDotVisualizer
               break;
             case 'P':
               shape = "hexagon";
+              label = posAnno;
+              break;
+            default:
+              shape = "circle";
               label = posAnno;
               break;
           }

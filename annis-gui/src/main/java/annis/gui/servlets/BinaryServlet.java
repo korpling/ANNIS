@@ -15,22 +15,32 @@
  */
 package annis.gui.servlets;
 
+import annis.gui.Helper;
+import annis.gui.MainApp;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.vaadin.terminal.gwt.server.AbstractWebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.Map;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This Servlet provides binary-files with a stream of partial-content. The
@@ -44,52 +54,76 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class BinaryServlet extends HttpServlet
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final long serialVersionUID = -8182635617256833563L;
-  private int slice = 200000; // max portion which is transfered over rmi
+  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
+  
+  @Override
+  public void init(ServletConfig config) throws ServletException
+  {
+    super.init(config);
+  }
 
+  
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException
+    throws ServletException
   {
 
     // get Parameter from url, actually it' s only the corpusId
     Map<String, String[]> binaryParameter = request.getParameterMap();
     toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     documentName = binaryParameter.get("documentName")[0];
-    ServletOutputStream out = response.getOutputStream();
-
-
-    String range = request.getHeader("Range");
-
-    ClientConfig rc = new DefaultClientConfig(SaltProjectProvider.class);
-    Client c = Client.create(rc);
-        
-    String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
-    if(annisServiceURL == null)
-    {
-      throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
-    }
-    WebResource annisRes = c.resource(annisServiceURL);
     
-    WebResource binaryRes = annisRes.path("corpora")
-      .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-      .path(documentName).path("binary"); 
-    
-    if (range != null)
+    ServletOutputStream out = null;
+    try
     {
-      responseStatus206(binaryRes, out, response, range);
+      out = response.getOutputStream();
+
+      String range = request.getHeader("Range");
+
+
+      String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
+      if(annisServiceURL == null)
+      {
+        throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
+      }
+      
+      HttpSession session = request.getSession();
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
+      
+      WebResource binaryRes = annisRes.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
+        .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
+
+      if (range != null)
+      {
+        responseStatus206(binaryRes, out, response, range);
+      }
+      else
+      {
+        responseStatus200(binaryRes, out, response);
+      }
+      
+      out.flush();
     }
-    else
+    catch(IOException ex)
     {
-
-      responseStatus200(binaryRes, out, response);
+      log.debug("IOException in BinaryServlet", ex);
     }
-
-    out.flush();
-    out.close();
+    catch(ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      response.setStatus(500);
+    }
+    catch(UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      response.setStatus(500);
+    }
   }
 
   private void responseStatus206(WebResource binaryRes, ServletOutputStream out,
@@ -97,12 +131,12 @@ public class BinaryServlet extends HttpServlet
   {
     AnnisBinaryMetaData bm = binaryRes.path("meta")
       .get(AnnisBinary.class);
-    AnnisBinary binary;
 
     // Range: byte=x-y | Range: byte=0-
     String[] rangeTupel = range.split("-");
     int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
 
+    int slice;
     if (rangeTupel.length > 1)
     {
       slice = Integer.parseInt(rangeTupel[1]);
@@ -111,17 +145,17 @@ public class BinaryServlet extends HttpServlet
     {
       slice = bm.getLength();
     }
-
-    binary = binaryRes.path("" + (offset +1)).path("" + (slice - offset))
-      .get(AnnisBinary.class);
-
+    
+    int lengthToFetch = slice - offset;
+    
     response.setHeader("Content-Range", "bytes " + offset + "-"
       + (bm.getLength() - 1) + "/" + bm.getLength());
     response.setContentType(bm.getMimeType());
     response.setStatus(206);
-    response.setContentLength(binary.getBytes().length);
+    response.setContentLength(lengthToFetch);
 
-    out.write(binary.getBytes());
+    writeStepByStep(offset, lengthToFetch, binaryRes, out);
+    
   }
 
   private void responseStatus200(WebResource binaryRes, ServletOutputStream out,
@@ -157,13 +191,28 @@ public class BinaryServlet extends HttpServlet
 
     AnnisBinaryMetaData annisBinary = binaryRes.path("meta")
       .get(AnnisBinary.class);
-    slice = annisBinary.getLength();
+    
+    int offset = 0;
+    int length = annisBinary.getLength();
+    
+    writeStepByStep(offset, length, binaryRes, out);
 
-    int offset = 1;
-    int length = annisBinary.getLength() - 1;
-    out.write(
-      binaryRes.path("" + offset).path("" + length).get(AnnisBinary.class)
-      .getBytes()
-      );
+  }
+  
+  private void writeStepByStep(int offset, int completeLength, WebResource binaryRes, ServletOutputStream out) throws IOException
+  {
+    int remaining = completeLength;
+    while(remaining > 0)
+    {
+      int stepLength = Math.min(MAX_LENGTH, remaining);
+      
+      AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
+      Validate.isTrue(bin.getBytes().length == stepLength);
+      out.write(bin.getBytes());
+      out.flush();
+      
+      offset += stepLength;      
+      remaining = remaining - stepLength;
+    }
   }
 }

@@ -15,12 +15,12 @@
  */
 package annis.gui.exporter;
 
-import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.WebResource;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 public class WekaExporter implements Exporter, Serializable
@@ -30,16 +30,29 @@ public class WekaExporter implements Exporter, Serializable
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Map<String, AnnisCorpus> corpora, String keysAsString, String argsAsString,
+    Set<String> corpora, String keysAsString, String argsAsString,
     WebResource annisResource, Writer out)
   {
     //this is a full result export
     try
     {
-      String result = annisResource.path("search").path("matrix")
-        .queryParam("corpora", StringUtils.join(corpora.keySet(), ","))
-        .queryParam("q", queryAnnisQL).get(String.class);
-      out.append(result);
+      InputStream result = annisResource.path("search").path("matrix")
+        .queryParam("corpora", StringUtils.join(corpora, ","))
+        .queryParam("q", queryAnnisQL).get(InputStream.class);
+      
+      try
+      {
+        int c;
+        while( (c = result.read()) > -1)
+        {
+          out.write(c);
+        }
+      }
+      finally
+      {
+        result.close();
+      }
+      
       out.flush();
     }
     catch (Exception ex)

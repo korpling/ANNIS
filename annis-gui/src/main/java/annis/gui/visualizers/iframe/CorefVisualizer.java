@@ -89,16 +89,12 @@ public class CorefVisualizer extends WriterVisualizer
   static class TReferent
   {
 
-    long Node;
     Set<Annotation> Annotations;
-    String Type;
     long Component;
 
     TReferent()
     {
-      Node = -1;
       Component = -1;
-      Type = "";
       Annotations = new HashSet<Annotation>();
     }
   }
@@ -162,11 +158,7 @@ public class CorefVisualizer extends WriterVisualizer
       ComponentOfToken = new HashMap<Long, List<Long>>();
       Componenttype = new LinkedList<TComponenttype>();
       AnnisResult anResult = input.getResult();
-      if (anResult == null)
-      {
-        println("An Error occured: Could not get Result (Result == null)</body>");
-        return;
-      }
+      
       AnnotationGraph anGraph = anResult.getGraph();
       if (anGraph == null)
       {
@@ -218,8 +210,6 @@ public class CorefVisualizer extends WriterVisualizer
           TReferent Ref = new TReferent();
           Ref.Annotations = e.getAnnotations();
           Ref.Component = Componentnr;
-          Ref.Node = e.getSource().getId();
-          Ref.Type = e.getName();
           ReferentList.add(Ref);
 
           List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), currentComponenttype, Componentnr);

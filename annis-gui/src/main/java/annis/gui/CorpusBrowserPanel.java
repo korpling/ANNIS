@@ -236,12 +236,12 @@ public class CorpusBrowserPanel extends Panel
       WebResource service = Helper.getAnnisWebResource(getApplication());
       if(service != null)
       {
-        result = service.path("corpora")
+        WebResource query = service.path("query").path("corpora")
           .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
           .path("annotations")
           .queryParam("fetchvalues", "true")
-          .queryParam("onlymostfrequentvalues", "true")
-          .get(new GenericType<List<AnnisAttribute>>(){});
+          .queryParam("onlymostfrequentvalues", "true");
+        result = query.get(new GenericType<List<AnnisAttribute>>(){});
       }
     }
     catch(Exception ex)
@@ -286,11 +286,11 @@ public class CorpusBrowserPanel extends Panel
     public void valueChange(ValueChangeEvent event)
     {
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
-      HashMap<String, AnnisCorpus> corpusMap = new HashMap<String, AnnisCorpus>();
-      corpusMap.put(corpus.getName(), corpus);
+      Set<String> corpusNameSet = new HashSet<String>();
+      corpusNameSet.add(corpus.getName());
       if(controlPanel != null)
       {
-        controlPanel.setQuery(cbe.getExample(), corpusMap);
+        controlPanel.setQuery(cbe.getExample(), corpusNameSet);
       }
     }
   }

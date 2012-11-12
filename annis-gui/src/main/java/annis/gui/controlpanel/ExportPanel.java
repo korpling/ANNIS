@@ -133,16 +133,6 @@ public class ExportPanel extends Panel implements Button.ClickListener
           return;
         }
 
-        // check corpus access
-        AnnisUser user = (AnnisUser) getApplication().getUser();
-        if(user == null || !user.getCorpusNameList().containsAll(
-          corpusListPanel.getSelectedCorpora().keySet()))
-        {
-          getWindow().showNotification("Illegal corpus access",
-            Notification.TYPE_ERROR_MESSAGE);
-          return;
-        }
-
         final PipedOutputStream out = new PipedOutputStream();
         final PipedInputStream in = new PipedInputStream(out);
 
@@ -152,13 +142,20 @@ public class ExportPanel extends Panel implements Button.ClickListener
           @Override
           public void run()
           {
-            exporter.convertText(queryPanel.getQuery(),
-              Integer.parseInt((String) cbLeftContext.getValue()),
-              Integer.parseInt((String) cbRightContext.getValue()),
-              corpusListPanel.getSelectedCorpora(),
-              null, (String) txtParameters.getValue(), 
-              Helper.getAnnisWebResource(getApplication()),
-              new OutputStreamWriter(out));
+            try
+            {
+              exporter.convertText(queryPanel.getQuery(),
+                Integer.parseInt((String) cbLeftContext.getValue()),
+                Integer.parseInt((String) cbRightContext.getValue()),
+                corpusListPanel.getSelectedCorpora(),
+                null, (String) txtParameters.getValue(),
+                Helper.getAnnisWebResource(getApplication()).path("query"),
+                new OutputStreamWriter(out, "UTF-8"));
+            }
+            catch (UnsupportedEncodingException ex)
+            {
+              log.error(null, ex);
+            }
           }
         }).start();
 
@@ -170,7 +167,7 @@ public class ExportPanel extends Panel implements Button.ClickListener
           {
             return in;
           }
-        }, exporterName + "_" + Math.abs(rand.nextLong()), getApplication());
+        }, exporterName + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
 
         getWindow().open(
           new ExternalResource(getApplication().getRelativeLocation(resource),"application/x-unknown"));

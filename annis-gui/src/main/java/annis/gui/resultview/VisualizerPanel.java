@@ -17,11 +17,14 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.VisualizationToggle;
+import annis.gui.media.MediaPlayer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel.KWICPanelImpl;
 import annis.resolver.ResolverEntry;
+import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.Application;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
@@ -29,21 +32,30 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +66,9 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
- * TODO test, if this works with mediaplayer
  */
-public class VisualizerPanel extends Panel implements Button.ClickListener
+public class VisualizerPanel extends CustomLayout 
+  implements Button.ClickListener, VisualizationToggle
 {
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
@@ -66,29 +78,31 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     "icon-expand.gif");
   private ApplicationResource resource = null;
   private Component vis;
-  private SDocument result;
-  private PluginSystem ps;
+  private transient SDocument result;
+  private transient PluginSystem ps;
   private ResolverEntry entry;
   private Random rand = new Random();
-  private Map<SNode, Long> markedAndCovered;
-  private List<SToken> token;
+  private transient Map<SNode, Long> markedAndCovered;
+  private transient List<SToken> token;
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanelImpl kwicPanel;
-  private List<String> mediaIDs;
   private String htmlID;
-  private CustomLayout visContainer;
-  private VisualizerPlugin visPlugin;
+  private String resultID;;
+  private transient VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
-  private STextualDS text;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
-  private boolean showTextID;
   private final String PERMANENT = "permanent";
   private final String ISVISIBLE = "visible";
-  private final String NOTVISIBLE = "hidden";
+  private final String HIDDEN = "hidden";
+  private final String PRELOADED = "preloaded";
 
+  private final static String htmlTemplate = 
+    "<div id=\":id\"><div location=\"btEntry\"></div>"
+    + "<div location=\"progress\"></div>"
+    + "<div location=\"iframe\"></div>"
+    + "</div>";
+    
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -102,17 +116,16 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     Map<SNode, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
     @Deprecated Map<String, String> markedExactMap,
-    STextualDS text,
     String htmlID,
+    String resultID,
     SingleResultPanel parent,
     String segmentationName,
-    PluginSystem ps,
-    CustomLayout visContainer,
-    boolean showTextID)
+    PluginSystem ps) throws IOException
   {
+    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes("UTF-8")));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
-
+    
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -123,67 +136,102 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
-    this.text = text;
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
-
-    this.visContainer = visContainer;
-    this.showTextID = showTextID;
+    this.resultID = resultID;
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-    this.setContent(this.visContainer);
   }
 
   @Override
   public void attach()
   {
 
-    if (visPlugin == null)
+    if (visPlugin == null && ps != null)
     {
       entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    if(entry != null)
+    if(entry != null && visPlugin != null)
     {
-      if(PERMANENT.equalsIgnoreCase(entry.getVisibility()))
-      {
-        // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        visContainer.addComponent(vis, "iframe");
-      }
-      else if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility()))
+      
+      if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
-        btEntry = new Button(entry.getDisplayName() 
-          + (showTextID ? " (" + text.getSName() + ")" : ""));
-        btEntry.setIcon(ICON_COLLAPSE);
-        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-          + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addListener((Button.ClickListener) this);
-        visContainer.addComponent(btEntry, "btEntry");
-
-
-        // create the visualizer and calc input
-        vis = this.visPlugin.createComponent(createInput());
-        vis.setVisible(true);
-        visContainer.addComponent(vis, "iframe");
-      }
-      else
-      {
-        // build button for visualizer
-        btEntry = new Button(entry.getDisplayName()
-          + (showTextID ? " (" + text.getSName() + ")" : ""));
+        btEntry = new Button(entry.getDisplayName());
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addListener((Button.ClickListener) this);
-        visContainer.addComponent(btEntry, "btEntry");
+        addComponent(btEntry, "btEntry");
       }
-    }
+      else
+      {
+        
+        if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
+          || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          // build button for visualizer
+          btEntry = new Button(entry.getDisplayName());
+          btEntry.setIcon(ICON_COLLAPSE);
+          btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+            + ChameleonTheme.BUTTON_SMALL);
+          btEntry.addListener((Button.ClickListener) this);
+          addComponent(btEntry, "btEntry");
+        }
+        
+        
+        // create the visualizer and calc input
+        try
+        {
+          vis = createComponent();
+          if(vis != null)
+          {
+            vis.setVisible(true);
+            addComponent(vis, "iframe");
+          }
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_TRAY_NOTIFICATION
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
+        
+        
+        if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          btEntry.setIcon(ICON_EXPAND);
+          if(vis != null)
+          {
+            vis.setVisible(false);
+          }
+        }
+        
+      }
+    } // end if entry not null
 
+  }
+  
+  private Component createComponent()
+  {
+    if(visPlugin == null)
+    {
+      return null;
+    }
+    
+    final Application application = getApplication();
+    final VisualizerInput input = createInput();
+    
+    Component c = visPlugin.createComponent(input, application);
+    c.setVisible(false);
+    
+    return c;
   }
 
   private VisualizerInput createInput()
@@ -193,7 +241,8 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
-    input.setId("" + rand.nextLong());
+    
+    input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
@@ -203,9 +252,7 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
     input.setResult(result);
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
-    input.setText(text);
     input.setSegmentationName(segmentationName);
-    input.setMediaVisualizer(mediaVisualizer);
 
     if (entry != null)
     {
@@ -216,10 +263,10 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       input.setResourcePathTemplate(template);
     }
 
-    if (visPlugin.isUsingText()
-      && result.getSDocumentGraph().getSNodes().size() > 0)
+    if (visPlugin != null && visPlugin.isUsingText()
+      && result != null && result.getSDocumentGraph().getSNodes().size() > 0)
     {
-      SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+      SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
 
       input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
@@ -254,41 +301,35 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   }
 
   public ApplicationResource createResource(
-    final ByteArrayOutputStream byteStream,
+    ByteArrayOutputStream byteStream,
     String mimeType)
   {
 
     StreamResource r;
 
-    r = new StreamResource(new StreamResource.StreamSource()
-    {
-      @Override
-      public InputStream getStream()
-      {
-        return new ByteArrayInputStream(byteStream.toByteArray());
-      }
-    }, entry.getVisType() + "_" + Math.abs(rand.nextLong()), getApplication());
+    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream), 
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
   }
 
-  private SaltProject getText(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
-    SaltProject text = null;
+    SaltProject txt = null;
     try
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      text = annisResource.path("graphs").path(toplevelCorpusName).path(
+      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).path(
         documentName).get(SaltProject.class);
     }
     catch (Exception e)
     {
       log.error("General remote service exception", e);
     }
-    return text;
+    return txt;
   }
 
   @Override
@@ -305,83 +346,173 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(true);
+    toggleVisualizer(!visualizerIsVisible(), null);
   }
 
-  /**
-   * Opens and closes visualizer.
-   *
-   * @param collapse when collapse is false, the Visualizer would never be
-   * closed
-   */
-  public void toggleVisualizer(boolean collapse)
+  @Override
+  public boolean visualizerIsVisible()
   {
-
-    if (resource != null && collapse)
+    if(vis == null || !vis.isVisible())
     {
-      getApplication().removeResource(resource);
+      return false;
     }
-
-    if (btEntry.getIcon() == ICON_EXPAND)
+    return true;
+  }
+  
+  private void loadVisualizer(final LoadableVisualizer.Callback callback)
+  {
+    // check if it's necessary to create input
+    if (visPlugin != null)
     {
-
-      // check if it's necessary to create input
-      if (visPlugin != null && vis == null)
+      Executor exec = Executors.newSingleThreadExecutor();
+      FutureTask<Component> future = new FutureTask<Component>(new LoadComponentTask())
       {
-        vis = this.visPlugin.createComponent(createInput());
-        this.visContainer.addComponent(vis, "iframe");
-      }
 
+        @Override
+        public void run()
+        {
+          try
+          {
+            super.run();
+            // wait maximum 60 seconds
+            vis = get(60, TimeUnit.SECONDS);
+            synchronized (getApplication())
+            {
+              if (callback != null && vis instanceof LoadableVisualizer)
+              {
+                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+                if (loadableVis.isLoaded())
+                {
+                  // direct call callback since the visualizer is already ready
+                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                }
+                else
+                {
+                  loadableVis.clearCallbacks();
+                  // add listener when player was fully loaded
+                  loadableVis.addOnLoadCallBack(callback);
+                }
+              }
+              
+              removeComponent("progress");
+
+              if (vis != null)
+              {
+                vis.setVisible(true);
+                if (getComponent("iframe") == null)
+                {
+                  addComponent(vis, "iframe");
+                }
+              }
+            }
+          }
+          catch (InterruptedException ex)
+          {
+            log.error("Visualizer creation interrupted " + visPlugin.getShortName(), ex);
+          }
+          catch (ExecutionException ex)
+          {
+            log.error("Exception when creating visualizer " + visPlugin.getShortName(), ex);
+          }
+          catch (TimeoutException ex)
+          {
+            log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
+            synchronized(getApplication())
+            {
+              getWindow().showNotification(
+                "Could not create visualizer " + visPlugin.getShortName(),
+                ex.toString(),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            cancel(true);
+          }
+        } 
+      };
+      exec.execute(future);
+      
+      
       btEntry.setIcon(ICON_COLLAPSE);
-      vis.setVisible(true);
+      ProgressIndicator progress = new ProgressIndicator();
+      progress.setIndeterminate(true);
+      progress.setVisible(true);
+      progress.setEnabled(true);
+      progress.setPollingInterval(100);
+      progress.setDescription("Loading visualizer" +  visPlugin.getShortName());
+      addComponent(progress, "progress");
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
+    // end if create input was needed
+
+  } // end loadVisualizer
+
+  
+  @Override
+  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
+  {
+    if (visible)
     {
+      loadVisualizer(callback);
+    }
+    else
+    {
+      // hide
+      
       if (vis != null)
       {
         vis.setVisible(false);
-        stopMediaVisualizers();
+        if(vis instanceof MediaPlayer)
+        {
+          removeComponent(vis);
+        }
       }
 
       btEntry.setIcon(ICON_EXPAND);
     }
-  }
 
-  public void setKwicPanel(KWICPanelImpl kwicPanel)
-  {
-    this.kwicPanel = kwicPanel;
   }
 
   public String getHtmlID()
   {
     return htmlID;
   }
-
-  public List<VisualizerPanel> getMediaVisualizer()
+  
+  public class LoadComponentTask implements Callable<Component>
   {
-    return mediaVisualizer;
-  }
-
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
-  {
-    this.mediaVisualizer = mediaVisualizer;
-  }
-
-  public void startMediaVisFromKWIC()
-  {
-    if (kwicPanel != null)
+    @Override
+    public Component call() throws Exception
     {
-      kwicPanel.startMediaVisualizers();
-      // set back to null, otherwise the movie will stop
-      kwicPanel = null;
+      // only create component if not already created
+      if(vis == null)
+      {
+        return createComponent();
+      }
+      else
+      {
+        return vis;
+      }
     }
   }
-
-  private void stopMediaVisualizers()
+  
+  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
   {
-    String stopCommand = ""
-      + "document.getElementById(\"" + this.htmlID + "\")"
-      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
-    getWindow().executeJavaScript(stopCommand);
+    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+    private transient ByteArrayOutputStream byteStream;
+
+    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
+    {
+      this.byteStream = byteStream;
+    }
+    
+    @Override
+    public InputStream getStream()
+    {
+      if(byteStream == null)
+      {
+        log.error("byte stream was null");
+        return null;
+      }
+      return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+    
   }
+
 }

@@ -54,7 +54,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
           if(mainWindow == null)
           {
             event.getButton().getWindow().showNotification("Internal Error", "Main window was not set",
-              Window.Notification.TYPE_ERROR_MESSAGE);
+              Window.Notification.TYPE_WARNING_MESSAGE);
           }
           else
           {
@@ -73,7 +73,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
             {
               mainWindow.showNotification("Internal error",
                 "No valid citation link was found",
-                Window.Notification.TYPE_ERROR_MESSAGE);
+                Window.Notification.TYPE_WARNING_MESSAGE);
             }
           }
         }

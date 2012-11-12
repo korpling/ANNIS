@@ -99,7 +99,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     ((VerticalLayout) panelStatus.getContent()).setSizeFull();
 
     lblStatus = new Label();
-    lblStatus.setContentMode(Label.CONTENT_TEXT);
+    lblStatus.setContentMode(Label.CONTENT_XHTML);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
     lblStatus.setHeight("-1px");
@@ -229,7 +229,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     try
     {
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      String result = annisResource.path("check").queryParam("q", query)
+      String result = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
       if ("ok".equalsIgnoreCase(result))
       {

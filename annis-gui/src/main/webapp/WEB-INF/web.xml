@@ -9,11 +9,11 @@
   <context-param>
     <description>URL of the Annis REST WebService</description>
     <param-name>AnnisWebService.URL</param-name>
-    <param-value>http://localhost:5711/annis</param-value>
+    <param-value>http://localhost:5711/annis/</param-value>
   </context-param>
   <servlet>
     <servlet-name>MainApp</servlet-name>
-    <servlet-class>annis.gui.AnnisApplicationServlet</servlet-class>
+    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>annis.gui.MainApp</param-value>
@@ -35,13 +35,16 @@
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
-<!--
     <init-param>
-      <description>E-Mail address for sending bug reports. Must be set to have the "Report Bug" button visible.</description>
+      <description>
+        E-Mail address for sending bug reports. 
+        Must be set to a valid value to have the "Report Bug" button visible.
+      </description>
       <param-name>bug-e-mail</param-name>        	
-      <param-value>thomas.krause@alumni.hu-berlin.de</param-value>
+      <param-value>${annis.bugmail}</param-value>
     </init-param>
--->
+
+
   </servlet>
   <servlet>
     <servlet-name>CitationRedirectionServlet</servlet-name>

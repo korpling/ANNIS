@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- False positive Filter for FindBugs -->
+
+<FindBugsFilter>
+  <!-- automatically generated or external code that we can't influence -->
+  <Match>
+    <Package name="org.json"/>
+  </Match>
+  
+  <Match>
+    <Bug category="EXPERIMENTAL" />
+  </Match>
+  
+</FindBugsFilter>
