@@ -19,6 +19,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -50,6 +51,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   private Button btAdd;
   private Button btClear;
   private Button btClose;
+  private Button btMove;
   private HorizontalLayout toolbar;
   private List<ConstraintLayout> constraints;
   private boolean prepareEdgeDock;
@@ -81,19 +83,28 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.setHeight("-1px");
     addComponent(toolbar);
 
-    btEdge = new Button("Edge");
-    btEdge.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btMove = new Button();
+    btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
+    btMove.setDescription("<strong>Move window</strong><br />Click, hold and move mouse to move the window.");
+    btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btMove.addStyleName("drag-source-enabled");
+    toolbar.addComponent(btMove);
+    
+    btEdge = new Button("Add Edge");
     btEdge.addListener((Button.ClickListener) this);
+    btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
       + "two nodes click this button first. "
       + "Then define a destination node by clicking its \"Dock\" "
       + "button.<br>You can cancel the action by clicking this button "
       + "(\"Cancel\") again.");
-    
+    btEdge.setImmediate(true);
     toolbar.addComponent(btEdge);
-    btAdd = new Button("Add");
-    btAdd.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    
+    btAdd = new Button();
+    btAdd.setIcon(new ThemeResource("tango-icons/22x22/list-add.png"));
+    btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
       + "Every condition will constraint the node described by this window. "
@@ -101,18 +112,23 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "values of the annotation a node needs to have.");
     
     toolbar.addComponent(btAdd);
-    btClear = new Button("Clear");
-    btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClear = new Button();
+    btClear.setIcon(new ThemeResource("tango-icons/22x22/edit-clear.png"));
+    btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
       
     toolbar.addComponent(btClear);
 
-    btClose = new Button("X");
-    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClose = new Button();
+    btClose.setIcon(new ThemeResource("tango-icons/22x22/process-stop.png"));
+    btClose.setDescription("<strong>Close</strong><br />Close this node description window");
+    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
+    toolbar.setComponentAlignment(btMove, Alignment.MIDDLE_LEFT);
+    toolbar.setComponentAlignment(btEdge, Alignment.MIDDLE_CENTER);
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
   }
 
@@ -123,6 +139,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btClear.setVisible(!prepare);
     btClose.setVisible(!prepare);
     btAdd.setVisible(!prepare);
+    btMove.setVisible(!prepare);
 
     if(prepare)
     {
@@ -130,7 +147,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else
     {
-      btEdge.setCaption("Edge");
+      btEdge.setCaption("Add Edge");
     }
   }
 
@@ -180,6 +197,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
       }
     }
   }
+
+  public Button getBtMove()
+  {
+    return btMove;
+  }
+  
+  
 
   public int getID()
   {
