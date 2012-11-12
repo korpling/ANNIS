@@ -85,7 +85,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
 
     btMove = new Button();
     btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
-    btMove.setDescription("<strong>Move window</strong><br />Click, hold and move mouse to move the window.");
+    btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
     btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
