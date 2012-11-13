@@ -13,7 +13,6 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +33,22 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNamedElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.TreeSet;
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -71,9 +79,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       SDocumentGraph graph = null;
 
-      // fn: edge pre order value -> edge
-      Map<RankID, SNode> nodeByPre = new HashMap<RankID, SNode>();
+      // fn: parent information (pre and component) id to node
+      FastInverseMap<RankID, SNode> nodeByPre = new FastInverseMap<RankID, SNode>();
 
+      TreeSet<Long> allTextIDs = new TreeSet<Long>();
       TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
       TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
       TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath =
@@ -103,7 +112,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           // create the text for the last graph
           if (graph != null && document != null)
           {
-            createPrimaryText(graph, tokenTexts, tokenByIndex);
+            removeArtificialDominancesEdges(graph);
+            createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
             setMatchedIDs(document, keyNameList);
             addOrderingRelations(graph, nodeBySegmentationPath);
           }
@@ -151,7 +161,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         } // end if new key
 
         // get node data
-        SNode node = createOrFindNewNode(resultSet, graph, tokenTexts,
+        SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath, key, keyNameList);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long componentID = longValue(resultSet, RANK_TABLE, "component_id");
@@ -165,7 +175,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // the last match needs a primary text, too
       if (graph != null)
       {
-        createPrimaryText(graph, tokenTexts, tokenByIndex);
+        removeArtificialDominancesEdges(graph);
+        createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
         setMatchedIDs(document, keyNameList);
         addOrderingRelations(graph, nodeBySegmentationPath);
       }
@@ -176,6 +187,78 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     return project;
+  }
+  
+  /**
+   * Removes all dominance edges with empty name, where an other edge with name,
+   * the same namespace and the same source and target nodes exists.
+   * @param graph 
+   */
+  private void removeArtificialDominancesEdges(SDocumentGraph graph)
+  {
+    ListIterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().listIterator();
+    List<SDominanceRelation> edgesToRemove = new LinkedList<SDominanceRelation>();
+    while(itDomReal.hasNext())
+    {
+      SDominanceRelation rel = itDomReal.next();
+      
+      SFeature featCompID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
+      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+
+      
+      boolean allNull = true;
+      EList<String> types = rel.getSTypes();
+      if(types != null)
+      {
+        for(String s : types)
+        {
+          if(s != null)
+          {
+            allNull = false;
+            break;
+          }
+        }
+      } // end if types not null
+      if (allNull)
+      {
+        EList<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
+          getSTarget().getSId());
+        if (mirrorEdges != null && mirrorEdges.size() > 1)
+        {
+          for (Edge mirror : mirrorEdges)
+          {
+            if (mirror != rel && featCompID != null)
+            {
+              SRelation mirrorRel = (SRelation) mirror;
+              
+              if(mirrorRel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT) == null)
+              {
+                mirrorRel.createSFeature(
+                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
+                  featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+                mirrorRel.createSFeature(
+                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
+                  featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+              }
+            }
+          }
+          // remove this edge
+          edgesToRemove.add(rel);
+        }
+      }
+    }
+    
+    // actually remove the edges
+    for(SDominanceRelation rel : edgesToRemove)
+    {
+      EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
+      for(SLayer layer : layersOfRel)
+      {
+        layer.getSRelations().remove(rel);
+      }
+      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );;
+    }
+    
   }
   
   private void addOrderingRelations(SDocumentGraph graph,
@@ -215,12 +298,12 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
   }
 
-  private void createPrimaryText(SDocumentGraph graph,
-    TreeMap<Long, String> tokenTexts, TreeMap<Long, SToken> tokenByIndex)
+  private void createSinglePrimaryText(SDocumentGraph graph, long textID,
+    TreeMap<Long, String> tokenTexts,  TreeMap<Long, SToken> tokenByIndex)
   {
     STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
     graph.addSNode(textDataSource);
-
+    
     StringBuilder sbText = new StringBuilder();
     Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
       iterator();
@@ -228,28 +311,42 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       Map.Entry<Long, String> e = itToken.next();
       SToken tok = tokenByIndex.get(e.getKey());
-
-      STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
-      textRel.setSSource(tok);
-      textRel.setSTarget(textDataSource);
-      textRel.setSStart(sbText.length());
-      textRel.setSEnd(sbText.length() + e.getValue().length());
-
-      textRel.setSTextualDS(textDataSource);
-      graph.addSRelation(textRel);
-
-      sbText.append(e.getValue());
-      if (itToken.hasNext())
+      
+      if(tok.getSFeature(ANNIS_NS, FEAT_TEXTREF).getSValueSNUMERIC() == textID)
       {
-        sbText.append(" ");
+        STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
+        textRel.setSSource(tok);
+        textRel.setSTarget(textDataSource);
+        textRel.setSStart(sbText.length());
+        textRel.setSEnd(sbText.length() + e.getValue().length());
+
+        textRel.setSTextualDS(textDataSource);
+        graph.addSRelation(textRel);
+
+        sbText.append(e.getValue());
+        if (itToken.hasNext())
+        {
+          sbText.append(" ");
+        }
       }
     }
 
     textDataSource.setSText(sbText.toString());
   }
+  
+  private void createPrimaryTexts(SDocumentGraph graph,
+    TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts, 
+    TreeMap<Long, SToken> tokenByIndex)
+  {
+    for(long textID : allTextIDs)
+    {
+      createSinglePrimaryText(graph, textID, tokenTexts, tokenByIndex);
+    }
+    
+  }
 
   private SNode createOrFindNewNode(ResultSet resultSet,
-    SDocumentGraph graph, TreeMap<Long, String> tokenTexts,
+    SDocumentGraph graph, TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
     SolutionKey<?> key,
@@ -307,6 +404,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         keyNameList[matchedNode-1] = node.getSName();
       }
 
+      // map layer
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
       EList<SLayer> layerList = graph.getSLayerByName(namespace);
       SLayer layer = (layerList != null && layerList.size() > 0)
@@ -318,6 +416,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         graph.addSLayer(layer);
       }
       node.getSLayers().add(layer);
+      
+      long textRef = longValue(resultSet, NODE_TABLE, "text_ref");
+      allTextIDs.add(textRef);
+      
     }
 
     String nodeAnnoValue =
@@ -419,6 +521,17 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
     return node;
   }
+  
+  private void updateMapAfterRecreatingNode(SNode oldNode, SNode newNode, 
+    FastInverseMap<RankID, SNode> nodeByPre)
+  {
+    // get *all* keys associated with this node
+    List<RankID> keys = nodeByPre.getKeys(oldNode);
+    for(RankID id : keys)
+    {
+      nodeByPre.put(id, newNode);
+    }
+  }
 
   private void moveNodeProperties(SStructuredNode from, SStructuredNode to,
     SGraph graph)
@@ -432,10 +545,50 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       to.getSLayers().add(l);
     }
     from.getSLayers().clear();
-
+ 
+    EList<Edge> inEdges =  new BasicEList<Edge>(graph.getInEdges(from.getSId()));
+    for(Edge e : inEdges)
+    {
+      if(e instanceof SRelation)
+      {
+        Validate.isTrue(graph.removeEdge(e));
+      }
+    }
+    EList<Edge> outEdges = new BasicEList<Edge>(graph.getOutEdges(from.getSId()));
+    for(Edge e : outEdges)
+    {
+      if(e instanceof SRelation)
+      {
+        Validate.isTrue(graph.removeEdge(e));
+      }
+    }
+    
     Validate.isTrue(graph.removeNode(from));
-
     graph.addNode(to);
+    
+    // fix old edges
+    if(inEdges != null)
+    {
+      for(Edge e : inEdges)
+      {
+        if(e instanceof SRelation)
+        {
+          ((SRelation) e).setSTarget(to);
+          graph.addSRelation((SRelation) e);
+        }
+      }
+    }
+    if(outEdges != null)
+    {
+      for(Edge e : outEdges)
+      {
+        if(e instanceof SRelation)
+        {
+          ((SRelation) e).setSSource(to);
+          graph.addSRelation((SRelation) e);
+        }
+      }
+    }
 
     for (SAnnotation anno : from.getSAnnotations())
     {
@@ -497,7 +650,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private SRelation createNewRelation(SDocumentGraph graph, SStructuredNode sourceNode, 
     SNode targetNode, String edgeName, String type, long componentID, 
     SLayer layer, long parent, long pre,
-    Map<RankID, SNode> nodeByPre)
+    FastInverseMap<RankID, SNode> nodeByPre)
   {
     SRelation rel = null;
     // create new relation
@@ -508,8 +661,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       if (sourceNode != null && !(sourceNode instanceof SStructure))
       {
+        SNode oldNode = sourceNode;
         sourceNode = recreateNode(SStructure.class, sourceNode);
-        nodeByPre.put(new RankID(componentID, parent), sourceNode);
+        updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
       }
     }
     else if ("c".equals(type))
@@ -519,8 +673,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       if (sourceNode != null && !(sourceNode instanceof SSpan))
       {
+        SNode oldNode = sourceNode;
         sourceNode = recreateNode(SSpan.class, sourceNode);
-        nodeByPre.put(new RankID(componentID, parent), sourceNode);
+        updateMapAfterRecreatingNode(oldNode,  sourceNode, nodeByPre);
       }
     }
     else if ("p".equals(type))
@@ -535,7 +690,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
     try
     {
-      rel.getSLayers().add(layer);
       rel.addSType(edgeName);
 
 
@@ -551,7 +705,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       featComponentID.setSValue(Long.valueOf(componentID));
       rel.addSFeature(featComponentID);
 
-      rel.setSSource(nodeByPre.get(new RankID(componentID, parent)));
+      rel.setSSource((SNode) nodeByPre.get(new RankID(componentID, parent)));
       if ("c".equals(type) && !(targetNode instanceof SToken))
       {
         log.warn("invalid edge detected: target node ({}) "
@@ -566,6 +720,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         rel.setSTarget(targetNode);
         graph.addSRelation(rel);
       }
+      
+      rel.getSLayers().add(layer);
+      
     }
     catch (SaltException ex)
     {
@@ -601,7 +758,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
 
   private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
-    Map<RankID, SNode> nodeByPre, SNode targetNode) throws
+    FastInverseMap<RankID, SNode> nodeByPre, SNode targetNode) throws
     SQLException
   {
     long parent = longValue(resultSet, RANK_TABLE, "parent");
@@ -614,7 +771,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     long componentID = longValue(resultSet, RANK_TABLE, "component_id");
     String edgeNamespace = stringValue(resultSet, COMPONENT_TABLE, "namespace");
     String edgeName = stringValue(resultSet, COMPONENT_TABLE, "name");
-
     String type = stringValue(resultSet, COMPONENT_TABLE, "type");
 
     SStructuredNode sourceNode = 
@@ -704,6 +860,70 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   public void setOuterQueryTableAccessStrategy(TableAccessStrategy outerQueryTableAccessStrategy)
   {
     this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
+  }
+  
+  public static class FastInverseMap<KeyType, ValueType>
+  {
+    private Map<KeyType, ValueType> key2value = new HashMap<KeyType, ValueType>();
+    private Map<ValueType, List<KeyType>> values2keys = new HashMap<ValueType, List<KeyType>>(); 
+    
+    /**
+     * Wrapper for {@link Map#put(java.lang.Object, java.lang.Object) }
+     * @param key
+     * @param value
+     * @return 
+     */
+    public ValueType put(KeyType key, ValueType value)
+    {
+      List<KeyType> inverse = values2keys.get(value);
+      if(inverse == null)
+      {
+        inverse = new LinkedList<KeyType>();
+        values2keys.put(value, inverse);
+      }
+      
+      inverse.add(key);
+      
+      return key2value.put(key, value);
+    }
+    
+    /**
+     * Wrapper for {@link Map#get(java.lang.Object) }
+     * @param key
+     * @return 
+     */
+    public ValueType get(KeyType key)
+    {
+      return key2value.get(key);
+    }
+    
+    /**
+     * Fast inverse lookup.
+     * 
+     * @param value
+     * @return All keys belonging to this value.
+     */
+    public List<KeyType> getKeys(ValueType value)
+    {
+      List<KeyType> result = values2keys.get(value);
+      if(result == null)
+      {
+        result = new LinkedList<KeyType>();
+        values2keys.put(value, result);
+      }
+      
+      // always return a copy
+      return new LinkedList<KeyType>(result);
+    }
+    
+    /**
+     * Wrapper for {@link  Map#clear() }
+     */
+    public void clear()
+    {
+      key2value.clear();
+      values2keys.clear();
+    }
   }
   
   public static class RankID

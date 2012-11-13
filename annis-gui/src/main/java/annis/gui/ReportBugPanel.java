@@ -120,7 +120,7 @@ public class ReportBugPanel extends Panel
           Window parent = subwindow.getParent();
           parent.removeWindow(subwindow);
 
-          parent.showNotification("Bug Report was send",
+          parent.showNotification("Bug report was sent",
             "We will answer your bug report as soon as possible",
             Window.Notification.TYPE_HUMANIZED_MESSAGE);
 
@@ -134,7 +134,7 @@ public class ReportBugPanel extends Panel
         {
           getWindow().showNotification("Could not send bug report", ex.
             getMessage(),
-            Window.Notification.TYPE_ERROR_MESSAGE);
+            Window.Notification.TYPE_WARNING_MESSAGE);
         }
       }
     });

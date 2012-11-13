@@ -26,11 +26,16 @@ import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -45,7 +50,23 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private boolean isShutdownRequested = false;
   private static Thread mainThread;
   private Server server;
+  
+  private boolean useAuthentification = true;
 
+  public AnnisServiceRunner()
+  {    
+    boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
+    this.useAuthentification = !nosecurity;
+    if(this.useAuthentification)
+    {
+      log.info("Using authentification");
+    }
+    else
+    {
+      log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
+    }
+  }
+  
   public static void main(String[] args) throws Exception
   {
     
@@ -167,10 +188,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
-    int port = ctx.getBean(AnnisWebService.class).getPort();
+    int port = ctx.getBean(QueryService.class).getPort();
     try
     {
-      server = new Server(port);
+      // only allow connections from localhost
+      // if the administrator wants to allow external acccess he *has* to
+      // use a HTTP proxy which also should use SSL encryption
+      InetSocketAddress addr = new InetSocketAddress("localhost", port);
+      server = new Server(addr);
             
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -188,8 +213,34 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       };
       
       ServletHolder holder = new ServletHolder(jerseyContainer);
-      
       context.addServlet(holder, "/*");
+
+      
+      if(useAuthentification)
+      {
+        context.setInitParameter("shiroConfigLocations",
+        "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
+      }
+      else
+      {
+        context.setInitParameter("shiroConfigLocations",
+        "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
+      }
+      
+      EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
+      context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
+      // enable compression
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+      //  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+      ///  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      
+      // configure Apache Shiro with the web application
+      context.addEventListener(new EnvironmentLoaderListener());
+      EnumSet<DispatcherType> shiroDispatchers = EnumSet.of(
+        DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
+        DispatcherType.ERROR);
+      context.addFilter(ShiroFilter.class, "/*", shiroDispatchers);
       
     }
     catch (IllegalArgumentException ex)
@@ -242,7 +293,27 @@ public class AnnisServiceRunner extends AnnisBaseRunner
         }
       }
     }
-
-
   }
+
+  /**
+   * True if authorization is enabled.
+   * @return 
+   */
+  public boolean isUseAuthentification()
+  {
+    return useAuthentification;
+  }
+
+  /**
+   * Set wether you want to protect the service using authentification.
+   * 
+   * Default value is true.
+   * @param useAuthentification True if service should be authentificated, false if not.
+   */
+  public void setUseAuthentification(boolean useAuthentification)
+  {
+    this.useAuthentification = useAuthentification;
+  }
+  
+  
 }

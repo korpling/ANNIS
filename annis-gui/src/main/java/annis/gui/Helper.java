@@ -16,13 +16,15 @@
 package annis.gui;
 
 import annis.provider.SaltProjectProvider;
+import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Window;
@@ -34,6 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -43,24 +50,95 @@ import org.slf4j.LoggerFactory;
 public class Helper
 {
   
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
-  private static ThreadLocal<WebResource> annisWebResource = new ThreadLocal<WebResource>();
+  public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
   
-  public static WebResource createAnnisWebResource(String uri)
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
+  private static Client anonymousClient;
+  
+  
+  /**
+   * Creates an authentificiated REST client 
+   * @param userName
+   * @param password
+   * @return A newly created client.
+   */
+  public static Client createRESTClient(String userName, String password)
   {
-    ClientConfig rc = new DefaultClientConfig();
+    
+    DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
-    Client c = Client.create(rc);
-    return c.resource(uri);
+    
+    rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER, 
+        new ThreadSafeClientConnManager());
+    
+    if(userName != null && password != null)
+    {
+      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY, 
+        new UsernamePasswordCredentials(userName, password));
+      
+      rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, 
+        credentialsProvider);
+      rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+      
+    }
+    
+    Client c = ApacheHttpClient4.create(rc);
+    return c;
+  }
+  
+  /**
+   * Create a REST web service client which is not authentificated.
+   * @return A newly created client.
+   */
+  public static Client createRESTClient()
+  {
+    return createRESTClient(null, null);
+  }
+  
+  /**
+   * Gets or creates a web resource to the ANNIS service.
+   *
+   * @param uri The URI where the service can be found
+   * @param user The user object or null (should be of type {@link AnnisUser}).
+   * @return A reference to the ANNIS service root resource.
+   */
+  public static WebResource getAnnisWebResource(String uri, Object user)
+  {
+    
+    if(user != null && user instanceof AnnisUser)
+    {
+      return ((AnnisUser) user).getClient().resource(uri);
+    }
+    
+    // use the anonymous client
+    if(anonymousClient == null)
+    {
+      // anonymous client not created yet
+      anonymousClient = createRESTClient();
+    }
+    
+    return anonymousClient.resource(uri);
   }
 
+  /**
+   * Gets or creates a web resource to the ANNIS service.
+   *
+   * This is a convinience wrapper to {@link #getAnnisWebResource(java.lang.String, java.lang.Object) }
+   * that gets all the needed information from the Vaadin {@link Application}
+   * 
+   * @param app  The Vaadin application.
+   * @return A reference to the ANNIS service root resource.
+   */
   public static WebResource getAnnisWebResource(Application app)
   {
-    if(annisWebResource.get() == null)
-    {
-      annisWebResource.set(createAnnisWebResource(app.getProperty("AnnisWebService.URL")));
-    }
-    return annisWebResource.get();
+    // get URI used by the application
+    String uri = app.getProperty(KEY_WEB_SERVICE_URL);
+    
+    // if already authentificated the REST client is set as the "user" property
+    Object user  = app.getUser();
+    
+    return getAnnisWebResource(uri, user);
   }
 
 
@@ -109,19 +187,6 @@ public class Helper
     }
     return "ERROR";
   }
-
-  public static Map<Long, AnnisCorpus> calculateID2Corpus(
-    Map<String, AnnisCorpus> corpusMap)
-  {
-    TreeMap<Long, AnnisCorpus> result = new TreeMap<Long, AnnisCorpus>();
-    for (AnnisCorpus c : corpusMap.values())
-    {
-      result.put(c.getId(), c);
-    }
-    return result;
-  }
-  
-  
   
   public static CorpusConfig getCorpusConfig(String corpus, 
     Application app, Window window)
@@ -131,8 +196,8 @@ public class Helper
     
     try
     {
-      corpusConfig = Helper.getAnnisWebResource(app).path("corpora").
-        path(URLEncoder.encode(corpus, "UTF-8"))
+      corpusConfig = Helper.getAnnisWebResource(app).path("query")
+        .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
         .path("config").get(CorpusConfig.class);
     }
     catch(UnsupportedEncodingException ex)

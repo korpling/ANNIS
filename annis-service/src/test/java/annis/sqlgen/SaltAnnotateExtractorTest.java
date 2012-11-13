@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Comparator;
 
@@ -50,13 +49,13 @@ public class SaltAnnotateExtractorTest
 {
 
   // class under test
-  private CsvResultSetProvider resultSetProvider;
+  private CsvResultSetProvider resultSetProviderSingleText;
+  private CsvResultSetProvider resultSetProviderMultiText;
+  private SaltAnnotateExtractor instance;
   
   // dependencies
   private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<String>();
   
-  // test data
-  private SaltProject project;
 
   @Before
   public void setUp() throws SQLException
@@ -65,12 +64,13 @@ public class SaltAnnotateExtractorTest
     
     solutionKey.setKeyColumnName("key");
 
-    resultSetProvider = new CsvResultSetProvider(getClass().getResourceAsStream(
+    resultSetProviderSingleText = new CsvResultSetProvider(getClass().getResourceAsStream(
       "SampleAnnotateResult.csv"));
+    
+    resultSetProviderMultiText = new CsvResultSetProvider(getClass().getResourceAsStream(
+      "SampleAnnotateResult_MultiText.csv"));
 
-    ResultSet resultSet = resultSetProvider.getResultSet();
-
-    SaltAnnotateExtractor instance = new SaltAnnotateExtractor() {
+    instance = new SaltAnnotateExtractor() {
       protected SolutionKey<?> createSolutionKey() {
         return solutionKey;
       }
@@ -80,14 +80,14 @@ public class SaltAnnotateExtractorTest
 
     TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(instance);
 
-    project = instance.extractData(resultSet);
-    assertNotNull(project);
-
   }
 
   @Test
   public void testCorpusGraph() throws Exception
   {
+    SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
+    assertNotNull(project);
+    
     assertEquals(1, project.getSCorpusGraphs().size());
 
     SCorpusGraph corpusGraph = project.getSCorpusGraphs().get(0);
@@ -101,8 +101,11 @@ public class SaltAnnotateExtractorTest
   }
 
   @Test
-  public void testLayerNames()
+  public void testLayerNames() throws SQLException
   {
+    SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
+    assertNotNull(project);
+    
     SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
       getSDocumentGraph();
 
@@ -120,8 +123,11 @@ public class SaltAnnotateExtractorTest
   }
 
   @Test
-  public void testLayerNodes()
+  public void testLayerNodes() throws SQLException
   {
+    SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
+    assertNotNull(project);
+    
     SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
       getSDocumentGraph();
 
@@ -187,8 +193,11 @@ public class SaltAnnotateExtractorTest
   }
 
   @Test
-  public void testLayerRelations()
+  public void testLayerRelations() throws SQLException
   {
+    SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
+    assertNotNull(project);
+    
     SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
       getSDocumentGraph();
 
@@ -316,12 +325,12 @@ public class SaltAnnotateExtractorTest
     e = g.getSLayerByName("tiger").get(0).getSRelations();
     ECollections.sort(e, new EdgeComparator());
 
-    assertEquals(34, e.size());
+    assertEquals(17, e.size());
 
-    assertEquals("const_59", e.get(19).getSSource().getSName());
-    assertEquals("tok_160", e.get(19).getSTarget().getSName());
-    assertEquals("const_61", e.get(33).getSSource().getSName());
-    assertEquals("tok_156", e.get(33).getSTarget().getSName());
+    assertEquals("const_59", e.get(9).getSSource().getSName());
+    assertEquals("tok_160", e.get(9).getSTarget().getSName());
+    assertEquals("const_61", e.get(16).getSSource().getSName());
+    assertEquals("tok_156", e.get(16).getSTarget().getSName());
 
     // urml, only control samples //
     e = g.getSLayerByName("urml").get(0).getSRelations();
@@ -337,8 +346,11 @@ public class SaltAnnotateExtractorTest
   }
 
   @Test
-  public void testRelationType()
+  public void testRelationType() throws SQLException
   {
+    SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
+    assertNotNull(project);
+    
     SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
       getSDocumentGraph();
 
@@ -367,6 +379,19 @@ public class SaltAnnotateExtractorTest
         }
       }
     }
+  }
+  
+  @Test
+  public void testMultipleTextGeneration() throws SQLException
+  {
+    SaltProject project = instance.extractData(resultSetProviderMultiText.getResultSet());
+    assertNotNull(project);
+    
+    SDocumentGraph g = project.getSCorpusGraphs().get(0)
+      .getSDocuments().get(0).getSDocumentGraph();
+    
+    assertEquals(3, g.getSTextualDSs().size());
+    
   }
 
   public static class NameComparator implements Comparator<SNamedElement>

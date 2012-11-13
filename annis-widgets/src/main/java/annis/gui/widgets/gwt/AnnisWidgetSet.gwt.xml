@@ -38,4 +38,6 @@
     
     <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
     
+
+    <inherits name="org.vaadin.jonatan.contexthelp.widgetset.ContexthelpWidgetset" />
 </module>

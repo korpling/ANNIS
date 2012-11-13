@@ -38,11 +38,6 @@
     <property name="password" value="$dao{datasource.password}"/>
   </bean>
 
-
-  <bean id="countExtractor" class="annis.dao.CountExtractor" lazy-init="true">
-    <property name="matchedNodesViewName" value="${annis.matched-nodes-view}" />
-  </bean>
-
 	<!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
 
@@ -90,6 +85,7 @@
     <property name="timeout" value="${annis.sql-timeout}"/>
 
     <property name="countSqlGenerator" ref="countSqlGenerator"/>
+    <property name="countMatchesAndDocumentsSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
     <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
     <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
@@ -115,15 +111,14 @@
     </property>
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-    <property name="countExtractor" ref="countExtractor"/>
-
+    
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
 
   </bean>
 
 	<!-- base bean for exported Database API for administration tasks -->
-  <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
+  <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" init-method="init" lazy-init="true">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />

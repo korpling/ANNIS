@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.extensions;
+package annis.service.objects;
 
-import annis.ql.parser.QueryData;
+import java.io.Serializable;
 
-import java.net.URI;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class is only a wrapper to transport the salt ids with the
@@ -26,6 +27,25 @@ import java.util.ArrayList;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class SaltURIs extends ArrayList<URI>
+@XmlRootElement
+public class SaltURIGroupSet implements Serializable
 {
+  private Map<Integer, SaltURIGroup> groups;
+  
+  public SaltURIGroupSet()
+  {
+    groups = new TreeMap<Integer, SaltURIGroup>();
+  }
+
+  public Map<Integer, SaltURIGroup> getGroups()
+  {
+    return groups;
+  }
+
+  public void setGroups(Map<Integer, SaltURIGroup> groups)
+  {
+    this.groups = groups;
+  }
+  
+  
 }

@@ -26,20 +26,20 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.BinaryResourceImpl;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.XMLParserPool;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLParserPoolImpl;
 import org.slf4j.LoggerFactory;
@@ -54,15 +54,22 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
-  private static ThreadLocal<XMLParserPool> xmlParserPool = 
-    new ThreadLocal<XMLParserPool>();
+  private static XMLParserPool xmlParserPool = 
+    new XMLParserPoolImpl();
+  
+  public static final MediaType APPLICATION_XMI_BINARY = new MediaType("application",
+    "xmi+binary");
+  public static final MediaType APPLICATION_XMI_XML = new MediaType("application",
+    "xmi+xml");
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,
     Annotation[] annotations, MediaType mediaType)
   {
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
-      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType))
+      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
+      || APPLICATION_XMI_BINARY.isCompatible(mediaType)
+      || APPLICATION_XMI_XML.isCompatible(mediaType))
       && SaltProject.class.isAssignableFrom(type);
   }
 
@@ -82,7 +89,17 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     throws IOException, WebApplicationException
   {
 
-    Resource resource = new XMIResourceImpl();
+    
+    Resource resource;
+    if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
+    {
+      resource = new BinaryResourceImpl();
+    }
+    else
+    {
+      resource = new XMIResourceImpl();
+    }
+    
     // add the project itself
     resource.getContents().add(project);
 
@@ -113,7 +130,9 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     Annotation[] annotations, MediaType mediaType)
   {
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
-      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType))
+      || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
+      || APPLICATION_XMI_BINARY.isCompatible(mediaType)
+      || APPLICATION_XMI_XML.isCompatible(mediaType))
       && SaltProject.class.isAssignableFrom(type);
   }
 
@@ -124,28 +143,23 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     IOException,
     WebApplicationException
   {
-    ResourceSet resourceSet = new ResourceSetImpl();
-    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
-      SaltCommonPackage.eINSTANCE);
-    
-    
-    XMIResourceImpl resource = new XMIResourceImpl();
-    resourceSet.getResources().add(resource);
-    
-    if(xmlParserPool.get() == null)
+   
+    Resource resource;
+    if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
     {
-      xmlParserPool.set(new XMLParserPoolImpl());
+      resource = loadBinary(entityStream);
+    }
+    else
+    {
+      resource = loadXMI(entityStream);
     }
     
-    Map<Object,Object> options = resource.getDefaultLoadOptions();
-    options.put(XMLResource.OPTION_USE_PARSER_POOL, xmlParserPool.get());
-    options.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
-    resource.load(entityStream, null);
-
     SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
     
-    for(EObject o : resource.getContents())
+    TreeIterator<EObject> itContents = resource.getAllContents();
+    while(itContents.hasNext())
     {
+      EObject o = itContents.next();
       if(o instanceof SaltProject)
       {
         project = (SaltProject) o;
@@ -155,4 +169,40 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     
     return project;
   }
+  
+  private BinaryResourceImpl loadBinary(InputStream entityStream) throws IOException
+  {
+    BinaryResourceImpl resource = new BinaryResourceImpl();
+    
+    ResourceSet resourceSet = new ResourceSetImpl();
+    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
+      SaltCommonPackage.eINSTANCE);
+
+    resourceSet.getResources().add(resource);
+
+
+    resource.load(entityStream, null);
+    
+    return resource;
+  }
+  
+  private XMIResourceImpl loadXMI(InputStream entityStream) throws IOException
+  {
+    XMIResourceImpl resource = new XMIResourceImpl();
+    
+    ResourceSet resourceSet = new ResourceSetImpl();
+    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
+      SaltCommonPackage.eINSTANCE);
+
+    resourceSet.getResources().add(resource);
+    
+    Map<Object,Object> options = resource.getDefaultLoadOptions();
+    options.put(XMIResource.OPTION_USE_PARSER_POOL, xmlParserPool);
+    options.put(XMIResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
+
+    resource.load(entityStream, null);
+    
+    return resource;
+  }
+
 }

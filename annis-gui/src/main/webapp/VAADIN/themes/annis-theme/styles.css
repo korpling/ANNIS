@@ -24,6 +24,14 @@
   padding: 0px;
 }
 
+.result-view .v-panel-content-result-view {
+  overflow-y: scroll;
+}
+
+.result-view-css {
+  width: 100%;
+}
+
 .single-result .v-table-cell-content {
   padding: 0px 6px;
 }
@@ -44,6 +52,9 @@
   cursor: pointer;
 }
 
+.drag-source-enabled {
+  cursor: move;
+}
 
 .toolbar .v-panel-content {
   background-color: #ecf0f6;
@@ -91,6 +102,17 @@ textarea.license {
 
 textarea.query {
   font-family: monospace;
+}
+
+.tigerquery-builder-canvas {
+  z-index: 0;
+}
+.tigerquery-builder-overlay {
+  z-index: 10;
+}
+
+.contextsensible-formlayout .v-filterselect {
+  float:left;
 }
 
 /* matched node colors by match index*/

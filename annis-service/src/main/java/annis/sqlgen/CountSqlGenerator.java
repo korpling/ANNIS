@@ -23,14 +23,9 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-
-
-public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
+public class CountSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator<Integer>
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
 
-	@SuppressWarnings("rawtypes")
-	private SqlGenerator findSqlGenerator;
-	
 	@Override
 	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {
 		return "\n" + indent + TABSTOP + "count(*)";
@@ -39,30 +34,10 @@ public class CountSqlGenerator extends AbstractSqlGenerator<Integer>
 	@Override
 	public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
 		int sum = 0;
-		while (rs.next())
-			sum += rs.getInt(1);
-		return sum;	
+	  while (rs.next())
+    {
+		  sum += rs.getInt(1);
+    }
+	  return sum;
 	}
-
-	@Override
-	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append(indent).append("(\n");
-    
-		sb.append(indent).append(TABSTOP);
-		sb.append(findSqlGenerator.toSql(queryData, indent + TABSTOP));
-		sb.append(indent).append(TABSTOP).append(") AS solutions");
-		
-		return sb.toString();
-	}
-
-	public SqlGenerator getFindSqlGenerator() {
-		return findSqlGenerator;
-	}
-
-	public void setFindSqlGenerator(@SuppressWarnings("rawtypes") SqlGenerator findSqlGenerator) {
-		this.findSqlGenerator = findSqlGenerator;
-	}
-
 }

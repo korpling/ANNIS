@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.security;
+package annis.service.objects;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class IllegalCorpusAccessException extends Exception
+@XmlRootElement
+public class SaltURIGroup implements Serializable
 {
+  private List<URI> uris;
 
-  /**
-   * Creates a new instance of <code>IllegalCorpusAccessException</code> without detail message.
-   */
-  public IllegalCorpusAccessException()
+  public SaltURIGroup()
   {
+    uris = new ArrayList<URI>();
+  }
+  
+  public List<URI> getUris()
+  {
+    return uris;
   }
 
-  /**
-   * Constructs an instance of <code>IllegalCorpusAccessException</code> with the specified detail message.
-   * @param msg the detail message.
-   */
-  public IllegalCorpusAccessException(String msg)
+  public void setUris(List<URI> uris)
   {
-    super(msg);
+    this.uris = uris;
   }
+  
+  
 }

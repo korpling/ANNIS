@@ -20,10 +20,13 @@ import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.TigerQueryBuilder;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
-import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
-import annis.security.SimpleSecurityManager;
 import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.terminal.ParameterHandler;
@@ -39,8 +42,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.netomi.vaadin.screenshot.Screenshot;
 import org.slf4j.LoggerFactory;
@@ -70,13 +73,14 @@ public class SearchWindow extends Window
   private TabSheet mainTab;
   private Window windowLogin;
   private ResultViewPanel resultView;
-  private AnnisSecurityManager securityManager;
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
   private String bugEMailAddress;
   
   private boolean warnedAboutMediaFormat = false;
 
+  public final static int CONTROL_PANEL_WIDTH = 360;
+  
   public SearchWindow(PluginSystem ps)
   {
     super("ANNIS Corpus Search");
@@ -84,7 +88,9 @@ public class SearchWindow extends Window
     this.ps = ps;
     
     setName("search");
-
+    // always get the resize events directly
+    setImmediate(true);
+    
     getContent().setSizeFull();
     ((VerticalLayout) getContent()).setMargin(false);
 
@@ -191,7 +197,7 @@ public class SearchWindow extends Window
     ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
 
     control = new ControlPanel(this);
-    control.setWidth(30f, Layout.UNITS_EM);
+    control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);
 
@@ -268,22 +274,12 @@ public class SearchWindow extends Window
     
     btBugReport.setVisible(this.bugEMailAddress != null);
     
-    initSecurityManager();
     updateUserInformation();
 
   }
 
   public void evaluateCitation(String relativeUri)
   {
-
-    AnnisUser user = (AnnisUser) getApplication().getUser();
-    if (user == null)
-    {
-      return;
-    }
-
-    Map<String, AnnisCorpus> userCorpora = user.getCorpusList();
-
     Matcher m = citationPattern.matcher(relativeUri);
     if (m.matches())
     {
@@ -295,20 +291,25 @@ public class SearchWindow extends Window
       }
 
       // CIDS      
-      HashMap<String, AnnisCorpus> selectedCorpora =
-        new HashMap<String, AnnisCorpus>();
+      Set<String> selectedCorpora = new HashSet<String>();
       if (m.group(2) != null)
       {
         String[] cids = m.group(2).split(",");
-        for (String name : cids)
-        {
-          AnnisCorpus c = userCorpora.get(name);
-          if (c != null)
-          {
-            selectedCorpora.put(c.getName(), c);
-          }
-        }
+        selectedCorpora.addAll(Arrays.asList(cids));
       }
+      
+      // filter by actually avaible user corpora in order not to get any exception later
+      WebResource res = Helper.getAnnisWebResource(getApplication());
+      List<AnnisCorpus> userCorpora =
+        res.path("query").path("corpora").
+        get(new GenericType<List<AnnisCorpus>>(){});
+      LinkedList<String> userCorporaStrings = new LinkedList<String>();
+      for(AnnisCorpus c : userCorpora)
+      {
+        userCorporaStrings.add(c.getName());
+      }
+      
+      selectedCorpora.retainAll(userCorporaStrings);
 
       // CLEFT and CRIGHT
       if (m.group(4) != null && m.group(6) != null)
@@ -345,32 +346,20 @@ public class SearchWindow extends Window
     }
   }
 
-  private void initSecurityManager()
-  {
-    securityManager = new SimpleSecurityManager();
-
-    Enumeration<?> parameterNames = getApplication().getPropertyNames();
-    Properties properties = new Properties();
-    while (parameterNames.hasMoreElements())
-    {
-      String name = (String) parameterNames.nextElement();
-      properties.put(name, getApplication().getProperty(name));
-    }
-    securityManager.setProperties(properties);
-    getApplication().setUser(null);
-  }
-
   public void updateUserInformation()
   {
-    AnnisUser user = (AnnisUser) getApplication().getUser();
-    if (btLoginLogout == null || lblUserName == null || user == null)
+    if (btLoginLogout == null || lblUserName == null)
     {
       return;
     }
     if (isLoggedIn())
     {
-      lblUserName.setValue("logged in as \"" + user.getUserName() + "\"");
-      btLoginLogout.setCaption("Logout");
+      Object user = getApplication().getUser();
+      if(user instanceof AnnisUser)
+      {
+        lblUserName.setValue("logged in as \"" + ((AnnisUser) user).getUserName() + "\"");
+        btLoginLogout.setCaption("Logout");
+      }
     }
     else
     {
@@ -379,7 +368,7 @@ public class SearchWindow extends Window
     }
   }
 
-  public void showQueryResult(String aql, Map<String, AnnisCorpus> corpora,
+  public void showQueryResult(String aql, Set<String> corpora,
     int contextLeft,
     int contextRight, String segmentationLayer, int pageSize)
   {
@@ -492,24 +481,52 @@ public class SearchWindow extends Window
   {
     try
     {
-      AnnisUser newUser = securityManager.login(event.getLoginParameter(
-        "username"),
-        event.getLoginParameter("annis-gui-password"), true);
-      getApplication().setUser(newUser);
-      showNotification("Logged in as \"" + newUser.getUserName() + "\"",
-        Window.Notification.TYPE_TRAY_NOTIFICATION);
+      // forget old user information
+      getApplication().setUser(null);
+      
+      String userName = event.getLoginParameter("username");
+      
+      Client client = Helper.createRESTClient(userName, 
+        event.getLoginParameter("annis-gui-password"));
+      
+      // check if this is valid user/password combination
+      WebResource res = client.resource(getApplication()
+        .getProperty(Helper.KEY_WEB_SERVICE_URL))
+        .path("admin").path("is-authenticated");
+      if("true".equalsIgnoreCase(res.get(String.class)))
+      {
+        // everything ok, save this user configuration for re-use
+        getApplication().setUser(new AnnisUser(userName, client));
+        
+        showNotification("Logged in as \"" + userName + "\"",
+          Window.Notification.TYPE_TRAY_NOTIFICATION);
+      }
     }
-    catch (AuthenticationException ex)
+    catch (ClientHandlerException ex)
     {
       showNotification("Authentification error: " + ex.getMessage(),
-        Window.Notification.TYPE_ERROR_MESSAGE);
+        Window.Notification.TYPE_WARNING_MESSAGE);
+    }
+    catch(UniformInterfaceException ex)
+    {
+      if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+      {
+        getWindow().showNotification("Username or password wrong", ex.getMessage(), 
+          Notification.TYPE_WARNING_MESSAGE);
+      }
+      else
+      {
+        log.error(null, ex);
+        showNotification("Unexpected exception: " + ex.getMessage(),
+          Window.Notification.TYPE_WARNING_MESSAGE);
+      }
     }
     catch (Exception ex)
     {
       log.error(null, ex);
 
       showNotification("Unexpected exception: " + ex.getMessage(),
-        Window.Notification.TYPE_ERROR_MESSAGE);
+        Window.Notification.TYPE_WARNING_MESSAGE);
     }
     finally
     {
@@ -521,15 +538,7 @@ public class SearchWindow extends Window
 
   public boolean isLoggedIn()
   {
-    AnnisUser u = (AnnisUser) getApplication().getUser();
-    if (u == null || AnnisSecurityManager.FALLBACK_USER.equals(u.getUserName()))
-    {
-      return false;
-    }
-    else
-    {
-      return true;
-    }
+    return getApplication().getUser() != null;
   }
 
   @Override
@@ -537,12 +546,6 @@ public class SearchWindow extends Window
   {
     return "Search";
   }
-
-  public AnnisSecurityManager getSecurityManager()
-  {
-    return securityManager;
-  }
-
   public ControlPanel getControl()
   {
     return control;
@@ -598,7 +601,7 @@ public class SearchWindow extends Window
           + " or use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_ERROR_MESSAGE, true);
+          Window.Notification.TYPE_WARNING_MESSAGE, true);
       }
       else
       {
@@ -606,7 +609,7 @@ public class SearchWindow extends Window
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_ERROR_MESSAGE, true);
+          Window.Notification.TYPE_WARNING_MESSAGE, true);
       }
 
       

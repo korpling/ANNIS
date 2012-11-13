@@ -18,15 +18,13 @@ package annis.gui.controlpanel;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.gui.Helper;
-import annis.gui.MainApp;
-import annis.security.AnnisSecurityManager;
-import annis.security.AnnisUser;
+import annis.security.AnnisUserConfig;
+import annis.security.CorpusSet;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
 import com.vaadin.Application.UserChangeEvent;
 import com.vaadin.Application.UserChangeListener;
 import com.vaadin.data.Item;
@@ -52,21 +50,20 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import javax.naming.AuthenticationException;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
-public class CorpusListPanel extends Panel implements UserChangeListener,
+public class CorpusListPanel extends VerticalLayout implements UserChangeListener,
   AbstractSelect.NewItemHandler, Action.Handler, ParameterHandler
 {
 
@@ -86,18 +83,16 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   private Table tblCorpora;
   private ControlPanel controlPanel;
   private ComboBox cbSelection;
-  private Map<String, Map<String, AnnisCorpus>> corpusSets =
-    new TreeMap<String, Map<String, AnnisCorpus>>();
+  private transient AnnisUserConfig userConfig;
+  private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
 
   public CorpusListPanel(ControlPanel controlPanel)
   {
     this.controlPanel = controlPanel;
     final CorpusListPanel finalThis = this;
     
-    setSizeFull();
-
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setSizeFull();
+    setHeight("99%");
+    setWidth("99%");
 
     HorizontalLayout selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");
@@ -121,7 +116,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       @Override
       public void valueChange(ValueChangeEvent event)
       {
-        updateCorpusList();
+        updateCorpusTable();
       }
     });
 
@@ -131,7 +126,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
 
-    layout.addComponent(selectionLayout);
+    addComponent(selectionLayout);
 
     tblCorpora = new Table();
     addComponent(tblCorpora);
@@ -172,7 +167,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       }
     });
     
-    layout.setExpandRatio(tblCorpora, 1.0f);
+    setExpandRatio(tblCorpora, 1.0f);
 
     Button btReload = new Button();
     btReload.addListener(new Button.ClickListener()
@@ -181,15 +176,6 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        MainApp app = (MainApp) getApplication();
-        try
-        {
-          app.getWindowSearch().getSecurityManager().updateUserCorpusList(app.getUser(), true);
-        }
-        catch (AuthenticationException ex)
-        {
-          log.error(null, ex);
-        }
         updateCorpusSetList(false);
         getWindow().showNotification("Reloaded corpus list", 
           Notification.TYPE_HUMANIZED_MESSAGE);
@@ -234,7 +220,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         cbSelection.setValue(selectedSet);
       }
       
-      updateCorpusList();
+      updateCorpusTable();
     }
   }
   
@@ -242,120 +228,111 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     updateCorpusSetList(true);
   }
-
+  
   private void updateCorpusSetList(boolean showLoginMessage)
   {
-    corpusSets.clear();
-
-
-    AnnisUser user = (AnnisUser) getApplication().getUser();
-    Map<String, AnnisCorpus> allCorpora = getCorpusList(user);
-    corpusSets.put(ALL_CORPORA, allCorpora);
-
-    if (user != null)
+    if(queryServerForCorpusList() && userConfig != null)
     {
-      if (user.getUserName().equals(AnnisSecurityManager.FALLBACK_USER))
+      if(getApplication().getUser() == null)
       {
-        if (corpusSets.get(ALL_CORPORA).isEmpty())
+        if(showLoginMessage)
         {
-          getWindow().showNotification("No corpora found. Please login "
-            + "(use button at upper right corner) to see more corpora.",
-            Notification.TYPE_HUMANIZED_MESSAGE);
-        }
-        else if(showLoginMessage)
-        {
-          getWindow().showNotification(
-            "You can login (use button at upper right corner) to see more corpora",
-            Notification.TYPE_TRAY_NOTIFICATION);
-        }
-      }
-
-      for (String p : user.stringPropertyNames())
-      {
-        if (p.startsWith(CORPUSSET_PREFIX))
-        {
-          String setName = p.substring(CORPUSSET_PREFIX.length());
-          Map<String, AnnisCorpus> corpora = new TreeMap<String, AnnisCorpus>();
-
-          String corpusString = user.getProperty(p);
-          if (!ALL_CORPORA.equals(setName) && corpusString != null)
+          if(allCorpora.isEmpty())
           {
-            String[] splitted = corpusString.split(",");
-            for (String s : splitted)
-            {
-              if (!"".equals(s))
-              {
-                try
-                {
-                  AnnisCorpus c = allCorpora.get(s);
-                  if (c != null)
-                  {
-                    corpora.put(c.getName(), c);
-                  }
-                }
-                catch (NumberFormatException ex)
-                {
-                  log.warn("invalid number in corpus set " + setName, ex);
-                }
-              }
-            }
-            corpusSets.put(setName, corpora);
+            getWindow().showNotification("No corpora found. Please login "
+                + "(use button at upper right corner) to see more corpora.",
+                Notification.TYPE_HUMANIZED_MESSAGE);
+          }
+          else
+          {
+            getWindow().showNotification(
+              "You can login (use button at upper right corner) to get access to more corpora",
+              Notification.TYPE_TRAY_NOTIFICATION);
           }
         }
       }
-    } // end if user not null
 
-    Object oldSelection = cbSelection.getValue();
-    cbSelection.removeAllItems();
-    for (String n : corpusSets.keySet())
-    {
-      cbSelection.addItem(n);
-    }
-    if (oldSelection != null && cbSelection.containsId(oldSelection))
-    {
-      cbSelection.select(oldSelection);
-    }
-    else
-    {
-      cbSelection.select(ALL_CORPORA);
-    }
+      Object oldSelection = cbSelection.getValue();
+      cbSelection.removeAllItems();
+      cbSelection.addItem(ALL_CORPORA);
 
-    updateCorpusList();
+      // add the corpus set names in sorted order
+      TreeSet<String> corpusSetNames = new TreeSet<String>();
+      for (CorpusSet cs : userConfig.getCorpusSets())
+      {
+        corpusSetNames.add(cs.getName());
+      }
+      for(String s : corpusSetNames)
+      {
+        cbSelection.addItem(s);
+      }
 
+      // restore old selection or select the ALL corpus selection
+      if (oldSelection != null && cbSelection.containsId(oldSelection))
+      {
+        cbSelection.select(oldSelection);
+      }
+      else
+      {
+        cbSelection.select(ALL_CORPORA);
+      }
+
+      updateCorpusTable();
+    } // end if querying the server for corpus list was successful
   }
 
-  private void updateCorpusList()
+  private void updateCorpusTable()
   {
     corpusContainer.removeAllItems();
-    String selectedCorpusSet = (String) cbSelection.getValue();
-    if (selectedCorpusSet == null)
+    String selectedCorpusSetName = (String) cbSelection.getValue();
+    
+    if (selectedCorpusSetName == null || ALL_CORPORA.equals(selectedCorpusSetName))
     {
-      selectedCorpusSet = ALL_CORPORA;
+      // add all corpora
+      corpusContainer.addAll(allCorpora);
     }
-    if (corpusSets.containsKey(selectedCorpusSet))
+    else if(userConfig != null)
     {
-      corpusContainer.addAll(corpusSets.get(selectedCorpusSet).values());
+      // TODO: use map
+      CorpusSet selectedCS = null;
+      for(CorpusSet cs : userConfig.getCorpusSets())
+      {
+        if(cs.getName().equals(selectedCorpusSetName))
+        {
+          selectedCS = cs;
+        }
+      }
+      if(selectedCS != null)
+      {
+        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<AnnisCorpus>();
+        for(AnnisCorpus c : allCorpora)
+        {
+          if(selectedCS.getCorpora().contains(c.getName()))
+          {
+            shownCorpora.add(c);
+          }
+        }
+        corpusContainer.addAll(shownCorpora);
+      }
     }
     tblCorpora.sort();
   }
 
-  private Map<String, AnnisCorpus> getCorpusList(AnnisUser user)
+  /**
+   * Queries the web service and sets the {@link #allCorpora} and {@link #userConfig} members.
+   * @return True if successfull
+   */
+  private boolean queryServerForCorpusList()
   {
-    Map<String, AnnisCorpus> result = new TreeMap<String, AnnisCorpus>();
     try
     {
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      loadFromRemote();
+      
+      WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+      allCorpora = rootRes.path("query").path("corpora")
+        .get(new GenericType<List<AnnisCorpus>>(){});
 
-      List<AnnisCorpus> corpora = res.path("corpora").get(new GenericType<List<AnnisCorpus>>()
-      {
-      });
-      for (AnnisCorpus c : corpora)
-      {
-        if (user == null || user.getCorpusNameList().contains(c.getName()))
-        {
-          result.put(c.getName(), c);
-        }
-      }
+      return true;
     }
     catch (ClientHandlerException ex)
     {
@@ -367,11 +344,19 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
     catch (UniformInterfaceException ex)
     {
-      log.error(
-        null, ex);
-      getWindow().showNotification("Remote exception: "
-        + ex.getLocalizedMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
+      if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+      {
+        getWindow().showNotification("You are not authorized to get the corpus list.", ex.getMessage(), 
+          Notification.TYPE_WARNING_MESSAGE);
+      }
+      else
+      {
+        log.error(
+          null, ex);
+        getWindow().showNotification("Remote exception: "
+          + ex.getLocalizedMessage(),
+          Notification.TYPE_TRAY_NOTIFICATION);
+      }
     }
     catch (Exception ex)
     {
@@ -381,7 +366,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
         + ex.getLocalizedMessage(),
         Notification.TYPE_TRAY_NOTIFICATION);
     }
-    return result;
+    return false;
   }
 
   @Override
@@ -389,44 +374,51 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
     updateCorpusSetList();
   }
+  
+  private void loadFromRemote()
+  {
+    WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+    // get the current corpus configuration
+    this.userConfig = rootRes.path("admin").path("userconfig").get(AnnisUserConfig.class);
+  }
+  
+  private void storeChangesRemote()
+  {
+     WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+    // store the config on the server
+    rootRes.path("admin").path("userconfig").post(this.userConfig);
+  }
 
   @Override
   public void addNewItem(String newItemCaption)
   {
-    if (!cbSelection.containsId(newItemCaption))
+    if (!cbSelection.containsId(newItemCaption) && this.userConfig != null)
     {
       cbSelection.addItem(newItemCaption);
       cbSelection.setValue(newItemCaption);
 
-      corpusSets.put(newItemCaption, new TreeMap<String, AnnisCorpus>());
-      updateCorpusList();
-
-      // add the new item to the user configuration
-      Application app = getApplication();
-      if (app instanceof MainApp)
+      try
       {
-        AnnisSecurityManager sm = ((MainApp) app).getSecurityManager();
-        AnnisUser user = (AnnisUser) app.getUser();
-        if (sm != null
-          && !AnnisSecurityManager.FALLBACK_USER.equals(user.getUserName()))
-        {
-          user.put(CORPUSSET_PREFIX + newItemCaption, "");
-          try
-          {
-            sm.storeUserProperties(user);
-          }
-          catch (Exception ex)
-          {
-            log.error(
-              "could not store new corpus set", ex);
-            getWindow().showNotification("Could not store new corpus set: "
-              + ex.getLocalizedMessage(),
-              Notification.TYPE_ERROR_MESSAGE);
-          }
+        loadFromRemote();
+        // add new corpus set to the config
+        CorpusSet newSet = new CorpusSet();
+        newSet.setName(newItemCaption);
+        this.userConfig.getCorpusSets().add(newSet);
+        // store the config on the server
+        storeChangesRemote();
 
-        }
+        // update everything else
+        updateCorpusTable();
       }
-    }
+      catch (ClientHandlerException ex)
+      {
+        log.error(
+          "could not store new corpus set", ex);
+        getWindow().showNotification("Could not store new corpus set: "
+          + ex.getLocalizedMessage(),
+          Notification.TYPE_WARNING_MESSAGE);
+      }
+    } // end if new item
   }
 
   @Override
@@ -435,32 +427,35 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     String corpusName = (String) target;
     LinkedList<Action> result = new LinkedList<Action>();
 
-    AnnisUser user = (AnnisUser) getApplication().getUser();
-    if (user == null || AnnisSecurityManager.FALLBACK_USER.equals(user.
-      getUserName()))
+    if(target == null)
     {
+      // no action for empty space
       return new Action[0];
     }
-
-    for (Map.Entry<String, Map<String, AnnisCorpus>> entry :
-      corpusSets.entrySet())
+    
+    if (getApplication().getUser() == null)
     {
-      if (entry.getValue() != null && !ALL_CORPORA.equals(entry.getKey())
-        && corpusName != null)
+      // we can't change anything if we are not logged in so don't even try
+      return new Action[0];
+    }
+    
+    if(userConfig != null)
+    {
+      for (CorpusSet entry : userConfig.getCorpusSets())
       {
-        if (entry.getValue().containsKey(corpusName))
+        if(entry.getCorpora().contains(corpusName))
         {
+          AddRemoveAction action = new AddRemoveAction(ActionType.Remove, entry,
+            corpusName, "Remove from " + entry.getName());
           // add possibility to remove
-          result.add(new AddRemoveAction(ActionType.Remove, entry.getKey(),
-            corpusName,
-            "Remove from " + entry.getKey()));
+          result.add(action);
         }
         else
         {
+          AddRemoveAction action = new AddRemoveAction(ActionType.Add, entry,
+            corpusName, "Add to " + entry.getName());
           // add possibility to add
-          result.add(new AddRemoveAction(ActionType.Add, entry.getKey(),
-            corpusName,
-            "Add to " + entry.getKey()));
+          result.add(action);
         }
       }
     }
@@ -471,72 +466,38 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   @Override
   public void handleAction(Action action, Object sender, Object target)
   {
-    if(action instanceof AddRemoveAction)
+    if (action instanceof AddRemoveAction && this.userConfig != null)
     {
       AddRemoveAction a = (AddRemoveAction) action;
 
-      Map<String, AnnisCorpus> set = corpusSets.get(a.getCorpusSet());
-      Map<String, AnnisCorpus> allCorpora = corpusSets.get(ALL_CORPORA);
 
-      if (a.type == ActionType.Remove)
+      int idx = this.userConfig.getCorpusSets().indexOf(a.getCorpusSet());
+      if (idx > -1)
       {
-        set.remove(a.getCorpusId());
-        if (set.isEmpty())
+        CorpusSet set = this.userConfig.getCorpusSets().get(idx);
+          
+        if (a.type == ActionType.Remove)
         {
-          // remove the set itself when it gets empty
-          corpusSets.remove(a.getCorpusSet());
-          cbSelection.removeItem(a.getCorpusSet());
-          cbSelection.select(ALL_CORPORA);
-        }
-      }
-      else if (a.type == ActionType.Add)
-      {
-        set.put(a.getCorpusId(), allCorpora.get(a.getCorpusId()));
-      }
-
-      // save to file
-      Application app = getApplication();
-      if (app instanceof MainApp)
-      {
-        AnnisSecurityManager sm = ((MainApp) app).getSecurityManager();
-        AnnisUser user = (AnnisUser) app.getUser();
-
-        LinkedList<String> keys = new LinkedList<String>(
-          user.stringPropertyNames());
-
-        for (String key : keys)
-        {
-          if (key.startsWith(CORPUSSET_PREFIX))
+          set.getCorpora().remove(a.getCorpusId());
+          if (set.getCorpora().isEmpty())
           {
-            user.remove(key);
+            // remove the set itself when it gets empty
+            this.userConfig.getCorpusSets().remove(set);
+        
+            cbSelection.removeItem(a.getCorpusSet().getName());
+            cbSelection.select(ALL_CORPORA);
           }
         }
-
-        for (Map.Entry<String, Map<String, AnnisCorpus>> entry : corpusSets.
-          entrySet())
+        else if (a.type == ActionType.Add)
         {
-          if (!ALL_CORPORA.equals(entry.getKey()))
-          {
-            String key = CORPUSSET_PREFIX + entry.getKey();
-            String value = StringUtils.join(entry.getValue().keySet(), ",");
-
-            user.setProperty(key, value);
-          }
+          set.getCorpora().add(a.getCorpusId());
         }
 
-        try
-        {
-          sm.storeUserProperties(user);
-        }
-        catch (Exception ex)
-        {
-          log.error(null,
-            ex);
-        }
+        storeChangesRemote();
+        
+        // update view
+        updateCorpusTable();
       }
-
-      // update view
-      updateCorpusList();
     }
   }
 
@@ -568,24 +529,23 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     }
   }
 
-  protected void selectCorpora(Map<String, AnnisCorpus> corpora)
+  protected void selectCorpora(Set<String> corpora)
   {
     if (tblCorpora != null)
     {
-      tblCorpora.setValue(new HashSet<String>(corpora.keySet()));
+      tblCorpora.setValue(corpora);
     }
   }
 
-  protected Map<String, AnnisCorpus> getSelectedCorpora()
+  protected Set<String> getSelectedCorpora()
   {
-    HashMap<String, AnnisCorpus> result = new HashMap<String, AnnisCorpus>();
+    Set<String> result = new HashSet<String>();
 
     for (String id : corpusContainer.getItemIds())
     {
       if (tblCorpora.isSelected(id))
       {
-        AnnisCorpus c = (AnnisCorpus) corpusContainer.getItem(id).getBean();
-        result.put(id, c);
+        result.add(id);
       }
     }
 
@@ -602,7 +562,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
-      l.setDescription(c.getName());
+      l.setDescription("show metadata and annotations for " + c.getName());
 
       l.addListener(new Button.ClickListener()
       {
@@ -643,10 +603,10 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
   {
 
     private ActionType type;
-    private String corpusSet;
+    private CorpusSet corpusSet;
     private String corpusId;
 
-    public AddRemoveAction(ActionType type, String corpusSet, String corpusId,
+    public AddRemoveAction(ActionType type, CorpusSet corpusSet, String corpusId,
       String caption)
     {
       super(caption);
@@ -665,9 +625,12 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       return corpusId;
     }
 
-    public String getCorpusSet()
+    public CorpusSet getCorpusSet()
     {
       return corpusSet;
     }
+
+    
+    
   }
 }

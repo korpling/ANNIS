@@ -32,11 +32,11 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.ByteArrayInputStream;
@@ -48,6 +48,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,9 +91,7 @@ public class VisualizerPanel extends CustomLayout
   private String resultID;;
   private transient VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
-  private transient STextualDS text;
   private String segmentationName;
-  private boolean showTextID;
   private final String PERMANENT = "permanent";
   private final String ISVISIBLE = "visible";
   private final String HIDDEN = "hidden";
@@ -93,7 +99,9 @@ public class VisualizerPanel extends CustomLayout
 
   private final static String htmlTemplate = 
     "<div id=\":id\"><div location=\"btEntry\"></div>"
-    + "<div location=\"iframe\"></div></div>";
+    + "<div location=\"progress\"></div>"
+    + "<div location=\"iframe\"></div>"
+    + "</div>";
     
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -108,13 +116,11 @@ public class VisualizerPanel extends CustomLayout
     Map<SNode, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
     @Deprecated Map<String, String> markedExactMap,
-    STextualDS text,
     String htmlID,
     String resultID,
     SingleResultPanel parent,
     String segmentationName,
-    PluginSystem ps,
-    boolean showTextID) throws IOException
+    PluginSystem ps) throws IOException
   {
     super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes("UTF-8")));
 
@@ -130,12 +136,9 @@ public class VisualizerPanel extends CustomLayout
     this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
-    this.text = text;
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
-
-    this.showTextID = showTextID;
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -157,8 +160,7 @@ public class VisualizerPanel extends CustomLayout
       if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
-        btEntry = new Button(entry.getDisplayName()
-          + (showTextID && text != null ? " (" + text.getSName() + ")" : ""));
+        btEntry = new Button(entry.getDisplayName());
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
@@ -172,8 +174,7 @@ public class VisualizerPanel extends CustomLayout
           || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           // build button for visualizer
-          btEntry = new Button(entry.getDisplayName() 
-            + (showTextID && text != null ? " (" + text.getSName() + ")" : ""));
+          btEntry = new Button(entry.getDisplayName());
           btEntry.setIcon(ICON_COLLAPSE);
           btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
             + ChameleonTheme.BUTTON_SMALL);
@@ -186,8 +187,11 @@ public class VisualizerPanel extends CustomLayout
         try
         {
           vis = createComponent();
-          vis.setVisible(true);
-          addComponent(vis, "iframe");
+          if(vis != null)
+          {
+            vis.setVisible(true);
+            addComponent(vis, "iframe");
+          }
         }
         catch(Exception ex)
         {
@@ -203,7 +207,10 @@ public class VisualizerPanel extends CustomLayout
         if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
-          vis.setVisible(false);
+          if(vis != null)
+          {
+            vis.setVisible(false);
+          }
         }
         
       }
@@ -218,10 +225,10 @@ public class VisualizerPanel extends CustomLayout
       return null;
     }
     
-    Application application = getApplication();
-    VisualizerInput input = createInput();
+    final Application application = getApplication();
+    final VisualizerInput input = createInput();
     
-    Component c = this.visPlugin.createComponent(input, application);
+    Component c = visPlugin.createComponent(input, application);
     c.setVisible(false);
     
     return c;
@@ -245,7 +252,6 @@ public class VisualizerPanel extends CustomLayout
     input.setResult(result);
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
-    input.setText(text);
     input.setSegmentationName(segmentationName);
 
     if (entry != null)
@@ -260,7 +266,7 @@ public class VisualizerPanel extends CustomLayout
     if (visPlugin != null && visPlugin.isUsingText()
       && result != null && result.getSDocumentGraph().getSNodes().size() > 0)
     {
-      SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
+      SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
 
       input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
@@ -308,7 +314,7 @@ public class VisualizerPanel extends CustomLayout
     return r;
   }
 
-  private SaltProject getText(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
     try
@@ -316,7 +322,7 @@ public class VisualizerPanel extends CustomLayout
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      txt = annisResource.path("graphs").path(toplevelCorpusName).path(
+      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).path(
         documentName).get(SaltProject.class);
     }
     catch (Exception e)
@@ -352,55 +358,99 @@ public class VisualizerPanel extends CustomLayout
     }
     return true;
   }
+  
+  private void loadVisualizer(final LoadableVisualizer.Callback callback)
+  {
+    // check if it's necessary to create input
+    if (visPlugin != null)
+    {
+      Executor exec = Executors.newSingleThreadExecutor();
+      FutureTask<Component> future = new FutureTask<Component>(new LoadComponentTask())
+      {
+
+        @Override
+        public void run()
+        {
+          try
+          {
+            super.run();
+            // wait maximum 60 seconds
+            vis = get(60, TimeUnit.SECONDS);
+            synchronized (getApplication())
+            {
+              if (callback != null && vis instanceof LoadableVisualizer)
+              {
+                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+                if (loadableVis.isLoaded())
+                {
+                  // direct call callback since the visualizer is already ready
+                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                }
+                else
+                {
+                  loadableVis.clearCallbacks();
+                  // add listener when player was fully loaded
+                  loadableVis.addOnLoadCallBack(callback);
+                }
+              }
+              
+              removeComponent("progress");
+
+              if (vis != null)
+              {
+                vis.setVisible(true);
+                if (getComponent("iframe") == null)
+                {
+                  addComponent(vis, "iframe");
+                }
+              }
+            }
+          }
+          catch (InterruptedException ex)
+          {
+            log.error("Visualizer creation interrupted " + visPlugin.getShortName(), ex);
+          }
+          catch (ExecutionException ex)
+          {
+            log.error("Exception when creating visualizer " + visPlugin.getShortName(), ex);
+          }
+          catch (TimeoutException ex)
+          {
+            log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
+            synchronized(getApplication())
+            {
+              getWindow().showNotification(
+                "Could not create visualizer " + visPlugin.getShortName(),
+                ex.toString(),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            cancel(true);
+          }
+        } 
+      };
+      exec.execute(future);
+      
+      
+      btEntry.setIcon(ICON_COLLAPSE);
+      ProgressIndicator progress = new ProgressIndicator();
+      progress.setIndeterminate(true);
+      progress.setVisible(true);
+      progress.setEnabled(true);
+      progress.setPollingInterval(100);
+      progress.setDescription("Loading visualizer" +  visPlugin.getShortName());
+      addComponent(progress, "progress");
+    }
+    // end if create input was needed
+
+  } // end loadVisualizer
 
   
   @Override
   public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
   {
-    
     if (visible)
     {
-      // check if it's necessary to create input
-      if (visPlugin != null && vis == null)
-      {
-        try
-        {
-          vis = createComponent();
-        }
-        catch(Exception ex)
-        {
-          getWindow().showNotification(
-            "Could not create visualizer " + visPlugin.getShortName(), 
-            ex.toString(),
-            Window.Notification.TYPE_WARNING_MESSAGE
-          );
-          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
-        }
-      }
-      // end if create input was needed
-      
-      if(callback != null && vis instanceof LoadableVisualizer)
-      {
-        LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-        if(loadableVis.isLoaded())
-        {
-          // direct call callback since the visualizer is already ready
-          callback.visualizerLoaded((LoadableVisualizer) vis);
-        }
-        else
-        {
-          loadableVis.clearCallbacks();
-          // add listener when player was fully loaded
-          loadableVis.addOnLoadCallBack(callback);
-        }
-      }
-      
-      btEntry.setIcon(ICON_COLLAPSE);    
-      vis.setVisible(true);
-      if(getComponent("iframe") == null)
-      {
-        addComponent(vis, "iframe");
-      }
+      loadVisualizer(callback);
     }
     else
     {
@@ -423,6 +473,23 @@ public class VisualizerPanel extends CustomLayout
   public String getHtmlID()
   {
     return htmlID;
+  }
+  
+  public class LoadComponentTask implements Callable<Component>
+  {
+    @Override
+    public Component call() throws Exception
+    {
+      // only create component if not already created
+      if(vis == null)
+      {
+        return createComponent();
+      }
+      else
+      {
+        return vis;
+      }
+    }
   }
   
   public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource

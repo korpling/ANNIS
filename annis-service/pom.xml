@@ -57,7 +57,7 @@
       <version>1.7</version>
       <scope>compile</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
@@ -186,23 +186,28 @@
       <artifactId>jetty-servlet</artifactId>
       <version>8.1.7.v20120910</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlets</artifactId>
+      <version>8.1.7.v20120910</version>
+    </dependency>
     
     
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.13</version>
+      <version>1.14</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>1.13</version>
+      <version>1.14</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-spring</artifactId>
-      <version>1.13</version>
+      <version>1.14</version>
       <exclusions>
         <exclusion>  
           <groupId>org.springframework</groupId>  
@@ -226,7 +231,28 @@
         </exclusion>      
       </exclusions> 
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+<!--    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId></artifactId>
+      <version>1.2.1</version>
+    </dependency>
+-->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>

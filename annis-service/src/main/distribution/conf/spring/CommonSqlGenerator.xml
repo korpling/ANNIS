@@ -387,4 +387,8 @@ limitations under the License.
     </property>
   </bean>
 
+  <bean id="countMatchesAndDocumentsSqlGenerator" class="annis.sqlgen.CountMatchesAndDocumentsSqlGenerator" parent="countSqlGenerator">
+    <property name="selectClauseSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
+  </bean>
+
 </beans>
