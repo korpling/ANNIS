@@ -15,6 +15,9 @@
  */
 package annis.gui.simplequery;
 
+import com.vaadin.event.MouseEvents.ClickEvent;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
@@ -39,27 +42,31 @@ public class SearchBox extends Panel
     
     this.id = id;
     
+    // searchbox values for ebene
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableAnnotationLevels(ebene))
     {
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
-    
     ComboBox l = new ComboBox(ebene);
     l.setInputPrompt(ebene);
     l.setWidth("100px");
-
     // configure & load content
     l.setImmediate(true);
     for (String annoname : annonames) 
     {
       l.addItem(annoname);
     }
-    
     addComponent(l);
     
+    // searchbox tickbox for regex
+    CheckBox cb = new CheckBox("Regex");
+    cb.setDescription("Tick to allow for a regular expression");
+    cb.setImmediate(true);
+    addComponent(cb);
+    
   }
-  
+ 
   public int getId()
   {
     return id;
