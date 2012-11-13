@@ -50,9 +50,10 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.Count;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
+import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -77,6 +78,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
+  private CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator;
   private CountSqlGenerator countSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SaltAnnotateExtractor saltAnnotateExtractor;
@@ -261,9 +263,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public Count count(QueryData queryData)
+  public int count(QueryData queryData)
   {
     return executeQueryFunction(queryData, countSqlGenerator);
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator);
   }
 
   @Override
@@ -663,14 +672,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.metaDataFilter = metaDataFilter;
   }
 
-  public CountSqlGenerator getCountSqlGenerator()
+  public CountMatchesAndDocumentsSqlGenerator getCountMatchesAndDocumentsSqlGenerator()
   {
-    return countSqlGenerator;
+    return countMatchesAndDocumentsSqlGenerator;
   }
 
-  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
   {
-    this.countSqlGenerator = countSqlGenerator;
+    this.countMatchesAndDocumentsSqlGenerator = countSqlGenerator;
   }
 
   @Override
@@ -746,5 +755,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
   {
     this.annotateSqlGenerator = annotateSqlGenerator;
+  }
+
+  public CountSqlGenerator getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
+
+  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
   }
 }

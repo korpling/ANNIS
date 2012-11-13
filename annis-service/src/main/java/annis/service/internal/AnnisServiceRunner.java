@@ -54,9 +54,17 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private boolean useAuthentification = true;
 
   public AnnisServiceRunner()
-  {
-    this.useAuthentification = 
-      Boolean.parseBoolean(System.getProperty("annis.secure", "true"));
+  {    
+    boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
+    this.useAuthentification = !nosecurity;
+    if(this.useAuthentification)
+    {
+      log.info("Using authentification");
+    }
+    else
+    {
+      log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
+    }
   }
   
   public static void main(String[] args) throws Exception

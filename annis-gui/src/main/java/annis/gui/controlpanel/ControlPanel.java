@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
-import annis.service.objects.Count;
+import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.PaintException;
@@ -175,7 +175,7 @@ public class ControlPanel extends Panel
   private class CountThread extends Thread
   {
 
-    private Count count = null;
+    private MatchAndDocumentCount count = null;
 
     @Override
     public void run()
@@ -193,7 +193,7 @@ public class ControlPanel extends Panel
         {
           count = res.path("query").path("search").path("count").queryParam(
             "q", lastQuery).queryParam("corpora",
-            StringUtils.join(lastCorpusSelection, ",")).get(Count.class);
+            StringUtils.join(lastCorpusSelection, ",")).get(MatchAndDocumentCount.class);
         }
         catch (UniformInterfaceException ex)
         {
@@ -230,15 +230,19 @@ public class ControlPanel extends Panel
         queryPanel.setCountIndicatorEnabled(false);
         if(count != null)
         {
-          queryPanel.setStatus("" + count.getTupelMatched() + " matches <br/>in " + count.getDocumentsMatched() + " documents" );
-          searchWindow.updateQueryCount(count.getTupelMatched());
+          String documentString = count.getDocumentCount() > 1 ? "documents" : "document";
+          String matchesString = count.getMatchCount() > 1 ? "matches" : "match";
+          
+          queryPanel.setStatus("" + count.getMatchCount() + " " + matchesString
+            + " <br/>in " + count.getDocumentCount() + " " + documentString );
+          searchWindow.updateQueryCount(count.getMatchCount());
         }
       }
     }
 
     public int getCount()
     {
-      return count.getTupelMatched();
+      return count.getMatchCount();
     }
   }
 }

@@ -178,6 +178,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         getWindow().showNotification("Could not get subgraphs",
           Window.Notification.TYPE_TRAY_NOTIFICATION);
       }
+      else
       {
         updateVariables(p);
         newPanels = createPanels(p, offset);

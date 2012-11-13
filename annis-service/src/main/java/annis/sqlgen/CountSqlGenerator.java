@@ -23,58 +23,21 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.service.objects.Count;
-
-
-public class CountSqlGenerator extends AbstractSqlGenerator<Count>
+public class CountSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator<Integer>
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
 
-	@SuppressWarnings("rawtypes")
-	private SqlGenerator findSqlGenerator;
-	
 	@Override
 	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {
-		return "\n" + indent + TABSTOP + "count(*) AS tupleCount, count(distinct corpus_ref) AS docCount";
+		return "\n" + indent + TABSTOP + "count(*)";
 	}
 
 	@Override
-	public Count extractData(ResultSet rs) throws SQLException, DataAccessException {
+	public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
 		int sum = 0;
-    
-    Count c = new Count();
-    
-    int tupleSum = 0;
-    int docSum = 0;
-		while (rs.next())
+	  while (rs.next())
     {
-			tupleSum += rs.getInt("tupleCount");
-      docSum += rs.getInt("docCount");
+		  sum += rs.getInt(1);
     }
-    c.setTupelMatched(tupleSum);
-    c.setDocumentsMatched(docSum);
-    
-		return c;	
+	  return sum;
 	}
-
-	@Override
-	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append(indent).append("(\n");
-    
-		sb.append(indent).append(TABSTOP);
-		sb.append(findSqlGenerator.toSql(queryData, indent + TABSTOP));
-		sb.append(indent).append(TABSTOP).append(") AS solutions");
-		
-		return sb.toString();
-	}
-
-	public SqlGenerator getFindSqlGenerator() {
-		return findSqlGenerator;
-	}
-
-	public void setFindSqlGenerator(@SuppressWarnings("rawtypes") SqlGenerator findSqlGenerator) {
-		this.findSqlGenerator = findSqlGenerator;
-	}
-
 }
