@@ -105,7 +105,8 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                     <para>To get the ANNIS front-end running, first download it: <link
                             xlink:href="https://github.com/downloads/korpling/ANNIS/annis-gui-${project.version}.war"
                             >annis-gui-${project.version}.war</link>  and deploy it to your Java
-                        servlet container (this is depending on the servlet container you use). </para>
+                        servlet container (this is depending on the servlet container you
+                        use).</para>
                 </step>
             </procedure></para>
         <para>We also <emphasis role="bold">strongly recommend</emphasis> reconfiguring the Postgres
