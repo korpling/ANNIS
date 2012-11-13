@@ -20,7 +20,7 @@ import com.vaadin.ui.Panel;
 
 /**
  *
- * @author tom
+ * @author tom und martin
  */
 public class EdgeBox extends Panel
 {
