@@ -248,7 +248,7 @@
             </para>
             <para> In each node you create you may click on <guiicon><inlinemediaobject>
                         <imageobject>
-                            <imagedata fileref="images/list-add.png" scale="70"/>
+                            <imagedata fileref="images/list-add.png"/>
                         </imageobject>
                     </inlinemediaobject></guiicon> to specify an annotation value. The annotation
                 name can be typed in or selected from a drop down list. The operator field in the
@@ -258,11 +258,11 @@
                 also possible to specify multiple annotations applying to the same position by
                 clicking on <guiicon><inlinemediaobject>
                         <imageobject>
-                            <imagedata fileref="images/list-add.png" scale="70"/>
+                            <imagedata fileref="images/list-add.png"/>
                         </imageobject>
                     </inlinemediaobject></guiicon> multiple times. Clicking on <guiicon><inlinemediaobject>
                         <imageobject>
-                            <imagedata fileref="images/edit-clear.png" scale="70"/>
+                            <imagedata fileref="images/edit-clear.png"/>
                         </imageobject>
                     </inlinemediaobject></guiicon> will delete the values in the node. To search for
                 word forms, simply leave the field name on the left empty and type directly on the
