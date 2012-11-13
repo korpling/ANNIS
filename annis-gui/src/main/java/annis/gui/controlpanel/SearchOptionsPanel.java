@@ -23,7 +23,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Panel;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
