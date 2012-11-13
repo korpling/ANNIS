@@ -328,8 +328,8 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                             <para><emphasis role="italic">vis_type</emphasis> determines the
                                 visualizer module used and is one of: <itemizedlist>
                                     <listitem>
-                                        <para><emphasis role="italic">tree</emphasis> (annotation
-                                            grid, with annotations spanning multiple tokens)<screenshot>
+                                        <para><emphasis role="italic">tree</emphasis> (constituent
+                                            syntax tree)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
                                                   <imagedata fileref="images/tiger_tree_vis.png"
@@ -339,8 +339,8 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             </screenshot></para>
                                     </listitem>
                                     <listitem>
-                                        <para><emphasis role="italic">grid</emphasis> (constituent
-                                            syntax tree)<screenshot>
+                                        <para><emphasis role="italic">grid</emphasis> (annotation
+                                            grid, with annotations spanning multiple tokens)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
                                                   <imagedata fileref="images/grid_vis.png"
@@ -436,12 +436,23 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             </screenshot></para>
                                     </listitem>
                                     <listitem>
-                                        <para><emphasis role="italic">file</emphasis> (a linked
-                                            multimedia file)<screenshot>
+                                        <para><emphasis role="italic">video</emphasis> (a linked
+                                            video file)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
-                                                  <imagedata fileref="images/file_vis.png"
+                                                  <imagedata format="" fileref="images/video.png"
                                                   width="70%" align="center"/>
+                                                  </imageobject>
+                                                </mediaobject>
+                                            </screenshot></para>
+                                    </listitem>
+                                    <listitem>
+                                        <para><emphasis role="italic">audio</emphasis> (a linked
+                                            audio file)<screenshot>
+                                                <mediaobject>
+                                                  <imageobject>
+                                                  <imagedata fileref="images/audio.png" width="70%"
+                                                  align="center"/>
                                                   </imageobject>
                                                 </mediaobject>
                                             </screenshot></para>

@@ -146,21 +146,21 @@
                     corpora" to open the corpora window. You may then drag and drop the desired or
                     unwanted corpora between the list and the window. </para>
 
-                <para>Pressing the <inlinemediaobject>
-                        <imageobject>
-                            <imagedata fileref="images/info.png"/>
-                        </imageobject>
-                    </inlinemediaobject> button next to a corpus in the list will open the corpus
-                    explorer window (see picture below), which shows metadata for the entire corpus
-                    on the left and a list of available annotations and example queries on the
-                    right. 6 Clicking on a query will copy it to the "AnnisQL" field at the top of
-                    the form. Pressing the link icon will give you a citation link that can be used
-                    to access the query from any browser. If the corpus contains hierarchical
-                    structures, such as dominance edges or pointing relations, there will be
-                    separate segments on the right hand side of the corpus explorer to show the
-                    available edge names and annotations together with example queries. Clicking on
-                    a query will copy it to the "AnnisQL" field at the top of the form. Pressing the
-                    link icon will give you a citation link that can be used to access the query
+                <para>Pressing the <guiicon><inlinemediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/info.png"/>
+                            </imageobject>
+                        </inlinemediaobject></guiicon> button next to a corpus in the list will open
+                    the corpus explorer window (see picture below), which shows metadata for the
+                    entire corpus on the left and a list of available annotations and example
+                    queries on the right. 6 Clicking on a query will copy it to the "AnnisQL" field
+                    at the top of the form. Pressing the link icon will give you a citation link
+                    that can be used to access the query from any browser. If the corpus contains
+                    hierarchical structures, such as dominance edges or pointing relations, there
+                    will be separate segments on the right hand side of the corpus explorer to show
+                    the available edge names and annotations together with example queries. Clicking
+                    on a query will copy it to the "AnnisQL" field at the top of the form. Pressing
+                    the link icon will give you a citation link that can be used to access the query
                     from any browser. If the corpus contains hierarchical structures, such as
                     dominance edges or pointing relations, there will be separate segments on the
                     right hand side of the corpus explorer to show the available edge names and
@@ -195,13 +195,19 @@
             </section>
             <section>
                 <title>The Result Window</title>
-                <para>The result window shows search results in pages of 10 hits each by default
-                    (this can be changed in the Search Form). The toolbar at the top of the window
-                    allows you to navigate between these pages. The "Token Annotations" button on
-                    the toolbar allows you to toggle 7 the token based annotations, such as lemmas
-                    and parts-of-speech, on or off for you convenience. The "Citation URL" button
-                    provides a hyperlink which you can e-mail or cite, allowing others to reproduce
-                    your query. <screenshot>
+                <para><screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/search_bar.png"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot>The result window shows search results in pages of 10 hits each by
+                    default (this can be changed in the Search Form). The toolbar at the top of the
+                    window allows you to navigate between these pages. The "Token Annotations"
+                    button on the toolbar allows you to toggle 7 the token based annotations, such
+                    as lemmas and parts-of-speech, on or off for you convenience. The "Citation URL"
+                    button provides a hyperlink which you can e-mail or cite, allowing others to
+                    reproduce your query. <screenshot>
                         <mediaobject>
                             <imageobject>
                                 <imagedata fileref="images/kwic.png" width="70%" align="center"/>
