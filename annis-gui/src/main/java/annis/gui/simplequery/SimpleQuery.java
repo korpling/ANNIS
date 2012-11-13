@@ -30,6 +30,7 @@ import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -66,11 +67,11 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
-    btInitLanguage = new Button("Initialize language", (Button.ClickListener) this);
+    btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btInitLanguage);
 
-    btInitMeta = new Button("Initialize meta", (Button.ClickListener) this);
+    btInitMeta = new Button("Start with meta search", (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
     toolbar.addComponent(btInitMeta);
     
@@ -90,6 +91,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     if(event.getButton() == btInitLanguage)
     {
+
       MenuBar addMenu = new MenuBar();
       Collection<String> annonames = getAvailableAnnotationNames();
       final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
@@ -114,6 +116,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     if(event.getButton() == btInitMeta)
     {
+      
       TextField tf = new TextField("meta");
       meta.addComponent(tf);
     }
