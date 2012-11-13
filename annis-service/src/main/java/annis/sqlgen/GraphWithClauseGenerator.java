@@ -30,7 +30,7 @@ import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
-import java.util.ArrayList;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
