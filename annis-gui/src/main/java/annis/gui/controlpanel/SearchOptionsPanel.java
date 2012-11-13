@@ -113,7 +113,7 @@ public class SearchOptionsPanel extends FormLayout
     addComponent(cbResultsPerPage);
     
     help.addHelpForComponent(cbSegmentation, "If corpora with multiple "
-      + "segmentation layers are selected, a list of available layers will be "
+      + "context definitions are selected, a list of available context units will be "
       + "displayed. By default context is calculated in ‘tokens’ "
       + "(e.g. 5 minimal units to the left and right of a search result). "
       + "Some corpora might offer further context definitions, e.g. in "
