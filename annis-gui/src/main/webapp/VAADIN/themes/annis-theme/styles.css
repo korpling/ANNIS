@@ -111,6 +111,10 @@ textarea.query {
   z-index: 10;
 }
 
+.contextsensible-formlayout .v-filterselect {
+  float:left;
+}
+
 /* matched node colors by match index*/
 .v-table-cell-content-match_1 {
   color: rgb(255,0,0);

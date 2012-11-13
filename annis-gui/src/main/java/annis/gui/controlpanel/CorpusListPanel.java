@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class CorpusListPanel extends Panel implements UserChangeListener,
+public class CorpusListPanel extends VerticalLayout implements UserChangeListener,
   AbstractSelect.NewItemHandler, Action.Handler, ParameterHandler
 {
 
@@ -91,10 +91,8 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     this.controlPanel = controlPanel;
     final CorpusListPanel finalThis = this;
     
-    setSizeFull();
-
-    VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setSizeFull();
+    setHeight("99%");
+    setWidth("99%");
 
     HorizontalLayout selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");
@@ -128,7 +126,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
     selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
 
-    layout.addComponent(selectionLayout);
+    addComponent(selectionLayout);
 
     tblCorpora = new Table();
     addComponent(tblCorpora);
@@ -169,7 +167,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       }
     });
     
-    layout.setExpandRatio(tblCorpora, 1.0f);
+    setExpandRatio(tblCorpora, 1.0f);
 
     Button btReload = new Button();
     btReload.addListener(new Button.ClickListener()
@@ -564,7 +562,7 @@ public class CorpusListPanel extends Panel implements UserChangeListener,
       Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
-      l.setDescription(c.getName());
+      l.setDescription("show metadata and annotations for " + c.getName());
 
       l.addListener(new Button.ClickListener()
       {
