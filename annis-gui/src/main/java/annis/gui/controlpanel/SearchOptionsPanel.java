@@ -40,7 +40,7 @@ import org.vaadin.jonatan.contexthelp.HelpFieldWrapper;
 public class SearchOptionsPanel extends FormLayout
 {  
   public static final String KEY_DEFAULT_SEGMENTATION = "default-segmentation";
-  public static final String NULL_SEGMENTATION_VALUE = "tokens";
+  public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
   private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
   

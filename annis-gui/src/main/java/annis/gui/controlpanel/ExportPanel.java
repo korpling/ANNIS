@@ -123,7 +123,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbRightContext);
 
     txtParameters = new TextField("Parameters");
-    addComponent(txtParameters);
+    help.addHelpForComponent(txtParameters, "You can input special parameters "
+      + "for certain exporters. See the description of each exporter "
+      + "(‘?’ button above) for specific parameter settings.");
+    addComponent(new HelpFieldWrapper(txtParameters, help));
+    
 
     btExport = new Button("Perform Export");
     btExport.addListener((Button.ClickListener) this);
