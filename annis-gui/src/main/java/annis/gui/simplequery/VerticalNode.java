@@ -44,8 +44,8 @@ public class VerticalNode extends Panel
     annonames = sq.getAvailableAnnotationNames();
     AddMenu am = new AddMenu(sb, annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
-    v.addComponent(sb);
     v.addComponent(am);
+    v.addComponent(sb);
     setWidth("160px");
     addComponent(v);
   }
