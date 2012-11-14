@@ -30,6 +30,7 @@ import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -77,9 +78,17 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     language = new HorizontalLayout();
     meta = new HorizontalLayout();
+    
+    HorizontalLayout option = new HorizontalLayout();
+    CheckBox cb = new CheckBox("Search within sentence");
+    cb.setDescription("Add some AQL code to the query to make it limited to a sentence.");
+    cb.setImmediate(true);
+    option.addComponent(cb);
+    
     addComponent(toolbar);
     addComponent(language);
     addComponent(meta);
+    addComponent(option);
 
   }
   
