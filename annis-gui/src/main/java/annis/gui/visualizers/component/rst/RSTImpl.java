@@ -392,16 +392,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       // since we have found some tokens, it must be a sentence in RST.
       if (token.size() > 0)
       {
-
         data.put("sentence", sb.toString());
-
-        String color = null;
-        if (markedAndCovered != null
-          && markedAndCovered.containsKey(token.get(0))
-          && (color = getHTMLColor(token.get(0))) != null)
-        {
-          data.put("color", color);
-        }
       }
 
 
