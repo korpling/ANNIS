@@ -43,7 +43,6 @@ public class SearchBox extends Panel implements Button.ClickListener
   public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
     
-    this.id = id;
     this.vn = vn;
     
     VerticalLayout sb = new VerticalLayout();

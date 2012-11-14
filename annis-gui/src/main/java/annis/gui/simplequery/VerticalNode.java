@@ -75,5 +75,11 @@ public class VerticalNode extends Panel implements Button.ClickListener
 public void removeSearchBox(SearchBox s)
   {
     v.removeComponent(s);
-  } 
+  }
+
+public void createSearchBox(String ebene)
+  {
+    SearchBox sb = new SearchBox(ebene, sq, this);
+    v.addComponent(sb);
+  }
 }
