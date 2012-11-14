@@ -20,7 +20,6 @@ import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.rst.RST;
 import annis.gui.visualizers.component.grid.GridVisualizer;
 import annis.gui.visualizers.iframe.CorefVisualizer;
@@ -33,9 +32,9 @@ import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.component.AudioVisualizer;
 import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
+import annis.gui.visualizers.component.rst.RSTFull;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
-import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -289,6 +288,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(RST.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(RSTFull.class).toURI());
     pluginManager.
       addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
