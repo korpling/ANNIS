@@ -22,6 +22,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,15 +33,19 @@ import java.util.Set;
  *
  * @author tom
  */
-public class SearchBox extends Panel
+public class SearchBox extends Panel implements Button.ClickListener
 {
   
   private int id;
+  private Button btClose;
+  private VerticalNode vn;
+
   
-  public SearchBox(int id, String ebene, SimpleQuery sq)
+  public SearchBox(int id, String ebene, SimpleQuery sq, VerticalNode vn)
   {
     
     this.id = id;
+    this.vn = vn;
     
     // searchbox values for ebene
     Collection<String> annonames = new TreeSet<String>();
@@ -66,12 +71,22 @@ public class SearchBox extends Panel
     addComponent(cb);
     
     // close the searchbox
-    Button b = new Button("Close");
-    b.setDescription("Closes this individual searchbox");
-    addComponent(b);
+    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    addComponent(btClose);
     
   }
  
+  @Override
+  public void buttonClick(Button.ClickEvent event)
+  {
+
+    if(event.getButton() == btClose)
+    {
+      vn.removeComponent(this);
+    }  
+  }
+  
   public int getId()
   {
     return id;

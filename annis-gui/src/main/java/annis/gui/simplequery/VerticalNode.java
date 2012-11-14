@@ -48,7 +48,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     btClose = new Button("Close", (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
         
-    SearchBox sb = new SearchBox(id, ebene, sq); //SearchBox has takes an argument to 
+    SearchBox sb = new SearchBox(id, ebene, sq, this); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
     
     annonames = sq.getAvailableAnnotationNames();
@@ -71,5 +71,9 @@ public class VerticalNode extends Panel implements Button.ClickListener
       sq.removeVerticalNode(this);
     }  
   }
-  
+
+public void removeSearchBox(SearchBox s)
+  {
+    v.removeComponent(s);
+  } 
 }

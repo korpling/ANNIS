@@ -39,7 +39,7 @@ public class AddMenu extends Panel
       add.addItem(sq.killNamespace(annoname), new Command() {
         @Override
         public void menuSelected(MenuItem selectedItem) {
-          SearchBox sb = new SearchBox(source.getId() + 1, sq.killNamespace(annoname), sq);
+          SearchBox sb = new SearchBox(source.getId() + 1, sq.killNamespace(annoname), sq, vn);
           vn.addComponent(sb);
         }
       });

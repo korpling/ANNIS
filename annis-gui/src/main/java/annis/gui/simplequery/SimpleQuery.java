@@ -131,9 +131,10 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     }
   }
 
-public void removeVerticalNode(VerticalNode v){
-  language.removeComponent(v);
-}  
+public void removeVerticalNode(VerticalNode v)
+  {
+    language.removeComponent(v);
+  }  
   
 public Set<String> getAvailableAnnotationNames()
   {
