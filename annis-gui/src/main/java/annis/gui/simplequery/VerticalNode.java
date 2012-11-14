@@ -23,6 +23,7 @@ import annis.gui.simplequery.SearchBox;
 import annis.gui.simplequery.AddMenu;
 import com.vaadin.ui.Panel;
 import annis.gui.simplequery.SimpleQuery;
+import com.vaadin.ui.Button;
 
 /**
  *
@@ -39,11 +40,18 @@ public class VerticalNode extends Panel
         
     this.sq = sq;
     VerticalLayout v = new VerticalLayout();
+    
+    Button b = new Button("Close");
+    b.setDescription("Closes this whole position including all searchboxes");
+        
     SearchBox sb = new SearchBox(id, ebene, sq); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
+    
     annonames = sq.getAvailableAnnotationNames();
     AddMenu am = new AddMenu(sb, annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
+    
+    v.addComponent(b);
     v.addComponent(am);
     v.addComponent(sb);
     setWidth("160px");
