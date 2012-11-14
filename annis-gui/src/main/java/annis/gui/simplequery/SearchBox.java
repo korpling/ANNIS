@@ -65,6 +65,11 @@ public class SearchBox extends Panel
     cb.setImmediate(true);
     addComponent(cb);
     
+    // close the searchbox
+    Button b = new Button("Close");
+    b.setDescription("Closes this individual searchbox");
+    addComponent(b);
+    
   }
  
   public int getId()
