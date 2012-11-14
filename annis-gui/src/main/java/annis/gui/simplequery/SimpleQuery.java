@@ -65,18 +65,16 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   {
     this.cp = cp;
     
-    HorizontalLayout toolbar = new HorizontalLayout();
-    toolbar.addStyleName("toolbar");
     btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    toolbar.addComponent(btInitLanguage);
 
     btInitMeta = new Button("Start with meta search", (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    toolbar.addComponent(btInitMeta);
-    
+        
     language = new HorizontalLayout();
+    language.addComponent(btInitLanguage);
     meta = new HorizontalLayout();
+    meta.addComponent(btInitMeta);
     
     HorizontalLayout option = new HorizontalLayout();
     CheckBox cb = new CheckBox("Search within sentence");
@@ -84,7 +82,6 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     cb.setImmediate(true);
     option.addComponent(cb);
     
-    addComponent(toolbar);
     addComponent(language);
     addComponent(meta);
     addComponent(option);
