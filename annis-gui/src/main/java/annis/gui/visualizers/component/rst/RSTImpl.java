@@ -94,6 +94,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     "span", "multinuc"
   };
 
+  /**
+   * Used for filtering edges which should not be visualized. The target of the
+   * edge is added to the json tree, but the sources contains an entry
+   * "invisibleRelations:target_id".
+   */
+  private String INVISIBLE_RELATION = "type";
+
   // sType for the pointing relation
   private final String POINTING_RELATION = "edge";
 
@@ -609,7 +616,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
           continue;
         }
 
-        if (hasAnnoKey(((SRelation) edge), "type")
+        if (hasAnnoKey(((SRelation) edge), INVISIBLE_RELATION)
           && ((SRelation) edge).getTarget() instanceof SNode)
         {
           nodeIds.put(getUniStrId(((SNode) ((SRelation) edge).getTarget())));
