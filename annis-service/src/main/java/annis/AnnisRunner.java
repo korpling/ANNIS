@@ -74,6 +74,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -168,8 +170,9 @@ public class AnnisRunner extends AnnisBaseRunner
   ///// Commands
   public void doBenchmarkFile(String filename) 
   {
-    try {
-      BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+    try 
+    {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"));
       try
       {
         Map<String, Integer> queryRun = new HashMap<String, Integer>();

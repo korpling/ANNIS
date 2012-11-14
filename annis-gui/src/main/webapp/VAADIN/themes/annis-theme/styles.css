@@ -52,6 +52,9 @@
   cursor: pointer;
 }
 
+.drag-source-enabled {
+  cursor: move;
+}
 
 .toolbar .v-panel-content {
   background-color: #ecf0f6;
@@ -99,6 +102,17 @@ textarea.license {
 
 textarea.query {
   font-family: monospace;
+}
+
+.tigerquery-builder-canvas {
+  z-index: 0;
+}
+.tigerquery-builder-overlay {
+  z-index: 10;
+}
+
+.contextsensible-formlayout .v-filterselect {
+  float:left;
 }
 
 /* matched node colors by match index*/

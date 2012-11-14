@@ -82,16 +82,31 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
     lock.writeLock().lock();
     try
     {
+      FileInputStream inStream = null;
       groups = new Properties();
       try
       {
-        FileInputStream inStream = new FileInputStream(groupsFile);
+        inStream = new FileInputStream(groupsFile);
         groups.load(inStream);
         lastTimeReloaded = new Date(groupsFile.lastModified());
       }
       catch (IOException ex)
       {
         log.error(null, ex);
+      }
+      finally
+      {
+        if(inStream != null)
+        {
+          try
+          {
+            inStream.close();
+          }
+          catch(IOException ex)
+          {
+            log.error("Could not close group file stream", ex);
+          }
+        }
       }
     }
     finally

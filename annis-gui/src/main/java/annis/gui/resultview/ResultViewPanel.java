@@ -54,6 +54,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
   
+  public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
+  
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private String aql;
@@ -91,7 +93,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     
-    miSegmentation = mbResult.addItem("Segmentation layer", null);
+    miSegmentation = mbResult.addItem("Base text", null);
     
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
@@ -321,7 +323,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     w.center();
   }
   
-  public void updateSegmentationLayer( Set<String> segLayers)
+  public void updateSegmentationLayer(Set<String> segLayers)
   {
     miSegmentation.removeChildren();
     
@@ -329,7 +331,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     for(String s : segLayers)
     {
-      MenuItem miSingleSegLayer = miSegmentation.addItem("".equals(s) ? "<default>" : s, 
+      MenuItem miSingleSegLayer = 
+        miSegmentation.addItem((s == null || "".equals(s)) ?  NULL_SEGMENTATION_VALUE : s, 
         new MenuBar.Command() 
       {
 
@@ -337,6 +340,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
         public void menuSelected(MenuItem selectedItem)
         {
           currentSegmentationLayer = selectedItem.getText();
+          if(NULL_SEGMENTATION_VALUE.equals(currentSegmentationLayer))
+          {
+            currentSegmentationLayer = null;
+          }
           for(MenuItem mi : miSegmentation.getChildren())
           {
             mi.setChecked(mi == selectedItem);

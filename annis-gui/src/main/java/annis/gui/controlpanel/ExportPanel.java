@@ -20,7 +20,8 @@ import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
-import annis.security.AnnisUser;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.StreamResource;
@@ -32,12 +33,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import org.slf4j.LoggerFactory;
+import org.vaadin.jonatan.contexthelp.ContextHelp;
+import org.vaadin.jonatan.contexthelp.HelpFieldWrapper;
 
 /**
  *
  * @author thomas
  */
-public class ExportPanel extends Panel implements Button.ClickListener
+public class ExportPanel extends FormLayout implements Button.ClickListener
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
@@ -48,6 +51,10 @@ public class ExportPanel extends Panel implements Button.ClickListener
     new TextExporter(),
     new GridExporter()
   };
+  
+  private final Map<String,String> help4Exporter = new HashMap<String,String>();
+  
+  private ContextHelp help;
   private ComboBox cbExporter;
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
@@ -64,15 +71,19 @@ public class ExportPanel extends Panel implements Button.ClickListener
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
 
-    setSizeFull();
-
-    FormLayout layout = new FormLayout();
-    layout.setSizeFull();
-    setContent(layout);
+    setWidth("99%");
+    setHeight("99%");
+    addStyleName("contextsensible-formlayout");
+    
+    initHelpMessages();
+    
+    help = new ContextHelp();
+    addComponent(help);
 
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
+    cbExporter.setImmediate(true);
     exporterMap = new HashMap<String, Exporter>();
     for(Exporter e : EXPORTER)
     {
@@ -81,8 +92,10 @@ public class ExportPanel extends Panel implements Button.ClickListener
       cbExporter.addItem(name);
     }
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
-
-    layout.addComponent(cbExporter);
+    cbExporter.addListener(new ExporterSelectionHelpListener());
+    help.addHelpForComponent(cbExporter, help4Exporter.get((String) cbExporter.getValue()));
+    
+    addComponent(new HelpFieldWrapper(cbExporter, help));
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -106,15 +119,19 @@ public class ExportPanel extends Panel implements Button.ClickListener
     cbLeftContext.setValue("5");
     cbRightContext.setValue("5");
 
-    layout.addComponent(cbLeftContext);
-    layout.addComponent(cbRightContext);
+    addComponent(cbLeftContext);
+    addComponent(cbRightContext);
 
     txtParameters = new TextField("Parameters");
-    layout.addComponent(txtParameters);
+    help.addHelpForComponent(txtParameters, "You can input special parameters "
+      + "for certain exporters. See the description of each exporter "
+      + "(‘?’ button above) for specific parameter settings.");
+    addComponent(new HelpFieldWrapper(txtParameters, help));
+    
 
     btExport = new Button("Perform Export");
     btExport.addListener((Button.ClickListener) this);
-    layout.addComponent(btExport);
+    addComponent(btExport);
   }
 
   @Override
@@ -179,4 +196,49 @@ public class ExportPanel extends Panel implements Button.ClickListener
       log.error(null, ex);
     }
   }
+  
+  private void initHelpMessages()
+  {
+    help4Exporter.put(EXPORTER[0].getClass().getSimpleName(),
+      "The WEKA Exporter exports only the "
+      + "values of the elements searched for by the user, ignoring the context "
+      + "around search results. The values for all annotations of each of the "
+      + "found nodes is given in a comma-separated table (CSV). At the top of "
+      + "the export, the names of the columns are given in order according to "
+      + "the WEKA format.");
+
+    help4Exporter.put(EXPORTER[1].getClass().getSimpleName(),
+      "The Text Exporter exports just the plain text of every search result and "
+      + "its context, one line per result.");
+
+    help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
+      "The Grid Exporter can export all annotations of a search result and its "
+      + "context. Each annotation layer is represented in a separate line, and the "
+      + "tokens covered by each annotation are given as number ranges after each "
+      + "annotation in brackets. To suppress token numbers, input numbers=false "
+      + "into the parameters box below. To display only a subset of annotations "
+      + "in any order, input e.g. keys=tok,pos,cat to show tokens and the "
+      + "annotations pos and cat. Combine both parameters like this:<br />"
+      + "keys=tok,pos;numbers=false.");
+  }
+  
+  public class ExporterSelectionHelpListener implements Property.ValueChangeListener
+  {
+    
+    @Override
+    public void valueChange(ValueChangeEvent event)
+    {
+      String helpMessage = help4Exporter.get((String) event.getProperty().getValue());
+      if(helpMessage != null)
+      {
+        help.addHelpForComponent(cbExporter, helpMessage);
+      }
+      else
+      {
+        help.addHelpForComponent(cbExporter, "No help available for this exporter");
+      }
+    }
+    
+  }
+  
 }

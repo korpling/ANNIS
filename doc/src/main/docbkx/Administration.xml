@@ -25,7 +25,7 @@
 
     </info>
     <section>
-        <title>Building and Installing an ANNIS public server</title>
+        <title>Installing an ANNIS public server</title>
         <para>The ANNIS server version can be installed on UNIX based server, or else under Windows
             using <link xlink:href="http://www.cygwin.com/">Cygwin</link>, the freely available UNIX
             emulator. To install the ANNIS server: 
@@ -57,19 +57,12 @@
                         them if you don’t) </para>
                 </step>
                 <step>
-                    <para>If you’re using Cygwin and Windows you will also need to install the
-                        “patch” program via the Cygwin package manager </para>
-                </step>
-                <step>
-                    <para>Download and unzip <link
-                            xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-2.2.1.zip"
-                            >Annis-2.2.1.zip</link>, then run the following commands (replacing the
-                        appropriate directories):</para>
+                    <para>Download <link
+                            xlink:href="https://github.com/downloads/korpling/ANNIS/annis-service-${project.version}-distribution.tar.gz"
+                            >annis-service-${project.version}-distribution.tar.gz</link> and then
+                        unzip the downloaded file:</para>
                     <para>
-                        <programlisting>cd &lt;unzipped source>/Annis-Service
-mvn -DskipTests=true install 
-mvn -DskipTests=true assembly:assembly tar xzvf
-target/annis-service-&lt;version>-distribution.tar.gz↵
+                        <programlisting>tar xzvf annis-service-${project.version}-distribution.tar.gz↵
     -C &lt;installation directory&gt;</programlisting>
                     </para>
                 </step>
@@ -109,20 +102,11 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                     </para>
                 </step>
                 <step>
-                    <para>To get the ANNIS front-end running, first compile it: </para>
-                    <para>
-                        <programlisting>cd &lt;unzipped source>
-mvn -DskipTests=true install</programlisting>
-                    </para>
-                    <para>If no error occurs the war-file will be available under 4
-                            <filename>&lt;unzipped
-                        source>/Annis-web/target/Annis-web.war</filename>. </para>
-                </step>
-                <step>
-                    <para>And configure your web server as described here: <link
-                            xlink:href="https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat "
-                            >https://korpling.german.hu-berlin.de/p/projects/annis/wiki/Tomcat
-                        </link></para>
+                    <para>To get the ANNIS front-end running, first download it: <link
+                            xlink:href="https://github.com/downloads/korpling/ANNIS/annis-gui-${project.version}.war"
+                            >annis-gui-${project.version}.war</link>  and deploy it to your Java
+                        servlet container (this is depending on the servlet container you
+                        use).</para>
                 </step>
             </procedure></para>
         <para>We also <emphasis role="bold">strongly recommend</emphasis> reconfiguring the Postgres
@@ -241,19 +225,21 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
         <title>Front-end web application</title>
         <section>
             <title>Configuring Tomcat or Jetty as application container</title>
-            <para>The build process will produce a war-file that is deployable by every common Java
-                Servlet Container like Tomcat or Jetty. Please use the documentation of the web
-                application container of your choice how to deploy these war-files.</para>
+            <para>We are providing a WAR-file that is deployable by every common Java Servlet
+                Container like Tomcat or Jetty. Please use the documentation of the web application
+                container of your choice how to deploy these war-files.</para>
             <section>
                 <title>UTF8 encoding in server.xml</title>
-                <para>searching for non-ASCII characters.In order to avoid the
-                    Connector-configuration needs the property "URIEncoding" set to "UTF-8" like in
-                    this example
-                    (<filename>$CATALINA_HOME/server.xml</filename>):<programlisting>&lt;Connector port="8080" protocol="HTTP/1.1" 
+                <para>If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
+                    installations of Tomcat don't use UTF-8 for the encoding of the URLs and that
+                    will cause problems when searching for non-ASCII characters. In order to avoid
+                    this the Connector-configuration needs the property "URIEncoding" set to "UTF-8"
+                    like in this example
+                    ($CATALINA_HOME/server.xml):<screen> &lt;Connector port="8080" protocol="HTTP/1.1" 
                connectionTimeout="20000" 
-               URIEncoding="UTF-8" &lt;!-- this line must be present -->
+               URIEncoding="UTF-8" 
                redirectPort="8443" 
-               executor="tomcatThreadPool" /></programlisting></para>
+               executor="tomcatThreadPool" /> </screen></para>
             </section>
         </section>
         
@@ -328,8 +314,8 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                             <para><emphasis role="italic">vis_type</emphasis> determines the
                                 visualizer module used and is one of: <itemizedlist>
                                     <listitem>
-                                        <para><emphasis role="italic">tree</emphasis> (annotation
-                                            grid, with annotations spanning multiple tokens)<screenshot>
+                                        <para><emphasis role="italic">tree</emphasis> (constituent
+                                            syntax tree)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
                                                   <imagedata fileref="images/tiger_tree_vis.png"
@@ -339,8 +325,8 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             </screenshot></para>
                                     </listitem>
                                     <listitem>
-                                        <para><emphasis role="italic">grid</emphasis> (constituent
-                                            syntax tree)<screenshot>
+                                        <para><emphasis role="italic">grid</emphasis> (annotation
+                                            grid, with annotations spanning multiple tokens)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
                                                   <imagedata fileref="images/grid_vis.png"
@@ -436,12 +422,23 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             </screenshot></para>
                                     </listitem>
                                     <listitem>
-                                        <para><emphasis role="italic">file</emphasis> (a linked
-                                            multimedia file)<screenshot>
+                                        <para><emphasis role="italic">video</emphasis> (a linked
+                                            video file)<screenshot>
                                                 <mediaobject>
                                                   <imageobject>
-                                                  <imagedata fileref="images/file_vis.png"
+                                                  <imagedata format="" fileref="images/video.png"
                                                   width="70%" align="center"/>
+                                                  </imageobject>
+                                                </mediaobject>
+                                            </screenshot></para>
+                                    </listitem>
+                                    <listitem>
+                                        <para><emphasis role="italic">audio</emphasis> (a linked
+                                            audio file)<screenshot>
+                                                <mediaobject>
+                                                  <imageobject>
+                                                  <imagedata fileref="images/audio.png" width="70%"
+                                                  align="center"/>
                                                   </imageobject>
                                                 </mediaobject>
                                             </screenshot></para>
