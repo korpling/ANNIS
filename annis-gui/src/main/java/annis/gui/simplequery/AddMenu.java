@@ -30,16 +30,18 @@ public class AddMenu extends Panel
 {
   
   private MenuBar addMenu = new MenuBar();
+  private VerticalNode vn;
   
-  public AddMenu(final SearchBox source, Collection<String> annonames, final SimpleQuery sq, final VerticalNode vn)
+  public AddMenu(Collection<String> annonames, final SimpleQuery sq, final VerticalNode vn)
   {
+    this.vn = vn;
     final MenuBar.MenuItem add = addMenu.addItem("Add condition", null);
     for (final String annoname : annonames)
     {
       add.addItem(sq.killNamespace(annoname), new Command() {
         @Override
         public void menuSelected(MenuItem selectedItem) {
-          SearchBox sb = new SearchBox(source.getId() + 1, sq.killNamespace(annoname), sq, vn);
+          SearchBox sb = new SearchBox(sq.killNamespace(annoname), sq, vn);
           vn.addComponent(sb);
         }
       });

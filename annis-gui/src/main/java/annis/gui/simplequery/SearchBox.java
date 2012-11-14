@@ -40,12 +40,14 @@ public class SearchBox extends Panel implements Button.ClickListener
   private Button btClose;
   private VerticalNode vn;
 
-  
-  public SearchBox(int id, String ebene, SimpleQuery sq, VerticalNode vn)
+  public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
     
     this.id = id;
     this.vn = vn;
+    
+    VerticalLayout sb = new VerticalLayout();
+    sb.setImmediate(true);
     
     // searchbox values for ebene
     Collection<String> annonames = new TreeSet<String>();
@@ -62,18 +64,20 @@ public class SearchBox extends Panel implements Button.ClickListener
     {
       l.addItem(annoname);
     }
-    addComponent(l);
+    sb.addComponent(l);
     
     // searchbox tickbox for regex
     CheckBox cb = new CheckBox("Regex");
     cb.setDescription("Tick to allow for a regular expression");
     cb.setImmediate(true);
-    addComponent(cb);
+    sb.addComponent(cb);
     
     // close the searchbox
     btClose = new Button("Close", (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    addComponent(btClose);
+    sb.addComponent(btClose);
+    
+    addComponent(sb);
     
   }
  
@@ -83,13 +87,8 @@ public class SearchBox extends Panel implements Button.ClickListener
 
     if(event.getButton() == btClose)
     {
-      vn.removeComponent(this);
+      vn.removeSearchBox(this);
     }  
-  }
-  
-  public int getId()
-  {
-    return id;
   }
   
 }

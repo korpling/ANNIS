@@ -32,7 +32,7 @@ public class EdgeBox extends Panel
     "_l_", "'_r_", "_o_", "_ol_", "_or_"
   };
   
-  public EdgeBox (int id, SimpleQuery sq)
+  public EdgeBox (SimpleQuery sq)
   {
     edge = new ComboBox();
     for(String o : EDGE_OPERATORS)

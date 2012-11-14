@@ -39,7 +39,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private Button btClose;
   private VerticalLayout v;
   
-  public VerticalNode(int id, String ebene, SimpleQuery sq)
+  public VerticalNode(String ebene, SimpleQuery sq)
   {
         
     this.sq = sq;
@@ -48,11 +48,11 @@ public class VerticalNode extends Panel implements Button.ClickListener
     btClose = new Button("Close", (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
         
-    SearchBox sb = new SearchBox(id, ebene, sq, this); //SearchBox has takes an argument to 
+    SearchBox sb = new SearchBox(ebene, sq, this); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
     
     annonames = sq.getAvailableAnnotationNames();
-    AddMenu am = new AddMenu(sb, annonames, sq, this); //AddMenu creates a menubar from 
+    AddMenu am = new AddMenu(annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     
     v.addComponent(btClose);

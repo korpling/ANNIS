@@ -55,7 +55,6 @@ import org.slf4j.LoggerFactory;
 public class SimpleQuery extends Panel implements Button.ClickListener
 {
   private Button btInitLanguage;
-  private int id = 0;
   private Button btInitMeta;
   private ControlPanel cp;
   private HorizontalLayout language;
@@ -109,13 +108,9 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         add.addItem(killNamespace(annoname), new Command() {
           @Override
           public void menuSelected(MenuBar.MenuItem selectedItem) {
-            id = id + 1;
-            if (id > 1)
-            {
-              EdgeBox eb = new EdgeBox(id, sq);
-              language.addComponent(eb);
-            }
-            VerticalNode vn = new VerticalNode(id, killNamespace(annoname), sq);
+            EdgeBox eb = new EdgeBox(sq);
+            language.addComponent(eb);
+            VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
             language.addComponent(vn);
           }
         });
