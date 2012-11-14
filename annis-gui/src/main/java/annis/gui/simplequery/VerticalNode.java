@@ -24,25 +24,29 @@ import annis.gui.simplequery.AddMenu;
 import com.vaadin.ui.Panel;
 import annis.gui.simplequery.SimpleQuery;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ChameleonTheme;
 
 /**
  *
  * @author tom
  */
-public class VerticalNode extends Panel
+public class VerticalNode extends Panel implements Button.ClickListener
 {
   
   private Set<String> annonames;
   private SimpleQuery sq;
+  private Button btClose;
+  private VerticalLayout v;
   
   public VerticalNode(int id, String ebene, SimpleQuery sq)
   {
         
     this.sq = sq;
-    VerticalLayout v = new VerticalLayout();
+    v = new VerticalLayout();
     
-    Button b = new Button("Close");
-    b.setDescription("Closes this whole position including all searchboxes");
+    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
         
     SearchBox sb = new SearchBox(id, ebene, sq); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
@@ -51,10 +55,21 @@ public class VerticalNode extends Panel
     AddMenu am = new AddMenu(sb, annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     
-    v.addComponent(b);
+    v.addComponent(btClose);
     v.addComponent(am);
     v.addComponent(sb);
     setWidth("160px");
     addComponent(v);
   }
+  
+@Override
+  public void buttonClick(Button.ClickEvent event)
+  {
+
+    if(event.getButton() == btClose)
+    {
+      sq.removeVerticalNode(this);
+    }  
+  }
+  
 }
