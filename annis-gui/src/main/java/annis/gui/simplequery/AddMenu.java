@@ -37,7 +37,7 @@ public class AddMenu extends Panel
   {
     this.vn = vn;
     this.sq = sq;
-    final MenuBar.MenuItem add = addMenu.addItem("Add condition", null);
+    final MenuBar.MenuItem add = addMenu.addItem("Add level", null);
     for (final String annoname : annonames)
     {
       add.addItem(sq.killNamespace(annoname), new Command() {

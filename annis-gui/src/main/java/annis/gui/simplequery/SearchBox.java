@@ -22,6 +22,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +57,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     }
     ComboBox l = new ComboBox(ebene);
     l.setInputPrompt(ebene);
-    l.setWidth("100px");
+    l.setWidth("130px");
     // configure & load content
     l.setImmediate(true);
     for (String annoname : annonames) 
@@ -65,16 +66,21 @@ public class SearchBox extends Panel implements Button.ClickListener
     }
     sb.addComponent(l);
     
+    HorizontalLayout sbtoolbar = new HorizontalLayout();
+    sbtoolbar.setSpacing(true);
+    
     // searchbox tickbox for regex
     CheckBox cb = new CheckBox("Regex");
     cb.setDescription("Tick to allow for a regular expression");
     cb.setImmediate(true);
-    sb.addComponent(cb);
+    sbtoolbar.addComponent(cb);
     
     // close the searchbox
     btClose = new Button("Close", (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    sb.addComponent(btClose);
+    sbtoolbar.addComponent(btClose);
+    
+    sb.addComponent(sbtoolbar);
     
     addComponent(sb);
     

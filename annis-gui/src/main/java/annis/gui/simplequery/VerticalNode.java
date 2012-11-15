@@ -24,6 +24,7 @@ import annis.gui.simplequery.AddMenu;
 import com.vaadin.ui.Panel;
 import annis.gui.simplequery.SimpleQuery;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
@@ -59,10 +60,12 @@ public class VerticalNode extends Panel implements Button.ClickListener
     AddMenu am = new AddMenu(annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     
-    v.addComponent(btClose);
-    v.addComponent(am);
+    HorizontalLayout vntoolbar = new HorizontalLayout();
+    vntoolbar.addComponent(btClose);
+    vntoolbar.addComponent(am);
+    v.addComponent(vntoolbar);
     v.addComponent(sb);
-    setWidth("160px");
+    setWidth("180px");
     addComponent(v);
   }
   
