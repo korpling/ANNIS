@@ -631,6 +631,7 @@ public class SearchWindow extends Window
   @Override
   public void notifyMightNotPlayMimeType(String mimeType)
   {
+    /*
     if(!warnedAboutPossibleMediaFormatProblem)
     {
       Notification notify = new Notification("Media file type \"" + mimeType  + "\" might be unsupported by your browser!",
@@ -643,6 +644,7 @@ public class SearchWindow extends Window
       showNotification(notify);
       warnedAboutPossibleMediaFormatProblem = true;
     }
+    */
   }
   
   

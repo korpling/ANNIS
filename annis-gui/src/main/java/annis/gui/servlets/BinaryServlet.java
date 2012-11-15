@@ -17,19 +17,16 @@ package annis.gui.servlets;
 
 import annis.gui.Helper;
 import annis.gui.MainApp;
-import annis.provider.SaltProjectProvider;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.vaadin.terminal.gwt.server.AbstractWebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -60,6 +57,7 @@ public class BinaryServlet extends HttpServlet
   private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
   private String toplevelCorpusName;
   private String documentName;
+  private String mimeType;
   
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -72,11 +70,10 @@ public class BinaryServlet extends HttpServlet
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException
   {
-
-    // get Parameter from url, actually it' s only the corpusId
     Map<String, String[]> binaryParameter = request.getParameterMap();
     toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     documentName = binaryParameter.get("documentName")[0];
+    mimeType = binaryParameter.get("mime")[0];
     
     ServletOutputStream out = null;
     try
@@ -97,15 +94,16 @@ public class BinaryServlet extends HttpServlet
       
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-        .path(URLEncoder.encode(documentName, "UTF-8")).path("binary"); 
+        .path(URLEncoder.encode(documentName, "UTF-8")).path("binary")
+        .queryParam("mime", mimeType); 
 
       if (range != null)
       {
-        responseStatus206(binaryRes, out, response, range);
+        responseStatus206(binaryRes, mimeType, out, response, range);
       }
       else
       {
-        responseStatus200(binaryRes, out, response);
+        responseStatus200(binaryRes, mimeType, out, response);
       }
       
       out.flush();
@@ -126,54 +124,80 @@ public class BinaryServlet extends HttpServlet
     }
   }
 
-  private void responseStatus206(WebResource binaryRes, ServletOutputStream out,
+  private void responseStatus206(WebResource binaryRes, String mimeType, ServletOutputStream out,
     HttpServletResponse response, String range) throws RemoteException, IOException
   {
-    AnnisBinaryMetaData bm = binaryRes.path("meta")
-      .get(AnnisBinary.class);
+    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
+      .get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
-    // Range: byte=x-y | Range: byte=0-
-    String[] rangeTupel = range.split("-");
-    int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
-
-    int slice;
-    if (rangeTupel.length > 1)
+    if(allMeta.size() > 0 )
     {
-      slice = Integer.parseInt(rangeTupel[1]);
-    }
-    else
-    {
-      slice = bm.getLength();
-    }
-    
-    int lengthToFetch = slice - offset;
-    
-    response.setHeader("Content-Range", "bytes " + offset + "-"
-      + (bm.getLength() - 1) + "/" + bm.getLength());
-    response.setContentType(bm.getMimeType());
-    response.setStatus(206);
-    response.setContentLength(lengthToFetch);
+      AnnisBinaryMetaData bm = allMeta.get(0);
+      for(AnnisBinaryMetaData m : allMeta)
+      {
+        if(mimeType.equals(m.getMimeType()))
+        {
+          bm = m;
+          break;
+        }
+      }
 
-    writeStepByStep(offset, lengthToFetch, binaryRes, out);
-    
+
+      // Range: byte=x-y | Range: byte=0-
+      String[] rangeTupel = range.split("-");
+      int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
+
+      int slice;
+      if (rangeTupel.length > 1)
+      {
+        slice = Integer.parseInt(rangeTupel[1]);
+      }
+      else
+      {
+        slice = bm.getLength();
+      }
+
+      int lengthToFetch = slice - offset;
+
+      response.setHeader("Content-Range", "bytes " + offset + "-"
+        + (bm.getLength() - 1) + "/" + bm.getLength());
+      response.setContentType(bm.getMimeType());
+      response.setStatus(206);
+      response.setContentLength(lengthToFetch);
+
+      writeStepByStep(offset, lengthToFetch, binaryRes, out);
+    }
   }
 
-  private void responseStatus200(WebResource binaryRes, ServletOutputStream out,
+  private void responseStatus200(WebResource binaryRes, String mimeType, ServletOutputStream out,
     HttpServletResponse response) throws RemoteException, IOException
   {
     
     
-    AnnisBinaryMetaData binaryMeta = binaryRes.path("meta")
-      .get(AnnisBinary.class);
+    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
+      .get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
-    response.setStatus(200);
-    response.setHeader("Accept-Ranges", "bytes");
-    response.setContentType(binaryMeta.getMimeType());
-    response.setHeader("Content-Range", "bytes 0-" + (binaryMeta.getLength() - 1)
-      + "/" + binaryMeta.getLength());
-    response.setContentLength(binaryMeta.getLength());
+    if(allMeta.size() > 0 )
+    {
+      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
+      for(AnnisBinaryMetaData m : allMeta)
+      {
+        if(mimeType.equals(m.getMimeType()))
+        {
+          binaryMeta = m;
+          break;
+        }
+      }
 
-    getCompleteFile(binaryRes, out);
+      response.setStatus(200);
+      response.setHeader("Accept-Ranges", "bytes");
+      response.setContentType(binaryMeta.getMimeType());
+      response.setHeader("Content-Range", "bytes 0-" + (binaryMeta.getLength() - 1)
+        + "/" + binaryMeta.getLength());
+      response.setContentLength(binaryMeta.getLength());
+
+      getCompleteFile(binaryRes, out);
+    }
   }
 
   /**

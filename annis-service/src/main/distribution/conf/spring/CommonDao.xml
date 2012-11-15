@@ -69,6 +69,7 @@
   </bean>
 
   <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
+  <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
 
   <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
@@ -113,6 +114,7 @@
     
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
+    <property name="metaByteHelper" ref="metaByteHelper" />
 
   </bean>
 

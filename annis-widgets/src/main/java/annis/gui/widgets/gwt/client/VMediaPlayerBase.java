@@ -95,7 +95,8 @@ public class VMediaPlayerBase extends Widget implements Paintable
       
       if(uidl.hasAttribute(MIME_TYPE))
       {
-        VConsole.log("canPlayType value is \"" + media.canPlayType(uidl.getStringAttribute(MIME_TYPE)) + "\"");
+        String mimeType = uidl.getStringAttribute(MIME_TYPE);
+        VConsole.log("canPlayType for \"" + mimeType + "\"value is \"" + media.canPlayType(mimeType) + "\"");
         // check for correct mime type
         if(media.canPlayType(uidl.getStringAttribute(MIME_TYPE)).equals(MediaElement.CANNOT_PLAY))
         {
@@ -137,14 +138,6 @@ public class VMediaPlayerBase extends Widget implements Paintable
       media.setSrc("");
     }
   }
-  
-  public String getMimeType()
-  {
-    Exception ex = new UnsupportedOperationException(
-      "Please overwrite and implement VMediaPlayerBase.getMimeType()");
-    VConsole.error(ex);
-    return null;
-  };
   
   private void metaDataWasLoaded()
   {

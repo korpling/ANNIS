@@ -23,6 +23,8 @@ import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.AudioPlayer;
 import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +32,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +65,6 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     String documentName = corpusPath.get(0);
-    
     try
     {
       corpusName = URLEncoder.encode(corpusName, "UTF-8");
@@ -73,16 +75,38 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
       log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
     }
     
-    binaryServletPath = input.getContextPath() + "/Binary?"
-      + "documentName=" + documentName
-      + "&toplevelCorpusName="
-      + corpusName;      
-
     WebResource resMeta = Helper.getAnnisWebResource(application).path(
       "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
-    AnnisBinary meta = resMeta.get(AnnisBinary.class);
+    List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
+
+    String mimeType = null;
+    for(AnnisBinaryMetaData m : meta)
+    {
+      if(m.getMimeType().startsWith("audio/"))
+      {
+        mimeType = m.getMimeType();
+        break;
+      }
+    }
     
-    AudioPlayer player = new AudioPlayer(binaryServletPath, meta.getMimeType());
+    Validate.notNull(mimeType, "There must be at least one binary file for the document with a audio mime type");
+    
+    String mimeTypeEncoded = mimeType;
+    try
+    {
+      mimeTypeEncoded = URLEncoder.encode(mimeType, "UTF-8");
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
+    }
+    
+    binaryServletPath = input.getContextPath() + "/Binary?"
+      + "documentName=" + documentName
+      + "&toplevelCorpusName=" + corpusName
+      + "&mime=" +  mimeTypeEncoded;      
+
+    AudioPlayer player = new AudioPlayer(binaryServletPath, mimeType);
 
     if (mcFactory != null && application instanceof MediaControllerHolder)
     {  
