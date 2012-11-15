@@ -583,7 +583,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       } // end check
 
       String time = null;
-      SToken token = (SToken) event.getPropertyId();
+      String tokenID = (String) event.getPropertyId();
+      
+      SNode token = result.getSDocumentGraph().getSNode(tokenID);
       for (SAnnotation anno : token.getSAnnotations())
       {
         for (String media_anno : media_annotations)
