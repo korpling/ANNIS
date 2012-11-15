@@ -37,6 +37,7 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -66,6 +67,8 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   public SimpleQuery(ControlPanel cp)
   {
     this.cp = cp;
+    vnodes = new ArrayList<VerticalNode>();
+    eboxes = new ArrayList<EdgeBox>();
     
     btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -133,6 +136,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 public void removeVerticalNode(VerticalNode v)
   {
     language.removeComponent(v);
+    vnodes.remove(v);
   }  
   
 public Set<String> getAvailableAnnotationNames()

@@ -26,6 +26,7 @@ import annis.gui.simplequery.SimpleQuery;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.ArrayList;
 
 /**
  *
@@ -45,6 +46,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
         
     this.sq = sq;
     v = new VerticalLayout();
+    sboxes = new ArrayList<SearchBox>();
     
     btClose = new Button("Close", (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -77,6 +79,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
 public void removeSearchBox(SearchBox s)
   {
     v.removeComponent(s);
+    sboxes.remove(s);
   }
 
 public void createSearchBox(String ebene)
