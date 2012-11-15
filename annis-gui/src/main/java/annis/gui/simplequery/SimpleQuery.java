@@ -60,6 +60,8 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private HorizontalLayout language;
   private HorizontalLayout meta;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
+  private Collection<VerticalNode> vnodes;
+  private Collection<EdgeBox> eboxes;
   
   public SimpleQuery(ControlPanel cp)
   {
@@ -105,10 +107,15 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         add.addItem(killNamespace(annoname), new Command() {
           @Override
           public void menuSelected(MenuBar.MenuItem selectedItem) {
-            EdgeBox eb = new EdgeBox(sq);
-            language.addComponent(eb);
+            if (!vnodes.isEmpty())
+            {
+              EdgeBox eb = new EdgeBox(sq);
+              language.addComponent(eb); 
+              eboxes.add(eb);
+            }
             VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
             language.addComponent(vn);
+            vnodes.add(vn);
           }
         });
       }
