@@ -376,7 +376,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
           if("annis::time".equals(a.getQName()))
           {
             
-            return "play excerpt " + a.getValueString();
+            return "play excerpt " + getShortenedTime(a.getValueString());
           }
           return a.getQName();
         }
@@ -433,10 +433,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
             {
               if (media_anno.equals(a.getName()))
               {
-                if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
-                {
-                  return "kwic-clickable";
-                }
+                return "kwic-media";
               }
             }
           }
@@ -556,7 +553,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
             {
               if (media_anno.equals(a.getName()))
               {
-                return getShortenedTime(a.getValueString());
+                return "";
+//                return getShortenedTime(a.getValueString());
               }
             }
 
@@ -581,7 +579,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       double endTime = splitTime.length > 1 ? Double.parseDouble(splitTime[1]) : -1;
 
       NumberFormat format = DecimalFormat.getInstance(Locale.US);
-      format.setMaximumFractionDigits(2);
+      format.setMaximumFractionDigits(4);
       format.setMinimumFractionDigits(0);
       if(endTime >= 0)
       {
