@@ -63,12 +63,14 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
+  private Collection<MetaBox> mboxes;
   
   public SimpleQuery(ControlPanel cp)
   {
     this.cp = cp;
     vnodes = new ArrayList<VerticalNode>();
     eboxes = new ArrayList<EdgeBox>();
+    mboxes = new ArrayList<MetaBox>();
     
     btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -127,9 +129,22 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     if(event.getButton() == btInitMeta)
     {
-      
-      TextField tf = new TextField("meta");
-      meta.addComponent(tf);
+      meta.removeComponent(btInitMeta);
+      MenuBar addMenu = new MenuBar();
+      Collection<String> annonames = getAvailableAnnotationNames();
+      final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
+      for (final String annoname : annonames)
+      {
+        add.addItem(killNamespace(annoname), new Command() {
+          @Override
+          public void menuSelected(MenuBar.MenuItem selectedItem) {
+            MetaBox mb = new MetaBox(killNamespace(annoname), sq);
+            meta.addComponent(mb); 
+            mboxes.add(mb);
+          }
+        });
+      }
+      meta.addComponent(addMenu);
     }
   }
 
