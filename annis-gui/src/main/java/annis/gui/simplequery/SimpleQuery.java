@@ -101,7 +101,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     
     if(event.getButton() == btInitLanguage)
     {
-
+      language.removeComponent(btInitLanguage);
       MenuBar addMenu = new MenuBar();
       Collection<String> annonames = getAvailableAnnotationNames();
       final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
