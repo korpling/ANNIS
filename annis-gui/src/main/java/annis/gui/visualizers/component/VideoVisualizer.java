@@ -16,11 +16,14 @@
 package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
+import annis.gui.Helper;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.VideoPlayer;
+import annis.service.objects.AnnisBinary;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -57,19 +60,30 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
 
     String binaryServletPath = "";
 
+    String corpusName = corpusPath.get(corpusPath.size() - 1);
+    String documentName = corpusPath.get(0);
+    
     try
     {
-      binaryServletPath = input.getContextPath() + "/Binary?"
-        + "documentName=" + URLEncoder.encode(corpusPath.get(0), "UTF-8")
-        + "&toplevelCorpusName="
-        + URLEncoder.encode(corpusPath.get(corpusPath.size() - 1), "UTF-8");
+      corpusName = URLEncoder.encode(corpusName, "UTF-8");
+      documentName = URLEncoder.encode(documentName, "UTF-8");
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error("UTF-8 was not known as encoding, expect non-working video", ex);
+      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
     }
     
-    VideoPlayer player = new VideoPlayer(binaryServletPath, "video/webm");
+
+    binaryServletPath = input.getContextPath() + "/Binary?"
+      + "documentName=" + documentName
+      + "&toplevelCorpusName="
+      + corpusName;
+
+    WebResource resMeta = Helper.getAnnisWebResource(application).path(
+      "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
+    AnnisBinary meta = resMeta.get(AnnisBinary.class);
+    
+    VideoPlayer player = new VideoPlayer(binaryServletPath, meta.getMimeType());
 
     if (mcFactory != null && application instanceof MediaControllerHolder)
     {

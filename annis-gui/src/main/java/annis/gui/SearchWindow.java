@@ -77,7 +77,6 @@ public class SearchWindow extends Window
   private TigerQueryBuilder queryBuilder;
   private String bugEMailAddress;
   
-  private boolean warnedAboutMediaFormat = false;
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
@@ -373,7 +372,6 @@ public class SearchWindow extends Window
     int contextLeft,
     int contextRight, String segmentationLayer, int pageSize)
   {
-    warnedAboutMediaFormat = false;
     warnedAboutPossibleMediaFormatProblem = false;
     
     // remove old result from view
@@ -577,7 +575,12 @@ public class SearchWindow extends Window
   @Override
   public void notifyCannotPlayMimeType(String mimeType)
   {
-    if(!warnedAboutMediaFormat)
+    if(mimeType == null)
+    {
+      return;
+    }
+  
+    if(mimeType.startsWith("audio/ogg") || mimeType.startsWith("video/web"))
     {
       String browserList = 
         "<ul>"
@@ -613,10 +616,16 @@ public class SearchWindow extends Window
           + browserList,
           Window.Notification.TYPE_WARNING_MESSAGE, true);
       }
-
-      
-      warnedAboutMediaFormat=true;
     }
+    else
+    {
+      getWindow().showNotification(
+        "Media file type \"" + mimeType + "\" unsupported by your browser!",
+        "Try to check your browsers documentation how to enable "
+        + "support for the media type or inform the corpus creator about this problem.",
+        Window.Notification.TYPE_WARNING_MESSAGE, true);
+    }
+
   }
 
   @Override
