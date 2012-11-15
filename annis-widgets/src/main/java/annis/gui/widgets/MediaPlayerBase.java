@@ -109,6 +109,14 @@ public abstract class MediaPlayerBase extends AbstractComponent
         ((MimeTypeErrorListener) getWindow()).notifyCannotPlayMimeType(mimeType);
       }
     }
+    if((Boolean) variables.get(VMediaPlayerBase.MIGHT_NOT_PLAY) == Boolean.TRUE)
+    {     
+      
+      if(getWindow() instanceof MimeTypeErrorListener)
+      {
+        ((MimeTypeErrorListener) getWindow()).notifyMightNotPlayMimeType(mimeType);
+      }
+    }
     
     if((Boolean) variables.get(VMediaPlayerBase.PLAYER_LOADED) == Boolean.TRUE)
     {

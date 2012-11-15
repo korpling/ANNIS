@@ -35,6 +35,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
   public static final String SOURCE_URL = "url";
   public static final String MIME_TYPE = "mime_type";
   public static final String CANNOT_PLAY = "cannot_play";
+  public static final String MIGHT_NOT_PLAY = "might_not_play";
   public static final String PLAYER_LOADED = "player_loaded";
   
   private MediaElement media;
@@ -100,8 +101,11 @@ public class VMediaPlayerBase extends Widget implements Paintable
         {
           VConsole.log("CANNOT PLAY!!!");
           
-          gClient.updateVariable(paintableId, CANNOT_PLAY, true, true);
-          
+          gClient.updateVariable(paintableId, CANNOT_PLAY, true, true); 
+        }
+        else if(media.canPlayType(uidl.getStringAttribute(MIME_TYPE)).equals(MediaElement.CAN_PLAY_MAYBE))
+        {          
+          gClient.updateVariable(paintableId, MIGHT_NOT_PLAY, true, true); 
         }
       }
       media.setSrc(uidl.getStringAttribute(SOURCE_URL));

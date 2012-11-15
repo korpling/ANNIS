@@ -78,6 +78,7 @@ public class SearchWindow extends Window
   private String bugEMailAddress;
   
   private boolean warnedAboutMediaFormat = false;
+  private boolean warnedAboutPossibleMediaFormatProblem = false;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
   
@@ -373,6 +374,7 @@ public class SearchWindow extends Window
     int contextRight, String segmentationLayer, int pageSize)
   {
     warnedAboutMediaFormat = false;
+    warnedAboutPossibleMediaFormatProblem = false;
     
     // remove old result from view
     if (resultView != null)
@@ -616,4 +618,24 @@ public class SearchWindow extends Window
       warnedAboutMediaFormat=true;
     }
   }
+
+  @Override
+  public void notifyMightNotPlayMimeType(String mimeType)
+  {
+    if(!warnedAboutPossibleMediaFormatProblem)
+    {
+      Notification notify = new Notification("Media file type \"" + mimeType  + "\" might be unsupported by your browser!",
+          "This means you might get errors playing this file.<br/><br /> "
+        + "<em>If you have problems with this media file:</em><br /> Try to check your browsers "
+        + "documentation how to enable "
+        + "support for the media type or inform the corpus creator about this problem.",
+          Window.Notification.TYPE_TRAY_NOTIFICATION, true);
+      notify.setDelayMsec(15000);
+      showNotification(notify);
+      warnedAboutPossibleMediaFormatProblem = true;
+    }
+  }
+  
+  
+  
 }
