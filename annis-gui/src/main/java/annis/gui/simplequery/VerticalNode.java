@@ -38,6 +38,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private SimpleQuery sq;
   private Button btClose;
   private VerticalLayout v;
+  private Collection<SearchBox> sboxes;
   
   public VerticalNode(String ebene, SimpleQuery sq)
   {
@@ -50,6 +51,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
         
     SearchBox sb = new SearchBox(ebene, sq, this); //SearchBox has takes an argument to 
       // tell it for which annotation level it should search
+    sboxes.add(sb);
     
     annonames = sq.getAvailableAnnotationNames();
     AddMenu am = new AddMenu(annonames, sq, this); //AddMenu creates a menubar from 
