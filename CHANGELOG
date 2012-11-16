@@ -1,4 +1,4 @@
-Version 3.0.0-alpha.1
+Version 3.0.0-alpha.2
 =====================
 
 First public alpha release in the new improved ANNIS 3.0 release series.
@@ -28,6 +28,7 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
  #3 Allow larger strings in annotation values
 
 [Other]
+ #51 fixed package declaration error
  #48 Improving the speed of the subgraph query
  #44 Move authentification and authorization from frontend to service
  #37 Allow to migrate corpora in database initialization

@@ -4,8 +4,8 @@ UPDATE _node AS n SET span =
   FROM _node_annotation AS na
   WHERE
     na.node_ref = n.id
-    AND na.namespace = 'annis'
     AND na.name = n.seg_name
+  LIMIT 1
 )
 WHERE
   seg_name IS NOT NULL
