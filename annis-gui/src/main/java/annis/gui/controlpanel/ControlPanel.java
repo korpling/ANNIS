@@ -52,14 +52,17 @@ public class ControlPanel extends Panel
     this.searchWindow = searchWindow;
     this.history = new ListOrderedSet<HistoryEntry>();
 
+    setSizeFull();
+    
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
     VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setHeight(100f, UNITS_PERCENTAGE);
-
+    layout.setSizeFull();
+    
     Accordion accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
     corpusList = new CorpusListPanel(this);
 
@@ -71,7 +74,6 @@ public class ControlPanel extends Panel
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-
 
     addComponent(queryPanel);
     addComponent(accordion);

@@ -1,5 +1,5 @@
 
-Lists of 43 third-party dependencies.
+Lists of 44 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.0.6 - http://logback.qos.ch)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.0.6 - http://logback.qos.ch)
      (The Apache Software License, Version 2.0) FindBugs-jsr305 (com.google.code.findbugs:jsr305:1.3.9 - http://findbugs.sourceforge.net/)
@@ -40,6 +40,7 @@ Lists of 43 third-party dependencies.
      (MIT License) JCL 1.1.1 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.6.6 - http://www.slf4j.org)
      (MIT License) JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.6.6 - http://www.slf4j.org)
      (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.6.6 - http://www.slf4j.org)
+     (Apache License, Version 2.0) contexthelp (org.vaadin.addons:contexthelp:1.3.1 - no url defined)
      (Apache License, Version 2.0) js-screenshot (org.vaadin.addons:js-screenshot:0.1.0 - no url defined)
      (Apache License, Version 2.0) popupbutton (org.vaadin.addons:popupbutton:1.2.1 - no url defined)
      (Apache License, Version 2.0) splitbutton (org.vaadin.hene.splitbutton:splitbutton:0.9.7 - no url defined)

@@ -56,9 +56,9 @@
                 </step>
                 <step>
                     <para>Download and unzip <link
-                            xlink:href="http://launchpad.net/annis/2.2/2.2.1/+download/Annis-Kickstarter-2.2.1-distribution.zip"
-                            >Annis-Kickstarter-2.2.1-distribution.zip</link> from the ANNIS website.
-                    </para>
+                            xlink:href="https://github.com/downloads/korpling/ANNIS/annis-kickstarter-${project.version}-distribution.zip"
+                            >annis-kickstarter-${project.version}-distribution.zip</link> from the
+                        ANNIS website. </para>
                 </step>
                 <step>
                     <para>Start AnnisKickstarter.bat if you’re using Windows or run the bash script
@@ -146,21 +146,21 @@
                     corpora" to open the corpora window. You may then drag and drop the desired or
                     unwanted corpora between the list and the window. </para>
 
-                <para>Pressing the <inlinemediaobject>
-                        <imageobject>
-                            <imagedata fileref="images/info.png"/>
-                        </imageobject>
-                    </inlinemediaobject> button next to a corpus in the list will open the corpus
-                    explorer window (see picture below), which shows metadata for the entire corpus
-                    on the left and a list of available annotations and example queries on the
-                    right. 6 Clicking on a query will copy it to the "AnnisQL" field at the top of
-                    the form. Pressing the link icon will give you a citation link that can be used
-                    to access the query from any browser. If the corpus contains hierarchical
-                    structures, such as dominance edges or pointing relations, there will be
-                    separate segments on the right hand side of the corpus explorer to show the
-                    available edge names and annotations together with example queries. Clicking on
-                    a query will copy it to the "AnnisQL" field at the top of the form. Pressing the
-                    link icon will give you a citation link that can be used to access the query
+                <para>Pressing the <guiicon><inlinemediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/info.png"/>
+                            </imageobject>
+                        </inlinemediaobject></guiicon> button next to a corpus in the list will open
+                    the corpus explorer window (see picture below), which shows metadata for the
+                    entire corpus on the left and a list of available annotations and example
+                    queries on the right. 6 Clicking on a query will copy it to the "AnnisQL" field
+                    at the top of the form. Pressing the link icon will give you a citation link
+                    that can be used to access the query from any browser. If the corpus contains
+                    hierarchical structures, such as dominance edges or pointing relations, there
+                    will be separate segments on the right hand side of the corpus explorer to show
+                    the available edge names and annotations together with example queries. Clicking
+                    on a query will copy it to the "AnnisQL" field at the top of the form. Pressing
+                    the link icon will give you a citation link that can be used to access the query
                     from any browser. If the corpus contains hierarchical structures, such as
                     dominance edges or pointing relations, there will be separate segments on the
                     right hand side of the corpus explorer to show the available edge names and
@@ -195,13 +195,19 @@
             </section>
             <section>
                 <title>The Result Window</title>
-                <para>The result window shows search results in pages of 10 hits each by default
-                    (this can be changed in the Search Form). The toolbar at the top of the window
-                    allows you to navigate between these pages. The "Token Annotations" button on
-                    the toolbar allows you to toggle 7 the token based annotations, such as lemmas
-                    and parts-of-speech, on or off for you convenience. The "Citation URL" button
-                    provides a hyperlink which you can e-mail or cite, allowing others to reproduce
-                    your query. <screenshot>
+                <para><screenshot>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/search_bar.png"/>
+                            </imageobject>
+                        </mediaobject>
+                    </screenshot>The result window shows search results in pages of 10 hits each by
+                    default (this can be changed in the Search Form). The toolbar at the top of the
+                    window allows you to navigate between these pages. The "Token Annotations"
+                    button on the toolbar allows you to toggle 7 the token based annotations, such
+                    as lemmas and parts-of-speech, on or off for you convenience. The "Citation URL"
+                    button provides a hyperlink which you can e-mail or cite, allowing others to
+                    reproduce your query. <screenshot>
                         <mediaobject>
                             <imageobject>
                                 <imagedata fileref="images/kwic.png" width="70%" align="center"/>
@@ -226,8 +232,7 @@
         </section>
         <section>
             <title>Using the ANNIS Query Builder</title>
-            <para>To open the graphical query builder, click on the Query Builder button on the
-                Search Form (clicking the button again will close the Query Builder). On the
+            <para>To open the graphical query builder, click on the Query Builder tab. On the
                 left-hand side of the toolbar at the top of the query builder canvas, you will see
                 the Create Node button. Use this button to define nodes to be searched for (tokens,
                 non-terminal nodes or annotations). Creating nodes and modifying them on the canvas
@@ -241,17 +246,28 @@
                     </mediaobject>
                 </screenshot>
             </para>
-            <para> In each node you create you may click on "Add" to specify an annotation value.
-                The annotation name can be typed in or selected from a drop down list. The
-                "Op[erator]" field in the middle allows you to choose between an exact match (the
-                '=' symbol) or wildcard search using Regular Expressions (the '~' symbol). The
-                annotation value is given on the right, and should NOT be surrounded by quotations
-                (see the example below). It is also possible to specify multiple annotations
-                applying to the same position by clicking on "Add" multiple times. Clicking on
-                "Clear" will delete the values in the node. To search for word forms, simply leave
-                the field name on the left empty and type directly on the right under "Value". A
-                node with no data entered will match any node, that is an underspecified token or
-                non-terminal node or annotation. <screenshot>
+            <para> In each node you create you may click on <guiicon><inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/list-add.png"/>
+                        </imageobject>
+                    </inlinemediaobject></guiicon> to specify an annotation value. The annotation
+                name can be typed in or selected from a drop down list. The operator field in the
+                middle allows you to choose between an exact match (the '=' symbol) or wildcard
+                search using Regular Expressions (the '~' symbol). The annotation value is given on
+                the right, and should NOT be surrounded by quotations (see the example below). It is
+                also possible to specify multiple annotations applying to the same position by
+                clicking on <guiicon><inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/list-add.png"/>
+                        </imageobject>
+                    </inlinemediaobject></guiicon> multiple times. Clicking on <guiicon><inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/edit-clear.png"/>
+                        </imageobject>
+                    </inlinemediaobject></guiicon> will delete the values in the node. To search for
+                word forms, simply leave the field name on the left empty and type directly on the
+                right under "Value". A node with no data entered will match any node, that is an
+                underspecified token or non-terminal node or annotation. <screenshot>
                     <mediaobject>
                         <imageobject>
                             <imagedata fileref="images/qb_node.png" width="30%" align="center"/>
@@ -267,8 +283,8 @@
                 directly into the edge's operator box, as in the example with a "func" label in the
                 image below. Note that the node clicked on first (where the "Edge" button was
                 clicked) will be the first node in the resulting quey, i.e. if this is the first
-                node it will dominate the second node (#1 > #2) and not the other way around, as
-                also represented by the arrows along the edge. <screenshot>
+                node it will dominate the second node (<code>#1 > #2</code>) and not the other way
+                around, as also represented by the arrows along the edge. <screenshot>
                     <mediaobject>
                         <imageobject>
                             <imagedata fileref="images/qb_graph.png" width="40%" align="center"/>

@@ -86,7 +86,7 @@
                 <resource>
                   <directory>THIRD-PARTY</directory>
                   <targetPath>THIRD-PARTY</targetPath>
-                  <excludes></excludes>
+                  <excludes />
                 </resource>
               </resources>              
             </configuration>            
@@ -180,7 +180,7 @@
       <artifactId>vaadin</artifactId>
       <version>6.8.4</version>
     </dependency>
-   
+    
    <dependency>
      <groupId>de.hu-berlin.german.korpling.annis</groupId>
      <artifactId>annis-widgets</artifactId>

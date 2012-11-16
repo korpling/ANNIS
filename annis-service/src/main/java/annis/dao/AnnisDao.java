@@ -27,6 +27,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
@@ -60,7 +61,18 @@ public interface AnnisDao
    * @param length
    * @return 
    */
-  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length);
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, 
+    String mimeType ,int offset, int length);
+  
+  /**
+   * Gets meta data about existing binary files from database.
+   * @param toplevelCorpusName
+   * @param corpusName
+   * @param offset starts with 1
+   * @param length
+   * @return 
+   */
+  public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName, String corpusName);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 

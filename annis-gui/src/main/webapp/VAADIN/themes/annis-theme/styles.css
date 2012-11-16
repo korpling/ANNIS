@@ -48,8 +48,14 @@
   color: grey;
 }
 
-.pointer, .v-table-cell-content-kwic-clickable {
+.pointer, .v-table-cell-content-kwic-media {
   cursor: pointer;
+}
+
+.v-table-cell-content-kwic-media {
+  background: url(speaker.png) no-repeat left;
+  width: 32px;
+  height: 32px;
 }
 
 .drag-source-enabled {
@@ -109,6 +115,10 @@ textarea.query {
 }
 .tigerquery-builder-overlay {
   z-index: 10;
+}
+
+.contextsensible-formlayout .v-filterselect {
+  float:left;
 }
 
 /* matched node colors by match index*/
