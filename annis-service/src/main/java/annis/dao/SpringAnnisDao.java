@@ -49,6 +49,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
@@ -60,6 +61,7 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.MatrixSqlGenerator;
+import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
@@ -178,6 +180,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private AnnisParser aqlParser;
   private HashMap<Long, Properties> corpusConfiguration;
   private ByteHelper byteHelper;
+  private MetaByteHelper metaByteHelper;
 
   public SpringAnnisDao()
   {
@@ -739,12 +742,24 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, int offset, int length)
+ public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, 
+ String mimeType,int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, offset, length), 
+      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset, length), 
       ByteHelper.getArgTypes(), byteHelper);
   }
+
+  @Override
+  public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
+    String corpusName)
+  {
+    return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(MetaByteHelper.SQL,
+      metaByteHelper.getArgs(toplevelCorpusName, corpusName), 
+      MetaByteHelper.getArgTypes(), metaByteHelper);
+  }
+  
+  
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
   {
@@ -766,4 +781,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.countSqlGenerator = countSqlGenerator;
   }
+
+  public MetaByteHelper getMetaByteHelper()
+  {
+    return metaByteHelper;
+  }
+
+  public void setMetaByteHelper(MetaByteHelper metaByteHelper)
+  {
+    this.metaByteHelper = metaByteHelper;
+  }
+  
+  
 }

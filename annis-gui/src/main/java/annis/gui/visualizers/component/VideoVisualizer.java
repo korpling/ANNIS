@@ -16,17 +16,23 @@
 package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
+import annis.gui.Helper;
 import annis.gui.media.MediaControllerFactory;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.VideoPlayer;
+import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.Application;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,19 +63,50 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
 
     String binaryServletPath = "";
 
+    String corpusName = corpusPath.get(corpusPath.size() - 1);
+    String documentName = corpusPath.get(0);
     try
     {
-      binaryServletPath = input.getContextPath() + "/Binary?"
-        + "documentName=" + URLEncoder.encode(corpusPath.get(0), "UTF-8")
-        + "&toplevelCorpusName="
-        + URLEncoder.encode(corpusPath.get(corpusPath.size() - 1), "UTF-8");
+      corpusName = URLEncoder.encode(corpusName, "UTF-8");
+      documentName = URLEncoder.encode(documentName, "UTF-8");
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error("UTF-8 was not known as encoding, expect non-working video", ex);
+      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
     }
     
-    VideoPlayer player = new VideoPlayer(binaryServletPath, "video/webm");
+    WebResource resMeta = Helper.getAnnisWebResource(application).path(
+      "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
+    List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
+
+    String mimeType = null;
+    for(AnnisBinaryMetaData m : meta)
+    {
+      if(m.getMimeType().startsWith("video/"))
+      {
+        mimeType = m.getMimeType();
+        break;
+      }
+    }
+    
+    Validate.notNull(mimeType, "There must be at least one binary file for the document with a video mime type");
+    
+    String mimeTypeEncoded = mimeType;
+    try
+    {
+      mimeTypeEncoded = URLEncoder.encode(mimeType, "UTF-8");
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
+    }
+    
+    binaryServletPath = input.getContextPath() + "/Binary?"
+      + "documentName=" + documentName
+      + "&toplevelCorpusName=" + corpusName
+      + "&mime=" + mimeTypeEncoded;
+    
+    VideoPlayer player = new VideoPlayer(binaryServletPath, mimeType);
 
     if (mcFactory != null && application instanceof MediaControllerHolder)
     {

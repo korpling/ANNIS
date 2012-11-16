@@ -31,16 +31,18 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -371,6 +373,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         SAnnotation a = node.getSAnnotation(layer);
         if (a != null)
         {
+          if("annis::time".equals(a.getQName()))
+          {
+            
+            return "play excerpt " + getShortenedTime(a.getValueString());
+          }
           return a.getQName();
         }
 
@@ -426,10 +433,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
             {
               if (media_anno.equals(a.getName()))
               {
-                if (!a.getValueString().matches("\\-[0-9]*(\\.[0-9]*)?"))
-                {
-                  return "kwic-clickable";
-                }
+                return "kwic-media";
               }
             }
           }
@@ -549,7 +553,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
             {
               if (media_anno.equals(a.getName()))
               {
-                return a.getSValueSTEXT();
+                return "";
+//                return getShortenedTime(a.getValueString());
               }
             }
 
@@ -563,6 +568,26 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       public Object generateCell(Table source, Object itemId, Object columnId)
       {
         return generateCell((String) itemId);
+      }
+    }
+    
+    private String getShortenedTime(String time)
+    {
+      String[] splitTime = StringUtils.splitByWholeSeparator(time,
+        "-", 2);
+      double startTime = Double.parseDouble(splitTime[0]);
+      double endTime = splitTime.length > 1 ? Double.parseDouble(splitTime[1]) : -1;
+
+      NumberFormat format = DecimalFormat.getInstance(Locale.US);
+      format.setMaximumFractionDigits(4);
+      format.setMinimumFractionDigits(0);
+      if(endTime >= 0)
+      {
+        return format.format(startTime) + "-" + format.format(endTime);
+      }
+      else
+      {
+        return format.format(startTime);
       }
     }
 
@@ -583,7 +608,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       } // end check
 
       String time = null;
-      SToken token = (SToken) event.getPropertyId();
+      String tokenID = (String) event.getPropertyId();
+      
+      SNode token = result.getSDocumentGraph().getSNode(tokenID);
       for (SAnnotation anno : token.getSAnnotations())
       {
         for (String media_anno : media_annotations)
@@ -595,21 +622,19 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         }
       }
 
-      // do not start the media player, when there is only an
-      // end time defined
-      if (time != null && time.matches("\\-[0-9]*(\\.[0-9]*)?"))
-      {
-        return;
-      }
+      startMediaVisualizers(time);
 
-      if(time != null)
-      {
-        startMediaVisualizers(time);
-      }
     }
 
     public void startMediaVisualizers(String time)
     {
+      // do not start the media player, when there is only an
+      // end time defined
+      if (time == null || time.matches("\\-[0-9]*(\\.[0-9]*)?"))
+      {
+        return;
+      }
+      
       if(mediaController != null && visInput != null)
       {
           
