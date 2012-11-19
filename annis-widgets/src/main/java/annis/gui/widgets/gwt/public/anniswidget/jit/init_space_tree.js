@@ -204,6 +204,14 @@ function initSpaceTree(config) {
         toNode = adj.nodeTo,
         isAlreadyConnected = false;
 
+        //check if we can draw a simple line
+        if (fromNode.data.isMultinuc)
+        {
+          this.edgeTypes.line.render(fromNode.pos, toNode.pos, canvas);
+          return;
+        }
+
+        // check if there this is a pointing relation
         for (var i = 0; i < edges.length; i++)
         {
           var edge = edges[i];

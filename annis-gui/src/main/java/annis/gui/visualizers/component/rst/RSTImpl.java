@@ -40,6 +40,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -103,6 +104,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   // sType for the pointing relation
   private final String POINTING_RELATION = "edge";
+
+  // nodes which has this outgoing or incoming sType has to be treated specially
+  private String MULTINUC = "multinuc";
 
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
@@ -388,6 +392,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       JSONObject data = new JSONObject();
       JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
       JSONArray invisRel = getInvisibleRelatedNodes(currNode);
+      boolean isMultiNucNode = isMultinucNode(currNode);
 
       // since we have found some tokens, it must be a sentence in RST.
       if (token.size() > 0)
@@ -417,6 +422,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         data.put(SENTENCE_LEFT, index);
         data.put(SENTENCE_RIGHT, index);
       }
+
+      // set Flag if the node is span of kind of multinuc
+      data.put("isMultinuc", isMultiNucNode);
 
       jsonData.put("data", data);
     }
@@ -755,11 +763,21 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       /**
        * the pointing relations are modelled as dominance relations with type
        * "edge" and do not carry the annotation "span" or "multinuc", so we will
-       * have to exclude the "point relation" here
+       * have to exclude the "point relation" here. There is one very weird case
+       * with multinucs: If one incoming edge is type of multinuc, we have to
+       * include this node, but this is not the edge we came from. This edge
+       * must be distinct from the current incoming edge.
        */
       if (sTypes.size() == 1
         && POINTING_RELATION.equals(sTypes.get(0))
-        && this.detectWrongAnnotaton(incomingEdge))
+        && detectWrongAnnotaton(incomingEdge)
+        && !isPartOfMultinuc(incomingEdge, incomingEdge.getSTarget()))
+      {
+        return false;
+      }
+      else if (sTypes.size() == 1
+        && "multinuc".equals(sTypes.get(0))
+        && hasAnnoKey(incomingEdge, INVISIBLE_RELATION))
       {
         return false;
       }
@@ -772,6 +790,45 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       return false;
     }
+  }
+
+  /**
+   * Checks if this node is part of a multinuc span. If there exists one
+   * additional edge which has the sType "multinuc" and is different from the
+   * incomin edge.
+   *
+   * @param node The node, which is checked.
+   * @param incomingEdge the edge we came from.
+   *
+   */
+  private boolean isPartOfMultinuc(SRelation incomingEdge, SNode node)
+  {
+    EList<Edge> in = node.getSGraph().getInEdges(node.getSId());
+    if (in != null)
+    {
+      for (Edge e : in)
+      {
+        EList<String> sTypes = null;
+
+        if (!(e instanceof SRelation))
+        {
+          continue;
+        }
+
+        sTypes = ((SRelation) e).getSTypes();
+        if (sTypes == null && sTypes.size() < 1)
+        {
+          continue;
+        }
+
+        // check the case described above.
+        if (MULTINUC.equals(sTypes.get(0)) && e != incomingEdge)
+        {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
