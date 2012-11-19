@@ -413,7 +413,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
       if (currNode instanceof SStructure && isSegment(currNode))
       {
-
         SProcessingAnnotation sentence_idx = currNode.
           getSProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
         int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.
@@ -475,7 +474,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         setSentenceSpan(node, root);
         sortChildren(root);
       }
-
     }
     catch (JSONException ex)
     {
@@ -977,6 +975,40 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       }
     }
 
+    return false;
+  }
+
+  private boolean isMultinucNode(SNode currNode)
+  {
+    EList<Edge> in = currNode.getSGraph().getInEdges(currNode.getSId());
+    if (in != null)
+    {
+      for (Edge e : in)
+      {
+        EList<String> sTypes;
+
+        if (!(e instanceof SRelation))
+        {
+          continue;
+        }
+
+        sTypes = ((SRelation) e).getSTypes();
+        if (sTypes == null && sTypes.size() < 1)
+        {
+          continue;
+        }
+
+        SAnnotation anno = ((SRelation) e).getSAnnotation(
+          ANNOTATION_NAMESPACE + "::" + "name");
+
+        if (MULTINUC.equals(sTypes.get(0))
+          && anno != null)
+        {
+          return true;
+        }
+
+      }
+    }
     return false;
   }
 }

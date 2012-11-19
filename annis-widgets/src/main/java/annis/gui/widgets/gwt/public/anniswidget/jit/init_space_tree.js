@@ -207,7 +207,7 @@ function initSpaceTree(config) {
         //check if we can draw a simple line
         if (fromNode.data.isMultinuc)
         {
-          this.edgeTypes.line.render(fromNode.pos, toNode.pos, canvas);
+          this.edgeHelper.line.render(fromNode.pos, toNode.pos, canvas);
           return;
         }
 
