@@ -109,7 +109,6 @@ public class TestAnnisParserExamples {
   
   @Theory
   @Test
-  @Ignore
 	public void testGoodQueriesAntLR(
 			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
 			String annisQuery) 
