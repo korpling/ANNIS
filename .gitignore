@@ -1,10 +1,10 @@
 /.gitignore~
-/annis-service-implementation/src/main/distribution/log/debug.log
-/annis-service-implementation/src/main/distribution/log/annis.log
-/annis-service-implementation/src/main/distribution/log/error.log
-/annis-service-implementation/src/main/distribution/log/query.log
+*.log
 *~
 /.netbeans/
 /annis-service-implementation/.settings/
 /annis-service-implementation/src/main/antlr3/annis/ql/output/
 target/
+/annis-kickstarter/.settings/
+/.settings/
+/doc/.settings/

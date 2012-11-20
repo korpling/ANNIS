@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2009-2011 Collaborative Research Centre SFB 632 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+	">
+	
+  <!-- Properties configuration -->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>file:${annis.home}/conf/annis-service.properties</value>
+      </list>
+    </property>
+  </bean>
+  
+	<!-- Annis QL Parser -->
+	<bean id="annisParser" class="annis.ql.parser.AnnisParser">
+		<lookup-method name="getInternalParser" bean="annisInternalParser"/>
+		<lookup-method name="getPostProcessors" bean="annisParserPostProcessors"/>
+	</bean>
+	
+	<!-- internal SableCC parser -->
+	<bean id="annisInternalParser" class="annis.ql.parser.AnnisParser$InternalParser" scope="prototype"/>
+		
+	<!-- default post-processors -->
+	<util:list id="annisParserPostProcessors" value-type="annis.ql.analysis.DepthFirstAdapter" scope="prototype">
+		<bean class="annis.ql.parser.NodeSearchNormalizer" scope="prototype" />
+		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
+	</util:list>
+
+  <!-- transforms a AQL query into its disjunctive normal form -->
+  <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" scope="prototype" />
+
+  <bean id="aqlClauseAnalysis" class="annis.ql.parser.ClauseAnalysis" scope="prototype">
+    <property name="precedenceBound" value="${annis.precedence-restriction}"/>
+  </bean>
+
+  <bean id="nodeRelationNormalizer" class="annis.ql.parser.NodeRelationNormalizer" scope="prototype">
+  </bean>
+  
+  <bean id="aqlAnalysis" class="annis.ql.parser.QueryAnalysis">
+    <lookup-method name="getDnfTransformer" bean="aqlDnfTransformer"/>
+    <lookup-method name="getClauseAnalysis" bean="aqlClauseAnalysis"/>
+    <lookup-method name="getNodeRelationNormalizer" bean="nodeRelationNormalizer"/>
+    
+    <property name="normalizeNodesInEdgeRelations" value="${annis.normalize-nodes-in-edge-relations}"/>
+  </bean>
+
+</beans>

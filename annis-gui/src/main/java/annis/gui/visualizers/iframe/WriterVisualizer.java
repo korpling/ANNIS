@@ -15,16 +15,18 @@
  */
 package annis.gui.visualizers.iframe;
 
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implentation of Visualizer which uses Writers instead of OutputStream
  * @author thomas
  */
-public abstract class WriterVisualizer extends IFrameVisualizer
+public abstract class WriterVisualizer extends AbstractIFrameVisualizer
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(WriterVisualizer.class);
@@ -45,7 +47,16 @@ public abstract class WriterVisualizer extends IFrameVisualizer
     catch(IOException ex)
     {
       log.error("Exception when writing visualizer output.", ex);
-      ex.printStackTrace(new PrintWriter(outstream));
+      StringWriter strWriter = new StringWriter();
+      ex.printStackTrace(new PrintWriter(strWriter));
+      try
+      {
+        outstream.write(strWriter.toString().getBytes("UTF-8"));
+      }
+      catch (IOException ex1)
+      {
+        log.error(null, ex);
+      }
     }
   }
 

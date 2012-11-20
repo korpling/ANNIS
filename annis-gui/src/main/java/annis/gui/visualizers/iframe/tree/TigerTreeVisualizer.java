@@ -15,8 +15,8 @@
  */
 package annis.gui.visualizers.iframe.tree;
 
-import annis.MatchedNodeColors;
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.MatchedNodeColors;
+import annis.gui.visualizers.AbstractIFrameVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.AbstractImageGraphicsItem;
 import annis.gui.visualizers.iframe.tree.backends.staticimg.Java2dBackend;
@@ -37,7 +37,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class TigerTreeVisualizer extends IFrameVisualizer
+public class TigerTreeVisualizer extends AbstractIFrameVisualizer
 {
 
   private VisualizerInput input = new VisualizerInput();
@@ -282,17 +282,22 @@ public class TigerTreeVisualizer extends IFrameVisualizer
 
     for(DirectedGraph<AnnisNode, Edge> g : graphtools.getSyntaxGraphs(input))
     {
-      ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
-        g, backend, labeler, styler, input);
+      if(g.getEdgeCount() > 0 && g.getVertexCount() > 0)
+      {
+      
+        ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
+          g, backend, labeler, styler, input);
 
-      AbstractImageGraphicsItem item = cl.createLayout(
-        new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.detectLayoutDirection(result.getGraph())));
+        AbstractImageGraphicsItem item = cl.createLayout(
+          new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.
+          detectLayoutDirection(result.getGraph())));
 
-      Rectangle2D treeSize = item.getBounds();
+        Rectangle2D treeSize = item.getBounds();
 
-      maxheight = Math.max(maxheight, treeSize.getHeight());
-      width += treeSize.getWidth();
-      layouts.add(item);
+        maxheight = Math.max(maxheight, treeSize.getHeight());
+        width += treeSize.getWidth();
+        layouts.add(item);
+      }
     }
 
     BufferedImage image = new BufferedImage(

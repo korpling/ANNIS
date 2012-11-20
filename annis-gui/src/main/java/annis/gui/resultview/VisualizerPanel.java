@@ -17,43 +17,58 @@ package annis.gui.resultview;
 
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
-import annis.gui.visualizers.IFrameVisualizer;
+import annis.gui.VisualizationToggle;
+import annis.gui.media.MediaPlayer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
-import annis.gui.widgets.AutoHeightIFrame;
 import annis.resolver.ResolverEntry;
+import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.Application;
 import com.vaadin.terminal.ApplicationResource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author thomas, Benjamin Weißenfels
+ * Controls the visibility of visualizer plugins and provides some control
+ * methods for the media visualizers.
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends Panel implements Button.ClickListener
+public class VisualizerPanel extends CustomLayout 
+  implements Button.ClickListener, VisualizationToggle
 {
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
@@ -62,158 +77,182 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
   private ApplicationResource resource = null;
-  private AutoHeightIFrame iframe;
-  private SDocument result;
-  private PluginSystem ps;
+  private Component vis;
+  private transient SDocument result;
+  private transient PluginSystem ps;
   private ResolverEntry entry;
   private Random rand = new Random();
-  private Map<SNode, Long> markedAndCovered;
-  private List<SNode> token;
+  private transient Map<SNode, Long> markedAndCovered;
+  private transient List<SToken> token;
   private Map<String, String> markersExact;
   private Map<String, String> markersCovered;
   private Button btEntry;
-  private KWICPanel kwicPanel;
-  private List<String> mediaIDs;
   private String htmlID;
-  private CustomLayout visContainer;
-  private ComponentVisualizerPlugin compVis;
+  private String resultID;;
+  private transient VisualizerPlugin visPlugin;
   private Set<String> visibleTokenAnnos;
-  private STextualDS text;
-  private SingleResultPanel parentPanel;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
+  private final String PERMANENT = "permanent";
+  private final String ISVISIBLE = "visible";
+  private final String HIDDEN = "hidden";
+  private final String PRELOADED = "preloaded";
 
+  private final static String htmlTemplate = 
+    "<div id=\":id\"><div location=\"btEntry\"></div>"
+    + "<div location=\"progress\"></div>"
+    + "<div location=\"iframe\"></div>"
+    + "</div>";
+    
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
    *
    */
-  public VisualizerPanel(String visType, SDocument result, List<SNode> token,
-    Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered,
-    STextualDS text, List<String> mediaIDs,
-    List<VisualizerPanel> mediaVisualizer, String htmlID,
-    SingleResultPanel parent, String segmentationName, PluginSystem ps,
-    CustomLayout visContainer)
+  public VisualizerPanel(
+    final ResolverEntry entry,
+    SDocument result,
+    List<SToken> token,
+    Set<String> visibleTokenAnnos,
+    Map<SNode, Long> markedAndCovered,
+    @Deprecated Map<String, String> markedAndCoveredMap,
+    @Deprecated Map<String, String> markedExactMap,
+    String htmlID,
+    String resultID,
+    SingleResultPanel parent,
+    String segmentationName,
+    PluginSystem ps) throws IOException
   {
-    // get the Visualizer instance
-    VisualizerPlugin tmpVis = ps.getVisualizer(visType);
-    VisualizerPlugin vis = null;
-    Label label;
+    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes("UTF-8")));
 
-    /**
-     * build a new instance, cause the Pluginsystem holds only one instance of
-     * the plugin.
-     */
-    try
-    {
-      vis = tmpVis.getClass().newInstance();
-    }
-    catch (InstantiationException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
-    catch (IllegalAccessException ex)
-    {
-      log.error("could not initiate {}", tmpVis.getShortName(), ex);
-    }
+    visPlugin = ps.getVisualizer(entry.getVisType());
+    
+    this.ps = ps;
+    this.entry = entry;
+    this.markersExact = markedExactMap;
+    this.markersCovered = markedAndCoveredMap;
+
 
     this.result = result;
     this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
-    this.text = text;
-    this.parentPanel = parent;
     this.segmentationName = segmentationName;
-    this.mediaVisualizer = mediaVisualizer;
-    this.mediaIDs = mediaIDs;
-    // TODO use this also for ComponentVisualizer, or lookup a native mediaplayer
     this.htmlID = htmlID;
+    this.resultID = resultID;
 
-    this.visContainer = visContainer;
-
-    if (!(vis instanceof ComponentVisualizerPlugin))
-    {
-      log.warn("{} is not a ComponentVisualizer", vis.getShortName());
-      return;
-    }
-
-    compVis = (ComponentVisualizerPlugin) vis;
-    
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    this.setWidth("100%");    
-    this.setContent(this.visContainer);    
-  }
-
-  public VisualizerPanel(final ResolverEntry entry, SDocument result,
-    PluginSystem ps, Map<String, String> markersExact,
-    Map<String, String> markersCovered, CustomLayout costumLayout,
-    List<String> mediaIDs, String htmlID)
-  {
-    this.result = result;
-    this.ps = ps;
-    this.entry = entry;
-    this.markersExact = markersExact;
-    this.markersCovered = markersCovered;
-    this.visContainer = costumLayout;
-    this.mediaIDs = mediaIDs;
-    this.htmlID = htmlID;
-
-
-    setContent(this.visContainer);
-
     this.setWidth("100%");
-    this.setHeight("-1px");
-
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    btEntry = new Button(entry.getDisplayName());
-    btEntry.setIcon(ICON_EXPAND);
-    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-      + ChameleonTheme.BUTTON_SMALL);
-    btEntry.addListener((Button.ClickListener) this);
-    visContainer.addComponent(btEntry, "btEntry");
   }
 
   @Override
   public void attach()
   {
-    VisualizerInput visInput;
 
-    /**
-     * check if this is a ComponentVisualizer.
-     */
-    if (compVis == null)
+    if (visPlugin == null && ps != null)
     {
-      return;
+      entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+      visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    visInput = createInput();
-    visInput.setResult(result);
-    visInput.setToken(token);
-    visInput.setVisibleTokenAnnos(visibleTokenAnnos);
-    visInput.setText(text);
-    visInput.setSingleResultPanelRef(parentPanel);
-    visInput.setSegmentationName(segmentationName);
-    visInput.setMediaIDs(mediaIDs);
-    visInput.setMediaVisualizer(mediaVisualizer);
+    if(entry != null && visPlugin != null)
+    {
+      
+      if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
+      {
+        // build button for visualizer
+        btEntry = new Button(entry.getDisplayName());
+        btEntry.setIcon(ICON_EXPAND);
+        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+          + ChameleonTheme.BUTTON_SMALL);
+        btEntry.addListener((Button.ClickListener) this);
+        addComponent(btEntry, "btEntry");
+      }
+      else
+      {
+        
+        if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
+          || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          // build button for visualizer
+          btEntry = new Button(entry.getDisplayName());
+          btEntry.setIcon(ICON_COLLAPSE);
+          btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
+            + ChameleonTheme.BUTTON_SMALL);
+          btEntry.addListener((Button.ClickListener) this);
+          addComponent(btEntry, "btEntry");
+        }
+        
+        
+        // create the visualizer and calc input
+        try
+        {
+          vis = createComponent();
+          if(vis != null)
+          {
+            vis.setVisible(true);
+            addComponent(vis, "iframe");
+          }
+        }
+        catch(Exception ex)
+        {
+          getWindow().showNotification(
+            "Could not create visualizer " + visPlugin.getShortName(), 
+            ex.toString(),
+            Window.Notification.TYPE_TRAY_NOTIFICATION
+          );
+          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+        }
+        
+        
+        if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        {
+          btEntry.setIcon(ICON_EXPAND);
+          if(vis != null)
+          {
+            vis.setVisible(false);
+          }
+        }
+        
+      }
+    } // end if entry not null
 
-    compVis.setVisualizerInput(visInput);
-    visContainer.addComponent(compVis, "compVis");
+  }
+  
+  private Component createComponent()
+  {
+    if(visPlugin == null)
+    {
+      return null;
+    }
+    
+    final Application application = getApplication();
+    final VisualizerInput input = createInput();
+    
+    Component c = visPlugin.createComponent(input, application);
+    c.setVisible(false);
+    
+    return c;
   }
 
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisRemoteServiceURL(getApplication().getProperty(
-      "AnnisRemoteService.URL"));
+    input.setAnnisWebServiceURL(getApplication().getProperty(
+      "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
-    input.setId("" + rand.nextLong());
+    
+    input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
-    input.setMediaIDs(mediaIDs);
     input.setMarkedAndCovered(markedAndCovered);
+    input.setVisPanel(this);
+
+    input.setResult(result);
+    input.setToken(token);
+    input.setVisibleTokenAnnos(visibleTokenAnnos);
+    input.setSegmentationName(segmentationName);
 
     if (entry != null)
     {
@@ -224,45 +263,73 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
       input.setResourcePathTemplate(template);
     }
 
+    if (visPlugin != null && visPlugin.isUsingText()
+      && result != null && result.getSDocumentGraph().getSNodes().size() > 0)
+    {
+      SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
+        get(0).getSName(), result.getSName());
+
+      input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
+
+    }
+    else
+    {
+      input.setDocument(result);
+    }
+
     return input;
   }
+  
+  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  {
+    this.visibleTokenAnnos = annos;
+    if(visPlugin != null && vis != null)
+    {
+      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
+    }
+  }
+  
+  public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
+  {
+    this.segmentationName = segmentationName;
+    this.markedAndCovered = markedAndCovered;
+    
+    if(visPlugin != null && vis != null)
+    {
+      visPlugin.setSegmentationLayer(vis, segmentationName,markedAndCovered);
+    }
+  }
 
-  private ApplicationResource createResource(
-    final ByteArrayOutputStream byteStream,
+  public ApplicationResource createResource(
+    ByteArrayOutputStream byteStream,
     String mimeType)
   {
 
     StreamResource r;
 
-    r = new StreamResource(new StreamResource.StreamSource()
-    {
-      @Override
-      public InputStream getStream()
-      {
-        return new ByteArrayInputStream(byteStream.toByteArray());
-      }
-    }, entry.getVisType() + "_" + Math.abs(rand.nextLong()), getApplication());
+    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream), 
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
     r.setMIMEType(mimeType);
 
     return r;
   }
 
-  private SaltProject getText(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
-    SaltProject text = null;
+    SaltProject txt = null;
     try
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      text = annisResource.path("graphs").path(toplevelCorpusName).path(
+      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).path(
         documentName).get(SaltProject.class);
     }
     catch (Exception e)
     {
       log.error("General remote service exception", e);
     }
-    return text;
+    return txt;
   }
 
   @Override
@@ -279,108 +346,173 @@ public class VisualizerPanel extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(true);
+    toggleVisualizer(!visualizerIsVisible(), null);
   }
 
-  /**
-   * Opens and closes visualizer.
-   *
-   * @param collapse when collapse is false, the Visualizer would never be
-   * closed
-   */
-  public void toggleVisualizer(boolean collapse)
+  @Override
+  public boolean visualizerIsVisible()
   {
-    if (resource != null && collapse)
+    if(vis == null || !vis.isVisible())
     {
-      getApplication().removeResource(resource);
+      return false;
     }
-
-    if (btEntry.getIcon() == ICON_EXPAND)
+    return true;
+  }
+  
+  private void loadVisualizer(final LoadableVisualizer.Callback callback)
+  {
+    // check if it's necessary to create input
+    if (visPlugin != null)
     {
-      // expand
-      if (iframe == null)
+      Executor exec = Executors.newSingleThreadExecutor();
+      FutureTask<Component> future = new FutureTask<Component>(new LoadComponentTask())
       {
 
-        VisualizerPlugin vis = ps.getVisualizer(entry.getVisType());
-
-        if (vis == null)
+        @Override
+        public void run()
         {
-          entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-          vis = ps.getVisualizer(entry.getVisType());
-        }
-
-        VisualizerInput input = createInput();
-        IFrameVisualizer iframeVis;
-
-        //TODO print error message
-        if (vis instanceof IFrameVisualizer)
-        {
-          iframeVis = (IFrameVisualizer) vis;
-
-          if (iframeVis.isUsingText()
-            && result.getSDocumentGraph().getSNodes().size() > 0)
+          try
           {
-            SaltProject p = getText(result.getSCorpusGraph().getSRootCorpus().
-              get(0).getSName(), result.getSName());
+            super.run();
+            // wait maximum 60 seconds
+            vis = get(60, TimeUnit.SECONDS);
+            synchronized (getApplication())
+            {
+              if (callback != null && vis instanceof LoadableVisualizer)
+              {
+                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+                if (loadableVis.isLoaded())
+                {
+                  // direct call callback since the visualizer is already ready
+                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                }
+                else
+                {
+                  loadableVis.clearCallbacks();
+                  // add listener when player was fully loaded
+                  loadableVis.addOnLoadCallBack(callback);
+                }
+              }
+              
+              removeComponent("progress");
 
-            input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
+              if (vis != null)
+              {
+                vis.setVisible(true);
+                if (getComponent("iframe") == null)
+                {
+                  addComponent(vis, "iframe");
+                }
+              }
+            }
           }
-          else
+          catch (InterruptedException ex)
           {
-
-            input.setDocument(result);
-
+            log.error("Visualizer creation interrupted " + visPlugin.getShortName(), ex);
           }
-
-          ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-          iframeVis.writeOutput(input, outStream);
-
-          resource = createResource(outStream, iframeVis.getContentType());
-          String url = getApplication().getRelativeLocation(resource);
-          iframe = new AutoHeightIFrame(url == null ? "/error.html" : url, this);
-
-          visContainer.addComponent(iframe, "iframe");
-        }
-
-      }
-
+          catch (ExecutionException ex)
+          {
+            log.error("Exception when creating visualizer " + visPlugin.getShortName(), ex);
+          }
+          catch (TimeoutException ex)
+          {
+            log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
+            synchronized(getApplication())
+            {
+              getWindow().showNotification(
+                "Could not create visualizer " + visPlugin.getShortName(),
+                ex.toString(),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            cancel(true);
+          }
+        } 
+      };
+      exec.execute(future);
+      
+      
       btEntry.setIcon(ICON_COLLAPSE);
-      iframe.setVisible(true);
+      ProgressIndicator progress = new ProgressIndicator();
+      progress.setIndeterminate(true);
+      progress.setVisible(true);
+      progress.setEnabled(true);
+      progress.setPollingInterval(100);
+      progress.setDescription("Loading visualizer" +  visPlugin.getShortName());
+      addComponent(progress, "progress");
     }
-    else if (btEntry.getIcon() == ICON_COLLAPSE && collapse)
+    // end if create input was needed
+
+  } // end loadVisualizer
+
+  
+  @Override
+  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
+  {
+    if (visible)
     {
-      // collapse
-      if (iframe != null)
+      loadVisualizer(callback);
+    }
+    else
+    {
+      // hide
+      
+      if (vis != null)
       {
-        iframe.setVisible(false);
-        stopMediaVisualizers();
+        vis.setVisible(false);
+        if(vis instanceof MediaPlayer)
+        {
+          removeComponent(vis);
+        }
       }
+
       btEntry.setIcon(ICON_EXPAND);
     }
+
   }
 
-  public void setKwicPanel(KWICPanel kwicPanel)
+  public String getHtmlID()
   {
-    this.kwicPanel = kwicPanel;
+    return htmlID;
   }
-
-  public void startMediaVisFromKWIC()
+  
+  public class LoadComponentTask implements Callable<Component>
   {
-    if (kwicPanel != null)
+    @Override
+    public Component call() throws Exception
     {
-      kwicPanel.startMediaVisualizers();
-      // set back to null, otherwise the movie will stop
-      kwicPanel = null;
+      // only create component if not already created
+      if(vis == null)
+      {
+        return createComponent();
+      }
+      else
+      {
+        return vis;
+      }
     }
   }
-
-  private void stopMediaVisualizers()
+  
+  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
   {
-    String stopCommand = ""
-      + "document.getElementById(\"" + this.htmlID + "\")"
-      + ".getElementsByTagName(\"iframe\")[0].contentWindow.stop()";
-    getWindow().executeJavaScript(stopCommand);
+    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+    private transient ByteArrayOutputStream byteStream;
 
+    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
+    {
+      this.byteStream = byteStream;
+    }
+    
+    @Override
+    public InputStream getStream()
+    {
+      if(byteStream == null)
+      {
+        log.error("byte stream was null");
+        return null;
+      }
+      return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+    
   }
+
 }

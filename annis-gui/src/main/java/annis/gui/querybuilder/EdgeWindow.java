@@ -18,6 +18,7 @@ package annis.gui.querybuilder;
 import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -29,7 +30,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 public class EdgeWindow extends Panel implements Button.ClickListener
 {
   
-  protected static final String[] EDGE_OPERATORS = new String[]
+  private static final String[] EDGE_OPERATORS = new String[]
   {
     ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
     "_l_", "'_r_", "_o_", "_ol_", "_or_"
@@ -51,7 +52,6 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     setSizeFull();
     
-    
     VerticalLayout vLayout = (VerticalLayout) getContent();
     vLayout.setMargin(false);
     
@@ -61,8 +61,9 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     toolbar.setHeight("20px");
     addComponent(toolbar);
         
-    btClose = new Button("X");
-    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClose = new Button();
+    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     

@@ -55,7 +55,7 @@
                 <doclet>org.dbdoclet.doclet.docbook.DocBookDoclet</doclet>
                 <docletPath>${basedir}/extlib/dbdoclet.jar</docletPath>
                 
-                <sourcepath>../annis-service-rmi/src/main/java:../annis-service-impl/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
+                <sourcepath>../annis-service-rmi/src/main/java:../annis-service/src/main/java:../annis-gui/src/main/java:../Annis-Kickstarter/src/main/java</sourcepath>
 
                 
                 <useStandardDocletOptions>false</useStandardDocletOptions>

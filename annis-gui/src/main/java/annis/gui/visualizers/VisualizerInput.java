@@ -16,13 +16,13 @@
 package annis.gui.visualizers;
 
 import annis.gui.MatchedNodeColors;
-import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerPanel;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Writer;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.jdom.Document;
 
 /**
  * Contains all needed data for a visualizer to perform the visualization.
@@ -42,34 +41,24 @@ public class VisualizerInput
 
   private SDocument document;
   private String namespace = "";
-  private String paula = null;
   private Map<SNode, Long> markedAndCovered;
   private Map<String, String> markableMap = new HashMap<String, String>();
   private Map<String, String> markableExactMap = new HashMap<String, String>();
   private String id = "";
   private String contextPath;
-  private String annisRemoteServiceURL;
+  private String annisWebServiceURL;
   private String dotPath;
-  private Document paulaJDOM = null;
   private AnnisResult result;
   private Properties mappings;
   private String resourcePathTemplate = "%s";
-  private List<String> mediaIDs;
-  private List<SNode> token;
+  private List<SToken> token;
   private Set<String> tokenAnnos;
-  private STextualDS text;
-  private SingleResultPanel singleResultPanel;
   private String segmentationName;
-  private List<VisualizerPanel> mediaVisualizer;
+  private VisualizerPanel visPanel;
 
-  /**
-   * Get the URL which is configured for the Annis installation.
-   *
-   * @return
-   */
-  public String getAnnisRemoteServiceURL()
+  public String getAnnisWebServiceURL()
   {
-    return annisRemoteServiceURL;
+    return annisWebServiceURL;
   }
 
   /**
@@ -77,9 +66,9 @@ public class VisualizerInput
    *
    * @param annisRemoteServiceURL
    */
-  public void setAnnisRemoteServiceURL(String annisRemoteServiceURL)
+  public void setAnnisWebServiceURL(String annisRemoteServiceURL)
   {
-    this.annisRemoteServiceURL = annisRemoteServiceURL;
+    this.annisWebServiceURL = annisRemoteServiceURL;
   }
 
   /**
@@ -325,34 +314,10 @@ public class VisualizerInput
   }
 
   /**
-   * mediaVisIds This sets the id of possible media visualizer. We use this to
-   * resolve the javascript api in the html frontend. The List could be null,
-   * which means, that there was no media visualizer triggered in the resovler
-   * entries
-   *
-   * @param mediaVisTriggered
-   */
-  public void setMediaIDs(List<String> mediaIDs)
-  {
-    this.mediaIDs = mediaIDs;
-  }
-
-  /**
-   * returns the media visualizer ids. We insert the iframe in a div block with
-   * this id: "resolver-resultNum-numOfVis"
-   *
-   * @return
-   */
-  public List<String> getMediaIDs()
-  {
-    return mediaIDs;
-  }
-
-  /**
    * should contains a list of all token of a the which is available with
    * {@link VisualizerInput#getSResult()}.
    */
-  public void setToken(List<SNode> token)
+  public void setToken(List<SToken> token)
   {
     this.token = token;
   }
@@ -365,11 +330,11 @@ public class VisualizerInput
    * {@link VisualizerInput#getSResult()}.
    *
    */
-  public List<SNode> getToken()
+  public List<SToken> getToken()
   {
     return this.token;
   }
-
+  
   /**
    * Set all token annotations which should be displayed by the visualizer and
    * correspondands to the annos choosen by the user in the annis gui.
@@ -388,30 +353,6 @@ public class VisualizerInput
     return this.tokenAnnos;
   }
 
-  // TODO find out why we need this.
-  public void setText(STextualDS text)
-  {
-    this.text = text;
-  }
-
-  // TODO find out why we need this
-  public STextualDS getText()
-  {
-    return this.text;
-  }
-
-  // TODO find out why we need this
-  public void setSingleResultPanelRef(SingleResultPanel parentPanel)
-  {
-    this.singleResultPanel = parentPanel;
-  }
-
-  // TODO find out why we need this
-  public SingleResultPanel getSingleResultPanel()
-  {
-    return this.singleResultPanel;
-  }
-
   public void setSegmentationName(String segmentationName)
   {
     this.segmentationName = segmentationName;
@@ -426,17 +367,19 @@ public class VisualizerInput
   }
 
   /**
-   * All available visualizer for this result.
-   *
-   * @param mediaVisualizer
+   * @return the visPanel
    */
-  public void setMediaVisualizer(List<VisualizerPanel> mediaVisualizer)
+  public VisualizerPanel getVisPanel()
   {
-    this.mediaVisualizer = mediaVisualizer;
+    return visPanel;
   }
 
-  public List<VisualizerPanel> getMediaVisualizer()
+  /**
+   * @param visPanel this should be the parent VisualizerPanel for the
+   * visualizer which render this result
+   */
+  public void setVisPanel(VisualizerPanel visPanel)
   {
-    return mediaVisualizer;
+    this.visPanel = visPanel;
   }
 }

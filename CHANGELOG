@@ -1,6 +1,34 @@
-Version 3.0.0-beta1
-===================
+Version 3.0.0-alpha.2
+=====================
 
-first beta release in the new improved ANNIS 3.0 release series
+First public alpha release in the new improved ANNIS 3.0 release series.
 
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 
+[Bugs]
+ #31 Regex behavior in Falko metadata is incorrect
+ #12 Staging area tables are not deleted after successfull import
+ #1 Regex bug with initial optional parentheses
+ #2 import: level for dominance edges might be not set
+
+[Enhancements]
+ #54 Count number of documents which have tupels matching the query.
+ #53 Sort results by the token order of the matches
+ #52 Vaadin based GUI
+ #33 Re-organize ANNIS manual
+ #32 improve co-existence with Vaadin logging
+ #30 Bug Report button in GUI
+ #22 button for deleting all nodes in query builder
+ #18 Hits should be numbered in result window
+ #16 Results in WEKA should be sorted
+ #13 missing postgres admin password
+ #7 Firefox does not save the login information
+ #8 Configurable edge names for Tiger tree visualizer
+ #3 Allow larger strings in annotation values
+
+[Other]
+ #51 fixed package declaration error
+ #48 Improving the speed of the subgraph query
+ #44 Move authentification and authorization from frontend to service
+ #37 Allow to migrate corpora in database initialization

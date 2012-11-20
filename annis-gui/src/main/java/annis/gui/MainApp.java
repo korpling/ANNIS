@@ -15,20 +15,24 @@
  */
 package annis.gui;
 
+import annis.gui.media.MediaController;
+import annis.gui.media.MediaControllerHolder;
+import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.grid.GridVisualizer;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
 import annis.gui.visualizers.iframe.dependency.ProielRegularDependencyTree;
 import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
+import annis.gui.visualizers.iframe.graph.DebugVisualizer;
 import annis.gui.visualizers.iframe.graph.DotGraphVisualizer;
 import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.iframe.media.AudioVisualizer;
-import annis.gui.visualizers.iframe.media.VideoVisualizer;
+import annis.gui.visualizers.component.AudioVisualizer;
+import annis.gui.visualizers.component.KWICPanel;
+import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
-import annis.security.AnnisSecurityManager;
 import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -66,7 +70,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener, HttpServletRequestListener, Serializable
+  UserChangeListener, HttpServletRequestListener, Serializable, MediaControllerHolder
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
@@ -79,6 +83,9 @@ public class MainApp extends Application implements PluginSystem,
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
   private Properties versionProperties;
+  
+  private transient MediaController mediaController;
+ 
 
   @Override
   public void init()
@@ -131,7 +138,7 @@ public class MainApp extends Application implements PluginSystem,
     }
     catch (JoranException ex)
     {
-      log.error("init loggin failed", ex);
+      log.error("init logging failed", ex);
     }
 
   }
@@ -238,28 +245,9 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void setUser(Object user)
   {
-    if (user == null || !(user instanceof AnnisUser))
-    {
-      try
-      {
-        user = getWindowSearch().getSecurityManager().login(AnnisSecurityManager.FALLBACK_USER,
-          AnnisSecurityManager.FALLBACK_USER, true);
-      }
-      catch (Exception ex)
-      {
-        log.error(null, ex);
-      }
-    }
     super.setUser(user);
 
     getWindowSearch().updateUserInformation();
-  }
-
-  @Override
-  public AnnisUser getUser()
-  {
-    Object u = super.getUser();
-    return (AnnisUser) u;
   }
 
   private void initPlugins()
@@ -272,7 +260,9 @@ public class MainApp extends Application implements PluginSystem,
     // add our core plugins by hand
     pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(DebugVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
@@ -282,13 +272,15 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
+    
+    pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
     if (basicPlugins.isDirectory())
     {
       pluginManager.addPluginsFrom(basicPlugins.toURI());
-      log.info("added plugins from {0}", basicPlugins.getPath());
+      log.info("added plugins from {}", basicPlugins.getPath());
     }
 
 
@@ -296,7 +288,7 @@ public class MainApp extends Application implements PluginSystem,
     if (globalPlugins != null)
     {
       pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
-      log.info("added plugins from {0}", globalPlugins);
+      log.info("added plugins from {}", globalPlugins);
     }
 
     StringBuilder listOfPlugins = new StringBuilder();
@@ -351,11 +343,6 @@ public class MainApp extends Application implements PluginSystem,
     session.setAttribute(USER_KEY, event.getNewUser());
   }
 
-  public AnnisSecurityManager getSecurityManager()
-  {
-    return getWindowSearch().getSecurityManager();
-  }
-
   @Override
   public void onRequestStart(HttpServletRequest request, HttpServletResponse response)
   {
@@ -388,5 +375,17 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void onRequestEnd(HttpServletRequest request, HttpServletResponse response)
   {
+  }
+
+  @Override
+  public MediaController getMediaController()
+  {
+    return mediaController;
+  }
+
+  @Override
+  public void setMediaController(MediaController mediaController)
+  {
+    this.mediaController = mediaController;
   }
 }

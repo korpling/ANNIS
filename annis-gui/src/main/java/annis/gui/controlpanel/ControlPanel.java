@@ -18,20 +18,16 @@ package annis.gui.controlpanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
-import annis.security.AnnisUser;
-import annis.service.objects.AnnisCorpus;
+import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.apache.commons.collections15.set.ListOrderedSet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 
@@ -46,7 +42,7 @@ public class ControlPanel extends Panel
   private SearchWindow searchWindow;
   private Window window;
   private String lastQuery;
-  private Map<String, AnnisCorpus> lastCorpusSelection;
+  private Set<String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
 
@@ -56,14 +52,17 @@ public class ControlPanel extends Panel
     this.searchWindow = searchWindow;
     this.history = new ListOrderedSet<HistoryEntry>();
 
+    setSizeFull();
+    
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
     VerticalLayout layout = (VerticalLayout) getContent();
-    layout.setHeight(100f, UNITS_PERCENTAGE);
-
+    layout.setSizeFull();
+    
     Accordion accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
     corpusList = new CorpusListPanel(this);
 
@@ -75,7 +74,6 @@ public class ControlPanel extends Panel
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-
 
     addComponent(queryPanel);
     addComponent(accordion);
@@ -90,7 +88,7 @@ public class ControlPanel extends Panel
     this.window = getWindow();
   }
 
-  public void setQuery(String query, Map<String, AnnisCorpus> corpora)
+  public void setQuery(String query, Set<String> corpora)
   {
     if (queryPanel != null && corpusList != null)
     {
@@ -102,7 +100,7 @@ public class ControlPanel extends Panel
     }
   }
 
-  public void setQuery(String query, Map<String, AnnisCorpus> corpora,
+  public void setQuery(String query, Set<String> corpora,
     int contextLeft, int contextRight)
   {
     setQuery(query, corpora);
@@ -110,7 +108,7 @@ public class ControlPanel extends Panel
     searchOptions.setRightContext(contextRight);
   }
 
-  public Map<String, AnnisCorpus> getSelectedCorpora()
+  public Set<String> getSelectedCorpora()
   {
     return corpusList.getSelectedCorpora();
   }
@@ -123,27 +121,14 @@ public class ControlPanel extends Panel
 
   public void executeQuery()
   {
-    if (getApplication() != null && getApplication().getUser() == null)
-    {
-      getWindow().showNotification("Please login first",
-        Window.Notification.TYPE_WARNING_MESSAGE);
-    }
-    else if (getApplication() != null && corpusList != null && queryPanel
+    if (getApplication() != null && corpusList != null && queryPanel
       != null)
     {
-
-      Map<String, AnnisCorpus> rawCorpusSelection =
-        corpusList.getSelectedCorpora();
-
-      // filter corpus selection by logged in user
-      lastCorpusSelection = new TreeMap<String, AnnisCorpus>(rawCorpusSelection);
-      AnnisUser user = (AnnisUser) getApplication().getUser();
-      if (user != null)
-      {
-        lastCorpusSelection.keySet().retainAll(user.getCorpusNameList());
-      }
+ 
       lastQuery = queryPanel.getQuery();
-      if (lastCorpusSelection.isEmpty())
+      lastCorpusSelection = corpusList.getSelectedCorpora();
+      
+      if (lastCorpusSelection == null || lastCorpusSelection.isEmpty())
       {
         getWindow().showNotification("Please select a corpus",
           Window.Notification.TYPE_WARNING_MESSAGE);
@@ -158,7 +143,7 @@ public class ControlPanel extends Panel
 
       HistoryEntry e = new HistoryEntry();
       e.setQuery(lastQuery);
-      e.setCorpora(getSelectedCorpora());
+      e.setCorpora(lastCorpusSelection);
 
       // remove it first in order to let it appear on the beginning of the list
       history.remove(e);
@@ -186,13 +171,13 @@ public class ControlPanel extends Panel
   
   public void corpusSelectionChanged()
   {
-    searchOptions.updateSegmentationList(corpusList.getSelectedCorpora().keySet());
+    searchOptions.updateSegmentationList(corpusList.getSelectedCorpora());
   }
 
   private class CountThread extends Thread
   {
 
-    private int count = -1;
+    private MatchAndDocumentCount count = null;
 
     @Override
     public void run()
@@ -208,16 +193,9 @@ public class ControlPanel extends Panel
       {
         try
         {
-          Set<String> corpusNames = new TreeSet<String>();
-          for(AnnisCorpus c : lastCorpusSelection.values())
-          {
-            corpusNames.add(c.getName());
-          }
-          
-          count = Integer.parseInt(res.path("search").path("count").queryParam(
+          count = res.path("query").path("search").path("count").queryParam(
             "q", lastQuery).queryParam("corpora",
-            StringUtils.join(corpusNames, ",")).get(
-            String.class));
+            StringUtils.join(lastCorpusSelection, ",")).get(MatchAndDocumentCount.class);
         }
         catch (UniformInterfaceException ex)
         {
@@ -226,15 +204,24 @@ public class ControlPanel extends Panel
             if (ex.getResponse().getStatus() == 400)
             {
               window.showNotification(
-                ex.getResponse().getEntity(String.class), "parsing error",
-                Window.Notification.TYPE_ERROR_MESSAGE);
+                "parsing error",
+                ex.getResponse().getEntity(String.class),
+                Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+            else if(ex.getResponse().getStatus() == 504) // gateway timeout
+            {
+               window.showNotification(
+                "Timeout: query execution took too long.",
+                "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
+                Window.Notification.TYPE_WARNING_MESSAGE);
             }
             else
             {
               window.showNotification(
-                ex.getResponse().getEntity(String.class), "unknown error " + ex.
+                "unknown error " + ex.
                 getResponse().getStatus(),
-                Window.Notification.TYPE_ERROR_MESSAGE);
+                ex.getResponse().getEntity(String.class),
+                Window.Notification.TYPE_WARNING_MESSAGE);
             }
           }
         }
@@ -242,15 +229,22 @@ public class ControlPanel extends Panel
 
       synchronized(getApplication()) 
       {
-        queryPanel.setStatus("" + count + " matches");
-        searchWindow.updateQueryCount(count);
+        queryPanel.setCountIndicatorEnabled(false);
+        if(count != null)
+        {
+          String documentString = count.getDocumentCount() > 1 ? "documents" : "document";
+          String matchesString = count.getMatchCount() > 1 ? "matches" : "match";
+          
+          queryPanel.setStatus("" + count.getMatchCount() + " " + matchesString
+            + " <br/>in " + count.getDocumentCount() + " " + documentString );
+          searchWindow.updateQueryCount(count.getMatchCount());
+        }
       }
-      queryPanel.setCountIndicatorEnabled(false);
     }
 
     public int getCount()
     {
-      return count;
+      return count.getMatchCount();
     }
   }
 }

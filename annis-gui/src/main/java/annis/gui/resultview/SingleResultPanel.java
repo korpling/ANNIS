@@ -16,23 +16,17 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
-import annis.gui.visualizers.ComponentVisualizerPlugin;
-import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.component.KWICPanel;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
-import annis.service.objects.CorpusConfig;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -42,9 +36,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,8 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class SingleResultPanel extends VerticalLayout implements
+public class SingleResultPanel extends CssLayout implements
   Button.ClickListener
 {
 
@@ -70,30 +62,22 @@ public class SingleResultPanel extends VerticalLayout implements
   private static final String INITIAL_OPEN = "initial_open";
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
-  private SDocument result;
-  private Map<SNode, Long> markedAndCovered;
+  private transient SDocument result;
+  private transient Map<SNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
   private ResolverProvider resolverProvider;
-  private PluginSystem ps;
-  private List<KWICPanel> kwicPanels;
-  private List<VisualizerPanel> mediaVisualizer;
-  private List<String> mediaIDs;
+  private transient PluginSystem ps;
+  private List<VisualizerPanel> visualizers;
   private Button btInfo;
   private int resultNumber;
   private List<String> path;
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
-  private CorpusConfig corpusConfig;
-  private List<SNode> token;
+  private transient List<SToken> token;
   private boolean wasAttached;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
-  // TODO should be configurable with resolver_vis_tab
-  private String[] alwaysVisibleVis =
-  {
-    "KWIC"
-  };
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
@@ -105,6 +89,7 @@ public class SingleResultPanel extends VerticalLayout implements
     this.resultNumber = resultNumber;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
+    
 
     calculateHelperVariables();
 
@@ -112,7 +97,7 @@ public class SingleResultPanel extends VerticalLayout implements
     setHeight("-1px");
 
     setMargin(false);
-    setSpacing(false);
+    //setSpacing(false);
 
     HorizontalLayout infoBar = new HorizontalLayout();
     infoBar.addStyleName("docPath");
@@ -149,62 +134,37 @@ public class SingleResultPanel extends VerticalLayout implements
     try
     {
 
-      if (wasAttached)
+      if (wasAttached || result == null)
       {
         return;
       }
       wasAttached = true;
 
-      // get corpus properties
-
-      corpusConfig =
-        Helper.getCorpusConfig(path.get(0), getApplication(), getWindow());
-
       ResolverEntry[] entries =
         resolverProvider.getResolverEntries(result);
-      mediaIDs = mediaVisIds(entries);
-      List<VisualizerPanel> visualizers = new LinkedList<VisualizerPanel>();
+      visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-      mediaVisualizer = new ArrayList<VisualizerPanel>();
+            
+      token = result.getSDocumentGraph().getSortedSTokenByText();
 
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+        result.getSDocumentGraph());
+      
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      calulcateColorsForMarkedAndCoverd();
 
-      // hacky implemented ComponentVisualizer
-      for (int i = 0; i < alwaysVisibleVis.length; i++)
-      {
-        String id = "resolver-" + resultNumber + "-" + i;
-        CustomLayout visContainer = this.visContainer(id, "compVis");
-
-        for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-        {
-          token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-            result.getSDocumentGraph());
-
-          markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
-          calulcateColorsForMarkedAndCoverd();
-
-          VisualizerPanel p = new VisualizerPanel(alwaysVisibleVis[i], result,
-            token, visibleTokenAnnos, markedAndCovered, text, mediaIDs,
-            mediaVisualizer, id, this, segmentationName, ps, visContainer);
-          visualizers.add(p);
-
-        }
-      }
-      // /hacky implemented ComponentVisualizer
-
+      String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
+      
       for (int i = 0; i < entries.length; i++)
       {
-        String id = "resolver-" + resultNumber + "-" + i;
-        CustomLayout visContainer = this.visContainer(id, "iframe");
+        String htmlID = "resolver-" + resultNumber + "_" +  i;
 
-        VisualizerPanel p = new VisualizerPanel(entries[i], result, ps,
-          markedExactMap, markedCoveredMap, visContainer, mediaIDs, id);
-
-        if ("media".equals(entries[i].getVisType())
-          || "video".equals(entries[i].getVisType())
-          || "audio".equals(entries[i].getVisType()))
-        {
-          mediaVisualizer.add(p);
-        }
+        VisualizerPanel p = new VisualizerPanel(
+          entries[i], result,
+          token, visibleTokenAnnos, markedAndCovered,
+          markedCoveredMap, markedExactMap, 
+          htmlID, resultID, this,
+          segmentationName, ps);
 
         visualizers.add(p);
         Properties mappings = entries[i].getMappings();
@@ -212,8 +172,9 @@ public class SingleResultPanel extends VerticalLayout implements
         {
           openVisualizers.add(p);
         }
-      }
 
+      } // for each resolver entry
+      
       for (VisualizerPanel p : visualizers)
       {
         addComponent(p);
@@ -221,8 +182,9 @@ public class SingleResultPanel extends VerticalLayout implements
 
       for (VisualizerPanel p : openVisualizers)
       {
-        p.toggleVisualizer(false);
+        p.toggleVisualizer(true, null);
       }
+      
     }
     catch (Exception ex)
     {
@@ -230,76 +192,28 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  @Deprecated
-  private void addKWICPanels()
-  {
-    if (!corpusConfig.getConfig().containsKey(HIDE_KWIC)
-      || Boolean.parseBoolean(
-      corpusConfig.getConfig().get(HIDE_KWIC)) == false)
-    {
-      kwicPanels.clear();
-      for (STextualDS text : result.getSDocumentGraph().getSTextualDSs())
-      {
-        token = CommonHelper.getSortedSegmentationNodes(segmentationName,
-          result.getSDocumentGraph());
-
-        markedAndCovered = calculateMarkedAndCoveredIDs(result, token);
-        calulcateColorsForMarkedAndCoverd();
-
-
-        KWICPanel kwic = new KWICPanel(result, token, visibleTokenAnnos,
-          markedAndCovered, text, mediaIDs, mediaVisualizer, this,
-          segmentationName);
-
-        // add after the info bar component
-        addComponent(kwic, 1);
-        kwicPanels.add(kwic);
-      }
-    }
-  }
-
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
-    if (kwicPanels != null)
-    {
-      for (KWICPanel kwic : kwicPanels)
-      {
-        removeComponent(kwic);
-      }
 
-      kwicPanels.clear();
-      addKWICPanels();
+    if(result != null)
+    {
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+          result.getSDocumentGraph());
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      for (VisualizerPanel p : visualizers)
+      {
+        p.setSegmentationLayer(segmentationName, markedAndCovered);
+      }
     }
   }
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-
-    for (String visName : alwaysVisibleVis)
-    {
-      VisualizerPlugin vis = ps.getVisualizer(visName);
-      ComponentVisualizerPlugin compVis;
-
-      if (vis instanceof ComponentVisualizerPlugin)
-      {
-        compVis = (ComponentVisualizerPlugin) vis;
-        compVis.setVisibleTokenAnnosVisible(annos);
-      }
-      else
-      {
-        log.warn(visName + " is not an instance of "
-          + ComponentVisualizerPlugin.class.getName());
-      }
-    }
-
-    if (kwicPanels != null)
-    {
-      for (KWICPanel kwic : kwicPanels)
-      {
-        kwic.setVisibleTokenAnnosVisible(annos);
-      }
-    }
+     for (VisualizerPanel p : visualizers)
+     {
+       p.setVisibleTokenAnnosVisible(annos);
+     }
   }
 
   private void calculateHelperVariables()
@@ -307,46 +221,52 @@ public class SingleResultPanel extends VerticalLayout implements
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
 
-    SDocumentGraph g = result.getSDocumentGraph();
-    if (g != null)
+    if(result != null)
     {
-      for (SNode n : result.getSDocumentGraph().getSNodes())
+      SDocumentGraph g = result.getSDocumentGraph();
+      if (g != null)
       {
-
-        SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-
-        if (match != null)
+        for (SNode n : result.getSDocumentGraph().getSNodes())
         {
-          int color = Math.max(0, Math.min((int) match.longValue() - 1,
-            MatchedNodeColors.values().length - 1));
-          SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-          if (feat != null)
-          {
-            markedExactMap.put("" + feat.getSValueSNUMERIC(),
-              MatchedNodeColors.values()[color].name());
-          }
-        }
 
-      }
-    }
+          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.
+            getSValueSNUMERIC();
+
+          if (match != null)
+          {
+            int color = Math.max(0, Math.min((int) match.longValue() - 1,
+              MatchedNodeColors.values().length - 1));
+            SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+            if (feat != null)
+            {
+              markedExactMap.put("" + feat.getSValueSNUMERIC(),
+                MatchedNodeColors.values()[color].name());
+            }
+          }
+
+        }
+      } // end if g not null
+    } // end if result not null
   }
 
   private void calulcateColorsForMarkedAndCoverd()
   {
-    for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
+    if(markedAndCovered != null)
     {
-      int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
-        - 1,
-        MatchedNodeColors.values().length - 1));
-      SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      if (feat != null)
+      for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
       {
-        markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
-          MatchedNodeColors.values()[color].name());
-      }
-    }
+        int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
+          - 1,
+          MatchedNodeColors.values().length - 1));
+        SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
+        if (feat != null)
+        {
+          markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
+            MatchedNodeColors.values()[color].name());
+        }
+      } // end for each entry in markedAndCoverd
+    } // end if markedAndCovered not null
   }
 
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
@@ -418,7 +338,7 @@ public class SingleResultPanel extends VerticalLayout implements
   @Override
   public void buttonClick(ClickEvent event)
   {
-    if (event.getButton() == btInfo)
+    if (event.getButton() == btInfo && result != null)
     {
       Window infoWindow = new Window("Info for " + result.getSId());
 
@@ -494,38 +414,4 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
-  private CustomLayout visContainer(String id, String place)
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id=\"").append(id).append("\">");
-    sb.append("<div location=\"btEntry\"></div>");
-    sb.append("  <div location=\"").append(place).append("\"></div>");
-    sb.append("</div>");
-    try
-    {
-      return new CustomLayout(new ByteArrayInputStream(sb.toString().getBytes()));
-    }
-    catch (IOException ex)
-    {
-      log.error("problems with generating vis container", ex);
-    }
-    return null;
-  }
-
-  private List<String> mediaVisIds(ResolverEntry[] entries)
-  {
-    List<String> mediaIds = new ArrayList<String>();
-    int counter = 0;
-    for (ResolverEntry e : entries)
-    {
-      String id = "resolver-" + resultNumber + "-" + counter++;
-      if ("media".equals(e.getVisType())
-        || "audio".equals(e.getVisType())
-        || "video".equals(e.getVisType()))
-      {
-        mediaIds.add(id);
-      }
-    }
-    return mediaIds;
-  }
 }

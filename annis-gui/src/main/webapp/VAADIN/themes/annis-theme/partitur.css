@@ -1,0 +1,79 @@
+.partitur_table {
+    margin:0px;
+    border-collapse:collapse;
+    font-family:arial,tahoma,helvetica,sans-serif;
+    font-size:11px;
+    font-style:normal;
+}
+
+.partitur_table .tok {
+    text-align:center;
+}
+
+.partitur_table .highlight-target {
+    background-color:#faf755;
+}
+
+.partitur_table .highlight-source {
+    background-color:rgb(175,175,175);
+}
+
+.partitur_table td.header {
+    
+    margin:0px;
+    padding:2px;
+    font-weight:bold;
+    border-style:dotted;
+    border-color:rgb(200,200,200);
+    border-width:1px;
+}
+
+
+.partitur_table td.gap {
+  background-image: url("hatching.png");
+  background-repeat: repeat;
+  border-style: solid;
+  border-color: black;
+}
+
+
+.partitur_table td {
+    margin:0px;
+    background-color:rgb(255,255,255);
+    border-style:dotted;
+    border-color:rgb(200,200,200);
+    border-width:1px;
+    padding:0px 10px 0px 10px;
+}
+
+td.single_event {
+    background-color:rgb(200,200,200);
+    border-color:rgb(0,0,0);
+    border-style:solid;
+    border-width:1px;
+}
+
+.checkedItem:before {
+  content: url('check.gif');  
+}
+
+.uncheckedItem:before {
+  content: url('empty.gif');
+}
+
+#tooltip {
+  font-size: 9pt;
+}
+
+#tooltip h3 {
+  font-size: 9pt;
+}
+
+.speaker {
+  background: url("speaker.png") no-repeat right;
+  cursor: pointer;
+}
+
+.speaker div {
+  cursor: pointer;
+}

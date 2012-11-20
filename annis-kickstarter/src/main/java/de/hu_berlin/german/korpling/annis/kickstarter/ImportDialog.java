@@ -16,7 +16,6 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
-import annis.exceptions.AnnisException;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -31,7 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +47,9 @@ public class ImportDialog extends javax.swing.JDialog
   private File confFile;
   private Properties confProps;
 
-  private class Status
+  private static class Status
   {
     public boolean ok = true;
-    public String errorMessage = "";
     public Exception ex = new Exception();
   }
   
@@ -87,7 +85,6 @@ public class ImportDialog extends javax.swing.JDialog
         {
           status.ok = false;
           status.ex = ex;
-          status.errorMessage = ex.getMessage();
           return status;
         }
       }
@@ -107,6 +104,12 @@ public class ImportDialog extends javax.swing.JDialog
         int i=0;
         for(Map<String, Object> corpus : corpora)
         {
+          if(isCancelled())
+          {
+            status.ok = true;
+            return status;
+          }
+          
           if(corpus.containsKey("source_path"))
           {
             final String path = (String) corpus.get("source_path");
@@ -143,13 +146,12 @@ public class ImportDialog extends javax.swing.JDialog
       if(errorMessages.length() > 0)
       {
         status.ok = false;
-        status.errorMessage = errorMessages.toString();
         return status;
       }
       
       return status;
     }
-
+    
     @Override
     protected void done()
     {
@@ -163,17 +165,20 @@ public class ImportDialog extends javax.swing.JDialog
       
       try
       {
-        Status status = this.get();
-        if (status.ok)
+        if(!isCancelled())
         {
-          JOptionPane.showMessageDialog(null,
-            "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
-          setVisible(false);
-        }
-        else
-        {
-          new ExceptionDialog( status.ex, "Import failed").setVisible(true);
-          setVisible(false);
+          Status status = this.get();
+          if (status.ok)
+          {
+            JOptionPane.showMessageDialog(null,
+              "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
+            setVisible(false);
+          }
+          else
+          {
+            new ExceptionDialog( status.ex, "Import failed").setVisible(true);
+            setVisible(false);
+          }
         }
       }
       catch (Exception ex)
@@ -211,8 +216,14 @@ public class ImportDialog extends javax.swing.JDialog
     {
       if(!confFile.exists())
       {
-        confFile.getParentFile().mkdirs();
-        confFile.createNewFile();
+        if(!confFile.getParentFile().mkdirs())
+        {
+          log.warn("Cannot create directory " +confFile.getAbsolutePath());
+        }
+        if(!confFile.createNewFile())
+        {
+          log.warn("Cannot create file " + confFile.getAbsolutePath());
+        }
       }
     }
     catch (IOException ex)
@@ -242,21 +253,39 @@ public class ImportDialog extends javax.swing.JDialog
   private void storeProperties()
   {
     confProps.put("last-directory", txtInputDir.getText());
+    FileOutputStream oStream = null;
     try
     {
-      confProps.store(new FileOutputStream(confFile), "");
+      oStream = new FileOutputStream(confFile);
+      confProps.store(oStream, "");
     }
     catch (IOException ex)
     {
       log.error(null, ex);
     }
+    finally
+    {
+      if(oStream != null)
+      {
+        try
+        {
+          oStream.close();
+        }
+        catch(IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
+    }
   }
   
   private void loadProperties()
   {
+    FileInputStream iStream = null;
     try
     {
-      confProps.load(new FileInputStream(confFile));
+      iStream = new FileInputStream(confFile);
+      confProps.load(iStream);
       String lastDirectory = confProps.getProperty("last-directory");
       if(lastDirectory != null)
       {
@@ -267,6 +296,20 @@ public class ImportDialog extends javax.swing.JDialog
     catch (IOException ex)
     {
       log.error(null, ex);
+    }
+    finally
+    {
+      if(iStream != null)
+      {
+        try
+        {
+          iStream.close();
+        }
+        catch(IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
     
   }

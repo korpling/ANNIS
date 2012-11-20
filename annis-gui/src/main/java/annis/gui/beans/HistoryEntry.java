@@ -15,11 +15,10 @@
  */
 package annis.gui.beans;
 
-import annis.service.objects.AnnisCorpus;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -28,21 +27,21 @@ import org.apache.commons.lang.StringUtils;
 public class HistoryEntry implements CitationProvider, Serializable
 {
 
-  private Map<String, AnnisCorpus> corpora;
+  private Set<String> corpora;
   private String query;
 
   public HistoryEntry()
   {
-    corpora = new HashMap<String, AnnisCorpus>();
+    corpora = new HashSet<String>();
   }
 
   @Override
-  public Map<String, AnnisCorpus> getCorpora()
+  public Set<String> getCorpora()
   {
     return corpora;
   }
 
-  public void setCorpora(Map<String, AnnisCorpus> corpora)
+  public void setCorpora(Set<String> corpora)
   {
     this.corpora = corpora;
   }
