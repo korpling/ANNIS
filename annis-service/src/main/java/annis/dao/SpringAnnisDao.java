@@ -41,6 +41,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
 import annis.model.Annotation;
+import annis.ql.AqlLexer;
+import annis.ql.AqlParser;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
 import annis.ql.parser.QueryAnalysis;
@@ -69,6 +71,11 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.logging.Level;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -306,6 +313,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
   {
+    // test the new AntLR based parser
+//    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(aql));
+//    AqlParser parser = new AqlParser(new CommonTokenStream(lexer));
+//    CommonTree tree;
+//    try
+//    {
+//      tree = (CommonTree) parser.start().getTree();
+//      
+//      log.info("parsed {} with result {}", aql, tree.toStringTree());
+//    }
+//    catch (RecognitionException ex)
+//    {
+//      log.error("parsing error for {}: {}", aql, ex.getMessage());
+//    }
+    
+    
     // parse the query
     Start statement = aqlParser.parse(aql);
     // analyze it

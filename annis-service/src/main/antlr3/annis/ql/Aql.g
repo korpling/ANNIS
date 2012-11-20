@@ -34,6 +34,7 @@ tokens {
 	STAR='*';
 	REF;
 	RANGE;
+	ANNO;
 	FROM_TO;
 	DOM;
 }
@@ -41,6 +42,19 @@ tokens {
 @parser::header {package annis.ql;}
 @lexer::header {package annis.ql;}
 
+@parser::members {
+  @Override
+  public void reportError(RecognitionException e) {
+    throw new RuntimeException(e); 
+  }
+}
+
+@lexer::members {
+  @Override
+  public void reportError(RecognitionException e) {
+    throw new RuntimeException(e); 
+  }
+}
 
 start 
 	: expr^
@@ -92,7 +106,7 @@ qName
 	;
 
 edge_anno
-	:	'[' qName EQ text_spec ']' -> ^(EQ qName text_spec)
+	:	'[' name=qName EQ value=text_spec ']' -> ^(EQ $name $value)
 	;
 
 precedence
@@ -105,15 +119,15 @@ precedence
 	;
 
 dominance
-	: REF DOMINANCE REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE))
-	| REF DOMINANCE STAR REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE STAR))
-	| REF DOMINANCE min=DIGITS (COMMA max=DIGITS)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE $min $max?))
+	: REF DOMINANCE (anno=edge_anno)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
+	| REF DOMINANCE (anno=edge_anno)? STAR REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE STAR)  ^(ANNO $anno)?)
+	| REF DOMINANCE (anno=edge_anno)? min=DIGITS (COMMA max=DIGITS)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
 	;
 	
 pointing
-	: REF POINTING label=ID REF -> ^(POINTING  $label ^(FROM_TO REF REF) ^(RANGE))
-	| REF POINTING label=ID STAR REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE STAR))
-	| REF POINTING label=ID COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?))
+	: REF POINTING label=ID (anno=edge_anno)? REF -> ^(POINTING  $label ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
+	| REF POINTING label=ID (anno=edge_anno)? STAR REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE STAR) ^(ANNO $anno)?)
+	| REF POINTING label=ID (anno=edge_anno)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
 	;
 
 binary_linguistic_term

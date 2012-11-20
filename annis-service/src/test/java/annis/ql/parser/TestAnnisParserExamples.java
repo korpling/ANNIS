@@ -35,7 +35,15 @@ import annis.test.SpringQueryExamples;
 import annis.test.SpringSyntaxTreeExamples;
 import annis.test.SyntaxTreeExample;
 import annis.exceptions.AnnisException;
+import annis.ql.AqlLexer;
+import annis.ql.AqlParser;
 import annis.ql.node.Start;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonTree;
+import org.junit.Ignore;
+import org.junit.Test;
 
 // see http://junit.sourceforge.net/doc/ReleaseNotes4.4.html
 // and http://popper.tigris.org/tutorial.html
@@ -48,9 +56,9 @@ public class TestAnnisParserExamples {
 	// access to AnnisParser
 	static ApplicationContext ctx;
 
-	// simple DddQueryParser instance
+	// simple AnnisParser instance
 	private AnnisParser parser;
-	
+  
 	// load Spring application context once
 	@BeforeClass
 	public static void loadApplicationContext() {
@@ -97,6 +105,47 @@ public class TestAnnisParserExamples {
 		} catch (AnnisException e) {
 			// ok
 		}
+	}
+  
+  @Theory
+  @Test
+  @Ignore
+	public void testGoodQueriesAntLR(
+			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
+			String annisQuery) 
+  {
+    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(annisQuery));
+    AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
+    try
+    {
+      assertThat(aqlParser.start().getTree(), is(not(nullValue())));
+    }
+    catch (Exception ex)
+    {
+      fail("good query throw exception: " + annisQuery);
+    }
+	}
+	
+	@Theory
+  @Test
+  @Ignore
+	public void testBadQueriesAntLR(
+			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
+			String annisQuery) {
+		
+    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(annisQuery));
+    AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
+    try
+    {
+      CommonTree tree = (CommonTree) aqlParser.start().getTree();
+      
+			fail("bad query passed as good: " + annisQuery);
+    }
+    catch (Exception ex)
+    {
+      // ok
+    }
+
 	}
 	
 }
