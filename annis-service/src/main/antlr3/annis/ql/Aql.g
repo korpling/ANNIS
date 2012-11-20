@@ -135,8 +135,8 @@ binary_linguistic_term
 	
 unary_linguistic_term
 	:	REF ROOT^
-	|	REF ARITY^
-	|	REF TOKEN_ARITY^
+	|	REF ARITY^ EQ! DIGITS
+	|	REF TOKEN_ARITY^ EQ! DIGITS
 	;
 
 term
