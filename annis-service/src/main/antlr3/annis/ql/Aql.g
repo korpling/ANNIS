@@ -106,8 +106,13 @@ qName
 	;
 
 edge_anno
-	:	'[' name=qName EQ value=text_spec ']' -> ^(EQ $name $value)
+	:	 name=qName EQ value=text_spec -> ^(EQ $name $value)
 	;
+
+edge_spec
+	: '['! edge_anno+ ']'! 
+	;
+
 
 precedence
 	: REF PRECEDENCE REF -> ^(PRECEDENCE  TOK ^(FROM_TO REF REF) ^(RANGE))
@@ -119,15 +124,15 @@ precedence
 	;
 
 dominance
-	: REF DOMINANCE (anno=edge_anno)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
-	| REF DOMINANCE (anno=edge_anno)? STAR REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE STAR)  ^(ANNO $anno)?)
-	| REF DOMINANCE (anno=edge_anno)? min=DIGITS (COMMA max=DIGITS)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
+	: REF DOMINANCE (anno=edge_spec)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
+	| REF DOMINANCE (anno=edge_spec)? STAR REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE STAR)  ^(ANNO $anno)?)
+	| REF DOMINANCE (anno=edge_spec)? min=DIGITS (COMMA max=DIGITS)? REF -> ^(DOMINANCE ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
 	;
 	
 pointing
-	: REF POINTING label=ID (anno=edge_anno)? REF -> ^(POINTING  $label ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
-	| REF POINTING label=ID (anno=edge_anno)? STAR REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE STAR) ^(ANNO $anno)?)
-	| REF POINTING label=ID (anno=edge_anno)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
+	: REF POINTING label=ID (anno=edge_spec)? REF -> ^(POINTING  $label ^(FROM_TO REF REF) ^(RANGE) ^(ANNO $anno)?)
+	| REF POINTING label=ID (anno=edge_spec)? STAR REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE STAR) ^(ANNO $anno)?)
+	| REF POINTING label=ID (anno=edge_spec)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?) ^(ANNO $anno)?)
 	;
 
 binary_linguistic_term
