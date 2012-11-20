@@ -113,7 +113,7 @@ dominance
 pointing
 	: REF POINTING label=ID REF -> ^(POINTING  $label ^(FROM_TO REF REF) ^(RANGE))
 	| REF POINTING label=ID STAR REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE STAR))
-	| REF PRECEDENCE label=ID COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?))
+	| REF POINTING label=ID COMMA? min=DIGITS (COMMA max=DIGITS)? REF -> ^(POINTING $label ^(FROM_TO REF REF) ^(RANGE $min $max?))
 	;
 
 binary_linguistic_term
