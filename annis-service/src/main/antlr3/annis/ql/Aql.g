@@ -25,6 +25,7 @@ tokens {
 	LEFT_CHILD='>@l';
 	RIGHT_CHILD='>@r';
 	COMMON_PARENT='$';
+	COMMON_ANCESTOR='$*';
 	ROOT=':root';
 	ARITY=':arity';
 	TOKEN_ARITY=':tokenarity';
@@ -123,10 +124,13 @@ binary_linguistic_term
 	|	REF INCLUSION^ REF
 	|	REF OVERLAP^ REF
 	|	REF RIGHT_OVERLAP^ REF
-	| 	REF LEFT_OVERLAP^REF
+	| 	REF LEFT_OVERLAP^ REF
 	|	dominance
+	|	REF LEFT_CHILD^ REF
+	|	REF RIGHT_CHILD^ REF
 	|	pointing
 	|	REF COMMON_PARENT^ REF
+	|	REF COMMON_ANCESTOR^ REF
 	;
 	
 unary_linguistic_term
