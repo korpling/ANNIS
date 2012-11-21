@@ -44,4 +44,9 @@ public class EdgeBox extends Panel
     addComponent(edge);
   }
   
+  public String getValue()
+  {
+    return edge.getValue().toString();
+  }
+  
 }

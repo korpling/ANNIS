@@ -48,5 +48,6 @@ public class VerticalNode extends Panel
     v.addComponent(sb);
     setWidth("160px");
     addComponent(v);
+    
   }
 }
