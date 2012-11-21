@@ -70,7 +70,7 @@ td.single_event {
 }
 
 .speaker {
-  background: url("speaker.svg") no-repeat right;
+  background: url("speaker.png") no-repeat right;
   cursor: pointer;
 }
 

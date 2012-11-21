@@ -35,12 +35,6 @@ public class VVideoPlayer extends VMediaPlayerBase
     
     updateDimensionsWhenMetadataLoaded(getMedia());
   }
-
-  @Override
-  public String getMimeType()
-  {
-    return "video/webm";
-  }
   
   private void updateSizeFromMetadata(int width, int height)
   {

@@ -86,7 +86,7 @@
                 <resource>
                   <directory>THIRD-PARTY</directory>
                   <targetPath>THIRD-PARTY</targetPath>
-                  <excludes></excludes>
+                  <excludes />
                 </resource>
               </resources>              
             </configuration>            

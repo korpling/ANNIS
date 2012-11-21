@@ -102,7 +102,7 @@
   <root level="DEBUG">
     <appender-ref ref="LOGFILE"/>
     <appender-ref ref="ERROR"/>
-    <appender-ref ref="DEBUG"/>
+<!--    <appender-ref ref="DEBUG"/> -->
   </root>
 
 </configuration>

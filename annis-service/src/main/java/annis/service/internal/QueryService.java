@@ -29,6 +29,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.MatchAndDocumentCount;
@@ -450,7 +451,8 @@ public class QueryService
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset, 
-    @PathParam("length") String rawLength)
+    @PathParam("length") String rawLength,
+    @QueryParam("mime") String mimeType)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
@@ -458,11 +460,11 @@ public class QueryService
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
     
-    AnnisBinary bin = null;
+    AnnisBinary bin;
     log.debug("fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
       + toplevelCorpusName + "/" + corpusName);
 
-    bin = annisDao.getBinary(toplevelCorpusName, corpusName, offset + 1, length);
+    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType ,offset + 1, length);
 
     log.debug("fetch successfully");
     return bin;
@@ -479,17 +481,15 @@ public class QueryService
   @GET
   @Path("corpora/{top}/{document}/binary/meta")
   @Produces("application/xml")
-  public AnnisBinary binaryMeta(
+  public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
     
-    AnnisBinary bin = null;
-    bin = annisDao.getBinary(toplevelCorpusName, documentName, 1, 1);
+    return annisDao.getBinaryMeta(toplevelCorpusName, documentName);
 
-    return bin;
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

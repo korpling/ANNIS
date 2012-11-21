@@ -22,4 +22,5 @@ package annis.gui.media;
 public interface MimeTypeErrorListener
 {
   public void notifyCannotPlayMimeType(String mimeType);
+  public void notifyMightNotPlayMimeType(String mimeType);
 }

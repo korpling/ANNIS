@@ -60,12 +60,4 @@ public class VAudioPlayer extends VMediaPlayerBase
       }
     }
   }
-
-  @Override
-  public String getMimeType()
-  {
-    return "audio/ogg";
-  }
-  
-  
 }
