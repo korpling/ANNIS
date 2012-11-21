@@ -97,6 +97,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     cb.setDescription("Add some AQL code to the query to make it limited to a sentence.");
     cb.setImmediate(true);
     option.addComponent(cb);
+    option.addComponent(btGo);
     
     addComponent(language);
     addComponent(meta);
@@ -104,61 +105,9 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 
   }
   
-  private List<SearchBox> getSearchBoxes(VerticalNode vn)
-    //added by Martin, it finally gets ALL SEARCHBOXES
-  {
-    //I first have to get the vertical layouts of vn
-    Iterator<Component> itVn = vn.getComponentIterator();
-    List<VerticalLayout> vlList = new ArrayList();
-    List<SearchBox> sbList = new ArrayList();
-    
-    //get vertical layouts and SearchBoxes placed directly on VerticalNodes
-    while(itVn.hasNext())//create List of vertical layouts
-    {
-      Component itElem = itVn.next();
-      if(itElem instanceof VerticalLayout)
-      {       
-       vlList.add((VerticalLayout)itElem);        
-      }      
-      if(itElem instanceof SearchBox)
-      {
-        sbList.add((SearchBox)itElem);
-      }
-    }    
-    
-    //now get Searchboxes from vertical layouts
-    Iterator<VerticalLayout> itVl = vlList.iterator();
-    
-    while(itVl.hasNext())//for each vertical layout in VerticalNode vn
-      // an iteration is started to get the SearchBoxes
-    {
-      Iterator<Component> itSb = itVl.next().getComponentIterator();
-      while(itSb.hasNext())
-      {
-        Component itElem = itSb.next();
-        if(itElem instanceof SearchBox)
-        {
-          sbList.add((SearchBox)itElem);
-        }
-      }
-    }    
-    
-    return sbList;
-  }
-  
   private String getAQLFragment(SearchBox sb)
   {
-    Iterator<Component> itSbParts = sb.getComponentIterator();    
-    String frag = "";
-    while(itSbParts.hasNext())
-    {
-      Component itElem = itSbParts.next();
-      if(itElem instanceof ComboBox)
-      {
-        ComboBox cb = (ComboBox)itElem;
-        frag = cb.getCaption() +"=\""+cb.getValue()+"\"";
-      }
-    }
+    String frag = sb.getAttribute() + "=\"" + sb.getValue() +"\"";
     return frag;
   }
   
@@ -174,11 +123,11 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       Component itElem = itcmp.next();
       if(itElem instanceof VerticalNode)
       {        
-        List<SearchBox> sbList = getSearchBoxes((VerticalNode)itElem);
+        Collection<SearchBox> sbList = ((VerticalNode)itElem).getSearchBoxes();
         for(SearchBox sb : sbList)
         {
           query += " & " + getAQLFragment(sb);
-          String addQuery = (count > 1) ? " & #" + (count-1) +" = "+ "#" + count : "";
+          String addQuery = (count > 1) ? " &\n #" + (count-1) +" = "+ "#" + count : "";
           edgeQuery += addQuery;
           count++;
         }        

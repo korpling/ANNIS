@@ -40,11 +40,14 @@ public class SearchBox extends Panel implements Button.ClickListener
   private int id;
   private Button btClose;
   private VerticalNode vn;
+  private String ebene;
+  private ComboBox cb;
 
   public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
     
     this.vn = vn;
+    this.ebene = ebene;
     
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
@@ -56,6 +59,7 @@ public class SearchBox extends Panel implements Button.ClickListener
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
     ComboBox l = new ComboBox(ebene);
+    this.cb = l;
     l.setInputPrompt(ebene);
     l.setWidth("130px");
     // configure & load content
@@ -96,4 +100,13 @@ public class SearchBox extends Panel implements Button.ClickListener
     }  
   }
   
+  public String getAttribute()
+  {
+    return ebene;
+  }
+  
+  public String getValue()
+  {
+    return cb.toString();
+  }
 }
