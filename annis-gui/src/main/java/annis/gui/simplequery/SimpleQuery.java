@@ -127,7 +127,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         for(SearchBox sb : sbList)
         {
           query += " & " + getAQLFragment(sb);
-          String addQuery = (count > 1) ? " &\n #" + (count-1) +" = "+ "#" + count : "";
+          String addQuery = (count > 1) ? " & #" + (count-1) +" = "+ "#" + count : "";
           edgeQuery += addQuery;
           count++;
         }        
