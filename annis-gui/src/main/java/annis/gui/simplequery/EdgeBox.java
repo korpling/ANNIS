@@ -20,7 +20,7 @@ import com.vaadin.ui.Panel;
 
 /**
  *
- * @author tom
+ * @author tom und martin
  */
 public class EdgeBox extends Panel
 {
@@ -42,6 +42,11 @@ public class EdgeBox extends Panel
     edge.setValue(EDGE_OPERATORS[0]);
     edge.setWidth("50px");
     addComponent(edge);
+  }
+  
+  public String getValue()
+  {
+    return edge.getValue().toString();
   }
   
 }

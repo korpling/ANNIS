@@ -47,6 +47,11 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
 import org.slf4j.LoggerFactory;
+//the following added by Martin:
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComboBox;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 
 /**
@@ -57,6 +62,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 {
   private Button btInitLanguage;
   private Button btInitMeta;
+  private Button btGo;
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
@@ -77,7 +83,10 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 
     btInitMeta = new Button("Start with meta search", (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-        
+    
+    btGo = new Button("Create AQL Query", (Button.ClickListener) this);
+    btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    
     language = new HorizontalLayout();
     language.addComponent(btInitLanguage);
     meta = new HorizontalLayout();
@@ -95,12 +104,107 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 
   }
   
+  private List<SearchBox> getSearchBoxes(VerticalNode vn)
+    //added by Martin, it finally gets ALL SEARCHBOXES
+  {
+    //I first have to get the vertical layouts of vn
+    Iterator<Component> itVn = vn.getComponentIterator();
+    List<VerticalLayout> vlList = new ArrayList();
+    List<SearchBox> sbList = new ArrayList();
+    
+    //get vertical layouts and SearchBoxes placed directly on VerticalNodes
+    while(itVn.hasNext())//create List of vertical layouts
+    {
+      Component itElem = itVn.next();
+      if(itElem instanceof VerticalLayout)
+      {       
+       vlList.add((VerticalLayout)itElem);        
+      }      
+      if(itElem instanceof SearchBox)
+      {
+        sbList.add((SearchBox)itElem);
+      }
+    }    
+    
+    //now get Searchboxes from vertical layouts
+    Iterator<VerticalLayout> itVl = vlList.iterator();
+    
+    while(itVl.hasNext())//for each vertical layout in VerticalNode vn
+      // an iteration is started to get the SearchBoxes
+    {
+      Iterator<Component> itSb = itVl.next().getComponentIterator();
+      while(itSb.hasNext())
+      {
+        Component itElem = itSb.next();
+        if(itElem instanceof SearchBox)
+        {
+          sbList.add((SearchBox)itElem);
+        }
+      }
+    }    
+    
+    return sbList;
+  }
+  
+  private String getAQLFragment(SearchBox sb)
+  {
+    Iterator<Component> itSbParts = sb.getComponentIterator();    
+    String frag = "";
+    while(itSbParts.hasNext())
+    {
+      Component itElem = itSbParts.next();
+      if(itElem instanceof ComboBox)
+      {
+        ComboBox cb = (ComboBox)itElem;
+        frag = cb.getCaption() +"=\""+cb.getValue()+"\"";
+      }
+    }
+    return frag;
+  }
+  
+  private String getAQLQuery()//by Martin    
+  {
+    int count = 1;
+    
+    //get all instances of type VerticalNode, Searchbox, Edgebox    
+    Iterator<Component> itcmp = language.getComponentIterator();    
+    String query = "", edgeQuery = "";
+    while(itcmp.hasNext())
+    {
+      Component itElem = itcmp.next();
+      if(itElem instanceof VerticalNode)
+      {        
+        List<SearchBox> sbList = getSearchBoxes((VerticalNode)itElem);
+        for(SearchBox sb : sbList)
+        {
+          query += " & " + getAQLFragment(sb);
+          String addQuery = (count > 1) ? " & #" + (count-1) +" = "+ "#" + count : "";
+          edgeQuery += addQuery;
+          count++;
+        }        
+      }      
+      //after a VerticalNode there is always an... EDGEBOX!
+      //so the Query will be build in the right order I guess
+      if(itElem instanceof EdgeBox)      
+      {        
+        EdgeBox eb = (EdgeBox)itElem;
+        edgeQuery += " & #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count;
+      }
+    }
+    
+    return query+edgeQuery;//delete leading " & " LATER
+  }
+  
+  public void updateQuery()//by Martin
+  {    
+    cp.setQuery(getAQLQuery(), null);    
+  }
+  
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
 
-    final SimpleQuery sq = this;
-    
+    final SimpleQuery sq = this;    
     if(event.getButton() == btInitLanguage)
     {
       language.removeComponent(btInitLanguage);
@@ -118,15 +222,16 @@ public class SimpleQuery extends Panel implements Button.ClickListener
               language.addComponent(eb); 
               eboxes.add(eb);
             }
+
             VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
             language.addComponent(vn);
             vnodes.add(vn);
+
           }
         });
       }
       language.addComponent(addMenu);
-    }
-    
+    }    
     if(event.getButton() == btInitMeta)
     {
       meta.removeComponent(btInitMeta);
@@ -145,6 +250,10 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         });
       }
       meta.addComponent(addMenu);
+    }
+    if (event.getButton() == btGo)
+    {
+      updateQuery();//by Martin
     }
   }
 
