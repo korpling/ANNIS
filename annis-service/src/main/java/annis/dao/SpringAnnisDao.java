@@ -683,10 +683,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return countMatchesAndDocumentsSqlGenerator;
   }
 
-  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
+  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator)
   {
-    this.countMatchesAndDocumentsSqlGenerator = countSqlGenerator;
+    this.countMatchesAndDocumentsSqlGenerator = countMatchesAndDocumentsSqlGenerator;
   }
+
+  public CountSqlGenerator getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
+
+  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
+  }
+  
+  
 
   @Override
   public HashMap<Long, Properties> getCorpusConfiguration()
@@ -784,5 +796,17 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.frequencySqlGenerator = frequencySqlGenerator;
   }
+
+  public MetaByteHelper getMetaByteHelper()
+  {
+    return metaByteHelper;
+  }
+
+  public void setMetaByteHelper(MetaByteHelper metaByteHelper)
+  {
+    this.metaByteHelper = metaByteHelper;
+  }
+  
+  
  
 }
