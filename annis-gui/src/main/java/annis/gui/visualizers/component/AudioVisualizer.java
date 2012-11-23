@@ -79,7 +79,8 @@ public class AudioVisualizer extends AbstractVisualizer<AudioPlayer>
       "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
     List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
-    String mimeType = null;
+    // if there is no document at all don't fail
+    String mimeType = meta.size() > 0 ? null : "audio/ogg";
     for(AnnisBinaryMetaData m : meta)
     {
       if(m.getMimeType().startsWith("audio/"))

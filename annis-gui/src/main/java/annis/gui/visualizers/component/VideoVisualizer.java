@@ -79,7 +79,8 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
       "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
     List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
-    String mimeType = null;
+    // if there is no document at all don't fail
+    String mimeType = meta.size() > 0 ? null : "video/webm";
     for(AnnisBinaryMetaData m : meta)
     {
       if(m.getMimeType().startsWith("video/"))
@@ -88,7 +89,6 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
         break;
       }
     }
-    
     Validate.notNull(mimeType, "There must be at least one binary file for the document with a video mime type");
     
     String mimeTypeEncoded = mimeType;
