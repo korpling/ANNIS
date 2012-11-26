@@ -35,6 +35,7 @@ import annis.ql.parser.QueryData;
 import annis.service.internal.QueryService;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
   private boolean sortSolutions;
+  private boolean outputCorpusPath;
   private CorpusPathExtractor corpusPathExtractor;
 
   @Override
@@ -76,8 +78,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
         + " AS node_name" + i);
-      ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
-        + " AS path_name" + i);
+      if(outputCorpusPath)
+      {
+        ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
+          + " AS path_name" + i);
+      }
       if (tblAccessStr.usesRankTable())
       {
         isDistinct = true;
@@ -158,12 +163,15 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     List<String> corpus_path = null;
 
     //get path
-    for (int column = 1; column <= columnCount; ++column)
+    if(outputCorpusPath)
     {
-      if (metaData.getColumnName(column).startsWith("path_name"))
+      for (int column = 1; column <= columnCount; ++column)
       {
-        corpus_path = corpusPathExtractor.extractCorpusPath(rs,
-          metaData.getColumnName(column));
+        if (corpusPathExtractor != null && metaData.getColumnName(column).startsWith("path_name"))
+        {
+          corpus_path = corpusPathExtractor.extractCorpusPath(rs,
+            metaData.getColumnName(column));
+        }
       }
     }
 
@@ -181,7 +189,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
         break;
       }
 
-      if (node_name != null)
+      if (outputCorpusPath && node_name != null)
       {
         match.setSaltId(buildSaltId(corpus_path, node_name));
         node_name = null;
@@ -243,6 +251,18 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   {
     this.sortSolutions = sortSolutions;
   }
+
+  public boolean isOutputCorpusPath()
+  {
+    return outputCorpusPath;
+  }
+
+  public void setOutputCorpusPath(boolean outputCorpusPath)
+  {
+    this.outputCorpusPath = outputCorpusPath;
+  }
+  
+  
   
   
 }
