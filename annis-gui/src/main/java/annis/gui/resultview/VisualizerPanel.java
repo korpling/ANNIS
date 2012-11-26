@@ -39,6 +39,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import static annis.model.AnnisConstants.*;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,7 +58,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,42 +69,65 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends CustomLayout 
+public class VisualizerPanel extends CustomLayout
   implements Button.ClickListener, VisualizationToggle
 {
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
+
   public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
     "icon-collapse.gif");
+
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
+
   private ApplicationResource resource = null;
+
   private Component vis;
+
   private transient SDocument result;
+
   private transient PluginSystem ps;
+
   private ResolverEntry entry;
+
   private Random rand = new Random();
+
   private transient Map<SNode, Long> markedAndCovered;
+
   private transient List<SToken> token;
+
   private Map<String, String> markersExact;
+
   private Map<String, String> markersCovered;
+
   private Button btEntry;
+
   private String htmlID;
-  private String resultID;;
+
+  private String resultID;
+
+  ;
   private transient VisualizerPlugin visPlugin;
+
   private Set<String> visibleTokenAnnos;
+
   private String segmentationName;
+
   private final String PERMANENT = "permanent";
+
   private final String ISVISIBLE = "visible";
+
   private final String HIDDEN = "hidden";
+
   private final String PRELOADED = "preloaded";
 
-  private final static String htmlTemplate = 
+  private final static String htmlTemplate =
     "<div id=\":id\"><div location=\"btEntry\"></div>"
     + "<div location=\"progress\"></div>"
     + "<div location=\"iframe\"></div>"
     + "</div>";
-    
+
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -122,10 +147,11 @@ public class VisualizerPanel extends CustomLayout
     String segmentationName,
     PluginSystem ps) throws IOException
   {
-    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes("UTF-8")));
+    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes(
+      "UTF-8")));
 
     visPlugin = ps.getVisualizer(entry.getVisType());
-    
+
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -154,10 +180,10 @@ public class VisualizerPanel extends CustomLayout
       visPlugin = ps.getVisualizer(entry.getVisType());
     }
 
-    if(entry != null && visPlugin != null)
+    if (entry != null && visPlugin != null)
     {
-      
-      if(HIDDEN.equalsIgnoreCase(entry.getVisibility()))
+
+      if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
         btEntry = new Button(entry.getDisplayName());
@@ -169,8 +195,8 @@ public class VisualizerPanel extends CustomLayout
       }
       else
       {
-        
-        if ( ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
+
+        if (ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
           || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           // build button for visualizer
@@ -181,56 +207,56 @@ public class VisualizerPanel extends CustomLayout
           btEntry.addListener((Button.ClickListener) this);
           addComponent(btEntry, "btEntry");
         }
-        
-        
+
+
         // create the visualizer and calc input
         try
         {
           vis = createComponent();
-          if(vis != null)
+          if (vis != null)
           {
             vis.setVisible(true);
             addComponent(vis, "iframe");
           }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           getWindow().showNotification(
-            "Could not create visualizer " + visPlugin.getShortName(), 
+            "Could not create visualizer " + visPlugin.getShortName(),
             ex.toString(),
-            Window.Notification.TYPE_TRAY_NOTIFICATION
-          );
-          log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+            Window.Notification.TYPE_TRAY_NOTIFICATION);
+          log.error("Could not create visualizer " + visPlugin.getShortName(),
+            ex);
         }
-        
-        
+
+
         if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
-          if(vis != null)
+          if (vis != null)
           {
             vis.setVisible(false);
           }
         }
-        
+
       }
     } // end if entry not null
 
   }
-  
+
   private Component createComponent()
   {
-    if(visPlugin == null)
+    if (visPlugin == null)
     {
       return null;
     }
-    
+
     final Application application = getApplication();
     final VisualizerInput input = createInput();
-    
+
     Component c = visPlugin.createComponent(input, application);
     c.setVisible(false);
-    
+
     return c;
   }
 
@@ -241,7 +267,7 @@ public class VisualizerPanel extends CustomLayout
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext(getApplication()));
     input.setDotPath(getApplication().getProperty("DotPath"));
-    
+
     input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
@@ -263,14 +289,18 @@ public class VisualizerPanel extends CustomLayout
       input.setResourcePathTemplate(template);
     }
 
-    if (visPlugin != null && visPlugin.isUsingText()
-      && result != null && result.getSDocumentGraph().getSNodes().size() > 0)
+    // getting the whole document, when plugin is using text
+    if (visPlugin != null
+      && visPlugin.isUsingText()
+      && result != null
+      && result.getSDocumentGraph().getSNodes().size() > 0)
     {
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
-
-      input.setDocument(p.getSCorpusGraphs().get(0).getSDocuments().get(0));
-
+      SDocument wholeDocument = p.getSCorpusGraphs().get(0).
+        getSDocuments().get(0);
+      copyAllAnnisFeatures(markedAndCovered, wholeDocument);
+      input.setDocument(wholeDocument);
     }
     else
     {
@@ -279,24 +309,25 @@ public class VisualizerPanel extends CustomLayout
 
     return input;
   }
-  
+
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
     this.visibleTokenAnnos = annos;
-    if(visPlugin != null && vis != null)
+    if (visPlugin != null && vis != null)
     {
       visPlugin.setVisibleTokenAnnosVisible(vis, annos);
     }
   }
-  
-  public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered)
+
+  public void setSegmentationLayer(String segmentationName,
+    Map<SNode, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;
-    
-    if(visPlugin != null && vis != null)
+
+    if (visPlugin != null && vis != null)
     {
-      visPlugin.setSegmentationLayer(vis, segmentationName,markedAndCovered);
+      visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
 
@@ -307,8 +338,9 @@ public class VisualizerPanel extends CustomLayout
 
     StreamResource r;
 
-    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream), 
-      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
+    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream),
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE),
+      getApplication());
     r.setMIMEType(mimeType);
 
     return r;
@@ -322,7 +354,8 @@ public class VisualizerPanel extends CustomLayout
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).path(
+      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
+        path(
         documentName).get(SaltProject.class);
     }
     catch (Exception e)
@@ -352,22 +385,22 @@ public class VisualizerPanel extends CustomLayout
   @Override
   public boolean visualizerIsVisible()
   {
-    if(vis == null || !vis.isVisible())
+    if (vis == null || !vis.isVisible())
     {
       return false;
     }
     return true;
   }
-  
+
   private void loadVisualizer(final LoadableVisualizer.Callback callback)
   {
     // check if it's necessary to create input
     if (visPlugin != null)
     {
       Executor exec = Executors.newSingleThreadExecutor();
-      FutureTask<Component> future = new FutureTask<Component>(new LoadComponentTask())
+      FutureTask<Component> future = new FutureTask<Component>(
+        new LoadComponentTask())
       {
-
         @Override
         public void run()
         {
@@ -393,7 +426,7 @@ public class VisualizerPanel extends CustomLayout
                   loadableVis.addOnLoadCallBack(callback);
                 }
               }
-              
+
               removeComponent("progress");
 
               if (vis != null)
@@ -408,16 +441,21 @@ public class VisualizerPanel extends CustomLayout
           }
           catch (InterruptedException ex)
           {
-            log.error("Visualizer creation interrupted " + visPlugin.getShortName(), ex);
+            log.error("Visualizer creation interrupted " + visPlugin.
+              getShortName(), ex);
           }
           catch (ExecutionException ex)
           {
-            log.error("Exception when creating visualizer " + visPlugin.getShortName(), ex);
+            log.error("Exception when creating visualizer " + visPlugin.
+              getShortName(), ex);
           }
           catch (TimeoutException ex)
           {
-            log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
-            synchronized(getApplication())
+            log.
+              error(
+              "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
+              ex);
+            synchronized (getApplication())
             {
               getWindow().showNotification(
                 "Could not create visualizer " + visPlugin.getShortName(),
@@ -426,27 +464,27 @@ public class VisualizerPanel extends CustomLayout
             }
             cancel(true);
           }
-        } 
+        }
       };
       exec.execute(future);
-      
-      
+
+
       btEntry.setIcon(ICON_COLLAPSE);
       ProgressIndicator progress = new ProgressIndicator();
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setPollingInterval(100);
-      progress.setDescription("Loading visualizer" +  visPlugin.getShortName());
+      progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress, "progress");
     }
     // end if create input was needed
 
   } // end loadVisualizer
 
-  
   @Override
-  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback)
+  public void toggleVisualizer(boolean visible,
+    LoadableVisualizer.Callback callback)
   {
     if (visible)
     {
@@ -455,11 +493,11 @@ public class VisualizerPanel extends CustomLayout
     else
     {
       // hide
-      
+
       if (vis != null)
       {
         vis.setVisible(false);
-        if(vis instanceof MediaPlayer)
+        if (vis instanceof MediaPlayer)
         {
           removeComponent(vis);
         }
@@ -474,14 +512,55 @@ public class VisualizerPanel extends CustomLayout
   {
     return htmlID;
   }
-  
+
+  /**
+   * Since the markedAndCovered contains in certain circumstances SNodes which
+   * have the ANNIS features that are not in the new whole document object, we
+   * have to copy these features. The reason for this is, that the ANNIS service
+   * does not provide matching ids for whole documents.
+   */
+  private void copyAllAnnisFeatures(Map<SNode,Long> markedAndCovered,
+    SDocument wholeDocument)
+  {
+    SNode target;
+    SFeature sfeature, tmp;
+
+    for (SNode n : markedAndCovered.keySet())
+    {
+      target = wholeDocument.getSDocumentGraph().getSNode(n.getSId());
+      if (target == null)
+      {
+        log.error("SNode {} should exist in document {}", n.getSName(),
+          wholeDocument.getSId());
+        continue;
+      }
+
+      sfeature = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+      if (sfeature != null)
+      {
+        for (SFeature f : n.getSFeatures())
+        {
+          tmp = target.getSFeature(f.getQName());
+          if (tmp == null)
+          {
+            target.createSFeature(f.getNamespace(), f.getName(),
+              f.getSValueSTEXT());
+            log.debug("copy SFeature {} value {}", f.getQName(), f.
+              getValueString());
+          }
+        }
+      }
+    }
+  }
+
   public class LoadComponentTask implements Callable<Component>
   {
+
     @Override
     public Component call() throws Exception
     {
       // only create component if not already created
-      if(vis == null)
+      if (vis == null)
       {
         return createComponent();
       }
@@ -491,28 +570,30 @@ public class VisualizerPanel extends CustomLayout
       }
     }
   }
-  
-  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource
+
+  public static class ByteArrayOutputStreamSource implements
+    StreamResource.StreamSource
   {
-    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+
+    private static final Logger log = LoggerFactory.
+      getLogger(ByteArrayOutputStreamSource.class);
+
     private transient ByteArrayOutputStream byteStream;
 
     public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
     {
       this.byteStream = byteStream;
     }
-    
+
     @Override
     public InputStream getStream()
     {
-      if(byteStream == null)
+      if (byteStream == null)
       {
         log.error("byte stream was null");
         return null;
       }
       return new ByteArrayInputStream(byteStream.toByteArray());
     }
-    
   }
-
 }

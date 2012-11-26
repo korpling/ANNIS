@@ -18,7 +18,7 @@ package annis.gui.visualizers.component.rst;
 import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.*;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -40,7 +40,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -120,8 +119,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // result graph
   private SDocumentGraph graph;
 
-  // all marked tokens of the result graph
-  private Map<SNode, Long> markedAndCovered;
 
   // namespace for SProcessingAnnotation sentence index
   static private final String SENTENCE_INDEX = "sentence_index";
@@ -149,13 +146,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
           {
             SToken tok = ((SToken) ((SRelation) e).getTarget());
             SFeature sf = tok.getSFeature(
-              AnnisConstants.ANNIS_NS + "::" + AnnisConstants.FEAT_LEFTTOKEN);
+              ANNIS_NS + "::" + FEAT_LEFTTOKEN);
             return Integer.parseInt(sf.getSValueSTEXT());
           }
         }
 
         SFeature sf = s.getSFeature(
-          AnnisConstants.ANNIS_NS + "::" + AnnisConstants.FEAT_LEFTTOKEN);
+          ANNIS_NS + "::" + FEAT_LEFTTOKEN);
         return Integer.parseInt(sf.getSValueSTEXT());
       }
 
@@ -204,7 +201,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private String transformSaltToJSON(VisualizerInput visInput)
   {
     graph = visInput.getDocument().getSDocumentGraph();
-    markedAndCovered = visInput.getMarkedAndCovered();
     EList<SNode> nodes = graph.getSRoots();
     EList<SNode> rootSNodes = new BasicEList<SNode>();
 
@@ -730,7 +726,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private String getHTMLColor(SToken token)
   {
 
-    if (!markedAndCovered.containsKey(token))
+    if (token.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE) == null)
     {
       return null;
     }
@@ -739,7 +735,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
      * Since the range in markedAndCovered is from 1 up to 8, we have to
      * decrease the value, for matching the colors in KWIC.
      */
-    int color = (int) (long) markedAndCovered.get(token);
+    int color = Integer.parseInt(token.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE).
+      getSValueSTEXT());
     color = Math.min(color > 0 ? color - 1 : color,
       MatchedNodeColors.values().length - 1);
 
