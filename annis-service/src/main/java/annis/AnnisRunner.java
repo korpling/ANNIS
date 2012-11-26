@@ -63,6 +63,7 @@ import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.extensions.AnnotateQueryData;
@@ -86,6 +87,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
   private AnnotateSqlGenerator<?> graphSqlGenerator;
+  private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -317,6 +319,10 @@ public class AnnisRunner extends AnnisBaseRunner
     else if ("subgraph".equals(function))
     {
       generator = getGraphSqlGenerator();
+    }
+    else if("frequency".equals(function))
+    {
+      generator = frequencySqlGenerator;
     }
     
     Validate.notNull(generator, "don't now query function: " + function);
@@ -1167,6 +1173,18 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.metaDataFilter = metaDataFilter;
   }
+
+  public FrequencySqlGenerator getFrequencySqlGenerator()
+  {
+    return frequencySqlGenerator;
+  }
+
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
+  {
+    this.frequencySqlGenerator = frequencySqlGenerator;
+  }
+  
+  
 
   private QueryData extractSaltIds(String param)
   {

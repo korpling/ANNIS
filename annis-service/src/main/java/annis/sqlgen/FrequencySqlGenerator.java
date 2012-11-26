@@ -18,11 +18,13 @@ package annis.sqlgen;
 import annis.dao.objects.FrequencyTable;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import static annis.sqlgen.TableAccessStrategy.CORPUS_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.extensions.FrequencyTableQueryData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
@@ -74,25 +76,78 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    return new HashSet<String>();
+//    throw new UnsupportedOperationException("Not supported yet.");
   }
   
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    TableAccessStrategy tas = tables(null);
+    
+    FrequencyTableQueryData ext;
+    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(FrequencyTableQueryData.class);
+    Validate.notNull(freqQueryData);
+    Validate.notEmpty(freqQueryData);    
+    ext = freqQueryData.get(0);
+    
+    StringBuilder sb = new StringBuilder();
+    int i=1;
+    for(FrequencyTableQueryData.Entry e : ext)
+    {
+      if(e.getType() == FrequencyTableQueryData.Type.annotation)
+      {
+        sb.append("a").append(i).append(".").append(
+          tas.columnName(ANNOTATION_POOL_TABLE,
+          "val"));
+      }
+      else
+      {
+        sb.append("v").append(i).append(".").append(
+          tas.columnName(NODE_TABLE,
+          "span"));
+      }
+      sb.append(" AS value").append(i).append(", ");
+      i++;
+    }
+    
+    sb.append("count(*) AS \"count\"");
+    
+    return sb.toString();
   }
 
   @Override
   public String groupByAttributes(QueryData queryData, List<QueryNode> alternative)
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    FrequencyTableQueryData ext;
+    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(FrequencyTableQueryData.class);
+    Validate.notNull(freqQueryData);
+    Validate.notEmpty(freqQueryData);    
+    ext = freqQueryData.get(0);
+    
+    StringBuilder sb = new StringBuilder();
+    for(int i=1; i <= ext.size(); i++)
+    {
+      sb.append("value").append(i);
+      if(i < ext.size())
+      {
+        sb.append(", ");
+      }
+    }
+    
+    return sb.toString();
   }
 
   @Override
   public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent)
   {
     TableAccessStrategy tas = tables(null);
+    
+    FrequencyTableQueryData ext;
+    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(FrequencyTableQueryData.class);
+    Validate.notNull(freqQueryData);
+    Validate.notEmpty(freqQueryData);    
+    ext = freqQueryData.get(0);
     
     StringBuilder sb = new StringBuilder();
 
@@ -102,28 +157,25 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
-    sb.append(indent).append(TABSTOP);
-    sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));;
+    int i = 1;
+    for(FrequencyTableQueryData.Entry e : ext)
+    {
+      sb.append(indent).append(TABSTOP);
+      sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), NODE_TABLE));
+      sb.append(" AS v").append(i).append("\n");
+      
+      if(e.getType() == FrequencyTableQueryData.Type.annotation)
+      {
+        sb.append(indent).append(TABSTOP);
+        // TODO: this only works for annopool scheme
+        sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), ANNOTATION_POOL_TABLE));
+        sb.append(" AS a").append(i).append("\n");
+      }
 
-    sb.append("\n");
-    
+      i++;
+    }
     return sb.toString();
   }
-  
-  protected void addFromOuterJoins(StringBuilder sb, QueryData queryData, 
-    TableAccessStrategy tas, String indent)
-  {
-    sb.append(indent).append(TABSTOP);
-    sb.append("LEFT OUTER JOIN ");
-    sb.append(CORPUS_ANNOTATION_TABLE);
-    sb.append(" ON (");
-    sb.append(tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
-    sb.append(" = ");
-    sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
-    sb.append(")");
-  }
-
 
   public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
   {
