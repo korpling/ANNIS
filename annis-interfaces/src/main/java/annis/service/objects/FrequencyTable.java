@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.SortedSet;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -34,7 +35,7 @@ public class FrequencyTable implements Serializable
 {
   
   private long sum;
-  private SortedSet<Entry> entries;
+  private Set<Entry> entries;
 
   public FrequencyTable()
   {
@@ -70,9 +71,15 @@ public class FrequencyTable implements Serializable
     }
   }
 
-  public Collection<Entry> getEntries()
+  public List<Entry> getEntries()
   {
     return new ArrayList<Entry>(entries);
+  }
+  
+  public void setEntries(List<Entry> entries)
+  {
+    this.entries.clear();
+    this.entries.addAll(entries);
   }
   
   public static class HighestCountComparator implements Comparator<Entry>, Serializable

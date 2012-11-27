@@ -60,12 +60,12 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
         "last column name must be \"count\"");
       
       long count = rs.getLong("count");      
-      String[] tupel = new String[meta.getColumnCount()-2];
+      String[] tupel = new String[meta.getColumnCount()-1];
       
       for(int i=1; i <= tupel.length; i++)
       {
-        String colName = meta.getColumnName(i);
-        tupel[i-1] = colName;
+        String colVal = rs.getString(i);
+        tupel[i-1] = colVal;
       } // end for each column (except last "count" column) 
       
       result.addEntry(new FrequencyTable.Entry(tupel, count));
@@ -106,8 +106,9 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
       }
       else
       {
-        // join on node ID
-        conditions.add("v" + i + ".node_anno_ref = a" + i + ".id");
+        // join on node ID and toplevel_corpus
+        conditions.add("a" + i + ".id = v" + i + ".node_anno_ref");
+        conditions.add("a" + i + ".toplevel_corpus = v" + i + ".toplevel_corpus");
         // filter by selected key
         conditions.add("a" + i + ".name = '" + e.getKey().replaceAll("'",
           "''") + "'");
