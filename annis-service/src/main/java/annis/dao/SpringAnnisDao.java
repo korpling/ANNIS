@@ -16,6 +16,7 @@
 package annis.dao;
 
 import annis.dao.objects.AnnotatedMatch;
+import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.io.File;
@@ -296,6 +297,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return executeQueryFunction(queryData, matrixSqlGenerator);
   }
 
+  @Transactional(readOnly = true)
+  @Override
+  public FrequencyTable frequency(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, frequencySqlGenerator);
+  }
+  
   @Override
   @Transactional(readOnly = true)
   public String explain(SqlGenerator<QueryData, ?> generator,

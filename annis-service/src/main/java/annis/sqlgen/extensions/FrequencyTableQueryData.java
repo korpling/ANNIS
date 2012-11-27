@@ -34,9 +34,8 @@ public class FrequencyTableQueryData extends ArrayList<FrequencyTableQueryData.E
   {
     private Type type;
     private String key;
+    private int referencedNode;
 
-    
-    
     public Type getType()
     {
       return type;
@@ -56,7 +55,16 @@ public class FrequencyTableQueryData extends ArrayList<FrequencyTableQueryData.E
     {
       this.key = key;
     }
-    
+
+    public int getReferencedNode()
+    {
+      return referencedNode;
+    }
+
+    public void setReferencedNode(int referencedNode)
+    {
+      this.referencedNode = referencedNode;
+    }
     
   }
   

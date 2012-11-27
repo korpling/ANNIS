@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.dao.objects;
+package annis.service.objects;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,12 +22,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * A frequency table holds the result of a frequency analysis on a specicif result.
+ * A frequency table holds the result of a frequency analysis on a specific result.
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@XmlRootElement
 public class FrequencyTable implements Serializable
 {
   

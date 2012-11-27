@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import annis.dao.objects.FrequencyTable;
+import annis.service.objects.FrequencyTable;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
