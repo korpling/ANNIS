@@ -24,9 +24,11 @@ import annis.sqlgen.extensions.FrequencyTableQueryData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DataAccessException;
 
@@ -76,7 +78,48 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    return new HashSet<String>();
+    TableAccessStrategy tas = tables(null);
+    Set<String> conditions = new LinkedHashSet<String>();
+    
+    FrequencyTableQueryData ext;
+    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(FrequencyTableQueryData.class);
+    Validate.notNull(freqQueryData);
+    Validate.notEmpty(freqQueryData);    
+    ext = freqQueryData.get(0);
+    
+    int i=1;
+    for(FrequencyTableQueryData.Entry e : ext)
+    {
+      // TODO: use alias names!
+      
+      // general partition restriction
+      conditions.add("v" + i + ".toplevel_corpus IN (" + StringUtils.join(
+        queryData.getCorpusList(), ",") + ")" );
+      // specificly join on top level corpus
+      conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus" );
+      // join on node ID
+      conditions.add("v" + i + ".id = solutions.id" + e.getReferencedNode() );
+      
+      if(e.getType() == FrequencyTableQueryData.Type.span)
+      {
+        conditions.add("v" + i + ".n_sample IS TRUE" );
+      }
+      else
+      {
+        // join on node ID
+        conditions.add("v" + i + ".node_anno_ref = a" + i + ".id");
+        // filter by selected key
+        conditions.add("a" + i + ".name = '" + e.getKey().replaceAll("'",
+          "''") + "'");
+        conditions.add("v" + i + ".n_na_sample IS TRUE" );
+        // general partition restriction
+        conditions.add("a" + i + ".toplevel_corpus IN (" + StringUtils.join(
+          queryData.getCorpusList(), ",") + ")");
+      }
+      i++;
+    }
+    
+    return conditions;
 //    throw new UnsupportedOperationException("Not supported yet.");
   }
   
@@ -158,19 +201,30 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     sb.append(indent).append(") AS solutions,\n");
 
     int i = 1;
-    for(FrequencyTableQueryData.Entry e : ext)
+    Iterator<FrequencyTableQueryData.Entry> itEntry = ext.iterator();
+    while(itEntry.hasNext())
     {
+      FrequencyTableQueryData.Entry e = itEntry.next();
+      
       sb.append(indent).append(TABSTOP);
       sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), NODE_TABLE));
-      sb.append(" AS v").append(i).append("\n");
+      sb.append(" AS v").append(i);
       
       if(e.getType() == FrequencyTableQueryData.Type.annotation)
       {
+        sb.append(",\n");
         sb.append(indent).append(TABSTOP);
         // TODO: this only works for annopool scheme
         sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), ANNOTATION_POOL_TABLE));
-        sb.append(" AS a").append(i).append("\n");
+        sb.append(" AS a").append(i);
       }
+      
+      if(itEntry.hasNext())
+      {
+        sb.append(",");
+      }
+      
+      sb.append("\n");
 
       i++;
     }
