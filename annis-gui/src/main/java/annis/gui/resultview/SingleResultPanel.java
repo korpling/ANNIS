@@ -272,7 +272,6 @@ public class SingleResultPanel extends CssLayout implements
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
 
     // add all covered nodes
@@ -284,7 +283,6 @@ public class SingleResultPanel extends CssLayout implements
 
       if (match != null)
       {
-        matchedNodes.add(n.getSId());
         initialCovered.put(n, match);
       }
     }
