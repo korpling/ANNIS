@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 //the following added by Martin:
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.OptionGroup;
 import java.util.Iterator;
 import java.util.ArrayList;
 
@@ -98,11 +99,11 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     cb.setImmediate(true);
     option.addComponent(cb);
     option.addComponent(btGo);
-    
+       
     addComponent(language);
     addComponent(meta);
     addComponent(option);
-
+    
   }
   
   private String getAQLFragment(SearchBox sb)
