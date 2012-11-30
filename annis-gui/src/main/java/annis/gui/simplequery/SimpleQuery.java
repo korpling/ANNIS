@@ -108,7 +108,6 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   
   private String getAQLFragment(SearchBox sb, boolean remode)
     //by Martin
-    //remode = regular-expression mode
   {
     if (remode)
     {
