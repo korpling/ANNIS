@@ -41,7 +41,8 @@ public class SearchBox extends Panel implements Button.ClickListener
   private Button btClose;
   private VerticalNode vn;
   private String ebene;
-  private ComboBox cb;
+  private ComboBox cb;  
+  private CheckBox reBox;//by Martin, tick for regular expression
 
   public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
@@ -72,12 +73,13 @@ public class SearchBox extends Panel implements Button.ClickListener
     
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(true);
-    
+     
     // searchbox tickbox for regex
-    CheckBox cb = new CheckBox("Regex");
-    cb.setDescription("Tick to allow for a regular expression");
-    cb.setImmediate(true);
-    sbtoolbar.addComponent(cb);
+    CheckBox tb = new CheckBox("Regex");
+    tb.setDescription("Tick to allow for a regular expression");
+    tb.setImmediate(true);
+    sbtoolbar.addComponent(tb);
+    reBox = tb;
     
     // close the searchbox
     btClose = new Button("Close", (Button.ClickListener) this);
@@ -108,5 +110,10 @@ public class SearchBox extends Panel implements Button.ClickListener
   public String getValue()
   {
     return cb.toString();
+  }
+  
+  public boolean isRegEx()
+  {
+    return reBox.booleanValue();
   }
 }
