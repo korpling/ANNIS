@@ -66,6 +66,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
+  private CheckBox cbSentence; //Martin
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
@@ -93,10 +94,10 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     meta.addComponent(btInitMeta);
     
     HorizontalLayout option = new HorizontalLayout();
-    CheckBox cb = new CheckBox("Search within sentence");
-    cb.setDescription("Add some AQL code to the query to make it limited to a sentence.");
-    cb.setImmediate(true);
-    option.addComponent(cb);
+    cbSentence = new CheckBox("Search within sentence");//Martin
+    cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
+    cbSentence.setImmediate(true);//Martin
+    option.addComponent(cbSentence);//Martin
     option.addComponent(btGo);
     
     addComponent(language);
@@ -105,43 +106,79 @@ public class SimpleQuery extends Panel implements Button.ClickListener
 
   }
   
-  private String getAQLFragment(SearchBox sb)
+  private String getAQLFragment(SearchBox sb, boolean remode)
+    //by Martin
+    //remode = regular-expression mode
   {
-    String frag = sb.getAttribute() + "=\"" + sb.getValue() +"\"";
-    return frag;
-  }
+    if (remode)
+    {
+      return sb.getAttribute() + "=/" + sb.getValue() +"/";
+    }
+    else
+    {
+      return sb.getAttribute() + "=\"" + sb.getValue() +"\"";
+    }        
+  }  
   
   private String getAQLQuery()//by Martin    
   {
     int count = 1;
     
     //get all instances of type VerticalNode, Searchbox, Edgebox    
-    Iterator<Component> itcmp = language.getComponentIterator();    
-    String query = "", edgeQuery = "";
+    Iterator<Component> itcmp = language.getComponentIterator();
+    Collection<Integer> sentenceVars = new ArrayList<Integer>();
+    String query = "", edgeQuery = "", sentenceQuery = "";    
     while(itcmp.hasNext())
     {
       Component itElem = itcmp.next();
+            
       if(itElem instanceof VerticalNode)
       {        
         Collection<SearchBox> sbList = ((VerticalNode)itElem).getSearchBoxes();
-        for(SearchBox sb : sbList)
+        
+        for (SearchBox sb : sbList)
         {
-          query += " & " + getAQLFragment(sb);
-          String addQuery = (count > 1) ? " & #" + (count-1) +" = "+ "#" + count : "";
+          query += " & " + getAQLFragment(sb, sb.isRegEx());
+        }
+        
+        sentenceVars.add(new Integer(count));
+        
+        for(int i=1; i < sbList.size(); i++)
+        {
+          String addQuery = "\n& #" + count +" = "+ "#" + ++count;
           edgeQuery += addQuery;
-          count++;
-        }        
-      }      
+        }
+        //if a VerticalNode contains no condition/SearchBox, a placeholder
+        //is inserted to describe the gap as "anything"
+        if (sbList.isEmpty()) {query += "\n& /.*/";}
+      }
+      
       //after a VerticalNode there is always an... EDGEBOX!
-      //so the Query will be build in the right order I guess
-      if(itElem instanceof EdgeBox)      
+      //so the Query will be build in the right order   
+      if(itElem instanceof EdgeBox)
+      //empty VNs not caught yet (delete them...)
       {        
-        EdgeBox eb = (EdgeBox)itElem;
-        edgeQuery += " & #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count;
+        count++;
+        EdgeBox eb = (EdgeBox)itElem;        
+        edgeQuery += "\n& #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count; 
+      }      
+    }
+    //search within sentence?
+    if(cbSentence.booleanValue())
+    {
+      query += "\n& "+ "satz = /C.*/";
+      count++;
+      for(Integer I : sentenceVars)
+      {
+        sentenceQuery += "\n& #" + count + "_i_#"+I.toString();
       }
     }
     
-    return query+edgeQuery;//delete leading " & " LATER
+    String fullQuery = (query+edgeQuery+sentenceQuery);
+    if (fullQuery.length() < 3) return "";
+    fullQuery = fullQuery.substring(3);//deletes leading " & "
+    fullQuery.replace("txt=", ""); //check later    
+    return fullQuery;
   }
   
   public void updateQuery()//by Martin
