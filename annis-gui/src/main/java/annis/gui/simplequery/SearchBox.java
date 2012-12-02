@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Set;
+//added by Martin:
 
 /**
  *
@@ -79,6 +80,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     tb.setDescription("Tick to allow for a regular expression");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
+    tb.addListener((Button.ClickListener) this);
     reBox = tb;
     
     // close the searchbox
@@ -89,8 +91,9 @@ public class SearchBox extends Panel implements Button.ClickListener
     sb.addComponent(sbtoolbar);
     
     addComponent(sb);
-    
+
   }
+ 
  
   @Override
   public void buttonClick(Button.ClickEvent event)
@@ -98,8 +101,14 @@ public class SearchBox extends Panel implements Button.ClickListener
 
     if(event.getButton() == btClose)
     {
-      vn.removeSearchBox(this);
-    }  
+      vn.removeSearchBox(this);      
+    }
+    
+    if(event.getComponent()==reBox)
+    {
+      cb.setNewItemsAllowed(reBox.booleanValue());//2be continued
+      //cb.setTextInputAllowed(reBox.booleanValue()); 
+    }
   }
   
   public String getAttribute()
