@@ -44,6 +44,7 @@ public class SearchBox extends Panel implements Button.ClickListener
   private String ebene;
   private ComboBox cb;  
   private CheckBox reBox;//by Martin, tick for regular expression
+  private Collection<String> annonames;//added by Martin, necessary for reconstructing the list of cb-Items
 
   public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
@@ -60,6 +61,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     {
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
+    this.annonames = annonames;//by Martin
     ComboBox l = new ComboBox(ebene);
     this.cb = l;
     l.setInputPrompt(ebene);
@@ -106,8 +108,18 @@ public class SearchBox extends Panel implements Button.ClickListener
     
     if(event.getComponent()==reBox)
     {
-      cb.setNewItemsAllowed(reBox.booleanValue());//2be continued
-      //cb.setTextInputAllowed(reBox.booleanValue()); 
+      boolean r = reBox.booleanValue();
+      cb.setNewItemsAllowed(r);//2be continued
+      if(!r)
+      {
+        //reconstruct list or keep new items?
+        //decided to reconstruct (copied from constructor):
+        cb.removeAllItems();
+        for(String a : annonames)
+        {
+          cb.addItem(a);
+        }
+      }      
     }
   }
   
