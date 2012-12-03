@@ -109,13 +109,18 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private String getAQLFragment(SearchBox sb, boolean remode)
     //by Martin
   {
+    String result, value=sb.getValue(), level=sb.getAttribute();    
     if (remode)
     {
-      return sb.getAttribute() + "=/" + sb.getValue() +"/";
+      result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
+      //regex .* if nothing is chosen
+      return result;
     }
     else
     {
-      return sb.getAttribute() + "=\"" + sb.getValue() +"\"";
+      result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";
+      //regex .* if nothing is chosen
+      return result;
     }        
   }  
   
@@ -174,9 +179,9 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     }
     
     String fullQuery = (query+edgeQuery+sentenceQuery);
-    if (fullQuery.length() < 3) return "";
+    if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
-    fullQuery.replace("txt=", ""); //check later    
+    fullQuery = fullQuery.replace("txt=", ""); //is that correct?
     return fullQuery;
   }
   
