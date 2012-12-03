@@ -38,8 +38,8 @@ import org.apache.commons.lang3.Validate;
 
 import org.springframework.dao.DataAccessException;
 
-import annis.dao.AnnotatedMatch;
-import annis.dao.AnnotatedSpan;
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
 import annis.model.QueryNode;
 import annis.model.Annotation;
 import annis.ql.parser.QueryData;
@@ -63,7 +63,6 @@ public class MatrixSqlGenerator
   @Deprecated
   private String matchedNodesViewName;
   private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
-  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
 
   /**
    * Create a solution key to be used inside a single call to
@@ -216,6 +215,8 @@ public class MatrixSqlGenerator
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    TableAccessStrategy tas = tables(null);
+    
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");
@@ -225,9 +226,8 @@ public class MatrixSqlGenerator
     sb.append(indent).append(") AS solutions,\n");
 
     sb.append(indent).append(TABSTOP);
-    // really ugly
     sb.append(
-      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
+      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));
 
     sb.append("\n");
 
@@ -399,17 +399,6 @@ public class MatrixSqlGenerator
     SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
   {
     this.innerQuerySqlGenerator = innerQuerySqlGenerator;
-  }
-
-  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
-  {
-    return tableJoinsInFromClauseGenerator;
-  }
-
-  public void setTableJoinsInFromClauseGenerator(
-    TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
-  {
-    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
   }
 
 }

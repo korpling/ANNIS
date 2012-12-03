@@ -18,9 +18,9 @@ package annis.sqlgen.fullfacts;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.AbstractFromClauseGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
-import annis.sqlgen.SolutionKey;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,16 +143,19 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
 
-    sb.append(indent).append("solutions,\n");
+      sb.append(indent).append("solutions,\n");
 
-    // really ugly
-    sb.append(indent).append(TABSTOP).append(
-      getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
-    sb.append(",\n");
-    sb.append(indent).append(TABSTOP).append(TableAccessStrategy.CORPUS_TABLE);
+      TableAccessStrategy tas = tables(null);
 
-    return sb.toString();
+      sb.append(indent).append(TABSTOP).append(
+        AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));
+      sb.append(",\n");
+      
+      sb.append(indent).append(TABSTOP).append(TableAccessStrategy.CORPUS_TABLE);
+
+      return sb.toString();
+   
   }
 }

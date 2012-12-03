@@ -74,6 +74,7 @@ public class ControlPanel extends Panel
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
+    accordion.addTab(new FrequencyPanel(), "Frequency analysis", null);
 
     addComponent(queryPanel);
     addComponent(accordion);

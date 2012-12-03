@@ -18,8 +18,6 @@ package annis;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;
@@ -51,13 +49,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
+import annis.dao.objects.AnnotatedMatch;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.AnnisParser;
-import annis.ql.parser.ParserException;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
@@ -65,10 +62,11 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
-import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.FrequencySqlGenerator;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -89,6 +87,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
   private AnnotateSqlGenerator<?> graphSqlGenerator;
+  private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
   private AnnisDao annisDao;
   private AnnisParser annisParser;
@@ -320,6 +319,10 @@ public class AnnisRunner extends AnnisBaseRunner
     else if ("subgraph".equals(function))
     {
       generator = getGraphSqlGenerator();
+    }
+    else if("frequency".equals(function))
+    {
+      generator = frequencySqlGenerator;
     }
     
     Validate.notNull(generator, "don't now query function: " + function);
@@ -1170,6 +1173,18 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.metaDataFilter = metaDataFilter;
   }
+
+  public FrequencySqlGenerator getFrequencySqlGenerator()
+  {
+    return frequencySqlGenerator;
+  }
+
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
+  {
+    this.frequencySqlGenerator = frequencySqlGenerator;
+  }
+  
+  
 
   private QueryData extractSaltIds(String param)
   {

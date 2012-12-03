@@ -15,6 +15,8 @@
  */
 package annis.dao;
 
+import annis.dao.objects.AnnotatedMatch;
+import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.io.File;
@@ -57,6 +59,7 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -86,6 +89,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private SaltAnnotateExtractor saltAnnotateExtractor;
   private MatrixSqlGenerator matrixSqlGenerator;
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
+  private FrequencySqlGenerator frequencySqlGenerator;
   // configuration
   private int timeout;
   // fn: corpus id -> corpus name
@@ -293,6 +297,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return executeQueryFunction(queryData, matrixSqlGenerator);
   }
 
+  @Transactional(readOnly = true)
+  @Override
+  public FrequencyTable frequency(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, frequencySqlGenerator);
+  }
+  
   @Override
   @Transactional(readOnly = true)
   public String explain(SqlGenerator<QueryData, ?> generator,
@@ -680,10 +691,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return countMatchesAndDocumentsSqlGenerator;
   }
 
-  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
+  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator)
   {
-    this.countMatchesAndDocumentsSqlGenerator = countSqlGenerator;
+    this.countMatchesAndDocumentsSqlGenerator = countMatchesAndDocumentsSqlGenerator;
   }
+
+  public CountSqlGenerator getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
+
+  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
+  }
+  
+  
 
   @Override
   public HashMap<Long, Properties> getCorpusConfiguration()
@@ -772,14 +795,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.annotateSqlGenerator = annotateSqlGenerator;
   }
 
-  public CountSqlGenerator getCountSqlGenerator()
+  public FrequencySqlGenerator getFrequencySqlGenerator()
   {
-    return countSqlGenerator;
+    return frequencySqlGenerator;
   }
 
-  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
   {
-    this.countSqlGenerator = countSqlGenerator;
+    this.frequencySqlGenerator = frequencySqlGenerator;
   }
 
   public MetaByteHelper getMetaByteHelper()
@@ -793,4 +816,5 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
   
   
+ 
 }

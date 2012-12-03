@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.gui.controlpanel;
+
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *
- * @author benjamin
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class LimitOffsetQueryData
+public class FrequencyPanel extends VerticalLayout
 {
-
-  private int offset;
-  private int limit;
-
-  public LimitOffsetQueryData(int offset, int limit)
+  public FrequencyPanel()
   {
-    this.offset = offset;
-    this.limit = limit;
-  }
-
-  public int getLimit()
-  {
-    return limit;
-  }
-
-  public int getOffset()
-  {
-    return offset;
-  }
-  
-  public boolean isPaged()
-  {
-    return offset != 0 || limit != 0;
+    addComponent(new Label("Hello Frequencies!"));
   }
 }

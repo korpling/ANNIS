@@ -20,7 +20,8 @@ import annis.CommonHelper;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
+import annis.dao.objects.AnnotatedMatch;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
@@ -34,9 +35,10 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
-import annis.sqlgen.AnnotateQueryData;
-import annis.sqlgen.LimitOffsetQueryData;
 import annis.service.objects.SubgraphQuery;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -236,7 +238,69 @@ public class QueryService
       return WekaHelper.exportAsArff(matches);
     }
   }
+  
+  /**
+   * Frequency analysis.
+   * 
+   * @param  rawFields Comma seperated list of result vector elements. 
+   *                   Each element has the form <node-nr>:<anno-name>. The
+   *                   annotation name can be set to "tok" to indicate that the
+   *                   span should be used instead of an annotation.
+   */
+  @GET
+  @Path("search/frequency")
+  @Produces("application/xml")
+  public FrequencyTable frequency(
+    @QueryParam("q") String query,
+    @QueryParam("corpora") String rawCorpusNames,
+    @QueryParam("fields") String rawFields)
+  {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
+    requiredParameter(rawFields, "fields", "Comma seperated list of result vector elements.");
     
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:matrix:" + c);
+    }
+    
+    
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    String[] fields = rawFields.split("\\s*,\\s*");
+    FrequencyTableQueryData ext = new FrequencyTableQueryData();
+    for(String f: fields)
+    {
+      String[] splitted = f.split(":", 2);
+      
+      if(splitted.length == 2)
+      {
+        FrequencyTableQueryData.Entry entry = new FrequencyTableQueryData.Entry();
+      
+        entry.setReferencedNode(Integer.parseInt(splitted[0]));
+        if("tok".equals(splitted[1]))
+        {
+          entry.setType(FrequencyTableQueryData.Type.span);
+        }
+        else
+        {
+          entry.setType(FrequencyTableQueryData.Type.annotation);
+          entry.setKey(splitted[1]);
+        }
+        ext.add(entry);
+      }
+    }
+    data.addExtension(ext);
+    
+    long start = new Date().getTime();
+    FrequencyTable freqTable = annisDao.frequency(data);
+    long end = new Date().getTime();
+    logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    
+    return freqTable;
+  }
+  
 
   /**
    * Get a graph as {@link SaltProject} of a set of Salt IDs.

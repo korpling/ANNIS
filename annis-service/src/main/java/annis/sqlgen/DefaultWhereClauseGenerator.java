@@ -25,7 +25,6 @@ import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
@@ -53,7 +52,6 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import java.util.LinkedList;
 import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
@@ -412,9 +410,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     TableAccessStrategy tas = tables(null);
     String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
-    String pre = tas.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
-    String post = tas.column("ancestor", tas.columnName(RANK_TABLE, "post"));
-    String component = tas.column("ancestor", tas.columnName(RANK_TABLE,
+    String pre = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
+    String post = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "post"));
+    String component = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
       "component_ref"));
     String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
 
@@ -536,8 +534,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     List<Long> corpusList = queryData.getCorpusList();
     TableAccessStrategy tas = tables(null);
     String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
-    String parent = tas.column("children", tas.columnName(RANK_TABLE, "parent"));
-    String pre = tas.column("children", tas.columnName(RANK_TABLE, "pre"));
+    String parent = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "parent"));
+    String pre = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "pre"));
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + pre + ")\n");
     sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");

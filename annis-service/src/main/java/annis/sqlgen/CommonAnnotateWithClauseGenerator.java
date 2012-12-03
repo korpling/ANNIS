@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import java.util.HashMap;

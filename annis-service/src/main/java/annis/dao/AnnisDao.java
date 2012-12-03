@@ -15,6 +15,8 @@
  */
 package annis.dao;
 
+import annis.dao.objects.AnnotatedMatch;
+import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.util.HashMap;
@@ -99,6 +101,8 @@ public interface AnnisDao
     final boolean analyze);
 
   List<AnnotatedMatch> matrix(QueryData queryData);
+  
+  FrequencyTable frequency(QueryData queryData);
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
