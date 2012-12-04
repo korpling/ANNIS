@@ -15,7 +15,6 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.controlpanel.freq.FrequencyPanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
@@ -75,7 +74,7 @@ public class ControlPanel extends Panel
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-    accordion.addTab(new FrequencyPanel(), "Frequency analysis", null);
+    accordion.addTab(new FrequencyQueryPanel(), "Frequency analysis", null);
 
     addComponent(queryPanel);
     addComponent(accordion);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel.freq;
+package annis.gui.controlpanel;
 
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyPanel extends VerticalLayout
+public class FrequencyQueryPanel extends VerticalLayout
 {
   private Table tblFrequencyDefinition;
   private Button btAdd;
@@ -42,7 +42,7 @@ public class FrequencyPanel extends VerticalLayout
   
   private int counter;
   
-  public FrequencyPanel()
+  public FrequencyQueryPanel()
   {
     setWidth("100%");
     setHeight("100%");
