@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
-
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+package annis.service.objects;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyPanel extends VerticalLayout
+public enum FrequencyTableEntryType
 {
-  public FrequencyPanel()
-  {
-    addComponent(new Label("Hello Frequencies!"));
-  }
+  span, annotation
+  
 }

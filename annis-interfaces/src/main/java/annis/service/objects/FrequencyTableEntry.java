@@ -13,17 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.extensions;
+package annis.service.objects;
 
-import annis.service.objects.FrequencyTableEntry;
-import annis.sqlgen.FrequencySqlGenerator;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
- * This is an extension to be used as argument for {@link FrequencySqlGenerator}
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
+public class FrequencyTableEntry implements Serializable
 {
+  private FrequencyTableEntryType type;
+
+  private String key;
+
+  private int referencedNode;
+
+  public FrequencyTableEntryType getType()
+  {
+    return type;
+  }
+
+  public void setType(FrequencyTableEntryType type)
+  {
+    this.type = type;
+  }
+
+  public String getKey()
+  {
+    return key;
+  }
+
+  public void setKey(String key)
+  {
+    this.key = key;
+  }
+
+  public int getReferencedNode()
+  {
+    return referencedNode;
+  }
+
+  public void setReferencedNode(int referencedNode)
+  {
+    this.referencedNode = referencedNode;
+  }
+  
 }

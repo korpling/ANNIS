@@ -37,6 +37,8 @@ import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SubgraphQuery;
 import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -276,16 +278,16 @@ public class QueryService
       
       if(splitted.length == 2)
       {
-        FrequencyTableQueryData.Entry entry = new FrequencyTableQueryData.Entry();
+        FrequencyTableEntry entry = new FrequencyTableEntry();
       
         entry.setReferencedNode(Integer.parseInt(splitted[0]));
         if("tok".equals(splitted[1]))
         {
-          entry.setType(FrequencyTableQueryData.Type.span);
+          entry.setType(FrequencyTableEntryType.span);
         }
         else
         {
-          entry.setType(FrequencyTableQueryData.Type.annotation);
+          entry.setType(FrequencyTableEntryType.annotation);
           entry.setKey(splitted[1]);
         }
         ext.add(entry);

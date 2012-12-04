@@ -17,6 +17,8 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import static annis.test.TestUtils.size;
 import java.util.ArrayList;
@@ -70,15 +72,15 @@ public class FrequencySqlGeneratorTest
   @Before
   public void setUp()
   {
-    FrequencyTableQueryData.Entry e1 = new FrequencyTableQueryData.Entry();
-    e1.setType(FrequencyTableQueryData.Type.span);
+    FrequencyTableEntry e1 = new FrequencyTableEntry();
+    e1.setType(FrequencyTableEntryType.span);
     
-    FrequencyTableQueryData.Entry e2 = new FrequencyTableQueryData.Entry();
-    e2.setType(FrequencyTableQueryData.Type.annotation);
+    FrequencyTableEntry e2 = new FrequencyTableEntry();
+    e2.setType(FrequencyTableEntryType.annotation);
     e2.setKey("lemma");
     
-    FrequencyTableQueryData.Entry e3 = new FrequencyTableQueryData.Entry();
-    e3.setType(FrequencyTableQueryData.Type.span);
+    FrequencyTableEntry e3 = new FrequencyTableEntry();
+    e3.setType(FrequencyTableEntryType.span);
     
     freqTableQueryData.add(e1);
     freqTableQueryData.add(e2);

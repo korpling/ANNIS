@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.controlpanel.freq.FrequencyPanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;

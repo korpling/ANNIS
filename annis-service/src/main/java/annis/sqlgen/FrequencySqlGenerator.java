@@ -18,6 +18,8 @@ package annis.sqlgen;
 import annis.service.objects.FrequencyTable;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
 import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
@@ -88,7 +90,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     ext = freqQueryData.get(0);
     
     int i=1;
-    for(FrequencyTableQueryData.Entry e : ext)
+    for(FrequencyTableEntry e : ext)
     {
       // TODO: use alias names!
       
@@ -100,7 +102,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
       // join on node ID
       conditions.add("v" + i + ".id = solutions.id" + e.getReferencedNode() );
       
-      if(e.getType() == FrequencyTableQueryData.Type.span)
+      if(e.getType() == FrequencyTableEntryType.span)
       {
         conditions.add("v" + i + ".n_sample IS TRUE" );
       }
@@ -137,9 +139,9 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     
     StringBuilder sb = new StringBuilder();
     int i=1;
-    for(FrequencyTableQueryData.Entry e : ext)
+    for(FrequencyTableEntry e : ext)
     {
-      if(e.getType() == FrequencyTableQueryData.Type.annotation)
+      if(e.getType() == FrequencyTableEntryType.annotation)
       {
         sb.append("a").append(i).append(".").append(
           tas.columnName(ANNOTATION_POOL_TABLE,
@@ -202,16 +204,16 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     sb.append(indent).append(") AS solutions,\n");
 
     int i = 1;
-    Iterator<FrequencyTableQueryData.Entry> itEntry = ext.iterator();
+    Iterator<FrequencyTableEntry> itEntry = ext.iterator();
     while(itEntry.hasNext())
     {
-      FrequencyTableQueryData.Entry e = itEntry.next();
+      FrequencyTableEntry e = itEntry.next();
       
       sb.append(indent).append(TABSTOP);
       sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), NODE_TABLE));
       sb.append(" AS v").append(i);
       
-      if(e.getType() == FrequencyTableQueryData.Type.annotation)
+      if(e.getType() == FrequencyTableEntryType.annotation)
       {
         sb.append(",\n");
         sb.append(indent).append(TABSTOP);
