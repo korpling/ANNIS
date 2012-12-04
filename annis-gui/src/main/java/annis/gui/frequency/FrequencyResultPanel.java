@@ -23,6 +23,7 @@ import annis.service.objects.FrequencyTableEntryType;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -74,6 +75,8 @@ public class FrequencyResultPanel extends VerticalLayout
     pbQuery.setEnabled(true);
     
     addComponent(pbQuery);
+    
+    setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
     // actually start query
     Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
@@ -177,8 +180,11 @@ public class FrequencyResultPanel extends VerticalLayout
     {
       removeComponent(tbResult);
     }
+    
     tbResult = new Table();
     tbResult.setSizeFull();
+    
+    tbResult.setCaption("Total sum: " + table.getSum());
     
     if(!table.getEntries().isEmpty())
     {
@@ -188,6 +194,7 @@ public class FrequencyResultPanel extends VerticalLayout
       for(int i=1; i <= tupelCount; i++)
       {
         tbResult.addContainerProperty("tupel-" + i, String.class, "");
+        tbResult.setColumnHeader("tupel-"+ i, "" + i);
       }
       
       tbResult.addContainerProperty("count", Long.class, -1l);

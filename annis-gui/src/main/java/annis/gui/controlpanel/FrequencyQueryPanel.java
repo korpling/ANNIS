@@ -15,7 +15,6 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
@@ -24,13 +23,11 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -89,9 +86,11 @@ public class FrequencyQueryPanel extends VerticalLayout
     tblFrequencyDefinition.addContainerProperty("type", ComboBox.class, null);
     tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
     
-    tblFrequencyDefinition.setColumnHeader("nr", "#node");
-    tblFrequencyDefinition.setColumnHeader("type", "");
+    tblFrequencyDefinition.setColumnHeader("nr", "Node");
+    tblFrequencyDefinition.setColumnHeader("type", "Type");
     tblFrequencyDefinition.setColumnHeader("annotation", "Annotation");
+    
+    tblFrequencyDefinition.setRowHeaderMode(Table.ROW_HEADER_MODE_INDEX);
     
     counter = 0;
     tblFrequencyDefinition.addItem(createNewTableRow(1,
