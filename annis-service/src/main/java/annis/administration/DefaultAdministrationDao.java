@@ -38,6 +38,7 @@ import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.postgresql.Driver;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -117,8 +119,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
   
   ///// Subtasks of creating the database
-  @Override
-  public void dropDatabase(String database)
+  protected void dropDatabase(String database)
   {
     String sql = "SELECT count(*) FROM pg_database WHERE datname = ?";
     int count = jdbcTemplate.queryForInt(sql, database);
@@ -129,8 +130,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
   
-  @Override
-  public void dropUser(String username)
+  protected void dropUser(String username)
   {
     String sql = "SELECT count(*) FROM pg_user WHERE usename = ?";
     int count = jdbcTemplate.queryForInt(sql, username);
@@ -141,16 +141,14 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
   
-  @Override
-  public void createUser(String username, String password)
+  protected void createUser(String username, String password)
   {
     log.info("creating user: " + username);
     jdbcTemplate.execute("CREATE USER " + username + " PASSWORD '" + password
       + "'");
   }
   
-  @Override
-  public void createDatabase(String database)
+  protected void createDatabase(String database)
   {
     log.info("creating database: " + database
       + " ENCODING = 'UTF8' TEMPLATE template0");
@@ -158,8 +156,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       + " ENCODING = 'UTF8' TEMPLATE template0");
   }
   
-  @Override
-  public void setupDatabase()
+  protected void setupDatabase()
   {
     installPlPgSql();
     createFunctionUniqueToplevelCorpusName();
@@ -184,8 +181,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("unique_toplevel_corpus_name.sql");
   }
   
-  @Override
-  public void createSchema()
+  protected void createSchema()
   {
     log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
@@ -196,15 +192,13 @@ public class DefaultAdministrationDao implements AdministrationDao
     
   }
   
-  @Override
-  public void createSchemaIndexes()
+  protected void createSchemaIndexes()
   {
     log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schemaindex.sql");
   }
   
-  @Override
-  public void populateSchema()
+  protected void populateSchema()
   {
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
@@ -248,6 +242,53 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return true;
   }
+
+  @Override
+  
+  public void initializeDatabase(String host, String port, String database,
+    String user, String password, String defaultDatabase, String superUser,
+    String superPassword)
+  {
+    log.info("Creating Annis database and user.");
+    // connect as super user to the default database to create new user and database
+    setDataSource(createDataSource(host, port,
+      defaultDatabase, superUser, superPassword));
+
+    dropDatabase(database);
+    dropUser(user);
+    createUser(user, password);
+    createDatabase(database);
+
+
+    // switch to new database, but still as super user to install stored procedure compute_rank_level
+    setDataSource(createDataSource(host, port, database,
+      superUser, superPassword));
+    setupDatabase();
+
+    // switch to new database as new user for the rest
+    setDataSource(createDataSource(host, port, database,
+      user, password));
+
+    createSchema();
+    createSchemaIndexes();
+    populateSchema();
+  }
+  
+  private DataSource createDataSource(String host, String port,
+    String database,
+    String user, String password)
+  {
+    String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+
+    // DriverManagerDataSource is deprecated
+    // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
+
+    // why is this better?
+    // XXX: how to construct the datasource?    
+    return new SimpleDriverDataSource(new Driver(), url, user, password);
+  }
+
+  
   
   @Override
   @Transactional(readOnly = false)
@@ -1132,7 +1173,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   ///// Getter / Setter
-  @Override
   public void setDataSource(DataSource dataSource)
   {
     this.dataSource = dataSource;
