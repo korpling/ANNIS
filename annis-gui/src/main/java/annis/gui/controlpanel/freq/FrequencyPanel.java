@@ -46,20 +46,19 @@ public class FrequencyPanel extends VerticalLayout
     
     tblFrequencyDefinition.setEditable(true);
     
-    tblFrequencyDefinition.addContainerProperty("Nr", Integer.class, 1);
-    tblFrequencyDefinition.addContainerProperty("Type", ComboBox.class, 
-      FrequencyTableEntryType.span);
-    tblFrequencyDefinition.addContainerProperty("Annotation", String.class, "pos");
+    tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
+    tblFrequencyDefinition.addContainerProperty("type", ComboBox.class, null);
+    tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
     
-    tblFrequencyDefinition.setColumnHeader("Nr", "#node");
-    tblFrequencyDefinition.setColumnHeader("Type", "");
-    tblFrequencyDefinition.setColumnHeader("Annotation", "Annotation");
+    tblFrequencyDefinition.setColumnHeader("nr", "#node");
+    tblFrequencyDefinition.setColumnHeader("type", "");
+    tblFrequencyDefinition.setColumnHeader("annotation", "Annotation");
     
     tblFrequencyDefinition.addItem(createNewTableRow(1,
       FrequencyTableEntryType.span, ""), "test");
-    //tblFrequencyDefinition.setColumnExpandRatio("Nr", 0.1f);
-    //tblFrequencyDefinition.setColumnExpandRatio("Type", 0.1f);
-    //tblFrequencyDefinition.setColumnExpandRatio("Annotation", 0.8f);
+    tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
+    tblFrequencyDefinition.setColumnExpandRatio("type", 0.3f);
+    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
     
     addComponent(tblFrequencyDefinition);
   }
@@ -69,18 +68,20 @@ public class FrequencyPanel extends VerticalLayout
     TextField txtNode = new TextField();
     txtNode.setValue("" + nodeNr);
     txtNode.addValidator(new IntegerValidator("Node reference must be a valid number"));
-    txtNode.setColumns(2);
+    txtNode.setWidth("100%");
     
     final ComboBox cbType = new ComboBox();
     cbType.addItem("span");
     cbType.addItem("annotation");
     cbType.setValue(type.name());
     cbType.setNullSelectionAllowed(false);
-    cbType.setWidth("-1px");
+    cbType.setWidth("100%");
+    cbType.setImmediate(true);
     
     final TextField txtAnno = new TextField();
     txtAnno.setValue(annotation);
     txtAnno.setEnabled(false);
+    txtAnno.setInputPrompt("disabled");
     txtAnno.setWidth("100%");
     
     cbType.addListener(new Property.ValueChangeListener() 
@@ -91,10 +92,12 @@ public class FrequencyPanel extends VerticalLayout
         if("span".equals(cbType.getValue()))
         {
           txtAnno.setEnabled(false);
+          txtAnno.setInputPrompt("disabled");
         }
         else
         {
           txtAnno.setEnabled(true);
+          txtAnno.setInputPrompt("");
         }
       }
     });
