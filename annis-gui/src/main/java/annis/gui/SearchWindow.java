@@ -16,12 +16,14 @@
 package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.TigerQueryBuilder;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.FrequencyTableEntry;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -73,6 +75,7 @@ public class SearchWindow extends Window
   private TabSheet mainTab;
   private Window windowLogin;
   private ResultViewPanel resultView;
+  private FrequencyResultPanel frequencyResultView;
   private PluginSystem ps;
   private TigerQueryBuilder queryBuilder;
   private String bugEMailAddress;
@@ -384,6 +387,19 @@ public class SearchWindow extends Window
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
   }
+  
+  public void showFrequencyQueryResult(String aql,
+    Set<String> corpora,
+    List<FrequencyTableEntry> freqDefinition)
+  {
+    if(frequencyResultView != null)
+    {
+      mainTab.removeComponent(frequencyResultView);
+    }
+    frequencyResultView = new FrequencyResultPanel(aql, corpora, freqDefinition);
+    mainTab.addTab(frequencyResultView, "Frequency analysis", null);
+    mainTab.setSelectedTab(frequencyResultView);
+  }
 
   public void updateQueryCount(int count)
   {
@@ -550,6 +566,13 @@ public class SearchWindow extends Window
   {
     return control;
   }
+
+  public TabSheet getMainTab()
+  {
+    return mainTab;
+  }
+  
+  
 
   @Override
   public void screenshotReceived(byte[] imageData)

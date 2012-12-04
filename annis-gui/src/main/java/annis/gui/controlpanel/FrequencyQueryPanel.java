@@ -15,18 +15,26 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.frequency.FrequencyResultPanel;
+import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,13 +47,15 @@ public class FrequencyQueryPanel extends VerticalLayout
   private Table tblFrequencyDefinition;
   private Button btAdd;
   private Button btDeleteRow;
+  private Button btShowFrequencies;
   
   private int counter;
   
-  public FrequencyQueryPanel()
+  public FrequencyQueryPanel(final ControlPanel parent)
   {
-    setWidth("100%");
-    setHeight("100%");
+    
+    setWidth("99%");
+    setHeight("99%");
     
     
     tblFrequencyDefinition = new Table();
@@ -121,8 +131,50 @@ public class FrequencyQueryPanel extends VerticalLayout
       }
     });
     layoutButtons.addComponent(btDeleteRow);
+    layoutButtons.setMargin(true);
+    layoutButtons.setHeight("-1px");
+    layoutButtons.setWidth("100%");
     
     addComponent(layoutButtons);
+    
+    btShowFrequencies = new Button("Perform frequency analysis");
+    btShowFrequencies.addListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        ArrayList<FrequencyTableEntry> freqDefinition = new ArrayList<FrequencyTableEntry>();
+        for(Object oid : tblFrequencyDefinition.getItemIds())
+        {
+          FrequencyTableEntry entry = new FrequencyTableEntry();
+          
+          Item item = tblFrequencyDefinition.getItem(oid);
+          AbstractField textNr = (AbstractField) item.getItemProperty("nr").getValue();
+          AbstractField textKey = (AbstractField) item.getItemProperty("annotation").getValue();
+          AbstractSelect cbType = (AbstractSelect) item.getItemProperty("type").getValue();
+          
+          entry.setKey((String) textKey.getValue());
+          entry.setReferencedNode(Integer.parseInt((String) textNr.getValue()));
+          entry.setType(FrequencyTableEntryType.valueOf((String) cbType.getValue()));
+          
+        }
+        
+        if(parent != null)
+        {
+          parent.executeFrequencyQuery(freqDefinition);
+        }
+          
+      }
+    });
+    addComponent(btShowFrequencies);
+    
+    setComponentAlignment(tblFrequencyDefinition, Alignment.TOP_CENTER);
+    setComponentAlignment(layoutButtons, Alignment.TOP_CENTER);
+    setComponentAlignment(btShowFrequencies, Alignment.TOP_CENTER);
+    
+    setExpandRatio(tblFrequencyDefinition, 1.0f);
+    setExpandRatio(layoutButtons, 0.0f);
+    setExpandRatio(btShowFrequencies, 0.0f);
   }
   
   private Object[] createNewTableRow(int nodeNr, FrequencyTableEntryType type, String annotation)

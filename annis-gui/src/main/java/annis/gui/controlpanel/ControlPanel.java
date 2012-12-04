@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.Helper;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
+import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -25,6 +26,7 @@ import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +76,7 @@ public class ControlPanel extends Panel
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-    accordion.addTab(new FrequencyQueryPanel(), "Frequency analysis", null);
+    accordion.addTab(new FrequencyQueryPanel(this), "Frequency analysis", null);
 
     addComponent(queryPanel);
     addComponent(accordion);
@@ -161,7 +163,32 @@ public class ControlPanel extends Panel
         searchOptions.getSegmentationLayer(),
         searchOptions.getResultsPerPage());
 
-
+    }
+  }
+  
+  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
+  {
+    if (getApplication() != null && corpusList != null && queryPanel
+      != null)
+    {
+ 
+      lastQuery = queryPanel.getQuery();
+      lastCorpusSelection = corpusList.getSelectedCorpora();
+      
+      if (lastCorpusSelection == null || lastCorpusSelection.isEmpty())
+      {
+        getWindow().showNotification("Please select a corpus",
+          Window.Notification.TYPE_WARNING_MESSAGE);
+        return;
+      }
+      if ("".equals(lastQuery))
+      {
+        getWindow().showNotification("Empty query",
+          Window.Notification.TYPE_WARNING_MESSAGE);
+        return;
+      }
+      searchWindow.showFrequencyQueryResult(lastQuery, lastCorpusSelection, 
+        freqDefinition);
     }
   }
 
