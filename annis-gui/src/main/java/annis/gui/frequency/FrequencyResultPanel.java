@@ -184,7 +184,7 @@ public class FrequencyResultPanel extends VerticalLayout
     tbResult = new Table();
     tbResult.setSizeFull();
     
-    tbResult.setCaption("Total sum: " + table.getSum());
+    tbResult.setCaption(table.getEntries().size() + " items with a total sum of " + table.getSum());
     
     if(!table.getEntries().isEmpty())
     {
