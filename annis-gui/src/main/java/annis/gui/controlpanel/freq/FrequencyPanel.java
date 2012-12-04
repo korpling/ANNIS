@@ -16,14 +16,19 @@
 package annis.gui.controlpanel.freq;
 
 import annis.service.objects.FrequencyTableEntryType;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -32,6 +37,11 @@ import com.vaadin.ui.VerticalLayout;
 public class FrequencyPanel extends VerticalLayout
 {
   private Table tblFrequencyDefinition;
+  private Button btAdd;
+  private Button btDeleteRow;
+  
+  private int counter;
+  
   public FrequencyPanel()
   {
     setWidth("100%");
@@ -39,12 +49,31 @@ public class FrequencyPanel extends VerticalLayout
     
     
     tblFrequencyDefinition = new Table();
+    tblFrequencyDefinition.setImmediate(true);
     tblFrequencyDefinition.setSortDisabled(true);
+    tblFrequencyDefinition.setSelectable(true);
+    tblFrequencyDefinition.setMultiSelect(true);
+    tblFrequencyDefinition.setEditable(true);
+    tblFrequencyDefinition.addListener(new Property.ValueChangeListener() 
+    {
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      {
+        if(tblFrequencyDefinition.getValue() == null 
+          || ((Set<Object>) tblFrequencyDefinition.getValue()).isEmpty())
+        {
+          btDeleteRow.setEnabled(false);
+        }
+        else
+        {
+          btDeleteRow.setEnabled(true);
+        }
+      }
+    });
     
     tblFrequencyDefinition.setWidth("100%");
     tblFrequencyDefinition.setHeight("100%");
     
-    tblFrequencyDefinition.setEditable(true);
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
     tblFrequencyDefinition.addContainerProperty("type", ComboBox.class, null);
@@ -54,13 +83,46 @@ public class FrequencyPanel extends VerticalLayout
     tblFrequencyDefinition.setColumnHeader("type", "");
     tblFrequencyDefinition.setColumnHeader("annotation", "Annotation");
     
+    counter = 0;
     tblFrequencyDefinition.addItem(createNewTableRow(1,
-      FrequencyTableEntryType.span, ""), "test");
+      FrequencyTableEntryType.span, ""), counter++);
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("type", 0.3f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
     
     addComponent(tblFrequencyDefinition);
+    
+    HorizontalLayout layoutButtons = new HorizontalLayout();
+    
+    btAdd = new Button("Add");
+    btAdd.addListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        tblFrequencyDefinition.addItem(createNewTableRow(counter+1,
+          FrequencyTableEntryType.span, ""), counter++);
+      }
+    });
+    layoutButtons.addComponent(btAdd);
+    
+    btDeleteRow = new Button("Delete selected row(s)");
+    btDeleteRow.setEnabled(false);
+    btDeleteRow.addListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        Set<Object> selected = new HashSet((Set<Object>) tblFrequencyDefinition.getValue());
+        for(Object o : selected)
+        {
+          tblFrequencyDefinition.removeItem(o);
+        }
+      }
+    });
+    layoutButtons.addComponent(btDeleteRow);
+    
+    addComponent(layoutButtons);
   }
   
   private Object[] createNewTableRow(int nodeNr, FrequencyTableEntryType type, String annotation)
