@@ -156,7 +156,7 @@ public class FrequencyQueryPanel extends VerticalLayout
           entry.setKey((String) textKey.getValue());
           entry.setReferencedNode(Integer.parseInt((String) textNr.getValue()));
           entry.setType(FrequencyTableEntryType.valueOf((String) cbType.getValue()));
-          
+          freqDefinition.add(entry);
         }
         
         if(parent != null)
