@@ -50,6 +50,11 @@ public class FrequencyTable implements Serializable
     return sum;
   }
   
+  public void setSum(long sum)
+  {
+    this.sum = sum;
+  }
+  
   /**
    * Adds an entry.
    * @param e 
