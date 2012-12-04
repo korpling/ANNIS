@@ -127,6 +127,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   static private final String SENTENCE_RIGHT = "sentence_right";
 
+  // contains all nodes which are marked as matches and child nodes of matches
+  private final Map<SNode, Long> markedAndCovered;
+
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
    * mapping the sentence to a number by the order of the SStructures in the
@@ -182,6 +185,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   public RSTImpl(VisualizerInput visInput)
   {
+
+    markedAndCovered = visInput.getMarkedAndCovered();
 
     /**
      * build id and increase count for every instance, so we receive an unique
@@ -726,7 +731,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private String getHTMLColor(SToken token)
   {
 
-    if (token.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE) == null)
+    if (!markedAndCovered.containsKey(token))
     {
       return null;
     }
@@ -735,8 +740,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
      * Since the range in markedAndCovered is from 1 up to 8, we have to
      * decrease the value, for matching the colors in KWIC.
      */
-    int color = Integer.parseInt(token.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE).
-      getSValueSTEXT());
+    int color = (int) (long) markedAndCovered.get(token);
     color = Math.min(color > 0 ? color - 1 : color,
       MatchedNodeColors.values().length - 1);
 
@@ -806,7 +810,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       for (Edge e : in)
       {
-        EList<String> sTypes = null;
+        EList<String> sTypes;
 
         if (!(e instanceof SRelation))
         {

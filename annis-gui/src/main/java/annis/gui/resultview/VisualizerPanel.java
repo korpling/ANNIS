@@ -42,11 +42,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -299,7 +301,8 @@ public class VisualizerPanel extends CustomLayout
         get(0).getSName(), result.getSName());
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
-      copyAllAnnisFeatures(markedAndCovered, wholeDocument);
+      markedAndCovered = rebuildMarkedAndConvered(markedAndCovered, input.
+        getDocument(), wholeDocument);
       input.setDocument(wholeDocument);
     }
     else
@@ -514,41 +517,65 @@ public class VisualizerPanel extends CustomLayout
   }
 
   /**
-   * Since the markedAndCovered contains in certain circumstances SNodes which
-   * have the ANNIS features that are not in the new whole document object, we
-   * have to copy these features. The reason for this is, that the ANNIS service
-   * does not provide matching ids for whole documents.
+   * Rebuild the map of marked and covered matches with new object references.
+   * If a visualizer uses the whole document, the {@link VisualizerInput} gets a
+   * new result object, with new SNode objects, so we have to update these
+   * references.
+   *
+   * @param markedAndCovered the original map calculated with the partial
+   * document graph
+   * @param document the partial document or subgraph
+   * @param wholeDocument the new complete document
+   * @return a new map, with updated object/node references. The salt ids of the
+   * node objects remains the same.
    */
-  private void copyAllAnnisFeatures(Map<SNode,Long> markedAndCovered,
-    SDocument wholeDocument)
+  private Map<SNode, Long> rebuildMarkedAndConvered(
+    Map<SNode, Long> markedAndCovered,
+    SDocument document, SDocument wholeDocument)
   {
-    SNode target;
-    SFeature sfeature, tmp;
+    Map<SNode, Long> newMarkedAndCovered = new HashMap<SNode, Long>();
+    SGraph wholeSGraph = wholeDocument.getSCorpusGraph();
+    SNode wholeNode;
 
-    for (SNode n : markedAndCovered.keySet())
+    for (SNode node : newMarkedAndCovered.keySet())
     {
-      target = wholeDocument.getSDocumentGraph().getSNode(n.getSId());
-      if (target == null)
-      {
-        log.error("SNode {} should exist in document {}", n.getSName(),
-          wholeDocument.getSId());
-        continue;
-      }
+      wholeNode = wholeSGraph.getSNode(node.getSId());
+      newMarkedAndCovered.put(wholeNode, markedAndCovered.get(node));
 
-      sfeature = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-      if (sfeature != null)
+      // copy the annis features, which are not set by the annis service
+      copyAnnisFeature(node, wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
+    }
+
+    // copy the annis features, which are not set by the annis service
+    copyAnnisFeature(document, wholeDocument, ANNIS_NS, FEAT_MATCHEDIDS);
+    return newMarkedAndCovered;
+  }
+
+  /**
+   * Since there is a bug in the annis-service some ANNIS Features are not set
+   * when the whole document is requested, we have to copy it manually from the
+   * old nodes
+   *
+   * @param source orignal node
+   * @param target node which is missing the annis feature
+   * @param featureNameSpace namespace of the feature
+   * @param featureName name of the feature
+   */
+  private void copyAnnisFeature(SNode source, SNode target,
+    String featureNameSpace, String featureName)
+  {
+    SFeature sfeature;
+    SFeature tmp;
+
+    if ((sfeature = source.getSFeature(featureNameSpace, featureName)) != null)
+    {
+      if ((tmp = target.getSFeature(
+        featureNameSpace, featureName)) == null)
       {
-        for (SFeature f : n.getSFeatures())
-        {
-          tmp = target.getSFeature(f.getQName());
-          if (tmp == null)
-          {
-            target.createSFeature(f.getNamespace(), f.getName(),
-              f.getSValueSTEXT());
-            log.debug("copy SFeature {} value {}", f.getQName(), f.
-              getValueString());
-          }
-        }
+        target.createSFeature(sfeature.getNamespace(), sfeature.getName(),
+          sfeature.getSValueSTEXT());
+        log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
+          getValueString());
       }
     }
   }
