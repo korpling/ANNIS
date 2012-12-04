@@ -191,6 +191,7 @@ public class FrequencyResultPanel extends VerticalLayout
       FrequencyTable.Entry firstEntry = table.getEntries().get(0);
       int tupelCount = firstEntry.getTupel().length;
       
+      tbResult.addContainerProperty("pos", Integer.class, -1);
       for(int i=1; i <= tupelCount; i++)
       {
         tbResult.addContainerProperty("tupel-" + i, String.class, "");
@@ -202,9 +203,13 @@ public class FrequencyResultPanel extends VerticalLayout
       int line=0;
       for(FrequencyTable.Entry e : table.getEntries())
       {
-        Object[] cells = new Object[tupelCount+1];
-        System.arraycopy(e.getTupel(), 0, cells, 0, tupelCount);
+        Object[] cells = new Object[tupelCount+2];
+        
+        System.arraycopy(e.getTupel(), 0, cells, 1, tupelCount);
+        
+        cells[0] = line+1;
         cells[cells.length-1] = e.getCount();
+        
         tbResult.addItem(cells, "entry-" + line++);
       }
     };
