@@ -2,6 +2,7 @@ BEGIN; -- transaction
 
 CREATE INDEX tmpidx_pk_corpus ON _corpus (id);
 CREATE INDEX tmpidx_pk_node ON _node (id);
+CREATE INDEX tmpidx_pk_text_ref ON _node (text_ref);
 CREATE INDEX tmpidx_pk_node_token ON _node(id) WHERE token_index is not null;
 CREATE INDEX tmpidx_fk_node_annotation ON _node_annotation (node_ref);
 CREATE INDEX tmpidx_pk_component ON _component (id);
