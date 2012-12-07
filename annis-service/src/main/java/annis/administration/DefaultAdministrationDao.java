@@ -74,6 +74,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private boolean temporaryStagingArea;
   private String schemaVersion;
   private Map<String, String> mimeTypeMapping;
+  private Map<String, String> tableInsertSelect;
   /**
    * The name of the file and the relation containing the resolver information.
    */
@@ -311,6 +312,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 //    if (true) return;
 
     adjustRankPrePost();
+    adjustTextId();
     long corpusID = updateIds();
     
     importBinaryData(path);
@@ -676,8 +678,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("updating pre and post order in _rank");
     executeSqlFromScript("adjustrankprepost.sql");
-    log.info("analyzing rank");
+    log.info("analyzing _rank");
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("rank"));
+  }
+  
+  protected void adjustTextId()
+  {
+    log.info("updating id in _text and text_ref in _node");
+    executeSqlFromScript("adjusttextid.sql");
+    log.info("analyzing _node and _text");
+    jdbcTemplate.execute("ANALYZE " + tableInStagingArea("text"));
+    jdbcTemplate.execute("ANALYZE " + tableInStagingArea("node"));
   }
 
   /**
@@ -741,14 +752,16 @@ public class DefaultAdministrationDao implements AdministrationDao
       {
         StringBuilder sql = new StringBuilder();
         
-        if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
+        if(tableInsertSelect != null && tableInsertSelect.containsKey(table))
         {
           sql.append("INSERT INTO ");
           sql.append(table);
-          //FIXME DIRTY!!! find a better way instead of naming the column-names in code 
-          sql.append(
-            "(corpus, version, namespace, element, vis_type, display_name, visibility, \"order\", mappings)");
-          sql.append(" (SELECT corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, \"order\", mappings FROM ");
+          sql.append(" ( ");
+          sql.append(tableInsertSelect.get(table));
+          
+          sql.append(" ) (SELECT ");
+          sql.append(tableInsertSelect.get(table));
+          sql.append(" FROM ");
           sql.append(tableInStagingArea(table)).append(")");
         }
         else
@@ -1243,4 +1256,16 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.mimeTypeMapping = mimeTypeMapping;
   }
+
+  public Map<String, String> getTableInsertSelect()
+  {
+    return tableInsertSelect;
+  }
+
+  public void setTableInsertSelect(Map<String, String> tableInsertSelect)
+  {
+    this.tableInsertSelect = tableInsertSelect;
+  }
+  
+  
 }
