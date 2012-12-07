@@ -75,6 +75,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private String schemaVersion;
   private Map<String, String> mimeTypeMapping;
   private Map<String, String> tableInsertSelect;
+  private Map<String, String> tableInsertFrom;
   /**
    * The name of the file and the relation containing the resolver information.
    */
@@ -751,16 +752,26 @@ public class DefaultAdministrationDao implements AdministrationDao
       if (numOfEntries > 0)
       {
         StringBuilder sql = new StringBuilder();
+  
+        String predefinedFrom = 
+          tableInsertFrom == null ? null : tableInsertFrom.get(table);
+        String predefinedSelect = 
+          tableInsertSelect == null ? null : tableInsertSelect.get(table);
         
-        if(tableInsertSelect != null && tableInsertSelect.containsKey(table))
+        if(predefinedFrom != null || predefinedSelect != null)
         {
+          if(predefinedFrom == null)
+          {
+            predefinedFrom = predefinedSelect;
+          }
+          
           sql.append("INSERT INTO ");
           sql.append(table);
           sql.append(" ( ");
-          sql.append(tableInsertSelect.get(table));
+          sql.append(predefinedSelect);
           
           sql.append(" ) (SELECT ");
-          sql.append(tableInsertSelect.get(table));
+          sql.append(predefinedFrom);
           sql.append(" FROM ");
           sql.append(tableInStagingArea(table)).append(")");
         }
@@ -1266,6 +1277,15 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.tableInsertSelect = tableInsertSelect;
   }
-  
+
+  public Map<String, String> getTableInsertFrom()
+  {
+    return tableInsertFrom;
+  }
+
+  public void setTableInsertFrom(Map<String, String> tableInsertFrom)
+  {
+    this.tableInsertFrom = tableInsertFrom;
+  }
   
 }
