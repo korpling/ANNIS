@@ -142,7 +142,7 @@
     <property name="tableInsertSelect">
       <util:map>
         <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility, &quot;order&quot;, mappings" />
-        <entry key="text" value="corpus_ref, id, name, text" />
+        <entry key="text" value="corpus_ref, id, name, text, toplevel_corpus" />
       </util:map>
     </property>
   </bean>
