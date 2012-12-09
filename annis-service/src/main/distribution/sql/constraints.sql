@@ -1,6 +1,5 @@
 -- _corpus
 ALTER TABLE _corpus ADD CONSTRAINT "_PK__corpus" PRIMARY KEY (id);
--- ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_name" UNIQUE (name);
 ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_pre" UNIQUE (pre);
 ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_post" UNIQUE (post);
 
@@ -9,11 +8,10 @@ ALTER TABLE _corpus_annotation ADD CONSTRAINT "_UNIQ__corpus_annotation" UNIQUE 
 ALTER TABLE _corpus_annotation ADD CONSTRAINT "_FK__corpus_annotation__corpus" FOREIGN KEY (corpus_ref) REFERENCES _corpus (id);
 
 -- _text
-ALTER TABLE _text ADD CONSTRAINT "_PK__text" PRIMARY KEY (id);
+ALTER TABLE _text ADD CONSTRAINT "_PK__text" PRIMARY KEY (corpus_ref, id);
 
 -- _node
 ALTER TABLE _node ADD CONSTRAINT "_PK__node" PRIMARY KEY (id);
-ALTER TABLE _node ADD CONSTRAINT "_FK__node__text" FOREIGN KEY (text_ref) REFERENCES _text (id);
 ALTER TABLE _node ADD CONSTRAINT "_FK__node__corpus" FOREIGN KEY (corpus_ref) REFERENCES _corpus (id);
 
 -- _component

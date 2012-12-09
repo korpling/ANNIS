@@ -227,12 +227,14 @@ public class CommonAnnotateWithClauseGenerator
       // their are put last in the ordered list
       // +1 is there to ensure that positive equal values (thus dist=0) are not ignored
       sb.append(indent3).append("row_number() OVER (PARTITION BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
         .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
         .append(" ORDER BY NULLIF(")
         .append(distLeft).append("+ 1, -abs(").append(distLeft)
         .append(" + 1)) ASC) AS rank_left,\n");
 
       sb.append(indent3).append("row_number() OVER (PARTITION BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
         .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
         .append(" ORDER BY NULLIF(")
         .append(distRight).append(" + 1, -abs(").append(distRight)
@@ -307,20 +309,21 @@ public class CommonAnnotateWithClauseGenerator
 
     if (islandsPolicy == IslandsPolicy.IslandPolicies.none)
     {
-      sb.append("min(").append(coveredName).append(".key) AS key, ").append(
-        coveredName).append(".n AS n, ").append("min(").append(tas.aliasedColumn(
-        NODE_TABLE, "left_token")).append(") AS \"min\", ").append("max(").
-        append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(
-        ") AS \"max\", ").append("").append(tas.aliasedColumn(NODE_TABLE,
-        "text_ref")).append(" AS \"text\"\n");
+      sb.append("min(").append(coveredName).append(".key) AS key, ")
+        .append(coveredName).append(".n AS n, ")
+        .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
+        .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
     }
     else if (islandsPolicy == IslandsPolicy.IslandPolicies.context)
     {
-      sb.append(coveredName).append(".key AS key, ").append(coveredName).append(
-        ".n AS n, ").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(
-        " AS \"min\", ").append(tas.aliasedColumn(NODE_TABLE, "right_token")).
-        append(" AS \"max\", ").append(tas.aliasedColumn(NODE_TABLE, "text_ref")).
-        append(" AS \"text\"\n");
+      sb.append(coveredName).append(".key AS key, ")
+        .append(coveredName).append(".n AS n, ")
+        .append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(" AS \"min\", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(" AS \"max\", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
     }
     else
     {
@@ -360,8 +363,10 @@ public class CommonAnnotateWithClauseGenerator
 
     if (islandsPolicy == IslandsPolicy.IslandPolicies.none)
     {
-      sb.append(indent2).append("GROUP BY ").append(tas.aliasedColumn(NODE_TABLE,
-        "text_ref")).append(", n\n");
+      sb.append(indent2).append("GROUP BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+        .append(", n\n");
     }
 
     sb.append(indent).append(")\n");
@@ -371,16 +376,19 @@ public class CommonAnnotateWithClauseGenerator
   
   
   public static String overlapForOneRange(String indent,
-    String rangeMin, String rangeMax, String textRef, TableAccessStrategy tables)
+    String rangeMin, String rangeMax, String textRef, String corpus_ref, TableAccessStrategy tables)
   {
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(");
 
-    sb.append(tables.aliasedColumn(NODE_TABLE, "left_token")).append(" <= ").
-      append(rangeMax).append(" AND ").append(tables.aliasedColumn(NODE_TABLE,
-      "right_token")).append(" >= ").append(rangeMin).append(" AND ").append(tables.
-      aliasedColumn(NODE_TABLE, "text_ref")).append(" = ").append(textRef);
+    sb.append(tables.aliasedColumn(NODE_TABLE, "left_token")).append(" <= ").append(rangeMax)
+      .append(" AND ")
+      .append(tables.aliasedColumn(NODE_TABLE, "right_token")).append(" >= ").append(rangeMin)
+      .append(" AND ")
+      .append(tables.aliasedColumn(NODE_TABLE, "text_ref")).append(" = ").append(textRef)
+      .append(" AND ")
+      .append(tables.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" = ").append(corpus_ref);
 
     sb.append(")");
 

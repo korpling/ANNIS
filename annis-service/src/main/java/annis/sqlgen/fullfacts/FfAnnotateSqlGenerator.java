@@ -40,20 +40,6 @@ import static annis.sqlgen.SqlConstraints.sqlString;
  */
 public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {
-
-  @Override
-  public String getTextQuery(long textID)
-  {
-    String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, facts.*, c.path_name as path, c.path_name[1] as document_name\n"
-      + "FROM\n"
-      + "\tfacts AS facts, corpus as c\n" + "WHERE\n"
-      + "\tfacts.text_ref = :text_id AND facts.corpus_ref = c.id\n"
-      + "ORDER BY facts.pre";
-    String sql = template.replace(":text_id", String.valueOf(textID));
-    return sql;
-  }
-
   @Override
   public String getDocumentQuery(String toplevelCorpusName, String documentName)
   {
