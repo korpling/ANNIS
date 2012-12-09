@@ -58,12 +58,6 @@ public class TestAnnotateSqlGenerator
     }
 
     @Override
-    public String getTextQuery(long textID)
-    {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String getDocumentQuery(String toplevelCorpusName,
       String documentName)
     {

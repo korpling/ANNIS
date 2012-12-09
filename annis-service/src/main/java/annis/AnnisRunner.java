@@ -973,18 +973,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   }
 
-  public void doSqlText(String textID)
-  {
-    long l = Long.parseLong(textID);
-    System.out.println(annotateSqlGenerator.getTextQuery(l));
-  }
-
-  public void doText(String textID)
-  {
-    SaltProject p = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
-    System.out.println(printSaltAsXMI(p));
-  }
-
   public void doSqlDoc(String docCall)
   {
     String[] splitted = docCall.split("( )+");
