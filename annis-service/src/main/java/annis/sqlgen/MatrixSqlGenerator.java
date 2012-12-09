@@ -281,7 +281,11 @@ public class MatrixSqlGenerator
     sb.append(" = ");
     sb.append(tables.aliasedColumn(NODE_TABLE, "text_ref"));
     conditions.add(sb.toString());
-
+    
+    conditions.add(tables.aliasedColumn(TEXT_TABLE, "corpus_ref") + " = "  
+      + tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
+    
+    
     // nodes selected by id
     sb.setLength(0);
     sb.append("(\n");
