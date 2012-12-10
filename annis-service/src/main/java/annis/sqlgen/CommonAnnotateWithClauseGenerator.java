@@ -313,7 +313,7 @@ public class CommonAnnotateWithClauseGenerator
         .append(coveredName).append(".n AS n, ")
         .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
         .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
         .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
     }
     else if (islandsPolicy == IslandsPolicy.IslandPolicies.context)
@@ -322,7 +322,7 @@ public class CommonAnnotateWithClauseGenerator
         .append(coveredName).append(".n AS n, ")
         .append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(" AS \"min\", ")
         .append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(" AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\"\n")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
         .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
     }
     else
