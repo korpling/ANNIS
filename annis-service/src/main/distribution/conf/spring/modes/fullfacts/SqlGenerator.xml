@@ -38,8 +38,8 @@ limitations under the License.
         parent="annotateSqlGeneratorBase" lazy-init="true">
   </bean>
   
-  <bean id="graphSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator" parent="annotateSqlGenerator">
-    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" lazy-init="true" />
+  <bean id="graphSqlGenerator" class="annis.sqlgen.fullfacts.FfAnnotateSqlGenerator" parent="annotateSqlGenerator"  lazy-init="true" >
+    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator"/>
   </bean>
 
 </beans>
