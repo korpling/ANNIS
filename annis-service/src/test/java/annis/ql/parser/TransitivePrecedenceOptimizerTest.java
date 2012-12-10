@@ -78,28 +78,39 @@ public class TransitivePrecedenceOptimizerTest
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
     
-    assertEquals(1, data.getAlternatives().size());
+    assertEquals("alternative added", 1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
     // no node size change
-    assertEquals(4, nodes.size());
+    assertEquals("no node size change allowed", 4, nodes.size());
     
     // check that we only add a concrete number of new linguistic contraints 
     // and not more
     // (especially since we might introduce a loop by accident)
-    assertEquals(3, nodes.get(0).getJoins().size());
-    assertEquals(2, nodes.get(1).getJoins().size());
-    assertEquals(1, nodes.get(2).getJoins().size());
-    assertEquals(1, nodes.get(3).getJoins().size());
+    assertEquals("wrong number of outgoing joins for node 1", 
+      3, nodes.get(0).getJoins().size());
+    assertEquals("wrong number of outgoing joins for node 2", 
+      2, nodes.get(1).getJoins().size());
+    assertEquals("wrong number of outgoing joins for node 3", 
+      1, nodes.get(2).getJoins().size());
+    assertEquals("wrong number of outgoing joins for node 4", 
+      1, nodes.get(3).getJoins().size());
     
     // these constraints must be a precedence operator
-    assertTrue(nodes.get(0).getJoins().get(0) instanceof Precedence);
-    assertTrue(nodes.get(0).getJoins().get(1) instanceof Precedence);
-    assertTrue(nodes.get(0).getJoins().get(2) instanceof Precedence);
-    assertTrue(nodes.get(1).getJoins().get(0) instanceof Precedence);
-    assertTrue(nodes.get(1).getJoins().get(1) instanceof Precedence);
-    assertTrue(nodes.get(2).getJoins().get(0) instanceof Precedence);
-    assertTrue(nodes.get(3).getJoins().get(0) instanceof Precedence);
+    assertTrue("not a precedence operator (node 1)", 
+      nodes.get(0).getJoins().get(0) instanceof Precedence);
+    assertTrue("not a precedence operator (node 1)", 
+      nodes.get(0).getJoins().get(1) instanceof Precedence);
+    assertTrue("not a precedence operator (node 1)", 
+      nodes.get(0).getJoins().get(2) instanceof Precedence);
+    assertTrue("not a precedence operator (node 2)", 
+      nodes.get(1).getJoins().get(0) instanceof Precedence);
+    assertTrue("not a precedence operator (node 2)", 
+      nodes.get(1).getJoins().get(1) instanceof Precedence);
+    assertTrue("not a precedence operator (node 3)", 
+      nodes.get(2).getJoins().get(0) instanceof Precedence);
+    assertTrue("not a precedence operator (node 4)", 
+      nodes.get(3).getJoins().get(0) instanceof Precedence);
     
     // test if target nodes are as expected
     assertEquals(2, ((Precedence) nodes.get(0).getJoins().get(0)).getTarget().getId());
