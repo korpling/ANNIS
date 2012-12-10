@@ -78,9 +78,6 @@ limitations under the License.
 
   <bean id="sampleWhereClause" class="annis.sqlgen.SampleWhereClause"
         parent="tableAccessStrategyFactory" lazy-init="true" />
-  
-  <bean id="transitivePrecedence" class="annis.sqlgen.TransitivePrecedenceWhereClauseGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true" />
 
   <bean id="metaDataAndCorpusWhereClauseGenerator" class="annis.sqlgen.MetaDataAndCorpusWhereClauseGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true" />

@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.ql.parser;
 
-import static annis.sqlgen.SqlConstraints.join;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
+import annis.ql.analysis.DepthFirstAdapter;
 import java.util.TreeSet;
 
 /**
@@ -44,19 +39,8 @@ import java.util.TreeSet;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class TransitivePrecedenceWhereClauseGenerator 
-  extends TableAccessStrategyFactory
-  implements WhereClauseSqlGenerator<QueryData>
+public class TransitivePrecedenceOptimizer 
+  extends DepthFirstAdapter
 {
-
-  @Override
-  public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
-  {
-    TreeSet<String> conditions = new TreeSet<String>();
-    
-    throw new UnsupportedOperationException("Not implemented yet.");
-    
-//	  return conditions;
-  }
 
 }

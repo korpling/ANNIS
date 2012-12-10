@@ -46,6 +46,8 @@ limitations under the License.
 	<util:list id="annisParserPostProcessors" value-type="annis.ql.analysis.DepthFirstAdapter" scope="prototype">
 		<bean class="annis.ql.parser.NodeSearchNormalizer" scope="prototype" />
 		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
+    <bean id="transitivePrecedence" class="annis.ql.parser.TransitivePrecedenceOptimizer" lazy-init="true" />
+
 	</util:list>
 
   <!-- transforms a AQL query into its disjunctive normal form -->

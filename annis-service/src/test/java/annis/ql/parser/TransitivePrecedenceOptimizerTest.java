@@ -13,32 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.ql.parser;
 
 import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
+import annis.ql.node.AAndExpr;
+import annis.ql.node.AAnyNodeSearchExpr;
+import annis.ql.node.ADirectPrecedenceSpec;
+import annis.ql.node.AIndirectPrecedenceSpec;
+import annis.ql.node.APrecedenceLingOp;
+import annis.ql.node.ARangePrecedenceSpec;
+import annis.ql.node.ARangeSpec;
+import annis.ql.node.PExpr;
+import annis.ql.node.PPrecedenceSpec;
+import annis.ql.node.Start;
+import annis.ql.node.TDigits;
 import annis.sqlgen.model.Precedence;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import static annis.ql.parser.AstBuilder.newAndExpr;
+import static annis.ql.parser.AstBuilder.newStart;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class TransitivePrecedenceWhereClauseGeneratorTest
+public class TransitivePrecedenceOptimizerTest
 {
-  // an example node
 
-  private QueryNode[] nodes;
+ 	private AnnisParser parser;
+  private AAnyNodeSearchExpr[] nodes;
 
-  public TransitivePrecedenceWhereClauseGeneratorTest()
+  public TransitivePrecedenceOptimizerTest()
   {
+    parser = new AnnisParser();
   }
 
   @Before
@@ -53,37 +66,25 @@ public class TransitivePrecedenceWhereClauseGeneratorTest
 
   /**
    * Test of whereConditions method, of class
-   * TransitivePrecedenceWhereClauseGenerator.
+   * TransitivePrecedenceOptimizer.
    */
   @Test
   public void testWhereConditions()
   {
     System.out.println("whereConditions");
-    QueryData queryData = null;
-    List<QueryNode> alternative = new LinkedList<QueryNode>();
-    String indent = "";
     
-    nodes = new QueryNode[4];
-    for(int i=0; i < 4; i++)
-    {
-      nodes[i] = new QueryNode(i);
-      alternative.add(nodes[i]);
-    }
-
-    nodes[0].addJoin(new Precedence(nodes[1], 3));
-    nodes[1].addJoin(new Precedence(nodes[2], 5, 10));
-    nodes[2].addJoin(new Precedence(nodes[3]));
+    String aql = "node & node & node & node "
+      + "& #1 .3 #2 "
+      + "& #2 .5,10 #3 "
+      + "& #3 .* #4 "
+      + "& #3 .* #2";
     
-    TransitivePrecedenceWhereClauseGenerator instance = new TransitivePrecedenceWhereClauseGenerator();
+    Start start = parser.parse(aql);
     
-    Set expResult = new TreeSet();
+    TransitivePrecedenceOptimizer instance = new TransitivePrecedenceOptimizer();
+    start.apply(instance);
 
-
-
-    Set result = instance.whereConditions(queryData, alternative, indent);
-
-    assertEquals(expResult, result);
-    // TODO review the generated test code and remove the default call to fail.
-    fail("The test case is a prototype.");
+    // TODO test that joins are added
+    
   }
 }
