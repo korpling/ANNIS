@@ -79,9 +79,12 @@ public class QueryAnalysis
 		}
 		log.debug("maximum column width is " + queryData.getMaxWidth());
 		
-    for(QueryDataTransformer transformer : postProcessors)
+    if(postProcessors != null)
     {
-      queryData = transformer.transform(queryData);
+      for(QueryDataTransformer transformer : postProcessors)
+      {
+        queryData = transformer.transform(queryData);
+      }
     }
     
     return queryData;
