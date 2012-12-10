@@ -174,6 +174,7 @@ public class TestQueryAnalysis {
 		assertThat(springManagedQueryAnalysis.getClauseAnalysis(), is(not(nullValue())));
 		assertThat(springManagedQueryAnalysis.getDnfTransformer(), is(not(nullValue())));
 		assertThat(springManagedQueryAnalysis.getNodeRelationNormalizer(), is(not(nullValue())));
+    assertThat(springManagedQueryAnalysis.getPostProcessors(), is(not(nullValue())));
 	}
 	
 	// getClauseAnalysis() returns new instance on each call

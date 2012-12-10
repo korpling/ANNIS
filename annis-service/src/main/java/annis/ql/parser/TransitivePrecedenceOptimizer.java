@@ -15,13 +15,6 @@
  */
 package annis.ql.parser;
 
-import java.util.List;
-import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.ql.analysis.DepthFirstAdapter;
-import java.util.TreeSet;
-
 /**
  * Extends precedence relations to other nodes that are only transitivly connected.
  * 
@@ -39,8 +32,22 @@ import java.util.TreeSet;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class TransitivePrecedenceOptimizer 
-  extends DepthFirstAdapter
+public class TransitivePrecedenceOptimizer implements QueryDataTransformer
 {
+  
+  public TransitivePrecedenceOptimizer()
+  {
 
+  }
+  @Override
+  public QueryData transform(QueryData data)
+  {
+    
+    QueryData result = data.clone();
+    
+    return result;
+  
+  }
+  
+  
 }

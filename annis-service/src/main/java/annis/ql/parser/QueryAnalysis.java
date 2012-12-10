@@ -41,6 +41,8 @@ public class QueryAnalysis
   private DnfTransformer dummyDnfTransformer;
   private ClauseAnalysis dummyClauseAnalysis;
   private NodeRelationNormalizer nodeRelationNormalizer;
+  
+  private List<QueryDataTransformer> postProcessors;
 
   public QueryData analyzeQuery(Start statement, List<Long> corpusList)
   {
@@ -61,8 +63,7 @@ public class QueryAnalysis
     {
 		  if (normalizeNodesInEdgeRelations)
 		  {
-		    NodeRelationNormalizer nodeRelationNormalizer = getNodeRelationNormalizer();
-		    clause.apply(nodeRelationNormalizer);
+		    clause.apply(getNodeRelationNormalizer());
 		  }
 
 			// get a fresh clause analyzer from Spring
@@ -78,6 +79,11 @@ public class QueryAnalysis
 		}
 		log.debug("maximum column width is " + queryData.getMaxWidth());
 		
+    for(QueryDataTransformer transformer : postProcessors)
+    {
+      queryData = transformer.transform(queryData);
+    }
+    
     return queryData;
   }
 
@@ -121,6 +127,15 @@ public class QueryAnalysis
   {
     this.normalizeNodesInEdgeRelations = normalizeNodesInEdgeRelations;
   }
+  
+  public List<QueryDataTransformer> getPostProcessors()
+  {
+    return postProcessors;
+  }
 
+  public void setPostProcessors(List<QueryDataTransformer> postProcessors)
+  {
+    this.postProcessors = postProcessors;
+  }
 
 }

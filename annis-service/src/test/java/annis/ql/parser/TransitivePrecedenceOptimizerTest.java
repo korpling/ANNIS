@@ -15,29 +15,34 @@
  */
 package annis.ql.parser;
 
-import annis.ql.node.AAndExpr;
-import annis.ql.node.AAnyNodeSearchExpr;
-import annis.ql.node.AIndirectPrecedenceSpec;
-import annis.ql.node.ALinguisticConstraintExpr;
-import annis.ql.node.APrecedenceLingOp;
-import annis.ql.node.ARangePrecedenceSpec;
-import annis.ql.node.ARangeSpec;
+import annis.model.QueryNode;
 import annis.ql.node.Start;
+import annis.sqlgen.model.Precedence;
+import java.util.LinkedList;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
 public class TransitivePrecedenceOptimizerTest
 {
 
  	private AnnisParser parser;
-  private AAnyNodeSearchExpr[] nodes;
-
+  
+  // QueryAnalysis instance that is managed by Spring (has Adapters injected)
+	@Autowired private QueryAnalysis queryAnalysis;
+  
   public TransitivePrecedenceOptimizerTest()
   {
     parser = new AnnisParser();
@@ -70,47 +75,66 @@ public class TransitivePrecedenceOptimizerTest
     
     // perform the initial parsing
     Start start = parser.parse(aql);
+    // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
+    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
     
-    // apply the optimizer
-    TransitivePrecedenceOptimizer instance = new TransitivePrecedenceOptimizer();
-    start.apply(instance);
+    assertEquals(1, data.getAlternatives().size());
+    List<QueryNode> nodes = data.getAlternatives().get(0);
     
-    assertTrue(start.getPExpr() instanceof AAndExpr);
-    AAndExpr and = (AAndExpr) start.getPExpr();
-
+    // no node size change
+    assertEquals(4, nodes.size());
+    
     int offset = 8;
-    // we only add a concrete number of new linguistic contraints and not more
+    // check that we only add a concrete number of new linguistic contraints 
+    // and not more
     // (especially since we might introduce a loop by accident)
-    assertEquals(offset + 3, and.getExpr().size());  
+    assertEquals(3, nodes.get(0).getJoins().size());
+    assertEquals(2, nodes.get(1).getJoins().size());
+    assertEquals(1, nodes.get(2).getJoins().size());
+    assertEquals(1, nodes.get(3).getJoins().size());
     
-    // we don't add any new nodes, only constraints
-    assertTrue(and.getExpr().get(offset + 0) instanceof ALinguisticConstraintExpr);
-    assertTrue(and.getExpr().get(offset + 1) instanceof ALinguisticConstraintExpr);
-    assertTrue(and.getExpr().get(offset + 2) instanceof ALinguisticConstraintExpr);
+    // these constraints must be a precedence operator
+    assertTrue(nodes.get(0).getJoins().get(0) instanceof Precedence);
+    assertTrue(nodes.get(0).getJoins().get(1) instanceof Precedence);
+    assertTrue(nodes.get(0).getJoins().get(2) instanceof Precedence);
+    assertTrue(nodes.get(1).getJoins().get(0) instanceof Precedence);
+    assertTrue(nodes.get(1).getJoins().get(1) instanceof Precedence);
+    assertTrue(nodes.get(2).getJoins().get(0) instanceof Precedence);
+    assertTrue(nodes.get(3).getJoins().get(0) instanceof Precedence);
     
-    // this constraint must be a precedence operator
-    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 0)).getLingOp() instanceof APrecedenceLingOp);
-    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 1)).getLingOp() instanceof APrecedenceLingOp);
-    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 2)).getLingOp() instanceof APrecedenceLingOp);
+    // test if target nodes are as expected
+    assertEquals(2, ((Precedence) nodes.get(0).getJoins().get(0)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(1)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(0).getJoins().get(2)).getTarget().getId());
     
-    // get the precdedence operators
-    APrecedenceLingOp op0 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 0)).getLingOp();
-    APrecedenceLingOp op1 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 1)).getLingOp();
-    APrecedenceLingOp op2 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 2)).getLingOp();
+    assertEquals(3, ((Precedence) nodes.get(1).getJoins().get(0)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(1).getJoins().get(1)).getTarget().getId());
     
-    // must be specified range
-    assertTrue(op0.getPrecedenceSpec() instanceof ARangePrecedenceSpec);
-    // unknown range but later than the other node
-    assertTrue(op1.getPrecedenceSpec() instanceof AIndirectPrecedenceSpec);
-    assertTrue(op2.getPrecedenceSpec() instanceof AIndirectPrecedenceSpec);
+    assertEquals(4, ((Precedence) nodes.get(2).getJoins().get(0)).getTarget().getId());
     
-    // the range is between 8 (3+5) and 13 (3+10) 
-    assertEquals("8",
-      ((ARangeSpec) ((ARangePrecedenceSpec) op0.getPrecedenceSpec()).getRangeSpec())
-      .getMin().getText());
-    assertEquals("13",
-      ((ARangeSpec) ((ARangePrecedenceSpec) op0.getPrecedenceSpec()).getRangeSpec())
-      .getMax().getText());
+    assertEquals(2, ((Precedence) nodes.get(3).getJoins().get(0)).getTarget().getId());
+    
+    // test if ranges are correct
+    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMinDistance());
+    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMaxDistance());
+    
+    assertEquals(8, ((Precedence) nodes.get(0).getJoins().get(1)).getMinDistance());
+    assertEquals(13, ((Precedence) nodes.get(0).getJoins().get(1)).getMaxDistance());
+    
+    assertEquals(0, ((Precedence) nodes.get(0).getJoins().get(2)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(0).getJoins().get(2)).getMaxDistance());
+    
+    assertEquals(5, ((Precedence) nodes.get(1).getJoins().get(0)).getMinDistance());
+    assertEquals(10, ((Precedence) nodes.get(1).getJoins().get(0)).getMaxDistance());
+    
+    assertEquals(0, ((Precedence) nodes.get(1).getJoins().get(1)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(1).getJoins().get(1)).getMaxDistance());
+    
+    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(0)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(0)).getMaxDistance());
+    
+    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(0)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(0)).getMaxDistance());
     
   }
 }
