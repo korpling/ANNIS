@@ -84,7 +84,6 @@ public class TransitivePrecedenceOptimizerTest
     // no node size change
     assertEquals(4, nodes.size());
     
-    int offset = 8;
     // check that we only add a concrete number of new linguistic contraints 
     // and not more
     // (especially since we might introduce a loop by accident)
