@@ -71,7 +71,7 @@ public class TransitivePrecedenceOptimizerTest
       + "& #1 .3 #2 "
       + "& #2 .5,10 #3 "
       + "& #3 .* #4 "
-      + "& #3 .* #2";
+      + "& #4 .* #2";
     
     // perform the initial parsing
     Start start = parser.parse(aql);
@@ -92,9 +92,9 @@ public class TransitivePrecedenceOptimizerTest
     assertEquals("wrong number of outgoing joins for node 2", 
       2, nodes.get(1).getJoins().size());
     assertEquals("wrong number of outgoing joins for node 3", 
-      1, nodes.get(2).getJoins().size());
+      2, nodes.get(2).getJoins().size());
     assertEquals("wrong number of outgoing joins for node 4", 
-      1, nodes.get(3).getJoins().size());
+      2, nodes.get(3).getJoins().size());
     
     // these constraints must be a precedence operator
     assertTrue("not a precedence operator (node 1)", 

@@ -19,6 +19,7 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.Precedence;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -54,17 +55,19 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   @Override
   public QueryData transform(QueryData data)
   {
+    // initialize helper variables
+    HashSet<Long> visitedNodes = new HashSet<Long>();
     
-    
+
     for(List<QueryNode> alternative : data.getAlternatives())
     {
-      // initialize helper variables
-      HashSet<Long> visitedNodes = new HashSet<Long>();
+      Map<Long, Set<Precedence>> outJoins = createInitialJoinMap(alternative);
       
       for(QueryNode node : alternative)
       {
+        visitedNodes.clear();
         // we apply the algorithm node by node
-        propagateNodePrecedence(node, node, visitedNodes, null);
+        propagateNodePrecedence(node, node, visitedNodes, outJoins, null);
       }
     }
     
@@ -72,7 +75,32 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   
   }
   
-  private void propagateNodePrecedence(QueryNode initialNode, QueryNode currentNode, Set<Long> visitedNodes, Range range)
+  private Map<Long, Set<Precedence>> createInitialJoinMap(List<QueryNode> alternative)
+  {
+    Map<Long, Set<Precedence>> result = new HashMap<Long, Set<Precedence>>();
+    
+    for(QueryNode node : alternative)
+    {
+      Set<Precedence> joinList = new HashSet<Precedence>();
+      
+      for(Join j : node.getJoins())
+      {
+        if(j instanceof Precedence)
+        {
+          joinList.add((Precedence) j);
+        }
+      }
+      
+      result.put(node.getId(), joinList);
+    }
+    
+    return result;
+  }
+  
+  private void propagateNodePrecedence(QueryNode initialNode, 
+    QueryNode currentNode, Set<Long> visitedNodes,
+    Map<Long, Set<Precedence>> outJoins,
+    Range range)
   {
     visitedNodes.add(currentNode.getId());
     
@@ -83,7 +111,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
     for(Join join : originalJoins)
     {
       if(join instanceof Precedence)
-      {
+      { 
         Range newRange;
     
         Precedence p = (Precedence) join;
@@ -104,46 +132,78 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
           else
           {
             // add the new precendence values to the old one
-            newRange = new Range(range.getMin() + p.getMinDistance(), range.getMax() + p.getMaxDistance());
+            newRange = new Range(range.getMin() + p.getMinDistance(), 
+              range.getMax() + p.getMaxDistance());
           }
         }
-        
-        // only add if this join is not already included 
-        // (which is always true for the initial node)
-        if(initialNode != currentNode)
-        {
-          // add newly created discovered transitive precedence
-          initialNode.addJoin(new Precedence(p.getTarget(), newRange.getMin(), newRange.getMax()));
-        }
-        
-        // only follow new path if the range is more restrictive
-        boolean add = true;
-        Range existingRange = nextNodes.get(p.getTarget());
-        if(existingRange != null)
-        {
-          add = false;
-          if(existingRange.getMin() != 0 && existingRange.getMax() != 0)
-          {
-            add = true;
-          }
-        }
-        
-        if(add)
+                
+        // put the target node in the list of nodes to check if not visited yet
+        if(!visitedNodes.contains(p.getTarget().getId()))
         {
           nextNodes.put(p.getTarget(), newRange);
+        
+          Precedence newJoin = new Precedence(p.getTarget(), newRange.getMin(),
+            newRange.getMax());
+          Set<Precedence> existingJoins = outJoins.get(initialNode.getId());
+          // only add if this join is not already included 
+          // (which is always true for the initial node)
+          // and the join is more restrictive than any previous one
+          boolean moreRestrictive = true;
+          for (Precedence oldJoin : existingJoins)
+          {
+            if(oldJoin.getTarget() == newJoin.getTarget())
+            {
+              if (!joinMoreRestrictive(oldJoin, newJoin))
+              {
+                moreRestrictive = false;
+                break;
+              }
+            }
+          }
+          if (moreRestrictive)
+          {
+            // add newly created discovered transitive precedence
+            initialNode.addJoin(newJoin);
+            existingJoins.add(newJoin);
+          }
+
         }
+        
       } // end if is precedence join
     } // end for each join
     
     for(Map.Entry<QueryNode, Range> e : nextNodes.entrySet())
     {
       // call us recursivly but remember the range
-      if(!visitedNodes.contains(e.getKey().getId()))
-      {
-        propagateNodePrecedence(initialNode, e.getKey(), visitedNodes, e.getValue());
-      }
+      propagateNodePrecedence(initialNode, e.getKey(), visitedNodes, outJoins, 
+        e.getValue());
     }
   }
   
+  private boolean joinMoreRestrictive(Precedence joinOld, Precedence joinNew)
+  {
+    // the new one is an unlimited indirect join which can never be better than
+    // the original one
+    if(joinNew.getMinDistance() == 0 && joinNew.getMaxDistance() == 0)
+    {
+      return false;
+    }
+    
+    // both values are worse than the old one
+    if(joinNew.getMaxDistance() >= joinOld.getMaxDistance() 
+      && joinNew.getMinDistance() <= joinOld.getMinDistance())
+    {
+      return false;
+    }
+    
+    // difference is less than the old one
+    if((joinOld.getMaxDistance() - joinOld.getMinDistance()) 
+      < (joinNew.getMaxDistance() - joinNew.getMinDistance()) )
+    {
+      return false;
+    }
+    
+    return true;
+  }
   
 }
