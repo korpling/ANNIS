@@ -15,29 +15,18 @@
  */
 package annis.ql.parser;
 
-import annis.model.QueryNode;
 import annis.ql.node.AAndExpr;
 import annis.ql.node.AAnyNodeSearchExpr;
-import annis.ql.node.ADirectPrecedenceSpec;
 import annis.ql.node.AIndirectPrecedenceSpec;
+import annis.ql.node.ALinguisticConstraintExpr;
 import annis.ql.node.APrecedenceLingOp;
 import annis.ql.node.ARangePrecedenceSpec;
 import annis.ql.node.ARangeSpec;
-import annis.ql.node.PExpr;
-import annis.ql.node.PPrecedenceSpec;
 import annis.ql.node.Start;
-import annis.ql.node.TDigits;
-import annis.sqlgen.model.Precedence;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import static annis.ql.parser.AstBuilder.newAndExpr;
-import static annis.ql.parser.AstBuilder.newStart;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -65,26 +54,63 @@ public class TransitivePrecedenceOptimizerTest
   }
 
   /**
-   * Test of whereConditions method, of class
-   * TransitivePrecedenceOptimizer.
+   * Test wether new linguistic operators are added.
    */
   @Test
-  public void testWhereConditions()
+  public void testAddTransitivePrecedenceOperators()
   {
     System.out.println("whereConditions");
     
+    // query to extend
     String aql = "node & node & node & node "
       + "& #1 .3 #2 "
       + "& #2 .5,10 #3 "
       + "& #3 .* #4 "
       + "& #3 .* #2";
     
+    // perform the initial parsing
     Start start = parser.parse(aql);
     
+    // apply the optimizer
     TransitivePrecedenceOptimizer instance = new TransitivePrecedenceOptimizer();
     start.apply(instance);
+    
+    assertTrue(start.getPExpr() instanceof AAndExpr);
+    AAndExpr and = (AAndExpr) start.getPExpr();
 
-    // TODO test that joins are added
+    int offset = 8;
+    // we only add a concrete number of new linguistic contraints and not more
+    // (especially since we might introduce a loop by accident)
+    assertEquals(offset + 3, and.getExpr().size());  
+    
+    // we don't add any new nodes, only constraints
+    assertTrue(and.getExpr().get(offset + 0) instanceof ALinguisticConstraintExpr);
+    assertTrue(and.getExpr().get(offset + 1) instanceof ALinguisticConstraintExpr);
+    assertTrue(and.getExpr().get(offset + 2) instanceof ALinguisticConstraintExpr);
+    
+    // this constraint must be a precedence operator
+    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 0)).getLingOp() instanceof APrecedenceLingOp);
+    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 1)).getLingOp() instanceof APrecedenceLingOp);
+    assertTrue(((ALinguisticConstraintExpr) and.getExpr().get(offset + 2)).getLingOp() instanceof APrecedenceLingOp);
+    
+    // get the precdedence operators
+    APrecedenceLingOp op0 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 0)).getLingOp();
+    APrecedenceLingOp op1 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 1)).getLingOp();
+    APrecedenceLingOp op2 = (APrecedenceLingOp) ((ALinguisticConstraintExpr) and.getExpr().get(offset + 2)).getLingOp();
+    
+    // must be specified range
+    assertTrue(op0.getPrecedenceSpec() instanceof ARangePrecedenceSpec);
+    // unknown range but later than the other node
+    assertTrue(op1.getPrecedenceSpec() instanceof AIndirectPrecedenceSpec);
+    assertTrue(op2.getPrecedenceSpec() instanceof AIndirectPrecedenceSpec);
+    
+    // the range is between 8 (3+5) and 13 (3+10) 
+    assertEquals("8",
+      ((ARangeSpec) ((ARangePrecedenceSpec) op0.getPrecedenceSpec()).getRangeSpec())
+      .getMin().getText());
+    assertEquals("13",
+      ((ARangeSpec) ((ARangePrecedenceSpec) op0.getPrecedenceSpec()).getRangeSpec())
+      .getMax().getText());
     
   }
 }
