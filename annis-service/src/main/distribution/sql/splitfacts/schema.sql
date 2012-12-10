@@ -39,11 +39,14 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  id    bigint PRIMARY KEY,
+  corpus_ref bigint REFERENCES corpus(id), 
+  id    bigint,
   name  varchar,
   text  text,
-  toplevel_corpus bigint REFERENCES corpus(id)
+  toplevel_corpus bigint REFERENCES corpus(id),
+  PRIMARY KEY(corpus_ref, id)
 );
+
 COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
@@ -65,7 +68,7 @@ CREATE TABLE annotation_pool (
 CREATE TABLE facts_node (
   fid bigserial,
   id bigint,
-  text_ref bigint REFERENCES text(id),
+  text_ref bigint,
   corpus_ref bigint REFERENCES corpus(id),
   toplevel_corpus bigint REFERENCES corpus(id),
   node_namespace varchar,
@@ -134,7 +137,6 @@ CREATE TABLE corpus_stats
   max_corpus_id bigint  NULL,
   max_corpus_pre bigint NULL,
   max_corpus_post bigint NULL,
-  max_text_id bigint NULL,
   max_component_id bigint NULL,
   max_node_id bigint NULL, 
   source_path varchar -- original path to the folder containing the relANNIS sources
