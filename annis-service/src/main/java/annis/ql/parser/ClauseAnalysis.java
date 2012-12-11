@@ -107,7 +107,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   private int aliasCount;
   private List<QueryAnnotation> metaAnnotations;
   private int precedenceBound;
-
+  
   public ClauseAnalysis()
   {
     this(0, new ArrayList<QueryAnnotation>(), new LinkedHashMap<String, QueryNode>(), 0);
@@ -853,5 +853,8 @@ public class ClauseAnalysis extends DepthFirstAdapter
   {
     this.precedenceBound = precedenceBound;
   }
+  
+  
   // </editor-fold>
+
 }

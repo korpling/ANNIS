@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2012 Collaborative Research Centre SFB 632 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,17 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
 /**
- *
- * @author thomas
+ * Adds the constraint that all nodes are always inside one document as
+ * WHERE clause elements.
+ * 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class SubcorpusConstraintWhereClause 
   extends TableAccessStrategyFactory
   implements WhereClauseSqlGenerator<QueryData>
 {
 
+  @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
 	  Set<String> conditions = new HashSet<String>();

@@ -47,6 +47,10 @@ limitations under the License.
 		<bean class="annis.ql.parser.NodeSearchNormalizer" scope="prototype" />
 		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
 	</util:list>
+  
+  <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype">
+		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" scope="prototype" />
+	</util:list>
 
   <!-- transforms a AQL query into its disjunctive normal form -->
   <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" scope="prototype" />
@@ -62,7 +66,8 @@ limitations under the License.
     <lookup-method name="getDnfTransformer" bean="aqlDnfTransformer"/>
     <lookup-method name="getClauseAnalysis" bean="aqlClauseAnalysis"/>
     <lookup-method name="getNodeRelationNormalizer" bean="nodeRelationNormalizer"/>
-    
+   
+    <property name="postProcessors" ref="queryAnalysisPostProcessors" />    
     <property name="normalizeNodesInEdgeRelations" value="${annis.normalize-nodes-in-edge-relations}"/>
   </bean>
 
