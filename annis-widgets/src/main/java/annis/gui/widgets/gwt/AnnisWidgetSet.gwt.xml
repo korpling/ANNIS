@@ -13,11 +13,7 @@
 	<!-- This is relative to widgetset_directory/public -->
 	<stylesheet src="anniswidget/styles.css"/>
 
-
-  <script src="anniswidget/jit/space_tree_jit.js" />
-  <script src="anniswidget/jit/init_space_tree.js" />
-
-
+  <script src="anniswidget/rst_vis.js" />
 
   <!-- JQuery makes our life easier -->
   <script src="anniswidget/jquery-1.8.2.min.js" />

@@ -29,15 +29,11 @@ public class JITVisualization extends JavaScriptObject
   {
   }
 
-  final public native void onClick(JITVisualization vis) /*-{
-     this.onClick(vis.root);
-  }-*/;
-
-  final public native void compute() /*-{
-     this.compute();
-  }-*/;
-
-  final native void loadJSON(JavaScriptObject json) /*-{
-    this.loadJSON(json);
+  final native void render() /*-{
+    this.layoutTree();
+    this.initWrapper();
+    this.initCanvas();
+    this.plotNodes();
+    this.plotEdges();
   }-*/;
 }

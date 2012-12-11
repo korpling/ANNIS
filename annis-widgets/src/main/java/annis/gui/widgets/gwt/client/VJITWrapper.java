@@ -68,22 +68,12 @@ public class VJITWrapper extends Widget implements Paintable
     count++;
 
     // init container
-    DivElement container = doc.createDivElement();
-    DivElement wrapper = container.appendChild(doc.createDivElement());
-    setElement(container);
+    DivElement wrapper = doc.createDivElement();
+    DivElement container = wrapper.appendChild(doc.createDivElement());
+    setElement(wrapper);
 
-    container.setAttribute("style",
-      "background:" + background + "; width:" + width + "; height:" + height);
     container.setAttribute("id", "container_" + elementID);
-    wrapper.setAttribute("style",
-      "background:" + background + "; width:" + width + "; height:" + height);
     wrapper.setAttribute("id", elementID);
-
-    // initialize some browser compatibilies of jit
-    setupJIT();
-
-    // setup config for visualization
-    setupConfig();
   }
 
   @Override
@@ -105,6 +95,9 @@ public class VJITWrapper extends Widget implements Paintable
 
       jsonData = parseStringToJSON(uidl.getStringAttribute("visData"));
 
+      // setup config for visualization
+      setupConfig();
+
       if (visualization == null)
       {
         visualization = visualizationInit(config.getJavaScriptObject());
@@ -112,9 +105,7 @@ public class VJITWrapper extends Widget implements Paintable
 
       if (jsonData != null)
       {
-        visualization.loadJSON(jsonData.getJavaScriptObject());
-        visualization.compute();
-        visualization.onClick(visualization);
+        visualization.render();
       }
       else
       {
@@ -123,29 +114,8 @@ public class VJITWrapper extends Widget implements Paintable
     }
   }
 
-  /**
-   * Some internal jit setup stuff, copied from examples script
-   */
-  private native void setupJIT() /*-{
-   var labelType, useGradients, nativeTextSupport, animate;
-   (function() {
-   var ua = navigator.userAgent,
-   iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
-   typeOfCanvas = typeof HTMLCanvasElement,
-   nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-   textSupport = nativeCanvasSupport
-   && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
-   //I'm setting this based on the fact that ExCanvas provides text support for IE
-   //and that as of today iPhone/iPad current text support is lame
-   labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
-   nativeTextSupport = labelType == 'Native';
-   useGradients = nativeCanvasSupport;
-   animate = !(iStuff || !nativeCanvasSupport);
-   })();
-   }-*/;
-
   public native JITVisualization visualizationInit(JavaScriptObject config)/*-{
-   return $wnd.initSpaceTree(config);
+   return $wnd.$viz(config);
    }-*/;
 
   public JSONObject parseStringToJSON(String jsonString)
@@ -167,35 +137,8 @@ public class VJITWrapper extends Widget implements Paintable
   private void setupConfig()
   {
     config = new JITConf();
-    config.setProperty("injectInto", elementID);
-    config.setProperty("orientation", "top");
-    config.setProperty("levelsToShow", 3);
-    config.setProperty("siblingOffset", 200);
-
-
-    // node config
-    JITConf node = new JITConf();
-    node.setProperty("overridable", true);
-    node.setProperty("width", 60);
-    node.setProperty("height", 20);
-    node.setProperty("color", background);
-    config.setProperty("Node", node);
-
-    // edges config
-    JITConf edge = new JITConf();
-    edge.setProperty("type", "edgeLabel");
-    edge.setProperty("overridable", true);
-    config.setProperty("Edge", edge);
-
-    // navigation config
-    JITConf navigation = new JITConf();
-    navigation.setProperty("enable", true);
-    navigation.setProperty("panning", true);
-    config.setProperty("Navigation", navigation);
-
-    //label config
-    JITConf label = new JITConf();
-    label.setProperty("overridable", true);
-    config.setProperty("Label", label);
+    config.setProperty("json", jsonData);
+    config.setProperty("wrapper", elementID);
+    config.setProperty("container", "container_" + elementID);
   }
 }

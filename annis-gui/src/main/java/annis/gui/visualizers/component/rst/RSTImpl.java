@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;

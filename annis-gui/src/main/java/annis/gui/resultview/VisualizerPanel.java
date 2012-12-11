@@ -525,7 +525,7 @@ public class VisualizerPanel extends CustomLayout
    * @param markedAndCovered the original map calculated with the partial
    * document graph
    * @param document the partial document or subgraph
-   * @param wholeDocument the new complete document
+   * @param wholeDocucment the new complete document
    * @return a new map, with updated object/node references. The salt ids of the
    * node objects remains the same.
    */
