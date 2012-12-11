@@ -331,6 +331,7 @@ limitations under the License.
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />
     <ref bean="corpusPathWhereClauseGenerator" />
+<!--    <ref bean="transitivePrecedence" /> -->
   </util:list>
 
 
