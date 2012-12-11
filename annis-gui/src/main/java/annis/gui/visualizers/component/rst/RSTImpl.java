@@ -119,7 +119,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // result graph
   private SDocumentGraph graph;
 
-
   // namespace for SProcessingAnnotation sentence index
   static private final String SENTENCE_INDEX = "sentence_index";
 
@@ -395,7 +394,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
        */
       JSONObject data = new JSONObject();
       JSONArray edgesJSON = getIncomingEdgeTypeAnnotation(currNode);
-      JSONArray invisRel = getInvisibleRelatedNodes(currNode);
+      JSONObject invisRel = getInvisibleRelatedNodes(currNode);
       boolean isMultiNucNode = isMultinucNode(currNode);
 
       // since we have found some tokens, it must be a sentence in RST.
@@ -462,7 +461,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
             st.peek().append("children", node);
             setSentenceSpan(node, st.peek());
             sortChildren(st.peek());
-            st.peek().getJSONObject("data").append("invisibleRelations",
+            st.peek().getJSONObject("data").put("invisibleRelations",
               getUniStrId(currSnode));
 
             st.push(tmp);
@@ -599,9 +598,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return true;
   }
 
-  private JSONArray getInvisibleRelatedNodes(SNode node)
+  private JSONObject getInvisibleRelatedNodes(SNode node)
   {
-    JSONArray nodeIds = new JSONArray();
+    JSONObject nodeIds = new JSONObject();
     EList<Edge> out = node.getSGraph().getOutEdges(node.getSId());
 
     /**
@@ -620,13 +619,20 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         if (hasAnnoKey(((SRelation) edge), INVISIBLE_RELATION)
           && ((SRelation) edge).getTarget() instanceof SNode)
         {
-          nodeIds.put(getUniStrId(((SNode) ((SRelation) edge).getTarget())));
+          try
+          {
+            nodeIds.put(getUniStrId(((SNode) ((SRelation) edge).getTarget())),
+              true);
+          }
+          catch (JSONException ex)
+          {
+            log.error("cannot add {} to invisible relations", node.getSId());
+          }
         }
       }
 
     }
     return nodeIds;
-
   }
 
   private JSONArray getIncomingEdgeTypeAnnotation(SNode node) throws JSONException
