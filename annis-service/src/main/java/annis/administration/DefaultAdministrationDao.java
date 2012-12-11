@@ -411,7 +411,7 @@ public class DefaultAdministrationDao implements AdministrationDao
               sb.append("\"element\"    varchar, ");
               sb.append("\"vis_type\"   varchar NOT NULL, ");
               sb.append("\"display_name\"   varchar NOT NULL, ");
-              sb.append("\"order\" bigint default '0', ");
+              sb.append("\"order\" integer default '0', ");
               sb.append("\"mappings\" varchar");
               sb.append(");");
               
@@ -513,8 +513,8 @@ public class DefaultAdministrationDao implements AdministrationDao
           "CREATE TEMPORARY TABLE _tmpnode"
           + "\n(\n"
           + "id bigint,\n"
-          + "text_ref bigint,\n"
-          + "corpus_ref bigint,\n"
+          + "text_ref integer,\n"
+          + "corpus_ref integer,\n"
           + "namespace varchar(100),\n"
           + "name varchar(100),\n"
           + "\"left\" integer,\n"
