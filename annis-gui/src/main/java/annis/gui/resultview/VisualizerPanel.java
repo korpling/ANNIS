@@ -301,8 +301,8 @@ public class VisualizerPanel extends CustomLayout
         get(0).getSName(), result.getSName());
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
-      markedAndCovered = rebuildMarkedAndConvered(markedAndCovered, input.
-        getDocument(), wholeDocument);
+      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered, input.
+        getDocument(), wholeDocument));
       input.setDocument(wholeDocument);
     }
     else
@@ -534,10 +534,10 @@ public class VisualizerPanel extends CustomLayout
     SDocument document, SDocument wholeDocument)
   {
     Map<SNode, Long> newMarkedAndCovered = new HashMap<SNode, Long>();
-    SGraph wholeSGraph = wholeDocument.getSCorpusGraph();
+    SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (SNode node : newMarkedAndCovered.keySet())
+    for (SNode node : markedAndCovered.keySet())
     {
       wholeNode = wholeSGraph.getSNode(node.getSId());
       newMarkedAndCovered.put(wholeNode, markedAndCovered.get(node));
