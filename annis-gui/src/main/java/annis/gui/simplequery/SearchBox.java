@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Set;
+//added by Martin:
 
 /**
  *
@@ -41,7 +42,9 @@ public class SearchBox extends Panel implements Button.ClickListener
   private Button btClose;
   private VerticalNode vn;
   private String ebene;
-  private ComboBox cb;
+  private ComboBox cb;  
+  private CheckBox reBox;//by Martin, tick for regular expression
+  private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
 
   public SearchBox(String ebene, SimpleQuery sq, VerticalNode vn)
   {
@@ -58,6 +61,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     {
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
+    this.annonames = annonames;//by Martin
     ComboBox l = new ComboBox(ebene);
     this.cb = l;
     l.setInputPrompt(ebene);
@@ -72,12 +76,14 @@ public class SearchBox extends Panel implements Button.ClickListener
     
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(true);
-    
+     
     // searchbox tickbox for regex
-    CheckBox cb = new CheckBox("Regex");
-    cb.setDescription("Tick to allow for a regular expression");
-    cb.setImmediate(true);
-    sbtoolbar.addComponent(cb);
+    CheckBox tb = new CheckBox("Regex");
+    tb.setDescription("Tick to allow for a regular expression");
+    tb.setImmediate(true);
+    sbtoolbar.addComponent(tb);
+    tb.addListener((Button.ClickListener) this);
+    reBox = tb;
     
     // close the searchbox
     btClose = new Button("Close", (Button.ClickListener) this);
@@ -87,8 +93,9 @@ public class SearchBox extends Panel implements Button.ClickListener
     sb.addComponent(sbtoolbar);
     
     addComponent(sb);
-    
+
   }
+ 
  
   @Override
   public void buttonClick(Button.ClickEvent event)
@@ -96,8 +103,23 @@ public class SearchBox extends Panel implements Button.ClickListener
 
     if(event.getButton() == btClose)
     {
-      vn.removeSearchBox(this);
-    }  
+      vn.removeSearchBox(this);      
+    }
+    
+    if(event.getComponent()==reBox)
+    {
+      boolean r = reBox.booleanValue();
+      cb.setNewItemsAllowed(r);
+      if(!r)
+      {
+        //rebuild ComboBox-content
+        cb.removeAllItems();
+        for(String a : annonames)
+        {
+          cb.addItem(a);
+        }
+      }      
+    }
   }
   
   public String getAttribute()
@@ -108,5 +130,10 @@ public class SearchBox extends Panel implements Button.ClickListener
   public String getValue()
   {
     return cb.toString();
+  }
+  
+  public boolean isRegEx()
+  {
+    return reBox.booleanValue();
   }
 }
