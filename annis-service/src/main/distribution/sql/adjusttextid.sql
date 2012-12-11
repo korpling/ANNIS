@@ -1,4 +1,4 @@
-ALTER TABLE _text ADD corpus_ref bigint;
+ALTER TABLE _text ADD corpus_ref integer;
 
 UPDATE _text AS t SET corpus_ref = (
   SELECT corpus_ref FROM _node WHERE text_ref = t.id LIMIT 1
@@ -6,8 +6,8 @@ UPDATE _text AS t SET corpus_ref = (
 
 DROP TABLE IF EXISTS _textid_min;
 CREATE UNLOGGED TABLE _textid_min (
-  corpus_ref bigint PRIMARY KEY,
-  min_id bigint
+  corpus_ref integer PRIMARY KEY,
+  min_id integer
 );
 
 INSERT INTO _textid_min(corpus_ref, min_id)

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION getAnno(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus bigint[], "type" varchar) 
+CREATE OR REPLACE FUNCTION getAnno(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus integer[], "type" varchar) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
   SELECT id 
@@ -13,7 +13,7 @@ SELECT ARRAY(
 );
 $f$ LANGUAGE SQL IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION getAnnoNot(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus bigint[], "type" varchar) 
+CREATE OR REPLACE FUNCTION getAnnoNot(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus integer[], "type" varchar) 
 RETURNS bigint[] AS $f$
 SELECT ARRAY(
   SELECT id 

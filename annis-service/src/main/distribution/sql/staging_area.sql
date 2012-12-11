@@ -18,12 +18,12 @@ DROP TABLE IF EXISTS _text;
 
 CREATE :tmp TABLE _corpus
 (
-	id 			bigint NOT NULL,		-- primary key
+	id 			integer NOT NULL,		-- primary key
 	name		varchar NOT NULL,		-- unique name
 	type		varchar NOT NULL,		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
 	version		varchar,				-- version number (not used)
-	pre			bigint	NOT NULL,		-- pre and post order of the corpus tree
-	post		bigint	NOT NULL
+	pre			integer	NOT NULL,		-- pre and post order of the corpus tree
+	post		integer	NOT NULL
 );
 
 -- corpus annotations
@@ -31,7 +31,7 @@ CREATE :tmp TABLE _corpus
 
 CREATE :tmp TABLE _corpus_annotation
 (
-	corpus_ref	bigint NOT NULL,		-- foreign key to _corpus.id
+	corpus_ref	integer NOT NULL,		-- foreign key to _corpus.id
 	namespace	varchar,
 	name		varchar NOT NULL,
 	value		varchar
@@ -41,7 +41,7 @@ CREATE :tmp TABLE _corpus_annotation
 -- stores each source text in its entirety
 CREATE :tmp TABLE _text
 (
-	id 		bigint NOT NULL,			-- primary key
+	id 		integer NOT NULL,			-- primary key
 	name	varchar,					-- name (not used)
 	text 	text							-- text contents (not used)
 );
@@ -54,8 +54,8 @@ CREATE :tmp TABLE _text
 CREATE :tmp TABLE _node
 (
 	id 				bigint	NOT NULL,	-- primary key
-	text_ref 		bigint NOT NULL,	-- foreign key to _text.id
-	corpus_ref		bigint NOT NULL,	-- foreign key to _corpus.id
+	text_ref 		integer NOT NULL,	-- foreign key to _text.id
+	corpus_ref		integer NOT NULL,	-- foreign key to _corpus.id
 	namespace		varchar,			-- namespace (not used)
 	name 			varchar NOT NULL,	-- name (not used)
 	"left" 			integer NOT NULL,		-- start of covered substring in _text.text (inclusive)
@@ -73,7 +73,7 @@ CREATE :tmp TABLE _node
 -- have a name
 CREATE :tmp TABLE _component
 (
-	id			bigint NOT NULL,		-- primary key
+	id			integer NOT NULL,		-- primary key
 	type		char(1),					-- edge type: c, d, P, NULL
 	namespace	varchar,				-- namespace (not used)
 	name		varchar
@@ -84,11 +84,11 @@ CREATE :tmp TABLE _component
 -- component and rank together model edges in the annotation graph
 CREATE :tmp TABLE _rank
 (
-	pre				bigint	NOT NULL,	-- pre and post order of the annotation ODAG
-	post			bigint	NOT NULL,
+	pre				integer	NOT NULL,	-- pre and post order of the annotation ODAG
+	post			integer	NOT NULL,
 	node_ref		bigint	NOT NULL,	-- foreign key to _node.id
-	component_ref	bigint NOT NULL,	-- foreign key to _component.id
-	parent			bigint NULL		-- foreign key to _rank.pre, NULL for root nodes
+	component_ref	integer NOT NULL,	-- foreign key to _component.id
+	parent			integer NULL		-- foreign key to _rank.pre, NULL for root nodes
 );
 
 -- node annotations
@@ -123,7 +123,7 @@ CREATE :tmp TABLE _resolver_vis_map
   "vis_type"   varchar NOT NULL, -- the abstract type of visualization: tree, discourse, grid, ...
   "display_name"   varchar NOT NULL, -- the name of the layer which shall be shown for display
   "visibility"  varchar default 'hidden' NOT NULL,
-  "order" bigint default '0', -- the order of the layers, in which they shall be shown
+  "order" integer default '0', -- the order of the layers, in which they shall be shown
   "mappings" varchar			    
 );
 
