@@ -77,7 +77,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithBound()
   {
-    System.out.println("whereConditions");
+    System.out.println("addTransitivePrecedenceOperatorsWithBound");
     
     // query to extend
     String aql = "node & node & node & node "
@@ -182,7 +182,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithoutBound()
   {
-    System.out.println("whereConditions");
+    System.out.println("addTransitivePrecedenceOperatorsWithoutBound");
     
     // query to extend
     String aql = "node & node & node & node "
@@ -276,5 +276,62 @@ public class TransitivePrecedenceOptimizerTest
     
     assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(1)).getMinDistance());
     assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(1)).getMaxDistance());
+  }
+  
+  @Test
+  public void testFollowSegmentation()
+  {
+    System.out.println("followSegmentation");
+    
+    // query to extend
+    String aql = "node & node & node & #1 .abc #2 & #2 .abc #3";
+    
+    // perform the initial parsing
+    Start start = parser.parse(aql);
+    // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
+    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
+    
+    assertEquals(1, data.getAlternatives().size());
+    List<QueryNode> nodes = data.getAlternatives().get(0);
+    
+    assertEquals(2, nodes.get(0).getJoins().size());
+  }
+  
+  @Test
+  public void testDontFollowSegmentation()
+  {
+    System.out.println("dontFollowSegmentation");
+    
+    // query to extend
+    String aql = "node & node & node & #1 .def #2 & #2 .abc #3";
+    
+    // perform the initial parsing
+    Start start = parser.parse(aql);
+    // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
+    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
+    
+    assertEquals(1, data.getAlternatives().size());
+    List<QueryNode> nodes = data.getAlternatives().get(0);
+    
+    assertEquals(1, nodes.get(0).getJoins().size());
+  }
+  
+  @Test
+  public void testDontFollowSegmentationFromTok()
+  {
+    System.out.println("dontFollowSegmentationFromTok");
+    
+    // query to extend
+    String aql = "node & node & node & #1 . #2 & #2 .abc #3";
+    
+    // perform the initial parsing
+    Start start = parser.parse(aql);
+    // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
+    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
+    
+    assertEquals(1, data.getAlternatives().size());
+    List<QueryNode> nodes = data.getAlternatives().get(0);
+    
+    assertEquals(1, nodes.get(0).getJoins().size());
   }
 }

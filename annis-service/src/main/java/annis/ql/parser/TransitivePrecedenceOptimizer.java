@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Extends precedence relations to other nodes that are only transitivly connected.
@@ -65,14 +66,40 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
       
       for(QueryNode node : alternative)
       {
+        Set<String> segmentations = getAllSegmentations(node);
+        
         visitedNodes.clear();
         // we apply the algorithm node by node
-        propagateNodePrecedence(node, node, visitedNodes, outJoins, null);
+        // tok == null segmentation
+        propagateNodePrecedence(node, node, visitedNodes, outJoins, null, null);
+        for(String s : segmentations)
+        {
+          propagateNodePrecedence(node, node, visitedNodes, outJoins, null, s);
+        }
       }
     }
     
     return data;
   
+  }
+  
+  private Set<String> getAllSegmentations(QueryNode node)
+  {
+    Set<String> result = new TreeSet<String>();
+    
+    for(Join j : node.getJoins())
+    {
+      if(j instanceof Precedence)
+      {
+        Precedence p = (Precedence) j;
+        if(p.getSegmentationName() != null)
+        {
+          result.add(p.getSegmentationName());
+        }
+      }
+    }
+    
+    return result;
   }
   
   private Map<Long, Set<Precedence>> createInitialJoinMap(List<QueryNode> alternative)
@@ -100,7 +127,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   private void propagateNodePrecedence(QueryNode initialNode, 
     QueryNode currentNode, Set<Long> visitedNodes,
     Map<Long, Set<Precedence>> outJoins,
-    Range range)
+    Range range, String segmentation)
   {
     visitedNodes.add(currentNode.getId());
     
@@ -112,63 +139,66 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
     {
       if(join instanceof Precedence)
       { 
-        Range newRange;
-    
         Precedence p = (Precedence) join;
-        if(range == null)
+        if((segmentation == null && p.getSegmentationName() == null) 
+          || (segmentation != null  && segmentation.equals(p.getSegmentationName())) )
         {
-          // create a new range at initial node
-          newRange = new Range(p.getMinDistance(), p.getMaxDistance());
-        }
-        else
-        {
-          // calculate the new range depending on old one
-          if((range.getMin() == 0 && range.getMax() == 0) 
-            || (p.getMinDistance() == 0 && p.getMaxDistance() == 0))
+          Range newRange;
+    
+          if(range == null)
           {
-            // unlimited range, nothing to calculate
-            newRange = new Range(0, 0);
+            // create a new range at initial node
+            newRange = new Range(p.getMinDistance(), p.getMaxDistance());
           }
           else
           {
-            // add the new precendence values to the old one
-            newRange = new Range(range.getMin() + p.getMinDistance(), 
-              range.getMax() + p.getMaxDistance());
-          }
-        }
-                
-        // put the target node in the list of nodes to check if not visited yet
-        if(!visitedNodes.contains(p.getTarget().getId()))
-        {
-          nextNodes.put(p.getTarget(), newRange);
-        
-          Precedence newJoin = new Precedence(p.getTarget(), newRange.getMin(),
-            newRange.getMax());
-          Set<Precedence> existingJoins = outJoins.get(initialNode.getId());
-          // only add if this join is not already included 
-          // (which is always true for the initial node)
-          // and the join is more restrictive than any previous one
-          boolean moreRestrictive = true;
-          for (Precedence oldJoin : existingJoins)
-          {
-            if(oldJoin.getTarget() == newJoin.getTarget())
+            // calculate the new range depending on old one
+            if((range.getMin() == 0 && range.getMax() == 0) 
+              || (p.getMinDistance() == 0 && p.getMaxDistance() == 0))
             {
-              if (!joinMoreRestrictive(oldJoin, newJoin))
-              {
-                moreRestrictive = false;
-                break;
-              }
+              // unlimited range, nothing to calculate
+              newRange = new Range(0, 0);
+            }
+            else
+            {
+              // add the new precendence values to the old one
+              newRange = new Range(range.getMin() + p.getMinDistance(), 
+                range.getMax() + p.getMaxDistance());
             }
           }
-          if (moreRestrictive)
-          {
-            // add newly created discovered transitive precedence
-            initialNode.addJoin(newJoin);
-            existingJoins.add(newJoin);
-          }
 
-        }
-        
+          // put the target node in the list of nodes to check if not visited yet
+          if(!visitedNodes.contains(p.getTarget().getId()))
+          {
+            nextNodes.put(p.getTarget(), newRange);
+
+            Precedence newJoin = new Precedence(p.getTarget(), newRange.getMin(),
+              newRange.getMax());
+            Set<Precedence> existingJoins = outJoins.get(initialNode.getId());
+            // only add if this join is not already included 
+            // (which is always true for the initial node)
+            // and the join is more restrictive than any previous one
+            boolean moreRestrictive = true;
+            for (Precedence oldJoin : existingJoins)
+            {
+              if(oldJoin.getTarget() == newJoin.getTarget())
+              {
+                if (!joinMoreRestrictive(oldJoin, newJoin))
+                {
+                  moreRestrictive = false;
+                  break;
+                }
+              }
+            }
+            if (moreRestrictive)
+            {
+              // add newly created discovered transitive precedence
+              initialNode.addJoin(newJoin);
+              existingJoins.add(newJoin);
+            }
+
+          } // end if not visited yet
+        } // end if segmentation matches
       } // end if is precedence join
     } // end for each join
     
@@ -176,7 +206,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
     {
       // call us recursivly but remember the range
       propagateNodePrecedence(initialNode, e.getKey(), visitedNodes, outJoins, 
-        e.getValue());
+        e.getValue(), segmentation);
     }
   }
   
