@@ -58,7 +58,7 @@ CREATE TABLE annotation_pool (
   "name" varchar,
   val varchar,
   "type" annotype,
-  occurences integer,
+  occurences bigint,
   PRIMARY KEY(id),
   UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
@@ -119,7 +119,7 @@ CREATE TABLE media_files
 (
   file  bytea NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
-  bytes integer NOT NULL,
+  bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,
   UNIQUE (corpus_ref, title)
@@ -132,7 +132,7 @@ CREATE TABLE corpus_stats
   name        varchar,
   id          integer NOT NULL REFERENCES corpus ON DELETE CASCADE,
   text        integer,
-  tokens        integer,
+  tokens        bigint,
   max_corpus_id integer  NULL,
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
@@ -190,7 +190,7 @@ CREATE TABLE annotations
   namespace varchar,
   "name" varchar,
   "value" varchar,
-  occurences integer,
+  occurences bigint,
   "type" varchar,
   "subtype" char(1),
   edge_namespace varchar,
