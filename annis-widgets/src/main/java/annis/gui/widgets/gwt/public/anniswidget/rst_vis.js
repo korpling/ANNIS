@@ -32,31 +32,33 @@
         this.canvas = {};
 
         this.config = {
-            siblingOffet : 200,
-            subTreeOffset : 100,
-            nodeWith : 60,
-            container : config.container,
+            siblingOffet : config.subTreeOffset || 200 ,
+            subTreeOffset : config.subTreeOffset || 100,
+            nodeWith : config.nodeWith  || 60 ,
+            labelSize : config.labelSize || 11,
+            container : config.container || "container",
+            background : config.background || "#FFFFFF",
             wrapper :  config.wrapper || "wrapper"
         };
     }
 
     rst.buildAdjazenzArray = function()
-        {
-            function buildAdjazenzArrayHelper(json, adj) {
-                var children = json.children;
-                if (children && children.length > 0)
-                {
-                    for (var child in children)
-                    {
-                        adj.push({
-                            from : json,
-                            to : children[child]
-                        });
-                        buildAdjazenzArrayHelper(children[child], adj);
-                    }
-                }};
-            buildAdjazenzArrayHelper(this.json, this.adj);
-        },
+    {
+      function buildAdjazenzArrayHelper(json, adj) {
+          var children = json.children;
+          if (children && children.length > 0)
+          {
+              for (var child in children)
+              {
+                  adj.push({
+                      from : json,
+                      to : children[child]
+                  });
+                  buildAdjazenzArrayHelper(children[child], adj);
+              }
+          }};
+      buildAdjazenzArrayHelper(this.json, this.adj);
+    },
 
     rst.layoutTree = function (f)
     {
@@ -164,7 +166,7 @@
         container.style.position = "relative";
         container.style.width = dim.x + "px";
         container.style.height = dim.y + "px";
-        container.style.background = "#DCE5EE";
+        container.style.background = this.config.background;
         this.container = container;
     };
 
@@ -185,7 +187,8 @@
             elem.style.top = json.pos.y + "px";
             elem.style.left = json.pos.x + "px";
             elem.style.textAlign = "center";
-            elem.style.width = conf.nodeWith;
+            elem.style.fontSize = conf.labelSize + "px";
+            elem.style.width = conf.nodeWith + "px";
 
             if (json.children != undefined)
             {
@@ -247,7 +250,6 @@
         this.canvas.setAttribute("width", wrapperElem.style.width);
         this.canvas.setAttribute("height", wrapperElem.style.height);
         this.canvas.style.position = "relative";
-        this.canvas.style.background = "#DCE5EE";
     };
 
     rst.drawLine = function(source, target)
@@ -345,7 +347,6 @@
     {
         var viz = new rst(config);
         extend(viz, rst);
-        console.log(Object.keys(viz));
         return viz;
     }
 }());
