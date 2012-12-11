@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -198,9 +197,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     jit = new JITWrapper();
     this.addComponent(jit);
 
+
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
     jit.requestRepaint();
+
+
+  }
+
+  private void addScrollbar()
+  {
+    this.setWidth(this.getParent().getWidth(), this.getParent().getWidthUnits());
+    this.getContent().setSizeUndefined();
   }
 
   private String transformSaltToJSON(VisualizerInput visInput)
@@ -1031,5 +1039,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       }
     }
     return false;
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    addScrollbar();
   }
 }
