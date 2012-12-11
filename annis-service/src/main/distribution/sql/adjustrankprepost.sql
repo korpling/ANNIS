@@ -1,10 +1,10 @@
 ALTER TABLE _rank RENAME pre TO id;
-ALTER TABLE _rank ADD pre bigint;
+ALTER TABLE _rank ADD pre integer;
 
 DROP TABLE IF EXISTS _premin;
 CREATE UNLOGGED TABLE _premin (
-  component_ref bigint PRIMARY KEY,
-  minpre bigint
+  component_ref integer PRIMARY KEY,
+  minpre integer
 );
 
 INSERT INTO _premin(component_ref, minpre)
