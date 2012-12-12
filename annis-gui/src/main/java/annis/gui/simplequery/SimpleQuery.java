@@ -22,6 +22,7 @@ import com.vaadin.ui.HorizontalLayout;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.simplequery.VerticalNode;
 import annis.gui.simplequery.AddMenu;
+import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
@@ -66,6 +67,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
+  private HorizontalLayout option;
   private CheckBox cbSentence; //Martin
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   private Collection<VerticalNode> vnodes;
@@ -98,6 +100,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
     cbSentence.setImmediate(true);//Martin
     option.addComponent(cbSentence);//Martin
+    
     option.addComponent(btGo);
     
     addComponent(language);
@@ -226,7 +229,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     {
       meta.removeComponent(btInitMeta);
       MenuBar addMenu = new MenuBar();
-      Collection<String> annonames = getAvailableAnnotationNames();
+      Collection<String> annonames = getAvailableMetaNames();
       final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
       for (final String annoname : annonames)
       {
@@ -264,7 +267,7 @@ public void removeVerticalNode(VerticalNode v)
       }
     vnodes.remove(v);
   }  
-  
+
 public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
@@ -285,7 +288,7 @@ public Set<String> getAvailableAnnotationNames()
           atts.addAll(
             service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
-              .queryParam("onlymostfrequentvalues", "true")
+              .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})
             );
         }
@@ -359,4 +362,39 @@ public Set<String> getAvailableAnnotationNames()
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }
+  
+  public Set<String> getAvailableMetaNames()
+  {
+    Set<String> result = new TreeSet<String>();
+
+    WebResource service = Helper.getAnnisWebResource(getApplication());
+
+    // get current corpus selection
+    Set<String> corpusSelection = cp.getSelectedCorpora();
+
+    if (service != null)
+    {
+      try
+      {
+        List<Annotation> atts = new LinkedList<Annotation>();
+        for(String corpus : corpusSelection)
+        {
+          atts.addAll(
+            service.path("query").path("corpora").path(corpus).path("docmetadata")
+            .get(new GenericType<List<Annotation>>() {}));
+        }
+        for (Annotation a : atts)
+        {
+          result.add(a.getName());
+        }
+
+      }
+      catch (Exception ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    return result;
+  }
+  
 }
