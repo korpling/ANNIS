@@ -418,7 +418,7 @@ public class QueryService
     
     return annisDao.listCorpusAnnotations(toplevelCorpusName);
   }
-
+  
   @GET
   @Path("corpora/{top}/{document}/metadata")
   @Produces("application/xml")
@@ -435,6 +435,17 @@ public class QueryService
     }
     return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
   }
+
+  @GET
+  @Path("corpora/{top}/docmetadata")
+  @Produces("application/xml")
+  public List<Annotation> getDocMetadata(
+    @PathParam("top") String toplevelCorpusName)
+  {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + toplevelCorpusName);
+    return annisDao.listDocumentsAnnotations(toplevelCorpusName);
+  }  
   
   /**
    * Get an Annis Binary object identified by its id.
