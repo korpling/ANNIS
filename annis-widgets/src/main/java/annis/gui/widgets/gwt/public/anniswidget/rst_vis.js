@@ -35,7 +35,7 @@
             siblingOffet : config.subTreeOffset || 200 ,
             subTreeOffset : config.subTreeOffset || 100,
             nodeWith : config.nodeWith  || 60 ,
-            labelSize : config.labelSize || 11,
+            labelSize : config.labelSize || 10,
             container : config.container || "container",
             background : config.background || "#FFFFFF",
             wrapper :  config.wrapper || "wrapper"
@@ -153,7 +153,8 @@
 
     rst.initWrapper = function()
     {
-        var container = document.getElementById(this.config.container);
+        var container = document.getElementById(this.config.container),
+        conf = this.config;
 
         if (!container)
         {
@@ -165,8 +166,8 @@
         dim = this.getDim(this.json);
         container.style.position = "relative";
         container.style.width = dim.x + "px";
-        container.style.height = dim.y + "px";
-        container.style.background = this.config.background;
+        container.style.height = dim.y + conf.subTreeOffset + "px";
+        container.style.background = conf.background;
         this.container = container;
     };
 
@@ -227,6 +228,7 @@
                 {
                     var from = edges[i].from,
                     to = edges[i].to;
+
                     this.drawBezierCurve(nodes[from], nodes[to]);
                     this.plotEdgeLabel(nodes[from], nodes[to],
                                        edges[i].annotation);
@@ -341,6 +343,7 @@
 
         label.style.top = labelPos.y + "px";
         label.style.left = labelPos.x + "px";
+        label.style.fontSize = this.config.labelSize + "px";
     };
 
     window.$viz = function (config)
