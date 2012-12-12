@@ -397,4 +397,40 @@ public Set<String> getAvailableAnnotationNames()
     return result;
   }
   
+  public Set<String> getAvailableMetaLevels(String ebene)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    WebResource service = Helper.getAnnisWebResource(getApplication());
+
+    // get current corpus selection
+    Set<String> corpusSelection = cp.getSelectedCorpora();
+
+    if (service != null)
+    {
+      try
+      {
+        List<Annotation> atts = new LinkedList<Annotation>();
+        for(String corpus : corpusSelection)
+        {
+          atts.addAll(
+            service.path("query").path("corpora").path(corpus).path("docmetadata")
+            .get(new GenericType<List<Annotation>>() {}));
+        }
+        for (Annotation a : atts)
+        {
+          if (killNamespace(a.getName()).equals(ebene))
+          {
+            result.add(a.getValue());
+          }
+        }
+
+      }
+      catch (Exception ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    return result;
+  }
 }

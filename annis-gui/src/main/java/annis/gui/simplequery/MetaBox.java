@@ -38,7 +38,7 @@ class MetaBox extends Panel
         
     // searchbox values for ebene
     Collection<String> annonames = new TreeSet<String>();
-    for(String a :sq.getAvailableAnnotationLevels("kasus"))
+    for(String a :sq.getAvailableMetaLevels(ebene))
     {
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
