@@ -42,7 +42,7 @@ public interface AnnisDao
     String documentName);
 
   public List<AnnisCorpus> listCorpora();
-
+  
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
@@ -134,4 +134,6 @@ public interface AnnisDao
   
   /** Called to check if the database management program has the right version */
   public boolean checkDatabaseVersion() throws AnnisException;
+
+  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName);
 }
