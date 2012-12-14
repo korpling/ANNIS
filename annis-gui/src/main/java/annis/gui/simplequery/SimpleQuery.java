@@ -248,20 +248,19 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   }
 
 public void removeVerticalNode(VerticalNode v)
-  {
+  {    
     language.removeComponent(v);
-    int id = 0;
     for (VerticalNode vnode : vnodes)
+    {
+      Iterator<EdgeBox> ebIterator = eboxes.iterator();
+      if((ebIterator.hasNext()) && (v.equals(vnode))) 
       {
         EdgeBox eb = eboxes.iterator().next();
-        if (v.equals(vnode))
-          {
-            eboxes.remove(eb);
-            language.removeComponent(eb);
-            break;
-          }
-          id = id + 1;
-      }
+        eboxes.remove(eb);
+        language.removeComponent(eb);
+        break;
+      }   
+    }
     vnodes.remove(v);
   }  
   
