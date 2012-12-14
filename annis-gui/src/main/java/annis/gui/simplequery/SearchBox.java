@@ -65,7 +65,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     ComboBox l = new ComboBox(ebene);
     this.cb = l;
     l.setInputPrompt(ebene);
-    l.setWidth("130px");
+    l.setWidth("140px");
     // configure & load content
     l.setImmediate(true);
     for (String annoname : annonames) 
