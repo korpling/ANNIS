@@ -33,18 +33,19 @@ import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
-import annis.security.AnnisUser;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.service.ApplicationContext;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -85,11 +86,23 @@ public class MainApp extends Application implements PluginSystem,
   private Properties versionProperties;
   
   private transient MediaController mediaController;
- 
 
+  @Override
+  public void start(URL applicationUrl, Properties applicationProperties,
+    ApplicationContext context)
+  {
+    // load some additional properties from our ANNIS configuration
+    loadApplicationProperties(applicationProperties, "annis-gui.properties", context);
+    
+    super.start(applicationUrl, applicationProperties, context);
+  }
+  
+  
+  
   @Override
   public void init()
   {
+    
 
     initLogging();
 
@@ -104,7 +117,7 @@ public class MainApp extends Application implements PluginSystem,
     {
       log.error(null, ex);
     }
-
+    
     addListener((UserChangeListener) this);
 
     initPlugins();
@@ -112,6 +125,63 @@ public class MainApp extends Application implements PluginSystem,
     setTheme("annis-theme");
 
     initWindow();
+  }
+  
+  protected void loadApplicationProperties(Properties p, String configFile, ApplicationContext appContext)
+  {
+    if(p == null || !(appContext instanceof WebApplicationContext))
+    {
+      return;
+    }
+    // first load everything from the base application
+    WebApplicationContext context = (WebApplicationContext) appContext;
+    loadPropertyFile(
+      new File(context.getHttpSession().getServletContext()
+      .getRealPath("/WEB-INF/conf/" + configFile)), p);
+    
+    // next everything from the global config
+    // When ANNIS_CFG environment variable is set use this value or default to
+    // "/etc/annis/
+    String globalConfigDir = System.getenv("ANNIS_CFG");
+    if(globalConfigDir == null)
+    {
+      globalConfigDir = "/etc/annis";
+    }
+    loadPropertyFile(new File(globalConfigDir + "/" + configFile), p);
+    
+    // the final and most specific user configuration is in the users home directory
+    loadPropertyFile(new File(System.getProperty("user.home") + "/.annis/" + configFile), p);
+  }
+  
+  private void loadPropertyFile(File f, Properties p)
+  {
+   if(f.canRead() && f.isFile())
+    {
+      FileInputStream fis = null;
+      try
+      {
+        fis = new FileInputStream(f);
+        p.load(fis);
+      }
+      catch(IOException ex)
+      {
+        
+      }
+      finally
+      {
+        if(fis != null)
+        {
+          try
+          {
+            fis.close();
+          }
+          catch(IOException ex)
+          {
+            log.error("could not close stream", ex);
+          }
+        }
+      }
+    } 
   }
 
   protected void initLogging()
@@ -319,6 +389,7 @@ public class MainApp extends Application implements PluginSystem,
 
     super.close();
   }
+
 
   @Override
   public PluginManager getPluginManager()
