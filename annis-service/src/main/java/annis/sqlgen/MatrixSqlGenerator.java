@@ -47,6 +47,7 @@ import annis.ql.parser.QueryData;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -247,6 +248,9 @@ public class MatrixSqlGenerator
   protected void addFromOuterJoins(StringBuilder sb, QueryData queryData, 
     TableAccessStrategy tas, String indent)
   {
+    
+    List<MatrixQueryData> matrixExtList = queryData.getExtensions(MatrixQueryData.class);
+    
     sb.append(indent).append(TABSTOP);
     sb.append("LEFT OUTER JOIN ");
     sb.append(CORPUS_ANNOTATION_TABLE);
@@ -254,6 +258,20 @@ public class MatrixSqlGenerator
     sb.append(tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "corpus_ref"));
     sb.append(" = ");
     sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
+    
+    // restrict to certain annnotation or metadata keys if wanted
+    if(!matrixExtList.isEmpty())
+    {
+      MatrixQueryData matrixExt = matrixExtList.get(0);
+      if(matrixExt.getMetaKeys() != null)
+      {
+        Set<String> conditions = new TreeSet<String>();
+        addAnnoSelectionCondition(conditions, matrixExt.getMetaKeys(), 
+          CORPUS_ANNOTATION_TABLE, tas);
+        sb.append(" AND ").append(StringUtils.join(conditions, " AND "));
+      }
+    }
+    
     sb.append(")");
   }
 
@@ -262,7 +280,6 @@ public class MatrixSqlGenerator
     List<QueryNode> alternative, String indent)
   {
     
-    List<MatrixQueryData> matrixExtList = queryData.getExtensions(MatrixQueryData.class);
     
     Set<String> conditions = new HashSet<String>();
     StringBuilder sb = new StringBuilder();
@@ -308,17 +325,6 @@ public class MatrixSqlGenerator
     sb.append(")");
     conditions.add(sb.toString());
 
-    // restrict to certain annnotation or metadata keys if wanted
-    if(!matrixExtList.isEmpty())
-    {
-      MatrixQueryData matrixExt = matrixExtList.get(0);
-      if(matrixExt.getMetaKeys() != null)
-      {
-        addAnnoSelectionCondition(conditions, matrixExt.getMetaKeys(), 
-          CORPUS_ANNOTATION_TABLE, tables);        
-      }
-     
-    }
     return conditions;
 
   }
