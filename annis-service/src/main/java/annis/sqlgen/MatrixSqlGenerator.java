@@ -272,7 +272,7 @@ public class MatrixSqlGenerator
       }
     }
     
-    sb.append(")");
+    sb.append(")\n");
   }
 
   @Override
@@ -339,16 +339,26 @@ public class MatrixSqlGenerator
     {
       MatrixQueryData.QName qname = itMatrix.next();
 
-      if (qname.name != null)
+      if (qname.name != null && qname.namespace != null)
       {
-        orConditions.add(tables.aliasedColumn(tableName, "name")
-          + " = " + SqlConstraints.sqlString(qname.name));
+        orConditions.add(
+          tables.aliasedColumn(tableName, "name") 
+          + " = " + SqlConstraints.sqlString(qname.name) + " AND "
+          + tables.aliasedColumn(tableName, "namespace") 
+          + " = " + SqlConstraints.sqlString(qname.namespace)
+        );
       }
-      if (qname.namespace != null)
+      else if (qname.namespace != null)
       {
         orConditions.add(tables.aliasedColumn(tableName,
           "namespace")
           + " = " + SqlConstraints.sqlString(qname.namespace));
+      }
+      else if (qname.name != null)
+      {
+        orConditions.add(tables.aliasedColumn(tableName,
+          "name")
+          + " = " + SqlConstraints.sqlString(qname.name));
       }
     }
     if (orConditions.isEmpty())
