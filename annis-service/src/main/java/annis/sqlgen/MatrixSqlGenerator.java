@@ -42,8 +42,10 @@ import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import annis.model.QueryNode;
 import annis.model.Annotation;
+import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,7 +229,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append(TABSTOP);
     // really ugly
     sb.append(
-      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
+      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true, false));
 
     sb.append("\n");
 
@@ -259,7 +261,9 @@ public class MatrixSqlGenerator
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-
+    
+    List<MatrixQueryData> matrixExtList = queryData.getExtensions(MatrixQueryData.class);
+    
     Set<String> conditions = new HashSet<String>();
     StringBuilder sb = new StringBuilder();
     TableAccessStrategy tables = tables(null);
@@ -304,8 +308,52 @@ public class MatrixSqlGenerator
     sb.append(")");
     conditions.add(sb.toString());
 
+    // restrict to certain annnotation or metadata keys if wanted
+    if(!matrixExtList.isEmpty())
+    {
+      MatrixQueryData matrixExt = matrixExtList.get(0);
+      if(matrixExt.getMetaKeys() != null)
+      {
+        addAnnoSelectionCondition(conditions, matrixExt.getMetaKeys(), 
+          CORPUS_ANNOTATION_TABLE, tables);        
+      }
+     
+    }
     return conditions;
 
+  }
+  
+  private void addAnnoSelectionCondition(Set<String> conditions, 
+    List<MatrixQueryData.QName> selected, String tableName,
+    TableAccessStrategy tables)
+  {
+    List<String> orConditions = new LinkedList<String>();
+    Iterator<MatrixQueryData.QName> itMatrix = selected.iterator();
+    while (itMatrix.hasNext())
+    {
+      MatrixQueryData.QName qname = itMatrix.next();
+
+      if (qname.name != null)
+      {
+        orConditions.add(tables.aliasedColumn(tableName, "name")
+          + " = " + SqlConstraints.sqlString(qname.name));
+      }
+      if (qname.namespace != null)
+      {
+        orConditions.add(tables.aliasedColumn(tableName,
+          "namespace")
+          + " = " + SqlConstraints.sqlString(qname.namespace));
+      }
+    }
+    if (orConditions.isEmpty())
+    {
+      //  add an always false condition on corpus_annotation
+      conditions.add(tables.aliasedColumn(tableName, "name") + " IS NULL");
+    }
+    else
+    {
+      conditions.add("(" + StringUtils.join(orConditions, " OR ") + ")");
+    }
   }
 
   @Override

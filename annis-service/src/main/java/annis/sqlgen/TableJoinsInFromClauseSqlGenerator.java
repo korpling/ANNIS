@@ -44,7 +44,15 @@ public class TableJoinsInFromClauseSqlGenerator
 		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
 	}
 	
-	public String fromClauseForNode(QueryNode node, boolean leftJoin) {
+  /**
+   * generated from clause for node with edge annotation included (if not materialized)
+   */
+  public String fromClauseForNode(QueryNode node, boolean leftJoin)
+  {
+    return fromClauseForNode(node, leftJoin, true);
+  }
+  
+	public String fromClauseForNode(QueryNode node, boolean leftJoin, boolean includeEdgeAnnotation) {
 		StringBuilder sb = new StringBuilder();
 		
 		// every node uses the node table
@@ -80,7 +88,8 @@ public class TableJoinsInFromClauseSqlGenerator
 		}
 		
 		// edge annotations
-		if (tables(node).usesEdgeAnnotationTable()) {
+		if (includeEdgeAnnotation && tables(node).usesEdgeAnnotationTable()) 
+    {
 			int start = tables(node).isMaterialized(EDGE_ANNOTATION_TABLE, RANK_TABLE) ? 2 : 1;
 			int size = node != null ? node.getEdgeAnnotations().size() : 1;
 			for (int i = start; i <= size; ++i) {
