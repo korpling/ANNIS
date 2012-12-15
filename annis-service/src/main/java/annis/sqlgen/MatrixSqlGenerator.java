@@ -229,7 +229,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append(TABSTOP);
     // really ugly
     sb.append(
-      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true, false));
+      tableJoinsInFromClauseGenerator.fromClauseForNode(null, true));
 
     sb.append("\n");
 
