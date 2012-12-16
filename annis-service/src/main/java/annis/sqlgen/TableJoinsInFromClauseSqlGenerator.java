@@ -80,7 +80,8 @@ public class TableJoinsInFromClauseSqlGenerator
 		}
 		
 		// edge annotations
-		if (tables(node).usesEdgeAnnotationTable()) {
+		if (tables(node).usesEdgeAnnotationTable()) 
+    {
 			int start = tables(node).isMaterialized(EDGE_ANNOTATION_TABLE, RANK_TABLE) ? 2 : 1;
 			int size = node != null ? node.getEdgeAnnotations().size() : 1;
 			for (int i = start; i <= size; ++i) {
