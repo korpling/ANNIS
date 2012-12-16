@@ -205,7 +205,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "around search results. The values for all annotations of each of the "
       + "found nodes is given in a comma-separated table (CSV). At the top of "
       + "the export, the names of the columns are given in order according to "
-      + "the WEKA format.");
+      + "the WEKA format.<br/><br/>"
+      + "Parameters: <br/>"
+      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+      + "<code>metakeys=title,documentname</code>)");
 
     help4Exporter.put(EXPORTER[1].getClass().getSimpleName(),
       "The Text Exporter exports just the plain text of every search result and "

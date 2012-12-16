@@ -55,13 +55,13 @@ public class ApMatrixSqlGenerator extends MatrixSqlGenerator
     sb.append("\n");
 
     // edge annopool
-    sb.append(indent).append(TABSTOP);
-    sb.append(
-      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (").append(tas.
-      aliasedColumn(RANK_TABLE, "edge_anno_ref")).append(" = edge_anno.id AND ").
-      append(tas.aliasedColumn(RANK_TABLE, "toplevel_corpus")).append(" = edge_anno.toplevel_corpus AND "
-      + "edge_anno.toplevel_corpus IN (").append(StringUtils.join(corpusList,
-      ", ")).append("))");
+//    sb.append(indent).append(TABSTOP);
+//    sb.append(
+//      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (").append(tas.
+//      aliasedColumn(RANK_TABLE, "edge_anno_ref")).append(" = edge_anno.id AND ").
+//      append(tas.aliasedColumn(RANK_TABLE, "toplevel_corpus")).append(" = edge_anno.toplevel_corpus AND "
+//      + "edge_anno.toplevel_corpus IN (").append(StringUtils.join(corpusList,
+//      ", ")).append("))");
 
 
   }
