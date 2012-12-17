@@ -98,7 +98,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
             String label = "";
             for(Annotation anno : e.getAnnotations())
             {
-              if(anno.getNamespace() != null && anno.getNamespace().equals(anno.getNamespace()))
+              if(anno.getNamespace() != null)
               {
                 label = anno.getValue();
                 break;
