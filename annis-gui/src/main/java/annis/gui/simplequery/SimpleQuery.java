@@ -67,7 +67,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
-  private CheckBox cbSentence; //Martin
+  private SpanBox spb;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
@@ -94,16 +94,12 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     meta = new HorizontalLayout();
     meta.addComponent(btInitMeta);
     
-    HorizontalLayout option = new HorizontalLayout();
-    cbSentence = new CheckBox("Search within sentence");//Martin
-    cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
-    cbSentence.setImmediate(true);//Martin
-    option.addComponent(cbSentence);//Martin
-    option.addComponent(btGo);
-       
+    spb = new SpanBox(this);    
+      
     addComponent(language);
     addComponent(meta);
-    addComponent(option);
+    addComponent(spb);
+    addComponent(btGo);//deal with that later --> horizontal layout...
     
   }
   
@@ -114,13 +110,11 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     if (remode)
     {
       result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
-      //regex .* if nothing is chosen
       return result;
     }
     else
     {
       result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";
-      //regex .* if nothing is chosen
       return result;
     }        
   }  
@@ -146,6 +140,8 @@ public class SimpleQuery extends Panel implements Button.ClickListener
           query += " & " + getAQLFragment(sb, sb.isRegEx());
         }
         
+        
+        
         sentenceVars.add(new Integer(count));
         
         for(int i=1; i < sbList.size(); i++)
@@ -161,7 +157,6 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       //after a VerticalNode there is always an... EDGEBOX!
       //so the Query will be build in the right order   
       if(itElem instanceof EdgeBox)
-      //empty VNs not caught yet (delete them...)
       {        
         count++;
         EdgeBox eb = (EdgeBox)itElem;        
@@ -169,20 +164,20 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       }      
     }
     //search within sentence?
-    if(cbSentence.booleanValue())
+    if(spb.searchWithinSpan())
     {
-      query += "\n& "+ "satz = /C.*/";
+      query += "\n& "+ spb.getSpanName() + " = /.*/";//is that correct?
       count++;
-      for(Integer I : sentenceVars)
+      for(Integer i : sentenceVars)
       {
-        sentenceQuery += "\n& #" + count + "_i_#"+I.toString();
+        sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
       }
     }
     
     String fullQuery = (query+edgeQuery+sentenceQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
-    fullQuery = fullQuery.replace("txt=", ""); //is that correct?
+    fullQuery = fullQuery.replace("txt=", ""); //depends on the corpus, I think
     return fullQuery;
   }
   
@@ -244,8 +239,8 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     }
     if (event.getButton() == btGo)
     {
-      updateQuery();//by Martin
-    }
+      updateQuery();
+    }    
   }
 
 public void removeVerticalNode(VerticalNode v)
