@@ -15,7 +15,7 @@
  */
 package annis.gui;
 
-import com.vaadin.terminal.ClassResource;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -51,7 +51,7 @@ public class AboutPanel extends Panel
   public void attach()
   {
     super.attach();
- 
+    
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();
@@ -64,8 +64,15 @@ public class AboutPanel extends Panel
     logoSfb.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoSfb);
     
+    Link lnkFork = new Link();
+    lnkFork.setResource(new ExternalResource("https://github.com/korpling/ANNIS"));
+    lnkFork.setIcon(new ExternalResource("https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
+    lnkFork.setTargetName("_blank");
+    hLayout.addComponent(lnkFork);
+    
     hLayout.setComponentAlignment(logoAnnis, Alignment.MIDDLE_LEFT);
     hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
+    hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
     
     addComponent(hLayout);
     
@@ -127,5 +134,6 @@ public class AboutPanel extends Panel
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
+    
   }
 }
