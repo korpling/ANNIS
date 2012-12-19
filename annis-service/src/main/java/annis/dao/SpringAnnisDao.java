@@ -59,6 +59,7 @@ import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
+import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
@@ -112,6 +113,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
+  }
+
+  /**
+   * @return the listDocumentsAnnotationsSqlHelper
+   */
+  public ListDocumentsAnnotationsSqlHelper getListDocumentsAnnotationsSqlHelper()
+  {
+    return listDocumentsAnnotationsSqlHelper;
+  }
+
+  /**
+   * @param listDocumentsAnnotationsSqlHelper the listDocumentsAnnotationsSqlHelper to set
+   */
+  public void setListDocumentsAnnotationsSqlHelper(ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper)
+  {
+    this.listDocumentsAnnotationsSqlHelper = listDocumentsAnnotationsSqlHelper;
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -169,6 +186,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private ListCorpusSqlHelper listCorpusSqlHelper;
   private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
+  private ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper;
   // / new
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
@@ -319,7 +337,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return (List<AnnisCorpus>) getJdbcTemplate().query(
       listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
   }
-
+  
   @Override
   @Transactional(readOnly = true)
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
@@ -361,7 +379,18 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       listCorpusAnnotationsSqlHelper);
     return corpusAnnotations;
   }
-
+  
+  @Override
+  @Transactional(readOnly = true)
+  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName)
+  {
+    final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName);
+    final List<Annotation> docAnnotations =
+      (List<Annotation>) getJdbcTemplate().query(sql,
+      listDocumentsAnnotationsSqlHelper);
+    return docAnnotations;
+  }
+  
   @Override
   @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,

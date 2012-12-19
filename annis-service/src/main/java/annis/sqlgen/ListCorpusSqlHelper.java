@@ -33,7 +33,7 @@ public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus>
   {
     return "SELECT * FROM corpus_stats";
   }
-
+  
   public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException
   {
     AnnisCorpus corpus = new AnnisCorpus();

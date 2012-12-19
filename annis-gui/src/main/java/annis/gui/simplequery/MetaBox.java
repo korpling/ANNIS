@@ -15,10 +15,13 @@
  */
 package annis.gui.simplequery;
 
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -32,15 +35,16 @@ class MetaBox extends Panel
   {
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
-    
+        
     // searchbox values for ebene
     Collection<String> annonames = new TreeSet<String>();
-    for(String a :sq.getAvailableAnnotationLevels(ebene))
+    for(String a :sq.getAvailableMetaLevels(ebene))
     {
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
-    ComboBox l = new ComboBox(ebene);
-    l.setInputPrompt(ebene);
+    
+    OptionGroup l = new OptionGroup(ebene);
+    l.setMultiSelect(true);
     l.setWidth("130px");
     // configure & load content
     l.setImmediate(true);

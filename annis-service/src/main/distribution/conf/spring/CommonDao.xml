@@ -50,6 +50,9 @@
 	<!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
 
+	<!-- Helper for listDocumentsAnnotations command -->
+  <bean id="listDocumentsAnnotationsSqlHelper" class="annis.sqlgen.ListDocumentsAnnotationsSqlHelper" lazy-init="true"/>
+
   <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
 
@@ -77,7 +80,7 @@
     <!-- missing: administrationDao -->
   </bean>
 
-   <!-- BEGIN EXPORTS -->
+  <!-- BEGIN EXPORTS -->
 
 	<!-- exported bean: AnnisDao -->
   <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
@@ -100,7 +103,8 @@
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
-
+    <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/> 
+    
     <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
