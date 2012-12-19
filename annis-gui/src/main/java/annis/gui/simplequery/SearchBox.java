@@ -67,7 +67,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     l.setInputPrompt(ebene);
     l.setWidth("140px");
     // configure & load content
-    l.setImmediate(true);
+    l.setImmediate(true);    
     for (String annoname : annonames) 
     {
       l.addItem(annoname);
