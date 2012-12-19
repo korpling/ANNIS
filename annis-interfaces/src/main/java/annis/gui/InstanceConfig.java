@@ -18,11 +18,48 @@ package annis.gui;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * Hold information about the configuration of a specific (sub-) instance of ANNIS.
+ * 
+ * Each physical installation (speak deployment) of ANNIS is able to have several
+ * instances which behave differently. This is meant to provide a more specialized
+ * presentation for different projects while still using only one ANNIS installation.
+ * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
 public class InstanceConfig
 {
+  private String instanceName;
+  private String instanceDisplayName;
+
+  /**
+   * Get the internal short name of this instance.
+   * @return 
+   */
+  public String getInstanceName()
+  {
+    return instanceName;
+  }
+
+  /** @see #getInstanceName()  */
+  public void setInstanceName(String instanceName)
+  {
+    this.instanceName = instanceName;
+  }
+
+  /** 
+   * Get the external display name (used e.g. in the user interface) of this instance. 
+   */
+  public String getInstanceDisplayName()
+  {
+    return instanceDisplayName;
+  }
+
+  /** @see #getInstanceDisplayName()  */
+  public void setInstanceDisplayName(String instanceDisplayName)
+  {
+    this.instanceDisplayName = instanceDisplayName;
+  }
+  
   
 }
