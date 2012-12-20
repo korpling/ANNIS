@@ -417,6 +417,7 @@ public class SearchWindow extends Window
   private void showLoginWindow()
   {
 
+    final Window parentWindow = this;
     if (windowLogin == null)
     {
       LoginForm login = new LoginForm()
@@ -429,7 +430,7 @@ public class SearchWindow extends Window
         protected byte[] getLoginHTML()
         {
            String appUri = getApplication().getURL().toString()
-            + getWindow().getName() + "/";
+            + parentWindow.getName() + "/";
 
           try
           {

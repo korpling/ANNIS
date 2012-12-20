@@ -86,8 +86,8 @@ public class MainApp extends Application implements PluginSystem,
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
-  private transient SearchWindow windowSearch;
   private transient PluginManager pluginManager;
+  private List<SearchWindow> searchWindows = new LinkedList<SearchWindow>();
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
   private static final Map<String, Date> resourceAddedDate =
@@ -96,7 +96,7 @@ public class MainApp extends Application implements PluginSystem,
   
   private transient MediaController mediaController;
   
-  private ObjectMapper jsonMapper = new ObjectMapper();
+  private transient ObjectMapper jsonMapper;
 
   @Override
   public void start(URL applicationUrl, Properties applicationProperties,
@@ -127,13 +127,6 @@ public class MainApp extends Application implements PluginSystem,
     {
       log.error(null, ex);
     }
-    
-    // configure json object mapper
-    AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-    jsonMapper.setAnnotationIntrospector(introspector);
-    // the json should be human readable
-    jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
-      true);
     
     addListener((UserChangeListener) this);
 
@@ -224,7 +217,7 @@ public class MainApp extends Application implements PluginSystem,
             {
               try
               {
-                InstanceConfig config = jsonMapper.readValue(i, InstanceConfig.class);
+                InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
                 String name = StringUtils.removeEnd(i.getName(), ".json");
                 config.setInstanceName(name);
                 result.put(name, config);
@@ -312,17 +305,19 @@ public class MainApp extends Application implements PluginSystem,
 
   public void initWindow()
   {
+    searchWindows.clear();
+    
     try
     {
       for(Map.Entry<String, InstanceConfig> cfgInstance : loadInstanceConfig(getContext()).entrySet())
       {
         SearchWindow instance = new SearchWindow((PluginSystem) this, cfgInstance.getValue());
-        instance.setName(cfgInstance.getKey());
+        instance.setName("instance-" + cfgInstance.getKey());
+        searchWindows.add(instance);
 
         if("default".equals(cfgInstance.getKey()))
         {
           setMainWindow(instance);
-          windowSearch = instance;
         }
         else
         {
@@ -351,15 +346,6 @@ public class MainApp extends Application implements PluginSystem,
       
     }
 
-  }
-
-  public SearchWindow getWindowSearch()
-  {
-    if (windowSearch == null)
-    {
-      initWindow();
-    }
-    return windowSearch;
   }
 
   public String getBuildRevision()
@@ -427,7 +413,10 @@ public class MainApp extends Application implements PluginSystem,
   {
     super.setUser(user);
 
-    getWindowSearch().updateUserInformation();
+    for(SearchWindow w : searchWindows)
+    {
+      w.updateUserInformation();
+    }
   }
 
   private void initPlugins()
@@ -534,7 +523,10 @@ public class MainApp extends Application implements PluginSystem,
       try
       {
         String decoded = URLDecoder.decode(parameters, "UTF-8");
-        getWindowSearch().evaluateCitation(decoded);
+        for(SearchWindow w : searchWindows)
+        {
+          w.evaluateCitation(decoded);
+        }
         try
         {
           response.sendRedirect(getURL().toString());
@@ -568,5 +560,20 @@ public class MainApp extends Application implements PluginSystem,
   public void setMediaController(MediaController mediaController)
   {
     this.mediaController = mediaController;
+  }
+  
+  public ObjectMapper getJsonMapper()
+  {
+    if(jsonMapper == null)
+    {
+      jsonMapper = new ObjectMapper();
+      // configure json object mapper
+      AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
+      jsonMapper.setAnnotationIntrospector(introspector);
+      // the json should be human readable
+      jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
+        true);
+    }
+    return jsonMapper;
   }
 }
