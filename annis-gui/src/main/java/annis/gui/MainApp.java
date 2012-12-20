@@ -33,11 +33,13 @@ import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
+import annis.security.AnnisUserConfig;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.service.ApplicationContext;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
@@ -53,8 +55,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -63,6 +70,16 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -86,6 +103,8 @@ public class MainApp extends Application implements PluginSystem,
   private Properties versionProperties;
   
   private transient MediaController mediaController;
+  
+  private ObjectMapper jsonMapper = new ObjectMapper();
 
   @Override
   public void start(URL applicationUrl, Properties applicationProperties,
@@ -101,8 +120,7 @@ public class MainApp extends Application implements PluginSystem,
   
   @Override
   public void init()
-  {
-    
+  { 
 
     initLogging();
 
@@ -118,13 +136,63 @@ public class MainApp extends Application implements PluginSystem,
       log.error(null, ex);
     }
     
+    // configure json object mapper
+    AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
+    jsonMapper.setAnnotationIntrospector(introspector);
+    // the json should be human readable
+    jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
+      true);
+    
     addListener((UserChangeListener) this);
 
     initPlugins();
 
     setTheme("annis-theme");
 
+    
     initWindow();
+  }
+  
+  /**
+   * Given an configuration file name (might include directory) this function
+   * returns all locations for this file in the "ANNIS configuration system".
+   * 
+   * The files in the result list do not necessarily exist.  
+   * 
+   * These locations are the 
+   * - base installation: WEB-INF/conf/ folder of the deployment.
+   * - global configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
+   * - user configuration: ~/.annis/
+   * @param configFile The file path of the configuration file relative to the base config folder.
+   * @param context The context is needed to get he base installation folder
+   * @return list of files or directories in the order in which they should be processed (most important is last)
+   */
+  protected List<File> getAllConfigLocations(String configFile, WebApplicationContext context)
+  {
+    LinkedList<File> locations = new LinkedList<File>();
+    
+    if (context != null)
+    {
+      // first load everything from the base application
+      locations.add(new File(context.getHttpSession().getServletContext()
+        .getRealPath("/WEB-INF/conf/" + configFile)));
+
+      // next everything from the global config
+      // When ANNIS_CFG environment variable is set use this value or default to
+      // "/etc/annis/
+      String globalConfigDir = System.getenv("ANNIS_CFG");
+      if (globalConfigDir == null)
+      {
+        globalConfigDir = "/etc/annis";
+      }
+      locations.add(new File(globalConfigDir + "/" + configFile));
+
+      // the final and most specific user configuration is in the users home directory
+      locations.add(new File(
+        System.getProperty("user.home") + "/.annis/" + configFile));
+    }
+    
+    return locations;
   }
   
   protected void loadApplicationProperties(Properties p, String configFile, ApplicationContext appContext)
@@ -133,24 +201,61 @@ public class MainApp extends Application implements PluginSystem,
     {
       return;
     }
-    // first load everything from the base application
-    WebApplicationContext context = (WebApplicationContext) appContext;
-    loadPropertyFile(
-      new File(context.getHttpSession().getServletContext()
-      .getRealPath("/WEB-INF/conf/" + configFile)), p);
     
-    // next everything from the global config
-    // When ANNIS_CFG environment variable is set use this value or default to
-    // "/etc/annis/
-    String globalConfigDir = System.getenv("ANNIS_CFG");
-    if(globalConfigDir == null)
+    List<File> locations = getAllConfigLocations(configFile, (WebApplicationContext) appContext);
+    
+    // load properties in the right order
+    for(File f : locations)
     {
-      globalConfigDir = "/etc/annis";
+      loadPropertyFile(f, p);
     }
-    loadPropertyFile(new File(globalConfigDir + "/" + configFile), p);
+  }
+  
+  protected Map<String, InstanceConfig> loadInstanceConfig(ApplicationContext appContext)
+  {
+    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
     
-    // the final and most specific user configuration is in the users home directory
-    loadPropertyFile(new File(System.getProperty("user.home") + "/.annis/" + configFile), p);
+    if(appContext instanceof WebApplicationContext)
+    {
+      // get a list of all directories that contain instance informations
+      List<File> locations = getAllConfigLocations("instances", (WebApplicationContext) appContext);
+      for(File f : locations)
+      {
+        if(f.isDirectory())
+        {
+          // get all sub-files ending on ".json"
+          File[] instanceFiles = 
+            f.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
+          for(File i : instanceFiles)
+          {
+            if(f.isFile() && f.canRead())
+            {
+              try
+              {
+                InstanceConfig config = jsonMapper.readValue(f, InstanceConfig.class);
+                String name = StringUtils.removeEnd(f.getName(), ".json");
+                config.setInstanceName(name);
+                result.put(name, config);
+              }
+              catch (IOException ex)
+              {
+                log.warn("could not parsing instance config: " + ex.getMessage());
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // always provide a default instance
+    if(!result.containsKey("default"))
+    {
+      InstanceConfig cfgDefault = new InstanceConfig();
+      cfgDefault.setInstanceDisplayName("ANNIS");
+      result.put("default", cfgDefault);
+    }
+    
+    return result;
   }
   
   private void loadPropertyFile(File f, Properties p)
@@ -217,8 +322,15 @@ public class MainApp extends Application implements PluginSystem,
   {
     try
     {
-      windowSearch = new SearchWindow((PluginSystem) this);
-      setMainWindow(windowSearch);
+      for(Map.Entry<String, InstanceConfig> cfgInstance : loadInstanceConfig(getContext()).entrySet())
+      {
+        SearchWindow instance = new SearchWindow((PluginSystem) this, cfgInstance.getValue());
+        if("default".equals(cfgInstance.getKey()))
+        {
+          setMainWindow(instance);
+          windowSearch = instance;
+        }
+      }
     }
     catch (Exception e)
     {

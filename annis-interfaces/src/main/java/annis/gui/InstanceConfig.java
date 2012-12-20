@@ -16,6 +16,7 @@
 package annis.gui;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Hold information about the configuration of a specific (sub-) instance of ANNIS.
@@ -36,6 +37,7 @@ public class InstanceConfig
    * Get the internal short name of this instance.
    * @return 
    */
+  @XmlTransient
   public String getInstanceName()
   {
     return instanceName;

@@ -81,9 +81,9 @@ public class SearchWindow extends Window
 
   public final static int CONTROL_PANEL_WIDTH = 360;
   
-  public SearchWindow(PluginSystem ps)
+  public SearchWindow(PluginSystem ps, InstanceConfig instanceConfig)
   {
-    super("ANNIS Corpus Search");
+    super("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
 
     this.ps = ps;
     
@@ -275,6 +275,7 @@ public class SearchWindow extends Window
         }
       }
     });
+    
 
   }
 
