@@ -418,7 +418,7 @@ public class TigerQueryBuilderCanvas extends Panel
           if (nodeComponentCount++ > 0)
           {
             nodeIdentityOperations.append("\n& #").append(componentCount).append(
-              " = #").append(componentCount + 1);
+              " _=_ #").append(componentCount + 1);
             query.append(" & ");
             componentCount++;
           }
