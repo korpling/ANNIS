@@ -38,8 +38,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public interface AnnisDao
 {
 
-  public SaltProject retrieveAnnotationGraph(long textId);
-
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
     String documentName);
 

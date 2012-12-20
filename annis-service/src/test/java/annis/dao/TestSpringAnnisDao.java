@@ -162,30 +162,6 @@ public class TestSpringAnnisDao
     assertThat(springManagedDao.getMetaDataFilter(), is(not(nullValue())));
   }
 
-  // retrieve annotation graph for a complete text
-  @Test
-  public void retrieveAnnotationGraphText()
-  {
-    final long TEXT_ID = 23;
-
-    // stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
-    final SaltProject GRAPH = mock(SaltProject.class);
-
-    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
-      anyLong())).thenReturn(GRAPH);
-
-    // call and test
-    assertThat(simpleAnnisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
-  }
-
-  // return null if text was not found
-  @Test
-  public void retrieveAnnotationGraphNoText()
-  {
-    when(jdbcTemplate.query(anyString(), any(AnnotateSqlGenerator.class))).
-      thenReturn(new ArrayList<AnnotationGraph>());
-    assertThat(simpleAnnisDao.retrieveAnnotationGraph(0), is(nullValue()));
-  }
 
   @SuppressWarnings("unchecked")
   @Test

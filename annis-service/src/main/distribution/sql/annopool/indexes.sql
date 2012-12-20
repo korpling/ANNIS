@@ -37,22 +37,16 @@ CREATE INDEX idx__facts_is_token__:id
   USING btree
   (is_token, corpus_ref);
 
-CREATE INDEX idx__facts_is_token2__:id
-  ON facts_:id
-  USING btree
-  (is_token, text_ref);
-
-
 CREATE INDEX idx__facts_left__:id
   ON facts_:id
   USING btree
-  ("left", text_ref);
+  ("left", corpus_ref);
 
 
 CREATE INDEX idx__facts_left_token__:id
   ON facts_:id
   USING btree
-  (left_token, text_ref);
+  (left_token, corpus_ref);
 
 
 CREATE INDEX idx__facts_level__:id
@@ -65,11 +59,6 @@ CREATE INDEX idx__facts_node_anno__:id
   USING btree
   (node_anno_ref, corpus_ref);
 
-CREATE INDEX idx__facts_node_anno2__:id
-  ON facts_:id
-  USING btree
-  (node_anno_ref, text_ref);
-
 CREATE INDEX idx__facts_edge_annotation__:id
   ON facts_:id
   USING btree
@@ -80,22 +69,10 @@ CREATE INDEX idx__facts_node_name__:id
   USING btree
   (node_name varchar_pattern_ops, corpus_ref);
 
-CREATE INDEX idx__facts_node_name2__:id
-  ON facts_:id
-  USING btree
-  (node_name varchar_pattern_ops, text_ref);
-
-
 CREATE INDEX idx__facts_node_namespace__:id
   ON facts_:id
   USING btree
   (node_namespace varchar_pattern_ops, corpus_ref);
-
-CREATE INDEX idx__facts_node_namespace2__:id
-  ON facts_:id
-  USING btree
-  (node_namespace varchar_pattern_ops, text_ref);
-
 
 CREATE INDEX idx__facts_parent__:id
   ON facts_:id
@@ -117,13 +94,13 @@ CREATE INDEX idx__facts_pre__:id
 CREATE INDEX idx__facts_right__:id
   ON facts_:id
   USING btree
-  ("right", text_ref);
+  ("right", corpus_ref);
 
 
 CREATE INDEX idx__facts_right_token__:id
   ON facts_:id
   USING btree
-  (right_token, text_ref);
+  (right_token, corpus_ref);
 
 CREATE INDEX idx__facts_root__:id
   ON facts_:id
@@ -145,16 +122,10 @@ CREATE INDEX idx__facts_span__:id
   USING btree
   (span varchar_pattern_ops, corpus_ref);
 
-CREATE INDEX idx__facts_span2__:id
-  ON facts_:id
-  USING btree
-  (span varchar_pattern_ops, text_ref);
-
-
 CREATE INDEX idx__facts_token_index__:id
   ON facts_:id
   USING btree
-  (token_index, text_ref);
+  (token_index, corpus_ref);
 
 CREATE INDEX idx__facts_corpus_ref_index__:id
   ON facts_:id
@@ -167,10 +138,10 @@ CREATE INDEX idx__facts_text_ref_index__:id
   (text_ref);
 
 ----- 2nd query
-CREATE INDEX idx__2nd_query_:id ON facts_:id (text_ref,left_token, right_token);
+CREATE INDEX idx__2nd_query_:id ON facts_:id (corpus_ref, text_ref,left_token, right_token);
 
 -- optimize the select distinct
-CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, text_ref, left_token, right_token);
+CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, corpus_ref, text_ref, left_token, right_token);
 
 -- allow simple searches (node, tok etc)
 CREATE INDEX idx__sample_n__:id ON facts_:id(n_sample);

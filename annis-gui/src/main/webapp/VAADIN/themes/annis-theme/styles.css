@@ -66,6 +66,7 @@
   background-color: #ecf0f6;
 }
 
+
 .toolbar {
   background-color: #ecf0f6;
 }
@@ -77,6 +78,11 @@
 .rtl {
   direction: rtl;
 }
+
+.v-label-opensource {
+    font-size: 14pt;
+}
+
 
 .docPath {
   text-align: left;

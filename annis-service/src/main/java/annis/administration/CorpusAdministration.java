@@ -46,20 +46,6 @@ public class CorpusAdministration
   {
   }
 
-  protected DataSource createDataSource(String host, String port,
-    String database,
-    String user, String password)
-  {
-    String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-
-    // DriverManagerDataSource is deprecated
-    // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
-
-    // why is this better?
-    // XXX: how to construct the datasource?    
-    return new SimpleDriverDataSource(new Driver(), url, user, password);
-  }
-
   @Transactional(readOnly = false)
   public void deleteCorpora(List<Long> ids)
   {
@@ -84,31 +70,8 @@ public class CorpusAdministration
   {
 
     log.info("initializing database");
-
-
-    log.info("Creating Annis database and user.");
-    // connect as super user to the default database to create new user and database
-    administrationDao.setDataSource(createDataSource(host, port,
-      defaultDatabase, superUser, superPassword));
-
-    administrationDao.dropDatabase(database);
-    administrationDao.dropUser(user);
-    administrationDao.createUser(user, password);
-    administrationDao.createDatabase(database);
-
-
-    // switch to new database, but still as super user to install stored procedure compute_rank_level
-    administrationDao.setDataSource(createDataSource(host, port, database,
-      superUser, superPassword));
-    administrationDao.setupDatabase();
-
-    // switch to new database as new user for the rest
-    administrationDao.setDataSource(createDataSource(host, port, database,
-      user, password));
-
-    administrationDao.createSchema();
-    administrationDao.createSchemaIndexes();
-    administrationDao.populateSchema();
+    administrationDao.initializeDatabase(host, port, database, user, password,
+      defaultDatabase, superUser, superPassword);
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password);

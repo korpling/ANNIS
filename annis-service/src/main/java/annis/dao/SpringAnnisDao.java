@@ -350,16 +350,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public SaltProject retrieveAnnotationGraph(long textId)
-  {
-    SaltProject p =
-      annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(), textId);
-
-    return p;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
     String documentName)
   {

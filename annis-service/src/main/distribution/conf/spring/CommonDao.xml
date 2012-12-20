@@ -138,6 +138,17 @@
         <entry key="pdf" value="application/pdf"/>
       </util:map>
     </property>
+    <property name="tableInsertFrom">
+      <util:map>
+        <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, &quot;order&quot;, mappings" />
+      </util:map>
+    </property>
+    <property name="tableInsertSelect">
+      <util:map>
+        <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility, &quot;order&quot;, mappings" />
+        <entry key="text" value="corpus_ref, id, name, text, toplevel_corpus" />
+      </util:map>
+    </property>
   </bean>
 
   <!-- END EXPORTS -->
