@@ -34,11 +34,20 @@ public class WekaExporter implements Exporter, Serializable
     WebResource annisResource, Writer out)
   {
     //this is a full result export
+    
     try
     {
-      InputStream result = annisResource.path("search").path("matrix")
+      WebResource res = annisResource.path("search").path("matrix")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL).get(InputStream.class);
+        .queryParam("q", queryAnnisQL);
+      
+      
+      if(argsAsString.startsWith("metakeys="))
+      {
+        res = res.queryParam("metakeys", argsAsString.substring("metakeys".length()+1));
+      }
+      
+      InputStream result = res.get(InputStream.class);
       
       try
       {
