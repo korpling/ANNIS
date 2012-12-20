@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -52,6 +53,7 @@ public class InstanceConfig
   /** 
    * Get the external display name (used e.g. in the user interface) of this instance. 
    */
+  @XmlElement(name="display-name")
   public String getInstanceDisplayName()
   {
     return instanceDisplayName;

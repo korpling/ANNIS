@@ -33,13 +33,11 @@ import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
-import annis.security.AnnisUserConfig;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
-import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.service.ApplicationContext;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
@@ -60,8 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -70,13 +66,9 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -219,21 +211,21 @@ public class MainApp extends Application implements PluginSystem,
     {
       // get a list of all directories that contain instance informations
       List<File> locations = getAllConfigLocations("instances", (WebApplicationContext) appContext);
-      for(File f : locations)
+      for(File root : locations)
       {
-        if(f.isDirectory())
+        if(root.isDirectory())
         {
           // get all sub-files ending on ".json"
           File[] instanceFiles = 
-            f.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
+            root.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
           for(File i : instanceFiles)
           {
-            if(f.isFile() && f.canRead())
+            if(i.isFile() && i.canRead())
             {
               try
               {
-                InstanceConfig config = jsonMapper.readValue(f, InstanceConfig.class);
-                String name = StringUtils.removeEnd(f.getName(), ".json");
+                InstanceConfig config = jsonMapper.readValue(i, InstanceConfig.class);
+                String name = StringUtils.removeEnd(i.getName(), ".json");
                 config.setInstanceName(name);
                 result.put(name, config);
               }
@@ -325,10 +317,16 @@ public class MainApp extends Application implements PluginSystem,
       for(Map.Entry<String, InstanceConfig> cfgInstance : loadInstanceConfig(getContext()).entrySet())
       {
         SearchWindow instance = new SearchWindow((PluginSystem) this, cfgInstance.getValue());
+        instance.setName(cfgInstance.getKey());
+
         if("default".equals(cfgInstance.getKey()))
         {
           setMainWindow(instance);
           windowSearch = instance;
+        }
+        else
+        {
+          addWindow(instance);
         }
       }
     }

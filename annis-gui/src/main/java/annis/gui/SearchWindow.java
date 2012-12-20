@@ -561,12 +561,7 @@ public class SearchWindow extends Window
   {
     return getApplication().getUser() != null;
   }
-
-  @Override
-  public String getName()
-  {
-    return "Search";
-  }
+  
   public ControlPanel getControl()
   {
     return control;
