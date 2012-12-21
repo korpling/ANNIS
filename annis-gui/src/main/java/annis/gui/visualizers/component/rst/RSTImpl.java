@@ -36,7 +36,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -213,35 +212,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
-    graph = visInput.getDocument().getSDocumentGraph();
-    EList<SNode> nodes = graph.getSRoots();
-    EList<SNode> rootSNodes = new BasicEList<SNode>();
+    EList<SNode> rootSNodes = visInput.getSResult().getSDocumentGraph().
+      getSRoots();
+
 
 
     Salt2DOT s2d = new Salt2DOT();
     s2d.salt2Dot(graph, URI.createFileURI(
       "/tmp/graph_" + graph.getSName() + ".dot"));
 
-    if (nodes != null)
-    {
-      for (SNode node : nodes)
-      {
-        for (SAnnotation anno : node.getSAnnotations())
-        {
-          log.debug("anno name {}, anno value {}", anno.getName(), anno.
-            getValue());
-
-          if (ANNOTATION_KEY.equals(anno.getName()))
-          {
-            rootSNodes.add(node);
-            log.debug("find root {} with {}", anno, ANNOTATION_KEY);
-            break;
-          }
-        }
-      }
-    }
-
-    if (rootSNodes.size() > 0)
+    if (rootSNodes.size() == 1)
     {
       graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
         "getSentences", new SGraphTraverseHandler()
@@ -251,13 +231,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
           String traversalId, SNode currNode, SRelation sRelation,
           SNode fromNode, long order)
         {
-        }
-
-        @Override
-        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-          long order)
-        {
           if (currNode instanceof SStructure && isSegment(currNode))
           {
             sentences.add((SStructure) currNode);
@@ -265,15 +238,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         }
 
         @Override
+        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+          long order)
+        {
+        }
+
+        @Override
         public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId, SRelation edge, SNode currNode, long order)
         {
-
-          // entry case
-          if (edge == null)
-          {
-            return true;
-          }
 
           // token are not needed
           if (currNode instanceof SToken)
@@ -281,7 +255,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
             return false;
           }
 
-          return checkIncomingEdge(edge);
+          return true;
         }
       });
 
@@ -301,7 +275,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     {
       log.debug("does not find an annotation which matched {}",
         ANNOTATION_KEY);
-      graph.traverse(nodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
         "jsonBuild", this);
     }
 
