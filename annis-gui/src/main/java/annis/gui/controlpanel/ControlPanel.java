@@ -26,9 +26,15 @@ import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -37,6 +43,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ControlPanel extends Panel
 {
 
+  private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
+  
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
@@ -46,6 +54,7 @@ public class ControlPanel extends Panel
   private Set<String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
+  private UriFragmentUtility uriFragment;
 
   public ControlPanel(SearchWindow searchWindow, InstanceConfig instanceConfig)
   {
@@ -60,6 +69,9 @@ public class ControlPanel extends Panel
 
     VerticalLayout layout = (VerticalLayout) getContent();
     layout.setSizeFull();
+    
+    uriFragment = new UriFragmentUtility();
+    addComponent(uriFragment);
     
     Accordion accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
@@ -152,6 +164,10 @@ public class ControlPanel extends Panel
 
       queryPanel.updateShortHistory(history.asList());
 
+      // set our fragment
+      uriFragment.setFragment(StringUtils.join(constructQueryFragmentParams(), "&"));
+      
+      
       queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
@@ -163,6 +179,34 @@ public class ControlPanel extends Panel
 
 
     }
+  }
+  
+  private List<String> constructQueryFragmentParams()
+  {
+    List<String> result = new ArrayList<String>();
+    try
+    {
+      result.add("query=" + URLEncoder.encode(lastQuery, "UTF-8"));
+      result.add("corpora=" 
+        + URLEncoder.encode(StringUtils.join(lastCorpusSelection, ","), "UTF-8"));
+      result.add("context-left=" 
+        + URLEncoder.encode("" + searchOptions.getLeftContext(), "UTF-8"));
+      result.add("context-right=" 
+        + URLEncoder.encode("" + searchOptions.getRightContext(), "UTF-8"));
+      result.add("result-length=" 
+        + URLEncoder.encode("" + searchOptions.getResultsPerPage(), "UTF-8"));
+      if(searchOptions.getSegmentationLayer() != null)
+      {
+        result.add("segmentation=" 
+          + URLEncoder.encode("" + searchOptions.getSegmentationLayer(), "UTF-8"));
+      }
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.warn(ex.getMessage(), ex);
+    }
+    
+    return result;
   }
 
   public Set<HistoryEntry> getHistory()
