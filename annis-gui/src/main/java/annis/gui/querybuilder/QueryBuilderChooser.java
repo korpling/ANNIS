@@ -64,6 +64,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     cbChooseBuilder.setNewItemsAllowed(false);
     cbChooseBuilder.setNullSelectionAllowed(false);
     cbChooseBuilder.setImmediate(true);
+    cbChooseBuilder.setInputPrompt("Choose a query builder");
+    
     
     PluginManagerUtil util = new PluginManagerUtil(pluginSystem.getPluginManager());
     Collection<QueryBuilderPlugin> builders = util.getPlugins(QueryBuilderPlugin.class);
