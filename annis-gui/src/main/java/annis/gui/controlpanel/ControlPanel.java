@@ -16,6 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.gui.Helper;
+import annis.gui.InstanceConfig;
 import annis.gui.SearchWindow;
 import annis.gui.beans.HistoryEntry;
 import annis.service.objects.MatchAndDocumentCount;
@@ -46,7 +47,7 @@ public class ControlPanel extends Panel
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
 
-  public ControlPanel(SearchWindow searchWindow)
+  public ControlPanel(SearchWindow searchWindow, InstanceConfig instanceConfig)
   {
     super("Search Form");
     this.searchWindow = searchWindow;
@@ -64,7 +65,7 @@ public class ControlPanel extends Panel
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
-    corpusList = new CorpusListPanel(this);
+    corpusList = new CorpusListPanel(this, instanceConfig);
 
     searchOptions = new SearchOptionsPanel();
 

@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -31,7 +32,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
-public class InstanceConfig
+public class InstanceConfig implements Serializable
 {
   private String instanceName;
   private String instanceDisplayName;
