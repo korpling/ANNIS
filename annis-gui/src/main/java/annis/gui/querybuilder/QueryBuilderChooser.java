@@ -22,7 +22,9 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +42,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private Map<String, String> caption2Short;
   private Map<String, QueryBuilderPlugin> pluginRegistry;
   private Component lastComponent;
+  private VerticalLayout layout;
   
   public QueryBuilderChooser(ControlPanel controlPanel, PluginSystem pluginSystem)
   {
@@ -48,6 +51,13 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     this.pluginRegistry = new HashMap<String, QueryBuilderPlugin>();
     this.caption2Short = new HashMap<String, String>();
+    
+    setStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    
+    layout = (VerticalLayout) getContent();
+    layout.setSizeFull();
+    layout.setSpacing(true);
+    setSizeFull();
     
     // add combobox to choose the query builder
     cbChooseBuilder = new ComboBox();
@@ -68,6 +78,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     cbChooseBuilder.addListener((Property.ValueChangeListener) this);
     
     addComponent(cbChooseBuilder);
+    layout.setExpandRatio(cbChooseBuilder, 0.0f);
   }
 
   @Override
@@ -94,6 +105,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
       removeComponent(lastComponent);
     }
     addComponent(component);
+    layout.setExpandRatio(component, 1.0f);
     lastComponent = component;
   }
   
