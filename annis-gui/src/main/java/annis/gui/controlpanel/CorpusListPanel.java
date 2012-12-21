@@ -72,7 +72,6 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   public static final String ALL_CORPORA = "All";
   public static final String CORPUSSET_PARAM= "corpusset";
-  public static final String CORPUSSET_PREFIX = "corpusset_";
 
   public enum ActionType
   {
@@ -287,7 +286,15 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       }
       else
       {
-        cbSelection.select(ALL_CORPORA);
+        
+        if(instanceConfig != null && instanceConfig.getDefaultCorpusSet() != null)
+        {
+          cbSelection.select(instanceConfig.getDefaultCorpusSet());
+        }
+        else
+        {
+          cbSelection.select(ALL_CORPORA);
+        }
       }
 
       updateCorpusTable();
