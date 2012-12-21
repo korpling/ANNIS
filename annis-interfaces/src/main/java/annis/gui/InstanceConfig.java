@@ -15,7 +15,9 @@
  */
 package annis.gui;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -34,6 +36,8 @@ public class InstanceConfig
   private String instanceName;
   private String instanceDisplayName;
   private String defaultQueryBuilder;
+  private List<CorpusSet> corpusSets;
+  private String defaultCorpusSet;
 
   /**
    * Get the internal short name of this instance.
@@ -66,15 +70,55 @@ public class InstanceConfig
     this.instanceDisplayName = instanceDisplayName;
   }
 
+  /**
+   * Get the short name of the query builder that should be selected by default.
+   * @return 
+   */
   @XmlElement(name="default-querybuilder")
   public String getDefaultQueryBuilder()
   {
     return defaultQueryBuilder;
   }
 
+  /** @see #getDefaultQueryBuilder()  */
   public void setDefaultQueryBuilder(String defaultQueryBuilder)
   {
     this.defaultQueryBuilder = defaultQueryBuilder;
   }
+
+  /**
+   * Get the corpus sets that are pre-defined by the instance.
+   * @return 
+   */
+  @XmlElementWrapper(name="corpus-sets")
+  public List<CorpusSet> getCorpusSets()
+  {
+    return corpusSets;
+  }
+
+  /** @see #getCorpusSets()  */
+  public void setCorpusSets(List<CorpusSet> corpusSets)
+  {
+    this.corpusSets = corpusSets;
+  }
+
+  /**
+   * Get the name of the corpus set that should be activated by default.
+   * @return 
+   */
+  @XmlElement(name="default-corpusset")
+  public String getDefaultCorpusSet()
+  {
+    return defaultCorpusSet;
+  }
+
+  /** @see #getDefaultCorpusSet()  */
+  public void setDefaultCorpusSet(String defaultCorpusSet)
+  {
+    this.defaultCorpusSet = defaultCorpusSet;
+  }
+  
+  
+  
   
 }
