@@ -17,7 +17,8 @@ package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.querybuilder.TigerQueryBuilder;
+import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
@@ -74,7 +75,7 @@ public class SearchWindow extends Window
   private Window windowLogin;
   private ResultViewPanel resultView;
   private PluginSystem ps;
-  private TigerQueryBuilder queryBuilder;
+  private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
@@ -227,7 +228,7 @@ public class SearchWindow extends Window
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    queryBuilder = new TigerQueryBuilder(control);
+    queryBuilder = new QueryBuilderChooser(control, ps);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
     hLayout.addComponent(mainTab);

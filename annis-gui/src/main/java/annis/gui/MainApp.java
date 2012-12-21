@@ -18,6 +18,8 @@ package annis.gui;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.MediaControllerFactoryImpl;
+import annis.gui.querybuilder.DummyQueryBuilderPlugin;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.grid.GridVisualizer;
@@ -38,6 +40,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.vaadin.Application;
 import com.vaadin.Application.UserChangeListener;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 import com.vaadin.service.ApplicationContext;
 import com.vaadin.terminal.ClassResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
@@ -442,6 +445,9 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
     
+    pluginManager.addPluginsFrom(new ClassURI(DummyQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    
     pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
@@ -466,7 +472,6 @@ public class MainApp extends Application implements PluginSystem,
     for (Plugin p : util.getPlugins())
     {
       listOfPlugins.append(p.getClass().getName()).append("\n");
-
     }
     log.info(listOfPlugins.toString());
 
