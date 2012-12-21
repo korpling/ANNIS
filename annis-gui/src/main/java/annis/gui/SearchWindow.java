@@ -228,7 +228,7 @@ public class SearchWindow extends Window
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    queryBuilder = new QueryBuilderChooser(control, ps);
+    queryBuilder = new QueryBuilderChooser(control, ps, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
     hLayout.addComponent(mainTab);

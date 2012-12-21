@@ -33,6 +33,7 @@ public class InstanceConfig
 {
   private String instanceName;
   private String instanceDisplayName;
+  private String defaultQueryBuilder;
 
   /**
    * Get the internal short name of this instance.
@@ -64,6 +65,16 @@ public class InstanceConfig
   {
     this.instanceDisplayName = instanceDisplayName;
   }
-  
+
+  @XmlElement(name="default-querybuilder")
+  public String getDefaultQueryBuilder()
+  {
+    return defaultQueryBuilder;
+  }
+
+  public void setDefaultQueryBuilder(String defaultQueryBuilder)
+  {
+    this.defaultQueryBuilder = defaultQueryBuilder;
+  }
   
 }

@@ -124,7 +124,7 @@ public class Helper
   /**
    * Gets or creates a web resource to the ANNIS service.
    *
-   * This is a convinience wrapper to {@link #getAnnisWebResource(java.lang.String, java.lang.Object) }
+   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, java.lang.Object) }
    * that gets all the needed information from the Vaadin {@link Application}
    * 
    * @param app  The Vaadin application.

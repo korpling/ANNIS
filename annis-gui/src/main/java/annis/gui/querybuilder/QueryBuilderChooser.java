@@ -15,6 +15,7 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.InstanceConfig;
 import annis.gui.PluginSystem;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property;
@@ -39,19 +40,27 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private PluginSystem pluginSystem;
   private ControlPanel controlPanel;
   private ComboBox cbChooseBuilder;
-  private Map<String, String> caption2Short;
+  private Map<String, String> short2caption;
   private Map<String, QueryBuilderPlugin> pluginRegistry;
   private Component lastComponent;
   private VerticalLayout layout;
+  private InstanceConfig instanceConfig;
   
-  public QueryBuilderChooser(ControlPanel controlPanel, PluginSystem pluginSystem)
+  public QueryBuilderChooser(ControlPanel controlPanel, PluginSystem pluginSystem,
+    InstanceConfig instanceConfig)
   {
     this.controlPanel = controlPanel;
     this.pluginSystem = pluginSystem;
+    this.instanceConfig = instanceConfig;
     
     this.pluginRegistry = new HashMap<String, QueryBuilderPlugin>();
-    this.caption2Short = new HashMap<String, String>();
+    this.short2caption = new HashMap<String, String>();
     
+  }
+
+  @Override
+  public void attach()
+  {
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     layout = (VerticalLayout) getContent();
@@ -72,8 +81,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     for(QueryBuilderPlugin b : builders)
     {
-      caption2Short.put(b.getCaption(), b.getShortName());
-      pluginRegistry.put(b.getShortName(), b);
+      short2caption.put(b.getShortName(), b.getCaption());
+      pluginRegistry.put(b.getCaption(), b);
       cbChooseBuilder.addItem(b.getCaption());
     }
     
@@ -81,20 +90,19 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     addComponent(cbChooseBuilder);
     layout.setExpandRatio(cbChooseBuilder, 0.0f);
+    
+    if(instanceConfig.getDefaultQueryBuilder() != null)
+    {
+      cbChooseBuilder.setValue(short2caption.get(instanceConfig.getDefaultQueryBuilder()));
+    }
   }
+  
+  
 
   @Override
   public void valueChange(ValueChangeEvent event)
-  {
-    String shortName = caption2Short.get((String) event.getProperty().getValue());
-    if(shortName == null)
-    {
-      getWindow().showNotification("Invalid selection (caption not found)", 
-        Window.Notification.TYPE_WARNING_MESSAGE);
-      return;
-    }
-    
-    QueryBuilderPlugin plugin = pluginRegistry.get(shortName);
+  { 
+    QueryBuilderPlugin plugin = pluginRegistry.get((String) event.getProperty().getValue());
     if(plugin == null)
     {
       getWindow().showNotification("Invalid selection (plugin not found)", 
