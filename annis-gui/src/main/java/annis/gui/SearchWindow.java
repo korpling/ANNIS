@@ -217,7 +217,7 @@ public class SearchWindow extends Window
     addComponent(hPanel);
     ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
 
-    control = new ControlPanel(this);
+    control = new ControlPanel(this, instanceConfig);
     control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);

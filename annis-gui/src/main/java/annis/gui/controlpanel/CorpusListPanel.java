@@ -19,7 +19,8 @@ import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.gui.Helper;
 import annis.security.AnnisUserConfig;
-import annis.security.CorpusSet;
+import annis.gui.CorpusSet;
+import annis.gui.InstanceConfig;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -43,7 +44,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -72,7 +72,6 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   public static final String ALL_CORPORA = "All";
   public static final String CORPUSSET_PARAM= "corpusset";
-  public static final String CORPUSSET_PREFIX = "corpusset_";
 
   public enum ActionType
   {
@@ -85,10 +84,13 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
   private ComboBox cbSelection;
   private transient AnnisUserConfig userConfig;
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
+  private InstanceConfig instanceConfig;
 
-  public CorpusListPanel(ControlPanel controlPanel)
+  public CorpusListPanel(ControlPanel controlPanel, InstanceConfig instanceConfig)
   {
     this.controlPanel = controlPanel;
+    this.instanceConfig = instanceConfig;
+    
     final CorpusListPanel finalThis = this;
     
     setHeight("99%");
@@ -256,9 +258,19 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       cbSelection.removeAllItems();
       cbSelection.addItem(ALL_CORPORA);
 
+      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      if(instanceConfig != null && instanceConfig.getCorpusSets() != null)
+      {
+        corpusSets.addAll(instanceConfig.getCorpusSets());
+      }
+      if(userConfig != null && userConfig.getCorpusSets() != null)
+      {
+        corpusSets.addAll(userConfig.getCorpusSets());
+      }
+      
       // add the corpus set names in sorted order
       TreeSet<String> corpusSetNames = new TreeSet<String>();
-      for (CorpusSet cs : userConfig.getCorpusSets())
+      for (CorpusSet cs : corpusSets)
       {
         corpusSetNames.add(cs.getName());
       }
@@ -274,7 +286,15 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       }
       else
       {
-        cbSelection.select(ALL_CORPORA);
+        
+        if(instanceConfig != null && instanceConfig.getDefaultCorpusSet() != null)
+        {
+          cbSelection.select(instanceConfig.getDefaultCorpusSet());
+        }
+        else
+        {
+          cbSelection.select(ALL_CORPORA);
+        }
       }
 
       updateCorpusTable();
@@ -293,9 +313,20 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
     }
     else if(userConfig != null)
     {
-      // TODO: use map
       CorpusSet selectedCS = null;
-      for(CorpusSet cs : userConfig.getCorpusSets())
+      
+      // TODO: use map
+      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      if(instanceConfig != null && instanceConfig.getCorpusSets() != null)
+      {
+        corpusSets.addAll(instanceConfig.getCorpusSets());
+      }
+      if(userConfig != null && userConfig.getCorpusSets() != null)
+      {
+        corpusSets.addAll(userConfig.getCorpusSets());
+      }
+      
+      for(CorpusSet cs : corpusSets)
       {
         if(cs.getName().equals(selectedCorpusSetName))
         {
@@ -320,7 +351,7 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
 
   /**
    * Queries the web service and sets the {@link #allCorpora} and {@link #userConfig} members.
-   * @return True if successfull
+   * @return True if successful
    */
   private boolean queryServerForCorpusList()
   {
