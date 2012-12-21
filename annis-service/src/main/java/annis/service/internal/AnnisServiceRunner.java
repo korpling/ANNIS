@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import java.io.IOException;
 import annis.AnnisBaseRunner;
+import annis.AnnisXmlContextHelper;
 import annis.exceptions.AnnisException;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -169,16 +170,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
     // create beans
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-    MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
-    try
-    {
-      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
-        "conf/annis-service.properties").getAbsolutePath()));
-    }
-    catch (IOException ex)
-    {
-      log.error("Could not load conf/annis-service.properties", ex);
-    }
+    AnnisXmlContextHelper.prepareContext(ctx);
     ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
     ctx.refresh();
 

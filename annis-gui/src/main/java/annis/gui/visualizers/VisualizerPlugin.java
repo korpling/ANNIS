@@ -20,6 +20,7 @@ import annis.gui.visualizers.component.KWICPanel;
 import com.vaadin.Application;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import net.xeoh.plugins.base.Plugin;
@@ -42,7 +43,7 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface VisualizerPlugin<I extends Component> extends Plugin
+public interface VisualizerPlugin<I extends Component> extends Plugin, Serializable
 {
 
   /**

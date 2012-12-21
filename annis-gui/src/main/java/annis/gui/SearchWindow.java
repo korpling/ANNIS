@@ -17,7 +17,8 @@ package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.querybuilder.TigerQueryBuilder;
+import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
@@ -74,16 +75,16 @@ public class SearchWindow extends Window
   private Window windowLogin;
   private ResultViewPanel resultView;
   private PluginSystem ps;
-  private TigerQueryBuilder queryBuilder;
+  private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
   
-  public SearchWindow(PluginSystem ps)
+  public SearchWindow(PluginSystem ps, InstanceConfig instanceConfig)
   {
-    super("ANNIS Corpus Search");
+    super("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
 
     this.ps = ps;
     
@@ -227,7 +228,7 @@ public class SearchWindow extends Window
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    queryBuilder = new TigerQueryBuilder(control);
+    queryBuilder = new QueryBuilderChooser(control, ps, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
     hLayout.addComponent(mainTab);
@@ -275,6 +276,7 @@ public class SearchWindow extends Window
         }
       }
     });
+    
 
   }
 
@@ -416,6 +418,7 @@ public class SearchWindow extends Window
   private void showLoginWindow()
   {
 
+    final Window parentWindow = this;
     if (windowLogin == null)
     {
       LoginForm login = new LoginForm()
@@ -428,7 +431,7 @@ public class SearchWindow extends Window
         protected byte[] getLoginHTML()
         {
            String appUri = getApplication().getURL().toString()
-            + getWindow().getName() + "/";
+            + parentWindow.getName() + "/";
 
           try
           {
@@ -560,12 +563,7 @@ public class SearchWindow extends Window
   {
     return getApplication().getUser() != null;
   }
-
-  @Override
-  public String getName()
-  {
-    return "Search";
-  }
+  
   public ControlPanel getControl()
   {
     return control;
