@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.visualizers.VisualizerPlugin;
+import java.io.Serializable;
 import net.xeoh.plugins.base.PluginManager;
 
 /**
@@ -24,7 +25,7 @@ import net.xeoh.plugins.base.PluginManager;
  * 
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
-public interface PluginSystem
+public interface PluginSystem extends Serializable
 {
   
   public final static String DEFAULT_VISUALIZER = "grid";
