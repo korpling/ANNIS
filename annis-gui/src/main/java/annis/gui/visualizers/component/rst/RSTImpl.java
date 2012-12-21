@@ -498,21 +498,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
     String traversalId, SRelation incomingEdge, SNode currNode, long order)
   {
-
-
-    //entry case
-    if (incomingEdge == null)
-    {
-      return true;
-    }
-
     // token data structures are not needed
     if (currNode instanceof SToken)
     {
       return false;
     }
 
-    return checkIncomingEdge(incomingEdge);
+    return true;
   }
 
   /**
@@ -734,92 +726,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       MatchedNodeColors.values().length - 1);
 
     return MatchedNodeColors.values()[color].getHTMLColor();
-  }
-
-  /**
-   * Returns false, if the incoming edge does not contain any sType or if it has
-   * an sType "edge" and not the annotation "span" and "multinuc".
-   */
-  private boolean checkIncomingEdge(SRelation incomingEdge)
-  {
-
-    EList<String> sTypes;
-
-    /**
-     * check whether the edge has an sType or not, because there are always two
-     * edges in the example rst corpus
-     */
-    if ((sTypes = incomingEdge.getSTypes()) != null && sTypes.size() > 0)
-    {
-      /**
-       * the pointing relations are modelled as dominance relations with type
-       * "edge" and do not carry the annotation "span" or "multinuc", so we will
-       * have to exclude the "point relation" here. There is one very weird case
-       * with multinucs: If one incoming edge is type of multinuc, we have to
-       * include this node, but this is not the edge we came from. This edge
-       * must be distinct from the current incoming edge.
-       */
-      if (sTypes.size() == 1
-        && POINTING_RELATION.equals(sTypes.get(0))
-        && detectWrongAnnotaton(incomingEdge)
-        && !isPartOfMultinuc(incomingEdge, incomingEdge.getSTarget()))
-      {
-        return false;
-      }
-      else if (sTypes.size() == 1
-        && "multinuc".equals(sTypes.get(0))
-        && hasAnnoKey(incomingEdge, INVISIBLE_RELATION))
-      {
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  /**
-   * Checks if this node is part of a multinuc span. If there exists one
-   * additional edge which has the sType "multinuc" and is different from the
-   * incomin edge.
-   *
-   * @param node The node, which is checked.
-   * @param incomingEdge the edge we came from.
-   *
-   */
-  private boolean isPartOfMultinuc(SRelation incomingEdge, SNode node)
-  {
-    EList<Edge> in = node.getSGraph().getInEdges(node.getSId());
-    if (in != null)
-    {
-      for (Edge e : in)
-      {
-        EList<String> sTypes;
-
-        if (!(e instanceof SRelation))
-        {
-          continue;
-        }
-
-        sTypes = ((SRelation) e).getSTypes();
-        if (sTypes == null && sTypes.size() < 1)
-        {
-          continue;
-        }
-
-        // check the case described above.
-        if (MULTINUC.equals(sTypes.get(0)) && e != incomingEdge)
-        {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   /**
