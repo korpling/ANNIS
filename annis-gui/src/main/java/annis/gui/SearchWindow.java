@@ -18,7 +18,6 @@ package annis.gui;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
@@ -40,6 +39,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +77,7 @@ public class SearchWindow extends Window
   private PluginSystem ps;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
+  private UriFragmentUtility uriFragment;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
@@ -88,7 +89,10 @@ public class SearchWindow extends Window
 
     this.ps = ps;
     
-    setName("search");
+    
+    uriFragment = new UriFragmentUtility();
+    addComponent(uriFragment);
+    
     // always get the resize events directly
     setImmediate(true);
     
@@ -401,11 +405,18 @@ public class SearchWindow extends Window
     {
       mainTab.removeComponent(resultView);
     }
-    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
+
+    updateFragment(aql, corpora, contextLeft, contextRight, segmentationLayer, 
+      0, pageSize);
+    
+    resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
       segmentationLayer, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
+    
   }
+  
+  
 
   public void updateQueryCount(int count)
   {
@@ -413,6 +424,48 @@ public class SearchWindow extends Window
     {
       resultView.setCount(count);
     }
+  }
+  public void updateFragment(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
+    int start, int limit)
+  {
+    List<String> args = constructQueryFragmentParams(aql, corpora, contextLeft, contextRight, 
+      segmentation, start, limit);
+      
+    // set our fragment
+    uriFragment.setFragment(StringUtils.join(args, "&"));
+  }
+  
+  public List<String> constructQueryFragmentParams(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
+    int start, int limit)
+  {
+    List<String> result = new ArrayList<String>();
+    try
+    {
+      result.add("query=" + URLEncoder.encode(aql, "UTF-8"));
+      result.add("corpora=" 
+        + URLEncoder.encode(StringUtils.join(corpora, ","), "UTF-8"));
+      result.add("context-left=" 
+        + URLEncoder.encode("" + contextLeft, "UTF-8"));
+      result.add("context-right=" 
+        + URLEncoder.encode("" + contextRight, "UTF-8"));
+      result.add("start=" 
+        + URLEncoder.encode("" + start, "UTF-8"));
+      result.add("limit=" 
+        + URLEncoder.encode("" + limit, "UTF-8"));
+      if(segmentation != null)
+      {
+        result.add("segmentation=" 
+          + URLEncoder.encode("" + segmentation, "UTF-8"));
+      }
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.warn(ex.getMessage(), ex);
+    }
+    
+    return result;
   }
 
   private void showLoginWindow()

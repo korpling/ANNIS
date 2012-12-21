@@ -20,6 +20,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
+import annis.gui.SearchWindow;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
@@ -68,9 +69,11 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
-  private VerticalLayout mainLayout;
+  private VerticalLayout mainLayout;  
+  private SearchWindow parent;
 
-  public ResultViewPanel(String aql, Set<String> corpora,
+
+  public ResultViewPanel(SearchWindow parent, String aql, Set<String> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int pageSize,
     PluginSystem ps)
   {
@@ -81,6 +84,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.contextRight = contextRight;
     this.pageSize = pageSize;
     this.ps = ps;
+    this.parent = parent;
     
     this.currentSegmentationLayer = segmentationLayer;
 
@@ -89,7 +93,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout = (VerticalLayout) getContent();
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
-
+    
+    
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     
@@ -127,17 +132,19 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
-
+    
   }
 
   @Override
   public void attach()
   {
+    super.attach();
+    
     try
     {
       query = new AnnisResultQuery(corpora, aql, getApplication());
       createPage(0, pageSize);
-    super.attach();
+    
     }
     catch (Exception ex)
     {
@@ -153,6 +160,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void createPage(final int start, final int limit)
   {
+    parent.updateFragment(aql, corpora, contextLeft, contextRight, currentSegmentationLayer, start,
+      limit);
+    
     if (query != null)
     {
       progressResult.setEnabled(true);
