@@ -552,27 +552,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return null;
   }
 
-  /**
-   * Returns false if the edge contains an annotation with value
-   * {@link RSTImpl#EDGE_TYPE_POINTING_REL}.
-   */
-  private boolean detectWrongAnnotaton(SRelation edge)
-  {
-    EList<SAnnotation> annos = edge.getSAnnotations();
-
-    for (SAnnotation anno : annos)
-    {
-      for (String value : ANNOTATION_VALUES)
-      {
-        if (value.equals(anno.getValueString()))
-        {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   private JSONObject getInvisibleRelatedNodes(SNode node)
   {
     JSONObject nodeIds = new JSONObject();
