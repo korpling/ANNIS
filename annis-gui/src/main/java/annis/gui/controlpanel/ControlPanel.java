@@ -123,8 +123,21 @@ public class ControlPanel extends Panel
   {
     super.paintContent(target);
   }
-
+  
+  public void executeCount(String aql, Set<String> corpora)
+  {
+    queryPanel.setQuery(aql);
+    corpusList.selectCorpora(corpora);
+    
+    executeQuery(true);
+  }
+  
   public void executeQuery()
+  {
+    executeQuery(false);
+  }
+
+  public void executeQuery(boolean onlyCount)
   {
     if (getApplication() != null && corpusList != null && queryPanel
       != null)
@@ -159,12 +172,14 @@ public class ControlPanel extends Panel
       queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
-
-      searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
-        searchOptions.getLeftContext(), searchOptions.getRightContext(),
-        searchOptions.getSegmentationLayer(),
-        searchOptions.getResultsPerPage());
-
+      
+      if(!onlyCount)
+      {
+        searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
+          searchOptions.getLeftContext(), searchOptions.getRightContext(),
+          searchOptions.getSegmentationLayer(),
+          0, searchOptions.getResultsPerPage());
+      }
 
     }
   }

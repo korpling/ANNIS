@@ -37,8 +37,10 @@ import com.vaadin.terminal.gwt.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -55,7 +57,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchWindow extends Window
   implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
-  MimeTypeErrorListener
+  MimeTypeErrorListener, UriFragmentUtility.FragmentChangedListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
@@ -78,6 +80,7 @@ public class SearchWindow extends Window
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private UriFragmentUtility uriFragment;
+  private String lastQueriedFragment;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
@@ -91,6 +94,7 @@ public class SearchWindow extends Window
     
     
     uriFragment = new UriFragmentUtility();
+    uriFragment.addListener((UriFragmentUtility.FragmentChangedListener) this);
     addComponent(uriFragment);
     
     // always get the resize events directly
@@ -396,7 +400,7 @@ public class SearchWindow extends Window
 
   public void showQueryResult(String aql, Set<String> corpora,
     int contextLeft,
-    int contextRight, String segmentationLayer, int pageSize)
+    int contextRight, String segmentationLayer, int start, int pageSize)
   {
     warnedAboutPossibleMediaFormatProblem = false;
     
@@ -407,10 +411,10 @@ public class SearchWindow extends Window
     }
 
     updateFragment(aql, corpora, contextLeft, contextRight, segmentationLayer, 
-      0, pageSize);
+      start, pageSize);
     
     resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
-      segmentationLayer, pageSize, ps);
+      segmentationLayer, start, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
     
@@ -433,7 +437,9 @@ public class SearchWindow extends Window
       segmentation, start, limit);
       
     // set our fragment
-    uriFragment.setFragment(StringUtils.join(args, "&"));
+    lastQueriedFragment = StringUtils.join(args, "&");
+    uriFragment.setFragment(lastQueriedFragment);
+    
   }
   
   public List<String> constructQueryFragmentParams(String aql, 
@@ -468,6 +474,35 @@ public class SearchWindow extends Window
     return result;
   }
 
+  @Override
+  public void fragmentChanged(FragmentChangedEvent source)
+  {
+    
+    String fragment = source.getUriFragmentUtility().getFragment();
+    // do nothing if not changed
+    if(fragment.equals(lastQueriedFragment))
+    {
+      return;
+    }
+    
+    Map<String, String> args = Helper.parseFragment(fragment);
+    
+    Set<String> corpora = new TreeSet<String>();
+    if(args.containsKey("corpora"))
+    {
+      String[] corporaSplitted = args.get("corpora").split("\\s*,\\s*");
+      corpora.addAll(Arrays.asList(corporaSplitted));
+    }
+    
+    control.executeCount(args.get("query"), corpora);
+    
+    showQueryResult(args.get("query"), corpora, 
+      Integer.parseInt(args.get("context-left")), Integer.parseInt(args.get("context-right")), 
+      args.get("segmentation"), Integer.parseInt(args.get("start")), 
+      Integer.parseInt(args.get("limit")));
+    
+  }
+  
   private void showLoginWindow()
   {
 

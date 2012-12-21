@@ -61,7 +61,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ResultSetPanel resultPanel;
   private String aql;
   private Set<String> corpora;
-  private int contextLeft, contextRight, pageSize;
+  private int contextLeft, contextRight, start, pageSize;
   private AnnisResultQuery query;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
@@ -74,7 +74,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
 
   public ResultViewPanel(SearchWindow parent, String aql, Set<String> corpora,
-    int contextLeft, int contextRight, String segmentationLayer, int pageSize,
+    int contextLeft, int contextRight, String segmentationLayer, int start, int pageSize,
     PluginSystem ps)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
@@ -85,6 +85,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.pageSize = pageSize;
     this.ps = ps;
     this.parent = parent;
+    // only allow start points at multiples of the page size
+    this.start = start - (start % pageSize);
     
     this.currentSegmentationLayer = segmentationLayer;
 
@@ -112,7 +114,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
       }
     });
 
-    paging = new PagingComponent(0, pageSize);
+    paging = new PagingComponent(start, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
     
@@ -143,7 +145,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     try
     {
       query = new AnnisResultQuery(corpora, aql, getApplication());
-      createPage(0, pageSize);
+      createPage(start, pageSize);
     
     }
     catch (Exception ex)
@@ -155,6 +157,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void setCount(int count)
   {
     paging.setCount(count, false);
+    paging.setStartNumber(start);
   }
 
   @Override

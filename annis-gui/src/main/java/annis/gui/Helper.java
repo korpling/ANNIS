@@ -17,7 +17,6 @@ package annis.gui;
 
 import annis.provider.SaltProjectProvider;
 import annis.security.AnnisUser;
-import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -31,6 +30,7 @@ import com.vaadin.ui.Window;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -211,5 +211,34 @@ public class Helper
         getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
     }
     return corpusConfig;
+  }
+  
+  public static Map<String,String> parseFragment(String fragment)
+  {
+    Map<String, String> result = new TreeMap<String, String>();
+ 
+    fragment = StringUtils.removeStart(fragment, "!");
+    
+    String[] split = StringUtils.split(fragment, "&");
+    for(String s : split)
+    {
+      String[] parts = s.split("=", 2);
+      String name = parts[0].trim();
+      String value = "";
+      if(parts.length == 2)
+      {
+        try
+        {
+          value = URLDecoder.decode(parts[1], "UTF-8");
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          log.warn(ex.getMessage(), ex);
+        }
+      }
+      
+      result.put(name, value);
+    }
+    return result;
   }
 }
