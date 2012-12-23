@@ -38,6 +38,7 @@ import com.vaadin.terminal.gwt.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
+import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -175,37 +176,37 @@ public class SearchWindow extends Window
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
-    Label lblOpenSource = new Label();
-    lblOpenSource.setValue(
-      "<p>ANNIS is Open Source software. "
-      + "This means you are free to download the source code and add new features or make other adjustments to ANNIS on your own.<p/>"
-      + "Here are some examples how you can help ANNIS:"
-      + "<ul>"
-      + "<li>Fix or report problems (bugs) you encounter when using the ANNIS software.</li>"
-      + "<li>Add new features.</li>"
-      + "<li>Enhance the documentation</li>"
-      + "</ul>"
-      + "<p>Feel free to visit our GitHub page for more information: <a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\">https://github.com/korpling/ANNIS</a></p>"
-      + "<a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\"><img style=\"position: absolute; top: 0; right: 0; border: 0;\" src=\"https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png\" alt=\"Fork me on GitHub\"></a>");
-    lblOpenSource.setContentMode(Label.CONTENT_RAW);
-    lblOpenSource.setStyleName("opensource");
-    
-    PopupView pvOpenSource = new PopupView("Help us to make ANNIS better!", lblOpenSource);
+    Button btOpenSource = new Button("Help us to make ANNIS better!");
+    btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
+    btOpenSource.addListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+      Window w = new Window("Help us to make ANNIS better!", new HelpUsPanel());
+      w.setModal(true);
+      w.setResizable(true);
+      w.setWidth("600px");
+      w.setHeight("500px");
+      addWindow(w);
+      w.center();
+      }
+    });
     
     
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
-    layoutToolbar.addComponent(pvOpenSource);
+    layoutToolbar.addComponent(btOpenSource);
     layoutToolbar.addComponent(lblUserName);
     layoutToolbar.addComponent(btLoginLogout);
 
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
-    layoutToolbar.setComponentAlignment(pvOpenSource, Alignment.MIDDLE_CENTER);
+    layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
     layoutToolbar.setComponentAlignment(btLoginLogout, Alignment.MIDDLE_RIGHT);
-    layoutToolbar.setExpandRatio(pvOpenSource, 1.0f);
+    layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
     
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();
