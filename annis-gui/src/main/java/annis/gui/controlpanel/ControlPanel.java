@@ -29,6 +29,8 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Set;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -37,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ControlPanel extends Panel
 {
 
+  private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
+  
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
@@ -46,7 +50,7 @@ public class ControlPanel extends Panel
   private Set<String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
-
+  
   public ControlPanel(SearchWindow searchWindow, InstanceConfig instanceConfig)
   {
     super("Search Form");
@@ -119,8 +123,21 @@ public class ControlPanel extends Panel
   {
     super.paintContent(target);
   }
-
+  
+  public void executeCount(String aql, Set<String> corpora)
+  {
+    queryPanel.setQuery(aql);
+    corpusList.selectCorpora(corpora);
+    
+    executeQuery(true);
+  }
+  
   public void executeQuery()
+  {
+    executeQuery(false);
+  }
+
+  public void executeQuery(boolean onlyCount)
   {
     if (getApplication() != null && corpusList != null && queryPanel
       != null)
@@ -155,12 +172,14 @@ public class ControlPanel extends Panel
       queryPanel.setCountIndicatorEnabled(true);
       CountThread countThread = new CountThread();
       countThread.start();
-
-      searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
-        searchOptions.getLeftContext(), searchOptions.getRightContext(),
-        searchOptions.getSegmentationLayer(),
-        searchOptions.getResultsPerPage());
-
+      
+      if(!onlyCount)
+      {
+        searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
+          searchOptions.getLeftContext(), searchOptions.getRightContext(),
+          searchOptions.getSegmentationLayer(),
+          0, searchOptions.getResultsPerPage());
+      }
 
     }
   }
@@ -169,6 +188,7 @@ public class ControlPanel extends Panel
   {
     return history;
   }
+  
   
   public void corpusSelectionChanged()
   {

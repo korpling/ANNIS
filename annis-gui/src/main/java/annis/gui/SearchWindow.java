@@ -8,7 +8,7 @@
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the Licsense is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -18,7 +18,6 @@ package annis.gui;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
@@ -39,6 +38,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchWindow extends Window
   implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
-  MimeTypeErrorListener
+  MimeTypeErrorListener, UriFragmentUtility.FragmentChangedListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
@@ -78,6 +78,8 @@ public class SearchWindow extends Window
   private PluginSystem ps;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
+  private UriFragmentUtility uriFragment;
+  private String lastQueriedFragment;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
@@ -89,7 +91,11 @@ public class SearchWindow extends Window
 
     this.ps = ps;
     
-    setName("search");
+    
+    uriFragment = new UriFragmentUtility();
+    uriFragment.addListener((UriFragmentUtility.FragmentChangedListener) this);
+    addComponent(uriFragment);
+    
     // always get the resize events directly
     setImmediate(true);
     
@@ -393,7 +399,7 @@ public class SearchWindow extends Window
 
   public void showQueryResult(String aql, Set<String> corpora,
     int contextLeft,
-    int contextRight, String segmentationLayer, int pageSize)
+    int contextRight, String segmentationLayer, int start, int pageSize)
   {
     warnedAboutPossibleMediaFormatProblem = false;
     
@@ -402,11 +408,18 @@ public class SearchWindow extends Window
     {
       mainTab.removeComponent(resultView);
     }
-    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
-      segmentationLayer, pageSize, ps);
+
+    updateFragment(aql, corpora, contextLeft, contextRight, segmentationLayer, 
+      start, pageSize);
+    
+    resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
+      segmentationLayer, start, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
+    
   }
+  
+  
 
   public void updateQueryCount(int count)
   {
@@ -415,7 +428,49 @@ public class SearchWindow extends Window
       resultView.setCount(count);
     }
   }
-
+  public void updateFragment(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
+    int start, int limit)
+  {
+    List<String> args = Helper.citationFragmentParams(aql, corpora, 
+      contextLeft, contextRight, 
+      segmentation, start, limit);
+      
+    // set our fragment
+    lastQueriedFragment = StringUtils.join(args, "&");
+    uriFragment.setFragment(lastQueriedFragment);
+    
+  }
+  
+  @Override
+  public void fragmentChanged(FragmentChangedEvent source)
+  {
+    
+    String fragment = source.getUriFragmentUtility().getFragment();
+    // do nothing if not changed
+    if(fragment.equals(lastQueriedFragment))
+    {
+      return;
+    }
+    
+    Map<String, String> args = Helper.parseFragment(fragment);
+    
+    Set<String> corpora = new TreeSet<String>();
+    if(args.containsKey("c"))
+    {
+      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
+      corpora.addAll(Arrays.asList(corporaSplitted));
+    }
+    
+    control.executeCount(args.get("q"), corpora);
+    
+    showQueryResult(args.get("q"), corpora, 
+      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")), 
+      args.get("seg"), Integer.parseInt(args.get("s")), 
+      Integer.parseInt(args.get("l")));
+    
+  }
+  
   private void showLoginWindow()
   {
 

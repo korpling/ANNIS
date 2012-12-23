@@ -20,6 +20,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
+import annis.gui.SearchWindow;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
@@ -60,7 +61,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private ResultSetPanel resultPanel;
   private String aql;
   private Set<String> corpora;
-  private int contextLeft, contextRight, pageSize;
+  private int contextLeft, contextRight, start, pageSize;
   private AnnisResultQuery query;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
@@ -68,10 +69,12 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
-  private VerticalLayout mainLayout;
+  private VerticalLayout mainLayout;  
+  private SearchWindow parent;
 
-  public ResultViewPanel(String aql, Set<String> corpora,
-    int contextLeft, int contextRight, String segmentationLayer, int pageSize,
+
+  public ResultViewPanel(SearchWindow parent, String aql, Set<String> corpora,
+    int contextLeft, int contextRight, String segmentationLayer, int start, int pageSize,
     PluginSystem ps)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
@@ -81,6 +84,9 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.contextRight = contextRight;
     this.pageSize = pageSize;
     this.ps = ps;
+    this.parent = parent;
+    // only allow start points at multiples of the page size
+    this.start = start - (start % pageSize);
     
     this.currentSegmentationLayer = segmentationLayer;
 
@@ -89,7 +95,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout = (VerticalLayout) getContent();
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
-
+    
+    
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     
@@ -97,17 +104,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    mbResult.addItem("Show Citation URL", new MenuBar.Command()
-    {
-
-      @Override
-      public void menuSelected(MenuItem selectedItem)
-      {
-        showCitationURLWindow();
-      }
-    });
-
-    paging = new PagingComponent(0, pageSize);
+    paging = new PagingComponent(start, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
     
@@ -127,17 +124,19 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
-
+    
   }
 
   @Override
   public void attach()
   {
+    super.attach();
+    
     try
     {
       query = new AnnisResultQuery(corpora, aql, getApplication());
-      createPage(0, pageSize);
-    super.attach();
+      createPage(start, pageSize);
+    
     }
     catch (Exception ex)
     {
@@ -148,11 +147,15 @@ public class ResultViewPanel extends Panel implements PagingCallback
   public void setCount(int count)
   {
     paging.setCount(count, false);
+    paging.setStartNumber(start);
   }
 
   @Override
   public void createPage(final int start, final int limit)
   {
+    parent.updateFragment(aql, corpora, contextLeft, contextRight, currentSegmentationLayer, start,
+      limit);
+    
     if (query != null)
     {
       progressResult.setEnabled(true);
@@ -312,17 +315,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     return result;
   }
 
-  private void showCitationURLWindow()
-  {
-    final Window w =
-      new CitationWindow(
-      getApplication(),
-      aql, corpora, contextLeft, contextRight);
-
-    getWindow().addWindow(w);
-    w.center();
-  }
-  
   public void updateSegmentationLayer(Set<String> segLayers)
   {
     miSegmentation.removeChildren();

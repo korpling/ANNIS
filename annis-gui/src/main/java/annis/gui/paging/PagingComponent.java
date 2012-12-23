@@ -231,6 +231,12 @@ public class PagingComponent extends CustomComponent implements
   {
     return (currentPage - 1) * pageSize;
   }
+  
+  public void setStartNumber(int startNumber)
+  {
+    currentPage = (startNumber / pageSize)+1;
+    update(false);
+  }
 
   public int getCount()
   {
