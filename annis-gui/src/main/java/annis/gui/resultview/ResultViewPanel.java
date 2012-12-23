@@ -104,16 +104,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    mbResult.addItem("Show Citation URL", new MenuBar.Command()
-    {
-
-      @Override
-      public void menuSelected(MenuItem selectedItem)
-      {
-        showCitationURLWindow();
-      }
-    });
-
     paging = new PagingComponent(start, pageSize);
     paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
     paging.addCallback((PagingCallback) this);
@@ -325,17 +315,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     return result;
   }
 
-  private void showCitationURLWindow()
-  {
-    final Window w =
-      new CitationWindow(
-      getApplication(),
-      aql, corpora, contextLeft, contextRight);
-
-    getWindow().addWindow(w);
-    w.center();
-  }
-  
   public void updateSegmentationLayer(Set<String> segLayers)
   {
     miSegmentation.removeChildren();
