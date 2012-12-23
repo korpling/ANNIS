@@ -32,8 +32,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -147,8 +149,70 @@ public class Helper
     WebApplicationContext context = (WebApplicationContext) app.getContext();
     return context.getHttpSession().getServletContext().getContextPath();
   }
+  
+  public static List<String> citationFragmentParams(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
+    int start, int limit)
+  {
+    List<String> result = new ArrayList<String>();
+    try
+    {
+      result.add("q=" + URLEncoder.encode(aql, "UTF-8"));
+      result.add("c=" 
+        + URLEncoder.encode(StringUtils.join(corpora, ","), "UTF-8"));
+      result.add("cl=" 
+        + URLEncoder.encode("" + contextLeft, "UTF-8"));
+      result.add("cr=" 
+        + URLEncoder.encode("" + contextRight, "UTF-8"));
+      result.add("s=" 
+        + URLEncoder.encode("" + start, "UTF-8"));
+      result.add("l=" 
+        + URLEncoder.encode("" + limit, "UTF-8"));
+      if(segmentation != null)
+      {
+        result.add("seg=" 
+          + URLEncoder.encode("" + segmentation, "UTF-8"));
+      }
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.warn(ex.getMessage(), ex);
+    }
+    
+    return result;
+  }
+  
+  public static String generateCitation(Application app, String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
+    int start, int limit)
+  {
+    try
+    {
+      URI appURI = app.getURL().toURI();
 
-  public static String generateCitation(Application app, String aql,
+      try
+      {
+        return new URI(appURI.getScheme(), null,
+          appURI.getHost(), appURI.getPort(),
+          getContext(app), null, 
+          StringUtils.join(citationFragmentParams(aql, corpora,
+            contextLeft, contextRight, segmentation, start, limit), "&"))
+          .toASCIIString();
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error(null, ex);
+      }
+      return "ERROR";
+    }
+    catch (URISyntaxException ex)
+    {
+      log.error(null, ex);
+    }
+    return "ERROR";
+  }
+
+  public static String generateClassicCitation(Application app, String aql,
     List<String> corpora,
     int contextLeft, int contextRight)
   {

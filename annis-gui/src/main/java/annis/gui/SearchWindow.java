@@ -8,7 +8,7 @@
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the Licsense is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -433,7 +433,8 @@ public class SearchWindow extends Window
     Set<String> corpora, int contextLeft, int contextRight, String segmentation,
     int start, int limit)
   {
-    List<String> args = constructQueryFragmentParams(aql, corpora, contextLeft, contextRight, 
+    List<String> args = Helper.citationFragmentParams(aql, corpora, 
+      contextLeft, contextRight, 
       segmentation, start, limit);
       
     // set our fragment
@@ -442,38 +443,6 @@ public class SearchWindow extends Window
     
   }
   
-  public List<String> constructQueryFragmentParams(String aql, 
-    Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
-    int start, int limit)
-  {
-    List<String> result = new ArrayList<String>();
-    try
-    {
-      result.add("query=" + URLEncoder.encode(aql, "UTF-8"));
-      result.add("corpora=" 
-        + URLEncoder.encode(StringUtils.join(corpora, ","), "UTF-8"));
-      result.add("context-left=" 
-        + URLEncoder.encode("" + contextLeft, "UTF-8"));
-      result.add("context-right=" 
-        + URLEncoder.encode("" + contextRight, "UTF-8"));
-      result.add("start=" 
-        + URLEncoder.encode("" + start, "UTF-8"));
-      result.add("limit=" 
-        + URLEncoder.encode("" + limit, "UTF-8"));
-      if(segmentation != null)
-      {
-        result.add("segmentation=" 
-          + URLEncoder.encode("" + segmentation, "UTF-8"));
-      }
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.warn(ex.getMessage(), ex);
-    }
-    
-    return result;
-  }
-
   @Override
   public void fragmentChanged(FragmentChangedEvent source)
   {
@@ -488,18 +457,18 @@ public class SearchWindow extends Window
     Map<String, String> args = Helper.parseFragment(fragment);
     
     Set<String> corpora = new TreeSet<String>();
-    if(args.containsKey("corpora"))
+    if(args.containsKey("c"))
     {
-      String[] corporaSplitted = args.get("corpora").split("\\s*,\\s*");
+      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
       corpora.addAll(Arrays.asList(corporaSplitted));
     }
     
-    control.executeCount(args.get("query"), corpora);
+    control.executeCount(args.get("q"), corpora);
     
-    showQueryResult(args.get("query"), corpora, 
-      Integer.parseInt(args.get("context-left")), Integer.parseInt(args.get("context-right")), 
-      args.get("segmentation"), Integer.parseInt(args.get("start")), 
-      Integer.parseInt(args.get("limit")));
+    showQueryResult(args.get("q"), corpora, 
+      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")), 
+      args.get("seg"), Integer.parseInt(args.get("s")), 
+      Integer.parseInt(args.get("l")));
     
   }
   
