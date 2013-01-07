@@ -55,18 +55,6 @@ import org.slf4j.LoggerFactory;
 /**
  * The Visualizer Plugin for RST-Visualization.
  *
- * This class is used for generating for Generating a JSON-object which is
- * passed to the JITWrapper.
- *
- * Particularity: The pointing relations are provided as dominance edges from
- * salt which are typed as "edge" and carry a couple of annotation values, but
- * not "span" and "multinuc".
- *
- * The RST-Data-Model contains sentences in nodes with annotation value segment.
- * The segments are descends of nodes with annotation value group and the
- * relations names are span or multiunc.
- *
- *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class RSTImpl extends Panel implements SGraphTraverseHandler
@@ -100,8 +88,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
    */
   private String INVISIBLE_RELATION = "type";
 
-  // sType for the pointing relation
-  private final String POINTING_RELATION = "edge";
+  // sType for the rst relation
+  private final String RST_RELATION = "rst";
 
   // nodes which has this outgoing or incoming sType has to be treated specially
   private String MULTINUC = "multinuc";
@@ -212,11 +200,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   private String transformSaltToJSON(VisualizerInput visInput)
   {
-    EList<SNode> rootSNodes = visInput.getSResult().getSDocumentGraph().
-      getSRoots();
+    graph = visInput.getSResult().getSDocumentGraph();
+    EList<SNode> rootSNodes = graph.getSRoots();
 
-
-
+    // debug output
     Salt2DOT s2d = new Salt2DOT();
     s2d.salt2Dot(graph, URI.createFileURI(
       "/tmp/graph_" + graph.getSName() + ".dot"));
@@ -426,24 +413,25 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     try
     {
+      // is set to true, when currNode is reached by an rst edge
       boolean isAppendedToParent = false;
+
       EList<Edge> in = currSnode.getSGraph().getInEdges(currSnode.getSId());
+
       if (in != null)
       {
-        SRelation sEdge;
 
         for (Edge e : in)
         {
-          if (e instanceof SRelation
-            && ((SRelation) e).getSource() instanceof SNode
-            && isSegment(((SNode) ((SRelation) e).getSource()))
-            && !isSegment(currSnode))
+          if (e instanceof SRelation && hasRSTType((SRelation) e))
           {
             JSONObject tmp = st.pop();
 
             st.peek().append("children", node);
             setSentenceSpan(node, st.peek());
             sortChildren(st.peek());
+
+            // do not draw a line to the moved up node
             st.peek().getJSONObject("data").put("invisibleRelations",
               getUniStrId(currSnode));
 
@@ -905,5 +893,24 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     super.attach();
     addScrollbar();
+  }
+
+  private boolean hasRSTType(SRelation e)
+  {
+    EList<String> sTypes = e.getSTypes();
+
+    for (String sType : sTypes)
+    {
+      if (getRSTType().equalsIgnoreCase(sType))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String getRSTType()
+  {
+    return RST_RELATION;
   }
 }
