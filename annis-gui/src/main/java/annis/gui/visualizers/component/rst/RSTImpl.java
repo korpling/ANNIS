@@ -848,51 +848,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     return false;
   }
-
-  /**
-   * If there exists an incoming edge with sType "multinuc" and the annotation
-   * key is "name" it must be the multinuc span node. Since the multinuc
-   * structures are not fully mapped to salt, this function will must changed.
-   *
-   * @param currNode the node to check
-   * @return returns true, if the currNode is a multinuc span
-   */
-  private boolean isMultinucNode(SNode currNode)
-  {
-    EList<Edge> in = currNode.getSGraph().getInEdges(currNode.getSId());
-    final String NAME = "name";
-    final String Q_ANNOTATION_NAME = ANNOTATION_NAMESPACE + "::" + NAME;
-
-    if (in != null)
-    {
-      for (Edge e : in)
-      {
-        EList<String> sTypes;
-
-        if (!(e instanceof SRelation))
-        {
-          continue;
-        }
-
-        sTypes = ((SRelation) e).getSTypes();
-        if (sTypes == null && sTypes.size() < 1)
-        {
-          continue;
-        }
-
-        SAnnotation anno = ((SRelation) e).getSAnnotation(Q_ANNOTATION_NAME);
-
-        if (MULTINUC.equals(sTypes.get(0))
-          && anno != null)
-        {
-          return true;
-        }
-
-      }
-    }
-    return false;
-  }
-
+  
   @Override
   public void attach()
   {
