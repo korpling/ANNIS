@@ -764,7 +764,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   /**
    * Sorts the children of root by the the sentence indizes. Since the sentence
-   * indizes are calculated with the token indizes, some sentences have no
+   * indizes are based on the token indizes, some sentences have no
    * sentences indizes, because sometimes token nodes are out of context.
    *
    * A kind of insertion sort would be better than the used mergesort.
@@ -848,7 +848,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     return false;
   }
-  
+
   @Override
   public void attach()
   {
