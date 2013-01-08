@@ -597,16 +597,25 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         JSONObject jsonEdge = new JSONObject();
         edgeData.put(jsonEdge);
 
-        /**
-         * Invert the direction of the RST-edge.
-         */
         jsonEdge.put("sType", sTypes.get(0));
-        jsonEdge.put("to", getUniStrId(node));
+
 
         if (((SRelation) edge).getTarget() instanceof SNode)
         {
-          jsonEdge.put("from",
-            getUniStrId((SNode) ((SRelation) edge).getTarget()));
+          /**
+           * Invert the direction of the RST-edge.
+           */
+          if (getRSTType().equals(sTypes.get(0)))
+          {
+            jsonEdge.put("to", getUniStrId(node));
+            jsonEdge.put("from",
+              getUniStrId((SNode) ((SRelation) edge).getTarget()));
+          }
+          else {
+            jsonEdge.put("from", getUniStrId(node));
+            jsonEdge.put("to",
+              getUniStrId((SNode) ((SRelation) edge).getTarget()));
+          }
         }
         else
         {
