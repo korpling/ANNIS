@@ -69,30 +69,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // result of transform operation salt -> json
   private JSONObject result;
 
-  // Default annotation namespace
-  private final String ANNOTATION_NAMESPACE = "default_ns";
-
   // filter root nodes with this annotation key
   private final String ANNOTATION_KEY = "cat";
 
-  // used for filtering dominating edges and detecting pointing relations
-  final String[] ANNOTATION_VALUES =
-  {
-    "span", "multinuc"
-  };
-
-  /**
-   * Used for filtering edges which should not be visualized. The target of the
-   * edge is added to the json tree, but the sources contains an entry
-   * "invisibleRelations:target_id".
-   */
-  private String INVISIBLE_RELATION = "type";
-
   // sType for the rst relation
   private final String RST_RELATION = "rst";
-
-  // nodes which has this outgoing or incoming sType has to be treated specially
-  private String MULTINUC = "multinuc";
 
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
@@ -531,43 +512,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return null;
   }
 
-  private JSONObject getInvisibleRelatedNodes(SNode node)
-  {
-    JSONObject nodeIds = new JSONObject();
-    EList<Edge> out = node.getSGraph().getOutEdges(node.getSId());
-
-    /**
-     * notice the node which are targets of edges which contains an annotation
-     * with the key "type"
-     */
-    if (out != null)
-    {
-      for (Edge edge : out)
-      {
-        if (!(edge instanceof SRelation))
-        {
-          continue;
-        }
-
-        if (hasAnnoKey(((SRelation) edge), INVISIBLE_RELATION)
-          && ((SRelation) edge).getTarget() instanceof SNode)
-        {
-          try
-          {
-            nodeIds.put(getUniStrId(((SNode) ((SRelation) edge).getTarget())),
-              true);
-          }
-          catch (JSONException ex)
-          {
-            log.error("cannot add {} to invisible relations", node.getSId());
-          }
-        }
-      }
-
-    }
-    return nodeIds;
-  }
-
   private JSONArray getOutGoingEdgeTypeAnnotation(SNode node) throws JSONException
   {
     EList<Edge> out = node.getSGraph().getOutEdges(node.getId());
@@ -611,7 +555,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
             jsonEdge.put("from",
               getUniStrId((SNode) ((SRelation) edge).getTarget()));
           }
-          else {
+          else
+          {
             jsonEdge.put("from", getUniStrId(node));
             jsonEdge.put("to",
               getUniStrId((SNode) ((SRelation) edge).getTarget()));
@@ -643,36 +588,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private String getUniStrId(SNode node)
   {
     return visId + "_" + node.getSName();
-  }
-
-  /**
-   * The salt graph does not contain pointing relations, so we have to check, if
-   * the edge annotation contains at least one of this
-   * {@link RSTImpl#ANNOTATION_VALUES}.
-   *
-   */
-  private boolean isPointingRelation(Edge edge)
-  {
-    EList<SAnnotation> annos;
-    if (edge instanceof SRelation)
-    {
-      annos = ((SRelation) edge).getSAnnotations();
-
-      if (annos != null)
-      {
-        for (SAnnotation anno : annos)
-        {
-          for (String span : ANNOTATION_VALUES)
-          {
-            if (span.equals(anno.getSValueSTEXT()))
-            {
-              return false;
-            }
-          }
-        }
-      }
-    }
-    return true;
   }
 
   /**
@@ -764,8 +679,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   /**
    * Sorts the children of root by the the sentence indizes. Since the sentence
-   * indizes are based on the token indizes, some sentences have no
-   * sentences indizes, because sometimes token nodes are out of context.
+   * indizes are based on the token indizes, some sentences have no sentences
+   * indizes, because sometimes token nodes are out of context.
    *
    * A kind of insertion sort would be better than the used mergesort.
    *
@@ -827,26 +742,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-  }
-
-  private boolean hasAnnoKey(SRelation edge, String type)
-  {
-    EList<SAnnotation> annos = edge.getSAnnotations();
-    for (SAnnotation anno : annos)
-    {
-      if (edge.getSTypes() != null && type.equals(anno.getSName()))
-      {
-        for (String annoValue : ANNOTATION_VALUES)
-        {
-          if (annoValue.equals(anno.getSValueSTEXT()))
-          {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
   }
 
   @Override
