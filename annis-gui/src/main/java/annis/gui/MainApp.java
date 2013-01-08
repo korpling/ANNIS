@@ -21,6 +21,7 @@ import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
+import annis.gui.visualizers.component.rst.RST;
 import annis.gui.visualizers.component.grid.GridVisualizer;
 import annis.gui.visualizers.iframe.CorefVisualizer;
 import annis.gui.visualizers.iframe.dependency.ProielDependecyTree;
@@ -32,6 +33,7 @@ import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.component.AudioVisualizer;
 import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
+import annis.gui.visualizers.component.rst.RSTFull;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
 import ch.qos.logback.classic.LoggerContext;
@@ -82,23 +84,32 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 @SuppressWarnings("serial")
 public class MainApp extends Application implements PluginSystem,
-  UserChangeListener, HttpServletRequestListener, Serializable, MediaControllerHolder
+  UserChangeListener, HttpServletRequestListener, Serializable,
+  MediaControllerHolder
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainApp.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    MainApp.class);
+
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
+
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
+
   private transient PluginManager pluginManager;
   private List<SearchWindow> searchWindows = new LinkedList<SearchWindow>();
+
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
+
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
+
   private Properties versionProperties;
-  
+
   private transient MediaController mediaController;
-  
+
   private transient ObjectMapper jsonMapper;
+
 
   @Override
   public void start(URL applicationUrl, Properties applicationProperties,
@@ -106,15 +117,15 @@ public class MainApp extends Application implements PluginSystem,
   {
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties(applicationProperties, "annis-gui.properties", context);
-    
+
     super.start(applicationUrl, applicationProperties, context);
   }
-  
-  
-  
+
+
+
   @Override
   public void init()
-  { 
+  {
 
     initLogging();
 
@@ -129,24 +140,24 @@ public class MainApp extends Application implements PluginSystem,
     {
       log.error(null, ex);
     }
-    
+
     addListener((UserChangeListener) this);
 
     initPlugins();
 
     setTheme("annis-theme");
 
-    
+
     initWindow();
   }
-  
+
   /**
    * Given an configuration file name (might include directory) this function
    * returns all locations for this file in the "ANNIS configuration system".
-   * 
-   * The files in the result list do not necessarily exist.  
-   * 
-   * These locations are the 
+   *
+   * The files in the result list do not necessarily exist.
+   *
+   * These locations are the
    * - base installation: WEB-INF/conf/ folder of the deployment.
    * - global configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
    * - user configuration: ~/.annis/
@@ -157,7 +168,7 @@ public class MainApp extends Application implements PluginSystem,
   protected List<File> getAllConfigLocations(String configFile, WebApplicationContext context)
   {
     LinkedList<File> locations = new LinkedList<File>();
-    
+
     if (context != null)
     {
       // first load everything from the base application
@@ -178,30 +189,30 @@ public class MainApp extends Application implements PluginSystem,
       locations.add(new File(
         System.getProperty("user.home") + "/.annis/" + configFile));
     }
-    
+
     return locations;
   }
-  
+
   protected void loadApplicationProperties(Properties p, String configFile, ApplicationContext appContext)
   {
     if(p == null || !(appContext instanceof WebApplicationContext))
     {
       return;
     }
-    
+
     List<File> locations = getAllConfigLocations(configFile, (WebApplicationContext) appContext);
-    
+
     // load properties in the right order
     for(File f : locations)
     {
       loadPropertyFile(f, p);
     }
   }
-  
+
   protected Map<String, InstanceConfig> loadInstanceConfig(ApplicationContext appContext)
   {
     TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
-    
+
     if(appContext instanceof WebApplicationContext)
     {
       // get a list of all directories that contain instance informations
@@ -211,7 +222,7 @@ public class MainApp extends Application implements PluginSystem,
         if(root.isDirectory())
         {
           // get all sub-files ending on ".json"
-          File[] instanceFiles = 
+          File[] instanceFiles =
             root.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
           for(File i : instanceFiles)
           {
@@ -233,7 +244,7 @@ public class MainApp extends Application implements PluginSystem,
         }
       }
     }
-    
+
     // always provide a default instance
     if(!result.containsKey("default"))
     {
@@ -241,10 +252,10 @@ public class MainApp extends Application implements PluginSystem,
       cfgDefault.setInstanceDisplayName("ANNIS");
       result.put("default", cfgDefault);
     }
-    
+
     return result;
   }
-  
+
   private void loadPropertyFile(File f, Properties p)
   {
    if(f.canRead() && f.isFile())
@@ -257,7 +268,7 @@ public class MainApp extends Application implements PluginSystem,
       }
       catch(IOException ex)
       {
-        
+
       }
       finally
       {
@@ -273,21 +284,22 @@ public class MainApp extends Application implements PluginSystem,
           }
         }
       }
-    } 
+    }
   }
 
   protected void initLogging()
   {
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
-    
+
     try
     {
       ClassResource res = new ClassResource("logback.xml", this);
 
       if (res != null)
       {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        LoggerContext context = (LoggerContext) LoggerFactory.
+          getILoggerFactory();
         JoranConfigurator jc = new JoranConfigurator();
         jc.setContext(context);
         context.reset();
@@ -308,7 +320,7 @@ public class MainApp extends Application implements PluginSystem,
   public void initWindow()
   {
     searchWindows.clear();
-    
+
     try
     {
       for(Map.Entry<String, InstanceConfig> cfgInstance : loadInstanceConfig(getContext()).entrySet())
@@ -331,21 +343,22 @@ public class MainApp extends Application implements PluginSystem,
     {
       log.error("something fundamently goes wrong, "
         + "probably in one of the attach blocks", e);
-      
+
       Window debugWindow = new Window();
-      
+
       Label lblError = new Label();
-      
-      
-      lblError.setValue("Could not start ANNIS, error message of type " + e.getClass().getSimpleName() 
-        + " is:\n" + e.getMessage() 
-        + "\n\nMore information is available in the log files.\n\n" 
+
+
+      lblError.setValue("Could not start ANNIS, error message of type " + e.
+        getClass().getSimpleName()
+        + " is:\n" + e.getMessage()
+        + "\n\nMore information is available in the log files.\n\n"
         + e.getStackTrace()[0].toString());
       lblError.setContentMode(Label.CONTENT_PREFORMATTED);
       debugWindow.addComponent(lblError);
-      
+
       setMainWindow(debugWindow);
-      
+
     }
 
   }
@@ -435,18 +448,25 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
+    pluginManager.
+      addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
+    pluginManager.
+      addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).toURI());
+    pluginManager.
+      addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).
+      toURI());
     pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
-    
+
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
-    
+
     pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
+
+    pluginManager.addPluginsFrom(new ClassURI(RST.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(RSTFull.class).toURI());
 
     File baseDir = this.getContext().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");
@@ -473,7 +493,8 @@ public class MainApp extends Application implements PluginSystem,
     }
     log.info(listOfPlugins.toString());
 
-    Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
+    Collection<VisualizerPlugin> visualizers = util.getPlugins(
+      VisualizerPlugin.class);
     for (VisualizerPlugin vis : visualizers)
     {
       visualizerRegistry.put(vis.getShortName(), vis);
@@ -512,12 +533,14 @@ public class MainApp extends Application implements PluginSystem,
   @Override
   public void applicationUserChanged(UserChangeEvent event)
   {
-    HttpSession session = ((WebApplicationContext) getContext()).getHttpSession();
+    HttpSession session = ((WebApplicationContext) getContext()).
+      getHttpSession();
     session.setAttribute(USER_KEY, event.getNewUser());
   }
 
   @Override
-  public void onRequestStart(HttpServletRequest request, HttpServletResponse response)
+  public void onRequestStart(HttpServletRequest request,
+    HttpServletResponse response)
   {
     String origURI = request.getRequestURI();
     String parameters = origURI.replaceAll(".*?/Cite(/)?", "");
@@ -549,7 +572,8 @@ public class MainApp extends Application implements PluginSystem,
   }
 
   @Override
-  public void onRequestEnd(HttpServletRequest request, HttpServletResponse response)
+  public void onRequestEnd(HttpServletRequest request,
+    HttpServletResponse response)
   {
   }
 
@@ -564,7 +588,7 @@ public class MainApp extends Application implements PluginSystem,
   {
     this.mediaController = mediaController;
   }
-  
+
   public ObjectMapper getJsonMapper()
   {
     if(jsonMapper == null)
