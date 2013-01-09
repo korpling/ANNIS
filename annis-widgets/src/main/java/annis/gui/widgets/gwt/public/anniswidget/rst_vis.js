@@ -172,7 +172,7 @@
   rst.getDim = function(json)
   {
     var right = this.getMostRightNode(json).pos.x + this.config.siblingOffet;
-    var depth = this.getDepth(json) * this.config.subTreeOffset + this.config.subTreeOffset;
+    var depth = this.getDepth(json) * this.config.subTreeOffset;
     return {
       x : right,
       y : depth
@@ -194,7 +194,7 @@
     dim = this.getDim(this.json);
     container.style.position = "relative";
     container.style.width = dim.x + "px";
-    container.style.height = dim.y + conf.subTreeOffset + "px";
+    container.style.height = 0 + "px";
     container.style.background = conf.background;
     container.style.padding = conf.padding + "px";
     this.container = container;
@@ -204,6 +204,8 @@
   {
     var conf = this.config;
     var container = this.container;
+    var canvas = this.canvas;
+
     for (var node in this.nodes)
     {
       var json = this.nodes[node];
@@ -224,8 +226,16 @@
       elem.style.textAlign = "center";
       elem.style.fontSize = conf.labelSize + "px";
       elem.style.width = conf.nodeWidth + "px";
-    }
 
+      // get the deepest one, it's hacky
+      var top = elem.clientHeight + elem.offsetTop;
+      if  ( top > container.clientHeight)
+      {
+        container.style.height = top + "px";
+        container.setAttribute("height", top + "px");
+        canvas.setAttribute("height", top + "px");
+      }
+    }
   };
 
   rst.plotEdges = function()
@@ -266,6 +276,25 @@
         }
       }
     }
+
+    //draw grid
+//    var ctx = this.canvas.getContext("2d");
+//    var grid = 20;
+//    //y
+//    for (var i = 0.5; i < this.canvas.offsetWidth; i+=grid)
+//    {
+//      ctx.moveTo(i, 0);
+//      ctx.lineTo(i, this.canvas.offsetHeight);
+//    }
+//
+//    //x
+//    for (var i = 0.5; i < this.canvas.offsetHeight; i+= grid)
+//    {
+//      ctx.moveTo(0, i);
+//      ctx.lineTo(this.canvas.offsetWidth, i);
+//    }
+//
+//    ctx.stroke()
   };
 
   rst.getTopCenter = function(node)
@@ -305,11 +334,11 @@
     mostLeftChild = this.getMostLeftNode(source).pos.x,
     mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth;
     // draw horizontal line
-    ctx.beginPath();
-    ctx.fillStyle = "#000000";
-    ctx.lineWidth = '1';
-    ctx.moveTo(mostLeftChild, source.pos.y);
-    ctx.lineTo(mostRightChild, source.pos.y);
+//    ctx.beginPath();
+//    ctx.fillStyle = "#000000";
+//    ctx.lineWidth = "1";
+    ctx.moveTo(mostLeftChild, source.pos.y + 0.5);
+    ctx.lineTo(mostRightChild, source.pos.y + 0.5);
     ctx.stroke();
   };
 
