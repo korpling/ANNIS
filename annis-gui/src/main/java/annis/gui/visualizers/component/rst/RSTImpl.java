@@ -67,7 +67,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   private Stack<JSONObject> st = new Stack<JSONObject>();
 
   // result of transform operation salt -> json
-  private JSONObject result;
+  private JSONObject result = new JSONObject();
 
   // filter root nodes with this annotation key
   private final String ANNOTATION_KEY = "cat";
@@ -189,7 +189,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     s2d.salt2Dot(graph, URI.createFileURI(
       "/tmp/graph_" + graph.getSName() + ".dot"));
 
-    if (rootSNodes.size() == 1)
+    if (rootSNodes.size() > 0)
     {
       graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
         "getSentences", new SGraphTraverseHandler()
@@ -445,7 +445,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     if (st.size() == 1)
     {
-      result = st.pop();
+      try
+      {
+        result.append("children", st.pop());
+      }
+      catch (JSONException ex)
+      {
+        log.error("Problems with adding roots", ex);
+      }
     }
     else
     {

@@ -51,8 +51,10 @@
   {
     function buildAdjazenzArrayHelper(json, adj) {
 
-      if (json.data.edges.length > 0)
-      {
+      if (json.pos != undefined
+        && json.data != undefined
+        && json.data.edges.length > 0)
+        {
         adj.push(json.data.edges);
       }
 
@@ -76,26 +78,38 @@
     function layoutTreeHelper(json, height, config, nodes, f)
     {
 
-      //build hashmap by the way, ugly
-      nodes[json.id] = json;
+      //build hashmap by the way, ugly, also exclude root
+      if (json.data !== undefined)
+      {
+        nodes[json.id] = json;
+      }
 
       if (json.children && json.children.length > 0)
       {
         for(var item in json.children)
         {
-          layoutTreeHelper(json.children[item], height +
-            config.subTreeOffset, config, nodes);
+          if (json.data !== undefined)
+          {
+            layoutTreeHelper(json.children[item], height +
+              config.subTreeOffset, config, nodes);
+          }else {
+            layoutTreeHelper(json.children[item], height, config, nodes);
+          }
         }
 
-        //center parent
-        var left = json.children[0].pos.x,
-        right = json.children[json.children.length -1].pos.x,
-        pos = {
-          x : Math.floor((left + right) / 2),
-          y : height
-        }
-        json.pos = pos;
+        // exclude root from calculation
+        if (json.data !== undefined)
+        {
+          //center parent
+          var left = json.children[0].pos.x,
+          right = json.children[json.children.length -1].pos.x,
+          pos = {
+            x : Math.floor((left + right) / 2),
+            y : height
+          }
 
+          json.pos = pos;
+        }
       } else {
         // calc posititions of the segments
         json.pos = {
@@ -188,16 +202,18 @@
 
   rst.plotNodes = function()
   {
-
-    function plotNodesHelper(json, conf, container) {
+    var conf = this.config;
+    var container = this.container;
+    for (var node in this.nodes)
+    {
+      var json = this.nodes[node];
       var elem = document.createElement("div");
-
       container.appendChild(elem);
 
       if (json.data.sentence_left != undefined && json.data.sentence_right !=  undefined)
       {
         elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>"
-          + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
+        + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
       }
 
       elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
@@ -208,17 +224,8 @@
       elem.style.textAlign = "center";
       elem.style.fontSize = conf.labelSize + "px";
       elem.style.width = conf.nodeWidth + "px";
-
-      if (json.children != undefined)
-      {
-        for (var item in json.children)
-        {
-          plotNodesHelper(json.children[item], conf, container);
-        }
-      }
     }
 
-    plotNodesHelper(this.json, this.config, this.container);
   };
 
   rst.plotEdges = function()
@@ -241,7 +248,6 @@
         to = nodes[adj[i][e].to],
         edgeType = adj[i][e].sType,
         annotation = adj[i][e].annotation;
-
 
         if (edgeType === "rst")
         {
