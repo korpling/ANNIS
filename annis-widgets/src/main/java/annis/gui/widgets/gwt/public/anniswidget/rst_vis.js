@@ -244,6 +244,12 @@
     var adj = this.adj;
     var nodes = this.nodes;
 
+    /**
+     * This function draws all edges. It takes into account the blurr effect of
+     * canvas.
+     */
+    this.context.translate(0.5, 0.5);
+
     for (var item in nodes)
     {
       this.drawHorizontalLine(nodes[item]);
@@ -266,7 +272,7 @@
         }
 
         if (edgeType === "multinuc") {
-          this.drawLine(from, to);
+          this.drawVerticalLine(from, to);
           this.plotMultinucLabel(from, annotation);
         }
 
@@ -277,24 +283,7 @@
       }
     }
 
-    //draw grid
-//    var ctx = this.canvas.getContext("2d");
-//    var grid = 20;
-//    //y
-//    for (var i = 0.5; i < this.canvas.offsetWidth; i+=grid)
-//    {
-//      ctx.moveTo(i, 0);
-//      ctx.lineTo(i, this.canvas.offsetHeight);
-//    }
-//
-//    //x
-//    for (var i = 0.5; i < this.canvas.offsetHeight; i+= grid)
-//    {
-//      ctx.moveTo(0, i);
-//      ctx.lineTo(this.canvas.offsetWidth, i);
-//    }
-//
-//    ctx.stroke()
+    this.context.stroke();
   };
 
   rst.getTopCenter = function(node)
@@ -312,58 +301,35 @@
     this.canvas.setAttribute("width", wrapperElem.style.width);
     this.canvas.setAttribute("height", wrapperElem.style.height);
     this.canvas.style.position = "relative";
+
+    this.context = this.canvas.getContext("2d");
   };
 
-  rst.drawLine = function(source, target)
+  rst.drawVerticalLine = function(source, target)
   {
-    var ctx = this.canvas.getContext("2d"),
     fromPosX = this.getTopCenter(source),
     toPosX = this.getTopCenter(target);
 
-    ctx.beginPath();
-    ctx.fillStyle = "#000000";
-    ctx.lineWidth = '1';
-    ctx.moveTo(fromPosX, source.pos.y);
-    ctx.lineTo(toPosX, target.pos.y);
-    ctx.stroke();
+    this.context.moveTo(fromPosX, source.pos.y);
+    this.context.lineTo(toPosX, target.pos.y);
   };
 
   rst.drawHorizontalLine = function (source)
   {
-    var ctx = this.canvas.getContext("2d"),
-    mostLeftChild = this.getMostLeftNode(source).pos.x,
+    var mostLeftChild = this.getMostLeftNode(source).pos.x,
     mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth;
-    // draw horizontal line
-//    ctx.beginPath();
-//    ctx.fillStyle = "#000000";
-//    ctx.lineWidth = "1";
-    ctx.moveTo(mostLeftChild, source.pos.y + 0.5);
-    ctx.lineTo(mostRightChild, source.pos.y + 0.5);
-    ctx.stroke();
+
+    this.context.moveTo(mostLeftChild, source.pos.y);
+    this.context.lineTo(mostRightChild, source.pos.y);
   };
 
   rst.drawSpan = function(source, target)
   {
-    var ctx = this.canvas.getContext("2d"),
-    mostLeftChild = this.getMostLeftNode(source).pos.x,
-    mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth,
-    targetCenterX = this.getTopCenter(target);
-
-    // draw horizontal line
-    ctx.beginPath();
-    ctx.fillStyle = "#000000";
-    ctx.lineWidth = '1';
-    ctx.moveTo(mostLeftChild, source.pos.y);
-    ctx.lineTo(mostRightChild, source.pos.y);
-    ctx.stroke();
+    var targetCenterX = this.getTopCenter(target);
 
     // draw vertical line
-    ctx.beginPath();
-    ctx.fillStyle = "#000000";
-    ctx.lineWidth = '1';
-    ctx.moveTo(targetCenterX, source.pos.y);
-    ctx.lineTo(targetCenterX, target.pos.y);
-    ctx.stroke();
+    this.context.moveTo(targetCenterX, source.pos.y);
+    this.context.lineTo(targetCenterX, target.pos.y);
   };
 
   rst.drawBezierCurve = function(source, target)
@@ -373,7 +339,6 @@
     fromX = this.getTopCenter(source),
     toX = this.getTopCenter(target),
     dim = 15,
-    ctx = this.canvas.getContext("2d"),
     controllPoint = {};
 
     if (fromX != toX)
