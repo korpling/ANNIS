@@ -350,18 +350,16 @@
       controllPoint.y = (from.y + to.y) / 2;
     }
 
-    //draw line
-    ctx.beginPath();
-    ctx.moveTo(fromX, from.y);
-    ctx.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
-    ctx.stroke();
+    //draw lines
+    this.context.moveTo(fromX, from.y);
+    this.context.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
+
 
     var headlen = 10;   // length of head in pixels
     var angle = Math.atan2(to.y - from.y, to.x - fromX);
-    ctx.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
-    ctx.moveTo(toX, to.y);
-    ctx.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
-    ctx.stroke();
+    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
+    this.context.moveTo(toX, to.y);
+    this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
   };
 
   rst.plotMultinucLabel = function(source, annotation)
