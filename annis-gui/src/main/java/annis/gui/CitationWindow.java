@@ -40,9 +40,9 @@ public class CitationWindow extends Window
     VerticalLayout wLayout = (VerticalLayout) getContent();
     wLayout.setSizeFull();
     
-    List<String> corpusNames = new LinkedList<String>(corpora);
-    String url = Helper.generateCitation(app, 
-      query, corpusNames, contextLeft, contextRight);
+    String url = Helper.generateCitation(app, query, corpora, contextLeft,
+      contextRight, null, 0, 10);
+    
     TextArea txtCitation = new TextArea();
 
     txtCitation.setWidth("100%");

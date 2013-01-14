@@ -8,7 +8,7 @@
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the Licsense is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -17,9 +17,9 @@ package annis.gui;
 
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.querybuilder.TigerQueryBuilder;
-import annis.gui.simplequery.SimpleQuery;
+import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.resultview.ResultViewPanel;
+import annis.gui.simplequery.SimpleQuery;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
@@ -38,6 +38,8 @@ import com.vaadin.terminal.gwt.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
+import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -55,7 +57,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchWindow extends Window
   implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
-  MimeTypeErrorListener
+  MimeTypeErrorListener, UriFragmentUtility.FragmentChangedListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
@@ -75,21 +77,27 @@ public class SearchWindow extends Window
   private Window windowLogin;
   private ResultViewPanel resultView;
   private PluginSystem ps;
-  private TigerQueryBuilder queryBuilder;
   private SimpleQuery simpleQueryBuilder;
+  private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
+  private UriFragmentUtility uriFragment;
+  private String lastQueriedFragment;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
   
-  public SearchWindow(PluginSystem ps)
+  public SearchWindow(PluginSystem ps, InstanceConfig instanceConfig)
   {
-    super("ANNIS Corpus Search");
+    super("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
 
     this.ps = ps;
     
-    setName("search");
+    
+    uriFragment = new UriFragmentUtility();
+    uriFragment.addListener((UriFragmentUtility.FragmentChangedListener) this);
+    addComponent(uriFragment);
+    
     // always get the resize events directly
     setImmediate(true);
     
@@ -176,37 +184,37 @@ public class SearchWindow extends Window
     btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
-    Label lblOpenSource = new Label();
-    lblOpenSource.setValue(
-      "<p>ANNIS is Open Source software. "
-      + "This means you are free to download the source code and add new features or make other adjustments to ANNIS on your own.<p/>"
-      + "Here are some examples how you can help ANNIS:"
-      + "<ul>"
-      + "<li>Fix or report problems (bugs) you encounter when using the ANNIS software.</li>"
-      + "<li>Add new features.</li>"
-      + "<li>Enhance the documentation</li>"
-      + "</ul>"
-      + "<p>Feel free to visit our GitHub page for more information: <a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\">https://github.com/korpling/ANNIS</a></p>"
-      + "<a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\"><img style=\"position: absolute; top: 0; right: 0; border: 0;\" src=\"https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png\" alt=\"Fork me on GitHub\"></a>");
-    lblOpenSource.setContentMode(Label.CONTENT_RAW);
-    lblOpenSource.setStyleName("opensource");
-    
-    PopupView pvOpenSource = new PopupView("Help us to make ANNIS better!", lblOpenSource);
+    Button btOpenSource = new Button("Help us to make ANNIS better!");
+    btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
+    btOpenSource.addListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+      Window w = new Window("Help us to make ANNIS better!", new HelpUsPanel());
+      w.setModal(true);
+      w.setResizable(true);
+      w.setWidth("600px");
+      w.setHeight("500px");
+      addWindow(w);
+      w.center();
+      }
+    });
     
     
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
-    layoutToolbar.addComponent(pvOpenSource);
+    layoutToolbar.addComponent(btOpenSource);
     layoutToolbar.addComponent(lblUserName);
     layoutToolbar.addComponent(btLoginLogout);
 
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
-    layoutToolbar.setComponentAlignment(pvOpenSource, Alignment.MIDDLE_CENTER);
+    layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
     layoutToolbar.setComponentAlignment(btLoginLogout, Alignment.MIDDLE_RIGHT);
-    layoutToolbar.setExpandRatio(pvOpenSource, 1.0f);
+    layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
     
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();
@@ -218,7 +226,7 @@ public class SearchWindow extends Window
     addComponent(hPanel);
     ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
 
-    control = new ControlPanel(this);
+    control = new ControlPanel(this, instanceConfig);
     control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
     control.setHeight(100f, Layout.UNITS_PERCENTAGE);
     hLayout.addComponent(control);
@@ -229,7 +237,7 @@ public class SearchWindow extends Window
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    queryBuilder = new TigerQueryBuilder(control);
+    queryBuilder = new QueryBuilderChooser(control, ps, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
     simpleQueryBuilder = new SimpleQuery(control);
@@ -280,6 +288,7 @@ public class SearchWindow extends Window
         }
       }
     });
+    
 
   }
 
@@ -395,7 +404,7 @@ public class SearchWindow extends Window
 
   public void showQueryResult(String aql, Set<String> corpora,
     int contextLeft,
-    int contextRight, String segmentationLayer, int pageSize)
+    int contextRight, String segmentationLayer, int start, int pageSize)
   {
     warnedAboutPossibleMediaFormatProblem = false;
     
@@ -404,11 +413,18 @@ public class SearchWindow extends Window
     {
       mainTab.removeComponent(resultView);
     }
-    resultView = new ResultViewPanel(aql, corpora, contextLeft, contextRight,
-      segmentationLayer, pageSize, ps);
+
+    updateFragment(aql, corpora, contextLeft, contextRight, segmentationLayer, 
+      start, pageSize);
+    
+    resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
+      segmentationLayer, start, pageSize, ps);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
+    
   }
+  
+  
 
   public void updateQueryCount(int count)
   {
@@ -417,10 +433,53 @@ public class SearchWindow extends Window
       resultView.setCount(count);
     }
   }
-
+  public void updateFragment(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
+    int start, int limit)
+  {
+    List<String> args = Helper.citationFragmentParams(aql, corpora, 
+      contextLeft, contextRight, 
+      segmentation, start, limit);
+      
+    // set our fragment
+    lastQueriedFragment = StringUtils.join(args, "&");
+    uriFragment.setFragment(lastQueriedFragment);
+    
+  }
+  
+  @Override
+  public void fragmentChanged(FragmentChangedEvent source)
+  {
+    
+    String fragment = source.getUriFragmentUtility().getFragment();
+    // do nothing if not changed
+    if(fragment.equals(lastQueriedFragment))
+    {
+      return;
+    }
+    
+    Map<String, String> args = Helper.parseFragment(fragment);
+    
+    Set<String> corpora = new TreeSet<String>();
+    if(args.containsKey("c"))
+    {
+      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
+      corpora.addAll(Arrays.asList(corporaSplitted));
+    }
+    
+    control.executeCount(args.get("q"), corpora);
+    
+    showQueryResult(args.get("q"), corpora, 
+      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")), 
+      args.get("seg"), Integer.parseInt(args.get("s")), 
+      Integer.parseInt(args.get("l")));
+    
+  }
+  
   private void showLoginWindow()
   {
 
+    final Window parentWindow = this;
     if (windowLogin == null)
     {
       LoginForm login = new LoginForm()
@@ -433,7 +492,7 @@ public class SearchWindow extends Window
         protected byte[] getLoginHTML()
         {
            String appUri = getApplication().getURL().toString()
-            + getWindow().getName() + "/";
+            + parentWindow.getName() + "/";
 
           try
           {
@@ -565,12 +624,7 @@ public class SearchWindow extends Window
   {
     return getApplication().getUser() != null;
   }
-
-  @Override
-  public String getName()
-  {
-    return "Search";
-  }
+  
   public ControlPanel getControl()
   {
     return control;
