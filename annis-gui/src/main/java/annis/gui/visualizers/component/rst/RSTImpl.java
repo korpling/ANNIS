@@ -184,11 +184,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     graph = visInput.getSResult().getSDocumentGraph();
     EList<SNode> rootSNodes = graph.getSRoots();
 
-    // debug output
-    Salt2DOT s2d = new Salt2DOT();
-    s2d.salt2Dot(graph, URI.createFileURI(
-      "/tmp/graph_" + graph.getSName() + ".dot"));
-
     if (rootSNodes.size() > 0)
     {
       graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
@@ -248,19 +243,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     }
 
     log.debug("result json string: {}", result);
-
-    try
-    {
-
-      String path = "/tmp/" + "json.js";
-      FileOutputStream out = new FileOutputStream(path);
-      out.write(("var json = " + result).toString().getBytes("UTF-8"));
-      out.close();
-    }
-    catch (Exception ex)
-    {
-      log.error("writing json failed", ex);
-    }
 
     return result.toString();
   }
