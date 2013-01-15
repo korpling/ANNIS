@@ -19,7 +19,6 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.simplequery.SimpleQuery;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
@@ -77,7 +76,6 @@ public class SearchWindow extends Window
   private Window windowLogin;
   private ResultViewPanel resultView;
   private PluginSystem ps;
-  private SimpleQuery simpleQueryBuilder;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private UriFragmentUtility uriFragment;
@@ -240,9 +238,6 @@ public class SearchWindow extends Window
     queryBuilder = new QueryBuilderChooser(control, ps, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
-    simpleQueryBuilder = new SimpleQuery(control);
-    mainTab.addTab(simpleQueryBuilder, "Simple Query Builder", null);
-    
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
 
