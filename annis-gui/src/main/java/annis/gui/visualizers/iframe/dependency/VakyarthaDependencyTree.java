@@ -138,11 +138,11 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       }
     }
 
-    Map<SNode, Integer> tok2Int = new HashMap<SNode, Integer>();
+    Map<SNode, Integer> node2Int = new HashMap<SNode, Integer>();
     int count = 0;
     for (SNode tok : selectedNodes.keySet())
     {
-      tok2Int.put(tok, count++);
+      node2Int.put(tok, count++);
     }
 
     try
@@ -193,13 +193,13 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           }
 
           if (sRelation.getSource() == null
-            || !tok2Int.containsKey(source))
+            || !node2Int.containsKey(source))
           {
             govs.put("root", label);
           }
           else
           {
-            govs.put(String.valueOf(tok2Int.get(source)), label);
+            govs.put(String.valueOf(node2Int.get(source)), label);
           }
 
         }
