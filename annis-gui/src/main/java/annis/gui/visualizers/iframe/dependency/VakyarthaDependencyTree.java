@@ -19,7 +19,6 @@ import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.iframe.WriterVisualizer;
 import static annis.model.AnnisConstants.*;
-import annis.service.ifaces.AnnisResult;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -29,7 +28,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
@@ -49,6 +47,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
+ * @author Kim Gerdes
  */
 @PluginImplementation
 public class VakyarthaDependencyTree extends WriterVisualizer
@@ -60,6 +59,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   private Writer theWriter;
 
   private VisualizerInput input;
+
+  private final String NODE_ANNOTATION_NAME = "np_form";
 
   @Override
   public String getShortName()
@@ -79,16 +80,32 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   public void printHTMLOutput()
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
-    Map<SToken, Integer> sToken = new TreeMap<SToken, Integer>(new Comparator<SToken>()
+
+    /**
+     * Try to create a sorted map of nodes. The left annis feature token index
+     * is used for sorting the nodes. It is possible the different nodes has the
+     * same left token index, but the probability of this is small and it seem's
+     * not to make much sense to visualize this. Mabye we should use the node
+     * id.
+     */
+    Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(new Comparator<SNode>()
     {
-      private int getIdx(SToken tok)
+      private int getIdx(SNode snode)
       {
-        SFeature sF = tok.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
-        return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+        if (snode instanceof SToken)
+        {
+          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
+          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+        }
+        else
+        {
+          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
+          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+        }
       }
 
       @Override
-      public int compare(SToken o1, SToken o2)
+      public int compare(SNode o1, SNode o2)
       {
         int tok1 = getIdx(o1);
         int tok2 = getIdx(o2);
@@ -112,18 +129,18 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     for (SNode n : sDocumentGraph.getSNodes())
     {
-      if (n instanceof SToken)
+      if (hasAnno(n))
       {
         SFeature sFeature = n.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
         int tokenIdx = sFeature != null ? (int) (long) sFeature.
           getSValueSNUMERIC() : -1;
-        sToken.put((SToken) n, tokenIdx);
+        selectedNodes.put(n, tokenIdx);
       }
     }
 
-    Map<SToken, Integer> tok2Int = new HashMap<SToken, Integer>();
+    Map<SNode, Integer> tok2Int = new HashMap<SNode, Integer>();
     int count = 0;
-    for (SToken tok : sToken.keySet())
+    for (SNode tok : selectedNodes.keySet())
     {
       tok2Int.put(tok, count++);
     }
@@ -150,7 +167,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
 
       count = 0;
-      for (SToken tok : sToken.keySet())
+      for (SNode tok : selectedNodes.keySet())
       {
         JSONObject o = new JSONObject();
         o.put("t", getText(tok));
@@ -247,13 +264,13 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     theWriter.append("\n");
   }
 
-  private String getText(SToken tok)
+  private String getText(SNode node)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
     EList<STYPE_NAME> textRelations = new BasicEList<STYPE_NAME>();
     textRelations.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
     EList<SDataSourceSequence> sequences = sDocumentGraph.
-      getOverlappedDSSequences(tok, textRelations);
+      getOverlappedDSSequences(node, textRelations);
 
     if (sequences != null && sequences.size() > 0)
     {
@@ -261,6 +278,25 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
     }
 
-    return "qurar";
+    return "";
+  }
+
+  /**
+   * Checks if the node carries the
+   * {@link VakyarthaDependencyTree#NODE_ANNOTATION_NAME}.
+   */
+  private boolean hasAnno(SNode n)
+  {
+    EList<SAnnotation> annos = n.getSAnnotations();
+
+    for (SAnnotation a : annos)
+    {
+      if (NODE_ANNOTATION_NAME.equals(a.getName()))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
