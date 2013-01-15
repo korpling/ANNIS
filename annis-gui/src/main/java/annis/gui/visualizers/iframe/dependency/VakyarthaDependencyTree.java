@@ -29,12 +29,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.eclipse.emf.common.util.BasicEList;
@@ -60,7 +60,9 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
   private VisualizerInput input;
 
-  private final String NODE_ANNOTATION_NAME = "np_form";
+  private final String MAPPING_NODE_KEY = "node_key";
+
+  private Properties mappings;
 
   @Override
   public String getShortName()
@@ -73,6 +75,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   {
     theWriter = writer;
     this.input = input;
+    this.mappings = input.getMappings();
 
     printHTMLOutput();
   }
@@ -129,7 +132,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     for (SNode n : sDocumentGraph.getSNodes())
     {
-      if (hasAnno(n))
+      if (selectNode(n))
       {
         SFeature sFeature = n.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
         int tokenIdx = sFeature != null ? (int) (long) sFeature.
@@ -280,16 +283,42 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   }
 
   /**
-   * Checks if the node carries the
-   * {@link VakyarthaDependencyTree#NODE_ANNOTATION_NAME}.
+   * If the {@link VakyarthaDependencyTree#MAPPING_NODE_KEY} is set, then the
+   * value of this mapping is used for selecting the SNode. If the mapping is
+   * not set, it falls back to the default behaviour and only SToken are are
+   * selected.
    */
-  private boolean hasAnno(SNode n)
+  private boolean selectNode(SNode n)
   {
-    EList<SAnnotation> annos = n.getSAnnotations();
+    String annoKey = null;
 
+    if (mappings.containsKey(MAPPING_NODE_KEY))
+    {
+      annoKey = mappings.getProperty(MAPPING_NODE_KEY);
+    }
+
+    /**
+     * Default behaviour, when mapping is not set correctly or is not set at
+     * all.
+     */
+    if (annoKey == null)
+    {
+      if (n instanceof SToken)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+
+    // if mapping is set, we check, if the node carries the mapped annotation key
+    EList<SAnnotation> annos = n.getSAnnotations();
     for (SAnnotation a : annos)
     {
-      if (NODE_ANNOTATION_NAME.equals(a.getName()))
+      if (annoKey.equals(a.getName()))
       {
         return true;
       }
