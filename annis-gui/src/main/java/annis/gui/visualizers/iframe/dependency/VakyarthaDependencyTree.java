@@ -177,33 +177,31 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         for (Edge e : sEdges)
         {
-          if (!(e instanceof SRelation) || !(e.getSource() instanceof SToken))
+          if (!(e instanceof SPointingRelation) || !(e.getSource() instanceof SNode))
           {
             continue;
           }
 
-          SRelation sRelation = (SRelation) e;
-          SToken sTokSource = (SToken) sRelation.getSource();
+          SPointingRelation sRelation = (SPointingRelation) e;
+          SNode source = (SNode) sRelation.getSource();
 
-          if (sRelation instanceof SPointingRelation)
+          String label = "";
+          for (SAnnotation anno : sRelation.getSAnnotations())
           {
-            String label = "";
-            for (SAnnotation anno : sRelation.getSAnnotations())
-            {
-              label = anno.getSValueSTEXT();
-              break;
-            }
-
-            if (sRelation.getSource() == null
-              || !tok2Int.containsKey(sTokSource))
-            {
-              govs.put("root", label);
-            }
-            else
-            {
-              govs.put(String.valueOf(tok2Int.get(sTokSource)), label);
-            }
+            label = anno.getSValueSTEXT();
+            break;
           }
+
+          if (sRelation.getSource() == null
+            || !tok2Int.containsKey(source))
+          {
+            govs.put("root", label);
+          }
+          else
+          {
+            govs.put(String.valueOf(tok2Int.get(source)), label);
+          }
+
         }
 
         o.put("govs", govs);
