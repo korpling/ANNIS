@@ -105,4 +105,36 @@ mvn jetty:run</programlisting>
                 by pressing "CTRL-C". </para>
         </section>
     </section>
+    <section>
+        <title>Create new query builder</title>
+        <para>A query builder is a class that<orderedlist>
+                <listitem>
+                    <para>implements the <classname>QueryBuilderPlugin</classname> interface</para>
+                </listitem>
+                <listitem>
+                    <para>has the <classname>@PluginImplementation</classname> annotation.</para>
+                    <para>When implementing the interface you have to provide a short name, a
+                        caption and a callback function that creates new Vaadin components. You get
+                        an object of the type <classname>ControlPanel</classname> which you can use
+                        to set new queries from your component.</para>
+                    <para>A query builder plugin must be either registered in the
+                            <function>initPlugins</function> function of the
+                            <classname>MainApp</classname> class (if the plugin is part of the
+                        annis-gui project) or must be added to a jar that is located at one of the
+                        following locations:<itemizedlist>
+                            <listitem>
+                                <para>the <filename>plugins</filename> folder inside the deployed
+                                    web application</para>
+                            </listitem>
+                            <listitem>
+                                <para>the path defined in the <envar>ANNIS_PLUGINS</envar>
+                                    environment variable</para>
+                            </listitem>
+                        </itemizedlist></para>
+                    <para>Please also note that it is possible to configure a default query builder
+                        for an instance. Further information can be found in the adminstration
+                        guide.</para>
+                </listitem>
+            </orderedlist></para>
+    </section>
 </article>
