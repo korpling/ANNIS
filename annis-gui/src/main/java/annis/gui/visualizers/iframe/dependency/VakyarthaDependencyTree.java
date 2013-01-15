@@ -165,7 +165,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       // output the data for the javascript
       println("<script type=\"text/javascript\">");
       println("fcolors={};");
-      println("shownfeatures=[\"t\"];");
+      println("shownfeatures=[\"cat\"];");
       println("tokens=new Object();");
 
 
@@ -275,8 +275,32 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     if (sequences != null && sequences.size() > 0)
     {
-      return ((STextualDS) sequences.get(0).getSSequentialDS()).getSText().
-        substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
+      if (mappings.containsKey(MAPPING_NODE_KEY) && mappings.getProperty(
+        MAPPING_NODE_KEY) != null)
+      {
+        String spanningText = ((STextualDS) sequences.get(0).getSSequentialDS()).
+          getSText().substring(sequences.get(0).getSStart(), sequences.get(0).
+          getSEnd());
+        EList<SAnnotation> annos = node.getSAnnotations();
+        SAnnotation anno = null;
+
+        for (SAnnotation a : annos)
+        {
+          if (mappings.getProperty(MAPPING_NODE_KEY).equals(a.getName()))
+          {
+            anno = a;
+            break;
+          }
+        }
+
+        return spanningText + (anno != null ? anno.getQName() + "=" + anno.
+          getSValueSTEXT() : "");
+      }
+      else
+      {
+        return ((STextualDS) sequences.get(0).getSSequentialDS()).getSText().
+          substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
+      }
     }
 
     return "";
