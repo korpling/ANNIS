@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,52 +16,32 @@
 package annis.gui.simplequery;
 
 import annis.gui.Helper;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.HorizontalLayout;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.simplequery.VerticalNode;
-import annis.gui.simplequery.AddMenu;
 import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.Command;
-import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.TreeSet;
-import org.slf4j.LoggerFactory;
-//the following added by Martin:
-import com.vaadin.ui.Component;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.OptionGroup;
-import java.util.Iterator;
-import java.util.ArrayList;
-
 
 /**
  *
  * @author tom
  */
 public class SimpleQuery extends Panel implements Button.ClickListener
-{
+  {
   private Button btInitLanguage;
   private Button btInitMeta;
   private Button btGo;
@@ -71,7 +51,6 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private HorizontalLayout option;
   private CheckBox cbSentence; //Martin
   private SpanBox spb;
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SimpleQuery.class);
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
@@ -210,7 +189,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
       for (final String annoname : annonames)
       {
-        add.addItem(killNamespace(annoname), new Command() {
+        add.addItem(killNamespace(annoname), new MenuBar.Command() {
           @Override
           public void menuSelected(MenuBar.MenuItem selectedItem) {
             if (!vnodes.isEmpty())
@@ -237,7 +216,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
       final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
       for (final String annoname : annonames)
       {
-        add.addItem(killNamespace(annoname), new Command() {
+        add.addItem(killNamespace(annoname), new MenuBar.Command() {
           @Override
           public void menuSelected(MenuBar.MenuItem selectedItem) {
             MetaBox mb = new MetaBox(killNamespace(annoname), sq);
@@ -307,7 +286,7 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        log.error(null, ex);
+        
       }
     }
     return result;
@@ -354,7 +333,7 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        log.error(null, ex);
+
       }
     }
     return result;
@@ -394,7 +373,7 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        log.error(null, ex);
+        
       }
     }
     return result;
@@ -431,7 +410,7 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        log.error(null, ex);
+        
       }
     }
     return result;

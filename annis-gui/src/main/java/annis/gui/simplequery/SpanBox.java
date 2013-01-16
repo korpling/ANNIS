@@ -21,7 +21,6 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
 
-
 /**
  *
  * @author Martin

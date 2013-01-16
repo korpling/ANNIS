@@ -20,6 +20,7 @@ import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
+import annis.gui.simplequery.SimpleQueryPlugin;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.gui.visualizers.component.rst.RST;
 import annis.gui.visualizers.component.grid.GridVisualizer;
@@ -462,6 +463,7 @@ public class MainApp extends Application implements PluginSystem,
     pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
 
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(SimpleQueryPlugin.class).toURI());
 
     pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
 
