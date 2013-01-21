@@ -155,9 +155,9 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
       println(
         "<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/jquery-1.4.2.min.js") + "\"></script>");
+        + input.getResourcePath("vakyartha/jquery-1.9.0.min.js") + "\"></script>");
       println("<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/raphael.js") + "\"></script>");
+        + input.getResourcePath("vakyartha/raphael-min.js") + "\"></script>");
       println(
         "<script type=\"text/javascript\" src=\""
         + input.getResourcePath("vakyartha/vakyarthaDependency.js") + "\"></script>");
