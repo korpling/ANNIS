@@ -293,8 +293,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           }
         }
 
-        return spanningText + (anno != null ? anno.getQName() + "=" + anno.
-          getSValueSTEXT() : "");
+        return spanningText + (anno != null ? "\n" + anno.getQName() + "="
+          + anno.getSValueSTEXT() : "");
       }
       else
       {
