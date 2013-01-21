@@ -165,7 +165,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       // output the data for the javascript
       println("<script type=\"text/javascript\">");
       println("fcolors={};");
-      println("shownfeatures=[\"cat\"];");
+      println("shownfeatures=[\"t\"];");
       println("tokens=new Object();");
 
 
