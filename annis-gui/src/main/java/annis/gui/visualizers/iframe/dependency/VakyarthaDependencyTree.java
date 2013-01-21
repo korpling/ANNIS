@@ -168,15 +168,20 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("shownfeatures=[\"t\"];");
       println("tokens=new Object();");
 
-
       count = 0;
-      for (SNode tok : selectedNodes.keySet())
+      for (SNode node : selectedNodes.keySet())
       {
-        JSONObject o = new JSONObject();
-        o.put("t", getText(tok));
+        JSONObject vakyarthaObject = new JSONObject();
+
+        String annotation = getAnnotation(node);
+        String text = getText(node);
+
+        vakyarthaObject.put("t", text + "\n" + annotation);
+        vakyarthaObject.put("annotation", annotation);
+        vakyarthaObject.put("text", text);
 
         JSONObject govs = new JSONObject();
-        EList<Edge> sEdges = tok.getSGraph().getInEdges(tok.getSId());
+        EList<Edge> sEdges = node.getSGraph().getInEdges(node.getSId());
 
         for (Edge e : sEdges)
         {
@@ -207,24 +212,24 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         }
 
-        o.put("govs", govs);
+        vakyarthaObject.put("govs", govs);
         JSONObject attris = new JSONObject();
 
         JSONObject tAttris = new JSONObject();
         String tokenColor = "black";
-        if (input.getMarkedAndCovered().containsKey(tok))
+        if (input.getMarkedAndCovered().containsKey(node))
         {
-          int colorNumber = ((int) (long) input.getMarkedAndCovered().get(tok)) - 1;
+          int colorNumber = ((int) (long) input.getMarkedAndCovered().get(node)) - 1;
           tokenColor = MatchedNodeColors.values()[colorNumber].getHTMLColor();
         }
         tAttris.put("fill", tokenColor);
         tAttris.put("font", "11px Arial,Tahoma,Helvetica,Sans-Serif");
 
         attris.put("t", tAttris);
-        o.put("attris", attris);
+        vakyarthaObject.put("attris", attris);
 
         theWriter.append("tokens[").append("" + count++).append("]=");
-        theWriter.append(o.toString().replaceAll("\n", " "));
+        theWriter.append(vakyarthaObject.toString().replaceAll("\n", " "));
         theWriter.append(";\n");
       }
 
@@ -265,6 +270,31 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     theWriter.append("\n");
   }
 
+  private String getAnnotation(SNode node)
+  {
+
+    if (mappings.containsKey(MAPPING_NODE_KEY)
+      && mappings.getProperty(MAPPING_NODE_KEY) != null)
+    {
+
+      EList<SAnnotation> annos = node.getSAnnotations();
+      SAnnotation anno = null;
+
+      for (SAnnotation a : annos)
+      {
+        if (mappings.getProperty(MAPPING_NODE_KEY).equals(a.getName()))
+        {
+          anno = a;
+          break;
+        }
+      }
+
+      return anno != null ? anno.getQName() + "=" + anno.getSValueSTEXT() : "";
+    }
+
+    return "";
+  }
+
   private String getText(SNode node)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
@@ -275,32 +305,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     if (sequences != null && sequences.size() > 0)
     {
-      if (mappings.containsKey(MAPPING_NODE_KEY) && mappings.getProperty(
-        MAPPING_NODE_KEY) != null)
-      {
-        String spanningText = ((STextualDS) sequences.get(0).getSSequentialDS()).
-          getSText().substring(sequences.get(0).getSStart(), sequences.get(0).
-          getSEnd());
-        EList<SAnnotation> annos = node.getSAnnotations();
-        SAnnotation anno = null;
-
-        for (SAnnotation a : annos)
-        {
-          if (mappings.getProperty(MAPPING_NODE_KEY).equals(a.getName()))
-          {
-            anno = a;
-            break;
-          }
-        }
-
-        return spanningText + (anno != null ? "\n" + anno.getQName() + "="
-          + anno.getSValueSTEXT() : "");
-      }
-      else
-      {
-        return ((STextualDS) sequences.get(0).getSSequentialDS()).getSText().
-          substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
-      }
+      return ((STextualDS) sequences.get(0).getSSequentialDS()).getSText().
+        substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
     }
 
     return "";

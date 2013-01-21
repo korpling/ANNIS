@@ -84,7 +84,7 @@ function Pnode(c,b){
     this.svgs[e]=f;
     if(g>this.width)this.width=g;
     d=d+line
-    };
+  };
 
   svgwi=svgwi+this.width+tab;
   this.x=0;
@@ -95,7 +95,7 @@ function Pnode(c,b){
 
   if("attris"in b&&"depline"in b["attris"])this.deplineattris=b["attris"]["depline"];
   if("attris"in b&&"deptext"in b["attris"])this.deptextattris=b["attris"]["deptext"]
-    };
+};
 
 drawsvgDep=function(c,b,d,h,e,f,g,i,p){
   var l=paper.set();
@@ -119,8 +119,8 @@ drawsvgDep=function(c,b,d,h,e,f,g,i,p){
     if(k+t.getBBox().width/2>svgwi)k=a.x-t.getBBox().width/2-funccurvedist/2;
     if(k-t.getBBox().width/2<0)k=a.x;
     t.attr("x",k)
-    }
-    if(g in fcolors){
+  }
+  if(g in fcolors){
     var o="#"+fcolors[g];
     j.attr({
       stroke:o
@@ -131,7 +131,7 @@ drawsvgDep=function(c,b,d,h,e,f,g,i,p){
     t.attr({
       fill:o
     })
-    };
+  };
 
   j.attr(i);
   n.attr(i);
@@ -139,7 +139,7 @@ drawsvgDep=function(c,b,d,h,e,f,g,i,p){
   l.push(j);
   l.push(n);
   return l
-  };
+};
 
 drawDep=function(c,b,d,h){
   c=parseInt(c);
@@ -150,7 +150,7 @@ drawDep=function(c,b,d,h){
     var f=node2.svgs[shownfeatures[0]].attr("y")-tokdepdist;
     var g=e;
     var i=0
-    }else{
+  }else{
     b=parseInt(b);
     var node1=words[b];
     var node2=words[c];
@@ -162,10 +162,10 @@ drawDep=function(c,b,d,h){
     var e=node2.svgs[shownfeatures[0]].attr("x")+node2.svgs[shownfeatures[0]].width/2;
     var i=node1.svgs[shownfeatures[0]].attr("y")+pois-tokdepdist;
     var f=node2.svgs[shownfeatures[0]].attr("y")-tokdepdist-h*linedeps
-    };
+  };
 
   node2.svgdep[b]=drawsvgDep(c,b,g,i,e,f,d,node2.deplineattris,node2.deptextattris)
-  };
+};
 
 drawalldeps=function(){
   for(var c in words){
@@ -174,9 +174,9 @@ drawalldeps=function(){
     for(var c in b.govs){
       drawDep(b.index,c,b.govs[c],d);
       d+=1
-      }
     }
-    };
+  }
+};
 
 words=new Object();
 makewords=function(){
@@ -186,18 +186,20 @@ makewords=function(){
     var b=new Pnode(c,tokens[c]);
     words[c]=b;
     currentx=currentx+b.width+tab
-    }
-  };
+  }
+}
 
-$(function(){
+function drawDependenceTree()
+{
   paper=Raphael("holder",window.innerWidth-100,100);
   svgpos=$("svg").offset();
   makewords();
   $("#holder").attr("style","width:99%;");
   $("svg")[0].setAttribute("width",svgwi);
   $("svg")[0].setAttribute("height",dependencyspace+shownfeatures.length*line);
-  drawalldeps()
-  });
+  drawalldeps();
+}
+
 Raphael.fn.pointer=function(c,b,d,h){
   var e=c+","+(b+d);
   var f="0,0"+(-d/2)+","+(-d*1.5)+" "+(-d/2)+","+(-d*1.5);
@@ -205,4 +207,52 @@ Raphael.fn.pointer=function(c,b,d,h){
   var i=this.path("M"+e+"c"+f+"c"+g+"z");
   i.rotate(h);
   return i
-  };
+}
+
+/**
+ *
+ */
+function addButton()
+{
+  var b = $("<button class='token_switcher'>show tokens</button>");
+  b.tokenState = true;
+
+  b.click(function(){
+    if (b.tokenState)
+    {
+      b.tokenState = false;
+      b.prop("innerHTML", "hide tokens");
+      createHolder();
+
+      for (var item in tokens)
+      {
+        tokens[item].t = tokens[item].annotation;
+      }
+    }
+    else {
+      b.tokenState = true;
+      b.prop("innerHTML", "show tokens");
+      createHolder();
+
+      for (var item in tokens)
+      {
+        tokens[item].t = tokens[item].text + "\n" + tokens[item].annotation;
+      }
+    }
+
+    drawDependenceTree();
+  });
+
+  $("body").append(b);
+}
+
+function createHolder(){
+  $("#holder").remove();
+  var holder = $("<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
+  $("body").append(holder);
+}
+
+$(function(){
+  drawDependenceTree();
+  addButton();
+});
