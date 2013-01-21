@@ -189,6 +189,21 @@ makewords=function(){
   }
 }
 
+
+Raphael.fn.pointer=function(c,b,d,h){
+  var e=c+","+(b+d);
+  var f="0,0"+(-d/2)+","+(-d*1.5)+" "+(-d/2)+","+(-d*1.5);
+  var g=(d/2)+","+(d/2)+" "+(d/2)+","+(d/2)+" "+(d)+",0";
+  var i=this.path("M"+e+"c"+f+"c"+g+"z");
+  i.rotate(h);
+  return i
+}
+
+
+/**
+ * Calls the visualization, written by Kim Gerdes. Do not ask me, what is
+ * happening here
+ */
 function drawDependenceTree()
 {
   paper=Raphael("holder",window.innerWidth-100,100);
@@ -200,21 +215,15 @@ function drawDependenceTree()
   drawalldeps();
 }
 
-Raphael.fn.pointer=function(c,b,d,h){
-  var e=c+","+(b+d);
-  var f="0,0"+(-d/2)+","+(-d*1.5)+" "+(-d/2)+","+(-d*1.5);
-  var g=(d/2)+","+(d/2)+" "+(d/2)+","+(d/2)+" "+(d)+",0";
-  var i=this.path("M"+e+"c"+f+"c"+g+"z");
-  i.rotate(h);
-  return i
-}
 
 /**
- *
+ * Puts a button to the visualizen, to toggle the token level.
  */
 function addButton()
 {
   var b = $("<button class='token_switcher'>show tokens</button>");
+  b.css("font-size", 11);
+
   b.tokenState = true;
 
   b.click(function(){
@@ -243,9 +252,13 @@ function addButton()
     drawDependenceTree();
   });
 
-  $("body").append(b);
+  $("body").prepend(b);
 }
 
+/**
+ * Creates an holder for the svg graphic. If a dom element with the id "#holder"
+ * already exist, it is deleted. *
+ */
 function createHolder(){
   $("#holder").remove();
   var holder = $("<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
@@ -253,6 +266,6 @@ function createHolder(){
 }
 
 $(function(){
-  drawDependenceTree();
   addButton();
+  drawDependenceTree();
 });
