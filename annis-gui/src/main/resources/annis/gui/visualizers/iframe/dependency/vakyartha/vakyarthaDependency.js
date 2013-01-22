@@ -222,38 +222,41 @@ function drawDependenceTree()
  */
 function addButton()
 {
-  var b = $("<button class='token_switcher'>show tokens</button>");
-  b.css("font-size", 11);
+  var buttonSelector = "button";
+  if ($(buttonSelector).length != 0)
+  {
+    var b = $(buttonSelector);
+    b.css("font-size", 11);
+    b.tokenState = true;
 
-  b.tokenState = true;
-
-  b.click(function(){
-    if (b.tokenState)
-    {
-      b.tokenState = false;
-      b.prop("innerHTML", "hide tokens");
-      createHolder();
-
-      for (var item in tokens)
+    b.click(function(){
+      if (b.tokenState)
       {
-        tokens[item].t = tokens[item].annotation;
+        b.tokenState = false;
+        b.prop("innerHTML", "show tokens");
+        createHolder();
+
+        for (var item in tokens)
+        {
+          tokens[item].t = tokens[item].annotation;
+        }
       }
-    }
-    else {
-      b.tokenState = true;
-      b.prop("innerHTML", "show tokens");
-      createHolder();
+      else {
+        b.tokenState = true;
+        b.prop("innerHTML", "hide tokens");
+        createHolder();
 
-      for (var item in tokens)
-      {
-        tokens[item].t = tokens[item].text + "\n" + tokens[item].annotation;
+        for (var item in tokens)
+        {
+          tokens[item].t = tokens[item].text + "\n" + tokens[item].annotation;
+        }
       }
-    }
 
-    drawDependenceTree();
-  });
+      drawDependenceTree();
+    });
 
-  $("body").prepend(b);
+    $("body").prepend(b);
+  }
 }
 
 /**

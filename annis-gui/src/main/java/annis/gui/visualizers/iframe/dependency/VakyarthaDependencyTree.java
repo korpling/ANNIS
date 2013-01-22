@@ -241,6 +241,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("</head>");
       println("<body>");
 
+      // only add button if mapping is set
+      if (mappings.containsKey(MAPPING_NODE_KEY))
+      {
+        println("<button class='token_switcher'>hide tokens</button>");
+      }
+
       // the div to render the javascript to
       println(
         "<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
