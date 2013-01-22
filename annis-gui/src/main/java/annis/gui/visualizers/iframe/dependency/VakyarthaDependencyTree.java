@@ -60,7 +60,37 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
   private VisualizerInput input;
 
+  /**
+   * If this mapping is not set in the resolver_vis_map table this visualization
+   * is only based on the token level.
+   */
   private final String MAPPING_NODE_KEY = "node_key";
+
+  /**
+   * Behaviour:
+   *
+   *
+   * 1. Node key mapping is not set: this mapping has no effect and the token
+   * switcher button is not shown.
+   *
+   * 2. Node key mapping is set:
+   *
+   * 2.1 Token visibility mapping is not set: The button is visible, but the
+   * token level is hidden.
+   *
+   * 2.2 Token visibility mapping is set to visible: The button and the token
+   * level is visible.
+   *
+   * 2.3 Token visiblity mapping is set to hidden The button is visible but the
+   * token level is not visible.
+   */
+  private final String MAPPING_TOKEN_VISIBILITY = "token_visibility";
+
+  // the one of two possible states of the token switcher button
+  private final String VISIBLE = "visible";
+
+  // the one of two possible states of the token switcher button
+  private final String HIDDEN = "hidden";
 
   private Properties mappings;
 
@@ -178,7 +208,27 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           ".*=", "");
         String text = getText(node);
 
-        vakyarthaObject.put("t", text + "\n" + annotationValue);
+        // decide, if the visualization is token based.
+        if (mappings.containsKey(MAPPING_NODE_KEY))
+        {
+          if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
+          {
+            vakyarthaObject.put("t", annotationValue);
+          }
+          else if (VISIBLE.
+            equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
+          {
+            vakyarthaObject.put("t", text + "\n" + annotationValue);
+          }
+          else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
+          {
+            vakyarthaObject.put("t", annotationValue);
+          }
+        }
+        else
+        {
+          vakyarthaObject.put("t", text);
+        }
         vakyarthaObject.put("annotation", annotationValue);
         vakyarthaObject.put("text", text);
         vakyarthaObject.put("tooltip", completeAnnotation);
@@ -244,7 +294,19 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       // only add button if mapping is set
       if (mappings.containsKey(MAPPING_NODE_KEY))
       {
-        println("<button class='token_switcher'>hide tokens</button>");
+        if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
+        {
+          println("<button class='token_switcher'>show tokens</button>");
+        }
+        else if (VISIBLE.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
+        {
+          println("<button class='token_switcher'>hide tokens</button>");
+        }
+        else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
+        {
+          println("<button class='token_switcher'>show tokens</button>");
+        }
+        // TODO notice the user of unproper config of the resolver_vis_map table
       }
 
       // the div to render the javascript to

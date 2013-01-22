@@ -222,12 +222,19 @@ function drawDependenceTree()
  */
 function initButtonEventListener()
 {
+  var visible = "hide tokens";
   var buttonSelector = "button";
   if ($(buttonSelector).length != 0)
   {
     var b = $(buttonSelector);
     b.css("font-size", 11);
-    b.tokenState = true;
+
+    if (b.prop("innerHTML") == visible)
+    {
+      b.tokenState = true;
+    } else {
+      b.tokenState = false;
+    }
 
     b.click(function(){
       if (b.tokenState)
