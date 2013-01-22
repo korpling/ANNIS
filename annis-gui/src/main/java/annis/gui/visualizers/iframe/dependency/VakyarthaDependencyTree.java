@@ -173,12 +173,15 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       {
         JSONObject vakyarthaObject = new JSONObject();
 
-        String annotation = getAnnotation(node);
+        String completeAnnotation = getAnnotation(node);
+        String annotationValue = completeAnnotation.replaceFirst(
+          ".*=", "");
         String text = getText(node);
 
-        vakyarthaObject.put("t", text + "\n" + annotation);
-        vakyarthaObject.put("annotation", annotation);
+        vakyarthaObject.put("t", text + "\n" + annotationValue);
+        vakyarthaObject.put("annotation", annotationValue);
         vakyarthaObject.put("text", text);
+        vakyarthaObject.put("tooltip", completeAnnotation);
 
         JSONObject govs = new JSONObject();
         EList<Edge> sEdges = node.getSGraph().getInEdges(node.getSId());
@@ -270,6 +273,14 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     theWriter.append("\n");
   }
 
+  /**
+   * Provid the whole annotation ((String)
+   * &lt;namespace&gt;::&lt;key&gt;=&lt;value&gt;) value with namespace and
+   * annotation key, which was defined in the mappings with the Key
+   * {@link VakyarthaDependencyTree#MAPPING_NODE_KEY}.
+   *
+   * @return Empty string, if the mapping is not defined.
+   */
   private String getAnnotation(SNode node)
   {
 
@@ -295,6 +306,11 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     return "";
   }
 
+  /**
+   * Get the text which is overlapped by the SNode.
+   *
+   * @return Empty string, if there are no token overlapped by the node.
+   */
   private String getText(SNode node)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();

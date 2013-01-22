@@ -73,9 +73,10 @@ function Pnode(c,b){
   var d=dependencyspace;
   for(var h in shownfeatures){
     var e=shownfeatures[h];
-    this.texts[e]=b[e];
+    this.texts[e]= b[e];
     var f=paper.text(currentx,d,b[e]);
     f.attr(defaultattris);
+    f.attr("title", b.tooltip);
     if(e in b)f.attr(attris[e]);
     if("attris"in b)f.attr(b["attris"][e]);
     var g=f.getBBox().width;
