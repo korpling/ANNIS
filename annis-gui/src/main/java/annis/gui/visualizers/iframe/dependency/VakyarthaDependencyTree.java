@@ -44,6 +44,23 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 /**
+ * <p>Provides a dependence visualization based on vakyartha visualization,
+ * which was developed by Kim Gerdes.</p>
+ *
+ * <p>Originally this visualization was token based. Now Vakyartha extended to
+ * visualize dependence between any nodes. This must be configured in the
+ * resolver_vis_map table. There exist a mapping column. Please read the section
+ * <strong>Configuring Visualizations</strong> in the ANNIS-Manual how to
+ * configure the visualization. Supported values for this visaulization are:
+ *
+ * <ul>
+ *
+ * <li>node_key:&lt;annotation key&gt;</li>
+ *
+ * <li>token_visibility:&lt;visible|shown&gt;</li>
+ *
+ * </ul>
+ * </p>
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
@@ -94,34 +111,14 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
   private Properties mappings;
 
-  @Override
-  public String getShortName()
-  {
-    return "arch_dependency";
-  }
-
-  @Override
-  public void writeOutput(VisualizerInput input, Writer writer)
-  {
-    theWriter = writer;
-    this.input = input;
-    this.mappings = input.getMappings();
-
-    printHTMLOutput();
-  }
-
-  public void printHTMLOutput()
-  {
-    SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
-
-    /**
-     * Try to create a sorted map of nodes. The left annis feature token index
-     * is used for sorting the nodes. It is possible the different nodes has the
-     * same left token index, but the probability of this is small and it seem's
-     * not to make much sense to visualize this. Mabye we should use the node
-     * id.
-     */
-    Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(new Comparator<SNode>()
+  /**
+   * Try to create a sorted map of nodes. The left annis feature token index is
+   * used for sorting the nodes. It is possible the different nodes has the same
+   * left token index, but the probability of this is small and it seem's not to
+   * make much sense to visualize this. Mabye we should use the node id.
+   */
+  private Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
+    new Comparator<SNode>()
     {
       private int getIdx(SNode snode)
       {
@@ -159,6 +156,26 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
       }
     });
+
+  @Override
+  public String getShortName()
+  {
+    return "arch_dependency";
+  }
+
+  @Override
+  public void writeOutput(VisualizerInput input, Writer writer)
+  {
+    theWriter = writer;
+    this.input = input;
+    this.mappings = input.getMappings();
+
+    printHTMLOutput();
+  }
+
+  public void printHTMLOutput()
+  {
+    SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
 
     for (SNode n : sDocumentGraph.getSNodes())
     {
