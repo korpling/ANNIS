@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
@@ -54,49 +55,49 @@ public class SimpleQuery extends Panel implements Button.ClickListener
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
-  
+
   public SimpleQuery(ControlPanel cp)
   {
     this.cp = cp;
     vnodes = new ArrayList<VerticalNode>();
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
-    
+
     btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btInitMeta = new Button("Start with meta search", (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    
+
     btGo = new Button("Create AQL Query", (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    
+
     language = new HorizontalLayout();
     language.addComponent(btInitLanguage);
     meta = new HorizontalLayout();
     meta.addComponent(btInitMeta);
-    
+
     HorizontalLayout option = new HorizontalLayout();
-    cbSentence = new CheckBox("Search within sentence");//Martin
-    cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
-    cbSentence.setImmediate(true);//Martin
-    option.addComponent(cbSentence);//Martin
-    
+    //cbSentence = new CheckBox("Search within sentence");//Martin
+    //cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
+    //cbSentence.setImmediate(true);//Martin
+    //option.addComponent(cbSentence);//Martin
+
+    spb = new SpanBox(this);
+
+    option.addComponent(spb);
     option.addComponent(btGo);
-       
-    spb = new SpanBox(this);    
-    
+
     addComponent(language);
     addComponent(meta);
-    addComponent(spb);
-    addComponent(btGo);//deal with that later --> horizontal layout...
-    
+    addComponent(option);
+
   }
-  
+
   private String getAQLFragment(SearchBox sb, boolean remode)
     //by Martin
   {
-    String result, value=sb.getValue(), level=sb.getAttribute();    
+    String result, value=sb.getValue(), level=sb.getAttribute();
     if (remode)
     {
       result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
@@ -106,52 +107,52 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     {
       result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";
       return result;
-    }        
-  }  
-  
-  private String getAQLQuery()//by Martin    
+    }
+  }
+
+  private String getAQLQuery()//by Martin
   {
     int count = 1;
-    
-    //get all instances of type VerticalNode, Searchbox, Edgebox    
+
+    //get all instances of type VerticalNode, Searchbox, Edgebox
     Iterator<Component> itcmp = language.getComponentIterator();
     Collection<Integer> sentenceVars = new ArrayList<Integer>();
-    String query = "", edgeQuery = "", sentenceQuery = "";    
+    String query = "", edgeQuery = "", sentenceQuery = "";
     while(itcmp.hasNext())
     {
       Component itElem = itcmp.next();
-            
+
       if(itElem instanceof VerticalNode)
-      {        
+      {
         Collection<SearchBox> sbList = ((VerticalNode)itElem).getSearchBoxes();
-        
+
         for (SearchBox sb : sbList)
         {
           query += " & " + getAQLFragment(sb, sb.isRegEx());
         }
-        
-        
-        
+
+
+
         sentenceVars.add(new Integer(count));
-        
+
         for(int i=1; i < sbList.size(); i++)
         {
-          String addQuery = "\n& #" + count +" = "+ "#" + ++count;
+          String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
           edgeQuery += addQuery;
         }
         //if a VerticalNode contains no condition/SearchBox, a placeholder
         //is inserted to describe the gap as "anything"
         if (sbList.isEmpty()) {query += "\n& /.*/";}
       }
-      
+
       //after a VerticalNode there is always an... EDGEBOX!
-      //so the Query will be build in the right order   
+      //so the Query will be build in the right order
       if(itElem instanceof EdgeBox)
-      {        
+      {
         count++;
-        EdgeBox eb = (EdgeBox)itElem;        
-        edgeQuery += "\n& #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count; 
-      }      
+        EdgeBox eb = (EdgeBox)itElem;
+        edgeQuery += "\n& #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count;
+      }
     }
     //search within sentence?
     if(spb.searchWithinSpan())
@@ -163,24 +164,24 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
       }
     }
-    
+
     String fullQuery = (query+edgeQuery+sentenceQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
-    fullQuery = fullQuery.replace("txt=", ""); //depends on the corpus, I think
+    //fullQuery = fullQuery.replace("txt=", ""); //depends on the corpus, I think
     return fullQuery;
   }
-  
+
   public void updateQuery()//by Martin
-  {    
-    cp.setQuery(getAQLQuery(), null);    
+  {
+    cp.setQuery(getAQLQuery(), null);
   }
-  
+
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
 
-    final SimpleQuery sq = this;    
+    final SimpleQuery sq = this;
     if(event.getButton() == btInitLanguage)
     {
       language.removeComponent(btInitLanguage);
@@ -195,7 +196,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
             if (!vnodes.isEmpty())
             {
               EdgeBox eb = new EdgeBox(sq);
-              language.addComponent(eb); 
+              language.addComponent(eb);
               eboxes.add(eb);
             }
 
@@ -207,7 +208,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
         });
       }
       language.addComponent(addMenu);
-    }    
+    }
     if(event.getButton() == btInitMeta)
     {
       meta.removeComponent(btInitMeta);
@@ -220,7 +221,7 @@ public class SimpleQuery extends Panel implements Button.ClickListener
           @Override
           public void menuSelected(MenuBar.MenuItem selectedItem) {
             MetaBox mb = new MetaBox(killNamespace(annoname), sq);
-            meta.addComponent(mb); 
+            meta.addComponent(mb);
             mboxes.add(mb);
           }
         });
@@ -230,25 +231,25 @@ public class SimpleQuery extends Panel implements Button.ClickListener
     if (event.getButton() == btGo)
     {
       updateQuery();
-    }    
+    }
   }
 
 public void removeVerticalNode(VerticalNode v)
-  {    
+  {
     language.removeComponent(v);
     for (VerticalNode vnode : vnodes)
     {
       Iterator<EdgeBox> ebIterator = eboxes.iterator();
-      if((ebIterator.hasNext()) && (v.equals(vnode))) 
+      if((ebIterator.hasNext()) && (v.equals(vnode)))
       {
         EdgeBox eb = eboxes.iterator().next();
         eboxes.remove(eb);
         language.removeComponent(eb);
         break;
-      }   
+      }
     }
     vnodes.remove(v);
-  }  
+  }
 
 public Set<String> getAvailableAnnotationNames()
   {
@@ -264,11 +265,11 @@ public Set<String> getAvailableAnnotationNames()
       try
       {
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
-        
+
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("query").path("corpora").path(corpus).path("annotations")
+service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})
@@ -286,12 +287,12 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        
+
       }
     }
     return result;
   }
-  
+
   public Collection<String> getAvailableAnnotationLevels(String meta)
   {
     Collection<String> result = new TreeSet<String>();
@@ -306,17 +307,17 @@ public Set<String> getAvailableAnnotationNames()
       try
       {
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
-        
+
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("query").path("corpora").path(corpus).path("annotations")
+service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "true")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})
             );
         }
-        
+
         for (AnnisAttribute a : atts)
         {
           if (a.getType() == AnnisAttribute.Type.node)
@@ -338,13 +339,13 @@ public Set<String> getAvailableAnnotationNames()
     }
     return result;
   }
-    
+
   public String killNamespace(String qName)
   {
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }
-  
+
   public Set<String> getAvailableMetaNames()
   {
     Set<String> result = new TreeSet<String>();
@@ -362,7 +363,7 @@ public Set<String> getAvailableAnnotationNames()
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("query").path("corpora").path(corpus).path("docmetadata")
+service.path("query").path("corpora").path(corpus).path("docmetadata")
             .get(new GenericType<List<Annotation>>() {}));
         }
         for (Annotation a : atts)
@@ -373,12 +374,12 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        
+
       }
     }
     return result;
   }
-  
+
   public Set<String> getAvailableMetaLevels(String ebene)
   {
     Set<String> result = new TreeSet<String>();
@@ -396,7 +397,7 @@ public Set<String> getAvailableAnnotationNames()
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-            service.path("query").path("corpora").path(corpus).path("docmetadata")
+service.path("query").path("corpora").path(corpus).path("docmetadata")
             .get(new GenericType<List<Annotation>>() {}));
         }
         for (Annotation a : atts)
@@ -410,9 +411,10 @@ public Set<String> getAvailableAnnotationNames()
       }
       catch (Exception ex)
       {
-        
+
       }
     }
     return result;
   }
 }
+
