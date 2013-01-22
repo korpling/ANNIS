@@ -218,9 +218,9 @@ function drawDependenceTree()
 
 
 /**
- * Puts a button to the visualizen, to toggle the token level.
+ * Add some listener to the token switcher button, if there is one in the DOM.
  */
-function addButton()
+function initButtonEventListener()
 {
   var buttonSelector = "button";
   if ($(buttonSelector).length != 0)
@@ -264,12 +264,18 @@ function addButton()
  * already exist, it is deleted. *
  */
 function createHolder(){
-  $("#holder").remove();
-  var holder = $("<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
+
+  var holder = $("#holder");
+
+  if(holder.length > 0)
+  {
+    holder.remove();
+  }
+  holder = $("<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
   $("body").append(holder);
 }
 
 $(function(){
-  addButton();
+  initButtonEventListener();
   drawDependenceTree();
 });
