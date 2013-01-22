@@ -28,21 +28,22 @@
         <title>Installing an ANNIS public server</title>
         <para>The ANNIS server version can be installed on UNIX based server, or else under Windows
             using <link xlink:href="http://www.cygwin.com/">Cygwin</link>, the freely available UNIX
-            emulator. To install the ANNIS server: 
-            <procedure>
+            emulator. To install the ANNIS server: <procedure>
                 <step>
                     <para>Install a PostgreSQL 9.2 server for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password you set during the
                             installation</emphasis>. </para>
-                    <note><para>Under Linux, you might have to set the
-                        PostgreSQL password manually. E.g. on Ubuntu you can achieve this with by running the following
-                        commands:</para>
-                    <para>
-                        <programlisting>sudo -u postgres psql
+                    <note>
+                        <para>Under Linux, you might have to set the PostgreSQL password manually.
+                            E.g. on Ubuntu you can achieve this with by running the following
+                            commands:</para>
+                        <para>
+                            <programlisting>sudo -u postgres psql
 \password
-\q</programlisting></para></note>
+\q</programlisting></para>
+                    </note>
                 </step>
                 <step>
                     <para>Install a web server such as <link xlink:href="http://tomcat.apache.org/"
@@ -104,7 +105,7 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                 <step>
                     <para>To get the ANNIS front-end running, first download it: <link
                             xlink:href="https://github.com/downloads/korpling/ANNIS/annis-gui-${project.version}.war"
-                            >annis-gui-${project.version}.war</link>  and deploy it to your Java
+                            >annis-gui-${project.version}.war</link> and deploy it to your Java
                         servlet container (this is depending on the servlet container you
                         use).</para>
                 </step>
@@ -129,7 +130,7 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                 of the <filename>conf/shiro.ini</filename> configuration file. This allows a much
                 more individual configuration and the usage of external authorization services like
                 LDAP. </para>
-            
+
             <section>
                 <title>Configuration file location</title>
                 <para>There is a central location where the user configuration files are stored.
@@ -151,13 +152,13 @@ globalPermResolver = annis.security.ANNISRolePermissionResolver
                 <procedure>
                     <step>
                         <para>Create a file "groups" in the user-configuration directory (e.g.
-                            <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
+                                <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
 group2=pcc3
 group3=tiger1
 demo=pcc2,falko</programlisting>This
                             example means that a member of group group1 will have access to corpora
                             with the names pcc3,falko, tiger2 (corpus names can be displayed with
-                            "<command>annis-admin.sh list</command>").</para>
+                                "<command>annis-admin.sh list</command>").</para>
                     </step>
                     <step>
                         <para>Create a subdirectory <filename>users</filename></para>
@@ -325,7 +326,7 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                 the URLs if you need a more project specific and less "technical" URL (e.g.
                     <code>http://&lt;server>/falko</code>).</para>
         </section>
-        
+
         <section>
             <title>Configuring Visualizations </title>
             <section>
@@ -356,15 +357,15 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                 </row>
                             </tbody>
                         </tgroup>
-                    </informaltable>In these cases the namespaces are
-                    usually taken from the source format in which the corpus was generated, and
-                    carried over into relAnnis during the conversion. It is also possible to use
-                    other namespaces, most easily when working with PAULA XML. In PAULA XML, the
-                    namespace is determined by the string prefix before the first period in the file
-                    name / paula_id of each annotation layer. In order to manually determine the
-                    visualizer and the display name for each namespace in each corpus, the resolver
-                    table in the database must be edited. To do so, open PGAdmin (or if you did not
-                    install PGAdmin with ANNIS then via PSQL), and access the table
+                    </informaltable>In these cases the namespaces are usually taken from the source
+                    format in which the corpus was generated, and carried over into relAnnis during
+                    the conversion. It is also possible to use other namespaces, most easily when
+                    working with PAULA XML. In PAULA XML, the namespace is determined by the string
+                    prefix before the first period in the file name / paula_id of each annotation
+                    layer. In order to manually determine the visualizer and the display name for
+                    each namespace in each corpus, the resolver table in the database must be
+                    edited. To do so, open PGAdmin (or if you did not install PGAdmin with ANNIS
+                    then via PSQL), and access the table
                             <emphasis><database>resolver_vis_map</database></emphasis> (it can be
                     found in PGAdmin under <emphasis>PostgreSQL 9.1 > Databases > anniskickstart >
                         Schemas > public > Tables</emphasis> (for ANNIS servers replace
@@ -580,6 +581,19 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             with <userinput>node_key:name</userinput>. Note that all
                                             grid levels visualize the same annotation name at
                                             different hierarchical depths.</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para><emphasis role="italic">arch_dependency</emphasis> –
+                                            if a annotation key is specified with
+                                                <userinput>node_key:key</userinput>, all nodes which
+                                            carry this annotation are searched for pointing
+                                            relations and instead token the annotation value is
+                                            used. If you also want to see the token level, you will
+                                            have to define the token_visbility property
+                                                with<userinput>token_visibility:visible</userinput>
+                                            or <userinput>token_visibility:hidden</userinput>. Take
+                                            into account, that the token_visibily property has only
+                                            an effect if a node_key is defined.</para>
                                     </listitem>
                                 </itemizedlist></para>
                         </listitem>
