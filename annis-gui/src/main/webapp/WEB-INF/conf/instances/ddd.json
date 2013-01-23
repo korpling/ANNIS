@@ -1,0 +1,11 @@
+{
+  "default-querybuilder": "precedencequerybuilder",
+  "display-name" : "Deutsch Diachron Digital",
+  "default-corpusset": "Referenzkorpus Altdeutsch",
+  "corpus-sets": [
+  {
+    "name": "Referenzkorpus Altdeutsch",
+    "corpus": ["DDD-AD_Tatian_111212_Exmaralda", "DDD-AD_Kl_Ahd_Denkmaeler_171012_exmaralda"]
+  }
+ ]
+}
