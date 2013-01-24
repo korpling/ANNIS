@@ -54,7 +54,7 @@ class MetaBox extends Panel
     }
     sb.addComponent(l);
     addComponent(sb);
-    
+
   }
   
 }

@@ -240,10 +240,17 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     
     if (event.getButton() == btClear)
     {
+      option.removeAllComponents();
+      language.removeAllComponents();
+      meta.removeAllComponents();
+      toolbar.removeAllComponents();
       removeComponent(option);
       removeComponent(language);
       removeComponent(meta);
       removeComponent(toolbar);
+      vnodes.clear();
+      eboxes.clear();
+      mboxes.clear();
       updateQuery();
       launch(cp);
     }
@@ -264,6 +271,7 @@ public void removeVerticalNode(VerticalNode v)
       }
     }
     vnodes.remove(v);
+    updateQuery();
   }
 
 public Set<String> getAvailableAnnotationNames()
