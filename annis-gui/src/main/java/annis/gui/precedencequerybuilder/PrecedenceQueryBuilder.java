@@ -28,6 +28,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +53,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private HorizontalLayout meta;
   private HorizontalLayout option;
   private HorizontalLayout toolbar;
+  private VerticalLayout mainLayout;
   private SpanBox spb;
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
@@ -65,6 +67,9 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   public void launch(ControlPanel cp)
   {
     this.cp = cp;
+    
+    mainLayout = new VerticalLayout();
+    
     vnodes = new ArrayList<VerticalNode>();
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
@@ -93,10 +98,16 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
     
-    addComponent(language);
-    addComponent(meta);
-    addComponent(option);
-    addComponent(toolbar);
+    mainLayout.addComponent(language);
+    mainLayout.addComponent(meta);
+    mainLayout.addComponent(option);
+    mainLayout.addComponent(toolbar);
+    
+    setContent(mainLayout);
+    setScrollable(true);
+    getContent().setSizeUndefined();
+    setHeight("100%");
+    
   }
   
   private String getAQLFragment(SearchBox sb, boolean remode)
