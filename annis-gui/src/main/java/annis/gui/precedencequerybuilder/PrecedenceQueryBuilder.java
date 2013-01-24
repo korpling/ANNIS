@@ -330,7 +330,7 @@ service.path("query").path("corpora").path(corpus).path("annotations")
         {
           if (a.getType() == AnnisAttribute.Type.node)
           {
-            result.add(a.getName());
+            result.add(killNamespace(a.getName()));
           }
         }
 
