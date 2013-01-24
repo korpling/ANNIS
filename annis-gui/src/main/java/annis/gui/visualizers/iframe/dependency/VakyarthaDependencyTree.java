@@ -29,6 +29,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
@@ -59,8 +60,7 @@ import org.slf4j.LoggerFactory;
  *
  * <li>token_visibility:&lt;visible|shown&gt;</li>
  *
- * </ul>
- * </p>
+ * </ul> </p>
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
@@ -82,6 +82,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
    * is only based on the token level.
    */
   private final String MAPPING_NODE_KEY = "node_key";
+
+  /**
+   * Only select edges with the edge namespace. If this mappging is not defined
+   * the {@link VakyarthaDependencyTree#MAPPING_NODE_KEY} is used.
+   */
+  private final String MAPPING_EDGE_NS = "edge_ns";
 
   /**
    * Behaviour:
@@ -255,7 +261,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         for (Edge e : sEdges)
         {
-          if (!(e instanceof SPointingRelation) || !(e.getSource() instanceof SNode))
+          if (!(e instanceof SPointingRelation))
           {
             continue;
           }
@@ -270,16 +276,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
             break;
           }
 
-          if (sRelation.getSource() == null
-            || !node2Int.containsKey(source))
-          {
-            govs.put("root", label);
-          }
-          else
+          if (sRelation.getSource() != null && node2Int.containsKey(source))
           {
             govs.put(String.valueOf(node2Int.get(source)), label);
           }
-
         }
 
         vakyarthaObject.put("govs", govs);
