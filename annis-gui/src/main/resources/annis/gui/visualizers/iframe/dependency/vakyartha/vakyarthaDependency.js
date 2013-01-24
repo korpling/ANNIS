@@ -255,7 +255,7 @@ function initButtonEventListener()
 
         for (var item in tokens)
         {
-          tokens[item].t = tokens[item].text + "\n" + tokens[item].annotation;
+          tokens[item].t = tokens[item].annotation + "\n" + tokens[item].text;
         }
       }
 

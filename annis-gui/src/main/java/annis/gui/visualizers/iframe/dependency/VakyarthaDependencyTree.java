@@ -241,7 +241,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           else if (VISIBLE.
             equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
           {
-            vakyarthaObject.put("t", text + "\n" + annotationValue);
+            vakyarthaObject.put("t", annotationValue + "\n" + text);
           }
           else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
           {
