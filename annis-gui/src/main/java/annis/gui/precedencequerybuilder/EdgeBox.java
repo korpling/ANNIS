@@ -27,10 +27,7 @@ public class EdgeBox extends Panel
   private ComboBox edge;
   private int id;
   private static final String[] EDGE_OPERATORS = new String[]
-  {
-    ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
-    "_l_", "'_r_", "_o_", "_ol_", "_or_"
-  };
+  {".",".1",".1,2",".*"};
   
   public EdgeBox (PrecedenceQueryBuilder sq)
   {
@@ -39,6 +36,7 @@ public class EdgeBox extends Panel
     {
       edge.addItem(o);
     }
+    edge.setNewItemsAllowed(true);
     edge.setValue(EDGE_OPERATORS[0]);
     edge.setWidth("50px");
     addComponent(edge);
