@@ -15,11 +15,13 @@
  */
 package annis.gui.precedencequerybuilder;
 
+import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.Arrays;
 import java.util.List;
@@ -29,15 +31,24 @@ import java.util.TreeSet;
  *
  * @author tom
  */
-class MetaBox extends Panel
+class MetaBox extends Panel implements Button.ClickListener
 {
 
+  private Button btClose;
+  private VerticalLayout sb;
+  private PrecedenceQueryBuilder sq;
+  
   public MetaBox(String ebene, PrecedenceQueryBuilder sq)
   {
-    VerticalLayout sb = new VerticalLayout();
+    this.sq = sq;
+    sb = new VerticalLayout();
     sb.setImmediate(true);
-        
-    // searchbox values for ebene
+    
+    // close
+    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    
+    // metabox values for ebene
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableMetaLevels(ebene))
     {
@@ -57,8 +68,18 @@ class MetaBox extends Panel
     l.setWidth("350px");
 
     sb.addComponent(l);
+    sb.addComponent(btClose);
     addComponent(sb);
 
   }
   
+  @Override
+  public void buttonClick(Button.ClickEvent event)
+  {
+
+    if(event.getButton() == btClose)
+    {
+      sq.removeMetaBox(this);
+    }
+  } 
 }

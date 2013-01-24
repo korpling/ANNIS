@@ -285,6 +285,13 @@ public void removeVerticalNode(VerticalNode v)
     updateQuery();
   }
 
+public void removeMetaBox(MetaBox v)
+  {
+    meta.removeComponent(v);
+    mboxes.remove(v);
+    updateQuery();
+  }
+
 public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
