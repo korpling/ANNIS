@@ -28,7 +28,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,10 +66,9 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     launch(cp);
   }
 
-  public void launch(ControlPanel cp)
+  private void launch(ControlPanel cp)
   {
     this.cp = cp;
-    
     mainLayout = new VerticalLayout();
     
     vnodes = new ArrayList<VerticalNode>();
@@ -198,72 +199,80 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   {
 
     final PrecedenceQueryBuilder sq = this;
-    if(event.getButton() == btInitLanguage)
-    {
-      language.removeComponent(btInitLanguage);
-      MenuBar addMenu = new MenuBar();
-      Collection<String> annonames = getAvailableAnnotationNames();
-      final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
-      for (final String annoname : annonames)
-      {
-        add.addItem(killNamespace(annoname), new MenuBar.Command() {
-          @Override
-          public void menuSelected(MenuBar.MenuItem selectedItem) {
-            if (!vnodes.isEmpty())
-            {
-              EdgeBox eb = new EdgeBox(sq);
-              language.addComponent(eb);
-              eboxes.add(eb);
-            }
-
-            VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
-            language.addComponent(vn);
-            vnodes.add(vn);
-
-          }
-        });
-      }
-      language.addComponent(addMenu);
-    }
-    if(event.getButton() == btInitMeta)
-    {
-      meta.removeComponent(btInitMeta);
-      MenuBar addMenu = new MenuBar();
-      Collection<String> annonames = getAvailableMetaNames();
-      final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
-      for (final String annoname : annonames)
-      {
-        add.addItem(killNamespace(annoname), new MenuBar.Command() {
-          @Override
-          public void menuSelected(MenuBar.MenuItem selectedItem) {
-            MetaBox mb = new MetaBox(killNamespace(annoname), sq);
-            meta.addComponent(mb);
-            mboxes.add(mb);
-          }
-        });
-      }
-      meta.addComponent(addMenu);
-    }
-    if (event.getButton() == btGo)
-    {
-      updateQuery();
+    
+    if (cp.getSelectedCorpora().isEmpty()){
+      getWindow().showNotification("No corpora selected");
     }
     
-    if (event.getButton() == btClear)
+    else
     {
-      option.removeAllComponents();
-      language.removeAllComponents();
-      meta.removeAllComponents();
-      toolbar.removeAllComponents();
-      removeComponent(option);
-      removeComponent(language);
-      removeComponent(meta);
-      removeComponent(toolbar);
-      vnodes.clear();
-      eboxes.clear();
-      mboxes.clear();
-      updateQuery();
-      launch(cp);
+      if(event.getButton() == btInitLanguage)
+      {
+        language.removeComponent(btInitLanguage);
+        MenuBar addMenu = new MenuBar();
+        Collection<String> annonames = getAvailableAnnotationNames();
+        final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
+        for (final String annoname : annonames)
+        {
+          add.addItem(killNamespace(annoname), new MenuBar.Command() {
+            @Override
+            public void menuSelected(MenuBar.MenuItem selectedItem) {
+              if (!vnodes.isEmpty())
+              {
+                EdgeBox eb = new EdgeBox(sq);
+                language.addComponent(eb);
+                eboxes.add(eb);
+              }
+
+              VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
+              language.addComponent(vn);
+              vnodes.add(vn);
+
+            }
+          });
+        }
+        language.addComponent(addMenu);
+      }
+      if(event.getButton() == btInitMeta)
+      {
+        meta.removeComponent(btInitMeta);
+        MenuBar addMenu = new MenuBar();
+        Collection<String> annonames = getAvailableMetaNames();
+        final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
+        for (final String annoname : annonames)
+        {
+          add.addItem(killNamespace(annoname), new MenuBar.Command() {
+            @Override
+            public void menuSelected(MenuBar.MenuItem selectedItem) {
+              MetaBox mb = new MetaBox(killNamespace(annoname), sq);
+              meta.addComponent(mb);
+              mboxes.add(mb);
+            }
+          });
+        }
+        meta.addComponent(addMenu);
+      }
+      if (event.getButton() == btGo)
+      {
+        updateQuery();
+      }
+
+      if (event.getButton() == btClear)
+      {
+        option.removeAllComponents();
+        language.removeAllComponents();
+        meta.removeAllComponents();
+        toolbar.removeAllComponents();
+        removeComponent(option);
+        removeComponent(language);
+        removeComponent(meta);
+        removeComponent(toolbar);
+        vnodes.clear();
+        eboxes.clear();
+        mboxes.clear();
+        updateQuery();
+        launch(cp);
+      }
     }
   }
 
