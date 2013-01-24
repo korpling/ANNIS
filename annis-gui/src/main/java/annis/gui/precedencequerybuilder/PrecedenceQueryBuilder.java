@@ -46,17 +46,23 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private Button btInitLanguage;
   private Button btInitMeta;
   private Button btGo;
+  private Button btClear;
   private ControlPanel cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
   private HorizontalLayout option;
-  private CheckBox cbSentence; //Martin
+  private HorizontalLayout toolbar;
   private SpanBox spb;
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
 
   public PrecedenceQueryBuilder(ControlPanel cp)
+  {
+    launch(cp);
+  }
+
+  public void launch(ControlPanel cp)
   {
     this.cp = cp;
     vnodes = new ArrayList<VerticalNode>();
@@ -72,28 +78,27 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     btGo = new Button("Create AQL Query", (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
+    btClear = new Button("Clear the Query Builder", (Button.ClickListener) this);
+    btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
+
+    spb = new SpanBox(this);
+    
     language = new HorizontalLayout();
     language.addComponent(btInitLanguage);
     meta = new HorizontalLayout();
     meta.addComponent(btInitMeta);
-
-    HorizontalLayout option = new HorizontalLayout();
-    //cbSentence = new CheckBox("Search within sentence");//Martin
-    //cbSentence.setDescription("Add some AQL code to the query to make it limited to a sentence.");//Martin
-    //cbSentence.setImmediate(true);//Martin
-    //option.addComponent(cbSentence);//Martin
-
-    spb = new SpanBox(this);
-
+    option = new HorizontalLayout();
     option.addComponent(spb);
-    option.addComponent(btGo);
-
+    toolbar = new HorizontalLayout();
+    toolbar.addComponent(btGo);
+    toolbar.addComponent(btClear);
+    
     addComponent(language);
     addComponent(meta);
     addComponent(option);
-
+    addComponent(toolbar);
   }
-
+  
   private String getAQLFragment(SearchBox sb, boolean remode)
     //by Martin
   {
@@ -231,6 +236,16 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     if (event.getButton() == btGo)
     {
       updateQuery();
+    }
+    
+    if (event.getButton() == btClear)
+    {
+      removeComponent(option);
+      removeComponent(language);
+      removeComponent(meta);
+      removeComponent(toolbar);
+      updateQuery();
+      launch(cp);
     }
   }
 
