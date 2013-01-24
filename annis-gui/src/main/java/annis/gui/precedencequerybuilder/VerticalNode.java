@@ -60,12 +60,12 @@ public class VerticalNode extends Panel implements Button.ClickListener
     AddMenu am = new AddMenu(annonames, sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     
-    HorizontalLayout vntoolbar = new HorizontalLayout();
+    VerticalLayout vntoolbar = new VerticalLayout();
     vntoolbar.addComponent(btClose);
     vntoolbar.addComponent(am);
     v.addComponent(vntoolbar);
     v.addComponent(sb);
-    setWidth("185px");
+    setWidth("200px");
     addComponent(v);
     
   }
