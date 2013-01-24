@@ -1,5 +1,5 @@
-ANNIS Developer guide {#mainpage}
-=====================
+Architecture {#architecture}
+============
 
 ANNIS is a web-based search and visualization architecture for multi-layer corpora. ANNIS consists of two major components: a backend service and a web front-end. There is also a local version, ANNIS Kickstarter, which is a simple starting point for new users who want to try out the system without installing a full server.
 
