@@ -18,6 +18,7 @@ package annis.gui.precedencequerybuilder;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.Arrays;
@@ -43,15 +44,18 @@ class MetaBox extends Panel
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
     
-    OptionGroup l = new OptionGroup(ebene);
-    l.setMultiSelect(true);
-    l.setWidth("130px");
-    // configure & load content
-    l.setImmediate(true);
-    for (String annoname : annonames) 
-    {
+    TwinColSelect l = new TwinColSelect(ebene);
+    for (String annoname : annonames) {
       l.addItem(annoname);
     }
+    l.setRows(10);
+    l.setNullSelectionAllowed(true);
+    l.setMultiSelect(true);
+    l.setImmediate(true);
+    l.setLeftColumnCaption("Available levels");
+    l.setRightColumnCaption("Selected levels");
+    l.setWidth("350px");
+
     sb.addComponent(l);
     addComponent(sb);
 
