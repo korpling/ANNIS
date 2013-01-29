@@ -57,10 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * <li>node_key:&lt;annotation key&gt;</li>
  *
- * <li>token_visibility:&lt;visible|shown&gt;</li>
- *
- * </ul>
- * </p>
+ * </ul> </p>
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
@@ -83,79 +80,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
    */
   private final String MAPPING_NODE_KEY = "node_key";
 
-  /**
-   * Behaviour:
-   *
-   *
-   * 1. Node key mapping is not set: this mapping has no effect and the token
-   * switcher button is not shown.
-   *
-   * 2. Node key mapping is set:
-   *
-   * 2.1 Token visibility mapping is not set: The button is visible, but the
-   * token level is hidden.
-   *
-   * 2.2 Token visibility mapping is set to visible: The button and the token
-   * level is visible.
-   *
-   * 2.3 Token visiblity mapping is set to hidden The button is visible but the
-   * token level is not visible.
-   */
-  private final String MAPPING_TOKEN_VISIBILITY = "token_visibility";
-
-  // the one of two possible states of the token switcher button
-  private final String VISIBLE = "visible";
-
-  // the one of two possible states of the token switcher button
-  private final String HIDDEN = "hidden";
-
   private Properties mappings;
 
   /**
-   * Try to create a sorted map of nodes. The left annis feature token index is
-   * used for sorting the nodes. It is possible the different nodes has the same
-   * left token index, but the probability of this is small and it seem's not to
-   * make much sense to visualize this. Mabye we should use the node id.
+   * Contains only token, if mappings does not contain "node_key".
    */
-  private Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
-    new Comparator<SNode>()
-    {
-      private int getIdx(SNode snode)
-      {
-        if (snode instanceof SToken)
-        {
-          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
-          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
-        }
-        else
-        {
-          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
-          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
-        }
-      }
-
-      @Override
-      public int compare(SNode o1, SNode o2)
-      {
-        int tok1 = getIdx(o1);
-        int tok2 = getIdx(o2);
-
-        if (tok1 < tok2)
-        {
-          return -1;
-        }
-
-        if (tok1 == tok2)
-        {
-          return 0;
-        }
-        else
-        {
-          return 1;
-        }
-
-      }
-    });
+  private Map<SNode, Integer> selectedNodes;
 
   @Override
   public String getShortName()
@@ -169,6 +99,53 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     theWriter = writer;
     this.input = input;
     this.mappings = input.getMappings();
+
+    /**
+     * Try to create a sorted map of nodes. The left annis feature token index
+     * is used for sorting the nodes. It is possible the different nodes has the
+     * same left token index, but the probability of this is small and it seem's
+     * not to make much sense to visualize this. Mabye we should use the node
+     * id.
+     */
+    this.selectedNodes = new TreeMap<SNode, Integer>(
+      new Comparator<SNode>()
+      {
+        private int getIdx(SNode snode)
+        {
+          if (snode instanceof SToken)
+          {
+            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
+            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+          }
+          else
+          {
+            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
+            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+          }
+        }
+
+        @Override
+        public int compare(SNode o1, SNode o2)
+        {
+          int tok1 = getIdx(o1);
+          int tok2 = getIdx(o2);
+
+          if (tok1 < tok2)
+          {
+            return -1;
+          }
+
+          if (tok1 == tok2)
+          {
+            return 0;
+          }
+          else
+          {
+            return 1;
+          }
+
+        }
+      });
 
     printHTMLOutput();
   }
@@ -228,19 +205,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         // decide, if the visualization is token based.
         if (mappings.containsKey(MAPPING_NODE_KEY))
         {
-          if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
-          {
-            vakyarthaObject.put("t", annotationValue);
-          }
-          else if (VISIBLE.
-            equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-          {
-            vakyarthaObject.put("t", text + "\n" + annotationValue);
-          }
-          else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-          {
-            vakyarthaObject.put("t", annotationValue);
-          }
+          vakyarthaObject.put("t", annotationValue);
         }
         else
         {
@@ -255,7 +220,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         for (Edge e : sEdges)
         {
-          if (!(e instanceof SPointingRelation) || !(e.getSource() instanceof SNode))
+          if (!(e instanceof SPointingRelation))
           {
             continue;
           }
@@ -270,16 +235,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
             break;
           }
 
-          if (sRelation.getSource() == null
-            || !node2Int.containsKey(source))
-          {
-            govs.put("root", label);
-          }
-          else
+          if (sRelation.getSource() != null && node2Int.containsKey(source))
           {
             govs.put(String.valueOf(node2Int.get(source)), label);
           }
-
         }
 
         vakyarthaObject.put("govs", govs);
@@ -307,24 +266,6 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
       println("</head>");
       println("<body>");
-
-      // only add button if mapping is set
-      if (mappings.containsKey(MAPPING_NODE_KEY))
-      {
-        if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
-        {
-          println("<button class='token_switcher'>show tokens</button>");
-        }
-        else if (VISIBLE.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-        {
-          println("<button class='token_switcher'>hide tokens</button>");
-        }
-        else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-        {
-          println("<button class='token_switcher'>show tokens</button>");
-        }
-        // TODO notice the user of unproper config of the resolver_vis_map table
-      }
 
       // the div to render the javascript to
       println(
