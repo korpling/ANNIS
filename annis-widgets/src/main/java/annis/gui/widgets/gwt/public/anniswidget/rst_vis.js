@@ -88,13 +88,8 @@
       {
         for(var item in json.children)
         {
-          if (json.data !== undefined)
-          {
-            layoutTreeHelper(json.children[item], height +
-              config.subTreeOffset, config, nodes);
-          }else {
-            layoutTreeHelper(json.children[item], height, config, nodes);
-          }
+          layoutTreeHelper(json.children[item], height +
+            config.subTreeOffset, config, nodes);
         }
 
         // exclude root from calculation
