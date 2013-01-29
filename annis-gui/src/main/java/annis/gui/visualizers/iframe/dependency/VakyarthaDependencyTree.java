@@ -29,7 +29,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
@@ -118,50 +117,9 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   private Properties mappings;
 
   /**
-   * Try to create a sorted map of nodes. The left annis feature token index is
-   * used for sorting the nodes. It is possible the different nodes has the same
-   * left token index, but the probability of this is small and it seem's not to
-   * make much sense to visualize this. Mabye we should use the node id.
+   * contains only token, if mappings does not contain "node_key"
    */
-  private Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
-    new Comparator<SNode>()
-    {
-      private int getIdx(SNode snode)
-      {
-        if (snode instanceof SToken)
-        {
-          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
-          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
-        }
-        else
-        {
-          SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
-          return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
-        }
-      }
-
-      @Override
-      public int compare(SNode o1, SNode o2)
-      {
-        int tok1 = getIdx(o1);
-        int tok2 = getIdx(o2);
-
-        if (tok1 < tok2)
-        {
-          return -1;
-        }
-
-        if (tok1 == tok2)
-        {
-          return 0;
-        }
-        else
-        {
-          return 1;
-        }
-
-      }
-    });
+  private Map<SNode, Integer> selectedNodes;
 
   @Override
   public String getShortName()
@@ -175,6 +133,53 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     theWriter = writer;
     this.input = input;
     this.mappings = input.getMappings();
+
+    /**
+     * Try to create a sorted map of nodes. The left annis feature token index
+     * is used for sorting the nodes. It is possible the different nodes has the
+     * same left token index, but the probability of this is small and it seem's
+     * not to make much sense to visualize this. Mabye we should use the node
+     * id.
+     */
+    this.selectedNodes = new TreeMap<SNode, Integer>(
+      new Comparator<SNode>()
+      {
+        private int getIdx(SNode snode)
+        {
+          if (snode instanceof SToken)
+          {
+            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
+            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+          }
+          else
+          {
+            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
+            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+          }
+        }
+
+        @Override
+        public int compare(SNode o1, SNode o2)
+        {
+          int tok1 = getIdx(o1);
+          int tok2 = getIdx(o2);
+
+          if (tok1 < tok2)
+          {
+            return -1;
+          }
+
+          if (tok1 == tok2)
+          {
+            return 0;
+          }
+          else
+          {
+            return 1;
+          }
+
+        }
+      });
 
     printHTMLOutput();
   }
