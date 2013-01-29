@@ -75,6 +75,28 @@
   {
     var lastChild;
 
+    /**
+     * If the root has at least one satellite, return true.
+     */
+    function hasSatellite(json)
+    {
+      var childrenArray = json["children"];
+
+      for (var i in childrenArray)
+      {
+        var edges = childrenArray[i].data.edges;
+        for (var e in edges)
+        {
+          if (edges[e].sType ==  "rst")
+          {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
     function layoutTreeHelper(json, height, config, nodes, f)
     {
 
@@ -88,8 +110,14 @@
       {
         for(var item in json.children)
         {
-          layoutTreeHelper(json.children[item], height +
-            config.subTreeOffset, config, nodes);
+          if (json.data === undefined && !hasSatellite(json))
+          {
+            layoutTreeHelper(json.children[item], height, config, nodes);
+          }
+          else{
+            layoutTreeHelper(json.children[item], height +
+              config.subTreeOffset, config, nodes);
+          }
         }
 
         // exclude root from calculation
