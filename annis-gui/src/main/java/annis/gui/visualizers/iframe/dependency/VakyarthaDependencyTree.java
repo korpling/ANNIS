@@ -57,8 +57,6 @@ import org.slf4j.LoggerFactory;
  *
  * <li>node_key:&lt;annotation key&gt;</li>
  *
- * <li>token_visibility:&lt;visible|shown&gt;</li>
- *
  * </ul> </p>
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
@@ -82,42 +80,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
    */
   private final String MAPPING_NODE_KEY = "node_key";
 
-  /**
-   * Only select edges with the edge namespace. If this mappging is not defined
-   * the {@link VakyarthaDependencyTree#MAPPING_NODE_KEY} is used.
-   */
-  private final String MAPPING_EDGE_NS = "edge_ns";
-
-  /**
-   * Behaviour:
-   *
-   *
-   * 1. Node key mapping is not set: this mapping has no effect and the token
-   * switcher button is not shown.
-   *
-   * 2. Node key mapping is set:
-   *
-   * 2.1 Token visibility mapping is not set: The button is visible, but the
-   * token level is hidden.
-   *
-   * 2.2 Token visibility mapping is set to visible: The button and the token
-   * level is visible.
-   *
-   * 2.3 Token visiblity mapping is set to hidden The button is visible but the
-   * token level is not visible.
-   */
-  private final String MAPPING_TOKEN_VISIBILITY = "token_visibility";
-
-  // the one of two possible states of the token switcher button
-  private final String VISIBLE = "visible";
-
-  // the one of two possible states of the token switcher button
-  private final String HIDDEN = "hidden";
-
   private Properties mappings;
 
   /**
-   * contains only token, if mappings does not contain "node_key"
+   * Contains only token, if mappings does not contain "node_key".
    */
   private Map<SNode, Integer> selectedNodes;
 
@@ -239,19 +205,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         // decide, if the visualization is token based.
         if (mappings.containsKey(MAPPING_NODE_KEY))
         {
-          if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
-          {
-            vakyarthaObject.put("t", annotationValue);
-          }
-          else if (VISIBLE.
-            equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-          {
-            vakyarthaObject.put("t", annotationValue + "\n" + text);
-          }
-          else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-          {
-            vakyarthaObject.put("t", annotationValue);
-          }
+          vakyarthaObject.put("t", annotationValue);
         }
         else
         {
@@ -312,24 +266,6 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
       println("</head>");
       println("<body>");
-
-      // only add button if mapping is set
-      if (mappings.containsKey(MAPPING_NODE_KEY))
-      {
-        if (!mappings.containsKey(MAPPING_TOKEN_VISIBILITY))
-        {
-          println("<button class='token_switcher'>show tokens</button>");
-        }
-        else if (VISIBLE.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-        {
-          println("<button class='token_switcher'>hide tokens</button>");
-        }
-        else if (HIDDEN.equals(mappings.getProperty(MAPPING_TOKEN_VISIBILITY)))
-        {
-          println("<button class='token_switcher'>show tokens</button>");
-        }
-        // TODO notice the user of unproper config of the resolver_vis_map table
-      }
 
       // the div to render the javascript to
       println(
