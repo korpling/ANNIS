@@ -76,6 +76,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import org.apache.commons.collections.list.SynchronizedList;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -142,6 +143,7 @@ public class AnnisRunner extends AnnisBaseRunner
     private String plan;
     private int runs;
     private int errors;
+    private final List<Long> values = Collections.synchronizedList(new ArrayList<Long>());
 
     public Benchmark(String functionCall, QueryData queryData)
     {
@@ -149,6 +151,26 @@ public class AnnisRunner extends AnnisBaseRunner
       this.functionCall = functionCall;
       this.queryData = queryData;
     }
+    
+    public long getMedian()
+    {
+      synchronized(values)
+      {        
+        // sort list
+        Collections.sort(values);
+        // get item in the middle
+        int pos = Math.round((float) values.size() / 2.0f);
+        if(pos >= 0 && pos < values.size())
+        {
+          return values.get(pos);
+        }       
+      }
+      
+      // indicate an error
+      return -1;
+    }
+    
+    
   }
   private List<AnnisRunner.Benchmark> benchmarks;
   private static final int SEQUENTIAL_RUNS = 5;
@@ -406,6 +428,7 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         long end = new Date().getTime();
         long runtime = end - start;
+        benchmark.values.add(runtime);
         benchmark.bestTimeInMilliseconds =
           Math.min(benchmark.bestTimeInMilliseconds, runtime);
         benchmark.worstTimeInMilliseconds =
@@ -453,6 +476,12 @@ public class AnnisRunner extends AnnisBaseRunner
       long end = new Date().getTime();
       long runtime = end - start;
       benchmark.avgTimeInMilliseconds += runtime;
+      benchmark.values.add(runtime);
+      benchmark.bestTimeInMilliseconds =
+        Math.min(benchmark.bestTimeInMilliseconds, runtime);
+      benchmark.worstTimeInMilliseconds =
+        Math.max(benchmark.worstTimeInMilliseconds, runtime);
+      
       ++benchmark.runs;
       if (error)
       {
@@ -471,7 +500,7 @@ public class AnnisRunner extends AnnisBaseRunner
       benchmark.avgTimeInMilliseconds = Math.round((double) benchmark.avgTimeInMilliseconds
         / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.avgTimeInMilliseconds + " ms (avg for "
+      out.println(benchmark.getMedian() + " ms (median for "
         + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
         + benchmark.errors + " errors)" : ")") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
@@ -514,19 +543,19 @@ public class AnnisRunner extends AnnisBaseRunner
 
       String[] header = new String[]
       {
-        "corpora", "query", "avg", "diff-best", "diff-worst"
+        "corpora", "query", "median", "diff-best", "diff-worst"
       };
       csv.writeNext(header);
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
+        long median = benchmark.getMedian();
+        
         String[] line = new String[5];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
-        line[2] = "" + benchmark.avgTimeInMilliseconds;
-        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds
-          - benchmark.avgTimeInMilliseconds);
-        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds
-          - benchmark.worstTimeInMilliseconds);
+        line[2] = "" + median;
+        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds- median);
+        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds - median);
         csv.writeNext(line);
       }
 
