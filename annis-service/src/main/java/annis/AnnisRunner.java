@@ -417,6 +417,7 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           out.print(", ");
         }
+        boolean error = false;
         long start = new Date().getTime();
         try
         {
@@ -424,7 +425,7 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         catch (RuntimeException e)
         {
-          // don't care
+          error = true;
         }
         long end = new Date().getTime();
         long runtime = end - start;
@@ -433,7 +434,14 @@ public class AnnisRunner extends AnnisBaseRunner
           Math.min(benchmark.bestTimeInMilliseconds, runtime);
         benchmark.worstTimeInMilliseconds =
           Math.max(benchmark.worstTimeInMilliseconds, runtime);
+        ++benchmark.runs;
+        if (error)
+        {
+          ++benchmark.errors;
+        }
+        
         out.print(runtime + " ms");
+       
       }
       out.println();
       out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
@@ -514,9 +522,9 @@ public class AnnisRunner extends AnnisBaseRunner
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.worstTimeInMilliseconds + " ms ("
-        + (benchmark.errors > 0 ? "?"
-        + benchmark.errors + " errors)" : ")") + " for '"
+      out.println(benchmark.worstTimeInMilliseconds + " ms "
+        + (benchmark.errors > 0 ? "("
+        + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
@@ -527,9 +535,9 @@ public class AnnisRunner extends AnnisBaseRunner
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.bestTimeInMilliseconds + " ms ("
-        + (benchmark.errors > 0 ? "?"
-        + benchmark.errors + " errors)" : ")") + " for '"
+      out.println(benchmark.bestTimeInMilliseconds + " ms "
+        + (benchmark.errors > 0 ? "("
+        + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
