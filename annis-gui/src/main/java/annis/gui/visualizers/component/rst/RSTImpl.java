@@ -168,6 +168,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
+    jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
 
 
