@@ -19,6 +19,10 @@ import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import static annis.model.AnnisConstants.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -162,21 +166,24 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     visId = "rst_" + count;
     count++;
 
-    jit = new JITWrapper();
-    this.addComponent(jit);
 
+
+
+
+    jit = new JITWrapper();
+    addComponent(jit);
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
     jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
 
-
   }
 
   private void addScrollbar()
   {
-    this.setWidth(this.getParent().getWidth(), this.getParent().getWidthUnits());
+    this.setWidth("100%");
+    this.setHeight("-1px");
     this.getContent().setSizeUndefined();
   }
 
@@ -768,6 +775,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     super.attach();
     addScrollbar();
+    setScrollable(true);
+
   }
 
   private boolean hasRSTType(SRelation e)

@@ -362,6 +362,25 @@
     return (((2 * x + this.config.nodeWidth) / 2));
   };
 
+  /**
+   * Returns middle position of the node label and takes into account, if the
+   * starting or end point of the edge connect an dominance label.
+   */
+  rst.getEndPosRSTEdge = function(node)
+  {
+    if (this.containsEdge(node))
+    {
+      edges  = this.getEdgesOfSType(node, DOMINANCE);
+      if (edges.length == 1)
+      {
+        var targetNode = this.nodes[edges[0].to];
+        return this.getTopCenter(targetNode.pos.x);
+      }
+    }
+
+    return this.getTopCenter(node.pos.x);
+  };
+
   rst.initCanvas = function()
   {
     var wrapperElem = this.container;
@@ -407,30 +426,10 @@
   {
     var from = source.pos,
     to = target.pos,
-    fromX = this.getTopCenter(source.pos.x),
-    toX = this.getTopCenter(target.pos.x),
+    fromX = this.getEndPosRSTEdge(source),
+    toX = this.getEndPosRSTEdge(target),
     dim = 15,
     controllPoint = {};
-
-    if (this.containsEdge(source))
-    {
-      var edges = this.getEdgesOfSType(source, DOMINANCE);
-      if (edges.length == 1)
-      {
-        var sourceNode = this.nodes[edges[0].to];
-        fromX = this.getTopCenter(sourceNode.pos.x);
-      }
-    }
-
-    if(this.containsEdge(target))
-    {
-      var edges = this.getEdgesOfSType(target, DOMINANCE);
-      if (edges.length == 1)
-      {
-        var targetNode = this.nodes[edges[0].to];
-        toX = this.getTopCenter(targetNode.pos.x);
-      }
-    }
 
     if (fromX != toX)
     {
@@ -500,7 +499,7 @@
     label.innerHTML = annotation;
 
     labelPos = {
-      x : (fromX + toX) / 2 - (label.offsetWidth / 2),
+      x : (fromX + toX) / 2 - (label.clientWidth / 2),
       y : source.pos.y - 35
     };
 
