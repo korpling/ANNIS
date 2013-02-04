@@ -563,7 +563,7 @@ public class AnnisRunner extends AnnisBaseRunner
         line[1] = benchmark.functionCall;
         line[2] = "" + median;
         line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds- median);
-        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds - median);
+        line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
 
