@@ -25,6 +25,7 @@ import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
 
 /**
  *
+ *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class RSTPanel extends Panel

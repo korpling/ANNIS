@@ -175,12 +175,25 @@ textarea.query {
   background-position: left top !important;
 }
 
+.left-button, .right-button {
+  background-position: center;
+  background-repeat: repeat-y;
+}
+
 .left-button {
-  background: url(left_arrow.png) repeat-y center;
-  padding: 5px;
+  background-image: url(left_rst_arrow.png);
 }
 
 .right-button {
-  background: url(right_arrow.png) repeat-y center;
-  padding: 5px;
+  background-image: url(right_rst_arrow.png);
+}
+
+.right-button .v-button-wrap {
+    background: none;
+    border: medium none;
+    border-radius: 2px 2px 2px 2px;
+    display: block;
+    height: 100%;
+    padding: 4px 13px;
+    text-overflow: ellipsis;
 }
