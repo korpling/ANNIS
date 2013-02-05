@@ -16,6 +16,7 @@
 package annis.gui.visualizers.component.rst;
 
 import annis.gui.visualizers.VisualizerInput;
+import annis.gui.widgets.JITWrapper;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
@@ -24,7 +25,9 @@ import org.vaadin.csstools.RenderInfo;
 import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
 
 /**
- *
+ * RSTPanel manages the scrollbuttons and calles then {@link RSTImpl} the actual
+ * implementation of RST. {@link RSTImpl} compute the json out of the Salt
+ * document. The whole rendering stuff is done in {@link JITWrapper}.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -36,6 +39,8 @@ public class RSTPanel extends Panel
     String btWidth = "30px";
     HorizontalLayout grid = new HorizontalLayout();
     final int scrollStep = 200;
+
+    // the calculation of the output json is done here.
     final Panel rstView = new RSTImpl(visInput);
 
     this.setHeight("-1px");
