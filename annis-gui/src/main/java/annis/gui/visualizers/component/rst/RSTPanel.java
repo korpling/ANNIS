@@ -44,33 +44,36 @@ public class RSTPanel extends Panel
     grid.setWidth("100%");
 
 
-    Button buttonLeft = new Button();
+    final Button buttonLeft = new Button();
     buttonLeft.setWidth(btWidth);
     buttonLeft.setHeight("100%");
     buttonLeft.addStyleName("left-button");
+    buttonLeft.setEnabled(false);
+
+    final Button buttonRight = new Button();
+    buttonRight.setWidth(btWidth);
+    buttonRight.setHeight("100%");
+    buttonRight.addStyleName("right-button");
 
     buttonLeft.addListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        getScrollLeft();
-
         if (rstView.getScrollLeft() < scrollStep)
         {
+          buttonLeft.setEnabled(false);
           rstView.setScrollLeft(0);
         }
         else
         {
+          //if the right button was deactivated set it back
           rstView.setScrollLeft(rstView.getScrollLeft() - scrollStep);
         }
+
+        buttonRight.setEnabled(true);
       }
     });
-
-    Button buttonRight = new Button();
-    buttonRight.setWidth(btWidth);
-    buttonRight.setHeight("100%");
-    buttonRight.addStyleName("right-button");
 
     buttonRight.addListener(new Button.ClickListener()
     {
@@ -86,9 +89,20 @@ public class RSTPanel extends Panel
             props.put("width", info.getProperty(CssProperty.width));
             String width = ((String) props.get("width")).replaceAll("px", "");
             int maxWidth = Integer.parseInt(width);
-            if (maxWidth > rstView.getScrollLeft())
+
+            if (maxWidth - rstView.getScrollLeft() > scrollStep)
             {
+              buttonLeft.setEnabled(true);
               rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
+            }
+            else
+            {
+              rstView.
+                setScrollLeft(
+                rstView.getScrollLeft() - (maxWidth - rstView.getScrollLeft()));
+
+              buttonLeft.setEnabled(true);
+              buttonRight.setEnabled(false);
             }
           }
         });
