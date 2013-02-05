@@ -166,10 +166,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     visId = "rst_" + count;
     count++;
 
-
-
-
-
     jit = new JITWrapper();
     addComponent(jit);
 

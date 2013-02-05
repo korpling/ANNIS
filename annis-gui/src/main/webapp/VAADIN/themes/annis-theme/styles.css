@@ -37,11 +37,11 @@
 }
 
 .kwic {
-  font-size: 11px;  
+  font-size: 11px;
 }
 
 .v-table-cell-content-kwic-anno {
-  color: grey;  
+  color: grey;
 }
 
 .v-table-cell-content-kwic-clickable {
@@ -160,7 +160,7 @@ textarea.query {
 
 /* HACKS (or workarounds for browser/vaadin bugs) */
 
-/* 
+/*
  image only buttons don't render their icons in Firefox >= 7'
  - https://vaadin.com/de/forum/-/message_boards/view_message/778075
  - http://dev.vaadin.com/ticket/7713
@@ -168,9 +168,19 @@ textarea.query {
 
 .v-ff .v-button-wrap { overflow: visible; }
 
-/* 
- split button should have the some appearance on focus as the other buttons 
+/*
+ split button should have the some appearance on focus as the other buttons
 */
 .v-splitbutton .v-button:focus .v-button-wrap {
   background-position: left top !important;
+}
+
+.left-button {
+  background: url(left_arrow.png) repeat-y center;
+  padding: 5px;
+}
+
+.right-button {
+  background: url(right_arrow.png) repeat-y center;
+  padding: 5px;
 }

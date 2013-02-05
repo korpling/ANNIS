@@ -16,14 +16,12 @@
 package annis.gui.visualizers.component.rst;
 
 import annis.gui.visualizers.VisualizerInput;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
+import java.util.Properties;
+import org.vaadin.csstools.RenderInfo;
+import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
 
 /**
  *
@@ -34,37 +32,67 @@ public class RSTPanel extends Panel
 
   RSTPanel(VisualizerInput visInput)
   {
+    String btWidth = "30px";
     HorizontalLayout grid = new HorizontalLayout();
+    final int scrollStep = 200;
+    final Panel rstView = new RSTImpl(visInput);
+
     this.setHeight("-1px");
     this.setWidth("100%");
     grid.setHeight("-1px");
     grid.setWidth("100%");
-    final Panel rstView = new RSTImpl(visInput);
 
-    Button buttonLeft = new Button("left");
+
+    Button buttonLeft = new Button();
+    buttonLeft.setWidth(btWidth);
+    buttonLeft.setHeight("100%");
+    buttonLeft.addStyleName("left-button");
+
     buttonLeft.addListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        rstView.setScrollLeft(rstView.getScrollLeft() - 100);
+        getScrollLeft();
+
+        if (rstView.getScrollLeft() < scrollStep)
+        {
+          rstView.setScrollLeft(0);
+        }
+        else
+        {
+          rstView.setScrollLeft(rstView.getScrollLeft() - scrollStep);
+        }
       }
     });
 
-    buttonLeft.setWidth("10px");
-    buttonLeft.setHeight("100%");
+    Button buttonRight = new Button();
+    buttonRight.setWidth(btWidth);
+    buttonRight.setHeight("100%");
+    buttonRight.addStyleName("right-button");
 
-    Button buttonRight = new Button("right");
     buttonRight.addListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        rstView.setScrollLeft(rstView.getScrollLeft() + 100);
+        final Properties props = new Properties();
+        RenderInfo.get(rstView, new RenderInfo.Callback()
+        {
+          @Override
+          public void infoReceived(RenderInfo info)
+          {
+            props.put("width", info.getProperty(CssProperty.width));
+            String width = ((String) props.get("width")).replaceAll("px", "");
+            int maxWidth = Integer.parseInt(width);
+            if (maxWidth > rstView.getScrollLeft())
+            {
+              rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
+            }
+          }
+        });
       }
     });
-    buttonRight.setWidth("10px");
-    buttonRight.setHeight("100%");
 
     grid.addComponent(buttonLeft);
     grid.addComponent(rstView);
