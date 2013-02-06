@@ -111,11 +111,11 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     
   }
   
-  private String getAQLFragment(SearchBox sb, boolean remode)
+  private String getAQLFragment(SearchBox sb)
     //by Martin
   {
     String result, value=sb.getValue(), level=sb.getAttribute();
-    if (remode)
+    if (sb.isRegEx())
     {
       result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
       return result;
@@ -145,7 +145,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
 
         for (SearchBox sb : sbList)
         {
-          query += " & " + getAQLFragment(sb, sb.isRegEx());
+          query += " & " + getAQLFragment(sb);
         }
 
 
@@ -171,10 +171,19 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         edgeQuery += "\n& #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count;
       }
     }
-    //search within sentence?
+    //search within span?
     if(spb.searchWithinSpan())
     {
-      query += "\n& "+ spb.getSpanName() + " = /.*/";//is that correct?
+      String addQuery;
+      if (spb.isRegEx())
+      {
+        addQuery = "\n& "+ spb.getSpanName() + " = /" + spb.getSpanValue() + "/";
+      }
+      else
+      {
+        addQuery = "\n& "+ spb.getSpanName() + " = \"" + spb.getSpanValue() + "\"";
+      }
+      query += addQuery;    
       count++;
       for(Integer i : sentenceVars)
       {
@@ -184,12 +193,11 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
 
     String fullQuery = (query+edgeQuery+sentenceQuery);
     if (fullQuery.length() < 3) {return "";}
-    fullQuery = fullQuery.substring(3);//deletes leading " & "
-    //fullQuery = fullQuery.replace("txt=", ""); //depends on the corpus, I think
+    fullQuery = fullQuery.substring(3);//deletes leading " & "    
     return fullQuery;
   }
 
-  public void updateQuery()//by Martin
+  public void updateQuery()
   {
     cp.setQuery(getAQLQuery(), null);
   }
