@@ -94,8 +94,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     
     addComponent(sb);
 
-  }
- 
+  } 
  
   @Override
   public void buttonClick(Button.ClickEvent event)
@@ -112,7 +111,7 @@ public class SearchBox extends Panel implements Button.ClickListener
       cb.setNewItemsAllowed(r);
       if(!r)
       {
-        //rebuild ComboBox-content
+        //rebuild ComboBox-content <- check out SpanBox for alternative solution
         cb.removeAllItems();
         for(String a : annonames)
         {
@@ -136,4 +135,6 @@ public class SearchBox extends Panel implements Button.ClickListener
   {
     return reBox.booleanValue();
   }
+  
+  
 }
