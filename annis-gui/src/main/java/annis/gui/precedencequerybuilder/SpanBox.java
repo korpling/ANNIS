@@ -15,29 +15,35 @@
  */
 package annis.gui.precedencequerybuilder;
 
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
+import com.vaadin.data.Property.ValueChangeListener;
+import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  *
  * @author Martin
  */
-public class SpanBox extends Panel implements Button.ClickListener
+public class SpanBox extends Panel implements Button.ClickListener, ComboBox.ValueChangeListener
 {
   private PrecedenceQueryBuilder sq;
-  private HorizontalLayout option;
+  private VerticalLayout option;
   private CheckBox chbWithin;
   private ComboBox cbSpan;
+  private ComboBox cbSpanValue;
+  private SearchBox sb;
+  private CheckBox reBox; 
   
   public SpanBox(PrecedenceQueryBuilder sq)
   {
     this.sq = sq;    
-    option = new HorizontalLayout();
-    option.setImmediate(true);
-    
+    option = new VerticalLayout();
+    option.setImmediate(true);  
     
     chbWithin = new CheckBox("Search within: ");
     chbWithin.setDescription("Add some AQL code to the query to make it limited to the chosen span.");
@@ -45,12 +51,30 @@ public class SpanBox extends Panel implements Button.ClickListener
     chbWithin.addListener((Button.ClickListener) this);
     
     cbSpan = new ComboBox();
+    cbSpanValue = new ComboBox();
+    
+    cbSpan.setCaption("span:");
     cbSpan.setEnabled(false);
     cbSpan.setNullSelectionAllowed(false);
     cbSpan.setImmediate(true);
+    cbSpan.setWidth("130px");
+    cbSpan.addListener((ValueChangeListener) this);   
+    
+    cbSpanValue.setCaption("span value:");
+    cbSpanValue.setEnabled(false);
+    cbSpanValue.setNullSelectionAllowed(false);
+    cbSpanValue.setImmediate(true);    
+    cbSpanValue.setWidth("130px");    
+    
+    reBox = new CheckBox("regex");
+    reBox.setEnabled(false);
+    reBox.setImmediate(true);    
+    reBox.addListener((Button.ClickListener) this);    
     
     option.addComponent(chbWithin);
     option.addComponent(cbSpan);
+    option.addComponent(cbSpanValue);
+    option.addComponent(reBox);
     
     addComponent(option);
   }
@@ -60,15 +84,76 @@ public class SpanBox extends Panel implements Button.ClickListener
   {
     if (event.getComponent() == chbWithin)
     {
-      if(cbSpan.size() == 0)
+      if (chbWithin.booleanValue())
       {
-        for (String annoname : sq.getAvailableAnnotationNames())
+        cbSpan.setEnabled(true);
+        if(cbSpan.size() == 0)//1st time
         {
-          cbSpan.addItem(sq.killNamespace(annoname));
-        }        
-      }      
-      cbSpan.setEnabled(chbWithin.booleanValue());
+          Collection<String> annonames = sq.getAvailableAnnotationNames();
+          for (String annoname : annonames)
+          {
+            cbSpan.addItem(sq.killNamespace(annoname));
+          }                  
+        }
+        cbSpan.setInputPrompt("span name");
+        String checkLevel = (cbSpan.getValue()==null) ? "" : cbSpan.getValue().toString();
+        cbSpanValue.setEnabled(!checkLevel.equals(""));
+      }
+      else
+      {
+        cbSpanValue.setEnabled(false); 
+        reBox.setEnabled(false);
+      }
+      
+      cbSpan.setEnabled(chbWithin.booleanValue());     
+      
     }
+    if (event.getComponent() == reBox)
+    {
+      cbSpanValue.setNewItemsAllowed(reBox.booleanValue());
+      if (!reBox.booleanValue())
+      {        
+        //delete regex-value:
+        String checkValue = cbSpanValue.getValue().toString();
+        Collection<String> annovals = getAnnotationValues(cbSpan.getValue().toString());
+        if(!annovals.contains(checkValue))
+        {
+          cbSpanValue.removeItem(checkValue);
+          cbSpanValue.setValue(annovals.iterator().next());
+        }        
+      }
+    }
+  }
+  
+  @Override
+  public void valueChange(ValueChangeEvent event)
+  {
+    if (true) //modify later <----- !!! !!! !!!
+    {      
+      cbSpanValue.removeAllItems();
+      Collection<String> annonames = getAnnotationValues(cbSpan.getValue().toString());
+      for (String a : annonames)
+      {
+        cbSpanValue.addItem(a);          
+      }
+      String first = annonames.iterator().next();
+      cbSpanValue.setValue(first);
+      cbSpanValue.setEnabled(true);
+      reBox.setEnabled(true);      
+    }
+  }
+  
+  private Collection<String> getAnnotationValues(String level)
+  {
+    Collection<String> names = new TreeSet<String>();
+    
+    for(String s : sq.getAvailableAnnotationLevels(level))
+    {
+      sq.killNamespace(s);
+      names.add(s.replaceFirst("^[^:]*:", ""));
+    }
+    
+    return names;
   }
   
   public boolean searchWithinSpan()
@@ -78,6 +163,17 @@ public class SpanBox extends Panel implements Button.ClickListener
   
   public String getSpanName()
   {
-    return cbSpan.toString();
+    return cbSpan.getValue().toString();
   }
+  
+  public String getSpanValue()
+  {
+    return cbSpanValue.getValue().toString();
+  }
+  
+  public boolean isRegEx()
+  {
+    return reBox.booleanValue();
+  }
+  
 }
