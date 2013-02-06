@@ -35,14 +35,19 @@ class MetaBox extends Panel implements Button.ClickListener
 {
 
   private Button btClose;
+  private String selection;
+  private TwinColSelect tcs;
   private VerticalLayout sb;
   private PrecedenceQueryBuilder sq;
+  private final String datum;
   
   public MetaBox(String ebene, PrecedenceQueryBuilder sq)
   {
     this.sq = sq;
     sb = new VerticalLayout();
     sb.setImmediate(true);
+    
+    datum = ebene;
     
     // close
     btClose = new Button("Close", (Button.ClickListener) this);
@@ -66,11 +71,23 @@ class MetaBox extends Panel implements Button.ClickListener
     l.setLeftColumnCaption("Available levels");
     l.setRightColumnCaption("Selected levels");
     l.setWidth("350px");
+    tcs = l;
 
-    sb.addComponent(l);
+    sb.addComponent(tcs);
     sb.addComponent(btClose);
     addComponent(sb);
 
+  }  
+  
+  public String getMetaDatum()
+  {
+    return datum;
+  }
+  
+  public Collection<String> getValues()
+  {
+    Collection<String> result = (Collection)tcs.getValue();
+    return result;
   }
   
   @Override
