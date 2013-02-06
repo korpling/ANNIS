@@ -126,6 +126,19 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
       return result;
     }
   }
+  
+  private String getMetaQueryFragment(MetaBox mb)
+  {
+    String result = "";
+    Collection<String> values = mb.getValues();
+    Iterator<String> itValues = values.iterator();
+    while(itValues.hasNext())
+    {
+      result+= "\n& meta::"+mb.getMetaDatum()+" = \""+itValues.next()+"\"";
+    }
+    
+    return result;
+  }
 
   private String getAQLQuery()//by Martin
   {
@@ -190,8 +203,16 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
       }
     }
+    
+    //metaquery:
+    String metaQuery = "";
+    Iterator<MetaBox> itMetaBoxes = mboxes.iterator();
+    while(itMetaBoxes.hasNext())
+    {
+      metaQuery += getMetaQueryFragment(itMetaBoxes.next());
+    }
 
-    String fullQuery = (query+edgeQuery+sentenceQuery);
+    String fullQuery = (query+edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "    
     return fullQuery;
