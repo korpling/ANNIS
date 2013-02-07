@@ -22,12 +22,8 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.client.ApplicationConnection;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Page;
@@ -41,12 +37,9 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -507,7 +500,7 @@ public class SearchUI extends AnnisBaseUI
 
     if (windowLogin == null)
     {
-      LoginWindow windowLogin = new LoginWindow();
+      windowLogin = new LoginWindow();
       windowLogin.setModal(true);
       windowLogin.setSizeUndefined();
     }
