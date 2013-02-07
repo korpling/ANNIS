@@ -175,8 +175,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       if (p == null)
       {
-        getWindow().showNotification("Could not get subgraphs",
-          Window.Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Could not get subgraphs",
+          Window.Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {

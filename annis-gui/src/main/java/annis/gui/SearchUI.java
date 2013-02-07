@@ -395,7 +395,7 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
-      showNotification("Invalid citation", Notification.TYPE_WARNING_MESSAGE);
+      showNotification("Invalid citation", Notification.Type.WARNING_MESSAGE);
     }
   }
 
@@ -613,7 +613,7 @@ public class SearchUI extends AnnisBaseUI
         + "<em>If you have problems with this media file:</em><br /> Try to check your browsers "
         + "documentation how to enable "
         + "support for the media type or inform the corpus creator about this problem.",
-          Window.Notification.TYPE_TRAY_NOTIFICATION, true);
+          Notification.Type.TRAY_NOTIFICATION, true);
       notify.setDelayMsec(15000);
       showNotification(notify);
       warnedAboutPossibleMediaFormatProblem = true;

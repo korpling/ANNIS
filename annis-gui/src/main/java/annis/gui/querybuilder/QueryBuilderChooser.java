@@ -105,8 +105,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     QueryBuilderPlugin plugin = pluginRegistry.get((String) event.getProperty().getValue());
     if(plugin == null)
     {
-      getWindow().showNotification("Invalid selection (plugin not found)", 
-        Window.Notification.TYPE_WARNING_MESSAGE);
+      Notification.show("Invalid selection (plugin not found)", 
+        Window.Notification.Type.WARNING_MESSAGE);
     }
     
     Component component = plugin.createComponent(controlPanel);

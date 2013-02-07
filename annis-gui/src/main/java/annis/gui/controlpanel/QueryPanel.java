@@ -29,12 +29,10 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
-import org.vaadin.hene.splitbutton.SplitButton;
-import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
+import org.vaadin.hene.popupbutton.PopupButton;
 
 /**
  *
@@ -51,7 +49,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
-  private SplitButton btHistory;
+  private PopupButton btHistory;
   private ListSelect lstHistory;
   private ControlPanel controlPanel;
   private ProgressIndicator piCount;
@@ -92,11 +90,13 @@ public class QueryPanel extends Panel implements TextChangeListener,
     mainLayout.addComponent(txtQuery, 1, 0);
 
     panelStatus = new Panel();
-    panelStatus.setWidth(100f, UNITS_PERCENTAGE);
-    panelStatus.setHeight(3.5f, UNITS_EM);
-    ((VerticalLayout) panelStatus.getContent()).setMargin(false);
-    ((VerticalLayout) panelStatus.getContent()).setSpacing(false);
-    ((VerticalLayout) panelStatus.getContent()).setSizeFull();
+    panelStatus.setWidth(100f, Unit.PERCENTAGE);
+    panelStatus.setHeight(3.5f, Unit.EM);
+    VerticalLayout panelStatusLayout = new VerticalLayout();
+    panelStatus.setContent(panelStatusLayout);
+    panelStatusLayout.setMargin(false);
+    panelStatusLayout.setSpacing(false);
+    panelStatusLayout.setSizeFull();
 
     lblStatus = new Label();
     lblStatus.setContentMode(Label.CONTENT_XHTML);
@@ -104,12 +104,9 @@ public class QueryPanel extends Panel implements TextChangeListener,
     lblStatus.setWidth("100%");
     lblStatus.setHeight("-1px");
 
-    panelStatus.addComponent(lblStatus);
+    panelStatusLayout.addComponent(lblStatus);
 
     mainLayout.addComponent(panelStatus, 1, 2);
-
-    setScrollable(true);
-
 
     Panel buttonPanel = new Panel();
     buttonPanelLayout = new HorizontalLayout();
@@ -122,7 +119,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     piCount.setEnabled(false);
     piCount.setVisible(false);
     piCount.setPollingInterval(500);
-    panelStatus.addComponent(piCount);
+    panelStatusLayout.addComponent(piCount);
 
 
     btShowResult = new Button("Show Result");
@@ -131,7 +128,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
-    buttonPanel.addComponent(btShowResult);
+    buttonPanelLayout.addComponent(btShowResult);
 
     lstHistory = new ListSelect();
     lstHistory.setNullSelectionAllowed(false);
@@ -139,19 +136,18 @@ public class QueryPanel extends Panel implements TextChangeListener,
     lstHistory.addListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
     
-    btHistory = new SplitButton("History");
-    btHistory.addStyleName(SplitButton.STYLE_CHAMELEON);
-    btHistory.setWidth(100f, UNITS_PERCENTAGE);
-    btHistory.setComponent(lstHistory);    
-    btHistory.setButtonDescription("<strong>Show History</strong><br />"
+    btHistory = new PopupButton("History");
+    btHistory.setWidth(100f, Unit.PERCENTAGE);
+    btHistory.setContent(lstHistory);
+    btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
-    buttonPanel.addComponent(btHistory);
+    buttonPanelLayout.addComponent(btHistory);
     
-    btHistory.addClickListener(new SplitButton.SplitButtonClickListener() {
-
+    btHistory.addClickListener(new Button.ClickListener() 
+    {
       @Override
-      public void splitButtonClick(SplitButtonClickEvent event)
+      public void buttonClick(ClickEvent event)
       {
         if(historyWindow == null)
         {
@@ -162,13 +158,13 @@ public class QueryPanel extends Panel implements TextChangeListener,
         }
         historyWindow.setContent(new HistoryPanel(history, controlPanel));
         
-        if(getWindow().getChildWindows().contains(historyWindow))
+        if(UI.getCurrent().getWindows().contains(historyWindow))
         {
           historyWindow.bringToFront();
         }
         else
         {          
-          getWindow().addWindow(historyWindow);
+          UI.getCurrent().addWindow(historyWindow);
         }
       }
     });
@@ -228,7 +224,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     // validate query
     try
     {
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      WebResource annisResource = Helper.getAnnisWebResource();
       String result = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
       if ("ok".equalsIgnoreCase(result))
@@ -250,16 +246,16 @@ public class QueryPanel extends Panel implements TextChangeListener,
       {
         log.error(
           "Exception when communicating with service", ex);
-        getWindow().showNotification("Exception when communicating with service: " + ex.getMessage(),
-          Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Exception when communicating with service: " + ex.getMessage(),
+          Notification.Type.TRAY_NOTIFICATION);
       }
     }
     catch(ClientHandlerException ex)
     {
       log.error(
           "Could not connect to web service", ex);
-        getWindow().showNotification("Could not connect to web service: " + ex.getMessage(),
-          Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Could not connect to web service: " + ex.getMessage(),
+          Notification.Type.TRAY_NOTIFICATION);
     }
   }
 

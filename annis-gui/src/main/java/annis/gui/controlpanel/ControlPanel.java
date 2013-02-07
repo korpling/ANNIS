@@ -22,8 +22,7 @@ import annis.gui.beans.HistoryEntry;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Set;
@@ -44,17 +43,16 @@ public class ControlPanel extends Panel
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
-  private SearchUI searchWindow;
-  private Window window;
+  private SearchUI searchUI;
   private String lastQuery;
   private Set<String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
   
-  public ControlPanel(SearchUI searchWindow, InstanceConfig instanceConfig)
+  public ControlPanel(SearchUI searchUI, InstanceConfig instanceConfig)
   {
     super("Search Form");
-    this.searchWindow = searchWindow;
+    this.searchUI = searchUI;
     this.history = new ListOrderedSet<HistoryEntry>();
 
     setSizeFull();
@@ -62,7 +60,8 @@ public class ControlPanel extends Panel
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    VerticalLayout layout = (VerticalLayout) getContent();
+    VerticalLayout layout = new VerticalLayout();
+    setContent(layout);
     layout.setSizeFull();
     
     Accordion accordion = new Accordion();
@@ -80,17 +79,10 @@ public class ControlPanel extends Panel
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
 
-    addComponent(queryPanel);
-    addComponent(accordion);
+    layout.addComponent(queryPanel);
+    layout.addComponent(accordion);
 
     layout.setExpandRatio(accordion, 1.0f);
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    this.window = getWindow();
   }
 
   public void setQuery(String query, Set<String> corpora)
@@ -117,12 +109,6 @@ public class ControlPanel extends Panel
   {
     return corpusList.getSelectedCorpora();
   }
-
-  @Override
-  public void paintContent(PaintTarget target) throws PaintException
-  {
-    super.paintContent(target);
-  }
   
   public void executeCount(String aql, Set<String> corpora)
   {
@@ -139,7 +125,7 @@ public class ControlPanel extends Panel
 
   public void executeQuery(boolean onlyCount)
   {
-    if (getApplication() != null && corpusList != null && queryPanel
+    if (searchUI != null && corpusList != null && queryPanel
       != null)
     {
  
@@ -148,14 +134,13 @@ public class ControlPanel extends Panel
       
       if (lastCorpusSelection == null || lastCorpusSelection.isEmpty())
       {
-        getWindow().showNotification("Please select a corpus",
-          Window.Notification.TYPE_WARNING_MESSAGE);
+        Notification.show("Please select a corpus",
+          Notification.Type.WARNING_MESSAGE);
         return;
       }
       if ("".equals(lastQuery))
       {
-        getWindow().showNotification("Empty query",
-          Window.Notification.TYPE_WARNING_MESSAGE);
+        Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
         return;
       }
 
@@ -175,7 +160,7 @@ public class ControlPanel extends Panel
       
       if(!onlyCount)
       {
-        searchWindow.showQueryResult(lastQuery, lastCorpusSelection,
+        searchUI.showQueryResult(lastQuery, lastCorpusSelection,
           searchOptions.getLeftContext(), searchOptions.getRightContext(),
           searchOptions.getSegmentationLayer(),
           0, searchOptions.getResultsPerPage());
@@ -204,11 +189,10 @@ public class ControlPanel extends Panel
     public void run()
     {
       WebResource res = null;
-      synchronized(getApplication()) 
-      {
-        res = Helper.getAnnisWebResource(getApplication());
-      }
-      
+
+      res = Helper.getAnnisWebResource();
+
+      VaadinSession session = VaadinSession.getCurrent();
       //AnnisService service = Helper.getService(getApplication(), window);
       if (res != null)
       {
@@ -220,35 +204,42 @@ public class ControlPanel extends Panel
         }
         catch (UniformInterfaceException ex)
         {
-          synchronized(getApplication()) 
+          
+          session.lock();
+          try
           {
             if (ex.getResponse().getStatus() == 400)
             {
-              window.showNotification(
+              Notification.show(
                 "parsing error",
                 ex.getResponse().getEntity(String.class),
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
             }
             else if(ex.getResponse().getStatus() == 504) // gateway timeout
             {
-               window.showNotification(
+              Notification.show(
                 "Timeout: query execution took too long.",
                 "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
             }
             else
             {
-              window.showNotification(
+              Notification.show(
                 "unknown error " + ex.
                 getResponse().getStatus(),
                 ex.getResponse().getEntity(String.class),
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
             }
+          }
+          finally
+          {
+            session.unlock();
           }
         }
       }
 
-      synchronized(getApplication()) 
+      session.lock();
+      try
       {
         queryPanel.setCountIndicatorEnabled(false);
         if(count != null)
@@ -258,8 +249,12 @@ public class ControlPanel extends Panel
           
           queryPanel.setStatus("" + count.getMatchCount() + " " + matchesString
             + " <br/>in " + count.getDocumentCount() + " " + documentString );
-          searchWindow.updateQueryCount(count.getMatchCount());
+          searchUI.updateQueryCount(count.getMatchCount());
         }
+      }
+      finally
+      {
+        session.unlock();
       }
     }
 

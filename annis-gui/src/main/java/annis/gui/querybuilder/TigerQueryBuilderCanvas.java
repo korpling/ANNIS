@@ -259,8 +259,8 @@ public class TigerQueryBuilderCanvas extends Panel
       }
       else
       {
-        getWindow().showNotification("There is already such an edge",
-          Notification.TYPE_WARNING_MESSAGE);
+        Notification.show("There is already such an edge",
+          Notification.Type.WARNING_MESSAGE);
       }
     }
   }

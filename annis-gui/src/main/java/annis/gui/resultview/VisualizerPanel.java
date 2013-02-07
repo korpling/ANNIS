@@ -223,10 +223,10 @@ public class VisualizerPanel extends CustomLayout
         }
         catch (Exception ex)
         {
-          getWindow().showNotification(
+          Notification.show(
             "Could not create visualizer " + visPlugin.getShortName(),
             ex.toString(),
-            Window.Notification.TYPE_TRAY_NOTIFICATION);
+            Window.Notification.Type.TRAY_NOTIFICATION);
           log.error("Could not create visualizer " + visPlugin.getShortName(),
             ex);
         }
@@ -460,10 +460,10 @@ public class VisualizerPanel extends CustomLayout
               ex);
             synchronized (getApplication())
             {
-              getWindow().showNotification(
+              Notification.show(
                 "Could not create visualizer " + visPlugin.getShortName(),
                 ex.toString(),
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Window.Notification.Type.WARNING_MESSAGE);
             }
             cancel(true);
           }

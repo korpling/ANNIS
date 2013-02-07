@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.jonatan.contexthelp.ContextHelp;
-import org.vaadin.jonatan.contexthelp.HelpFieldWrapper;
 
 /**
  *
@@ -65,8 +63,9 @@ public class SearchOptionsPanel extends FormLayout
     
     addStyleName("contextsensible-formlayout");
     
-    ContextHelp help = new ContextHelp();
-    addComponent(help);
+    // TODO: re-enable context help in search options (vaadin7)
+//    ContextHelp help = new ContextHelp();
+//    addComponent(help);
     
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -108,22 +107,22 @@ public class SearchOptionsPanel extends FormLayout
 
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
-    addComponent(new HelpFieldWrapper(cbSegmentation, help));
+//    addComponent(new HelpFieldWrapper(cbSegmentation, help));
     addComponent(cbResultsPerPage);
     
-    help.addHelpForComponent(cbSegmentation, "If corpora with multiple "
-      + "context definitions are selected, a list of available context units will be "
-      + "displayed. By default context is calculated in ‘tokens’ "
-      + "(e.g. 5 minimal units to the left and right of a search result). "
-      + "Some corpora might offer further context definitions, e.g. in "
-      + "syllables, word forms belonging to different speakers, normalized or "
-      + "diplomatic segmentations of a manuscript, etc.");
+//    help.addHelpForComponent(cbSegmentation, "If corpora with multiple "
+//      + "context definitions are selected, a list of available context units will be "
+//      + "displayed. By default context is calculated in ‘tokens’ "
+//      + "(e.g. 5 minimal units to the left and right of a search result). "
+//      + "Some corpora might offer further context definitions, e.g. in "
+//      + "syllables, word forms belonging to different speakers, normalized or "
+//      + "diplomatic segmentations of a manuscript, etc.");
   }
 
   public void updateSegmentationList(Set<String> corpora)
   {
     // get all segmentation paths
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
     if (service != null)
     {
 
@@ -151,7 +150,7 @@ public class SearchOptionsPanel extends FormLayout
           log.error(null, ex);
         }
         
-        CorpusConfig config = Helper.getCorpusConfig(corpus, getApplication(), getWindow());
+        CorpusConfig config = Helper.getCorpusConfig(corpus);
         
         if(config.getConfig().containsKey(KEY_DEFAULT_SEGMENTATION))
         {

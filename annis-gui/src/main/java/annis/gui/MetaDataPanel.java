@@ -16,7 +16,6 @@
 package annis.gui;
 
 import annis.model.Annotation;
-import com.google.gwt.logging.client.DefaultLevel;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;

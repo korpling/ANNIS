@@ -26,16 +26,14 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application.UserChangeEvent;
-import com.vaadin.Application.UserChangeListener;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.event.Action;
-import com.vaadin.terminal.ParameterHandler;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -44,10 +42,11 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
@@ -63,15 +62,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class CorpusListPanel extends VerticalLayout implements UserChangeListener,
-  AbstractSelect.NewItemHandler, Action.Handler, ParameterHandler
+public class CorpusListPanel extends VerticalLayout implements
+  AbstractSelect.NewItemHandler, Action.Handler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
   
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
   public static final String ALL_CORPORA = "All";
-  public static final String CORPUSSET_PARAM= "corpusset";
 
   public enum ActionType
   {
@@ -179,8 +177,8 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       public void buttonClick(ClickEvent event)
       {
         updateCorpusSetList(false);
-        getWindow().showNotification("Reloaded corpus list", 
-          Notification.TYPE_HUMANIZED_MESSAGE);
+        Notification.show("Reloaded corpus list", 
+          Notification.Type.HUMANIZED_MESSAGE);
       }
     });
     btReload.setIcon(new ThemeResource("../runo/icons/16/reload.png"));
@@ -197,34 +195,11 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
   {
     super.attach();
     
-    getWindow().addParameterHandler(this);
-    getApplication().addListener((UserChangeListener) this);
-
     tblCorpora.setSortContainerPropertyId("name");
     updateCorpusSetList();
   }
   
   
-  @Override
-  public void handleParameters(Map<String, String[]> parameters)
-  {
-    String[] param = parameters.get(CORPUSSET_PARAM);
-    if(param != null && param.length > 0)
-    {
-      String selectedSet = param[0];
-      Item item = cbSelection.getItem(selectedSet);
-      if(item == null)
-      {
-        getWindow().showNotification("Could not find corpus set \"" + selectedSet + "\"", "", 
-          Notification.TYPE_WARNING_MESSAGE);
-      }
-      {
-        cbSelection.setValue(selectedSet);
-      }
-      
-      updateCorpusTable();
-    }
-  }
   
   private void updateCorpusSetList()
   {
@@ -235,21 +210,21 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
   {
     if(queryServerForCorpusList() && userConfig != null)
     {
-      if(getApplication().getUser() == null)
+      if(VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
       {
         if(showLoginMessage)
         {
           if(allCorpora.isEmpty())
           {
-            getWindow().showNotification("No corpora found. Please login "
+            Notification.show("No corpora found. Please login "
                 + "(use button at upper right corner) to see more corpora.",
-                Notification.TYPE_HUMANIZED_MESSAGE);
+                Notification.Type.HUMANIZED_MESSAGE);
           }
           else
           {
-            getWindow().showNotification(
+            Notification.show(
               "You can login (use button at upper right corner) to get access to more corpora",
-              Notification.TYPE_TRAY_NOTIFICATION);
+              Notification.Type.TRAY_NOTIFICATION);
           }
         }
       }
@@ -359,7 +334,7 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
     {
       loadFromRemote();
       
-      WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+      WebResource rootRes = Helper.getAnnisWebResource();
       allCorpora = rootRes.path("query").path("corpora")
         .get(new GenericType<List<AnnisCorpus>>(){});
 
@@ -369,53 +344,54 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
     {
       log.error(
         null, ex);
-      getWindow().showNotification("Service not available: "
+      Notification.show("Service not available: "
         + ex.getLocalizedMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.Type.TRAY_NOTIFICATION);
     }
     catch (UniformInterfaceException ex)
     {
       if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
       {
-        getWindow().showNotification("You are not authorized to get the corpus list.", ex.getMessage(), 
-          Notification.TYPE_WARNING_MESSAGE);
+        Notification.show("You are not authorized to get the corpus list.", ex.getMessage(), 
+          Notification.Type.WARNING_MESSAGE);
       }
       else
       {
         log.error(
           null, ex);
-        getWindow().showNotification("Remote exception: "
+        Notification.show("Remote exception: "
           + ex.getLocalizedMessage(),
-          Notification.TYPE_TRAY_NOTIFICATION);
+          Notification.Type.TRAY_NOTIFICATION);
       }
     }
     catch (Exception ex)
     {
       log.error(
         null, ex);
-      getWindow().showNotification("Exception: "
+      Notification.show("Exception: "
         + ex.getLocalizedMessage(),
-        Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.Type.TRAY_NOTIFICATION);
     }
     return false;
   }
 
-  @Override
-  public void applicationUserChanged(UserChangeEvent event)
-  {
-    updateCorpusSetList();
-  }
+  // TODO: update corpus list on user change (vaadin7)
+//  @Override
+//  public void applicationUserChanged(UserChangeEvent event)
+//  {
+//    updateCorpusSetList();
+//  }
   
   private void loadFromRemote()
   {
-    WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+    WebResource rootRes = Helper.getAnnisWebResource();
     // get the current corpus configuration
     this.userConfig = rootRes.path("admin").path("userconfig").get(AnnisUserConfig.class);
   }
   
   private void storeChangesRemote()
   {
-     WebResource rootRes = Helper.getAnnisWebResource(getApplication());
+     WebResource rootRes = Helper.getAnnisWebResource();
     // store the config on the server
     rootRes.path("admin").path("userconfig").post(this.userConfig);
   }
@@ -445,9 +421,9 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       {
         log.error(
           "could not store new corpus set", ex);
-        getWindow().showNotification("Could not store new corpus set: "
+        Notification.show("Could not store new corpus set: "
           + ex.getLocalizedMessage(),
-          Notification.TYPE_WARNING_MESSAGE);
+          Notification.Type.WARNING_MESSAGE);
       }
     } // end if new item
   }
@@ -464,7 +440,7 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
       return new Action[0];
     }
     
-    if (getApplication().getUser() == null)
+    if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
     {
       // we can't change anything if we are not logged in so don't even try
       return new Action[0];
@@ -619,9 +595,8 @@ public class CorpusListPanel extends VerticalLayout implements UserChangeListene
             window.setResizable(false);
             window.setModal(false);
 
-            getWindow().addWindow(window);
+            UI.getCurrent().addWindow(window);
             window.center();
-
           }
         }
       });

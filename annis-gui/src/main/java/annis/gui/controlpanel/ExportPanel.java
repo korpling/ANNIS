@@ -23,18 +23,15 @@ import annis.gui.exporter.WekaExporter;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import org.slf4j.LoggerFactory;
-import org.vaadin.jonatan.contexthelp.ContextHelp;
-import org.vaadin.jonatan.contexthelp.HelpFieldWrapper;
 
 /**
  *
@@ -54,7 +51,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   
   private final Map<String,String> help4Exporter = new HashMap<String,String>();
   
-  private ContextHelp help;
+  // TODO: re-enable context help (vaadin7)
+//  private ContextHelp help;
   private ComboBox cbExporter;
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
@@ -77,8 +75,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     
     initHelpMessages();
     
-    help = new ContextHelp();
-    addComponent(help);
+//    help = new ContextHelp();
+//    addComponent(help);
 
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
@@ -93,9 +91,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     }
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
     cbExporter.addListener(new ExporterSelectionHelpListener());
-    help.addHelpForComponent(cbExporter, help4Exporter.get((String) cbExporter.getValue()));
+//    help.addHelpForComponent(cbExporter, help4Exporter.get((String) cbExporter.getValue()));
     
-    addComponent(new HelpFieldWrapper(cbExporter, help));
+//    addComponent(new HelpFieldWrapper(cbExporter, help));
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -123,10 +121,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbRightContext);
 
     txtParameters = new TextField("Parameters");
-    help.addHelpForComponent(txtParameters, "You can input special parameters "
-      + "for certain exporters. See the description of each exporter "
-      + "(‘?’ button above) for specific parameter settings.");
-    addComponent(new HelpFieldWrapper(txtParameters, help));
+//    help.addHelpForComponent(txtParameters, "You can input special parameters "
+//      + "for certain exporters. See the description of each exporter "
+//      + "(‘?’ button above) for specific parameter settings.");
+//    addComponent(new HelpFieldWrapper(txtParameters, help));
     
 
     btExport = new Button("Perform Export");
@@ -145,8 +143,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       {
         if(corpusListPanel.getSelectedCorpora().isEmpty())
         {
-          getWindow().showNotification("Please select a corpus",
-            Notification.TYPE_WARNING_MESSAGE);
+          Notification.show("Please select a corpus",
+            Notification.Type.WARNING_MESSAGE);
           return;
         }
 
@@ -166,7 +164,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
                 Integer.parseInt((String) cbRightContext.getValue()),
                 corpusListPanel.getSelectedCorpora(),
                 null, (String) txtParameters.getValue(),
-                Helper.getAnnisWebResource(getApplication()).path("query"),
+                Helper.getAnnisWebResource().path("query"),
                 new OutputStreamWriter(out, "UTF-8"));
             }
             catch (UnsupportedEncodingException ex)
@@ -184,10 +182,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           {
             return in;
           }
-        }, exporterName + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
+        }, exporterName + "_" + rand.nextInt(Integer.MAX_VALUE));
 
-        getWindow().open(
-          new ExternalResource(getApplication().getRelativeLocation(resource),"application/x-unknown"));
+        UI.getCurrent().getPage().open(resource, "_blank", false);
 
       }
     }
@@ -234,11 +231,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       String helpMessage = help4Exporter.get((String) event.getProperty().getValue());
       if(helpMessage != null)
       {
-        help.addHelpForComponent(cbExporter, helpMessage);
+//        help.addHelpForComponent(cbExporter, helpMessage);
       }
       else
       {
-        help.addHelpForComponent(cbExporter, "No help available for this exporter");
+//        help.addHelpForComponent(cbExporter, "No help available for this exporter");
       }
     }
     
