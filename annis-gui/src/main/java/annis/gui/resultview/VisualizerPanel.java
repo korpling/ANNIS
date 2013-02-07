@@ -24,10 +24,6 @@ import annis.gui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
@@ -40,7 +36,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
+import com.vaadin.server.ConnectorResource;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -60,6 +61,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.ws.rs.core.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +85,7 @@ public class VisualizerPanel extends CustomLayout
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
 
-  private ApplicationResource resource = null;
+  private ConnectorResource resource = null;
 
   private Component vis;
 
@@ -226,7 +228,7 @@ public class VisualizerPanel extends CustomLayout
           Notification.show(
             "Could not create visualizer " + visPlugin.getShortName(),
             ex.toString(),
-            Window.Notification.Type.TRAY_NOTIFICATION);
+            Notification.Type.TRAY_NOTIFICATION);
           log.error("Could not create visualizer " + visPlugin.getShortName(),
             ex);
         }
@@ -253,10 +255,9 @@ public class VisualizerPanel extends CustomLayout
       return null;
     }
 
-    final Application application = getApplication();
     final VisualizerInput input = createInput();
 
-    Component c = visPlugin.createComponent(input, application);
+    Component c = visPlugin.createComponent(input);
     c.setVisible(false);
 
     return c;
@@ -265,10 +266,10 @@ public class VisualizerPanel extends CustomLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL(getApplication().getProperty(
+    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().getAttribute(
       "AnnisWebService.URL"));
-    input.setContextPath(Helper.getContext(getApplication()));
-    input.setDotPath(getApplication().getProperty("DotPath"));
+    input.setContextPath(Helper.getContext());
+    input.setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
 
     input.setId(resultID);
 
@@ -286,7 +287,7 @@ public class VisualizerPanel extends CustomLayout
     {
       input.setMappings(entry.getMappings());
       input.setNamespace(entry.getNamespace());
-      String template = Helper.getContext(getApplication())
+      String template = Helper.getContext()
         + "/Resource/" + entry.getVisType() + "/%s";
       input.setResourcePathTemplate(template);
     }
@@ -334,7 +335,7 @@ public class VisualizerPanel extends CustomLayout
     }
   }
 
-  public ApplicationResource createResource(
+  public ConnectorResource createResource(
     ByteArrayOutputStream byteStream,
     String mimeType)
   {
@@ -342,8 +343,7 @@ public class VisualizerPanel extends CustomLayout
     StreamResource r;
 
     r = new StreamResource(new ByteArrayOutputStreamSource(byteStream),
-      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE),
-      getApplication());
+      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE));
     r.setMIMEType(mimeType);
 
     return r;
@@ -356,7 +356,7 @@ public class VisualizerPanel extends CustomLayout
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      WebResource annisResource = Helper.getAnnisWebResource();
       txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
         path(
         documentName).get(SaltProject.class);
@@ -375,7 +375,8 @@ public class VisualizerPanel extends CustomLayout
 
     if (resource != null)
     {
-      getApplication().removeResource(resource);
+      // TODO: how to detach the resource? (vaadin7)
+      //getApplication().removeResource(resource);
     }
   }
 
@@ -407,12 +408,14 @@ public class VisualizerPanel extends CustomLayout
         @Override
         public void run()
         {
+          VaadinSession session = VaadinSession.getCurrent();
           try
           {
             super.run();
             // wait maximum 60 seconds
             vis = get(60, TimeUnit.SECONDS);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
               if (callback != null && vis instanceof LoadableVisualizer)
               {
@@ -441,6 +444,10 @@ public class VisualizerPanel extends CustomLayout
                 }
               }
             }
+            finally
+            {
+              session.unlock();
+            }
           }
           catch (InterruptedException ex)
           {
@@ -458,12 +465,17 @@ public class VisualizerPanel extends CustomLayout
               error(
               "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
               ex);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
               Notification.show(
                 "Could not create visualizer " + visPlugin.getShortName(),
                 ex.toString(),
-                Window.Notification.Type.WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
+            }
+            finally
+            {
+              session.unlock();
             }
             cancel(true);
           }

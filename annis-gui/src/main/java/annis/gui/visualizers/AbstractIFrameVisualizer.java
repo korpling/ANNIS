@@ -16,8 +16,7 @@
 package annis.gui.visualizers;
 
 import annis.gui.widgets.AutoHeightIFrame;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
+import com.vaadin.server.ConnectorResource;
 import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -60,10 +59,10 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
 
   @Override
-  public Component createComponent(VisualizerInput vis, Application application)
+  public Component createComponent(VisualizerInput vis)
   {
     AutoHeightIFrame iframe;
-    ApplicationResource resource;
+    ConnectorResource resource;
 
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);

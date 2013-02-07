@@ -30,6 +30,9 @@ import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.Page;
+import com.vaadin.server.Page.BrowserWindowResizeEvent;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -126,23 +129,20 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   {
     super.attach();
     
-    getWindow().addListener(new Window.ResizeListener() 
+    UI.getCurrent().getPage().addBrowserWindowResizeListener(new Page.BrowserWindowResizeListener() 
     {
-
       @Override
-      public void windowResized(ResizeEvent e)
+      public void browserWindowResized(BrowserWindowResizeEvent event)
       {
-        layout.requestRepaintAll();
+        layout.markAsDirty();
       }
     });
     
-//    layout.setWidth(getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25, UNITS_PIXELS);
-    
     // reset all registered media players    
     MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
-    if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
+    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
     {
-      mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
+      mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent()).clearMediaPlayers();
     }
     
     // enable indicator in order to get refresh GUI regulary
@@ -157,11 +157,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       @Override
       protected void done()
       {
-        synchronized(getApplication())
+        VaadinSession session = VaadinSession.getCurrent();
+        session.lock();
+        try
         {
           indicator.setEnabled(false);
           indicator.setVisible(false);
           indicatorLayout.setVisible(false);
+        }
+        finally
+        {
+          session.unlock();
         }
       }
     };
@@ -176,7 +182,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       if (p == null)
       {
         Notification.show("Could not get subgraphs",
-          Window.Notification.Type.TRAY_NOTIFICATION);
+          Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {
@@ -284,7 +290,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
 
-      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
+      WebResource resResolver = Helper.getAnnisWebResource()
         .path("query").path("resolver");
 
       for (SingleResolverRequest r : resolverRequests)
@@ -426,7 +432,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       boolean allSuccessfull = true;
       
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = Helper.getAnnisWebResource();
       if (res != null)
       {
         res = res.path("query/search/subgraph");
@@ -452,18 +458,24 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             allSuccessfull = false;
           }
           
-          synchronized(getApplication())
+          VaadinSession session = VaadinSession.getCurrent();
+          session.lock();
+          try
           {
             
             if(lastProject != null)
             {
               addQueryResult(lastProject, j+firstMatchOffset);
             }
-            indicator.setValue((double) j++ / (double) matches.size());
+            indicator.setValue((float) j++ / (float) matches.size());
             if(j == matches.size())
             {
               indicator.setValue(1.0f);
             }
+          }
+          finally
+          {
+            session.unlock();
           }
         }
         

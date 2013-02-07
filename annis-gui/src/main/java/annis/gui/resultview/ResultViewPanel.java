@@ -18,15 +18,15 @@ package annis.gui.resultview;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
 import annis.gui.SearchUI;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
 import annis.service.objects.Match;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
@@ -34,7 +34,6 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -134,7 +133,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     try
     {
-      query = new AnnisResultQuery(corpora, aql, getApplication());
+      query = new AnnisResultQuery(corpora, aql);
       createPage(start, pageSize);
     
     }
@@ -174,55 +173,74 @@ public class ResultViewPanel extends Panel implements PagingCallback
         @Override
         public List<Match> call()
         {
+          VaadinSession session = VaadinSession.getCurrent();
           try
           {
 
-            AnnisUser user = null;
-            synchronized(getApplication()) 
-            {
-              if (getApplication() != null)
-              {
-                user = (AnnisUser) getApplication().getUser();
-              }
-            }
+            AnnisUser user = session.getAttribute(AnnisUser.class);
             return query.loadBeans(start, limit, user);
           }
           catch (AnnisQLSemanticsException ex)
           {
-            synchronized(getApplication()) 
+            session.lock();
+            try 
             {
               paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           catch (AnnisQLSyntaxException ex)
           {
-            synchronized(getApplication()) 
+            session.lock();
+            try
             {
               paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           catch (AnnisCorpusAccessException ex)
           {
-            synchronized(getApplication()) 
+            session.lock();
+            try
             {
               paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           catch (Exception ex)
           {
             log.error(
               "unknown exception in result view", ex);
-            synchronized(getApplication()) 
+            session.lock();
+            try
             {
               paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           finally
           {
-            synchronized(getApplication()) 
+            session.lock();
+            try
             {
               progressResult.setVisible(false);
               progressResult.setEnabled(false);
+            }
+            finally
+            {
+              session.unlock();
             }
           }        
           return null;  
@@ -239,6 +257,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
             return;
           }
           
+          VaadinSession session = VaadinSession.getCurrent();
+
           try
           {
             List<Match> result = get();
@@ -247,7 +267,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
               return;
             }
             
-            synchronized (getApplication())
+            session.lock();
+            try
             {
               if (resultPanel != null)
               {
@@ -279,14 +300,23 @@ public class ResultViewPanel extends Panel implements PagingCallback
                 mainLayout.setExpandRatio(lblNoResult, 1.0f);
               }
             }
+            finally
+            {
+              session.unlock();
+            }
             
           }
           catch (Exception ex)
           {
             log.error("Could not get result of future task", ex);
-            synchronized(getApplication()) 
+            session.lock();
+            try 
             {
               paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           

@@ -15,14 +15,13 @@
  */
 package annis.gui.tutorial;
 
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -41,16 +40,13 @@ public class TutorialPanel extends Panel
     
     embedded = new Embedded();
     embedded.setSizeFull();
-    addComponent(embedded);
+    layout.addComponent(embedded);
   }
 
   @Override
   public void attach()
   {
-    
-    WebApplicationContext webappcontext = (WebApplicationContext) getApplication().getContext();
-    HttpSession session = webappcontext.getHttpSession();
-    String contextPath = session.getServletContext().getContextPath();
+    String contextPath = VaadinService.getCurrentRequest().getContextPath();
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setSource(new ExternalResource(contextPath + "/tutorial/index.html"));
     

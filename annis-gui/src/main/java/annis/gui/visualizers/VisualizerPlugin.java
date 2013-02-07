@@ -59,7 +59,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin, Serializa
    * vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput, Application application);
+  public I createComponent(VisualizerInput visInput);
 
   /**
    * Checks if the Plugin needs the primary text source.
