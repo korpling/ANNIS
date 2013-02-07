@@ -15,12 +15,10 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VGripDragComponent;
 import com.vaadin.event.Transferable;
 import com.vaadin.event.TransferableImpl;
 import com.vaadin.event.dd.DragSource;
-import com.vaadin.terminal.gwt.client.MouseEventDetails;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import java.util.Map;
@@ -29,7 +27,6 @@ import java.util.Map;
  * A draggabe panel where only a specific grip is the starting point for the drag action.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VGripDragComponent.class)
 public class GripDragComponent extends CustomComponent implements DragSource
 {
   public GripDragComponent(Component panel)

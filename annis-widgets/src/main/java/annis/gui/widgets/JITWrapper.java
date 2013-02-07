@@ -15,18 +15,17 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VJITWrapper;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.LegacyComponent;
+import java.util.Map;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@ClientWidget(VJITWrapper.class)
-public class JITWrapper extends AbstractComponent
+public class JITWrapper extends AbstractComponent implements LegacyComponent
 {
   
   private String visData = null;
@@ -41,8 +40,6 @@ public class JITWrapper extends AbstractComponent
   public void paintContent(PaintTarget target)
     throws PaintException
   {
-    super.paintContent(target);
-
     target.addAttribute("visData", visData);
   }
 
@@ -50,5 +47,10 @@ public class JITWrapper extends AbstractComponent
   public void setVisData(String visData)
   {
     this.visData = visData;
+  }
+
+  public void changeVariables(Object source,
+    Map<String, Object> variables)
+  {
   }
 }

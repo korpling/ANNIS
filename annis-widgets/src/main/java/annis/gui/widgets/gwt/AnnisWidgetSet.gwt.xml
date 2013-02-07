@@ -5,18 +5,13 @@
 	-->
 
 	<!-- Inherit DefaultWidgetSet -->
-	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" />
+	<inherits name="com.vaadin.DefaultWidgetSet" />
 
   <inherits name="com.google.gwt.json.JSON" />
 
 	<!-- Widgetset default theme -->
 	<!-- This is relative to widgetset_directory/public -->
 	<stylesheet src="anniswidget/styles.css"/>
-
-  <script src="anniswidget/rst_vis.js" />
-
-  <!-- JQuery makes our life easier -->
-  <script src="anniswidget/jquery-1.8.2.min.js" />
 
     <!--
      Uncomment the following to compile the widgetset for one browser only.
@@ -37,12 +32,5 @@
     <inherits name="com.google.common.collect.Collect" />
 
 
-    <!-- automatically appended -->
     <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
-    <inherits name="org.vaadin.hene.splitbutton.widgetset.SplitButtonWidgetSet" />
-
-    <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
-
-
-    <inherits name="org.vaadin.jonatan.contexthelp.widgetset.ContexthelpWidgetset" />
 </module>

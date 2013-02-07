@@ -1,18 +1,16 @@
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VAutoHeightIFrame;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.LegacyComponent;
 import java.util.Map;
 
 /**
  * Server side component for the VAutoHeightIFrame widget.
  */
-@ClientWidget(VAutoHeightIFrame.class)
-public class AutoHeightIFrame extends AbstractComponent
+public class AutoHeightIFrame extends AbstractComponent implements LegacyComponent
 {
 
   private String url;
@@ -29,7 +27,6 @@ public class AutoHeightIFrame extends AbstractComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-    super.paintContent(target);
 
     if (!urlUpdated)
     {

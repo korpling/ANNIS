@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,22 @@
  */
 package annis.gui.widgets;
 
-import com.vaadin.ui.LegacyComponent;
+import annis.gui.widgets.gwt.client.VVideoPlayer;
+import com.vaadin.client.ui.LegacyConnector;
+import com.vaadin.shared.ui.Connect;
 
 /**
- * Audio player that implements the functions needed by ANNIS.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class AudioPlayer extends MediaPlayerBase
+@Connect(VideoPlayer.class)
+public class VideoPlayerConnector extends LegacyConnector
 {
-  public AudioPlayer(String resourceURL, String mimeType)
+
+  @Override
+  public VVideoPlayer getWidget()
   {
-    super(resourceURL, mimeType);
+    return (VVideoPlayer) super.getWidget();
   }
+  
 }

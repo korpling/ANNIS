@@ -18,7 +18,7 @@ package annis.gui.widgets.gwt.client;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.vaadin.terminal.gwt.client.Util;
+import com.vaadin.client.Util;
 
 /**
  *
