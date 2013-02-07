@@ -30,6 +30,18 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <excludes>
+            <exclude>VAADIN/widgetsets/WEB-INF/**</exclude>
+            <exclude>VAADIN/gwt-unitCache/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
 
       <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
 			<!-- directory is cleaned properly -->
@@ -53,9 +65,9 @@
 					<!-- <runTarget>mobilemail</runTarget> -->
 					<!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
 						way compatible with Vaadin eclipse plugin. -->
-					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets
+					<webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
 					</webappDirectory>
-					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets
+					<hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
 					</hostedWebapp>
 					<noServer>true</noServer>
 					<!-- Remove draftCompile when project is ready -->
