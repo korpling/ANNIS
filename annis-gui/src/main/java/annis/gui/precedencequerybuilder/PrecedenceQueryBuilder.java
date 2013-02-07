@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -60,6 +61,8 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
+  
+  private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", "^","$", "|", "?", "(", ")"};
 
   public PrecedenceQueryBuilder(ControlPanel cp)
   {
@@ -112,7 +115,6 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   }
   
   private String getAQLFragment(SearchBox sb)
-    //by Martin
   {
     String result, value=sb.getValue(), level=sb.getAttribute();
     if (sb.isRegEx())
@@ -128,15 +130,34 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   }
   
   private String getMetaQueryFragment(MetaBox mb)
-  {
-    String result = "";
+  {    
     Collection<String> values = mb.getValues();
-    Iterator<String> itValues = values.iterator();
-    while(itValues.hasNext())
+    String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+    if(values.size()==1)
     {
-      result+= "\n& meta::"+mb.getMetaDatum()+" = \""+itValues.next()+"\"";
+      result += "\""+values+"\"";//CHECK !!!
     }
+    else
+    {      
+      Iterator<String> itValues = values.iterator();
+      result += "/" + itValues.next();
+      while(itValues.hasNext())
+      {
+        result+= "|"+escapeRegexCharacters(itValues.next());
+      }
+      result += "/";
+    }   
     
+    return result;
+  }
+  
+  private String escapeRegexCharacters(String tok)
+  {
+    String result=tok;
+    for (int i = 0; i<REGEX_CHARACTERS.length; i++)
+    {
+      result = result.replace(REGEX_CHARACTERS[i], "\\"+REGEX_CHARACTERS[i]);
+    }
     return result;
   }
 
