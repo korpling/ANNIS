@@ -31,8 +31,8 @@ import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,7 +106,7 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     Set<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
     Set<String> corpusSelection = controlPanel.getSelectedCorpora();

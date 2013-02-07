@@ -22,6 +22,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -63,7 +64,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   {
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
-    layout = (VerticalLayout) getContent();
+    layout = new VerticalLayout();
+    setContent(layout);
     layout.setSizeFull();
     layout.setSpacing(true);
     setSizeFull();
@@ -88,7 +90,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     cbChooseBuilder.addListener((Property.ValueChangeListener) this);
     
-    addComponent(cbChooseBuilder);
+    layout.addComponent(cbChooseBuilder);
     layout.setExpandRatio(cbChooseBuilder, 0.0f);
     
     if(instanceConfig.getDefaultQueryBuilder() != null)
@@ -106,15 +108,15 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     if(plugin == null)
     {
       Notification.show("Invalid selection (plugin not found)", 
-        Window.Notification.Type.WARNING_MESSAGE);
+        Notification.Type.WARNING_MESSAGE);
     }
     
     Component component = plugin.createComponent(controlPanel);
     if(lastComponent != null)
     {
-      removeComponent(lastComponent);
+      layout.removeComponent(lastComponent);
     }
-    addComponent(component);
+    layout.addComponent(component);
     layout.setExpandRatio(component, 1.0f);
     lastComponent = component;
   }

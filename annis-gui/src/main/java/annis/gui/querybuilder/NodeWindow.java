@@ -19,10 +19,11 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.AbstractSelect.NewItemHandler;
+import com.vaadin.server.ThemeResource;
+
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   private List<ConstraintLayout> constraints;
   private boolean prepareEdgeDock;
   private int id;
+  private VerticalLayout vLayout;
 
   public NodeWindow(int id, TigerQueryBuilderCanvas parent)
   {
@@ -74,14 +76,15 @@ public class NodeWindow extends Panel implements Button.ClickListener
 
     prepareEdgeDock = false;
 
-    VerticalLayout vLayout = (VerticalLayout) getContent();
+    vLayout = new VerticalLayout();
+    setContent(vLayout);
     vLayout.setMargin(false);
 
     toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
     toolbar.setWidth("100%");
     toolbar.setHeight("-1px");
-    addComponent(toolbar);
+    vLayout.addComponent(toolbar);
 
     btMove = new Button();
     btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
@@ -178,7 +181,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       c.setWidth("100%");
       c.setHeight("-1px");
       constraints.add(c);
-      addComponent(c);
+      vLayout.addComponent(c);
       if(parent != null)
       {
         parent.updateQuery();
@@ -188,7 +191,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     {
       for(ConstraintLayout c : constraints)
       {
-        removeComponent(c);
+        vLayout.removeComponent(c);
       }
       constraints.clear();
       if(parent != null)
