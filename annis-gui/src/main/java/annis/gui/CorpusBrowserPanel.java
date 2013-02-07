@@ -27,9 +27,9 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Window.Notification;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
@@ -101,9 +101,6 @@ public class CorpusBrowserPanel extends Panel
   @Override
   public void attach()
   {
-
-    citationGenerator.setMainWindow(getApplication().getMainWindow());
-
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
@@ -233,7 +230,7 @@ public class CorpusBrowserPanel extends Panel
     Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
     try
     {
-      WebResource service = Helper.getAnnisWebResource(getApplication());
+      WebResource service = Helper.getAnnisWebResource();
       if(service != null)
       {
         WebResource query = service.path("query").path("corpora")
@@ -247,9 +244,9 @@ public class CorpusBrowserPanel extends Panel
     catch(Exception ex)
     {
       log.error(null, ex);
-      getWindow().showNotification(
+      Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
+        Notification.Type.WARNING_MESSAGE);
     }
     return new LinkedList<AnnisAttribute>(result);
   }

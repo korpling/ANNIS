@@ -113,7 +113,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About ANNIS", new AboutPanel());
+        Window w = new Window("About ANNIS", new AboutWindow());
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
@@ -180,7 +180,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
-      Window w = new Window("Help us to make ANNIS better!", new HelpUsPanel());
+      Window w = new Window("Help us to make ANNIS better!", new HelpUsWindow());
       w.setModal(true);
       w.setResizable(true);
       w.setWidth("600px");

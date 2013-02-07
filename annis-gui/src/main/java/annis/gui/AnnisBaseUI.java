@@ -31,6 +31,8 @@ import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
 import annis.gui.visualizers.component.AudioVisualizer;
 import annis.gui.visualizers.component.KWICPanel;
 import annis.gui.visualizers.component.VideoVisualizer;
+import annis.gui.visualizers.component.grid.GridVisualizer;
+import annis.gui.visualizers.component.rst.RST;
 import annis.gui.visualizers.component.rst.RSTFull;
 import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
 import annis.gui.visualizers.iframe.tree.TigerTreeVisualizer;
@@ -43,7 +45,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.UI;
 import java.io.*;
-import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -55,9 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -125,6 +123,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
     try
     {
       versionProperties.load(res.getStream().getStream());
+      getSession().setAttribute("annis-version", getVersion());
     }
     catch (Exception ex)
     {

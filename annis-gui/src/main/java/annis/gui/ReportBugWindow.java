@@ -15,15 +15,17 @@
  */
 package annis.gui;
 
-import com.vaadin.Application;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.activation.FileDataSource;
+import javax.ws.rs.core.Application;
 import org.apache.commons.mail.*;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ReportBugPanel extends Panel
+public class ReportBugWindow extends Window
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
@@ -45,11 +47,15 @@ public class ReportBugPanel extends Panel
   private Button btSubmit;
   private Button btCancel;
   
-  public ReportBugPanel(Application app, final String bugEMailAddress, final byte[] screenImage)
+  public ReportBugWindow(Application app, final String bugEMailAddress, final byte[] screenImage)
   {
     
     setSizeUndefined();
-
+    
+    // TODO: use form layout directly as content (vaadin7)
+    VerticalLayout mainLayout = new VerticalLayout();
+    setContent(mainLayout);
+      
     FormLayout layout = new FormLayout();
     layout.setSizeUndefined();
     form = new Form(layout);
@@ -57,10 +63,9 @@ public class ReportBugPanel extends Panel
     form.setSizeUndefined();
 
     form.setInvalidCommitted(false);
-    form.setWriteThrough(false);
-
-    getContent().setSizeFull();
-    getContent().addComponent(form);
+    
+    mainLayout.setSizeFull();
+    mainLayout.addComponent(form);
 
     txtSummary = new TextField("Short Summary");
     txtSummary.setRequired(true);
@@ -103,6 +108,7 @@ public class ReportBugPanel extends Panel
     form.addField("name", txtName);
     form.addField("email", txtMail);
 
+    final ReportBugWindow finalThis = this;
     btSubmit = new Button("Submit bug report", new Button.ClickListener()
     {
 
@@ -114,15 +120,12 @@ public class ReportBugPanel extends Panel
           form.commit();
 
           sendBugReport(bugEMailAddress, screenImage);
+          
+          UI.getCurrent().removeWindow(finalThis);
 
-
-          Window subwindow = getWindow();
-          Window parent = subwindow.getParent();
-          parent.removeWindow(subwindow);
-
-          parent.showNotification("Bug report was sent",
+          Notification.show("Bug report was sent",
             "We will answer your bug report as soon as possible",
-            Window.Notification.TYPE_HUMANIZED_MESSAGE);
+            Notification.Type.HUMANIZED_MESSAGE);
 
 
         }
@@ -132,9 +135,9 @@ public class ReportBugPanel extends Panel
         }
         catch (Exception ex)
         {
-          getWindow().showNotification("Could not send bug report", ex.
+          Notification.show("Could not send bug report", ex.
             getMessage(),
-            Window.Notification.TYPE_WARNING_MESSAGE);
+            Notification.Type.WARNING_MESSAGE);
         }
       }
     });
@@ -146,9 +149,7 @@ public class ReportBugPanel extends Panel
       public void buttonClick(ClickEvent event)
       {
         form.discard();
-
-        Window subwindow = getWindow();
-        subwindow.getParent().removeWindow(subwindow);
+        UI.getCurrent().removeWindow(finalThis);
       }
     });
 
@@ -182,9 +183,10 @@ public class ReportBugPanel extends Panel
       sbMsg.append("Reporter: ").append(form.getField("name").getValue().
         toString()).append(" (").append(form.getField("email").getValue().
         toString()).append(")\n");
-      sbMsg.append("Version: ").append(getApplication().getVersion()).append(
+      sbMsg.append("Version: ").append(VaadinSession.getCurrent().getAttribute(
+        "annis-version")).append(
         "\n");
-      sbMsg.append("URL: ").append(getApplication().getURL().toString()).append(
+      sbMsg.append("URL: ").append(UI.getCurrent().getPage().getLocation().toASCIIString()).append(
         "\n");
 
       sbMsg.append("\n");
@@ -204,8 +206,7 @@ public class ReportBugPanel extends Panel
           log.error(null, ex);
         }
         
-        WebApplicationContext context = (WebApplicationContext) getApplication().getContext();
-        File logfile = new File(context.getHttpSession().getServletContext().getRealPath("/WEB-INF/log/annis-gui.log"));
+        File logfile = new File(VaadinService.getCurrent().getBaseDirectory(), "/WEB-INF/log/annis-gui.log");
         if(logfile.exists() && logfile.isFile() && logfile.canRead())
         {
           mail.attach(new FileDataSource(logfile), "annis-gui.log", "Logfile of the GUI (shared by all users)");
@@ -217,9 +218,9 @@ public class ReportBugPanel extends Panel
     }
     catch (EmailException ex)
     {
-      getWindow().showNotification("E-Mail not configured on server", 
+      Notification.show("E-Mail not configured on server", 
         "If this is no Kickstarter version please ask the adminstrator of this ANNIS-instance for assistance. "
-        + "Bug reports are not available for ANNIS Kickstarter", Window.Notification.TYPE_ERROR_MESSAGE);
+        + "Bug reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);
       log.error(null,
         ex);
     }

@@ -15,8 +15,10 @@
  */
 package annis.gui;
 
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import java.io.File;
@@ -31,14 +33,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class AboutPanel extends Panel
+public class AboutWindow extends Window
 {
   
-  private static final Logger log = LoggerFactory.getLogger(AboutPanel.class);
+  private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
     
   private VerticalLayout layout;
   
-  public AboutPanel()
+  public AboutWindow()
   {
     setSizeFull();
     
@@ -51,6 +53,9 @@ public class AboutPanel extends Panel
   public void attach()
   {
     super.attach();
+    
+    VerticalLayout vLayout = new VerticalLayout();
+    setContent(vLayout);
     
     HorizontalLayout hLayout = new HorizontalLayout();
     
@@ -74,14 +79,14 @@ public class AboutPanel extends Panel
     hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
     hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
     
-    addComponent(hLayout);
+    vLayout.addComponent(hLayout);
     
-    addComponent(new Label("ANNIS is a project of the "
+    vLayout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
-    addComponent(new Label("Homepage: "
+    vLayout.addComponent(new Label("Homepage: "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/d1/annis/\">"
       + "http://www.sfb632.uni-potsdam.de/d1/annis/</a>.", Label.CONTENT_XHTML));
-    addComponent(new Label("Version: " + getApplication().getVersion()));
+    vLayout.addComponent(new Label("Version: " + VaadinSession.getCurrent().getAttribute("annis-version")));
     
     TextArea txtThirdParty = new TextArea();
     txtThirdParty.setSizeFull();
@@ -93,7 +98,7 @@ public class AboutPanel extends Panel
       + "made the ANNIS GUI possible:\n");
     
     File thirdPartyFolder = 
-      new File(getApplication().getContext().getBaseDirectory(), "THIRD-PARTY");
+      new File(VaadinService.getCurrent().getBaseDirectory(), "THIRD-PARTY");
     if(thirdPartyFolder.isDirectory())
     {
       for(File c : thirdPartyFolder.listFiles((FileFilter) new WildcardFileFilter("*.txt")))
@@ -117,19 +122,19 @@ public class AboutPanel extends Panel
     txtThirdParty.addStyleName("license");
     txtThirdParty.setWordwrap(false);
     
-    addComponent(txtThirdParty);
+    vLayout.addComponent(txtThirdParty);
     
     Button btOK = new Button("OK");
-    btOK.addListener(new Button.ClickListener() {
+    final AboutWindow finalThis = this;
+    btOK.addClickListener(new Button.ClickListener() {
 
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window subwindow = getWindow();
-        subwindow.getParent().removeWindow(subwindow);
+        UI.getCurrent().removeWindow(finalThis);
       }
     });
-    addComponent(btOK);
+    vLayout.addComponent(btOK);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);

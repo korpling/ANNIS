@@ -15,32 +15,32 @@
  */
 package annis.gui;
 
-import com.vaadin.terminal.ExternalResource;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.themes.ChameleonTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * A window displaying an invitation to participate in the development of ANNIS. 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class HelpUsPanel extends Panel
+public class HelpUsWindow extends Window
 {
   
-  private static final Logger log = LoggerFactory.getLogger(HelpUsPanel.class);
+  private static final Logger log = LoggerFactory.getLogger(HelpUsWindow.class);
     
   private VerticalLayout layout;
   
-  public HelpUsPanel()
+  public HelpUsWindow()
   {
     setSizeFull();
-    
-    layout = (VerticalLayout) getContent();
+    layout = new VerticalLayout();
+    setContent(layout);
     
     layout.setSizeFull();
-    layout.setMargin(false, false, true, false);
+    layout.setMargin(new MarginInfo(false, false, true, false));
   }
 
   @Override
@@ -76,18 +76,15 @@ public class HelpUsPanel extends Panel
     lnkFork.setIcon(new ExternalResource("https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
     lnkFork.setTargetName("_blank");
     
-    Panel panelLabel = new Panel();
-    panelLabel.setSizeFull();
-    panelLabel.addComponent(lblOpenSource);
-    panelLabel.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
-    hLayout.addComponent(panelLabel);
+    hLayout.addComponent(lblOpenSource);
     hLayout.addComponent(lnkFork);
-    hLayout.setComponentAlignment(panelLabel, Alignment.TOP_LEFT);
+    hLayout.setComponentAlignment(lblOpenSource, Alignment.TOP_LEFT);
     hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
-    hLayout.setExpandRatio(panelLabel, 1.0f);
+    hLayout.setExpandRatio(lblOpenSource, 1.0f);
     
-    addComponent(hLayout);
+    layout.addComponent(hLayout);
+    
+    final HelpUsWindow finalThis = this;
     
     Button btOK = new Button("OK");
     btOK.addListener(new Button.ClickListener() {
@@ -95,11 +92,10 @@ public class HelpUsPanel extends Panel
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window subwindow = getWindow();
-        subwindow.getParent().removeWindow(subwindow);
+        UI.getCurrent().removeWindow(finalThis);
       }
     });
-    addComponent(btOK);
+    layout.addComponent(btOK);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);

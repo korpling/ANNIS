@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.beans.HistoryEntry;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -44,15 +45,18 @@ public class HistoryPanel extends Panel
   {
     this.parent = parent;
     
+    VerticalLayout layout = new VerticalLayout();
+    setContent(layout);
+    
     setSizeFull();
-    ((VerticalLayout) getContent()).setSizeFull();
+    layout.setSizeFull();
 
     containerHistory = new BeanItemContainer(HistoryEntry.class);
     containerHistory.addAll(history);
 
     tblHistory = new Table();
 
-    addComponent(tblHistory);
+    layout.addComponent(tblHistory);
     tblHistory.setSizeFull();
     tblHistory.setSelectable(true);
     tblHistory.setMultiSelect(false);
@@ -87,8 +91,6 @@ public class HistoryPanel extends Panel
   public void attach()
   {
     super.attach();
-    
-    citationGenerator.setMainWindow(getApplication().getMainWindow());
   }
   
   
