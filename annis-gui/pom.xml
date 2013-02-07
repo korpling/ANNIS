@@ -177,7 +177,7 @@
     
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
+      <artifactId>vaadin-server</artifactId>
       <version>7.0.0</version>
     </dependency>
     

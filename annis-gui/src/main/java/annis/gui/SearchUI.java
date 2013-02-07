@@ -27,18 +27,19 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.client.ApplicationConnection;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.terminal.ParameterHandler;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.terminal.gwt.client.ApplicationConnection;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
-import com.vaadin.terminal.gwt.server.WebBrowser;
+import com.vaadin.server.Page;
+import com.vaadin.server.Page.UriFragmentChangedEvent;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -47,19 +48,18 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.netomi.vaadin.screenshot.Screenshot;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
-public class SearchWindow extends Window
-  implements LoginForm.LoginListener, Screenshot.ScreenshotListener,
-  MimeTypeErrorListener, UriFragmentUtility.FragmentChangedListener
+public class SearchUI extends AnnisBaseUI
+  implements LoginForm.LoginListener,
+  MimeTypeErrorListener, Page.UriFragmentChangedListener
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchWindow.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchUI.class);
     
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
@@ -75,32 +75,31 @@ public class SearchWindow extends Window
   private TabSheet mainTab;
   private Window windowLogin;
   private ResultViewPanel resultView;
-  private PluginSystem ps;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
-  private UriFragmentUtility uriFragment;
   private String lastQueriedFragment;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
-  
-  public SearchWindow(PluginSystem ps, InstanceConfig instanceConfig)
-  {
-    super("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
 
-    this.ps = ps;
+  @Override
+  protected void init(VaadinRequest request)
+  {
+    super.init(request);
+  
+    InstanceConfig instanceConfig = getInstanceConfig(request);
+    getPage().setTitle("ANNIS Corpus Searc: " + instanceConfig.getInstanceDisplayName());
     
-    
-    uriFragment = new UriFragmentUtility();
-    uriFragment.addListener((UriFragmentUtility.FragmentChangedListener) this);
-    addComponent(uriFragment);
     
     // always get the resize events directly
     setImmediate(true);
     
-    getContent().setSizeFull();
-    ((VerticalLayout) getContent()).setMargin(false);
+    VerticalLayout mainLayout = new VerticalLayout();
+    setContent(mainLayout);
+    
+    mainLayout.setSizeFull();
+    mainLayout.setMargin(false);
 
     HorizontalLayout layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
@@ -109,7 +108,7 @@ public class SearchWindow extends Window
     Panel panelToolbar = new Panel(layoutToolbar);
     panelToolbar.setWidth("100%");
     panelToolbar.setHeight("-1px");
-    addComponent(panelToolbar);
+    mainLayout.addComponent(panelToolbar);
     panelToolbar.addStyleName("toolbar");
 
     Button btAboutAnnis = new Button("About ANNIS");
@@ -131,11 +130,11 @@ public class SearchWindow extends Window
       }
     });
 
-    final SearchWindow finalThis = this;
-    final Screenshot screenShot = new Screenshot();
-    screenShot.addListener(finalThis);
-
-    addComponent(screenShot);
+    // TODO: re-enable screenshots (vaadin7)
+//    final Screenshot screenShot = new Screenshot();
+//    screenShot.addListener(this);
+//
+//    addComponent(screenShot);
 
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -149,8 +148,8 @@ public class SearchWindow extends Window
       {
         btBugReport.setCaption("bug report is initialized...");
         
-        // make screenshot
-        screenShot.makeScreenshot(finalThis);
+        //TODO make screenshot (vaadin7)
+//        screenShot.makeScreenshot(finalThis);
       }
     });
     
@@ -168,9 +167,8 @@ public class SearchWindow extends Window
         if (isLoggedIn())
         {
           // logout
-          getApplication().setUser(null);
-          showNotification("Logged out",
-            Window.Notification.TYPE_TRAY_NOTIFICATION);
+          getSession().setAttribute(AnnisUser.class, null);
+          Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
         }
         else
         {
@@ -221,7 +219,7 @@ public class SearchWindow extends Window
     hPanel.setSizeFull();
     hPanel.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    addComponent(hPanel);
+    mainLayout.addComponent(hPanel);
     ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
 
     control = new ControlPanel(this, instanceConfig);
@@ -235,7 +233,7 @@ public class SearchWindow extends Window
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial", null);
 
-    queryBuilder = new QueryBuilderChooser(control, ps, instanceConfig);
+    queryBuilder = new QueryBuilderChooser(control, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder", null);
 
     hLayout.addComponent(mainTab);
@@ -259,32 +257,65 @@ public class SearchWindow extends Window
         mainTab.setSelectedTab(tutorial);
       }
     });
-
-    addParameterHandler(new ParameterHandler()
-    {
-
-      @Override
-      public void handleParameters(Map<String, String[]> parameters)
-      {
-        if (parameters.containsKey("citation"))
-        {
-          HttpSession session =
-            ((WebApplicationContext) getApplication().getContext()).
-            getHttpSession();
-          String citation = (String) session.getAttribute("citation");
-          if (citation != null)
-          {
-            citation = StringUtils.removeStart(citation,
-              Helper.getContext(getApplication()) + "/Cite/");
-            evaluateCitation(citation);
-            session.removeAttribute("citation");
-          }
-
-        }
-      }
-    });
     
+    getPage().addUriFragmentChangedListener(this);
+    
+    // TODO: re-enable parsing of the old style citation links (vaadin7)
 
+//    addParameterHandler(new ParameterHandler()
+//    {
+//
+//      @Override
+//      public void handleParameters(Map<String, String[]> parameters)
+//      {
+//        if (parameters.containsKey("citation"))
+//        {
+//          HttpSession session =
+//            ((WebApplicationContext) getApplication().getContext()).
+//            getHttpSession();
+//          String citation = (String) session.getAttribute("citation");
+//          if (citation != null)
+//          {
+//            citation = StringUtils.removeStart(citation,
+//              Helper.getContext(getApplication()) + "/Cite/");
+//            evaluateCitation(citation);
+//            session.removeAttribute("citation");
+//          }
+//
+//        }
+//      }
+//    });
+  }
+  
+  private InstanceConfig getInstanceConfig(VaadinRequest request)
+  {
+    String instance = null;
+    String pathInfo = request.getPathInfo();
+    if(pathInfo != null && pathInfo.startsWith("/instance-"))
+    {
+      instance = pathInfo.substring("/instance-".length());
+    }
+    
+    Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
+    if(instance != null && allConfigs.containsKey(instance))
+    {
+      // return the config that matches the parsed name
+      return allConfigs.get(instance);
+    }
+    else if(allConfigs.containsKey("default"))
+    {
+      // return the default config
+      return allConfigs.get("default");
+    }
+    else if(allConfigs.size() > 0)
+    {
+      // just return any existing config as a fallback
+      log.warn("Instance config {} not found or null and default config is not available.", instance);
+      return allConfigs.values().iterator().next();
+    }
+    
+    // default to an empty instance config
+    return new InstanceConfig();
   }
 
   @Override
@@ -292,7 +323,7 @@ public class SearchWindow extends Window
   {
     super.attach();
 
-    String bugmail = getApplication().getProperty("bug-e-mail");
+    String bugmail = (String) VaadinSession.getCurrent().getAttribute("bug-e-mail");
     if(bugmail != null && !bugmail.isEmpty() 
       && !bugmail.startsWith("${")
       && new EmailValidator("").isValid(bugmail))
@@ -328,7 +359,7 @@ public class SearchWindow extends Window
       }
       
       // filter by actually avaible user corpora in order not to get any exception later
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = Helper.getAnnisWebResource();
       List<AnnisCorpus> userCorpora =
         res.path("query").path("corpora").
         get(new GenericType<List<AnnisCorpus>>(){});
@@ -361,9 +392,9 @@ public class SearchWindow extends Window
       {
         control.setQuery(aql, selectedCorpora);
       }
-
+      
       // remove all currently openend sub-windows
-      Set<Window> all = new HashSet<Window>(getChildWindows());
+      Set<Window> all = new HashSet<Window>(getWindows());
       for (Window w : all)
       {
         removeWindow(w);
@@ -383,8 +414,8 @@ public class SearchWindow extends Window
     }
     if (isLoggedIn())
     {
-      Object user = getApplication().getUser();
-      if(user instanceof AnnisUser)
+      AnnisUser user = VaadinSession.getCurrent().getAttribute(AnnisUser.class);
+      if(user != null)
       {
         lblUserName.setValue("logged in as \"" + ((AnnisUser) user).getUserName() + "\"");
         btLoginLogout.setCaption("Logout");
@@ -413,7 +444,7 @@ public class SearchWindow extends Window
       start, pageSize);
     
     resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
-      segmentationLayer, start, pageSize, ps);
+      segmentationLayer, start, pageSize, this);
     mainTab.addTab(resultView, "Query Result", null);
     mainTab.setSelectedTab(resultView);
     
@@ -438,15 +469,15 @@ public class SearchWindow extends Window
       
     // set our fragment
     lastQueriedFragment = StringUtils.join(args, "&");
-    uriFragment.setFragment(lastQueriedFragment);
+    getPage().setUriFragment(lastQueriedFragment);
     
   }
-  
+
   @Override
-  public void fragmentChanged(FragmentChangedEvent source)
+  public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
     
-    String fragment = source.getUriFragmentUtility().getFragment();
+    String fragment = event.getUriFragment();
     // do nothing if not changed
     if(fragment.equals(lastQueriedFragment))
     {
@@ -474,82 +505,11 @@ public class SearchWindow extends Window
   private void showLoginWindow()
   {
 
-    final Window parentWindow = this;
     if (windowLogin == null)
     {
-      LoginForm login = new LoginForm()
-      {
-
-        /**
-         * Custom implementation which uses a more distinctive name for the password field
-         */
-        @Override
-        protected byte[] getLoginHTML()
-        {
-           String appUri = getApplication().getURL().toString()
-            + parentWindow.getName() + "/";
-
-          try
-          {
-            return ("<!DOCTYPE html PUBLIC \"-//W3C//DTD "
-              + "XHTML 1.0 Transitional//EN\" "
-              + "\"http://www.w3.org/TR/xhtml1/"
-              + "DTD/xhtml1-transitional.dtd\">\n" + "<html>"
-              + "<head><script type='text/javascript'>"
-              + "var setTarget = function() {" + "var uri = '"
-              + appUri
-              + "loginHandler"
-              + "'; var f = document.getElementById('loginf-annis');"
-              + "document.forms[0].action = uri;document.forms[0].username.focus();};"
-              + ""
-              + "var styles = window.parent.document.styleSheets;"
-              + "for(var j = 0; j < styles.length; j++) {\n"
-              + "if(styles[j].href) {"
-              + "var stylesheet = document.createElement('link');\n"
-              + "stylesheet.setAttribute('rel', 'stylesheet');\n"
-              + "stylesheet.setAttribute('type', 'text/css');\n"
-              + "stylesheet.setAttribute('href', styles[j].href);\n"
-              + "document.getElementsByTagName('head')[0].appendChild(stylesheet);\n"
-              + "}"
-              + "}\n"
-              + "function submitOnEnter(e) { var keycode = e.keyCode || e.which;"
-              + " if (keycode == 13) {document.forms[0].submit();}  } \n"
-              + "</script>"
-              + "</head><body onload='setTarget();' style='margin:0;padding:0; background:transparent;' class=\""
-              + ApplicationConnection.GENERATED_BODY_CLASSNAME
-              + "\">"
-              + "<div class='v-app v-app-loginpage' style=\"background:transparent;\">"
-              + "<iframe name='logintarget' style='width:0;height:0;"
-              + "border:0;margin:0;padding:0;'></iframe>"
-              + "<form id='loginf-annis' target='logintarget' onkeypress=\"submitOnEnter(event)\" method=\"post\">"
-              + "<div>"
-              + getUsernameCaption()
-              + "</div><div >"
-              + "<input class='v-textfield' style='display:block;' type='text' name='username'></div>"
-              + "<div>"
-              + getPasswordCaption()
-              + "</div>"
-              + "<div><input class='v-textfield' style='display:block;' type='password' name='annis-gui-password'></div>"
-              + "<div><div onclick=\"document.forms[0].submit();\" tabindex=\"0\" class=\"v-button\" role=\"button\" ><span class=\"v-button-wrap\"><span class=\"v-button-caption\">"
-              + getLoginButtonCaption()
-              + "</span></span></div></div></form></div>" + "</body></html>")
-              .getBytes("UTF-8");
-          }
-          catch (UnsupportedEncodingException e)
-          {
-            throw new RuntimeException("UTF-8 encoding not avalable", e);
-          }
-        }
-        
-      };
-      login.addListener((LoginForm.LoginListener) this);
-
-      windowLogin = new Window("Login");
-      windowLogin.addComponent(login);
+      LoginWindow windowLogin = new LoginWindow();
       windowLogin.setModal(true);
       windowLogin.setSizeUndefined();
-      login.setSizeUndefined();
-      ((VerticalLayout) windowLogin.getContent()).setSizeUndefined();
     }
     addWindow(windowLogin);
     windowLogin.center();
@@ -558,66 +518,13 @@ public class SearchWindow extends Window
   @Override
   public void onLogin(LoginEvent event)
   {
-    try
-    {
-      // forget old user information
-      getApplication().setUser(null);
-      
-      String userName = event.getLoginParameter("username");
-      
-      Client client = Helper.createRESTClient(userName, 
-        event.getLoginParameter("annis-gui-password"));
-      
-      // check if this is valid user/password combination
-      WebResource res = client.resource(getApplication()
-        .getProperty(Helper.KEY_WEB_SERVICE_URL))
-        .path("admin").path("is-authenticated");
-      if("true".equalsIgnoreCase(res.get(String.class)))
-      {
-        // everything ok, save this user configuration for re-use
-        getApplication().setUser(new AnnisUser(userName, client));
-        
-        showNotification("Logged in as \"" + userName + "\"",
-          Window.Notification.TYPE_TRAY_NOTIFICATION);
-      }
-    }
-    catch (ClientHandlerException ex)
-    {
-      showNotification("Authentification error: " + ex.getMessage(),
-        Window.Notification.TYPE_WARNING_MESSAGE);
-    }
-    catch(UniformInterfaceException ex)
-    {
-      if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
-      {
-        getWindow().showNotification("Username or password wrong", ex.getMessage(), 
-          Notification.TYPE_WARNING_MESSAGE);
-      }
-      else
-      {
-        log.error(null, ex);
-        showNotification("Unexpected exception: " + ex.getMessage(),
-          Window.Notification.TYPE_WARNING_MESSAGE);
-      }
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-
-      showNotification("Unexpected exception: " + ex.getMessage(),
-        Window.Notification.TYPE_WARNING_MESSAGE);
-    }
-    finally
-    {
-      // hide login window
-      removeWindow(windowLogin);
-    }
+    
 
   }
 
   public boolean isLoggedIn()
   {
-    return getApplication().getUser() != null;
+    return getSession().getAttribute(AnnisUser.class) != null;
   }
   
   public ControlPanel getControl()
@@ -625,26 +532,27 @@ public class SearchWindow extends Window
     return control;
   }
 
-  @Override
-  public void screenshotReceived(byte[] imageData)
-  {
-    btBugReport.setEnabled(true);
-    btBugReport.setCaption("Report Bug");
-    
-    if(bugEMailAddress != null)
-    {
-      ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
-        bugEMailAddress, imageData);
-
-      // show bug report window
-
-      Window w = new Window("Report Bug", reportBugPanel);
-      w.setModal(true);
-      w.setResizable(true);
-      addWindow(w);
-      w.center();
-    }
-  }
+  // TODO: handle screenshot event (vaadin7)
+//  @Override
+//  public void screenshotReceived(byte[] imageData)
+//  {
+//    btBugReport.setEnabled(true);
+//    btBugReport.setCaption("Report Bug");
+//    
+//    if(bugEMailAddress != null)
+//    {
+//      ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
+//        bugEMailAddress, imageData);
+//
+//      // show bug report window
+//
+//      Window w = new Window("Report Bug", reportBugPanel);
+//      w.setModal(true);
+//      w.setResizable(true);
+//      addWindow(w);
+//      w.center();
+//    }
+//  }
 
   @Override
   public void notifyCannotPlayMimeType(String mimeType)
@@ -661,9 +569,8 @@ public class SearchWindow extends Window
         + "<li>Mozilla Firefox: <a href=\"http://www.mozilla.org/firefox\" target=\"_blank\">http://www.mozilla.org/firefox</a></li>"
         + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
         + "</ul>";
-      WebApplicationContext context = ((WebApplicationContext) getApplication()
-        .getContext());
-      WebBrowser browser = context.getBrowser();
+      
+      WebBrowser browser = getPage().getWebBrowser();
 
       // IE9 users can install a plugin
       Set<String> supportedByIE9Plugin = new HashSet<String>();
@@ -674,30 +581,30 @@ public class SearchWindow extends Window
       if (browser.isIE()
         && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.contains(mimeType))
       {
-        getWindow().showNotification("Media file type unsupported by your browser",
+        Notification.show("Media file type unsupported by your browser",
           "Please install the WebM plugin for Internet Explorer 9 from "
           + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
           + " or use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_WARNING_MESSAGE, true);
+          Notification.Type.WARNING_MESSAGE);
       }
       else
       {
-        getWindow().showNotification("Media file type unsupported by your browser",
+        Notification.show("Media file type unsupported by your browser",
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Window.Notification.TYPE_WARNING_MESSAGE, true);
+          Notification.Type.WARNING_MESSAGE);
       }
     }
     else
     {
-      getWindow().showNotification(
+      Notification.show(
         "Media file type \"" + mimeType + "\" unsupported by your browser!",
         "Try to check your browsers documentation how to enable "
         + "support for the media type or inform the corpus creator about this problem.",
-        Window.Notification.TYPE_WARNING_MESSAGE, true);
+        Notification.Type.WARNING_MESSAGE);
     }
 
   }

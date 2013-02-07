@@ -20,7 +20,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.CitationWindow;
 import annis.gui.PluginSystem;
-import annis.gui.SearchWindow;
+import annis.gui.SearchUI;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.security.AnnisUser;
@@ -70,10 +70,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
   private VerticalLayout mainLayout;  
-  private SearchWindow parent;
+  private SearchUI parent;
 
 
-  public ResultViewPanel(SearchWindow parent, String aql, Set<String> corpora,
+  public ResultViewPanel(SearchUI parent, String aql, Set<String> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int start, int pageSize,
     PluginSystem ps)
   {

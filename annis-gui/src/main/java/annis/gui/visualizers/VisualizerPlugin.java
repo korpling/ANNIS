@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.MainApp;
+import annis.gui.AnnisBaseUI;
 import annis.gui.visualizers.component.KWICPanel;
 import com.vaadin.Application;
 import com.vaadin.ui.Component;
@@ -27,7 +27,7 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Every visualizer must implement this interface. It' s also necessary to to
- * load this plugin by hand in {@link MainApp#initPlugins()}
+ * load this plugin by hand in {@link AnnisBaseUI#initPlugins()}
  *
  * If you wish to implement an iframe visualizer you should extend the
  * {@link AbstractIFrameVisualizer} class, because this class already has

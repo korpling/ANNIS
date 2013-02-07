@@ -17,7 +17,7 @@ package annis.gui.controlpanel;
 
 import annis.gui.Helper;
 import annis.gui.InstanceConfig;
-import annis.gui.SearchWindow;
+import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -44,14 +44,14 @@ public class ControlPanel extends Panel
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusList;
-  private SearchWindow searchWindow;
+  private SearchUI searchWindow;
   private Window window;
   private String lastQuery;
   private Set<String> lastCorpusSelection;
   private SearchOptionsPanel searchOptions;
   private ListOrderedSet<HistoryEntry> history;
   
-  public ControlPanel(SearchWindow searchWindow, InstanceConfig instanceConfig)
+  public ControlPanel(SearchUI searchWindow, InstanceConfig instanceConfig)
   {
     super("Search Form");
     this.searchWindow = searchWindow;
