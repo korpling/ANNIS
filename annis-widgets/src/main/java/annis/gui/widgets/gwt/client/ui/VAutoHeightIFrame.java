@@ -1,4 +1,4 @@
-package annis.gui.widgets.gwt.client;
+package annis.gui.widgets.gwt.client.ui;
 
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.dom.client.*;

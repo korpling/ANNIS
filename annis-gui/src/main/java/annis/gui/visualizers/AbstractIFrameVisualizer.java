@@ -66,7 +66,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);
-    resource = vis.getVisPanel().createResource(outStream, getContentType());
+//    resource = vis.getVisPanel().createResource(outStream, getContentType());
     
     // TODO: find a good way to maintain the resource for the IFrame (vaadin7)
     String url = "empty.html";

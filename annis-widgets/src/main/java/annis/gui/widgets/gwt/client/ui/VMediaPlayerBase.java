@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client;
+package annis.gui.widgets.gwt.client.ui;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.MediaElement;
@@ -173,7 +173,7 @@ public class VMediaPlayerBase extends Widget implements Paintable
       
       media.on('loadedmetadata', $entry(function(e) 
       {
-        self.@annis.gui.widgets.gwt.client.VMediaPlayerBase::metaDataWasLoaded()();
+        self.@annis.gui.widgets.gwt.client.ui.VMediaPlayerBase::metaDataWasLoaded()();
       }));
   }-*/;
 

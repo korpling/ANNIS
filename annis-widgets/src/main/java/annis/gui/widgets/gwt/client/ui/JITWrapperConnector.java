@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VAutoHeightIFrame;
-import annis.gui.widgets.gwt.client.VVideoPlayer;
+import annis.gui.widgets.JITWrapper;
+import annis.gui.widgets.gwt.client.ui.VJITWrapper;
+import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -24,14 +25,14 @@ import com.vaadin.shared.ui.Connect;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Connect(AutoHeightIFrame.class)
-public class AutoHeightIFrameConnector extends LegacyConnector
+@Connect(JITWrapper.class)
+public class JITWrapperConnector extends LegacyConnector
 {
 
   @Override
-  public VAutoHeightIFrame getWidget()
+  public VJITWrapper getWidget()
   {
-    return (VAutoHeightIFrame) super.getWidget();
+    return (VJITWrapper) super.getWidget();
   }
   
 }

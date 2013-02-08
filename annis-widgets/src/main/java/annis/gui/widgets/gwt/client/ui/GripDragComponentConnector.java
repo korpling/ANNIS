@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VVideoPlayer;
+import annis.gui.widgets.GripDragComponent;
+import annis.gui.widgets.gwt.client.ui.VAudioPlayer;
+import annis.gui.widgets.gwt.client.ui.VGripDragComponent;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -23,14 +27,14 @@ import com.vaadin.shared.ui.Connect;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Connect(VideoPlayer.class)
-public class VideoPlayerConnector extends LegacyConnector
+@Connect(GripDragComponent.class)
+public class GripDragComponentConnector extends LegacyConnector
 {
 
   @Override
-  public VVideoPlayer getWidget()
+  public VGripDragComponent getWidget()
   {
-    return (VVideoPlayer) super.getWidget();
+    return (VGripDragComponent) super.getWidget();
   }
   
 }

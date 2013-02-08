@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VJITWrapper;
-import annis.gui.widgets.gwt.client.VVideoPlayer;
+import annis.gui.widgets.AudioPlayer;
+import annis.gui.widgets.gwt.client.ui.VAudioPlayer;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -24,14 +26,14 @@ import com.vaadin.shared.ui.Connect;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Connect(JITWrapper.class)
-public class JITWrapperConnector extends LegacyConnector
+@Connect(AudioPlayer.class)
+public class AudioPlayerConnector extends LegacyConnector
 {
 
   @Override
-  public VJITWrapper getWidget()
+  public VAudioPlayer getWidget()
   {
-    return (VJITWrapper) super.getWidget();
+    return (VAudioPlayer) super.getWidget();
   }
   
 }

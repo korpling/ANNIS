@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 SFB 632.
+ * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VAudioPlayer;
-import annis.gui.widgets.gwt.client.VGripDragComponent;
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.ui.Widget;
-import com.vaadin.client.ui.LegacyConnector;
-import com.vaadin.shared.ui.Connect;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
+ * Wraps the visualization into a java class.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@Connect(GripDragComponent.class)
-public class GripDragComponentWrapper extends LegacyConnector
+public class JITVisualization extends JavaScriptObject
 {
 
-  @Override
-  public VGripDragComponent getWidget()
+  protected JITVisualization()
   {
-    return (VGripDragComponent) super.getWidget();
   }
-  
+
+  final native void render() /*-{
+    this.layoutTree();
+    this.initWrapper();
+    this.initCanvas();
+    this.plotNodes();
+    this.plotEdges();
+  }-*/;
 }

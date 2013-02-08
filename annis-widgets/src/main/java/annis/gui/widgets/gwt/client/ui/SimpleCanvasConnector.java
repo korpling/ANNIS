@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VAudioPlayer;
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.ui.Widget;
+import annis.gui.widgets.SimpleCanvas;
+import annis.gui.widgets.gwt.client.ui.VSimpleCanvas;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -25,14 +24,14 @@ import com.vaadin.shared.ui.Connect;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Connect(AudioPlayer.class)
-public class AudioPlayerConnector extends LegacyConnector
+@Connect(SimpleCanvas.class)
+public class SimpleCanvasConnector extends LegacyConnector
 {
 
   @Override
-  public VAudioPlayer getWidget()
+  public VSimpleCanvas getWidget()
   {
-    return (VAudioPlayer) super.getWidget();
+    return (VSimpleCanvas) super.getWidget();
   }
   
 }

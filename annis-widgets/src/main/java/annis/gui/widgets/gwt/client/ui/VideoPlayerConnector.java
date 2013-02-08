@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client;
+package annis.gui.widgets.gwt.client.ui;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import annis.gui.widgets.VideoPlayer;
+import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
+import com.vaadin.client.ui.LegacyConnector;
+import com.vaadin.shared.ui.Connect;
 
 /**
- * Wraps the visualization into a java class.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class JITVisualization extends JavaScriptObject
+@Connect(VideoPlayer.class)
+public class VideoPlayerConnector extends LegacyConnector
 {
 
-  protected JITVisualization()
+  @Override
+  public VVideoPlayer getWidget()
   {
+    return (VVideoPlayer) super.getWidget();
   }
-
-  final native void render() /*-{
-    this.layoutTree();
-    this.initWrapper();
-    this.initCanvas();
-    this.plotNodes();
-    this.plotEdges();
-  }-*/;
+  
 }

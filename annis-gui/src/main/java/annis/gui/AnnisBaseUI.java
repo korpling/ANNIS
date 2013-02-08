@@ -85,6 +85,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
     AnnisBaseUI.class);
 
   public final static String USER_KEY = "annis.gui.AnnisBaseUI:USER_KEY";
+  public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
@@ -114,6 +115,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
     getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
       getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
+    getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     
     initLogging();
 

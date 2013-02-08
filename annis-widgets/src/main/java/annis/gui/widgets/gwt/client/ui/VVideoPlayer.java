@@ -13,51 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client;
+package annis.gui.widgets.gwt.client.ui;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.vaadin.client.ApplicationConnection;
-import com.vaadin.client.BrowserInfo;
-import com.vaadin.client.UIDL;
+import com.vaadin.client.Util;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VAudioPlayer extends VMediaPlayerBase
+public class VVideoPlayer extends VMediaPlayerBase
 {
-
   private static String CLASSNAME = "v-audioplayer";
-
-  public VAudioPlayer()
+  
+  public VVideoPlayer()
   {
-    super(Document.get().createAudioElement());
+    super(Document.get().createVideoElement());
     setStyleName(CLASSNAME);
     
+    updateDimensionsWhenMetadataLoaded(getMedia());
   }
-
-  @Override
-  public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
+  
+  private void updateSizeFromMetadata(int width, int height)
   {
-    if (client.updateComponent(this, uidl, true))
-    {
-      return;
-    }
-    super.updateFromUIDL(uidl, client);
-    Style mediaStyle = getMedia().getStyle();
-
-    // ensure control visibility
-    if ((mediaStyle.getHeight() == null || "".equals(mediaStyle.getHeight())))
-    {
-      if (BrowserInfo.get().isChrome())
-      {
-        mediaStyle.setHeight(32, Style.Unit.PX);
-      }
-      else
-      {
-        mediaStyle.setHeight(25, Style.Unit.PX);
-      }
-    }
+    getMedia().getStyle().setWidth(width, Style.Unit.PX);
+    getMedia().getStyle().setHeight(height, Style.Unit.PX);
+    Util.notifyParentOfSizeChange(this, true);
   }
+  private native void updateDimensionsWhenMetadataLoaded(Element el)
+  /*-{
+      var media = $wnd.$(el);
+      var self = this;
+      
+      media.on('loadedmetadata', $entry(function(e) 
+      {
+        self.@annis.gui.widgets.gwt.client.ui.VVideoPlayer::updateSizeFromMetadata(II)(el.videoWidth, el.videoHeight);
+      }));
+  }-*/;
 }

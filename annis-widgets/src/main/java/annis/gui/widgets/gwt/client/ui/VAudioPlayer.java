@@ -13,43 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client;
+package annis.gui.widgets.gwt.client.ui;
 
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.vaadin.client.Util;
+import com.vaadin.client.ApplicationConnection;
+import com.vaadin.client.BrowserInfo;
+import com.vaadin.client.UIDL;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VVideoPlayer extends VMediaPlayerBase
+public class VAudioPlayer extends VMediaPlayerBase
 {
+
   private static String CLASSNAME = "v-audioplayer";
-  
-  public VVideoPlayer()
+
+  public VAudioPlayer()
   {
-    super(Document.get().createVideoElement());
+    super(Document.get().createAudioElement());
     setStyleName(CLASSNAME);
     
-    updateDimensionsWhenMetadataLoaded(getMedia());
   }
-  
-  private void updateSizeFromMetadata(int width, int height)
+
+  @Override
+  public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
-    getMedia().getStyle().setWidth(width, Style.Unit.PX);
-    getMedia().getStyle().setHeight(height, Style.Unit.PX);
-    Util.notifyParentOfSizeChange(this, true);
-  }
-  private native void updateDimensionsWhenMetadataLoaded(Element el)
-  /*-{
-      var media = $wnd.$(el);
-      var self = this;
-      
-      media.on('loadedmetadata', $entry(function(e) 
+    if (client.updateComponent(this, uidl, true))
+    {
+      return;
+    }
+    super.updateFromUIDL(uidl, client);
+    Style mediaStyle = getMedia().getStyle();
+
+    // ensure control visibility
+    if ((mediaStyle.getHeight() == null || "".equals(mediaStyle.getHeight())))
+    {
+      if (BrowserInfo.get().isChrome())
       {
-        self.@annis.gui.widgets.gwt.client.VVideoPlayer::updateSizeFromMetadata(II)(el.videoWidth, el.videoHeight);
-      }));
-  }-*/;
+        mediaStyle.setHeight(32, Style.Unit.PX);
+      }
+      else
+      {
+        mediaStyle.setHeight(25, Style.Unit.PX);
+      }
+    }
+  }
 }

@@ -24,12 +24,10 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -148,7 +146,15 @@ public class Helper
 
   public static String getContext()
   {
-    return  VaadinService.getCurrentRequest().getContextPath();
+    if(VaadinService.getCurrentRequest() != null)
+    {
+      return  VaadinService.getCurrentRequest().getContextPath();
+    }
+    else
+    {
+      return (String) VaadinSession.getCurrent().getAttribute(AnnisBaseUI.CONTEXT_PATH);
+    }
+    
   }
   
   public static List<String> citationFragmentParams(String aql, 

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.gwt.client.VSimpleCanvas;
+import annis.gui.widgets.AutoHeightIFrame;
+import annis.gui.widgets.gwt.client.ui.VAutoHeightIFrame;
+import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -23,14 +25,14 @@ import com.vaadin.shared.ui.Connect;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Connect(SimpleCanvas.class)
-public class SimpleCanvasConnector extends LegacyConnector
+@Connect(AutoHeightIFrame.class)
+public class AutoHeightIFrameConnector extends LegacyConnector
 {
 
   @Override
-  public VSimpleCanvas getWidget()
+  public VAutoHeightIFrame getWidget()
   {
-    return (VSimpleCanvas) super.getWidget();
+    return (VAutoHeightIFrame) super.getWidget();
   }
   
 }
