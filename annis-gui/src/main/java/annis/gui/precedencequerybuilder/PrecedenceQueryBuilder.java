@@ -120,13 +120,12 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     if (sb.isRegEx())
     {
       result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
-      return result;
     }
     else
     {
-      result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";
-      return result;
+      result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";      
     }
+    return result;
   }
   
   private String getMetaQueryFragment(MetaBox mb)
