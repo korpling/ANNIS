@@ -140,10 +140,10 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     else
     {      
       Iterator<String> itValues = values.iterator();
-      result += "/" + itValues.next();
+      result += "/(" + escapeRegexCharacters(itValues.next())+")";
       while(itValues.hasNext())
       {
-        result+= "|"+escapeRegexCharacters(itValues.next());
+        result+= "|("+escapeRegexCharacters(itValues.next())+")";
       }
       result += "/";
     }   
