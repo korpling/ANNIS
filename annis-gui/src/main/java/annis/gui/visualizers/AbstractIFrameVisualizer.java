@@ -69,7 +69,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 //    resource = vis.getVisPanel().createResource(outStream, getContentType());
     
     // TODO: find a good way to maintain the resource for the IFrame (vaadin7)
-    String url = "empty.html";
+    String url = "http://korpling.german.hu-berlin.de/";
 //    String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
     iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
     return iframe;

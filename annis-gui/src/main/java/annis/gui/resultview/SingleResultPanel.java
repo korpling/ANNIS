@@ -28,6 +28,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -76,6 +77,8 @@ public class SingleResultPanel extends CssLayout implements
   private String segmentationName;
   private transient List<SToken> token;
   private boolean wasAttached;
+  private HorizontalLayout infoBar;
+  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
@@ -95,7 +98,7 @@ public class SingleResultPanel extends CssLayout implements
     setWidth("100%");
     setHeight("-1px");
 
-    HorizontalLayout infoBar = new HorizontalLayout();
+    infoBar = new HorizontalLayout();
     infoBar.addStyleName("docPath");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
@@ -127,6 +130,8 @@ public class SingleResultPanel extends CssLayout implements
   @Override
   public void attach()
   {
+    addComponent(infoBar);
+
     try
     {
 
