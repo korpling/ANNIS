@@ -78,9 +78,7 @@ public class SearchUI extends AnnisBaseUI
 
   @Override
   protected void init(VaadinRequest request)
-  {
-    super.init(request);
-  
+  {  
     InstanceConfig instanceConfig = getInstanceConfig(request);
     getPage().setTitle("ANNIS Corpus Searc: " + instanceConfig.getInstanceDisplayName());
     
@@ -145,6 +143,16 @@ public class SearchUI extends AnnisBaseUI
 //        screenShot.makeScreenshot(finalThis);
       }
     });
+     String bugmail = (String) VaadinSession.getCurrent().getAttribute("bug-e-mail");
+    if(bugmail != null && !bugmail.isEmpty() 
+      && !bugmail.startsWith("${")
+      && new EmailValidator("").isValid(bugmail))
+    {
+      this.bugEMailAddress = bugmail;
+    }
+    btBugReport.setVisible(this.bugEMailAddress != null);
+    
+    updateUserInformation();
     
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("-1px");
@@ -309,26 +317,6 @@ public class SearchUI extends AnnisBaseUI
     
     // default to an empty instance config
     return new InstanceConfig();
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-
-    String bugmail = (String) VaadinSession.getCurrent().getAttribute("bug-e-mail");
-    if(bugmail != null && !bugmail.isEmpty() 
-      && !bugmail.startsWith("${")
-      && new EmailValidator("").isValid(bugmail))
-    {
-      this.bugEMailAddress = bugmail;
-    }
-    
-    
-    btBugReport.setVisible(this.bugEMailAddress != null);
-    
-    updateUserInformation();
-    
   }
 
   public void evaluateCitation(String relativeUri)

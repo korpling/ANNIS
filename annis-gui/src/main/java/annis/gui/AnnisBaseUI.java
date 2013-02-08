@@ -84,10 +84,10 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisBaseUI.class);
 
-  public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
-  public final static String WEBSERVICEURL_KEY = "annis.gui.MainApp:WEBSERVICEURL_KEY";
+  public final static String USER_KEY = "annis.gui.AnnisBaseUI:USER_KEY";
+  public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
 
-  public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
+  public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
   private transient PluginManager pluginManager;
   

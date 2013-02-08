@@ -7,11 +7,11 @@
     <param-value>false</param-value>
   </context-param>
   <servlet>
-    <servlet-name>MainApp</servlet-name>
+    <servlet-name>Search</servlet-name>
     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
     <init-param>
       <param-name>UI</param-name>
-      <param-value>annis.gui.MainApp</param-value>
+      <param-value>annis.gui.SearchUI</param-value>
     </init-param>
     <init-param>
       <description>
@@ -36,11 +36,11 @@
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>MainApp</servlet-name>
+    <servlet-name>Search</servlet-name>
     <url-pattern>/app/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MainApp</servlet-name>
+    <servlet-name>Search</servlet-name>
     <url-pattern>/VAADIN/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>

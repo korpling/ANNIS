@@ -62,7 +62,8 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     { 
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
-      VerticalLayout layout = (VerticalLayout) getContent();
+      VerticalLayout layout = new VerticalLayout();
+      setContent(layout);
       layout.setSizeFull();
       setSizeFull();
       
