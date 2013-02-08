@@ -59,7 +59,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     private TigerQueryBuilderCanvas queryBuilder;
 
     public TigerQueryBuilder(ControlPanel controlPanel)
-    { 
+    {
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
       VerticalLayout layout = new VerticalLayout();
