@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.grid;
+package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.*;
+import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.gwt.client.ui.VAnnotationGrid;
 import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
 import com.vaadin.client.ui.LegacyConnector;
