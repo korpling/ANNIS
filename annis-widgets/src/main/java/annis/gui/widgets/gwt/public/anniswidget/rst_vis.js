@@ -19,6 +19,10 @@
     return target;
   }
 
+  const DOMINANCE = "edge";
+  const RST = "rst";
+  const MULTINUC = "multinuc";
+
   var rst = function (config) {
 
     this.json = config.json;
@@ -34,7 +38,7 @@
     this.canvas = {};
 
     this.config = {
-      siblingOffet : config.siblingOffset || 200 ,
+      siblingOffet : config.siblingOffset || 80,
       subTreeOffset : config.subTreeOffset || 100,
       nodeWidth : config.nodeWidth  || 60,
       labelSize : config.labelSize || 10,
@@ -223,6 +227,36 @@
     this.container = container;
   };
 
+  rst.containsMultinuc = function(node)
+  {
+    return (this.getEdgesOfSType(node, MULTINUC).length > 0);
+  };
+
+  rst.containsEdge = function(node)
+  {
+    return (this.getEdgesOfSType(node, DOMINANCE).length > 0);
+  }
+
+  rst.getEdgesOfSType = function(json, sType)
+  {
+    var edges = json.data.edges;
+    var edgesArray = [];
+
+    if (edges !== undefined)
+    {
+      for (var item in edges)
+      {
+        var edge = edges[item];
+        if (edge.sType === sType)
+        {
+          edgesArray.push(edge);
+        }
+      }
+    }
+
+    return edgesArray;
+  };
+
   rst.plotNodes = function()
   {
     var conf = this.config;
@@ -235,17 +269,31 @@
       var elem = document.createElement("div");
       container.appendChild(elem);
 
-      if (json.data.sentence_left != undefined && json.data.sentence_right !=  undefined)
-      {
+      if (json.data.sentence_left != undefined
+        && json.data.sentence_right !=  undefined)
+        {
         elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>"
         + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
       }
 
-      elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
 
+      elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
       elem.style.position = "absolute";
       elem.style.top = json.pos.y + "px";
-      elem.style.left = json.pos.x + "px";
+
+      if (this.containsEdge(json)) {
+
+        var edges = this.getEdgesOfSType(json, DOMINANCE);
+        if (edges.length == 1)
+        {
+          var targetNode = this.nodes[edges[0].to];
+          elem.style.left = targetNode.pos.x + "px";
+        }
+      }
+      else {
+        elem.style.left = json.pos.x + "px";
+      }
+
       elem.style.textAlign = "center";
       elem.style.fontSize = conf.labelSize + "px";
       elem.style.width = conf.nodeWidth + "px";
@@ -288,18 +336,18 @@
         edgeType = adj[i][e].sType,
         annotation = adj[i][e].annotation;
 
-        if (edgeType === "rst")
+        if (edgeType === RST)
         {
           this.drawBezierCurve(from, to);
           this.plotRSTLabel(from, to, annotation);
         }
 
-        if (edgeType === "multinuc") {
+        if (edgeType === MULTINUC) {
           this.drawVerticalLine(from, to);
           this.plotMultinucLabel(from, annotation);
         }
 
-        if (edgeType === "edge")
+        if (edgeType === DOMINANCE)
         {
           this.drawSpan(from, to);
         }
@@ -309,9 +357,28 @@
     this.context.stroke();
   };
 
-  rst.getTopCenter = function(node)
+  rst.getTopCenter = function(x)
   {
-    return (((2* node.pos.x + this.config.nodeWidth) / 2));
+    return (((2 * x + this.config.nodeWidth) / 2));
+  };
+
+  /**
+   * Returns middle position of the node label and takes into account, if the
+   * starting or end point of the edge connect an dominance label.
+   */
+  rst.getEndPosRSTEdge = function(node)
+  {
+    if (this.containsEdge(node))
+    {
+      edges  = this.getEdgesOfSType(node, DOMINANCE);
+      if (edges.length == 1)
+      {
+        var targetNode = this.nodes[edges[0].to];
+        return this.getTopCenter(targetNode.pos.x);
+      }
+    }
+
+    return this.getTopCenter(node.pos.x);
   };
 
   rst.initCanvas = function()
@@ -330,8 +397,8 @@
 
   rst.drawVerticalLine = function(source, target)
   {
-    fromPosX = this.getTopCenter(source),
-    toPosX = this.getTopCenter(target);
+    fromPosX = this.getTopCenter(source.pos.x),
+    toPosX = this.getTopCenter(target.pos.x);
 
     this.context.moveTo(fromPosX, source.pos.y);
     this.context.lineTo(toPosX, target.pos.y);
@@ -348,7 +415,7 @@
 
   rst.drawSpan = function(source, target)
   {
-    var targetCenterX = this.getTopCenter(target);
+    var targetCenterX = this.getTopCenter(target.pos.x);
 
     // draw vertical line
     this.context.moveTo(targetCenterX, source.pos.y);
@@ -359,8 +426,8 @@
   {
     var from = source.pos,
     to = target.pos,
-    fromX = this.getTopCenter(source),
-    toX = this.getTopCenter(target),
+    fromX = this.getEndPosRSTEdge(source),
+    toX = this.getEndPosRSTEdge(target),
     dim = 15,
     controllPoint = {};
 
@@ -423,8 +490,8 @@
 
   rst.plotRSTLabel = function(source, target, annotation)
   {
-    var fromX = this.getTopCenter(source),
-    toX = this.getTopCenter(target),
+    var fromX = this.getTopCenter(source.pos.x),
+    toX = this.getTopCenter(target.pos.x),
     label = document.createElement("label");
 
     this.container.appendChild(label);
@@ -432,7 +499,7 @@
     label.innerHTML = annotation;
 
     labelPos = {
-      x : (fromX + toX) / 2 - (label.offsetWidth / 2),
+      x : (fromX + toX) / 2 - (label.clientWidth / 2),
       y : source.pos.y - 35
     };
 
