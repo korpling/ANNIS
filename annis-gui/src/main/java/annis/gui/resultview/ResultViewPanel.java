@@ -120,8 +120,11 @@ public class ResultViewPanel extends Panel implements PagingCallback
     progressResult.setCaption("Searching for \"" + aql.replaceAll("\n", " ") + "\"");
     
     mainLayout.addComponent(progressResult);
-    mainLayout.setComponentAlignment(progressResult, Alignment.TOP_CENTER);
     
+    mainLayout.setComponentAlignment(paging, Alignment.TOP_CENTER);
+    mainLayout.setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
+    
+    mainLayout.setExpandRatio(mbResult, 0.0f);
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
     
@@ -271,7 +274,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
               
               progressResult.setEnabled(false);              
               progressResult.setVisible(false);
-              mainLayout.setExpandRatio(progressResult, 0.0f);
+              //mainLayout.setExpandRatio(progressResult, 0.0f);
               
               if(result.size() > 0)
               {
@@ -281,6 +284,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
                 mainLayout.addComponent(resultPanel);
                 mainLayout.setExpandRatio(resultPanel, 1.0f);
+                mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
 
                 resultPanel.setVisible(true);
               }
