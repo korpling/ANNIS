@@ -41,13 +41,6 @@ public class HelpUsWindow extends Window
     
     layout.setSizeFull();
     layout.setMargin(new MarginInfo(false, false, true, false));
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
     
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();

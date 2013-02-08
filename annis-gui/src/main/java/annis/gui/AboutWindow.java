@@ -47,13 +47,7 @@ public class AboutWindow extends Window
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-        
+ 
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();

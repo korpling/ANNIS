@@ -96,11 +96,7 @@ public class CorpusBrowserPanel extends Panel
     accordion.addTab(tblNodeAnno, "Node annotations", null);
     accordion.addTab(tblEdgeTypes, "Edge types", null);
     accordion.addTab(tblEdgeAnno, "Edge annotations", null);
-  }
-
-  @Override
-  public void attach()
-  {
+  
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
@@ -222,7 +218,6 @@ public class CorpusBrowserPanel extends Panel
     tblEdgeTypes.setSortContainerPropertyId("name");
     tblEdgeAnno.setSortContainerPropertyId("name");
       
-    super.attach();
   }
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)

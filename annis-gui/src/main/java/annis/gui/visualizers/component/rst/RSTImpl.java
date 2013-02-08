@@ -760,12 +760,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-  }
 
-  @Override
-  public void attach()
-  {
-    super.attach();
     addScrollbar();
   }
 

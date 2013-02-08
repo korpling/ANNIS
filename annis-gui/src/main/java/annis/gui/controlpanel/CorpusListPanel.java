@@ -188,13 +188,6 @@ public class CorpusListPanel extends VerticalLayout implements
     selectionLayout.addComponent(btReload);
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
     
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
     tblCorpora.setSortContainerPropertyId("name");
     updateCorpusSetList();
   }

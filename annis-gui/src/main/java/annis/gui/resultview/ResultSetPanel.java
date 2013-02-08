@@ -122,13 +122,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
+      
     UI.getCurrent().getPage().addBrowserWindowResizeListener(new Page.BrowserWindowResizeListener() 
     {
       @Override

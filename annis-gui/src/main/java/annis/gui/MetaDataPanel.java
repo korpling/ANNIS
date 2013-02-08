@@ -52,13 +52,6 @@ public class MetaDataPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-
-    super.attach();
 
     // load meta data from service
     BeanItemContainer<Annotation> mData =

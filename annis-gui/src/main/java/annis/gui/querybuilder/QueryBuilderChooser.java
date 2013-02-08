@@ -56,12 +56,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     this.pluginRegistry = new HashMap<String, QueryBuilderPlugin>();
     this.short2caption = new HashMap<String, String>();
-    
-  }
-
-  @Override
-  public void attach()
-  {
+ 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
     layout = new VerticalLayout();

@@ -41,16 +41,11 @@ public class TutorialPanel extends Panel
     embedded = new Embedded();
     embedded.setSizeFull();
     layout.addComponent(embedded);
-  }
 
-  @Override
-  public void attach()
-  {
     String contextPath = VaadinService.getCurrentRequest().getContextPath();
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setSource(new ExternalResource(contextPath + "/tutorial/index.html"));
     
-    super.attach();
   }
 
   @Override

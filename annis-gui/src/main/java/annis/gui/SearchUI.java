@@ -236,10 +236,10 @@ public class SearchUI extends AnnisBaseUI
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(tutorial, "Tutorial", null);
+    mainTab.addTab(tutorial, "Tutorial");
 
     queryBuilder = new QueryBuilderChooser(control, this, instanceConfig);
-    mainTab.addTab(queryBuilder, "Query Builder", null);
+    mainTab.addTab(queryBuilder, "Query Builder");
 
     hLayout.addComponent(mainTab);
     hLayout.setExpandRatio(mainTab, 1.0f);
@@ -430,7 +430,7 @@ public class SearchUI extends AnnisBaseUI
     
     resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
       segmentationLayer, start, pageSize, this);
-    mainTab.addTab(resultView, "Query Result", null);
+    mainTab.addTab(resultView, "Query Result");
     mainTab.setSelectedTab(resultView);
     
   }

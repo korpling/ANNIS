@@ -88,14 +88,6 @@ public class HistoryPanel extends Panel
   }
 
   @Override
-  public void attach()
-  {
-    super.attach();
-  }
-  
-  
-
-  @Override
   public void valueChange(ValueChangeEvent event)
   {
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();

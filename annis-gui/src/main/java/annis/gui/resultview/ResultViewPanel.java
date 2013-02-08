@@ -125,13 +125,6 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
     
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
     try
     {
       query = new AnnisResultQuery(corpora, aql);

@@ -76,7 +76,6 @@ public class SingleResultPanel extends CssLayout implements
   private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private transient List<SToken> token;
-  private boolean wasAttached;
   private HorizontalLayout infoBar;
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -103,8 +102,6 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
 
-    addComponent(infoBar);
-
     Label lblNumber = new Label("" + (resultNumber + 1));
     infoBar.addComponent(lblNumber);
     lblNumber.setSizeUndefined();
@@ -125,22 +122,12 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
-  }
-
-  @Override
-  public void attach()
-  {
+  
+    // THIS WAS in attach()
     addComponent(infoBar);
 
     try
     {
-
-      if (wasAttached || result == null)
-      {
-        return;
-      }
-      wasAttached = true;
-
       ResolverEntry[] entries =
         resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();

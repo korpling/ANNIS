@@ -189,11 +189,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       this.visInput = visInput;
       this.mediaController = mediaController;
       this.text = text;
-    }
-
-    @Override
-    public void attach()
-    {
 
       if (visInput != null)
       {
