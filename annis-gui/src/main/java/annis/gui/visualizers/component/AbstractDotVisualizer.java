@@ -18,11 +18,9 @@ package annis.gui.visualizers.component;
 import annis.gui.ImagePanel;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import com.vaadin.Application;
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Embedded;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,7 +41,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractDotVisualizer.class);
   
   @Override
-  public ImagePanel createComponent(final VisualizerInput visInput, Application application)
+  public ImagePanel createComponent(final VisualizerInput visInput)
   { 
     try
     {
@@ -71,7 +69,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
           {
             return in;
           }
-        }, fileName, application);
+        }, fileName);
       
       Embedded emb = new Embedded("", resource);
       emb.setMimeType("image/png");

@@ -163,7 +163,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     count++;
 
     jit = new JITWrapper();
-    this.addComponent(jit);
+    setContent(jit);
 
 
     // send the json to the widget

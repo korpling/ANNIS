@@ -17,7 +17,6 @@ package annis.gui.visualizers.component.rst;
 
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import com.vaadin.Application;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -35,8 +34,7 @@ public class RST extends AbstractVisualizer<RSTImpl>
   }
 
   @Override
-  public RSTImpl createComponent(VisualizerInput visInput,
-    Application application)
+  public RSTImpl createComponent(VisualizerInput visInput)
   {
         return new RSTImpl(visInput);
   }

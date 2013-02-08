@@ -23,7 +23,6 @@ import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
-import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.AbstractSelect;
@@ -31,6 +30,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
@@ -67,12 +67,12 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
   }
 
   @Override
-  public KWICInterface createComponent(VisualizerInput visInput, Application application)
+  public KWICInterface createComponent(VisualizerInput visInput)
   {
     MediaController mediaController = null;
-    if(mcFactory != null && application instanceof MediaControllerHolder)
+    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
     {
-      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
+      mediaController = mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent());
     }
     
     EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
@@ -440,11 +440,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         }
         return "kwic-anno";
       }
-
+      
       @Override
-      public String getStyle(Object itemId, Object propertyId)
+      public String getStyle(Table source, Object itemId, Object propertyId)
       {
-         if (result == null)
+        if (result == null)
         {
           log.error("KWICStyleGenerator was restored from serialization and "
             + "can not generate new cells");

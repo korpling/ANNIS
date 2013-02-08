@@ -17,7 +17,6 @@ package annis.gui.visualizers;
 
 import annis.gui.AnnisBaseUI;
 import annis.gui.visualizers.component.KWICPanel;
-import com.vaadin.Application;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;

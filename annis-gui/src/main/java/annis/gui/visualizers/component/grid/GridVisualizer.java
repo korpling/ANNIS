@@ -26,8 +26,8 @@ import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import static annis.model.AnnisConstants.*;
-import com.vaadin.Application;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -78,12 +78,12 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   }
 
   @Override
-  public GridVisualizerComponent createComponent(VisualizerInput visInput, Application application)
+  public GridVisualizerComponent createComponent(VisualizerInput visInput)
   {
     MediaController mediaController = null;
-    if(mcFactory != null && application instanceof MediaControllerHolder)
+    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
     {
-      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
+      mediaController = mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent());
     }
     GridVisualizerComponent component = new GridVisualizerComponent(visInput, mediaController);
     return component;
@@ -101,6 +101,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     private AnnotationGrid grid;
     private transient VisualizerInput input;
     private transient MediaController mediaController;
+    private VerticalLayout layout;
 
     public enum ElementType
     {
@@ -119,7 +120,10 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
       setWidth("100%");
       setHeight("-1");
-      ((VerticalLayout) getContent()).setSizeUndefined();
+      
+      layout = new VerticalLayout();
+      setContent(layout);
+      layout.setSizeUndefined();
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
     }
@@ -129,11 +133,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     {
       if(input != null)
       {
-      String resultID = input.getId();
+        String resultID = input.getId();
       
         grid = new AnnotationGrid(mediaController, resultID);
         grid.addStyleName("partitur_table");
-        addComponent(grid);
+        layout.addComponent(grid);
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
