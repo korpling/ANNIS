@@ -79,6 +79,8 @@ public class SearchUI extends AnnisBaseUI
   @Override
   protected void init(VaadinRequest request)
   {  
+    super.init(request);
+    
     InstanceConfig instanceConfig = getInstanceConfig(request);
     getPage().setTitle("ANNIS Corpus Searc: " + instanceConfig.getInstanceDisplayName());
     
@@ -111,7 +113,8 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Window w = new Window("About ANNIS", new AboutWindow());
+        Window w =  new AboutWindow();
+        w.setCaption("About ANNIS");
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
@@ -188,7 +191,8 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
-      Window w = new Window("Help us to make ANNIS better!", new HelpUsWindow());
+      Window w = new HelpUsWindow();
+      w.setCaption("Help us to make ANNIS better!");
       w.setModal(true);
       w.setResizable(true);
       w.setWidth("600px");

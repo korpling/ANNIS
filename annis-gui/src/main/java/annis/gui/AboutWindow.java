@@ -44,8 +44,8 @@ public class AboutWindow extends Window
   {
     setSizeFull();
     
-    layout = (VerticalLayout) getContent();
-    
+    layout = new VerticalLayout();
+    setContent(layout);
     layout.setSizeFull();
   }
 
@@ -53,10 +53,7 @@ public class AboutWindow extends Window
   public void attach()
   {
     super.attach();
-    
-    VerticalLayout vLayout = new VerticalLayout();
-    setContent(vLayout);
-    
+        
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();
@@ -79,14 +76,14 @@ public class AboutWindow extends Window
     hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
     hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
     
-    vLayout.addComponent(hLayout);
+    layout.addComponent(hLayout);
     
-    vLayout.addComponent(new Label("ANNIS is a project of the "
+    layout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
-    vLayout.addComponent(new Label("Homepage: "
+    layout.addComponent(new Label("Homepage: "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/d1/annis/\">"
       + "http://www.sfb632.uni-potsdam.de/d1/annis/</a>.", Label.CONTENT_XHTML));
-    vLayout.addComponent(new Label("Version: " + VaadinSession.getCurrent().getAttribute("annis-version")));
+    layout.addComponent(new Label("Version: " + VaadinSession.getCurrent().getAttribute("annis-version")));
     
     TextArea txtThirdParty = new TextArea();
     txtThirdParty.setSizeFull();
@@ -122,7 +119,7 @@ public class AboutWindow extends Window
     txtThirdParty.addStyleName("license");
     txtThirdParty.setWordwrap(false);
     
-    vLayout.addComponent(txtThirdParty);
+    layout.addComponent(txtThirdParty);
     
     Button btOK = new Button("OK");
     final AboutWindow finalThis = this;
@@ -134,7 +131,7 @@ public class AboutWindow extends Window
         UI.getCurrent().removeWindow(finalThis);
       }
     });
-    vLayout.addComponent(btOK);
+    layout.addComponent(btOK);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
