@@ -225,7 +225,7 @@ public class SearchUI extends AnnisBaseUI
     hPanel.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     mainLayout.addComponent(hPanel);
-    ((VerticalLayout) getContent()).setExpandRatio(hPanel, 1.0f);
+    mainLayout.setExpandRatio(hPanel, 1.0f);
 
     control = new ControlPanel(this, instanceConfig);
     control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);

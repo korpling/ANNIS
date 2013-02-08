@@ -91,7 +91,8 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
     setSizeFull();
 
-    mainLayout = (VerticalLayout) getContent();
+    mainLayout = new VerticalLayout();
+    setContent(mainLayout);
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
     
