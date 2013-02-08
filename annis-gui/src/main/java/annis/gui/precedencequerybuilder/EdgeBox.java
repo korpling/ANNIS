@@ -26,25 +26,31 @@ public class EdgeBox extends Panel
 {
   private ComboBox edge;
   private int id;
-  private static final String[] EDGE_OPERATORS = new String[]
-  {".",".1",".1,2",".*"};
+  private static final String[][] EDGE_OPERATORS = new String[][]
+  {{".",".2",".1,2",".*"},{"is directly preceding (.)","is preceding with one token in between (.2)","is directly preceding or with one token in between(.1,2)","is indirectly preceding (.*)"}};
+  
   
   public EdgeBox (PrecedenceQueryBuilder sq)
   {
     edge = new ComboBox();
-    for(String o : EDGE_OPERATORS)
+    for(String o : EDGE_OPERATORS[1])
     {
       edge.addItem(o);
     }
     edge.setNewItemsAllowed(true);
-    edge.setValue(EDGE_OPERATORS[0]);
+    edge.setValue(EDGE_OPERATORS[1][0]);
     edge.setWidth("50px");
     addComponent(edge);
   }
   
   public String getValue()
   {
-    return edge.getValue().toString();
+    int i=0;
+    while((i<EDGE_OPERATORS.length)&&(!EDGE_OPERATORS[1][i].equals(edge.getValue().toString())))
+    {
+      i++;
+    }
+    return EDGE_OPERATORS[0][i];
   }
   
 }
