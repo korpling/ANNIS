@@ -16,8 +16,7 @@
 package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.AutoHeightIFrame;
-import annis.gui.widgets.gwt.client.ui.VAutoHeightIFrame;
-import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
+import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 
@@ -34,5 +33,6 @@ public class AutoHeightIFrameConnector extends LegacyConnector
   {
     return (VAutoHeightIFrame) super.getWidget();
   }
+  
   
 }

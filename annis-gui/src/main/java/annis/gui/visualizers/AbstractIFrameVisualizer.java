@@ -15,11 +15,25 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.resultview.VisualizerPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import com.vaadin.server.ConnectorResource;
+import com.vaadin.server.ResourceReference;
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.rmi.server.UID;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -59,19 +73,23 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
 
   @Override
-  public Component createComponent(VisualizerInput vis)
-  {
-    AutoHeightIFrame iframe;
-    ConnectorResource resource;
-
-    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-    writeOutput(vis, outStream);
-//    resource = vis.getVisPanel().createResource(outStream, getContentType());
+  public Component createComponent(final VisualizerInput vis)
+  { 
     
-    // TODO: find a good way to maintain the resource for the IFrame (vaadin7)
-    String url = "http://korpling.german.hu-berlin.de/";
-//    String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
-    iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+    StreamResource asResource = new StreamResource(new StreamResource.StreamSource() 
+    {
+      @Override
+      public InputStream getStream()
+      {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        writeOutput(vis, outStream);
+    
+        return new ByteArrayInputStream(outStream.toByteArray());
+      }
+    }, UUID.randomUUID().toString());
+    asResource.setMIMEType(getContentType());
+    AutoHeightIFrame iframe = new AutoHeightIFrame(asResource);
+    
     return iframe;
   }
 }

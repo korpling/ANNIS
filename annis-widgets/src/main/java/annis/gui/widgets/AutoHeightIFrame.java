@@ -1,7 +1,10 @@
 package annis.gui.widgets;
 
+import com.vaadin.server.ClientConnector;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
+import com.vaadin.server.Resource;
+import com.vaadin.server.ResourceReference;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.LegacyComponent;
@@ -13,13 +16,26 @@ import java.util.Map;
 public class AutoHeightIFrame extends AbstractComponent implements LegacyComponent
 {
 
-  private String url;
+  private ResourceReference resRef;
   private boolean urlUpdated = false;
   public static final int ADDITIONAL_HEIGHT = 25;
+  
+  public final static String RES_KEY = "iframe-vis-res";
 
-  public AutoHeightIFrame(String url)
+  public AutoHeightIFrame(Resource resource)
   {
-    this.url = url;
+    this.resRef = ResourceReference.create(
+                resource, (ClientConnector) this, RES_KEY);
+    
+    if (this.resRef == null)
+    {
+      getState().resources.remove(RES_KEY);
+    }
+    else
+    {
+      getState().resources.put(RES_KEY, this.resRef);
+    }
+    
     urlUpdated = false;
     setWidth("100%");
   }
@@ -30,7 +46,7 @@ public class AutoHeightIFrame extends AbstractComponent implements LegacyCompone
 
     if (!urlUpdated)
     {
-      target.addAttribute("url", url);
+      target.addAttribute("url", resRef.getURL());
       target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
       urlUpdated = true;
     }
