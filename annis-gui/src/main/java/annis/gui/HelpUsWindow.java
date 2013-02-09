@@ -17,6 +17,7 @@ package annis.gui;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class HelpUsWindow extends Window
       + "</ul>"
       + "<p>Feel free to visit our GitHub page for more information: <a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\">https://github.com/korpling/ANNIS</a></p>"
     );
-    lblOpenSource.setContentMode(Label.CONTENT_XHTML);
+    lblOpenSource.setContentMode(ContentMode.HTML);
     lblOpenSource.setStyleName("opensource");
     lblOpenSource.setWidth("100%");
     lblOpenSource.setHeight("-1px");

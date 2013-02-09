@@ -59,7 +59,7 @@ public class SearchOptionsPanel extends FormLayout
   public SearchOptionsPanel()
   {
     setWidth("99%");
-    setHeight("99%");
+    setHeight("-1px");
     
     addStyleName("contextsensible-formlayout");
     

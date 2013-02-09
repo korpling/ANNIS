@@ -27,6 +27,7 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import java.util.LinkedList;
@@ -67,7 +68,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     this.history = new LinkedList<HistoryEntry>();
     
     setSizeFull();
-
+   
     mainLayout = new GridLayout(2, 3);
     setContent(mainLayout);
     mainLayout.setSizeFull();
@@ -85,7 +86,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     txtQuery.addStyleName("query");
     txtQuery.setSizeFull();
     txtQuery.setTextChangeTimeout(1000);
-    txtQuery.addListener((TextChangeListener) this);
+    txtQuery.addTextChangeListener((TextChangeListener) this);
 
     mainLayout.addComponent(txtQuery, 1, 0);
 
@@ -94,12 +95,10 @@ public class QueryPanel extends Panel implements TextChangeListener,
     panelStatus.setHeight(3.5f, Unit.EM);
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatus.setContent(panelStatusLayout);
-    panelStatusLayout.setMargin(false);
-    panelStatusLayout.setSpacing(false);
     panelStatusLayout.setSizeFull();
 
     lblStatus = new Label();
-    lblStatus.setContentMode(Label.CONTENT_XHTML);
+    lblStatus.setContentMode(ContentMode.HTML);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
     lblStatus.setHeight("-1px");
@@ -133,7 +132,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     lstHistory = new ListSelect();
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
-    lstHistory.addListener((ValueChangeListener) this);
+    lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
     
     btHistory = new PopupButton("History");
