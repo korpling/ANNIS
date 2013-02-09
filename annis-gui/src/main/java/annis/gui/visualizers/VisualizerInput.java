@@ -24,6 +24,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.Set;
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
-public class VisualizerInput
+public class VisualizerInput implements Serializable
 {
 
   private SDocument document;
