@@ -122,15 +122,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
-      
-    UI.getCurrent().getPage().addBrowserWindowResizeListener(new Page.BrowserWindowResizeListener() 
-    {
-      @Override
-      public void browserWindowResized(BrowserWindowResizeEvent event)
-      {
-        layout.markAsDirty();
-      }
-    });
     
     // reset all registered media players    
     MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
