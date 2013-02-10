@@ -361,9 +361,9 @@ public class TigerQueryBuilderCanvas extends Panel
       }
 
       int xChange = details.getMouseEvent().getClientX()
-        - t.getMouseDownEvent().getClientX();
+        - t.getClientX();
       int yChange = details.getMouseEvent().getClientY()
-        - t.getMouseDownEvent().getClientY();
+        - t.getClientY();
 
       // Move the component in the absolute layout
       ComponentPosition pos =

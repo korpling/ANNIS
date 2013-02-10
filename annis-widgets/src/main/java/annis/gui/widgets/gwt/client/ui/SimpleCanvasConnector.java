@@ -16,7 +16,6 @@
 package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.SimpleCanvas;
-import annis.gui.widgets.gwt.client.ui.VSimpleCanvas;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 

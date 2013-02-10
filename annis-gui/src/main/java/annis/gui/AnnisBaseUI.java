@@ -76,7 +76,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * This class allows to out source some common tasks like initialization of 
  * the logging framework or the plugin loading to this base class.
  */
-@Theme("annis-theme")
+@Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
   MediaControllerHolder
 {

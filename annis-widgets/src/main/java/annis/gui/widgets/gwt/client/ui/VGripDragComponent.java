@@ -15,22 +15,34 @@
  */
 package annis.gui.widgets.gwt.client.ui;
 
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Widget;
+import com.vaadin.client.ApplicationConnection;
+import com.vaadin.client.ConnectorMap;
+import com.vaadin.client.Paintable;
+import com.vaadin.client.Util;
+import com.vaadin.client.ui.VCustomComponent;
+import com.vaadin.client.ui.VPanel;
+import com.vaadin.client.ui.dd.VDragAndDropManager;
+import com.vaadin.client.ui.dd.VDragEvent;
+import com.vaadin.client.ui.dd.VTransferable;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VGripDragComponent extends Widget
+public class VGripDragComponent extends VCustomComponent 
 {
   
    /** Set the CSS class name to allow styling. */
   public static final String CLASSNAME = "v-moveablepanel";
+  public ApplicationConnection client;
   
   public VGripDragComponent()
   {
@@ -39,10 +51,10 @@ public class VGripDragComponent extends Widget
     {
       public void onMouseDown(MouseDownEvent event)
       {
-//        if (startDrag(event.getNativeEvent()))
-//        {
-//          event.preventDefault(); // prevent text selection
-//        }
+        if (startDrag(event.getNativeEvent()))
+        {
+          event.preventDefault(); // prevent text selection
+        }
       }
     }, MouseDownEvent.getType());
 
@@ -50,13 +62,13 @@ public class VGripDragComponent extends Widget
     {
       public void onTouchStart(TouchStartEvent event)
       {
-//        if (startDrag(event.getNativeEvent()))
-//        {
-//          /*
-//           * Dont let eg. panel start scrolling.
-//           */
-//          event.stopPropagation();
-//        }
+        if (startDrag(event.getNativeEvent()))
+        {
+          /*
+           * Dont let eg. panel start scrolling.
+           */
+          event.stopPropagation();
+        }
       }
     }, TouchStartEvent.getType());
 
@@ -64,40 +76,39 @@ public class VGripDragComponent extends Widget
     
   }
   
-  // TODO
-//  private boolean startDrag(NativeEvent event) 
-//  {
-//    VTransferable transferable = new VTransferable();
-//    transferable.setDragSource(VGripDragComponent.this);
-//
-//    Element targetElement = (Element) event.getEventTarget().cast();
-//    
-//    Paintable paintable;
-//    Widget w = Util.findWidget(targetElement, null);
-//    
-//    if(!w.getStyleName().contains("drag-source-enabled"))
-//    {
-//      return false;
-//    }
-//    
-//    while (w != null && !(w instanceof Paintable)) 
-//    {
-//        w = w.getParent();
-//    }
-//    paintable = (Paintable) w;
-//
-//    transferable.setData("component", paintable);
-//    VDragEvent dragEvent = VDragAndDropManager.get().startDrag(
-//            transferable, event, true);
-//
-//    transferable.setData("mouseDown",
-//      new MouseEventDetails(event).serialize());
-//
-//
-//    dragEvent.createDragImage(getElement(), true);
-//
-//    return true;
-//
-//  }
+  private boolean startDrag(NativeEvent event) 
+  {
+    VTransferable transferable = new VTransferable();    
+    transferable.setDragSource(ConnectorMap.get(client).getConnector(
+      this));
+
+    Element targetElement = (Element) event.getEventTarget().cast();
+    
+    Paintable paintable;
+    Widget w = Util.findWidget(targetElement, null);
+    
+    if(!w.getStyleName().contains("drag-source-enabled"))
+    {
+      return false;
+    }
+    
+    while (w != null && !(w instanceof Paintable)) 
+    {
+        w = w.getParent();
+    }
+    paintable = (Paintable) w;
+
+    transferable.setData("component", paintable);
+    VDragEvent dragEvent = VDragAndDropManager.get().startDrag(
+            transferable, event, true);
+
+    transferable.setData("clientX", event.getClientX());
+    transferable.setData("clientY", event.getClientY());
+
+    dragEvent.createDragImage(getElement(), true);
+
+    return true;
+
+  }
 
 }

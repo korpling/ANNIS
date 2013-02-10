@@ -16,11 +16,10 @@
 package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.GripDragComponent;
-import annis.gui.widgets.gwt.client.ui.VAudioPlayer;
-import annis.gui.widgets.gwt.client.ui.VGripDragComponent;
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.ui.Widget;
-import com.vaadin.client.ui.LegacyConnector;
+import com.vaadin.client.ApplicationConnection;
+import com.vaadin.client.Paintable;
+import com.vaadin.client.UIDL;
+import com.vaadin.client.ui.customcomponent.CustomComponentConnector;
 import com.vaadin.shared.ui.Connect;
 
 /**
@@ -28,13 +27,27 @@ import com.vaadin.shared.ui.Connect;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Connect(GripDragComponent.class)
-public class GripDragComponentConnector extends LegacyConnector
+public class GripDragComponentConnector extends CustomComponentConnector
+  implements Paintable
 {
+  
+  public GripDragComponentConnector()
+  {
+
+  }
 
   @Override
-  public VGripDragComponent getWidget()
+  public final VGripDragComponent getWidget()
   {
     return (VGripDragComponent) super.getWidget();
   }
+
+  @Override
+  public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
+  {
+    getWidget().client = client;
+  }
+  
+
   
 }

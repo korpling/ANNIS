@@ -24,6 +24,7 @@ import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Page;
@@ -44,9 +45,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * GUI for searching in corpora.
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@PreserveOnRefresh
 public class SearchUI extends AnnisBaseUI
   implements LoginForm.LoginListener,
   MimeTypeErrorListener, Page.UriFragmentChangedListener
