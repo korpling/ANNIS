@@ -16,13 +16,19 @@
 package annis.gui.controlpanel;
 
 import annis.gui.Helper;
+import annis.gui.widgets.ContextHelp;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.server.ResourceReference;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.PopupView;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
@@ -100,23 +106,27 @@ public class SearchOptionsPanel extends FormLayout
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
     cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
+    cbSegmentation.
+      setDescription("If corpora with multiple "
+      + "context definitions are selected, a list of available context units will be "
+      + "displayed. By default context is calculated in ‘tokens’ "
+      + "(e.g. 5 minimal units to the left and right of a search result). "
+      + "Some corpora might offer further context definitions, e.g. in "
+      + "syllables, word forms belonging to different speakers, normalized or "
+      + "diplomatic segmentations of a manuscript, etc.");
     
     cbLeftContext.setValue("5");
     cbRightContext.setValue("5");
     cbResultsPerPage.setValue("10");
 
+    
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
-//    addComponent(new HelpFieldWrapper(cbSegmentation, help));
-    addComponent(cbResultsPerPage);
+    addComponent(cbSegmentation);
+    new ContextHelp().extend(cbSegmentation);
     
-//    help.addHelpForComponent(cbSegmentation, "If corpora with multiple "
-//      + "context definitions are selected, a list of available context units will be "
-//      + "displayed. By default context is calculated in ‘tokens’ "
-//      + "(e.g. 5 minimal units to the left and right of a search result). "
-//      + "Some corpora might offer further context definitions, e.g. in "
-//      + "syllables, word forms belonging to different speakers, normalized or "
-//      + "diplomatic segmentations of a manuscript, etc.");
+    addComponent(cbResultsPerPage);
+
   }
 
   public void updateSegmentationList(Set<String> corpora)
