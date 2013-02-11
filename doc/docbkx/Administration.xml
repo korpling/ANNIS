@@ -538,6 +538,29 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                 heading that is shown for each visualizer in the interface</para>
                         </listitem>
                         <listitem>
+                            <para><emphasis role="italic">visibility</emphasis>determines the
+                                visibility state of the visualizer. Valid values are:</para>
+                            <itemizedlist>
+                                <listitem>
+                                    <para><emphasis>permanent</emphasis> - the visualizer is shown
+                                        and not closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>hidden</emphasis> - the visualizer is hidden,
+                                        but expandable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>visible</emphasis> - the visualizer is visible
+                                        and closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>preload</emphasis> - behaviour is the same as
+                                        hidden, but the visualizer starts to rendering in the
+                                        background.</para>
+                                </listitem>
+                            </itemizedlist>
+                        </listitem>
+                        <listitem>
                             <para><emphasis role="italic">order</emphasis> determines the order in
                                 which visualizers are rendered in the interface (low to high)</para>
                         </listitem>
