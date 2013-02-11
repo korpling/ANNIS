@@ -80,13 +80,15 @@ public class ReportBugWindow extends Window
         {
           form.commit();
 
-          sendBugReport(bugEMailAddress, screenImage, imageMimeType);
+          if(sendBugReport(bugEMailAddress, screenImage, imageMimeType))
+          {
+            Notification.show("Bug report was sent",
+              "We will answer your bug report as soon as possible",
+              Notification.Type.HUMANIZED_MESSAGE);
+          }
           
           UI.getCurrent().removeWindow(finalThis);
 
-          Notification.show("Bug report was sent",
-            "We will answer your bug report as soon as possible",
-            Notification.Type.HUMANIZED_MESSAGE);
         }
         catch (FieldGroup.CommitException ex)
         {
@@ -190,7 +192,7 @@ public class ReportBugWindow extends Window
   }
   
 
-  private void sendBugReport(String bugEMailAddress, byte[] screenImage, String imageMimeType)
+  private boolean sendBugReport(String bugEMailAddress, byte[] screenImage, String imageMimeType)
   {
     MultiPartEmail mail = new MultiPartEmail();
     try
@@ -244,6 +246,7 @@ public class ReportBugWindow extends Window
       }
     
       mail.send();
+      return true;
 
     }
     catch (EmailException ex)
@@ -253,6 +256,7 @@ public class ReportBugWindow extends Window
         + "Bug reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);
       log.error(null,
         ex);
+      return false;
     }
   }
   
