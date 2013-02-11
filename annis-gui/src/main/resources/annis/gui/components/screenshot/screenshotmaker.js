@@ -19,7 +19,7 @@ window.annis_gui_components_screenshot_ScreenshotMaker = function() {
     var component = this;
     
     this.makeScreenshot = function () {
-      var  body = $("body");
+      var  body = $(".v-app").get(0);
       html2canvas(body, {
         onrendered: function(canvas) {
           component.finishedScreenshot(canvas.toDataURL());
