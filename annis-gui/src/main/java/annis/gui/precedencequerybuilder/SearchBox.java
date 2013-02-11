@@ -45,12 +45,15 @@ public class SearchBox extends Panel implements Button.ClickListener
   private ComboBox cb;  
   private CheckBox reBox;//by Martin, tick for regular expression
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
+  private PrecedenceQueryBuilder sq;
+  
 
   public SearchBox(String ebene, PrecedenceQueryBuilder sq, VerticalNode vn)
   {
     
     this.vn = vn;
     this.ebene = ebene;
+    this.sq = sq;
     
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
@@ -112,12 +115,17 @@ public class SearchBox extends Panel implements Button.ClickListener
       if(!r)
       {
         //rebuild ComboBox-content <- check out SpanBox for alternative solution
-        cb.removeAllItems();
+        /*cb.removeAllItems();
         for(String a : annonames)
         {
           cb.addItem(a);
-        }
-      }      
+        }*/
+        SpanBox.buildBoxValues(cb, this.ebene, sq);
+      }
+      else
+      {
+        cb.setValue(sq.escapeRegexCharacters(cb.getValue().toString()));
+      }
     }
   }
   

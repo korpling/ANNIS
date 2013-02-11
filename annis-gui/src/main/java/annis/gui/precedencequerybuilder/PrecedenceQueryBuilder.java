@@ -150,7 +150,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     return result;
   }
   
-  private String escapeRegexCharacters(String tok)
+  public String escapeRegexCharacters(String tok)
   {
     String result=tok;
     for (int i = 0; i<REGEX_CHARACTERS.length; i++)
@@ -348,6 +348,19 @@ public void removeMetaBox(MetaBox v)
     meta.removeComponent(v);
     mboxes.remove(v);
     updateQuery();
+  }
+
+public Collection<String> getAnnotationValues(String level)
+  {
+    Collection<String> values = new TreeSet<String>();
+    
+    for(String s : getAvailableAnnotationLevels(level))
+    {
+      killNamespace(s);
+      values.add(s.replaceFirst("^[^:]*:", ""));
+    }
+    
+    return values;
   }
 
 public Set<String> getAvailableAnnotationNames()

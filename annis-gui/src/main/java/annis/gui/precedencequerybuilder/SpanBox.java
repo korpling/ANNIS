@@ -45,7 +45,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     option = new VerticalLayout();
     option.setImmediate(true);  
     
-    chbWithin = new CheckBox("Search within: ");
+    chbWithin = new CheckBox("Search within span: ");
     chbWithin.setDescription("Add some AQL code to the query to make it limited to the chosen span.");
     chbWithin.setImmediate(true);
     chbWithin.addListener((Button.ClickListener) this);
@@ -53,7 +53,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     cbSpan = new ComboBox();
     cbSpanValue = new ComboBox();
     
-    cbSpan.setCaption("span:");
+    cbSpan.setCaption("span level:");
     cbSpan.setEnabled(false);
     cbSpan.setNullSelectionAllowed(false);
     cbSpan.setImmediate(true);
@@ -66,7 +66,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     cbSpanValue.setImmediate(true);    
     cbSpanValue.setWidth("130px");    
     
-    reBox = new CheckBox("regex");
+    reBox = new CheckBox("Regex");
     reBox.setEnabled(false);
     reBox.setImmediate(true);    
     reBox.addListener((Button.ClickListener) this);    
@@ -112,17 +112,33 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     {
       cbSpanValue.setNewItemsAllowed(reBox.booleanValue());
       if (!reBox.booleanValue())
-      {        
-        //delete regex-value:
-        String checkValue = cbSpanValue.getValue().toString();
-        Collection<String> annovals = getAnnotationValues(cbSpan.getValue().toString());
-        if(!annovals.contains(checkValue))
-        {
-          cbSpanValue.removeItem(checkValue);
-          cbSpanValue.setValue(annovals.iterator().next());
-        }        
+      {      
+        buildBoxValues(cbSpanValue, cbSpan.getValue().toString(), sq);      
       }
     }
+  }
+  
+  public static void buildBoxValues(ComboBox cb, String level, PrecedenceQueryBuilder sq)
+  {
+    /*
+     * this method deletes the user's regular expressions
+     * from the ComboBox
+     * (actually it simply refills the box)
+     * ---
+     * SearchBox uses this method, too
+     */
+    String value = cb.getValue().toString();
+    Collection<String> annovals = sq.getAnnotationValues(level);    
+    cb.removeAllItems();
+    for (String s : annovals)
+    {
+      cb.addItem(s);
+    }
+    if (annovals.contains(value))
+    {
+      cb.setValue(value);
+    }
+    else {cb.setValue(annovals.iterator().next());}
   }
   
   @Override
@@ -131,7 +147,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     if (true) //modify later <----- !!! !!! !!!
     {      
       cbSpanValue.removeAllItems();
-      Collection<String> annonames = getAnnotationValues(cbSpan.getValue().toString());
+      Collection<String> annonames = sq.getAnnotationValues(cbSpan.getValue().toString());
       for (String a : annonames)
       {
         cbSpanValue.addItem(a);          
@@ -141,19 +157,6 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
       cbSpanValue.setEnabled(true);
       reBox.setEnabled(true);      
     }
-  }
-  
-  private Collection<String> getAnnotationValues(String level)
-  {
-    Collection<String> names = new TreeSet<String>();
-    
-    for(String s : sq.getAvailableAnnotationLevels(level))
-    {
-      sq.killNamespace(s);
-      names.add(s.replaceFirst("^[^:]*:", ""));
-    }
-    
-    return names;
   }
   
   public boolean searchWithinSpan()
