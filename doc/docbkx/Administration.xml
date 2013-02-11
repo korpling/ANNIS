@@ -588,12 +588,7 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                                 <userinput>node_key:key</userinput>, all nodes which
                                             carry this annotation are searched for pointing
                                             relations and instead token the annotation value is
-                                            used. If you also want to see the token level, you will
-                                            have to define the token_visbility property
-                                                with<userinput>token_visibility:visible</userinput>
-                                            or <userinput>token_visibility:hidden</userinput>. Take
-                                            into account, that the token_visibily property has only
-                                            an effect if a node_key is defined.</para>
+                                            used.</para>
                                     </listitem>
                                 </itemizedlist></para>
                         </listitem>
