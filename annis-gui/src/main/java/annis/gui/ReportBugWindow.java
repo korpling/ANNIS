@@ -15,17 +15,26 @@
  */
 package annis.gui;
 
-import com.vaadin.data.Validator;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.themes.BaseTheme;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import javax.activation.FileDataSource;
-import javax.ws.rs.core.Application;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.*;
 import org.slf4j.LoggerFactory;
 
@@ -39,75 +48,27 @@ public class ReportBugWindow extends Window
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
 
-  private Form form;
-  private TextField txtSummary;
-  private TextArea txtDescription;
-  private TextField txtName;
-  private TextField txtMail;
+  private FieldGroup form;
+  
   private Button btSubmit;
   private Button btCancel;
   
-  public ReportBugWindow(Application app, final String bugEMailAddress, final byte[] screenImage)
+  public ReportBugWindow(final String bugEMailAddress, final byte[] screenImage, 
+    final String imageMimeType)
   {
-    
     setSizeUndefined();
+    setCaption("Report Bug");
+          
+    ReportFormLayout layout = new ReportFormLayout();
+    setContent(layout);
     
-    // TODO: use form layout directly as content (vaadin7)
-    VerticalLayout mainLayout = new VerticalLayout();
-    setContent(mainLayout);
-      
-    FormLayout layout = new FormLayout();
-    layout.setSizeUndefined();
-    form = new Form(layout);
-    form.setCaption("Report Bug");
-    form.setSizeUndefined();
-
-    form.setInvalidCommitted(false);
+    layout.setHeight("350px");
+    layout.setWidth("750px");
     
-    mainLayout.setSizeFull();
-    mainLayout.addComponent(form);
-
-    txtSummary = new TextField("Short Summary");
-    txtSummary.setRequired(true);
-    txtSummary.setRequiredError("You must provide a summary");
-    txtSummary.setColumns(50);
+    form = new FieldGroup(new BeanItem<BugReport>(new BugReport()));
+    form.bindMemberFields(layout);
+    form.setBuffered(true);
     
-    txtDescription = new TextArea("Long Description");
-    txtDescription.setRequired(true);
-    txtDescription.setRequiredError("You must provide a description");
-    txtDescription.setRows(10);
-    txtDescription.setColumns(50);
-    txtDescription.setValue("What steps will reproduce the problem?\n"
-      + "1.\n"
-      + "2.\n"
-      + "3.\n"
-      + "\n"
-      + "What is the expected result?\n"
-      + "\n"
-      + "\n"
-      + "What happens instead\n"
-      + "\n"
-      + "\n"
-      + "Please provide any additional information below.\n");
-    
-    txtName = new TextField("Your Name");
-    txtName.setRequired(true);
-    txtName.setRequiredError("You must provide your name");
-    txtName.setColumns(50);
-
-    txtMail = new TextField("Your e-mail adress");
-    txtMail.setRequired(true);
-    txtMail.setRequiredError("You must provide a valid e-mail adress");
-    txtMail.addValidator(new EmailValidator(
-      "You must provide a valid e-mail adress"));
-    txtMail.setColumns(50);
-
-
-    form.addField("summary", txtSummary);
-    form.addField("description", txtDescription);
-    form.addField("name", txtName);
-    form.addField("email", txtMail);
-
     final ReportBugWindow finalThis = this;
     btSubmit = new Button("Submit bug report", new Button.ClickListener()
     {
@@ -119,22 +80,44 @@ public class ReportBugWindow extends Window
         {
           form.commit();
 
-          sendBugReport(bugEMailAddress, screenImage);
+          sendBugReport(bugEMailAddress, screenImage, imageMimeType);
           
           UI.getCurrent().removeWindow(finalThis);
 
           Notification.show("Bug report was sent",
             "We will answer your bug report as soon as possible",
             Notification.Type.HUMANIZED_MESSAGE);
-
-
         }
-        catch (Validator.InvalidValueException ex)
+        catch (FieldGroup.CommitException ex)
         {
-          // ignore
+          List<String> errorFields = new LinkedList<String>();
+          for(Field f : form.getFields())
+          {
+            if (f instanceof AbstractComponent)
+            {
+              AbstractComponent c = (AbstractComponent) f;
+              if (f.isValid())
+              {
+                c.setComponentError(null);
+              }
+              else
+              {
+                errorFields.add(f.getCaption()); 
+                c.setComponentError(new UserError("Validation failed: "));
+              }
+            }            
+          } // for each field
+          String message = "Please check the error messages "
+            + "(place mouse over red triangle) for the following fields:<br />";
+          message = message + StringUtils.join(errorFields, ",<br/>");
+          Notification notify = new Notification("Validation failed", 
+            message, Notification.Type.WARNING_MESSAGE,
+            true);
+          notify.show(UI.getCurrent().getPage());
         }
         catch (Exception ex)
         {
+          log.error("Could not send bug report", ex);
           Notification.show("Could not send bug report", ex.
             getMessage(),
             Notification.Type.WARNING_MESSAGE);
@@ -152,15 +135,62 @@ public class ReportBugWindow extends Window
         UI.getCurrent().removeWindow(finalThis);
       }
     });
+    
+    addScreenshotPreview(layout, screenImage, imageMimeType);
 
     HorizontalLayout buttons = new HorizontalLayout();
     buttons.addComponent(btSubmit);
     buttons.addComponent(btCancel);
 
-    form.getFooter().addComponent(buttons);
+    layout.addComponent(buttons);
+    
   }
+  
+  private void addScreenshotPreview(Layout layout, final byte[] rawImage, String mimeType)
+  {
+    StreamResource res = new StreamResource(
+      new StreamResource.StreamSource()
+      {
+        @Override
+        public InputStream getStream()
+        {
+          return new ByteArrayInputStream(rawImage);
+        }
+      }, "screendump_" + UUID.randomUUID().toString() + ".png"
+    );
+    res.setMIMEType(mimeType);
 
-  private void sendBugReport(String bugEMailAddress, byte[] screenImage)
+    final Image imgScreenshot =
+      new Image("Attached screenshot", res);
+    imgScreenshot.setAlternateText("Screenshot of the ANNIS browser window, "
+      + "no other window or part of the desktop is captured.");
+    imgScreenshot.setVisible(false);
+    imgScreenshot.setWidth("100%");
+    
+    Button btShowScreenshot = new Button("Show attached screenshot", new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        imgScreenshot.setVisible(!imgScreenshot.isVisible());
+        if(imgScreenshot.isVisible())
+        {
+          event.getButton().setCaption("Hide attached screenshot");
+        }
+        else
+        {
+          event.getButton().setCaption("Show attached screenshot");
+        }
+      }
+    });
+    btShowScreenshot.addStyleName(BaseTheme.BUTTON_LINK);
+    
+    layout.addComponent(btShowScreenshot);
+    layout.addComponent(imgScreenshot);
+  }
+  
+
+  private void sendBugReport(String bugEMailAddress, byte[] screenImage, String imageMimeType)
   {
     MultiPartEmail mail = new MultiPartEmail();
     try
@@ -195,10 +225,10 @@ public class ReportBugWindow extends Window
       mail.setMsg(sbMsg.toString());
 
       if (screenImage != null)
-      {
+      { 
         try
         {
-          mail.attach(new ByteArrayDataSource(screenImage, "image/png"),
+          mail.attach(new ByteArrayDataSource(screenImage, imageMimeType),
             "screendump.png", "Screenshot of the browser content at time of bug report");
         }
         catch (IOException ex)
@@ -226,5 +256,110 @@ public class ReportBugWindow extends Window
     }
   }
   
+  
+  public static class BugReport
+  {
+    private String summary = "";
+    private String description = 
+      "What steps will reproduce the problem?\n"
+      + "1.\n"
+      + "2.\n"
+      + "3.\n"
+      + "\n"
+      + "What is the expected result?\n"
+      + "\n"
+      + "\n"
+      + "What happens instead\n"
+      + "\n"
+      + "\n"
+      + "Please provide any additional information below.\n";
+    private String name = "";
+    private String email = "";
+
+    public String getSummary()
+    {
+      return summary;
+    }
+
+    public void setSummary(String summary)
+    {
+      this.summary = summary;
+    }
+
+    public String getDescription()
+    {
+      return description;
+    }
+
+    public void setDescription(String description)
+    {
+      this.description = description;
+    }
+
+    public String getName()
+    {
+      return name;
+    }
+
+    public void setName(String name)
+    {
+      this.name = name;
+    }
+
+    public String getEmail()
+    {
+      return email;
+    }
+
+    public void setEmail(String mail)
+    {
+      this.email = mail;
+    }  
+  }
+  
+  public static class ReportFormLayout extends FormLayout
+  {
+    @PropertyId("summary")
+    private TextField txtSummary;
+
+    @PropertyId("description")
+    private TextArea txtDescription;
+
+    @PropertyId("name")
+    private TextField txtName;
+
+    @PropertyId("email")
+    private TextField txtMail;
+    
+    public ReportFormLayout()
+    {
+      txtSummary = new TextField("Short Summary");
+      txtSummary.setRequired(true);
+      txtSummary.setRequiredError("You must provide a summary");
+      txtSummary.setColumns(50);
+
+      txtDescription = new TextArea("Long Description");
+      txtDescription.setRequired(true);
+      txtDescription.setRequiredError("You must provide a description");
+      txtDescription.setRows(10);
+      txtDescription.setColumns(50);
+
+      txtName = new TextField("Your Name");
+      txtName.setRequired(true);
+      txtName.setRequiredError("You must provide your name");
+      txtName.setColumns(50);
+
+      txtMail = new TextField("Your e-mail adress");
+      txtMail.setRequired(true);
+      txtMail.setRequiredError("You must provide a valid e-mail adress");
+      txtMail.addValidator(new EmailValidator(
+        "You must provide a valid e-mail adress"));
+      txtMail.setColumns(50);
+
+      addComponents(txtSummary, txtDescription, txtName, txtMail);
+
+    }
+
+  }
 
 }

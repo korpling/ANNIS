@@ -16,14 +16,13 @@
 
 window.annis_gui_components_screenshot_ScreenshotMaker = function() {
     var element = $(this.getElement());
+    var component = this;
     
     this.makeScreenshot = function () {
-      alert("Trying to make a screenshot!");
       var  body = $("body");
       html2canvas(body, {
         onrendered: function(canvas) {
-          alert("render finished");
-          finishedScreenshot(canvas.toDataURL());
+          component.finishedScreenshot(canvas.toDataURL());
         }
       });
     }

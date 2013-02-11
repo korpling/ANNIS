@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 @PreserveOnRefresh
 public class SearchUI extends AnnisBaseUI
   implements LoginForm.LoginListener,
+  ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener, Page.UriFragmentChangedListener
 {
 
@@ -132,7 +133,7 @@ public class SearchUI extends AnnisBaseUI
 //    screenShot.addListener(this);
 //
 //    addComponent(screenShot);
-    final ScreenshotMaker screenshot = new ScreenshotMaker();
+    final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     mainLayout.addComponent(screenshot);
 
     btBugReport = new Button("Report Bug");
@@ -145,7 +146,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
-        screenshot.makeScreenshot(null);
+        screenshot.makeScreenshot();
         btBugReport.setCaption("bug report is initialized...");
         
         //TODO make screenshot (vaadin7)
@@ -523,27 +524,23 @@ public class SearchUI extends AnnisBaseUI
     return control;
   }
 
-  // TODO: handle screenshot event (vaadin7)
-//  @Override
-//  public void screenshotReceived(byte[] imageData)
-//  {
-//    btBugReport.setEnabled(true);
-//    btBugReport.setCaption("Report Bug");
-//    
-//    if(bugEMailAddress != null)
-//    {
-//      ReportBugPanel reportBugPanel = new ReportBugPanel(getApplication(),
-//        bugEMailAddress, imageData);
-//
-//      // show bug report window
-//
-//      Window w = new Window("Report Bug", reportBugPanel);
-//      w.setModal(true);
-//      w.setResizable(true);
-//      addWindow(w);
-//      w.center();
-//    }
-//  }
+  @Override
+  public void screenshotReceived(byte[] imageData, String mimeType)
+  {
+    btBugReport.setEnabled(true);
+    btBugReport.setCaption("Report Bug");
+    
+    if(bugEMailAddress != null)
+    {
+      ReportBugWindow reportBugWindow = 
+        new ReportBugWindow(bugEMailAddress, imageData, mimeType);
+      
+      reportBugWindow.setModal(true);
+      reportBugWindow.setResizable(true);
+      addWindow(reportBugWindow);
+      reportBugWindow.center();
+    }
+  }
 
   @Override
   public void notifyCannotPlayMimeType(String mimeType)
