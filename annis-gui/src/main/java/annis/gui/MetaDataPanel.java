@@ -161,6 +161,7 @@ public class MetaDataPanel extends Panel
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
+    tblMeta.setSortContainerPropertyId("name");
     return tblMeta;
   }
 
