@@ -16,6 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.gui.Helper;
+import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.TextExporter;
@@ -57,8 +58,6 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   
   private final Map<String,String> help4Exporter = new HashMap<String,String>();
   
-  // TODO: re-enable context help (vaadin7)
-//  private ContextHelp help;
   private ComboBox cbExporter;
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
@@ -81,9 +80,6 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     
     initHelpMessages();
     
-//    help = new ContextHelp();
-//    addComponent(help);
-    
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -97,10 +93,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     }
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
     cbExporter.addListener(new ExporterSelectionHelpListener());
-//    help.addHelpForComponent(cbExporter, help4Exporter.get((String) cbExporter.getValue()));
+    cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
     
-    addComponent(cbExporter);
-//    addComponent(new HelpFieldWrapper(cbExporter, help));
+    addComponent(new HelpButton(cbExporter));
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -128,11 +123,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbRightContext);
 
     txtParameters = new TextField("Parameters");
-//    help.addHelpForComponent(txtParameters, "You can input special parameters "
-//      + "for certain exporters. See the description of each exporter "
-//      + "(‘?’ button above) for specific parameter settings.");
-//    addComponent(new HelpFieldWrapper(txtParameters, help));
-    
+    txtParameters.setDescription("You can input special parameters "
+      + "for certain exporters. See the description of each exporter "
+      + "(‘?’ button above) for specific parameter settings.");
+    addComponent(new HelpButton(txtParameters));
 
     btExport = new Button("Perform Export");
     btExport.setDisableOnClick(true);
@@ -303,11 +297,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       String helpMessage = help4Exporter.get((String) event.getProperty().getValue());
       if(helpMessage != null)
       {
-//        help.addHelpForComponent(cbExporter, helpMessage);
+        cbExporter.setDescription(helpMessage);
       }
       else
       {
-//        help.addHelpForComponent(cbExporter, "No help available for this exporter");
+        cbExporter.setDescription("No help available for this exporter");
       }
     }
   }

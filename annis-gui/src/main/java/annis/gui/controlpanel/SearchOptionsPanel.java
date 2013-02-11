@@ -63,10 +63,7 @@ public class SearchOptionsPanel extends FormLayout
     setHeight("-1px");
     
     addStyleName("contextsensible-formlayout");
-    
-    // TODO: re-enable context help in search options (vaadin7)
-//    ContextHelp help = new ContextHelp();
-//    addComponent(help);
+
     
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
