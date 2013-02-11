@@ -531,6 +531,35 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                                 </mediaobject>
                                             </screenshot></para>
                                     </listitem>
+                                    <listitem>
+                                        <para><emphasis>rst</emphasis> - imitates the RST-diagrams
+                                            from the RST-Tool (<link
+                                                xlink:href="http://www.wagsoft.com/RSTTool/"
+                                                >RSTTool</link>)</para>
+                                        <para>Note, that the rst-xml-format models edges beetwen
+                                            nucleus and satellite the other way around, than in the
+                                            common visualization of rst-graphs. So the dominance
+                                            relation between nodes must be defined in AQL like that: </para>
+                                        <para>
+                                            <programlisting>node &amp; node &amp; "Therefore" &amp; #1 >rst[relname="nonvolitional-result"] #2 &amp; #2 > #3</programlisting>
+                                        </para>
+                                        <para>The AQL-Query above searches for a sattelite which
+                                            contains the token "Therefore" and dominates a node with
+                                            the rst edge type "nonvolitional-result". Important is,
+                                            that the first note dominates the second one, also the
+                                            visualization shows it the other way around. </para>
+                                        <para><screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata fileref="images/rst_vis.png" width="70%"
+                                                        align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                            <para>Further the rst relations are not modeled as
+                                            pointing relations, so the <code>-></code> Operator
+                                            obviously does not provide a result.</para>
+                                    </listitem>
                                 </itemizedlist></para>
                         </listitem>
                         <listitem>
