@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.components.screenshot.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
 import annis.gui.querybuilder.QueryBuilderChooser;
@@ -131,6 +132,8 @@ public class SearchUI extends AnnisBaseUI
 //    screenShot.addListener(this);
 //
 //    addComponent(screenShot);
+    final ScreenshotMaker screenshot = new ScreenshotMaker();
+    mainLayout.addComponent(screenshot);
 
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -142,6 +145,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
+        screenshot.makeScreenshot(null);
         btBugReport.setCaption("bug report is initialized...");
         
         //TODO make screenshot (vaadin7)
