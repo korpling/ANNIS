@@ -16,19 +16,14 @@
 package annis.gui.controlpanel;
 
 import annis.gui.Helper;
-import annis.gui.widgets.ContextHelp;
+import annis.gui.components.HelpButton;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.IntegerValidator;
-import com.vaadin.server.ResourceReference;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.PopupView;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
@@ -122,8 +117,7 @@ public class SearchOptionsPanel extends FormLayout
     
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
-    addComponent(cbSegmentation);
-    new ContextHelp().extend(cbSegmentation);
+    addComponent(new HelpButton(cbSegmentation));
     
     addComponent(cbResultsPerPage);
 

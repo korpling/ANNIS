@@ -15,10 +15,7 @@
  */
 package annis.gui.widgets.gwt.client.ui;
 
-import annis.gui.widgets.*;
 import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.gwt.client.ui.VAnnotationGrid;
-import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 

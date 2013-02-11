@@ -158,6 +158,10 @@ textarea.query {
   font-weight: bold;
 }
 
+.v-button-helpbutton {
+	padding-left: 0.5em;
+}
+
 /* HACKS (or workarounds for browser/vaadin bugs) */
 
 /* 
