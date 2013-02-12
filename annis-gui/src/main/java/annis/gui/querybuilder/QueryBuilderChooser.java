@@ -17,6 +17,7 @@ package annis.gui.querybuilder;
 
 import annis.gui.InstanceConfig;
 import annis.gui.PluginSystem;
+import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -30,6 +31,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sound.midi.ControllerEventListener;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -39,7 +41,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
   private PluginSystem pluginSystem;
-  private ControlPanel controlPanel;
+  private QueryController controller;
   private ComboBox cbChooseBuilder;
   private Map<String, String> short2caption;
   private Map<String, QueryBuilderPlugin> pluginRegistry;
@@ -47,10 +49,10 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private VerticalLayout layout;
   private InstanceConfig instanceConfig;
   
-  public QueryBuilderChooser(ControlPanel controlPanel, PluginSystem pluginSystem,
+  public QueryBuilderChooser(QueryController controller, PluginSystem pluginSystem,
     InstanceConfig instanceConfig)
   {
-    this.controlPanel = controlPanel;
+    this.controller = controller;
     this.pluginSystem = pluginSystem;
     this.instanceConfig = instanceConfig;
     
@@ -106,7 +108,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
         Notification.Type.WARNING_MESSAGE);
     }
     
-    Component component = plugin.createComponent(controlPanel);
+    Component component = plugin.createComponent(controller);
     if(lastComponent != null)
     {
       layout.removeComponent(lastComponent);

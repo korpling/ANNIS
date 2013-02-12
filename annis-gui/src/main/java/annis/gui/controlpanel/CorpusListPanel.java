@@ -21,6 +21,7 @@ import annis.gui.Helper;
 import annis.security.AnnisUserConfig;
 import annis.gui.CorpusSet;
 import annis.gui.InstanceConfig;
+import annis.gui.QueryController;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -77,15 +78,15 @@ public class CorpusListPanel extends VerticalLayout implements
   };
   BeanContainer<String, AnnisCorpus> corpusContainer;
   private Table tblCorpora;
-  private ControlPanel controlPanel;
+  private QueryController controller;
   private ComboBox cbSelection;
   private transient AnnisUserConfig userConfig;
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
   private InstanceConfig instanceConfig;
 
-  public CorpusListPanel(ControlPanel controlPanel, InstanceConfig instanceConfig)
+  public CorpusListPanel(QueryController controller, InstanceConfig instanceConfig)
   {
-    this.controlPanel = controlPanel;
+    this.controller = controller;
     this.instanceConfig = instanceConfig;
     
     final CorpusListPanel finalThis = this;
@@ -162,7 +163,7 @@ public class CorpusListPanel extends VerticalLayout implements
       @Override
       public void valueChange(ValueChangeEvent event)
       { 
-        finalThis.controlPanel.corpusSelectionChanged();
+        finalThis.controller.corpusSelectionChanged();
       }
     });
     
@@ -521,7 +522,7 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
-  protected void selectCorpora(Set<String> corpora)
+  public void selectCorpora(Set<String> corpora)
   {
     if (tblCorpora != null)
     {
@@ -529,7 +530,7 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
-  protected Set<String> getSelectedCorpora()
+  public Set<String> getSelectedCorpora()
   {
     Set<String> result = new HashSet<String>();
 
@@ -563,9 +564,9 @@ public class CorpusListPanel extends VerticalLayout implements
         public void buttonClick(ClickEvent event)
         {
           MetaDataPanel meta = new MetaDataPanel(c.getName());
-          if (controlPanel != null)
+          if (controller != null)
           {
-            CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controlPanel);
+            CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controller);
             HorizontalLayout layout = new HorizontalLayout();
             layout.addComponent(meta);
             layout.addComponent(browse);

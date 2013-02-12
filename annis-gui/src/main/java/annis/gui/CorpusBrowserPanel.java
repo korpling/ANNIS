@@ -55,14 +55,14 @@ public class CorpusBrowserPanel extends Panel
   private Table tblEdgeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerEdgeAnno;
   private CitationLinkGenerator citationGenerator;
-  private ControlPanel controlPanel;
+  private QueryController controller;
 
   public CorpusBrowserPanel(final AnnisCorpus corpus,
-    ControlPanel controlPanel)
+    QueryController controller)
   {
     super("Available annotations");
     this.corpus = corpus;
-    this.controlPanel = controlPanel;
+    this.controller = controller;
 
     setSizeFull();
 
@@ -280,9 +280,9 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
       Set<String> corpusNameSet = new HashSet<String>();
       corpusNameSet.add(corpus.getName());
-      if(controlPanel != null)
+      if(controller != null)
       {
-        controlPanel.setQuery(cbe.getExample(), corpusNameSet);
+        controller.setQuery(cbe.getExample(), corpusNameSet);
       }
     }
   }

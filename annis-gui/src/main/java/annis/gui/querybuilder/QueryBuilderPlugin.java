@@ -16,6 +16,7 @@
 package annis.gui.querybuilder;
 
 import annis.gui.AnnisBaseUI;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.ui.Component;
@@ -46,6 +47,6 @@ public interface QueryBuilderPlugin<I extends Component> extends Plugin, Seriali
    * Vaadin.
    *
    */
-  public I createComponent(ControlPanel controlPanel);
+  public I createComponent(QueryController controller);
 
 }

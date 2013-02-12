@@ -38,12 +38,12 @@ public class HistoryPanel extends Panel
 
   private Table tblHistory;
   private BeanItemContainer<HistoryEntry> containerHistory;
-  private ControlPanel parent;
+  private QueryController controller;
   private CitationLinkGenerator citationGenerator;
 
-  public HistoryPanel(List<HistoryEntry> history, ControlPanel parent)
+  public HistoryPanel(List<HistoryEntry> history, QueryController controller)
   {
-    this.parent = parent;
+    this.controller = controller;
     
     VerticalLayout layout = new VerticalLayout();
     setContent(layout);
@@ -92,9 +92,9 @@ public class HistoryPanel extends Panel
   {
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
     
-    if(parent != null)
+    if(controller != null)
     {
-      parent.setQuery(e.getQuery(), new HashSet<String>(e.getCorpora()));
+      controller.setQuery(e.getQuery(), new HashSet<String>(e.getCorpora()));
     }
   }
 }

@@ -17,6 +17,7 @@ package annis.gui.controlpanel;
 
 import annis.gui.Helper;
 import annis.gui.HistoryPanel;
+import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -27,11 +28,18 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -40,29 +48,33 @@ import org.vaadin.hene.popupbutton.PopupButton;
  * @author thomas
  */
 public class QueryPanel extends Panel implements TextChangeListener,
-  ValueChangeListener
+  ValueChangeListener, View
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
   
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
+  
+  // the view name
+  public static final String NAME = "query";
 
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
   private PopupButton btHistory;
   private ListSelect lstHistory;
-  private ControlPanel controlPanel;
+  private QueryController controller;
   private ProgressIndicator piCount;
   private GridLayout mainLayout;
   private Panel panelStatus;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
+  private String lastQueriedFragment;
   
-  public QueryPanel(final ControlPanel controlPanel)
+  public QueryPanel(final QueryController controller)
   {
-    this.controlPanel = controlPanel;
+    this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
     
@@ -148,7 +160,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
           historyWindow.setWidth("400px");
           historyWindow.setHeight("250px");
         }
-        historyWindow.setContent(new HistoryPanel(history, controlPanel));
+        historyWindow.setContent(new HistoryPanel(history, controller));
         
         if(UI.getCurrent().getWindows().contains(historyWindow))
         {
@@ -266,15 +278,59 @@ public class QueryPanel extends Panel implements TextChangeListener,
           Notification.Type.TRAY_NOTIFICATION);
     }
   }
+  
+  public void updateFragment(String aql, 
+    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
+    int start, int limit)
+  {
+    List<String> args = Helper.citationFragmentParams(aql, corpora, 
+      contextLeft, contextRight, 
+      segmentation, start, limit);
+      
+    // set our fragment
+    lastQueriedFragment = StringUtils.join(args, "&");
+    UI.getCurrent().getPage().setUriFragment(NAME + "/" + lastQueriedFragment);
+    
+  }
 
+  @Override
+  public void enter(ViewChangeEvent event)
+  {
+    String parameters = event.getParameters();
+    // do nothing if not changed
+    if (parameters.equals(lastQueriedFragment))
+    {
+      return;
+    }
+    
+    // TODO: re-enable the query fragments (vaadin7)
+
+//    Map<String, String> args = Helper.parseFragment(parameters);
+//
+//    Set<String> corpora = new TreeSet<String>();
+//    if (args.containsKey("c"))
+//    {
+//      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
+//      corpora.addAll(Arrays.asList(corporaSplitted));
+//    }
+//
+//    controlPanel.executeCount(args.get("q"), corpora);
+//
+//    controlPanel.s
+//    showQueryResult(args.get("q"), corpora,
+//      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")),
+//      args.get("seg"), Integer.parseInt(args.get("s")),
+//      Integer.parseInt(args.get("l")));
+  }
+  
   @Override
   public void valueChange(ValueChangeEvent event)
   {
     btHistory.setPopupVisible(false);
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
-    if(controlPanel != null & e != null)
+    if(controller != null & e != null)
     {
-      controlPanel.setQuery(e.getQuery(), e.getCorpora());
+      controller.setQuery(e.getQuery(), e.getCorpora());
     }
   }
 
@@ -284,9 +340,9 @@ public class QueryPanel extends Panel implements TextChangeListener,
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(controlPanel != null)
+      if(controller != null)
       {
-        controlPanel.executeQuery();
+        controller.executeQuery();
       }
     }
   }
@@ -302,7 +358,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     }
   }
 
-  protected void setStatus(String status)
+  public void setStatus(String status)
   {
     if(lblStatus != null)
     {

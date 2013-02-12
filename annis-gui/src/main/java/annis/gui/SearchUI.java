@@ -28,21 +28,17 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.Page;
-import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -53,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   LoginWindow.LoginListener,
-  MimeTypeErrorListener, Page.UriFragmentChangedListener
+  MimeTypeErrorListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchUI.class);
@@ -67,14 +63,14 @@ public class SearchUI extends AnnisBaseUI
   private Label lblUserName;
   private Button btLoginLogout;
   private Button btBugReport;
-  private ControlPanel control;
+  private ControlPanel controlPanel;
   private TutorialPanel tutorial;
   private TabSheet mainTab;
   private Window windowLogin;
   private ResultViewPanel resultView;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
-  private String lastQueriedFragment;
+  private QueryController queryController;
   
   private boolean warnedAboutPossibleMediaFormatProblem = false;
 
@@ -88,6 +84,7 @@ public class SearchUI extends AnnisBaseUI
     InstanceConfig instanceConfig = getInstanceConfig(request);
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
+    queryController = new QueryController(this);
     
     // always get the resize events directly
     setImmediate(true);
@@ -227,10 +224,10 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.addComponent(hPanel);
     mainLayout.setExpandRatio(hPanel, 1.0f);
 
-    control = new ControlPanel(this, instanceConfig);
-    control.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
-    control.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    hLayout.addComponent(control);
+    controlPanel = new ControlPanel(queryController, instanceConfig);
+    controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
+    controlPanel.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    hLayout.addComponent(controlPanel);
 
     tutorial = new TutorialPanel();
 
@@ -238,7 +235,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.addTab(tutorial, "Tutorial");
 
-    queryBuilder = new QueryBuilderChooser(control, this, instanceConfig);
+    queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder");
 
     hLayout.addComponent(mainTab);
@@ -262,8 +259,6 @@ public class SearchUI extends AnnisBaseUI
         mainTab.setSelectedTab(tutorial);
       }
     });
-    
-    getPage().addUriFragmentChangedListener(this);
     
     // TODO: re-enable parsing of the old style citation links (vaadin7)
 
@@ -371,11 +366,11 @@ public class SearchUI extends AnnisBaseUI
           log.error(
             "could not parse context value", ex);
         }
-        control.setQuery(aql, selectedCorpora, cleft, cright);
+        queryController.setQuery(aql, selectedCorpora, cleft, cright);
       }
       else
       {
-        control.setQuery(aql, selectedCorpora);
+        queryController.setQuery(aql, selectedCorpora);
       }
       
       // remove all currently openend sub-windows
@@ -412,7 +407,7 @@ public class SearchUI extends AnnisBaseUI
       btLoginLogout.setCaption("Login");
     }
     
-    control.updateCorpusSetList();
+    queryController.updateCorpusSetList();
   }
 
   public void showQueryResult(String aql, Set<String> corpora,
@@ -427,10 +422,7 @@ public class SearchUI extends AnnisBaseUI
       mainTab.removeComponent(resultView);
     }
 
-    updateFragment(aql, corpora, contextLeft, contextRight, segmentationLayer, 
-      start, pageSize);
-    
-    resultView = new ResultViewPanel(this, aql, corpora, contextLeft, contextRight,
+    resultView = new ResultViewPanel(queryController, aql, corpora, contextLeft, contextRight,
       segmentationLayer, start, pageSize, this);
     mainTab.addTab(resultView, "Query Result");
     mainTab.setSelectedTab(resultView);
@@ -445,48 +437,6 @@ public class SearchUI extends AnnisBaseUI
     {
       resultView.setCount(count);
     }
-  }
-  public void updateFragment(String aql, 
-    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
-    int start, int limit)
-  {
-    List<String> args = Helper.citationFragmentParams(aql, corpora, 
-      contextLeft, contextRight, 
-      segmentation, start, limit);
-      
-    // set our fragment
-    lastQueriedFragment = StringUtils.join(args, "&");
-    getPage().setUriFragment(lastQueriedFragment);
-    
-  }
-
-  @Override
-  public void uriFragmentChanged(UriFragmentChangedEvent event)
-  {
-    
-    String fragment = event.getUriFragment();
-    // do nothing if not changed
-    if(fragment.equals(lastQueriedFragment))
-    {
-      return;
-    }
-    
-    Map<String, String> args = Helper.parseFragment(fragment);
-    
-    Set<String> corpora = new TreeSet<String>();
-    if(args.containsKey("c"))
-    {
-      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
-      corpora.addAll(Arrays.asList(corporaSplitted));
-    }
-    
-    control.executeCount(args.get("q"), corpora);
-    
-    showQueryResult(args.get("q"), corpora, 
-      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")), 
-      args.get("seg"), Integer.parseInt(args.get("s")), 
-      Integer.parseInt(args.get("l")));
-    
   }
   
   private void showLoginWindow()
@@ -520,9 +470,9 @@ public class SearchUI extends AnnisBaseUI
     return Helper.getUser() != null;
   }
   
-  public ControlPanel getControl()
+  public ControlPanel getControlPanel()
   {
-    return control;
+    return controlPanel;
   }
 
   @Override
@@ -542,6 +492,17 @@ public class SearchUI extends AnnisBaseUI
       reportBugWindow.center();
     }
   }
+
+  public ResultViewPanel getResultView()
+  {
+    return resultView;
+  }
+
+  public QueryController getQueryController()
+  {
+    return queryController;
+  }
+  
 
   @Override
   public void notifyCannotPlayMimeType(String mimeType)

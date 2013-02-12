@@ -20,6 +20,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
@@ -70,10 +71,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
   private TreeMap<String, Boolean> tokenAnnoVisible;
   private String currentSegmentationLayer;
   private VerticalLayout mainLayout;  
-  private SearchUI parent;
+  private QueryController controller;
 
 
-  public ResultViewPanel(SearchUI parent, String aql, Set<String> corpora,
+  public ResultViewPanel(QueryController controller, String aql, Set<String> corpora,
     int contextLeft, int contextRight, String segmentationLayer, int start, int pageSize,
     PluginSystem ps)
   {
@@ -84,7 +85,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
     this.contextRight = contextRight;
     this.pageSize = pageSize;
     this.ps = ps;
-    this.parent = parent;
+    this.controller = controller;
     // only allow start points at multiples of the page size
     this.start = start - (start % pageSize);
     
@@ -150,8 +151,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
   @Override
   public void createPage(final int start, final int limit)
   {
-    parent.updateFragment(aql, corpora, contextLeft, contextRight, currentSegmentationLayer, start,
-      limit);
+    controller.offsetLimitChanged(start, limit);
     
     if (query != null)
     {

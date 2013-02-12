@@ -15,6 +15,7 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.QueryController;
 import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.server.ThemeResource;
@@ -50,9 +51,9 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   }
 
   @Override
-  public TigerQueryBuilder createComponent(ControlPanel controlPanel)
+  public TigerQueryBuilder createComponent(QueryController controller)
   {
-    return new TigerQueryBuilder(controlPanel);
+    return new TigerQueryBuilder(controller);
   }
   
   public static class TigerQueryBuilder extends Panel implements Button.ClickListener
@@ -62,7 +63,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     private Button btClearAll;
     private TigerQueryBuilderCanvas queryBuilder;
 
-    public TigerQueryBuilder(ControlPanel controlPanel)
+    public TigerQueryBuilder(QueryController controller)
     {
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
@@ -128,7 +129,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
 
       layout.addComponent(toolbar);
 
-      queryBuilder = new TigerQueryBuilderCanvas(controlPanel);
+      queryBuilder = new TigerQueryBuilderCanvas(controller);
       layout.addComponent(queryBuilder);
 
       layout.setExpandRatio(queryBuilder, 1.0f);

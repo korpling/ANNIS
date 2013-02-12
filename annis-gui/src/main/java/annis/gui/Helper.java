@@ -287,13 +287,18 @@ public class Helper
     return corpusConfig;
   }
   
-  public static Map<String,String> parseFragment(String fragment)
+  /**
+   * Parses the fragment parameter for navigation views.
+   * 
+   * Parameters have the form key1=value&key2=test ...
+   * @param parameters
+   * @return 
+   */
+  public static Map<String,String> parseFragmentParameter(String parameters)
   {
     Map<String, String> result = new TreeMap<String, String>();
- 
-    fragment = StringUtils.removeStart(fragment, "!");
     
-    String[] split = StringUtils.split(fragment, "&");
+    String[] split = StringUtils.split(parameters, "&");
     for(String s : split)
     {
       String[] parts = s.split("=", 2);
