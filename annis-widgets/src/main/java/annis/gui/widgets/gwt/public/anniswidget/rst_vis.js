@@ -316,25 +316,6 @@
     return (((2* node.pos.x + this.config.nodeWidth) / 2));
   };
 
-  /**
-   * Returns middle position of the node label and takes into account, if the
-   * starting or end point of the edge connect an dominance label.
-   */
-  rst.getEndPosRSTEdge = function(node)
-  {
-    if (this.containsEdge(node))
-    {
-      edges  = this.getEdgesOfSType(node, DOMINANCE);
-      if (edges.length == 1)
-      {
-        var targetNode = this.nodes[edges[0].to];
-        return this.getTopCenter(targetNode.pos.x);
-      }
-    }
-
-    return this.getTopCenter(node.pos.x);
-  };
-
   rst.initCanvas = function()
   {
     var wrapperElem = this.container;
@@ -354,8 +335,11 @@
     fromPosX = this.getTopCenter(source),
     toPosX = this.getTopCenter(target);
 
+    this.context.beginPath();
     this.context.moveTo(fromPosX, source.pos.y);
     this.context.lineTo(toPosX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawHorizontalLine = function (source)
@@ -406,7 +390,7 @@
     this.context.beginPath();
     this.context.moveTo(fromX, from.y);
     this.context.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
-    this.context.closePath();
+
     this.context.stroke();
 
 
@@ -415,14 +399,12 @@
 
 
     this.context.beginPath();
-
     this.context.moveTo(toX, to.y);
     this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
     this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
-    this.context.fillStyle = this.context.strokeStyle;
 
-    this.context.stroke()
     this.context.fill();
+    this.context.closePath();
 
   };
 
