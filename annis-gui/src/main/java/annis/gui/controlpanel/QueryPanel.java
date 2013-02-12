@@ -54,7 +54,6 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private ListSelect lstHistory;
   private ControlPanel controlPanel;
   private ProgressIndicator piCount;
-  private HorizontalLayout buttonPanelLayout;
   private GridLayout mainLayout;
   private Panel panelStatus;
   private String lastPublicStatus;
@@ -107,11 +106,9 @@ public class QueryPanel extends Panel implements TextChangeListener,
 
     mainLayout.addComponent(panelStatus, 1, 2);
 
-    Panel buttonPanel = new Panel();
-    buttonPanelLayout = new HorizontalLayout();
-    buttonPanel.setContent(buttonPanelLayout);
-    buttonPanelLayout.setWidth(100f, UNITS_PERCENTAGE);
-    mainLayout.addComponent(buttonPanel, 1, 1);
+    HorizontalLayout buttonLayout = new HorizontalLayout();
+    buttonLayout.setWidth("100%");
+    mainLayout.addComponent(buttonLayout, 1, 1);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);
@@ -127,23 +124,19 @@ public class QueryPanel extends Panel implements TextChangeListener,
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
-    buttonPanelLayout.addComponent(btShowResult);
+    buttonLayout.addComponent(btShowResult);
 
+    VerticalLayout historyListLayout = new VerticalLayout();
+    historyListLayout.setSizeUndefined();
+    
     lstHistory = new ListSelect();
+    lstHistory.setWidth("200px");
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
     lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
     
-    btHistory = new PopupButton("History");
-    btHistory.setWidth(100f, Unit.PERCENTAGE);
-    btHistory.setContent(lstHistory);
-    btHistory.setDescription("<strong>Show History</strong><br />"
-      + "Either use the short overview (arrow down) or click on the button "
-      + "for the extended view.");
-    buttonPanelLayout.addComponent(btHistory);
-    
-    btHistory.addClickListener(new Button.ClickListener() 
+    Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener() 
     {
       @Override
       public void buttonClick(ClickEvent event)
@@ -167,6 +160,22 @@ public class QueryPanel extends Panel implements TextChangeListener,
         }
       }
     });
+    btShowMoreHistory.setWidth("100%");
+    
+    historyListLayout.addComponent(lstHistory);
+    historyListLayout.addComponent(btShowMoreHistory);
+    
+    historyListLayout.setExpandRatio(lstHistory, 1.0f);
+    historyListLayout.setExpandRatio(btShowMoreHistory, 0.0f);
+    
+    btHistory = new PopupButton("History");
+    btHistory.setWidth(100f, Unit.PERCENTAGE);
+    btHistory.setContent(historyListLayout);
+    btHistory.setDescription("<strong>Show History</strong><br />"
+      + "Either use the short overview (arrow down) or click on the button "
+      + "for the extended view.");
+    buttonLayout.addComponent(btHistory);
+    
 
   }
   
