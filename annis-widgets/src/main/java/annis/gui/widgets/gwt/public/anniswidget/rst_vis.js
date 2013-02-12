@@ -309,8 +309,6 @@
         }
       }
     }
-
-    this.context.stroke();
   };
 
   rst.getTopCenter = function(node)
@@ -365,8 +363,11 @@
     var mostLeftChild = this.getMostLeftNode(source).pos.x,
     mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth;
 
+    this.context.beginPath();
     this.context.moveTo(mostLeftChild, source.pos.y);
     this.context.lineTo(mostRightChild, source.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawSpan = function(source, target)
@@ -374,8 +375,11 @@
     var targetCenterX = this.getTopCenter(target);
 
     // draw vertical line
+    this.context.beginPath();
     this.context.moveTo(targetCenterX, source.pos.y);
     this.context.lineTo(targetCenterX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawBezierCurve = function(source, target)
@@ -399,18 +403,27 @@
     }
 
     //draw lines
+    this.context.beginPath();
     this.context.moveTo(fromX, from.y);
     this.context.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
+    this.context.closePath();
+    this.context.stroke();
 
 
     var headlen = 10;   // length of head in pixels
     var angle = Math.atan2(to.y - controllPoint.y, to.x - controllPoint.x);
 
-    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
-    this.context.moveTo(toX, to.y);
 
-    this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
+    this.context.beginPath();
+
     this.context.moveTo(toX, to.y);
+    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
+    this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
+    this.context.fillStyle = this.context.strokeStyle;
+
+    this.context.stroke()
+    this.context.fill();
+
   };
 
   rst.plotMultinucLabel = function(source, annotation)
