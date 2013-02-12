@@ -12,7 +12,7 @@ Backend Service
 
 The service runs on a web server such as Tomcat or Jetty and
 communicates with a relational database, using the open source DB
-PostgreSQL. PostgreSQL (V9.1) must be installed for ANNIS to work. For
+PostgreSQL. PostgreSQL (Version 9.2) must be installed for ANNIS to work. For
 more information on installing and managing the backend service, see
 the Administration Guide in the documentation.
 
