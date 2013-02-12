@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.SearchUI;
 import annis.gui.paging.PagingCallback;
@@ -174,7 +175,7 @@ public class ResultViewPanel extends Panel implements PagingCallback
           try
           {
 
-            AnnisUser user = session.getAttribute(AnnisUser.class);
+            AnnisUser user = Helper.getUser();
             return query.loadBeans(start, limit, user);
           }
           catch (AnnisQLSemanticsException ex)

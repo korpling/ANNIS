@@ -26,6 +26,7 @@ import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
@@ -99,6 +100,25 @@ public class Helper
     return createRESTClient(null, null);
   }
   
+  public static AnnisUser getUser()
+  {
+    Object o = VaadinSession.getCurrent().getSession().getAttribute(
+      AnnisBaseUI.USER_KEY);
+    if(o instanceof AnnisUser)
+    {
+      return (AnnisUser) o;
+    }
+    else
+    {
+      return null;
+    }
+  }
+  public static void setUser(AnnisUser user)
+  {
+    VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
+      user);
+  }
+  
   /**
    * Gets or creates a web resource to the ANNIS service.
    *
@@ -138,7 +158,7 @@ public class Helper
     String uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
     
     // if already authentificated the REST client is set as the "user" property
-    AnnisUser user  = VaadinSession.getCurrent().getAttribute(AnnisUser.class);
+    AnnisUser user  = getUser();
     
     return getAnnisWebResource(uri, user);
   }

@@ -84,6 +84,11 @@ public class ControlPanel extends Panel
 
     layout.setExpandRatio(accordion, 1.0f);
   }
+  
+  public void updateCorpusSetList()
+  {
+    corpusList.updateCorpusSetList();
+  }
 
   public void setQuery(String query, Set<String> corpora)
   {

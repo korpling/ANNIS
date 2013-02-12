@@ -20,6 +20,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -53,6 +54,11 @@ public class LoginWindow extends Window implements Button.ClickListener
     
     VerticalLayout layout = new VerticalLayout(txtUser, txtPassword, btLogin);
     setContent(layout);
+    layout.setMargin(true);
+    
+    btLogin.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+    
+    txtUser.focus();
   }
 
   @Override
@@ -61,7 +67,7 @@ public class LoginWindow extends Window implements Button.ClickListener
     try
     {
       // forget old user information
-      VaadinSession.getCurrent().setAttribute(AnnisUser.class, null);
+      Helper.setUser(null);
       
       String userName = txtUser.getValue();
       
@@ -75,8 +81,7 @@ public class LoginWindow extends Window implements Button.ClickListener
       if("true".equalsIgnoreCase(res.get(String.class)))
       {
         // everything ok, save this user configuration for re-use
-        VaadinSession.getCurrent().setAttribute(AnnisUser.class, 
-          new AnnisUser(userName, client));
+        Helper.setUser(new AnnisUser(userName, client));
         
         Notification.show("Logged in as \"" + userName + "\"",
           Notification.Type.TRAY_NOTIFICATION);
@@ -112,7 +117,17 @@ public class LoginWindow extends Window implements Button.ClickListener
     {
       // hide login window
       getUI().removeWindow(this);
+      
+      if(UI.getCurrent() instanceof LoginListener)
+      {
+        ((LoginListener) UI.getCurrent()).onLogin();
+      }
     }
+  }
+  
+  public static interface LoginListener 
+  {
+    public void onLogin();
   }
   
 }

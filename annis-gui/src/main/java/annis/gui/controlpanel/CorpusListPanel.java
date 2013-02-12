@@ -193,7 +193,7 @@ public class CorpusListPanel extends VerticalLayout implements
   
   
   
-  private void updateCorpusSetList()
+  public void updateCorpusSetList()
   {
     updateCorpusSetList(true);
   }
@@ -366,13 +366,6 @@ public class CorpusListPanel extends VerticalLayout implements
     }
     return false;
   }
-
-  // TODO: update corpus list on user change (vaadin7)
-//  @Override
-//  public void applicationUserChanged(UserChangeEvent event)
-//  {
-//    updateCorpusSetList();
-//  }
   
   private void loadFromRemote()
   {

@@ -51,8 +51,8 @@ import org.slf4j.LoggerFactory;
  */
 @PreserveOnRefresh
 public class SearchUI extends AnnisBaseUI
-  implements LoginForm.LoginListener,
-  ScreenshotMaker.ScreenshotCallback,
+  implements ScreenshotMaker.ScreenshotCallback,
+  LoginWindow.LoginListener,
   MimeTypeErrorListener, Page.UriFragmentChangedListener
 {
 
@@ -127,12 +127,7 @@ public class SearchUI extends AnnisBaseUI
         w.center();
       }
     });
-
-    // TODO: re-enable screenshots (vaadin7)
-//    final Screenshot screenShot = new Screenshot();
-//    screenShot.addListener(this);
-//
-//    addComponent(screenShot);
+    
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     mainLayout.addComponent(screenshot);
 
@@ -148,9 +143,6 @@ public class SearchUI extends AnnisBaseUI
       {
         screenshot.makeScreenshot();
         btBugReport.setCaption("bug report is initialized...");
-        
-        //TODO make screenshot (vaadin7)
-//        screenShot.makeScreenshot(finalThis);
       }
     });
      String bugmail = (String) VaadinSession.getCurrent().getAttribute("bug-e-mail");
@@ -178,8 +170,9 @@ public class SearchUI extends AnnisBaseUI
         if (isLoggedIn())
         {
           // logout
-          getSession().setAttribute(AnnisUser.class, null);
+          Helper.setUser(null);
           Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
+          updateUserInformation();
         }
         else
         {
@@ -406,7 +399,7 @@ public class SearchUI extends AnnisBaseUI
     }
     if (isLoggedIn())
     {
-      AnnisUser user = VaadinSession.getCurrent().getAttribute(AnnisUser.class);
+      AnnisUser user = Helper.getUser();
       if(user != null)
       {
         lblUserName.setValue("logged in as \"" + ((AnnisUser) user).getUserName() + "\"");
@@ -418,6 +411,8 @@ public class SearchUI extends AnnisBaseUI
       lblUserName.setValue("not logged in");
       btLoginLogout.setCaption("Login");
     }
+    
+    control.updateCorpusSetList();
   }
 
   public void showQueryResult(String aql, Set<String> corpora,
@@ -496,27 +491,33 @@ public class SearchUI extends AnnisBaseUI
   
   private void showLoginWindow()
   {
+    windowLogin = new LoginWindow();
+    windowLogin.setModal(true);
+    windowLogin.setSizeUndefined();
 
-    if (windowLogin == null)
-    {
-      windowLogin = new LoginWindow();
-      windowLogin.setModal(true);
-      windowLogin.setSizeUndefined();
-    }
     addWindow(windowLogin);
     windowLogin.center();
   }
 
   @Override
-  public void onLogin(LoginEvent event)
+  public void onLogin()
   {
+    AnnisUser user = Helper.getUser();
     
+    if(user == null)
+    {
+      Notification.show("Logged in as \"" + user.getUserName() + "\"",
+        Notification.Type.TRAY_NOTIFICATION);
+    }
+    
+    updateUserInformation();
 
   }
+  
 
   public boolean isLoggedIn()
   {
-    return getSession().getAttribute(AnnisUser.class) != null;
+    return Helper.getUser() != null;
   }
   
   public ControlPanel getControl()
