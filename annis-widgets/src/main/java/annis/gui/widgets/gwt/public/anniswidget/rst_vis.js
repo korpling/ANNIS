@@ -38,7 +38,7 @@
     this.canvas = {};
 
     this.config = {
-      siblingOffet : config.siblingOffset || 80,
+      siblingOffet : config.siblingOffset || 200 ,
       subTreeOffset : config.subTreeOffset || 100,
       nodeWidth : config.nodeWidth  || 60,
       labelSize : config.labelSize || 10,
@@ -227,36 +227,6 @@
     this.container = container;
   };
 
-  rst.containsMultinuc = function(node)
-  {
-    return (this.getEdgesOfSType(node, MULTINUC).length > 0);
-  };
-
-  rst.containsEdge = function(node)
-  {
-    return (this.getEdgesOfSType(node, DOMINANCE).length > 0);
-  }
-
-  rst.getEdgesOfSType = function(json, sType)
-  {
-    var edges = json.data.edges;
-    var edgesArray = [];
-
-    if (edges !== undefined)
-    {
-      for (var item in edges)
-      {
-        var edge = edges[item];
-        if (edge.sType === sType)
-        {
-          edgesArray.push(edge);
-        }
-      }
-    }
-
-    return edgesArray;
-  };
-
   rst.plotNodes = function()
   {
     var conf = this.config;
@@ -269,31 +239,17 @@
       var elem = document.createElement("div");
       container.appendChild(elem);
 
-      if (json.data.sentence_left != undefined
-        && json.data.sentence_right !=  undefined)
-        {
+      if (json.data.sentence_left != undefined && json.data.sentence_right !=  undefined)
+      {
         elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>"
         + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
       }
 
-
       elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
+
       elem.style.position = "absolute";
       elem.style.top = json.pos.y + "px";
-
-      if (this.containsEdge(json)) {
-
-        var edges = this.getEdgesOfSType(json, DOMINANCE);
-        if (edges.length == 1)
-        {
-          var targetNode = this.nodes[edges[0].to];
-          elem.style.left = targetNode.pos.x + "px";
-        }
-      }
-      else {
-        elem.style.left = json.pos.x + "px";
-      }
-
+      elem.style.left = json.pos.x + "px";
       elem.style.textAlign = "center";
       elem.style.fontSize = conf.labelSize + "px";
       elem.style.width = conf.nodeWidth + "px";
@@ -353,32 +309,11 @@
         }
       }
     }
-
-    this.context.stroke();
   };
 
-  rst.getTopCenter = function(x)
+  rst.getTopCenter = function(node)
   {
-    return (((2 * x + this.config.nodeWidth) / 2));
-  };
-
-  /**
-   * Returns middle position of the node label and takes into account, if the
-   * starting or end point of the edge connect an dominance label.
-   */
-  rst.getEndPosRSTEdge = function(node)
-  {
-    if (this.containsEdge(node))
-    {
-      edges  = this.getEdgesOfSType(node, DOMINANCE);
-      if (edges.length == 1)
-      {
-        var targetNode = this.nodes[edges[0].to];
-        return this.getTopCenter(targetNode.pos.x);
-      }
-    }
-
-    return this.getTopCenter(node.pos.x);
+    return (((2* node.pos.x + this.config.nodeWidth) / 2));
   };
 
   rst.initCanvas = function()
@@ -397,11 +332,14 @@
 
   rst.drawVerticalLine = function(source, target)
   {
-    fromPosX = this.getTopCenter(source.pos.x),
-    toPosX = this.getTopCenter(target.pos.x);
+    fromPosX = this.getTopCenter(source),
+    toPosX = this.getTopCenter(target);
 
+    this.context.beginPath();
     this.context.moveTo(fromPosX, source.pos.y);
     this.context.lineTo(toPosX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawHorizontalLine = function (source)
@@ -409,25 +347,33 @@
     var mostLeftChild = this.getMostLeftNode(source).pos.x,
     mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth;
 
+    this.context.beginPath();
     this.context.moveTo(mostLeftChild, source.pos.y);
     this.context.lineTo(mostRightChild, source.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawSpan = function(source, target)
   {
-    var targetCenterX = this.getTopCenter(target.pos.x);
+    var targetCenterX = this.getTopCenter(target);
 
     // draw vertical line
+    this.context.beginPath();
     this.context.moveTo(targetCenterX, source.pos.y);
     this.context.lineTo(targetCenterX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawBezierCurve = function(source, target)
   {
     var from = source.pos,
     to = target.pos,
-    fromX = this.getEndPosRSTEdge(source),
-    toX = this.getEndPosRSTEdge(target),
+
+    fromX = this.getTopCenter(source),
+    toX = this.getTopCenter(target),
+
     dim = 15,
     controllPoint = {};
 
@@ -441,15 +387,25 @@
     }
 
     //draw lines
+    this.context.beginPath();
     this.context.moveTo(fromX, from.y);
     this.context.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
 
+    this.context.stroke();
+
 
     var headlen = 10;   // length of head in pixels
-    var angle = Math.atan2(to.y - from.y, to.x - fromX);
-    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
+    var angle = Math.atan2(to.y - controllPoint.y, to.x - controllPoint.x);
+
+
+    this.context.beginPath();
     this.context.moveTo(toX, to.y);
+    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
     this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
+
+    this.context.fill();
+    this.context.closePath();
+
   };
 
   rst.plotMultinucLabel = function(source, annotation)
@@ -490,8 +446,8 @@
 
   rst.plotRSTLabel = function(source, target, annotation)
   {
-    var fromX = this.getTopCenter(source.pos.x),
-    toX = this.getTopCenter(target.pos.x),
+    var fromX = this.getTopCenter(source),
+    toX = this.getTopCenter(target),
     label = document.createElement("label");
 
     this.container.appendChild(label);
@@ -499,7 +455,7 @@
     label.innerHTML = annotation;
 
     labelPos = {
-      x : (fromX + toX) / 2 - (label.clientWidth / 2),
+      x : (fromX + toX) / 2 - (label.offsetWidth / 2),
       y : source.pos.y - 35
     };
 
