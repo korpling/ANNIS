@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree.backends.staticimg;
+package annis.gui.visualizers.component.tree;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+public enum VerticalOrientation {
+	TOP_ROOT(1),
+	BOTTOM_ROOT(-1);
 
-public class GraphicsItemGroup extends AbstractImageGraphicsItem {
-
-	@Override
-	public Rectangle2D getBounds() {
-		Rectangle2D r = new Rectangle2D.Double();
-		for (AbstractImageGraphicsItem c: getChildren()) {
-			Rectangle2D childBounds = c.getBounds();
-			if (childBounds != null) {
-				r.add(childBounds);
-			}
-		}
-		return r;
-	}
-
-	@Override
-	public void draw(Graphics2D canvas) {
+	final int value;
+	
+	private VerticalOrientation(int v) {
+		value = v;
 	}
 	
 }

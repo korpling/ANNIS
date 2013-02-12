@@ -13,16 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree;
+package annis.gui.visualizers.component.tree;
 
-public enum VerticalOrientation {
-	TOP_ROOT(1),
-	BOTTOM_ROOT(-1);
+import annis.gui.visualizers.component.tree.GraphicsBackend.Font;
+import annis.model.AnnisNode;
+import annis.model.Edge;
+import java.awt.Color;
+import java.awt.Stroke;
 
-	final int value;
+public interface TreeElementStyler {
 	
-	private VerticalOrientation(int v) {
-		value = v;
-	}
+	Font getFont(AnnisNode n);
+	Font getFont(Edge e);
 	
+	Color getTextBrush(AnnisNode n);
+	Color getTextBrush(Edge n);
+	
+	Color getEdgeColor(Edge n);
+	Stroke getStroke(Edge n);
+	
+	Shape getShape(AnnisNode n);
+	Shape getShape(Edge e);
+	
+	
+	int getLabelPadding();
+	int getHeightStep();
+	int getTokenSpacing();
+	int getVEdgeOverlapThreshold();
 }

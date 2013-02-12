@@ -453,7 +453,7 @@ public class VisualizerPanel extends CustomLayout
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
-      progress.setPollingInterval(100);
+      progress.setPollingInterval(250);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress, "progress");
     }

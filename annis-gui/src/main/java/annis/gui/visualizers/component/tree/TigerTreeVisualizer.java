@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree;
+package annis.gui.visualizers.component.tree;
 
+import annis.gui.ImagePanel;
 import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.AbstractIFrameVisualizer;
+import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import annis.gui.visualizers.iframe.tree.backends.staticimg.AbstractImageGraphicsItem;
-import annis.gui.visualizers.iframe.tree.backends.staticimg.Java2dBackend;
+import annis.gui.visualizers.component.AbstractImageVisualizer;
+import annis.gui.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
+import annis.gui.visualizers.component.tree.backends.staticimg.Java2dBackend;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
+import com.vaadin.ui.Embedded;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -37,7 +41,7 @@ import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class TigerTreeVisualizer extends AbstractIFrameVisualizer
+public class TigerTreeVisualizer extends AbstractImageVisualizer
 {
 
   private VisualizerInput input = new VisualizerInput();
@@ -361,10 +365,5 @@ public class TigerTreeVisualizer extends AbstractIFrameVisualizer
   {
     return "image/png";
   }
-
-  @Override
-  public String getCharacterEncoding()
-  {
-    return "ISO-8859-1";
-  }
+  
 }

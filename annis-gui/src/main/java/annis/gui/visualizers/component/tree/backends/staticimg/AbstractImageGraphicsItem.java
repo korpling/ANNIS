@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree.backends.staticimg;
+package annis.gui.visualizers.component.tree.backends.staticimg;
 
-import annis.gui.visualizers.iframe.tree.GraphicsItem;
+import annis.gui.visualizers.component.tree.GraphicsItem;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;

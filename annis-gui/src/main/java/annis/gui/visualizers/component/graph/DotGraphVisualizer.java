@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.graph;
+package annis.gui.visualizers.component.graph;
 
 import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.component.AbstractDotVisualizer;

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree;
+package annis.gui.visualizers.component.tree;
 
-import annis.model.AnnisNode;
-import annis.model.Edge;
+import java.awt.geom.Rectangle2D;
 
-public interface TreeElementLabeler {
-	String getLabel(AnnisNode n);
-	String getLabel(Edge e);
+public interface GraphicsItem {
+	void setZValue(int zValue);
+	void setParentItem(GraphicsItem parent);
+	Rectangle2D getBounds();
+	
 }

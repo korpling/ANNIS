@@ -13,27 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree;
+package annis.gui.visualizers.component.tree;
 
 import annis.model.AnnisNode;
-import java.util.Comparator;
+import annis.model.Edge;
 
-public enum HorizontalOrientation {
-	LEFT_TO_RIGHT(1),
-	RIGHT_TO_LEFT(-1);
-	
-	private final int directionModifier;
-	
-	HorizontalOrientation(int directionModifier_) {
-		directionModifier = directionModifier_;
-	}
-	
-	Comparator<AnnisNode> getComparator() {
-		return new Comparator<AnnisNode>() {
-			@Override
-			public int compare(AnnisNode o1, AnnisNode o2) {
-				return directionModifier * (o1.getTokenIndex().intValue() - o2.getTokenIndex().intValue());
-			}
-		};	
-	}
+public interface TreeElementLabeler {
+	String getLabel(AnnisNode n);
+	String getLabel(Edge e);
 }

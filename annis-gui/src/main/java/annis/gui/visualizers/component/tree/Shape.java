@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.iframe.tree;
+package annis.gui.visualizers.component.tree;
 
-import annis.gui.visualizers.iframe.tree.GraphicsBackend.Alignment;
-import annis.gui.visualizers.iframe.tree.GraphicsBackend.Font;
+import annis.gui.visualizers.component.tree.GraphicsBackend.Alignment;
+import annis.gui.visualizers.component.tree.GraphicsBackend.Font;
 import java.awt.Color;
 import java.awt.Stroke;
 
