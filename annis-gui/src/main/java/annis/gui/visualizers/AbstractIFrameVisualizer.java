@@ -15,25 +15,14 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.resultview.VisualizerPanel;
 import annis.gui.widgets.AutoHeightIFrame;
-import com.vaadin.server.ConnectorResource;
-import com.vaadin.server.ResourceReference;
 import com.vaadin.server.StreamResource;
-import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.rmi.server.UID;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -45,7 +34,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 {
 
   /**
-   * Returns the character endocing for this particular Visualizer output. For
+   * Returns the character encoding for this particular Visualizer output. For
    * more information see
    * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
    * overridden to change default "utf-8".

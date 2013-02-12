@@ -35,7 +35,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
-import com.vaadin.server.ConnectorResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -81,8 +80,6 @@ public class VisualizerPanel extends CustomLayout
 
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
-
-  private ConnectorResource resource = null;
 
   private Component vis;
 
@@ -328,21 +325,6 @@ public class VisualizerPanel extends CustomLayout
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
-
-  public ConnectorResource createResource(
-    ByteArrayOutputStream byteStream,
-    String mimeType)
-  {
-
-    StreamResource r;
-
-    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream),
-      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE));
-    r.setMIMEType(mimeType);
-
-    return r;
-  }
-
   private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
@@ -360,18 +342,6 @@ public class VisualizerPanel extends CustomLayout
       log.error("General remote service exception", e);
     }
     return txt;
-  }
-
-  @Override
-  public void detach()
-  {
-    super.detach();
-
-    if (resource != null)
-    {
-      // TODO: how to detach the resource? (vaadin7)
-      //getApplication().removeResource(resource);
-    }
   }
 
   @Override

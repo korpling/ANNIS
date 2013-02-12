@@ -86,7 +86,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     
     InstanceConfig instanceConfig = getInstanceConfig(request);
-    getPage().setTitle("ANNIS Corpus Searc: " + instanceConfig.getInstanceDisplayName());
+    getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
     
     // always get the resize events directly

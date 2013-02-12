@@ -23,7 +23,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
   ApplicationConnection gClient;
   private IFrameElement iframe;
   private int additionalHeight;
-
   /**
    * The constructor should first call super() to initialize the component and
    * then handle any initialization relevant to Vaadin.
@@ -42,7 +41,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
 
     addDomHandler(new LoadHandler()
     {
-
       @Override
       public void onLoad(LoadEvent event)
       {
@@ -55,7 +53,8 @@ public class VAutoHeightIFrame extends Widget implements Paintable
             final Document doc = iframe.getContentDocument();
             if(doc != null)
             {
-              Timer t = new Timer() {
+              Timer t = new Timer() 
+              {
 
                 @Override
                 public void run()
@@ -70,9 +69,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
           {
             VConsole.log("trying to access iframe source from different domain which is forbidden");
           }
-
-
-
         }
       }
     }, LoadEvent.getType());
@@ -143,6 +139,7 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     }
 
     String url = uidl.getStringAttribute("url");
+    url = client.translateVaadinUri(url);    
 
     if(iframe.getSrc() != null && url != null && iframe.getSrc().equals(url))
     {
@@ -167,10 +164,9 @@ public class VAutoHeightIFrame extends Widget implements Paintable
 
     if(url != null)
     {
-      url = client.translateVaadinUri(url);
-
       //VConsole.log("iframe is updated with url " + url );
       iframe.setSrc(url);
+
     }
   }
 

@@ -17,7 +17,7 @@ public class AutoHeightIFrame extends AbstractComponent implements LegacyCompone
 {
 
   private ResourceReference resRef;
-  private boolean urlUpdated = false;
+  private boolean heightWasSet = false;
   public static final int ADDITIONAL_HEIGHT = 25;
   
   public final static String RES_KEY = "iframe-vis-res";
@@ -36,31 +36,25 @@ public class AutoHeightIFrame extends AbstractComponent implements LegacyCompone
       getState().resources.put(RES_KEY, this.resRef);
     }
     
-    urlUpdated = false;
     setWidth("100%");
   }
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-
-    if (!urlUpdated)
-    {
-      target.addAttribute("url", resRef.getURL());
-      target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
-      urlUpdated = true;
-    }
-
-  }
+    target.addAttribute("url", resRef.getURL());
+    target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
+  }  
 
   @Override
   public void changeVariables(Object source, Map<String, Object> variables)
   {
-    if (variables.containsKey("height"))
+    if (!heightWasSet && variables.containsKey("height"))
     {
       int height = (Integer) variables.get("height");
 //      getWindow().showNotification("new height: " + height, Window.Notification.TYPE_TRAY_NOTIFICATION);
       this.setHeight((float) height, Sizeable.UNITS_PIXELS);
+      heightWasSet = true;
     }   
   }
 }
