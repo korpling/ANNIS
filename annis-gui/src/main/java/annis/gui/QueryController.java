@@ -15,30 +15,52 @@
  */
 package annis.gui;
 
+import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.beans.HistoryEntry;
-import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.PagedResultQuery;
+import annis.gui.model.Query;
+import annis.gui.paging.PagingCallback;
+import annis.gui.paging.PagingComponent;
+import annis.gui.resultview.AnnisResultQuery;
+import annis.gui.resultview.ResultViewPanel;
+import annis.security.AnnisUser;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages all the query related actions.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController
+// TODO: implement locking to avoid several parallel queries
+public class QueryController implements PagingCallback
 {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
+
   private SearchUI ui;
   
-  private String lastQuery = "";
-  private Set<String> lastCorpusSelection = new HashSet<String>();
+  private PagedResultQuery lastQuery;
   private ListOrderedSet<HistoryEntry> history;
-  
+  private ResultViewPanel lastResultView;
+  private AnnisResultQuery resultFetcher;
+  private MatchAndDocumentCount lastCount;
+
   
   public QueryController(SearchUI ui)
   {
@@ -51,21 +73,133 @@ public class QueryController
     ui.getControlPanel().getCorpusList().updateCorpusSetList();
   }
   
-  
-  public void setQuery(String query, Set<String> corpora,
-    int contextLeft, int contextRight)
+  public void setQuery(String query)
   {
-    setQuery(query, corpora);
-    ui.getControlPanel().getSearchOptions().setLeftContext(contextLeft);
-    ui.getControlPanel().getSearchOptions().setRightContext(contextRight);
+    setQuery(new Query(query, ui.getControlPanel().getCorpusList().getSelectedCorpora()));
   }
   
-  public void setQuery(String query, Set<String> corpora)
+  public void setQuery(Query query)
   {
-    ui.getControlPanel().getQueryPanel().setQuery(query);
-    if (corpora != null)
+    PagedResultQuery paged = new PagedResultQuery(
+      ui.getControlPanel().getSearchOptions().getLeftContext(),
+      ui.getControlPanel().getSearchOptions().getRightContext(),
+      0,
+      ui.getControlPanel().getSearchOptions().getResultsPerPage(),
+      ui.getControlPanel().getSearchOptions().getSegmentationLayer(),
+      query.getQuery(), query.getCorpora()
+    );
+    setQuery(paged);
+  }
+  
+  public void setQuery(PagedResultQuery query)
+  {
+    // only allow offset at multiples of the limit size
+    query.setOffset(query.getOffset() - (query.getOffset() % query.getLimit()));
+    
+    lastQuery = query;
+    
+    
+    ui.getControlPanel().getQueryPanel().setQuery(query.getQuery());
+    ui.getControlPanel().getSearchOptions().setLeftContext(query.
+      getContextLeft());
+    ui.getControlPanel().getSearchOptions().setRightContext(query.
+      getContextRight());
+    ui.getControlPanel().getSearchOptions().setSegmentationLayer(query.
+      getSegmentation());
+
+    if (query.getCorpora() != null)
     {
-      ui.getControlPanel().getCorpusList().selectCorpora(corpora);
+      ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
+    }
+  }
+  
+  public void executeQuery()
+  {
+    executeQuery(true, true);
+  }
+  
+  public void executeQuery(boolean executeCount, boolean executeResult)
+  {
+
+    Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
+
+    HistoryEntry e = new HistoryEntry();
+    e.setCorpora(lastQuery.getCorpora());
+    e.setQuery(lastQuery.getQuery());
+    // remove it first in order to let it appear on the beginning of the list
+    history.remove(e);
+    history.add(0, e);
+    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
+
+
+    if (lastQuery.getCorpora() == null || lastQuery.getCorpora().isEmpty())
+    {
+      Notification.show("Please select a corpus",
+        Notification.Type.WARNING_MESSAGE);
+      return;
+    }
+    if ("".equals(lastQuery.getQuery()))
+    {
+      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
+      return;
+    }
+
+    resultFetcher = null;
+
+    if(executeResult)
+    {    
+      resultFetcher = new AnnisResultQuery(lastQuery.getCorpora(), lastQuery.getQuery());
+
+      // remove old result from view
+      if (lastResultView != null)
+      {
+        ui.getMainTab().removeComponent(lastResultView);
+      }
+      lastResultView = new ResultViewPanel(this, ui);
+      ui.getMainTab().addTab(lastResultView, "Query Result");
+      ui.getMainTab().setSelectedTab(lastResultView);
+
+      FutureTask<List<Match>> task = new FutureTask<List<Match>>(new ResultCallable(
+        resultFetcher, lastQuery.getOffset(), lastQuery.getLimit(), 
+        lastResultView.getPaging()))
+      {
+
+        @Override
+        protected void done()
+        {
+          VaadinSession session = VaadinSession.getCurrent();
+          session.lock();
+          try
+          {
+            lastResultView.setResult(get(), lastQuery.getContextLeft(), 
+              lastQuery.getContextRight(), lastQuery.getSegmentation(),
+              lastQuery.getOffset());
+          }
+          catch(InterruptedException ex)
+          {
+            log.error(null, ex);
+          }
+          catch(ExecutionException ex)
+          {
+            log.error(null, ex);
+          }
+          finally
+          {
+            session.unlock();
+          }
+        }
+        
+      };
+      Executor exec = Executors.newSingleThreadExecutor();
+      exec.execute(task);     
+    }
+    
+     if (executeCount)
+    {
+      // start count query
+      ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+      CountThread countThread = new CountThread();
+      countThread.start();
     }
   }
   
@@ -75,67 +209,98 @@ public class QueryController
       .updateSegmentationList(ui.getControlPanel().getCorpusList().getSelectedCorpora());
   }
   
-  public void offsetLimitChanged(int offset, int limit)
-  {
-    // TODO: update the fragment (vaadin7)
-  }
-  
-   public void executeQuery()
-  {
-    executeQuery(false);
-  }
-
-  public void executeQuery(boolean onlyCount)
-  {
-
-    lastQuery = ui.getControlPanel().getQueryPanel().getQuery();
-    lastCorpusSelection = ui.getControlPanel().getCorpusList().getSelectedCorpora();
-
-    if (lastCorpusSelection == null || lastCorpusSelection.isEmpty())
-    {
-      Notification.show("Please select a corpus",
-        Notification.Type.WARNING_MESSAGE);
-      return;
-    }
-    if ("".equals(lastQuery))
-    {
-      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
-      return;
-    }
-
-    HistoryEntry e = new HistoryEntry();
-    e.setQuery(lastQuery);
-    e.setCorpora(lastCorpusSelection);
-
-    // remove it first in order to let it appear on the beginning of the list
-    history.remove(e);
-    history.add(0, e);
-
-    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
-
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
-    CountThread countThread = new CountThread();
-    countThread.start();
-
-    if(!onlyCount)
-    {
-      ui.showQueryResult(lastQuery, lastCorpusSelection,
-        ui.getControlPanel().getSearchOptions().getLeftContext(), 
-        ui.getControlPanel().getSearchOptions().getRightContext(),
-        ui.getControlPanel().getSearchOptions().getSegmentationLayer(),
-        0, ui.getControlPanel().getSearchOptions().getResultsPerPage());
-    }
-  }
   
   public Set<String> getSelectedCorpora()
   {
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
   }
   
-    private class CountThread extends Thread
+  public PagedResultQuery getQuery()
+  {
+    return lastQuery;
+  }
+
+  @Override
+  public void switchPage(int offset, int limit)
+  {
+    if(lastQuery != null)
+    {
+      lastQuery.setOffset(offset);
+      lastQuery.setLimit(limit);
+      
+      // execute the result query again
+      executeQuery(false, true);
+      if(lastResultView != null && lastCount != null)
+      {
+        lastResultView.setCount(lastCount.getMatchCount());
+      }
+    }
+  }
+  
+  private static class ResultCallable implements Callable<List<Match>>
   {
 
-    private MatchAndDocumentCount count = null;
+    private AnnisResultQuery resultFetcher;
+    private int offset, limit;
+    private PagingComponent paging;
+    public ResultCallable(AnnisResultQuery resultFetcher, int offset, int limit, 
+      PagingComponent paging)
+    {
+      this.resultFetcher = resultFetcher;
+      this.offset = offset;
+      this.limit = limit;
+      this.paging = paging;
+    }
+    
+    private void showError(String error)
+    {
+      VaadinSession session = VaadinSession.getCurrent();
+      session.lock();
+      try
+      {
+        paging.setInfo(error);
+      }
+      finally
+      {
+        session.unlock();
+      }
+    }
+    
+    @Override
+    public List<Match> call() throws Exception
+    {
+      try
+      {
+        AnnisUser user = Helper.getUser();
+        return resultFetcher.loadBeans(offset, limit, user);
+      }
+      catch (AnnisQLSemanticsException ex)
+      {
+        showError("Semantic error: " + ex.getLocalizedMessage());
+      }
+      catch (AnnisQLSyntaxException ex)
+      {
+        showError("Syntax error: " + ex.getLocalizedMessage());
+      }
+      catch (AnnisCorpusAccessException ex)
+      {
+        showError("Corpus access error: " + ex.getLocalizedMessage());
+      }
+      catch (Exception ex)
+      {
+        log.error(
+          "unknown exception in result view", ex);
+        showError("unknown exception: " + ex.getLocalizedMessage());
+        
+      }
+
+      return null;  
+    }
+    
+  }
+  
+  private class CountThread extends Thread
+  {
 
     @Override
     public void run()
@@ -150,9 +315,9 @@ public class QueryController
       {
         try
         {
-          count = res.path("query").path("search").path("count").queryParam(
-            "q", lastQuery).queryParam("corpora",
-            StringUtils.join(lastCorpusSelection, ",")).get(MatchAndDocumentCount.class);
+          lastCount = res.path("query").path("search").path("count").queryParam(
+            "q", lastQuery.getQuery()).queryParam("corpora",
+            StringUtils.join(lastQuery.getCorpora(), ",")).get(MatchAndDocumentCount.class);
         }
         catch (UniformInterfaceException ex)
         {
@@ -194,25 +359,23 @@ public class QueryController
       try
       {
         ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-        if(count != null)
+        if(lastCount != null)
         {
-          String documentString = count.getDocumentCount() > 1 ? "documents" : "document";
-          String matchesString = count.getMatchCount() > 1 ? "matches" : "match";
+          String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
+          String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
           
-          ui.getControlPanel().getQueryPanel().setStatus("" + count.getMatchCount() + " " + matchesString
-            + " <br/>in " + count.getDocumentCount() + " " + documentString );
-          ui.updateQueryCount(count.getMatchCount());
+          ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.getMatchCount() + " " + matchesString
+            + " <br/>in " + lastCount.getDocumentCount() + " " + documentString );
+          if(lastResultView != null && lastCount.getMatchCount() > 0)
+          {
+            lastResultView.setCount(lastCount.getMatchCount());
+          }
         }
       }
       finally
       {
         session.unlock();
       }
-    }
-
-    public int getCount()
-    {
-      return count.getMatchCount();
     }
   }
     

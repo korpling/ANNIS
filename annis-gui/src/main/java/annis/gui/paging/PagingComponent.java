@@ -206,7 +206,7 @@ public class PagingComponent extends CustomComponent implements
     {
       for (PagingCallback c : callbacks)
       {
-        c.createPage(getStartNumber(), pageSize);
+        c.switchPage(getStartNumber(), pageSize);
       }
     }
   }

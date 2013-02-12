@@ -230,4 +230,10 @@ public class SearchOptionsPanel extends FormLayout
   {
     return (String) cbSegmentation.getValue();
   }
+  
+  public void setSegmentationLayer(String layer)
+  {
+    cbSegmentation.setValue(layer);
+  }
+  
 }

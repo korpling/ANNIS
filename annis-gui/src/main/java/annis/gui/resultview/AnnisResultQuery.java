@@ -26,13 +26,14 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.ws.rs.core.Application;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * Allows to query for matches ({@link Match})  for a specific range. 
+ * 
+ * @see #loadBeans(int, int, annis.security.AnnisUser) 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class AnnisResultQuery implements Serializable
 {
@@ -47,7 +48,14 @@ public class AnnisResultQuery implements Serializable
     this.aql = aql;
   }
 
-  public List<Match> loadBeans(int startIndex, int count, AnnisUser user)
+  /**
+   * Query for a list of matches ({@link Match}).
+   * @param offset where to start 
+   * @param limit how many items to get at maximum
+   * @param user use this user for authentification with the service
+   * @return 
+   */
+  public List<Match> loadBeans(int offset, int limit, AnnisUser user)
   {
     
     List<Match> result = new LinkedList<Match>();
@@ -57,8 +65,8 @@ public class AnnisResultQuery implements Serializable
     {
       annisResource = annisResource.path("query").path("search").path("find")
         .queryParam("q", aql)
-        .queryParam("offset", "" + startIndex)
-        .queryParam("limit", "" + count)         
+        .queryParam("offset", "" + offset)
+        .queryParam("limit", "" + limit)         
         .queryParam("corpora", StringUtils.join(corpora, ","));
 
       result = annisResource.get(new GenericType<List<Match>>() {});

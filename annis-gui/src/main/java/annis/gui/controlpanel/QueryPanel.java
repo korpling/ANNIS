@@ -19,6 +19,8 @@ import annis.gui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.model.PagedResultQuery;
+import annis.gui.model.Query;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -305,22 +307,33 @@ public class QueryPanel extends Panel implements TextChangeListener,
     
     // TODO: re-enable the query fragments (vaadin7)
 
-//    Map<String, String> args = Helper.parseFragment(parameters);
-//
-//    Set<String> corpora = new TreeSet<String>();
-//    if (args.containsKey("c"))
-//    {
-//      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
-//      corpora.addAll(Arrays.asList(corporaSplitted));
-//    }
-//
-//    controlPanel.executeCount(args.get("q"), corpora);
-//
-//    controlPanel.s
-//    showQueryResult(args.get("q"), corpora,
-//      Integer.parseInt(args.get("cl")), Integer.parseInt(args.get("cr")),
-//      args.get("seg"), Integer.parseInt(args.get("s")),
-//      Integer.parseInt(args.get("l")));
+    Map<String, String> args = Helper.parseFragmentParameter(parameters);
+
+    Set<String> corpora = new TreeSet<String>();
+    if (args.containsKey("c"))
+    {
+      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
+      corpora.addAll(Arrays.asList(corporaSplitted));
+    }
+
+    if(args.get("cl") != null && args.get("cr") != null)
+    {
+      // full query with given context
+      controller.setQuery(new PagedResultQuery(
+        Integer.parseInt(args.get("cl")), 
+        Integer.parseInt(args.get("cr")),
+        Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
+        args.get("seg"),
+        args.get("q"), corpora));
+    }
+    else
+    {
+      // use default context
+      controller.setQuery(new Query(args.get("q"), corpora));
+    }
+    
+    controller.executeQuery(true, true);
+    
   }
   
   @Override
@@ -330,7 +343,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
     if(controller != null & e != null)
     {
-      controller.setQuery(e.getQuery(), e.getCorpora());
+      controller.setQuery(new Query(e.getQuery(), e.getCorpora()));
     }
   }
 
@@ -342,6 +355,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     {
       if(controller != null)
       {
+        controller.setQuery((txtQuery.getValue()));
         controller.executeQuery();
       }
     }

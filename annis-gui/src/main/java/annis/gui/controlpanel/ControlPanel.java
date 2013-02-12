@@ -17,7 +17,6 @@ package annis.gui.controlpanel;
 
 import annis.gui.InstanceConfig;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Set;
@@ -74,14 +73,6 @@ public class ControlPanel extends Panel
     layout.setExpandRatio(accordion, 1.0f);
   }
   
-  public void executeCount(String aql, Set<String> corpora)
-  {
-    queryPanel.setQuery(aql);
-    corpusList.selectCorpora(corpora);
-    
-    controller.executeQuery(true);
-  }
-
   public CorpusListPanel getCorpusList()
   {
     return corpusList;

@@ -15,19 +15,11 @@
  */
 package annis.gui.resultview;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.gui.Helper;
 import annis.gui.PluginSystem;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
-import annis.gui.paging.PagingCallback;
+import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
-import annis.security.AnnisUser;
 import annis.service.objects.Match;
-import com.vaadin.server.PaintException;
-import com.vaadin.server.PaintTarget;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
@@ -41,55 +33,37 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
-public class ResultViewPanel extends Panel implements PagingCallback
+public class ResultViewPanel extends Panel
 {
-  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
   
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
   
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
-  private String aql;
-  private Set<String> corpora;
-  private int contextLeft, contextRight, start, pageSize;
-  private AnnisResultQuery query;
   private ProgressIndicator progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
-  private String currentSegmentationLayer;
   private VerticalLayout mainLayout;  
   private QueryController controller;
+  private String selectedSegmentationLayer;
 
-
-  public ResultViewPanel(QueryController controller, String aql, Set<String> corpora,
-    int contextLeft, int contextRight, String segmentationLayer, int start, int pageSize,
+  public ResultViewPanel(QueryController controller,
     PluginSystem ps)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
-    this.aql = aql;
-    this.corpora = corpora;
-    this.contextLeft = contextLeft;
-    this.contextRight = contextRight;
-    this.pageSize = pageSize;
     this.ps = ps;
     this.controller = controller;
-    // only allow start points at multiples of the page size
-    this.start = start - (start % pageSize);
+    this.selectedSegmentationLayer = controller.getQuery().getSegmentation();
     
-    this.currentSegmentationLayer = segmentationLayer;
 
     setSizeFull();
 
@@ -106,9 +80,11 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    paging = new PagingComponent(start, pageSize);
-    paging.setInfo("Result for query \"" + aql.replaceAll("\n", " ") + "\"");
-    paging.addCallback((PagingCallback) this);
+    PagedResultQuery q = controller.getQuery();
+    
+    paging = new PagingComponent(q.getOffset(), q.getLimit());
+    paging.setInfo("Result for query \"" + q.getQuery().replaceAll("\n", " ") + "\"");
+    paging.addCallback(controller);
     
     mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
@@ -117,9 +93,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
     
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
-    progressResult.setEnabled(false);
     progressResult.setPollingInterval(250);
-    progressResult.setCaption("Searching for \"" + aql.replaceAll("\n", " ") + "\"");
+    progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n", " ") + "\"");
+    progressResult.setEnabled(true);
+    progressResult.setVisible(true);
     
     mainLayout.addComponent(progressResult);
     
@@ -130,204 +107,65 @@ public class ResultViewPanel extends Panel implements PagingCallback
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
     
+  }
+  
+  public void setResult(List<Match> result, int contextLeft, int contextRight, 
+    String segmentationLayer, int offset)
+  {
+    progressResult.setVisible(false);
+    progressResult.setEnabled(false);
+    
+    if (result == null)
+    {
+      return;
+    }
+
+    VaadinSession session = VaadinSession.getCurrent();
+    session.lock();
     try
     {
-      query = new AnnisResultQuery(corpora, aql);
-      createPage(start, pageSize);
-    
+      if (resultPanel != null)
+      {
+        mainLayout.removeComponent(resultPanel);
+      }
+
+      progressResult.setEnabled(false);
+      progressResult.setVisible(false);
+
+      if (result.size() > 0)
+      {
+        resultPanel = new ResultSetPanel(result, ps,
+          contextLeft, contextRight,
+          segmentationLayer, this, offset);
+
+        mainLayout.addComponent(resultPanel);
+        mainLayout.setExpandRatio(resultPanel, 1.0f);
+        mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
+
+        resultPanel.setVisible(true);
+      }
+      else
+      {
+        // nothing to show since we have an empty result
+        Label lblNoResult = new Label("No matches found.");
+        lblNoResult.setSizeUndefined();
+        mainLayout.addComponent(lblNoResult);
+        mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
+        mainLayout.setExpandRatio(lblNoResult, 1.0f);
+      }
     }
-    catch (Exception ex)
+    finally
     {
-      log.error("something failed", ex);
+      session.unlock();
     }
   }
 
   public void setCount(int count)
   {
     paging.setCount(count, false);
-    paging.setStartNumber(start);
+    paging.setStartNumber(controller.getQuery().getOffset());
   }
 
-  @Override
-  public void createPage(final int start, final int limit)
-  {
-    controller.offsetLimitChanged(start, limit);
-    
-    if (query != null)
-    {
-      progressResult.setEnabled(true);
-      progressResult.setVisible(true);
-      if (resultPanel != null)
-      {
-        resultPanel.setVisible(false);
-      }
-      
-      final ResultViewPanel finalThis = this;
-
-      
-      Callable<List<Match>> r = new Callable<List<Match>>() 
-      {
- 
-        @Override
-        public List<Match> call()
-        {
-          VaadinSession session = VaadinSession.getCurrent();
-          try
-          {
-
-            AnnisUser user = Helper.getUser();
-            return query.loadBeans(start, limit, user);
-          }
-          catch (AnnisQLSemanticsException ex)
-          {
-            session.lock();
-            try 
-            {
-              paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          catch (AnnisQLSyntaxException ex)
-          {
-            session.lock();
-            try
-            {
-              paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          catch (AnnisCorpusAccessException ex)
-          {
-            session.lock();
-            try
-            {
-              paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          catch (Exception ex)
-          {
-            log.error(
-              "unknown exception in result view", ex);
-            session.lock();
-            try
-            {
-              paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          finally
-          {
-            session.lock();
-            try
-            {
-              progressResult.setVisible(false);
-              progressResult.setEnabled(false);
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }        
-          return null;  
-        }
-      };
-      
-      FutureTask<List<Match>> task = new FutureTask<List<Match>>(r)
-      {
-        @Override
-        protected void done()
-        {
-          if(isCancelled())
-          {
-            return;
-          }
-          
-          VaadinSession session = VaadinSession.getCurrent();
-
-          try
-          {
-            List<Match> result = get();
-            if(result == null)
-            {
-              return;
-            }
-            
-            session.lock();
-            try
-            {
-              if (resultPanel != null)
-              {
-                mainLayout.removeComponent(resultPanel);
-              }
-              
-              progressResult.setEnabled(false);              
-              progressResult.setVisible(false);
-              //mainLayout.setExpandRatio(progressResult, 0.0f);
-              
-              if(result.size() > 0)
-              {
-                resultPanel = new ResultSetPanel(result, ps,
-                  contextLeft, contextRight,
-                  currentSegmentationLayer, finalThis, start);
-
-                mainLayout.addComponent(resultPanel);
-                mainLayout.setExpandRatio(resultPanel, 1.0f);
-                mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
-
-                resultPanel.setVisible(true);
-              }
-              else
-              {
-                // nothing to show since we have an empty result
-                Label lblNoResult = new Label("No matches found.");
-                lblNoResult.setSizeUndefined();
-                mainLayout.addComponent(lblNoResult);
-                mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
-                mainLayout.setExpandRatio(lblNoResult, 1.0f);
-              }
-            }
-            finally
-            {
-              session.unlock();
-            }
-            
-          }
-          catch (Exception ex)
-          {
-            log.error("Could not get result of future task", ex);
-            session.lock();
-            try 
-            {
-              paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          
-        }
-      };
-      
-      Executor exec = Executors.newSingleThreadExecutor();
-      exec.execute(task);
-      
-      
-    }
-  }
 
   public Set<String> getVisibleTokenAnnos()
   {
@@ -360,24 +198,24 @@ public class ResultViewPanel extends Panel implements PagingCallback
         @Override
         public void menuSelected(MenuItem selectedItem)
         {
-          currentSegmentationLayer = selectedItem.getText();
-          if(NULL_SEGMENTATION_VALUE.equals(currentSegmentationLayer))
+          selectedSegmentationLayer = selectedItem.getText();
+          if(NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
           {
-            currentSegmentationLayer = null;
+            selectedSegmentationLayer = null;
           }
           for(MenuItem mi : miSegmentation.getChildren())
           {
             mi.setChecked(mi == selectedItem);
           }
           
-          resultPanel.setSegmentationLayer(currentSegmentationLayer);
+          resultPanel.setSegmentationLayer(selectedSegmentationLayer);
         }
       });
      
       miSingleSegLayer.setCheckable(true);
       miSingleSegLayer.setChecked(
-        (currentSegmentationLayer == null && "".equals(s)) 
-        || s.equals(currentSegmentationLayer));
+        (selectedSegmentationLayer == null && "".equals(s)) 
+        || s.equals(selectedSegmentationLayer));
     }
   }
 
@@ -423,9 +261,10 @@ public class ResultViewPanel extends Panel implements PagingCallback
 
   }
 
-  @Override
-  public void paintContent(PaintTarget target) throws PaintException
+  public PagingComponent getPaging()
   {
-    super.paintContent(target);
+    return paging;
   }
+  
+  
 }

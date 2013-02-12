@@ -18,8 +18,9 @@ package annis.gui;
 import annis.gui.components.screenshot.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.media.MimeTypeErrorListener;
+import annis.gui.model.PagedResultQuery;
+import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import annis.gui.resultview.ResultViewPanel;
 import annis.gui.tutorial.TutorialPanel;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
@@ -67,13 +68,10 @@ public class SearchUI extends AnnisBaseUI
   private TutorialPanel tutorial;
   private TabSheet mainTab;
   private Window windowLogin;
-  private ResultViewPanel resultView;
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private QueryController queryController;
   
-  private boolean warnedAboutPossibleMediaFormatProblem = false;
-
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   @Override
@@ -366,11 +364,12 @@ public class SearchUI extends AnnisBaseUI
           log.error(
             "could not parse context value", ex);
         }
-        queryController.setQuery(aql, selectedCorpora, cleft, cright);
+        queryController.setQuery(
+          new PagedResultQuery(cleft, cright, 0, 10, null, aql, selectedCorpora));
       }
       else
       {
-        queryController.setQuery(aql, selectedCorpora);
+        queryController.setQuery(new Query(aql, selectedCorpora));
       }
       
       // remove all currently openend sub-windows
@@ -408,35 +407,6 @@ public class SearchUI extends AnnisBaseUI
     }
     
     queryController.updateCorpusSetList();
-  }
-
-  public void showQueryResult(String aql, Set<String> corpora,
-    int contextLeft,
-    int contextRight, String segmentationLayer, int start, int pageSize)
-  {
-    warnedAboutPossibleMediaFormatProblem = false;
-    
-    // remove old result from view
-    if (resultView != null)
-    {
-      mainTab.removeComponent(resultView);
-    }
-
-    resultView = new ResultViewPanel(queryController, aql, corpora, contextLeft, contextRight,
-      segmentationLayer, start, pageSize, this);
-    mainTab.addTab(resultView, "Query Result");
-    mainTab.setSelectedTab(resultView);
-    
-  }
-  
-  
-
-  public void updateQueryCount(int count)
-  {
-    if (resultView != null && count >= 0)
-    {
-      resultView.setCount(count);
-    }
   }
   
   private void showLoginWindow()
@@ -493,14 +463,14 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  public ResultViewPanel getResultView()
-  {
-    return resultView;
-  }
-
   public QueryController getQueryController()
   {
     return queryController;
+  }
+
+  public TabSheet getMainTab()
+  {
+    return mainTab;
   }
   
 

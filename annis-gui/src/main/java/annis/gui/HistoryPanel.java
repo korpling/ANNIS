@@ -16,8 +16,7 @@
 package annis.gui;
 
 import annis.gui.beans.HistoryEntry;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.model.Query;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -94,7 +93,7 @@ public class HistoryPanel extends Panel
     
     if(controller != null)
     {
-      controller.setQuery(e.getQuery(), new HashSet<String>(e.getCorpora()));
+      controller.setQuery(new Query(e.getQuery(), new HashSet<String>(e.getCorpora())));
     }
   }
 }

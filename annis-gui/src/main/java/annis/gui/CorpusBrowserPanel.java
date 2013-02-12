@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
@@ -282,7 +283,7 @@ public class CorpusBrowserPanel extends Panel
       corpusNameSet.add(corpus.getName());
       if(controller != null)
       {
-        controller.setQuery(cbe.getExample(), corpusNameSet);
+        controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
       }
     }
   }
