@@ -1,0 +1,19 @@
+@import "../chameleon/legacy-styles.css";
+@import "legacy-base.css";
+@import "partitur.css";
+@import "legacy-styles.css";
+
+.v-caption,
+.v-button,
+.v-widget,
+.v-accordion-item-caption .v-caption,
+.v-inline-datefield-calendarpanel-header button,
+.v-datefield-calendarpanel-header button,
+.v-panel-bubble .v-panel-caption-bubble,
+.v-label-h4, .v-label h4,
+.v-app, .v-window, .v-popupview-popup, .v-tooltip, .v-app input, .v-app select, .v-app button, .v-app textarea, .v-window input, .v-window select, .v-window button, .v-window textarea, .v-popupview-popup input, .v-popupview-popup select, .v-popupview-popup button, .v-popupview-popup textarea, .v-filterselect-suggestpopup, .v-datefield-popup, .v-contextmenu, .v-Notification, .v-menubar-submenu, .v-table-header-drag, .v-menubar-submenu, .v-drag-element,
+.v-richtextarea .gwt-HTML,
+.v-table-table
+{
+  font-size : 10px;
+}
