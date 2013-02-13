@@ -15,6 +15,7 @@
  */
 package annis.gui.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ import java.util.Set;
  * A POJO representing a query
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class Query
+public class Query implements Serializable
 {
   private String query;
   private Set<String> corpora;
