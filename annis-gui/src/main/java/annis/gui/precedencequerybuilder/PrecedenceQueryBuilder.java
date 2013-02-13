@@ -63,6 +63,12 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private Collection<MetaBox> mboxes;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", "^","$", "|", "?", "(", ")"};
+  private static final String BUTTON_LANGUAGE_LABEL = "Start with linguistic search";
+  private static final String BUTTON_META_LABEL = "Start with meta search";
+  private static final String BUTTON_GO_LABEL = "Create AQL Query";
+  private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
+  private static final String NO_CORPORA_WARNING = "No corpora selected";
+  private static final String BUTTON_ADD_LABEL = "Add position";
 
   public PrecedenceQueryBuilder(ControlPanel cp)
   {
@@ -78,16 +84,16 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
 
-    btInitLanguage = new Button("Start with linguistic search", (Button.ClickListener) this);
+    btInitLanguage = new Button(BUTTON_LANGUAGE_LABEL, (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
-    btInitMeta = new Button("Start with meta search", (Button.ClickListener) this);
+    btInitMeta = new Button(BUTTON_META_LABEL, (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
-    btGo = new Button("Create AQL Query", (Button.ClickListener) this);
+    btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
-    btClear = new Button("Clear the Query Builder", (Button.ClickListener) this);
+    btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
     spb = new SpanBox(this);
@@ -256,7 +262,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     final PrecedenceQueryBuilder sq = this;
     
     if (cp.getSelectedCorpora().isEmpty()){
-      getWindow().showNotification("No corpora selected");
+      getWindow().showNotification(NO_CORPORA_WARNING);
     }
     
     else
@@ -266,7 +272,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         language.removeComponent(btInitLanguage);
         MenuBar addMenu = new MenuBar();
         Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
+        final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADD_LABEL, null);
         for (final String annoname : annonames)
         {
           add.addItem(killNamespace(annoname), new MenuBar.Command() {

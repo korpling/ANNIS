@@ -25,6 +25,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import java.util.Collection;
 import java.util.TreeSet;
 
+
 /**
  *
  * @author Martin
@@ -39,34 +40,41 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
   private SearchBox sb;
   private CheckBox reBox; 
   
+  private static final String SPANBOX_LABEL = "Search within span:";
+  private static final String ACTIVATOR_DESCRIPTION = "Add some AQL code to the query to make it limited to a specific span.";
+  private static final String SPANNAME_LABEL = "span level:";
+  private static final String SPANVALUE_LABEL = "span value:";
+  public static final String REBOX_LABEL = "Regex";
+  private static final String CB_WIDTH = "130px";
+  
   public SpanBox(PrecedenceQueryBuilder sq)
   {
     this.sq = sq;    
     option = new VerticalLayout();
     option.setImmediate(true);  
     
-    chbWithin = new CheckBox("Search within span: ");
-    chbWithin.setDescription("Add some AQL code to the query to make it limited to the chosen span.");
+    chbWithin = new CheckBox(SPANBOX_LABEL);
+    chbWithin.setDescription(ACTIVATOR_DESCRIPTION);
     chbWithin.setImmediate(true);
     chbWithin.addListener((Button.ClickListener) this);
     
     cbSpan = new ComboBox();
     cbSpanValue = new ComboBox();
     
-    cbSpan.setCaption("span level:");
+    cbSpan.setCaption(SPANNAME_LABEL);
     cbSpan.setEnabled(false);
     cbSpan.setNullSelectionAllowed(false);
     cbSpan.setImmediate(true);
-    cbSpan.setWidth("130px");
+    cbSpan.setWidth(CB_WIDTH);
     cbSpan.addListener((ValueChangeListener) this);   
     
-    cbSpanValue.setCaption("span value:");
+    cbSpanValue.setCaption(SPANVALUE_LABEL);
     cbSpanValue.setEnabled(false);
     cbSpanValue.setNullSelectionAllowed(false);
     cbSpanValue.setImmediate(true);    
-    cbSpanValue.setWidth("130px");    
+    cbSpanValue.setWidth(CB_WIDTH);    
     
-    reBox = new CheckBox("Regex");
+    reBox = new CheckBox(REBOX_LABEL);
     reBox.setEnabled(false);
     reBox.setImmediate(true);    
     reBox.addListener((Button.ClickListener) this);    
@@ -95,7 +103,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
             cbSpan.addItem(sq.killNamespace(annoname));
           }                  
         }
-        cbSpan.setInputPrompt("span name");
+        cbSpan.setInputPrompt(SPANNAME_LABEL);
         String checkLevel = (cbSpan.getValue()==null) ? "" : cbSpan.getValue().toString();
         cbSpanValue.setEnabled(!checkLevel.equals(""));
       }

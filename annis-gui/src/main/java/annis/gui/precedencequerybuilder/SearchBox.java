@@ -81,7 +81,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     sbtoolbar.setSpacing(true);
      
     // searchbox tickbox for regex
-    CheckBox tb = new CheckBox("Regex");
+    CheckBox tb = new CheckBox(SpanBox.REBOX_LABEL);
     tb.setDescription("Tick to allow for a regular expression");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
