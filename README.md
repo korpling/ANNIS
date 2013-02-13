@@ -8,3 +8,4 @@ Since information structure interacts with linguistic phenomena on many levels, 
 * Wiki: https://korpling.german.hu-berlin.de/p/projects/annis/wiki
 * Code: https://github.com/korpling/ANNIS
 * Bug and issue tracking: https://github.com/korpling/ANNIS/issues
+-
