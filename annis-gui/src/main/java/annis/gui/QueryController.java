@@ -46,9 +46,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages all the query related actions.
+ * 
+ * <strong>This class is not reentrant.</strong>
+ * It is expected that you call the functions from the Vaadin session lock context,
+ * either implicitly (e.g. from a component constructor or a handler callback)
+ * or explicitly with {@link VaadinSession#lock() }.
+ * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-// TODO: implement locking to avoid several parallel queries
 public class QueryController implements PagingCallback
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
@@ -123,6 +128,8 @@ public class QueryController implements PagingCallback
 
     Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
 
+    ui.updateFragment(lastQuery);
+    
     HistoryEntry e = new HistoryEntry();
     e.setCorpora(lastQuery.getCorpora());
     e.setQuery(lastQuery.getQuery());

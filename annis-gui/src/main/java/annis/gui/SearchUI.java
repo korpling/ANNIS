@@ -29,6 +29,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.Page;
+import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
@@ -40,6 +42,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -50,7 +53,8 @@ import org.slf4j.LoggerFactory;
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   LoginWindow.LoginListener,
-  MimeTypeErrorListener
+  MimeTypeErrorListener,
+  Page.UriFragmentChangedListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SearchUI.class);
@@ -71,6 +75,7 @@ public class SearchUI extends AnnisBaseUI
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private QueryController queryController;
+  private String lastQueriedFragment;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -257,6 +262,8 @@ public class SearchUI extends AnnisBaseUI
         mainTab.setSelectedTab(tutorial);
       }
     });
+    
+    getPage().addUriFragmentChangedListener(this);
     
     // TODO: re-enable parsing of the old style citation links (vaadin7)
 
@@ -546,6 +553,58 @@ public class SearchUI extends AnnisBaseUI
       warnedAboutPossibleMediaFormatProblem = true;
     }
     */
+  }
+
+  @Override
+  public void uriFragmentChanged(UriFragmentChangedEvent event)
+  {
+    String fragment = event.getUriFragment();
+    // do nothing if not changed
+    if (fragment.equals(lastQueriedFragment))
+    {
+      return;
+    }
+    
+    // TODO: re-enable the query fragments (vaadin7)
+
+    Map<String, String> args = Helper.parseFragment(fragment);
+
+    Set<String> corpora = new TreeSet<String>();
+    if (args.containsKey("c"))
+    {
+      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
+      corpora.addAll(Arrays.asList(corporaSplitted));
+    }
+
+    if(args.get("cl") != null && args.get("cr") != null)
+    {
+      // full query with given context
+      queryController.setQuery(new PagedResultQuery(
+        Integer.parseInt(args.get("cl")), 
+        Integer.parseInt(args.get("cr")),
+        Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
+        args.get("seg"),
+        args.get("q"), corpora));
+    }
+    else
+    {
+      // use default context
+      queryController.setQuery(new Query(args.get("q"), corpora));
+    }    
+    queryController.executeQuery(true, true);
+  }
+  
+  
+  public void updateFragment(PagedResultQuery q)
+  {
+    List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(), 
+      q.getContextLeft(), q.getContextRight(), 
+      q.getSegmentation(), q.getOffset(), q.getLimit());
+      
+    // set our fragment
+    lastQueriedFragment = StringUtils.join(args, "&");
+    UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
+    
   }
   
   

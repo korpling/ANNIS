@@ -177,7 +177,7 @@ public class Helper
     
   }
   
-  public static List<String> citationFragmentParams(String aql, 
+  public static List<String> citationFragment(String aql, 
     Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
     int start, int limit)
   {
@@ -220,7 +220,7 @@ public class Helper
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
         getContext(), null, 
-        StringUtils.join(citationFragmentParams(aql, corpora,
+        StringUtils.join(citationFragment(aql, corpora,
           contextLeft, contextRight, segmentation, start, limit), "&"))
         .toASCIIString();
     }
@@ -288,17 +288,19 @@ public class Helper
   }
   
   /**
-   * Parses the fragment parameter for navigation views.
+   * Parses the fragment.
    * 
-   * Parameters have the form key1=value&key2=test ...
-   * @param parameters
+   * Fragments have the form key1=value&key2=test ...
+   * @param fragment
    * @return 
    */
-  public static Map<String,String> parseFragmentParameter(String parameters)
+  public static Map<String,String> parseFragment(String fragment)
   {
     Map<String, String> result = new TreeMap<String, String>();
+ 
+    fragment = StringUtils.removeStart(fragment, "!");
     
-    String[] split = StringUtils.split(parameters, "&");
+    String[] split = StringUtils.split(fragment, "&");
     for(String s : split)
     {
       String[] parts = s.split("=", 2);

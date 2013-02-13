@@ -50,7 +50,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
  * @author thomas
  */
 public class QueryPanel extends Panel implements TextChangeListener,
-  ValueChangeListener, View
+  ValueChangeListener
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
@@ -72,7 +72,6 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
-  private String lastQueriedFragment;
   
   public QueryPanel(final QueryController controller)
   {
@@ -279,61 +278,6 @@ public class QueryPanel extends Panel implements TextChangeListener,
         Notification.show("Could not connect to web service: " + ex.getMessage(),
           Notification.Type.TRAY_NOTIFICATION);
     }
-  }
-  
-  public void updateFragment(String aql, 
-    Set<String> corpora, int contextLeft, int contextRight, String segmentation,
-    int start, int limit)
-  {
-    List<String> args = Helper.citationFragmentParams(aql, corpora, 
-      contextLeft, contextRight, 
-      segmentation, start, limit);
-      
-    // set our fragment
-    lastQueriedFragment = StringUtils.join(args, "&");
-    UI.getCurrent().getPage().setUriFragment(NAME + "/" + lastQueriedFragment);
-    
-  }
-
-  @Override
-  public void enter(ViewChangeEvent event)
-  {
-    String parameters = event.getParameters();
-    // do nothing if not changed
-    if (parameters.equals(lastQueriedFragment))
-    {
-      return;
-    }
-    
-    // TODO: re-enable the query fragments (vaadin7)
-
-    Map<String, String> args = Helper.parseFragmentParameter(parameters);
-
-    Set<String> corpora = new TreeSet<String>();
-    if (args.containsKey("c"))
-    {
-      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
-      corpora.addAll(Arrays.asList(corporaSplitted));
-    }
-
-    if(args.get("cl") != null && args.get("cr") != null)
-    {
-      // full query with given context
-      controller.setQuery(new PagedResultQuery(
-        Integer.parseInt(args.get("cl")), 
-        Integer.parseInt(args.get("cr")),
-        Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
-        args.get("seg"),
-        args.get("q"), corpora));
-    }
-    else
-    {
-      // use default context
-      controller.setQuery(new Query(args.get("q"), corpora));
-    }
-    
-    controller.executeQuery(true, true);
-    
   }
   
   @Override
