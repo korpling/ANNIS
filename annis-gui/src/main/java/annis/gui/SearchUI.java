@@ -81,6 +81,7 @@ public class SearchUI extends AnnisBaseUI
   private String bugEMailAddress;
   private QueryController queryController;
   private String lastQueriedFragment;
+  private InstanceConfig instanceConfig;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -89,7 +90,7 @@ public class SearchUI extends AnnisBaseUI
   {  
     super.init(request);
     
-    InstanceConfig instanceConfig = getInstanceConfig(request);
+    this.instanceConfig = getInstanceConfig(request);
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
     queryController = new QueryController(this);
@@ -622,6 +623,9 @@ public class SearchUI extends AnnisBaseUI
     // set our fragment
     lastQueriedFragment = StringUtils.join(args, "&");
     UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
+    
+    // reset title
+    getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
   }
   
