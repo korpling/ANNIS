@@ -41,6 +41,10 @@ class MetaBox extends Panel implements Button.ClickListener
   private PrecedenceQueryBuilder sq;
   private final String datum;
   
+  private static final String LEFT_COLUMN_LABEL = "Available levels";
+  private static final String RIGHT_COLUMN_LABEL = "Selected levels";
+  private static final String TWIN_COL_WIDTH = "350px";
+  
   public MetaBox(String ebene, PrecedenceQueryBuilder sq)
   {
     this.sq = sq;
@@ -50,7 +54,7 @@ class MetaBox extends Panel implements Button.ClickListener
     datum = ebene;
     
     // close
-    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     
     // metabox values for ebene
@@ -68,9 +72,9 @@ class MetaBox extends Panel implements Button.ClickListener
     l.setNullSelectionAllowed(true);
     l.setMultiSelect(true);
     l.setImmediate(true);
-    l.setLeftColumnCaption("Available levels");
-    l.setRightColumnCaption("Selected levels");
-    l.setWidth("350px");
+    l.setLeftColumnCaption(LEFT_COLUMN_LABEL);
+    l.setRightColumnCaption(RIGHT_COLUMN_LABEL);
+    l.setWidth(TWIN_COL_WIDTH);
     tcs = l;
 
     sb.addComponent(tcs);

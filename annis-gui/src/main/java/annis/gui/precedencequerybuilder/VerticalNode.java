@@ -42,6 +42,8 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private VerticalLayout v;
   private Collection<SearchBox> sboxes;
   
+  private static final String WIDTH = "200px";
+  
   public VerticalNode(String ebene, PrecedenceQueryBuilder sq)
   {
         
@@ -49,7 +51,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     v = new VerticalLayout();
     sboxes = new ArrayList<SearchBox>();
     
-    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
         
     SearchBox sb = new SearchBox(ebene, sq, this); //SearchBox has takes an argument to 
@@ -68,7 +70,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     vntoolbar.addComponent(am);
     v.addComponent(vntoolbar);
     v.addComponent(sb);
-    setWidth("200px");
+    setWidth(WIDTH);
     addComponent(v);
     
   }

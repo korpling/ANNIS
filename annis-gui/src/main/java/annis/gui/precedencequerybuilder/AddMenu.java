@@ -32,12 +32,14 @@ public class AddMenu extends Panel
   private MenuBar addMenu = new MenuBar();
   private VerticalNode vn;
   private PrecedenceQueryBuilder sq;
+  private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
+  
   
   public AddMenu(Collection<String> annonames, final PrecedenceQueryBuilder sq, final VerticalNode vn)
   {
     this.vn = vn;
     this.sq = sq;
-    final MenuBar.MenuItem add = addMenu.addItem("Add level", null);
+    final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
     for (final String annoname : annonames)
     {
       add.addItem(sq.killNamespace(annoname), new Command() {

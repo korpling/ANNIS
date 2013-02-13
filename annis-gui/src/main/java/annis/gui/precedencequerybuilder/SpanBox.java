@@ -43,9 +43,10 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
   private static final String SPANBOX_LABEL = "Search within span:";
   private static final String ACTIVATOR_DESCRIPTION = "Add some AQL code to the query to make it limited to a specific span.";
   private static final String SPANNAME_LABEL = "span level:";
-  private static final String SPANVALUE_LABEL = "span value:";
-  public static final String REBOX_LABEL = "Regex";
+  private static final String SPANVALUE_LABEL = "span value:";  
   private static final String CB_WIDTH = "130px";
+  public static final String REBOX_LABEL = "Regex";
+  public static final String REBOX_DESCRIPTION = "Tick to allow for a regular expression";
   
   public SpanBox(PrecedenceQueryBuilder sq)
   {
@@ -75,6 +76,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     cbSpanValue.setWidth(CB_WIDTH);    
     
     reBox = new CheckBox(REBOX_LABEL);
+    reBox.setDescription(REBOX_DESCRIPTION);
     reBox.setEnabled(false);
     reBox.setImmediate(true);    
     reBox.addListener((Button.ClickListener) this);    

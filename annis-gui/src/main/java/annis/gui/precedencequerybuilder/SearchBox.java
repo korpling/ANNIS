@@ -47,6 +47,9 @@ public class SearchBox extends Panel implements Button.ClickListener
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
   private PrecedenceQueryBuilder sq;
   
+  public static final String BUTTON_CLOSE_LABEL = "Close";
+  private static final String SB_CB_WIDTH = "140px";
+  
 
   public SearchBox(String ebene, PrecedenceQueryBuilder sq, VerticalNode vn)
   {
@@ -68,7 +71,7 @@ public class SearchBox extends Panel implements Button.ClickListener
     ComboBox l = new ComboBox(ebene);
     this.cb = l;
     l.setInputPrompt(ebene);
-    l.setWidth("140px");
+    l.setWidth(SB_CB_WIDTH);
     // configure & load content
     l.setImmediate(true);    
     for (String annoname : annonames) 
@@ -82,14 +85,14 @@ public class SearchBox extends Panel implements Button.ClickListener
      
     // searchbox tickbox for regex
     CheckBox tb = new CheckBox(SpanBox.REBOX_LABEL);
-    tb.setDescription("Tick to allow for a regular expression");
+    tb.setDescription(SpanBox.REBOX_DESCRIPTION);
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
     tb.addListener((Button.ClickListener) this);
     reBox = tb;
     
     // close the searchbox
-    btClose = new Button("Close", (Button.ClickListener) this);
+    btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     sbtoolbar.addComponent(btClose);
     
