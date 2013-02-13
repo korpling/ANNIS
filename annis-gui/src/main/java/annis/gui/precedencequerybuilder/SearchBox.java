@@ -108,23 +108,19 @@ public class SearchBox extends Panel implements Button.ClickListener
       vn.removeSearchBox(this);      
     }
     
-    if(event.getComponent()==reBox)
+    else if(event.getComponent()==reBox)
     {
       boolean r = reBox.booleanValue();
       cb.setNewItemsAllowed(r);
       if(!r)
-      {
-        //rebuild ComboBox-content <- check out SpanBox for alternative solution
-        /*cb.removeAllItems();
-        for(String a : annonames)
-        {
-          cb.addItem(a);
-        }*/
-        SpanBox.buildBoxValues(cb, this.ebene, sq);
+      {         
+        SpanBox.buildBoxValues(cb, ebene, sq);
       }
-      else
+      else if(cb.getValue()!=null)
       {
-        cb.setValue(sq.escapeRegexCharacters(cb.getValue().toString()));
+        String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+        cb.addItem(escapedItem);
+        cb.setValue(escapedItem);         
       }
     }
   }

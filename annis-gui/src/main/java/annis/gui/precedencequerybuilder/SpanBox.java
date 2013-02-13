@@ -108,12 +108,19 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
       cbSpan.setEnabled(chbWithin.booleanValue());     
       
     }
-    if (event.getComponent() == reBox)
+    else if (event.getComponent() == reBox)
     {
-      cbSpanValue.setNewItemsAllowed(reBox.booleanValue());
-      if (!reBox.booleanValue())
+      boolean r = reBox.booleanValue();
+      cbSpanValue.setNewItemsAllowed(r);
+      if (!r)
       {      
         buildBoxValues(cbSpanValue, cbSpan.getValue().toString(), sq);      
+      }
+      else if(cbSpanValue.getValue()!=null)
+      {
+        String escapedItem = sq.escapeRegexCharacters(cbSpanValue.getValue().toString());
+        cbSpanValue.addItem(escapedItem);
+        cbSpanValue.setValue(escapedItem);    
       }
     }
   }
@@ -126,8 +133,8 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
      * (actually it simply refills the box)
      * ---
      * SearchBox uses this method, too
-     */
-    String value = cb.getValue().toString();
+     */    
+    String value = (cb.getValue()!=null) ? cb.getValue().toString() : "";
     Collection<String> annovals = sq.getAnnotationValues(level);    
     cb.removeAllItems();
     for (String s : annovals)
@@ -138,25 +145,24 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     {
       cb.setValue(value);
     }
-    else {cb.setValue(annovals.iterator().next());}
+    else 
+    {
+      cb.setValue(null);
+    }
   }
   
   @Override
   public void valueChange(ValueChangeEvent event)
   {
-    if (true) //modify later <----- !!! !!! !!!
-    {      
-      cbSpanValue.removeAllItems();
-      Collection<String> annonames = sq.getAnnotationValues(cbSpan.getValue().toString());
-      for (String a : annonames)
-      {
-        cbSpanValue.addItem(a);          
-      }
-      String first = annonames.iterator().next();
-      cbSpanValue.setValue(first);
-      cbSpanValue.setEnabled(true);
-      reBox.setEnabled(true);      
-    }
+         
+    cbSpanValue.removeAllItems();
+    String level = cbSpan.getValue().toString();
+    buildBoxValues(cbSpanValue, level, sq);
+    cbSpanValue.setInputPrompt(level);
+    cbSpanValue.setValue(null);
+    cbSpanValue.setEnabled(true);
+    reBox.setEnabled(true);      
+
   }
   
   public boolean searchWithinSpan()
@@ -171,6 +177,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
   
   public String getSpanValue()
   {
+    if (cbSpanValue.getValue()==null){return "";}
     return cbSpanValue.getValue().toString();
   }
   

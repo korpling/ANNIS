@@ -152,6 +152,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   
   public String escapeRegexCharacters(String tok)
   {
+    if(tok==null | tok.equals("")){return "";}
     String result=tok;
     for (int i = 0; i<REGEX_CHARACTERS.length; i++)
     {
@@ -160,7 +161,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     return result;
   }
 
-  private String getAQLQuery()//by Martin
+  private String getAQLQuery()
   {
     int count = 1;
 
@@ -208,13 +209,18 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     if(spb.searchWithinSpan())
     {
       String addQuery;
-      if (spb.isRegEx())
+      
+      if ((!spb.isRegEx())&&(!spb.getSpanValue().equals("")))
       {
-        addQuery = "\n& "+ spb.getSpanName() + " = /" + spb.getSpanValue() + "/";
+        addQuery = "\n& "+ spb.getSpanName() + " = \"" + spb.getSpanValue() + "\"";        
+      }
+      else if (spb.getSpanValue().equals(""))
+      {        
+        addQuery = "\n& "+ spb.getSpanName() + " = /.*/";
       }
       else
       {
-        addQuery = "\n& "+ spb.getSpanName() + " = \"" + spb.getSpanValue() + "\"";
+        addQuery = "\n& "+ spb.getSpanName() + " = /" + spb.getSpanValue() + "/";
       }
       query += addQuery;    
       count++;
@@ -355,8 +361,7 @@ public Collection<String> getAnnotationValues(String level)
     Collection<String> values = new TreeSet<String>();
     
     for(String s : getAvailableAnnotationLevels(level))
-    {
-      killNamespace(s);
+    {      
       values.add(s.replaceFirst("^[^:]*:", ""));
     }
     
