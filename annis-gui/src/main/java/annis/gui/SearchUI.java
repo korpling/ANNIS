@@ -565,8 +565,6 @@ public class SearchUI extends AnnisBaseUI
       return;
     }
     
-    // TODO: re-enable the query fragments (vaadin7)
-
     Map<String, String> args = Helper.parseFragment(fragment);
 
     Set<String> corpora = new TreeSet<String>();
