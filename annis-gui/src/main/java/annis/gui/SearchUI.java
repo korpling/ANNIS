@@ -31,14 +31,19 @@ import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -265,32 +270,20 @@ public class SearchUI extends AnnisBaseUI
     
     getPage().addUriFragmentChangedListener(this);
     
-    // TODO: re-enable parsing of the old style citation links (vaadin7)
-
-//    addParameterHandler(new ParameterHandler()
-//    {
-//
-//      @Override
-//      public void handleParameters(Map<String, String[]> parameters)
-//      {
-//        if (parameters.containsKey("citation"))
-//        {
-//          HttpSession session =
-//            ((WebApplicationContext) getApplication().getContext()).
-//            getHttpSession();
-//          String citation = (String) session.getAttribute("citation");
-//          if (citation != null)
-//          {
-//            citation = StringUtils.removeStart(citation,
-//              Helper.getContext(getApplication()) + "/Cite/");
-//            evaluateCitation(citation);
-//            session.removeAttribute("citation");
-//          }
-//
-//        }
-//      }
-//    });
+    getSession().addRequestHandler(new RequestHandler() 
+    {
+      @Override
+      public boolean handleRequest(VaadinSession session, VaadinRequest request,
+        VaadinResponse response) throws IOException
+      {
+        checkCitation(request);
+        return false;
+      }
+    });
+    
+    checkCitation(request);
   }
+  
   
   private InstanceConfig getInstanceConfig(VaadinRequest request)
   {
@@ -322,6 +315,32 @@ public class SearchUI extends AnnisBaseUI
     // default to an empty instance config
     return new InstanceConfig();
   }
+  
+  public void checkCitation(VaadinRequest request)
+  {
+    Object origURLRaw = VaadinSession.getCurrent().getSession().getAttribute(
+      "citation");
+    if(origURLRaw == null || !(origURLRaw instanceof String))
+    {
+      return;
+    }
+    String origURL = (String) origURLRaw;
+    String parameters = origURL.replaceAll(".*?/Cite(/)?", "");
+    if (!"".equals(parameters) && !origURL.equals(parameters))
+    {
+      try
+      {
+        String decoded = URLDecoder.decode(parameters, "UTF-8");
+        evaluateCitation(decoded);
+      }
+      catch (UnsupportedEncodingException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    
+  }
+  
 
   public void evaluateCitation(String relativeUri)
   {
@@ -390,6 +409,7 @@ public class SearchUI extends AnnisBaseUI
     {
       showNotification("Invalid citation", Notification.Type.WARNING_MESSAGE);
     }
+    
   }
 
   public void updateUserInformation()
@@ -560,7 +580,7 @@ public class SearchUI extends AnnisBaseUI
   {
     String fragment = event.getUriFragment();
     // do nothing if not changed
-    if (fragment.equals(lastQueriedFragment))
+    if (fragment == null || fragment.equals(lastQueriedFragment))
     {
       return;
     }

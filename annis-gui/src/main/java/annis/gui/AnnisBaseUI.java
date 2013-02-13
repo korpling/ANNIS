@@ -43,8 +43,10 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -134,6 +136,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
     
     initPlugins();
   }
+  
+  
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -455,41 +459,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
     return visualizerRegistry.get(shortName);
   }
 
-
-  // TODO: move this to SearchGUI (vaadin7)
-  
-//  @Override
-//  public void onRequestStart(HttpServletRequest request,
-//    HttpServletResponse response)
-//  {
-//    String origURI = request.getRequestURI();
-//    String parameters = origURI.replaceAll(".*?/Cite(/)?", "");
-//    if (!"".equals(parameters) && !origURI.equals(parameters))
-//    {
-//      try
-//      {
-//        String decoded = URLDecoder.decode(parameters, "UTF-8");
-//        for(SearchWindow w : searchWindows)
-//        {
-//          w.evaluateCitation(decoded);
-//        }
-//        try
-//        {
-//          response.sendRedirect(getURL().toString());
-//        }
-//        catch (IOException ex)
-//        {
-//          log.error(null, ex);
-//        }
-//      }
-//      catch (UnsupportedEncodingException ex)
-//      {
-//        log.error(null, ex);
-//      }
-//
-//
-//    }
-//  }
 
 
   @Override

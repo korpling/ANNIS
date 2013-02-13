@@ -40,7 +40,7 @@ public class CitationRedirectionServlet extends HttpServlet
     {
       URI uri = new URI(req.getRequestURI());
       req.getSession().setAttribute("citation", uri.getPath());
-      resp.sendRedirect(req.getContextPath() + "/?citation");
+      resp.sendRedirect(req.getContextPath() + "/");
     }
     catch(URISyntaxException ex)
     {
