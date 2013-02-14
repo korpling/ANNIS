@@ -70,10 +70,6 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   private static final org.slf4j.Logger log = LoggerFactory.
     getLogger(VakyarthaDependencyTree.class);
 
-  private Writer theWriter;
-
-  private VisualizerInput input;
-
   /**
    * If this mapping is not set in the resolver_vis_map table this visualization
    * is only based on the token level.
@@ -96,8 +92,6 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   @Override
   public void writeOutput(VisualizerInput input, Writer writer)
   {
-    theWriter = writer;
-    this.input = input;
     this.mappings = input.getMappings();
 
     /**
@@ -147,10 +141,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         }
       });
 
-    printHTMLOutput();
+    printHTMLOutput(input, writer);
   }
 
-  public void printHTMLOutput()
+  public void printHTMLOutput(VisualizerInput input, Writer writer)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
 
@@ -174,23 +168,25 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
     try
     {
-      println("<html>");
-      println("<head>");
+      println("<html>", writer);
+      println("<head>", writer);
 
       println(
         "<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/jquery-1.9.0.min.js") + "\"></script>");
+        + input.getResourcePath("vakyartha/jquery-1.9.0.min.js") + "\"></script>", 
+        writer);
       println("<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/raphael-min.js") + "\"></script>");
+        + input.getResourcePath("vakyartha/raphael-min.js") + "\"></script>", writer);
       println(
         "<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/vakyarthaDependency.js") + "\"></script>");
+        + input.getResourcePath("vakyartha/vakyarthaDependency.js") + "\"></script>", 
+        writer);
 
       // output the data for the javascript
-      println("<script type=\"text/javascript\">");
-      println("fcolors={};");
-      println("shownfeatures=[\"t\"];");
-      println("tokens=new Object();");
+      println("<script type=\"text/javascript\">", writer);
+      println("fcolors={};", writer);
+      println("shownfeatures=[\"t\"];", writer);
+      println("tokens=new Object();", writer);
 
       count = 0;
       for (SNode node : selectedNodes.keySet())
@@ -200,7 +196,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         String completeAnnotation = getAnnotation(node);
         String annotationValue = completeAnnotation.replaceFirst(
           ".*=", "");
-        String text = getText(node);
+        String text = getText(node, input);
 
         // decide, if the visualization is token based.
         if (mappings.containsKey(MAPPING_NODE_KEY))
@@ -257,22 +253,23 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         attris.put("t", tAttris);
         vakyarthaObject.put("attris", attris);
 
-        theWriter.append("tokens[").append("" + count++).append("]=");
-        theWriter.append(vakyarthaObject.toString().replaceAll("\n", " "));
-        theWriter.append(";\n");
+        writer.append("tokens[").append("" + count++).append("]=");
+        writer.append(vakyarthaObject.toString().replaceAll("\n", " "));
+        writer.append(";\n");
       }
 
-      println("</script>");
+      println("</script>", writer);
 
-      println("</head>");
-      println("<body>");
+      println("</head>", writer);
+      println("<body>", writer);
 
       // the div to render the javascript to
       println(
-        "<div id=\"holder\" style=\"background:white; position:relative;\"> </div>");
+        "<div id=\"holder\" style=\"background:white; position:relative;\"> </div>", 
+        writer);
 
-      println("</body>");
-      println("</html>");
+      println("</body>", writer);
+      println("</html>", writer);
     }
     catch (JSONException ex)
     {
@@ -284,19 +281,19 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     }
   }
 
-  private void println(String s) throws IOException
+  private void println(String s, Writer writer) throws IOException
   {
-    println(s, 0);
+    println(s, 0, writer);
   }
 
-  private void println(String s, int indent) throws IOException
+  private void println(String s, int indent, Writer writer) throws IOException
   {
     for (int i = 0; i < indent; i++)
     {
-      theWriter.append("\t");
+      writer.append("\t");
     }
-    theWriter.append(s);
-    theWriter.append("\n");
+    writer.append(s);
+    writer.append("\n");
   }
 
   /**
@@ -337,7 +334,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
    *
    * @return Empty string, if there are no token overlapped by the node.
    */
-  private String getText(SNode node)
+  private String getText(SNode node, VisualizerInput input)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
     EList<STYPE_NAME> textRelations = new BasicEList<STYPE_NAME>();

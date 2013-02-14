@@ -15,10 +15,11 @@
  */
 package annis.gui.visualizers.component.tree;
 
+import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Edge;
 
 public interface TreeElementLabeler {
-	String getLabel(AnnisNode n);
-	String getLabel(Edge e);
+	String getLabel(AnnisNode n, VisualizerInput input);
+	String getLabel(Edge e, VisualizerInput input);
 }

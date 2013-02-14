@@ -40,7 +40,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 public class TigerTreeVisualizer extends AbstractImageVisualizer
 {
 
-  private VisualizerInput input = new VisualizerInput();
   private static final int SIDE_MARGIN = 20;
   private static final int TOP_MARGIN = 40;
   private static final int TREE_DISTANCE = 40;
@@ -88,9 +87,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    public Shape getShape(AnnisNode n)
+    public Shape getShape(AnnisNode n, VisualizerInput input)
     {
-      if(isQueryMatch(n))
+      if(isQueryMatch(n, input))
       {
         // get CSS color name
         String backColorName = input.getMarkableMap().get("" + n.getId());
@@ -125,17 +124,17 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
     }
 
-    private boolean isQueryMatch(AnnisNode n)
+    private boolean isQueryMatch(AnnisNode n, VisualizerInput input)
     {
       return input.getMarkableExactMap().containsKey(Long.toString(n.getId()));
     }
 
     @Override
-    public Shape getShape(Edge e)
+    public Shape getShape(Edge e, VisualizerInput input)
     {
       if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
-        return new Shape.Rectangle(getEdgeColor(e), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
+        return new Shape.Rectangle(getEdgeColor(e, input), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
       }
       else
       {
@@ -144,9 +143,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    public Color getTextBrush(AnnisNode n)
+    public Color getTextBrush(AnnisNode n, VisualizerInput input)
     {
-      if(isQueryMatch(n))
+      if(isQueryMatch(n, input))
       {
         return Color.WHITE;
       }
@@ -169,7 +168,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    public Color getEdgeColor(Edge e)
+    public Color getEdgeColor(Edge e, VisualizerInput input)
     {
       if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
@@ -194,7 +193,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    public Stroke getStroke(Edge e)
+    public Stroke getStroke(Edge e, VisualizerInput input)
     {
       if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
       {
@@ -214,7 +213,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   {
 
     @Override
-    public String getLabel(AnnisNode n)
+    public String getLabel(AnnisNode n, VisualizerInput input)
     {
       if(n.isToken())
       {
@@ -234,7 +233,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    public String getLabel(Edge e)
+    public String getLabel(Edge e, VisualizerInput input)
     {
       return extractAnnotation(e.getAnnotations(),
         input.getMappings().getProperty("edge_anno_ns", input.getNamespace()),
@@ -273,7 +272,6 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   @Override
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
-    this.input = input;
     AnnisResult result = input.getResult();
     List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 

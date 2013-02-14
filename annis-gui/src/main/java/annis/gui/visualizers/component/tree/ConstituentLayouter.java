@@ -331,7 +331,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 				x += styler.getTokenSpacing();
 			}
 			positions.put(token, x);
-			x += 2 * padding + tokenFont.extents(labeler.getLabel(token)).getWidth();
+			x += 2 * padding + tokenFont.extents(labeler.getLabel(token, input)).getWidth();
 		}
 		return positions;
 	}
@@ -349,7 +349,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		}
 		calculateNodePosition(root, treeLayout, options);
 		Edge e = getOutgoingEdges(root).get(0);
-		GraphicsItem edges = backend.makeLines(treeLayout.getLines(), styler.getEdgeColor(e), styler.getStroke(e));
+		GraphicsItem edges = backend.makeLines(treeLayout.getLines(), 
+      styler.getEdgeColor(e, input), styler.getStroke(e, input));
 		edges.setZValue(-4);
 		edges.setParentItem(treeLayout.getParentItem());
 		addSecEdges(treeLayout, options);
@@ -378,9 +379,9 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 			treeLayout.addEdge(new Point2D.Double(childPos.getX(), y), childPos);
 			
 			GraphicsItem label = backend.makeLabel(
-					labeler.getLabel(e), 
+					labeler.getLabel(e, input), 
 					new Point2D.Double(childPos.getX(), y + treeLayout.orientation.value * styler.getHeightStep() * 0.5), 
-					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e));
+					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
 			
 			label.setZValue(10);
 			label.setParentItem(treeLayout.parentItem);
@@ -391,8 +392,9 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 				Collections.max(childPositions));
 
 		GraphicsItem label = backend.makeLabel(
-				labeler.getLabel(current), new Point2D.Double(xCenter, y), 
-				styler.getFont(current), styler.getTextBrush(current), Alignment.CENTERED, styler.getShape(current));
+				labeler.getLabel(current, input), new Point2D.Double(xCenter, y), 
+				styler.getFont(current), styler.getTextBrush(current, input), 
+        Alignment.CENTERED, styler.getShape(current, input));
 		treeLayout.addNodeRect(current, label.getBounds());
 		
 		label.setZValue(11);
@@ -403,8 +405,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 	private Point2D addTerminalNode(AnnisNode terminal, TreeLayoutData treeLayout) {
 		GraphicsItem label = backend.makeLabel(
-				labeler.getLabel(terminal), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
-				styler.getTextBrush(terminal), Alignment.NONE, styler.getShape(terminal));
+				labeler.getLabel(terminal, input), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
+				styler.getTextBrush(terminal, input), Alignment.NONE, styler.getShape(terminal, input));
 		label.setParentItem(treeLayout.getParentItem());
 		treeLayout.addNodeRect(terminal, label.getBounds());
 		return treeLayout.getDominanceConnector(terminal, label.getBounds());
@@ -484,18 +486,18 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 			Rectangle2D targetRect = treeLayout.getRect(e.getDestination());
 			
 			CubicCurve2D curveData = secedgeCurve(treeLayout.getOrientation(), sourceRect, targetRect);
-			T secedgeElem = backend.cubicCurve(curveData, styler.getStroke(e), styler.getEdgeColor(e));
+			T secedgeElem = backend.cubicCurve(curveData, styler.getStroke(e, input), styler.getEdgeColor(e, input));
 			secedgeElem.setZValue(-2);
 			
-			T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(), new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e));
+			T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(), new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e, input));
 			arrowElem.setZValue(-1);
 			arrowElem.setParentItem(secedgeElem);
 			
 			Point2D labelPos = evaluate(curveData, 0.8);
 
 			T label = backend.makeLabel(
-					labeler.getLabel(e), labelPos, 
-					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e));
+					labeler.getLabel(e, input), labelPos, 
+					styler.getFont(e), styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
 			label.setParentItem(secedgeElem);
 			secedgeElem.setParentItem(treeLayout.getParentItem());
 		}
