@@ -24,7 +24,6 @@ import annis.resolver.ResolverEntry;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -55,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class SingleResultPanel extends CssLayout implements
+public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
 
@@ -109,7 +108,7 @@ public class SingleResultPanel extends CssLayout implements
     btInfo = new Button();
     btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
     btInfo.setIcon(ICON_RESOURCE);
-    btInfo.addListener((Button.ClickListener) this);
+    btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
 
     path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),

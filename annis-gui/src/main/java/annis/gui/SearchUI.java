@@ -17,11 +17,15 @@ package annis.gui;
 
 import annis.gui.components.screenshot.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.media.MediaController;
 import annis.gui.media.MimeTypeErrorListener;
+import annis.gui.media.impl.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.tutorial.TutorialPanel;
+import annis.gui.visualizers.IFrameResource;
+import annis.gui.visualizers.IFrameResourceMap;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
@@ -278,9 +282,32 @@ public class SearchUI extends AnnisBaseUI
         VaadinResponse response) throws IOException
       {
         checkCitation(request);
+        
+        if(request.getPathInfo() != null && request.getPathInfo().startsWith(
+          "/vis-iframe-res/"))
+        {
+          String uuidString = StringUtils.removeStart(request.getPathInfo(), "/vis-iframe-res/");
+          UUID uuid = UUID.fromString(uuidString);
+          IFrameResourceMap map = 
+            VaadinSession.getCurrent().getAttribute(IFrameResourceMap.class);
+          if(map != null)
+          {
+            IFrameResource res = map.get(uuid);
+            if(res != null)
+            {
+              response.setStatus(200);
+              response.getOutputStream().write(res.getData());
+            }
+          }
+          response.setStatus(404);
+          return true;
+        }
+        
         return false;
       }
     });
+    
+    getSession().setAttribute(MediaController.class, new MediaControllerImpl());
     
     checkCitation(request);
   }

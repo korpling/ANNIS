@@ -16,8 +16,6 @@
 package annis.gui;
 
 import annis.gui.media.MediaController;
-import annis.gui.media.MediaControllerHolder;
-import annis.gui.media.impl.MediaControllerFactoryImpl;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
@@ -43,10 +41,8 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
-import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -79,8 +75,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * the logging framework or the plugin loading to this base class.
  */
 @Theme("annis")
-public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
-  MediaControllerHolder
+public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -392,8 +387,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
 
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
 
-    pluginManager.addPluginsFrom(new ClassURI(MediaControllerFactoryImpl.class).toURI());
-
     pluginManager.addPluginsFrom(new ClassURI(RST.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(RSTFull.class).toURI());
 
@@ -457,20 +450,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable,
   public VisualizerPlugin getVisualizer(String shortName)
   {
     return visualizerRegistry.get(shortName);
-  }
-
-
-
-  @Override
-  public MediaController getMediaController()
-  {
-    return mediaController;
-  }
-
-  @Override
-  public void setMediaController(MediaController mediaController)
-  {
-    this.mediaController = mediaController;
   }
 
   public ObjectMapper getJsonMapper()

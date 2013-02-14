@@ -18,8 +18,6 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
@@ -30,11 +28,8 @@ import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.Page;
-import com.vaadin.server.Page.BrowserWindowResizeEvent;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -122,14 +117,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
-    
-    // reset all registered media players    
-    MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
-    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
-    {
-      mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent()).clearMediaPlayers();
-    }
-    
+       
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 

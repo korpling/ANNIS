@@ -139,7 +139,6 @@ public class VAutoHeightIFrame extends Widget implements Paintable
     }
 
     String url = uidl.getStringAttribute("url");
-    url = client.translateVaadinUri(url);    
 
     if(iframe.getSrc() != null && url != null && iframe.getSrc().equals(url))
     {

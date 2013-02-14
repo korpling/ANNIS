@@ -15,14 +15,19 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.VisualizationToggle;
 import annis.gui.widgets.AutoHeightIFrame;
-import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
-import java.io.ByteArrayInputStream;
+import com.vaadin.ui.UI;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -32,6 +37,7 @@ import java.util.UUID;
  */
 public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
 {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
   /**
    * Returns the character encoding for this particular Visualizer output. For
@@ -62,23 +68,29 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
 
   @Override
-  public Component createComponent(final VisualizerInput vis)
+  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle)
   { 
+   
     
-    StreamResource asResource = new StreamResource(new StreamResource.StreamSource() 
+    VaadinSession session = VaadinSession.getCurrent();
+    if(session.getAttribute(IFrameResourceMap.class) == null)
     {
-      @Override
-      public InputStream getStream()
-      {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        writeOutput(vis, outStream);
+      session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
+    }
     
-        return new ByteArrayInputStream(outStream.toByteArray());
-      }
-    }, UUID.randomUUID().toString());
-    asResource.setMIMEType(getContentType());
-    AutoHeightIFrame iframe = new AutoHeightIFrame(asResource);
+    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    writeOutput(vis, outStream);
     
+    IFrameResource res  = new IFrameResource();
+    res.setData(outStream.toByteArray());
+    res.setMimeType(getContentType());
+    
+    UUID uuid = UUID.randomUUID();
+    session.getAttribute(IFrameResourceMap.class).put(uuid, res);
+  
+    URI base = UI.getCurrent().getPage().getLocation();
+    AutoHeightIFrame iframe = 
+      new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
     return iframe;
   }
 }

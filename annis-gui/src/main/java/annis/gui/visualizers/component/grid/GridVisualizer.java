@@ -16,9 +16,8 @@
 package annis.gui.visualizers.component.grid;
 
 import annis.CommonHelper;
+import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.gui.media.impl.TimeHelper;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
@@ -26,8 +25,8 @@ import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import static annis.model.AnnisConstants.*;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -54,7 +53,6 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -68,9 +66,6 @@ import org.slf4j.LoggerFactory;
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent>
 {
   
-  @InjectPlugin
-  public MediaControllerFactory mcFactory;
-
   @Override
   public String getShortName()
   {
@@ -78,13 +73,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
   }
 
   @Override
-  public GridVisualizerComponent createComponent(VisualizerInput visInput)
+  public GridVisualizerComponent createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-    MediaController mediaController = null;
-    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
-    {
-      mediaController = mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent());
-    }
+    MediaController mediaController = VaadinSession.getCurrent().getAttribute(MediaController.class);
     GridVisualizerComponent component = new GridVisualizerComponent(visInput, mediaController);
     return component;
   }

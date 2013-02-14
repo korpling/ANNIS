@@ -17,20 +17,19 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
+import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
@@ -41,7 +40,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -56,10 +54,6 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 {
-  
-  @InjectPlugin
-  public MediaControllerFactory mcFactory;
-
   @Override
   public String getShortName()
   {
@@ -67,13 +61,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
   }
 
   @Override
-  public KWICInterface createComponent(VisualizerInput visInput)
+  public KWICInterface createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-    MediaController mediaController = null;
-    if(mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
-    {
-      mediaController = mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent());
-    }
+    MediaController mediaController = VaadinSession.getCurrent().getAttribute(MediaController.class);
     
     EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
     

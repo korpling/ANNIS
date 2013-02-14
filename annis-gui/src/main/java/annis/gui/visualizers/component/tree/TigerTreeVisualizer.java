@@ -15,10 +15,7 @@
  */
 package annis.gui.visualizers.component.tree;
 
-import annis.gui.ImagePanel;
 import annis.gui.MatchedNodeColors;
-import annis.gui.visualizers.AbstractIFrameVisualizer;
-import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.visualizers.component.AbstractImageVisualizer;
 import annis.gui.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
@@ -27,7 +24,6 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
-import com.vaadin.ui.Embedded;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import java.awt.*;
 import java.awt.geom.AffineTransform;

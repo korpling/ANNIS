@@ -16,6 +16,7 @@
 package annis.gui.visualizers;
 
 import annis.gui.AnnisBaseUI;
+import annis.gui.VisualizationToggle;
 import annis.gui.visualizers.component.KWICPanel;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -58,7 +59,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin, Serializa
    * vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput);
+  public I createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
 
   /**
    * Checks if the Plugin needs the primary text source.

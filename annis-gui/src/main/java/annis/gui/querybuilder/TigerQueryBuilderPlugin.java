@@ -16,13 +16,10 @@
 package annis.gui.querybuilder;
 
 import annis.gui.QueryController;
-import annis.gui.components.HelpButton;
-import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;

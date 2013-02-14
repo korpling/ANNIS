@@ -16,6 +16,7 @@
 package annis.gui.visualizers.component;
 
 import annis.gui.ImagePanel;
+import annis.gui.VisualizationToggle;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import com.vaadin.server.StreamResource;
@@ -41,7 +42,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractDotVisualizer.class);
   
   @Override
-  public ImagePanel createComponent(final VisualizerInput visInput)
+  public ImagePanel createComponent(final VisualizerInput visInput, VisualizationToggle visToggle)
   { 
     try
     {

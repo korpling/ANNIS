@@ -19,12 +19,14 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.AnnisResultQuery;
 import annis.gui.resultview.ResultViewPanel;
+import annis.gui.visualizers.IFrameResourceMap;
 import annis.security.AnnisUser;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
@@ -128,6 +130,14 @@ public class QueryController implements PagingCallback
 
     Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
 
+    // cleanup resources
+    VaadinSession session = VaadinSession.getCurrent();
+    session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
+    if(session.getAttribute(MediaController.class) != null)
+    {
+      session.getAttribute(MediaController.class).clearMediaPlayers();
+    }
+    
     ui.updateFragment(lastQuery);
     
     HistoryEntry e = new HistoryEntry();

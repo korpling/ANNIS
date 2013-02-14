@@ -17,14 +17,15 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.Helper;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
+import annis.gui.VisualizationToggle;
+import annis.gui.media.MediaController;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.VideoPlayer;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -45,9 +46,6 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
 
   private Logger log = LoggerFactory.getLogger(VideoVisualizer.class);
   
-  @InjectPlugin
-  public MediaControllerFactory mcFactory;
-
   @Override
   public String getShortName()
   {
@@ -55,7 +53,7 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
   }
 
   @Override
-  public VideoPlayer createComponent(VisualizerInput input)
+  public VideoPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle)
   {
     List<String> corpusPath =
       CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(), input.getDocument());
@@ -107,10 +105,10 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
     
     VideoPlayer player = new VideoPlayer(binaryServletPath, mimeType);
 
-    if (mcFactory != null && UI.getCurrent() instanceof MediaControllerHolder)
+    if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null)
     {
-      mcFactory.getOrCreate((MediaControllerHolder) UI.getCurrent())
-        .addMediaPlayer(player, input.getId(), input.getVisPanel());
+      VaadinSession.getCurrent().getAttribute(MediaController.class)
+        .addMediaPlayer(player, input.getId(), visToggle);
     }
 
     return player;

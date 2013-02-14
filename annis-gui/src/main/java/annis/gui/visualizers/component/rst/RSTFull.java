@@ -15,6 +15,7 @@
  */
 package annis.gui.visualizers.component.rst;
 
+import annis.gui.VisualizationToggle;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -34,7 +35,7 @@ public class RSTFull extends AbstractVisualizer<RSTImpl>
   }
 
   @Override
-  public RSTImpl createComponent(VisualizerInput visInput)
+  public RSTImpl createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
     return new RSTImpl(visInput);
   }

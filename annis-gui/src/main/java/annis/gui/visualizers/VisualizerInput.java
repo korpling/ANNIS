@@ -55,7 +55,6 @@ public class VisualizerInput implements Serializable
   private List<SToken> token;
   private Set<String> tokenAnnos;
   private String segmentationName;
-  private VisualizerPanel visPanel;
 
   public String getAnnisWebServiceURL()
   {
@@ -365,22 +364,5 @@ public class VisualizerInput implements Serializable
   public String getSegmentationName()
   {
     return segmentationName;
-  }
-
-  /**
-   * @return the visPanel
-   */
-  public VisualizerPanel getVisPanel()
-  {
-    return visPanel;
-  }
-
-  /**
-   * @param visPanel this should be the parent VisualizerPanel for the
-   * visualizer which render this result
-   */
-  public void setVisPanel(VisualizerPanel visPanel)
-  {
-    this.visPanel = visPanel;
   }
 }

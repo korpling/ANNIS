@@ -128,6 +128,7 @@ public class ResultViewPanel extends Panel
       {
         mainLayout.removeComponent(resultPanel);
       }
+      resultPanel = null;
 
       progressResult.setEnabled(false);
       progressResult.setVisible(false);

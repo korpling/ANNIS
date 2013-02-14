@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.media;
+package annis.gui.visualizers;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
- * A MediaControllerHolder is a bean whith a property containing
- * a {@link MediaController}.
+ * A map that holds all the iframe related resources.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public interface MediaControllerHolder
+public class IFrameResourceMap extends HashMap<UUID, IFrameResource>
 {
-  /**
-   * Getter for the {@link MediaController}. Might return {@code null}.
-   * @return The {@link MediaController} holded by this bean or {@code null}.
-   */
-  public MediaController getMediaController();
-  /**
-   * Setter for the {@link MediaController}
-   * @param mediaController 
-   */
-  public void setMediaController(MediaController mediaController);
+  
 }

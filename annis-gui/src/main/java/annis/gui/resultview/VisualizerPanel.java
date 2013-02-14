@@ -27,7 +27,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -39,6 +38,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends CustomLayout
+public class VisualizerPanel extends VerticalLayout
   implements Button.ClickListener, VisualizationToggle
 {
 
@@ -105,7 +105,6 @@ public class VisualizerPanel extends CustomLayout
 
   private String resultID;
 
-  ;
   private transient VisualizerPlugin visPlugin;
 
   private Set<String> visibleTokenAnnos;
@@ -119,6 +118,8 @@ public class VisualizerPanel extends CustomLayout
   private final String HIDDEN = "hidden";
 
   private final String PRELOADED = "preloaded";
+  
+  private ProgressIndicator progress;
 
   private final static String htmlTemplate =
     "<div id=\":id\"><div location=\"btEntry\"></div>"
@@ -145,9 +146,6 @@ public class VisualizerPanel extends CustomLayout
     String segmentationName,
     PluginSystem ps) throws IOException
   {
-    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes(
-      "UTF-8")));
-
     visPlugin = ps.getVisualizer(entry.getVisType());
 
     this.ps = ps;
@@ -163,6 +161,8 @@ public class VisualizerPanel extends CustomLayout
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
+    
+    this.progress = new ProgressIndicator();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -185,8 +185,8 @@ public class VisualizerPanel extends CustomLayout
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addListener((Button.ClickListener) this);
-        addComponent(btEntry, "btEntry");
+        btEntry.addClickListener((Button.ClickListener) this);
+        addComponent(btEntry);
       }
       else
       {
@@ -199,8 +199,8 @@ public class VisualizerPanel extends CustomLayout
           btEntry.setIcon(ICON_COLLAPSE);
           btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
             + ChameleonTheme.BUTTON_SMALL);
-          btEntry.addListener((Button.ClickListener) this);
-          addComponent(btEntry, "btEntry");
+          btEntry.addClickListener((Button.ClickListener) this);
+          addComponent(btEntry);
         }
 
 
@@ -211,7 +211,7 @@ public class VisualizerPanel extends CustomLayout
           if (vis != null)
           {
             vis.setVisible(true);
-            addComponent(vis, "iframe");
+            addComponent(vis);
           }
         }
         catch (Exception ex)
@@ -248,7 +248,7 @@ public class VisualizerPanel extends CustomLayout
 
     final VisualizerInput input = createInput();
 
-    Component c = visPlugin.createComponent(input);
+    Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
 
     return c;
@@ -267,7 +267,6 @@ public class VisualizerPanel extends CustomLayout
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
     input.setMarkedAndCovered(markedAndCovered);
-    input.setVisPanel(this);
 
     input.setResult(result);
     input.setToken(token);
@@ -397,15 +396,15 @@ public class VisualizerPanel extends CustomLayout
                 }
               }
 
-              removeComponent("progress");
-
+              if(getComponentIndex(progress) > -1)
+              {
+                removeComponent(progress);
+              }
+              
               if (vis != null)
               {
                 vis.setVisible(true);
-                if (getComponent("iframe") == null)
-                {
-                  addComponent(vis, "iframe");
-                }
+                addComponent(vis);
               }
             }
             finally
@@ -449,13 +448,13 @@ public class VisualizerPanel extends CustomLayout
 
 
       btEntry.setIcon(ICON_COLLAPSE);
-      ProgressIndicator progress = new ProgressIndicator();
+     
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setPollingInterval(250);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      addComponent(progress, "progress");
+      addComponent(progress);
     }
     // end if create input was needed
 
