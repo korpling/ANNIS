@@ -19,7 +19,6 @@ import annis.gui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
-import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -30,18 +29,11 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -49,7 +41,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
  *
  * @author thomas
  */
-public class QueryPanel extends Panel implements TextChangeListener,
+public class QueryPanel extends GridLayout implements TextChangeListener,
   ValueChangeListener
 {
   
@@ -67,61 +59,56 @@ public class QueryPanel extends Panel implements TextChangeListener,
   private ListSelect lstHistory;
   private QueryController controller;
   private ProgressIndicator piCount;
-  private GridLayout mainLayout;
-  private Panel panelStatus;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
   
   public QueryPanel(final QueryController controller)
   {
+    super(2,3);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
     
-    setSizeFull();
-   
-    mainLayout = new GridLayout(2, 3);
-    setContent(mainLayout);
-    mainLayout.setSizeFull();
-    mainLayout.setSpacing(true);
-    mainLayout.setMargin(true);
+    setSpacing(true);
+    setMargin(true);
 
-    mainLayout.addComponent(new Label("AnnisQL:"), 0, 0);
-    mainLayout.addComponent(new Label("Status:"), 0, 2);
+    addComponent(new Label("AnnisQL:"), 0, 0);
+    addComponent(new Label("Status:"), 0, 2);
 
-    mainLayout.setRowExpandRatio(0, 1.0f);
-    mainLayout.setColumnExpandRatio(0, 0.2f);
-    mainLayout.setColumnExpandRatio(1, 0.8f);
+    setRowExpandRatio(0, 1.0f);
+    setColumnExpandRatio(0, 0.2f);
+    setColumnExpandRatio(1, 0.8f);
 
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
-    txtQuery.setSizeFull();
+    txtQuery.setWidth("100%");
+    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
+    
 
-    mainLayout.addComponent(txtQuery, 1, 0);
+    addComponent(txtQuery, 1, 0);
 
-    panelStatus = new Panel();
-    panelStatus.setWidth(100f, Unit.PERCENTAGE);
-    panelStatus.setHeight(3.5f, Unit.EM);
     VerticalLayout panelStatusLayout = new VerticalLayout();
-    panelStatus.setContent(panelStatusLayout);
-    panelStatusLayout.setSizeFull();
-
+    panelStatusLayout.setHeight(3.5f, Unit.EM);
+    panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
+    
+    
     lblStatus = new Label();
     lblStatus.setContentMode(ContentMode.HTML);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
-    lblStatus.setHeight("-1px");
+    lblStatus.setHeight(3.5f, Unit.EM);
+    lblStatus.addStyleName("border-layout");
 
     panelStatusLayout.addComponent(lblStatus);
 
-    mainLayout.addComponent(panelStatus, 1, 2);
+    addComponent(panelStatusLayout, 1, 2);
 
     HorizontalLayout buttonLayout = new HorizontalLayout();
     buttonLayout.setWidth("100%");
-    mainLayout.addComponent(buttonLayout, 1, 1);
+    addComponent(buttonLayout, 1, 1);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);

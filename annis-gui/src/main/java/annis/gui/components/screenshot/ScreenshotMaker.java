@@ -48,6 +48,9 @@ public class ScreenshotMaker extends AbstractJavaScriptComponent
   {
     Validate.notNull(callback);
     
+    setHeight(0.0f, Unit.PIXELS);
+    setWidth(0.0f, Unit.PIXELS);
+    
     addFunction("finishedScreenshot", new JavaScriptFunction() 
     {
       @Override

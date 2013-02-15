@@ -16,42 +16,28 @@
 package annis.gui.tutorial;
 
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.PaintException;
-import com.vaadin.server.PaintTarget;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *
  * @author thomas
  */
-public class TutorialPanel extends Panel
+public class TutorialPanel extends VerticalLayout
 {
   private Embedded embedded;
   public TutorialPanel()
   {
     setSizeFull();   
     
-    HorizontalLayout layout = new HorizontalLayout();
-    layout.setSizeFull();
-    setContent(layout);
-    
     embedded = new Embedded();
     embedded.setSizeFull();
-    layout.addComponent(embedded);
+    addComponent(embedded);
 
     String contextPath = VaadinService.getCurrentRequest().getContextPath();
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setSource(new ExternalResource(contextPath + "/tutorial/index.html"));
     
   }
-
-  @Override
-  public void paintContent(PaintTarget target) throws PaintException
-  {
-    super.paintContent(target);
-  }
-  
 }

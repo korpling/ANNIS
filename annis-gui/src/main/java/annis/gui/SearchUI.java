@@ -112,11 +112,9 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.setWidth("100%");
     layoutToolbar.setHeight("-1px");
 
-    Panel panelToolbar = new Panel(layoutToolbar);
-    panelToolbar.setWidth("100%");
-    panelToolbar.setHeight("-1px");
-    mainLayout.addComponent(panelToolbar);
-    panelToolbar.addStyleName("toolbar");
+    mainLayout.addComponent(layoutToolbar);
+    layoutToolbar.addStyleName("toolbar");
+    layoutToolbar.addStyleName("border-layout");
 
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -139,7 +137,7 @@ public class SearchUI extends AnnisBaseUI
     });
     
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
-    mainLayout.addComponent(screenshot);
+    layoutToolbar.addComponent(screenshot);
 
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -230,12 +228,8 @@ public class SearchUI extends AnnisBaseUI
     HorizontalLayout hLayout = new HorizontalLayout();
     hLayout.setSizeFull();
 
-    Panel hPanel = new Panel(hLayout);
-    hPanel.setSizeFull();
-    hPanel.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    mainLayout.addComponent(hPanel);
-    mainLayout.setExpandRatio(hPanel, 1.0f);
+    mainLayout.addComponent(hLayout);
+    mainLayout.setExpandRatio(hLayout, 1.0f);
 
     controlPanel = new ControlPanel(queryController, instanceConfig);
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.UNITS_PIXELS);
@@ -243,6 +237,7 @@ public class SearchUI extends AnnisBaseUI
     hLayout.addComponent(controlPanel);
 
     tutorial = new TutorialPanel();
+    tutorial.setHeight("99%");
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();

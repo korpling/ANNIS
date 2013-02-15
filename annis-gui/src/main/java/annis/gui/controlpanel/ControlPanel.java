@@ -61,8 +61,9 @@ public class ControlPanel extends Panel
     searchOptions = new SearchOptionsPanel();
 
     queryPanel = new QueryPanel(controller);
-    queryPanel.setHeight(18f, Layout.UNITS_EM);
-
+    queryPanel.setHeight("-1px");
+    queryPanel.setWidth("100%");
+    
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);

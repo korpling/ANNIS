@@ -13,6 +13,10 @@ body .v-app-loading {
   background-color: #ecf0f6;
 }
 
+.control .v-layout {
+  background-color: #ecf0f6;
+}
+
 .v-table-cell-wrapper {
   white-space: normal;
 }
@@ -84,7 +88,7 @@ body .v-app-loading {
 }
 
 .v-label-opensource {
-    font-size: 14pt;
+    font-size: 14pt !important;
 }
 
 
@@ -129,6 +133,12 @@ textarea.query {
 
 .contextsensible-formlayout .v-filterselect {
   float:left;
+}
+
+.border-layout {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #b3b3b3;  
 }
 
 /* matched node colors by match index*/
