@@ -278,17 +278,7 @@ public class TigerQueryBuilderCanvas extends Panel
   public void addNode()
   {
     final NodeWindow n = new NodeWindow(number++, this);
-
-//    DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-//    nodes.put(n, wrapper);
-//
-//
-//    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
-//    wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
-//    wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
-//    wrapper.addStyleName("tigerquery-builder-overlay");
-//    wrapper.setImmediate(true);
-  
+   
     GripDragComponent panel = new GripDragComponent(n);
     panel.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
     panel.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);

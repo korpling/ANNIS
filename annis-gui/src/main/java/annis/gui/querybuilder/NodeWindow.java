@@ -20,6 +20,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.MarginInfo;
 
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -38,7 +39,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
 {
   
   public static final int HEIGHT=100;
-  public static final int WIDTH=200;
+  public static final int WIDTH=250;
   
   private static final String[] NODE_OPERATORS = new String[] 
   {
@@ -70,32 +71,43 @@ public class NodeWindow extends Panel implements Button.ClickListener
       annoNames.add(a.replaceFirst("^[^:]*:", ""));
     }
     constraints = new ArrayList<ConstraintLayout>();
-
-    setWidth("99%");
-    setHeight("99%");
-
+    
+    setSizeFull();
+    
+    // HACK: use our own border since the one from chameleon does not really work
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    addStyleName("border-layout");
+    addStyleName("solid-white-background");
+    
     prepareEdgeDock = false;
 
     vLayout = new VerticalLayout();
     setContent(vLayout);
+    vLayout.setWidth("100%");
+    vLayout.setHeight("-1px");
     vLayout.setMargin(false);
+    vLayout.setSpacing(false);
 
     toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
     toolbar.setWidth("100%");
     toolbar.setHeight("-1px");
+    toolbar.setMargin(false);
+    toolbar.setSpacing(false);
     vLayout.addComponent(toolbar);
 
-    btMove = new Button();
+    btMove = new Button("");
     btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
     btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
     btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
+   
     
-    btEdge = new Button("Add Edge");
-    btEdge.addListener((Button.ClickListener) this);
-    btEdge.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btEdge = new Button("");
+    btEdge.setIcon(new ThemeResource("tango-icons/22x22/go-jump.png"));
+    btEdge.addClickListener((Button.ClickListener) this);
+    btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
       + "two nodes click this button first. "
@@ -105,34 +117,34 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btEdge.setImmediate(true);
     toolbar.addComponent(btEdge);
     
-    btAdd = new Button();
+    btAdd = new Button("");
     btAdd.setIcon(new ThemeResource("tango-icons/22x22/list-add.png"));
-    btAdd.setStyleName(ChameleonTheme.BUTTON_LINK);
-    btAdd.addListener((Button.ClickListener) this);
+    btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btAdd.addClickListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
       + "Every condition will constraint the node described by this window. "
       + "Most conditions limit the node by defining which annotations and which "
       + "values of the annotation a node needs to have.");
-    
     toolbar.addComponent(btAdd);
-    btClear = new Button();
+    
+    btClear = new Button("");
     btClear.setIcon(new ThemeResource("tango-icons/22x22/edit-clear.png"));
-    btClear.setStyleName(ChameleonTheme.BUTTON_LINK);
-    btClear.addListener((Button.ClickListener) this);
+    btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btClear.addClickListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
-      
     toolbar.addComponent(btClear);
 
-    btClose = new Button();
+    btClose = new Button("");
     btClose.setIcon(new ThemeResource("tango-icons/22x22/process-stop.png"));
     btClose.setDescription("<strong>Close</strong><br />Close this node description window");
-    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
-    btClose.addListener((Button.ClickListener) this);
+    btClose.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.addClickListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
     toolbar.setComponentAlignment(btMove, Alignment.MIDDLE_LEFT);
     toolbar.setComponentAlignment(btEdge, Alignment.MIDDLE_CENTER);
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
+
   }
 
   public void setPrepareEdgeDock(boolean prepare)
@@ -147,10 +159,12 @@ public class NodeWindow extends Panel implements Button.ClickListener
     if(prepare)
     {
       btEdge.setCaption("Dock");
+      btEdge.setIcon(new ThemeResource("pixel.png"));
     }
     else
     {
-      btEdge.setCaption("Add Edge");
+      btEdge.setIcon(new ThemeResource("tango-icons/22x22/go-jump.png"));
+      btEdge.setCaption("");
     }
   }
 
@@ -168,6 +182,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       {
         parent.prepareAddingEdge(this);
         setPrepareEdgeDock(true);
+        btEdge.setIcon(new ThemeResource("pixel.png"));
         btEdge.setCaption("Cancel");
       }
     }

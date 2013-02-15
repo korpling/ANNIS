@@ -141,6 +141,10 @@ textarea.query {
   border-color: #b3b3b3;  
 }
 
+.solid-white-background {
+  background-color: rgb(255,255,255);
+}
+
 /* matched node colors by match index*/
 .v-table-cell-content-match_1 {
   color: rgb(255,0,0);

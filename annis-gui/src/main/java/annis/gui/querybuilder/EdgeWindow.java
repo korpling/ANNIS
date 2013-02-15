@@ -52,6 +52,11 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     setSizeFull();
     
+    // HACK: use our own border since the one from chameleon does not really work
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    addStyleName("border-layout");
+    addStyleName("solid-white-background");
+    
     VerticalLayout vLayout = new VerticalLayout();
     setContent(vLayout);
     vLayout.setMargin(false);
