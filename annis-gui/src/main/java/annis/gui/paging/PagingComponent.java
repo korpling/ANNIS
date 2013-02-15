@@ -105,26 +105,30 @@ public class PagingComponent extends CustomComponent implements
     btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
-    btFirst.addListener((Button.ClickListener) this);
+    btFirst.addClickListener((Button.ClickListener) this);
     btFirst.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btFirst.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btLast = new Button();
     btLast.setIcon(LAST);
     btLast.setDescription("jump to last page");
-    btLast.addListener((Button.ClickListener) this);
+    btLast.addClickListener((Button.ClickListener) this);
     btLast.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btLast.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btNext = new Button();
     btNext.setIcon(RIGHT_ARROW);
     btNext.setDescription("jump to next page");
-    btNext.addListener((Button.ClickListener) this);
+    btNext.addClickListener((Button.ClickListener) this);
     btNext.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btNext.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btPrevious = new Button();
     btPrevious.setIcon(LEFT_ARROW);
     btPrevious.setDescription("jump to previous page");
     btPrevious.addClickListener((Button.ClickListener) this);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btPrevious.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     txtPage = new TextField();
     txtPage.setDescription("current page");
