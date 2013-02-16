@@ -19,6 +19,10 @@ import annis.gui.MatchedNodeColors;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import static annis.model.AnnisConstants.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -163,19 +167,19 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     count++;
 
     jit = new JITWrapper();
-    this.addComponent(jit);
-
+    addComponent(jit);
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
+    jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
-
 
   }
 
   private void addScrollbar()
   {
-    this.setWidth(this.getParent().getWidth(), this.getParent().getWidthUnits());
+    this.setWidth("100%");
+    this.setHeight("-1px");
     this.getContent().setSizeUndefined();
   }
 
@@ -185,9 +189,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     EList<SNode> rootSNodes = graph.getSRoots();
 
     // debug output
-    Salt2DOT s2d = new Salt2DOT();
-    s2d.salt2Dot(graph, URI.createFileURI(
-      "/tmp/graph_" + graph.getSName() + ".dot"));
+    if (log.isDebugEnabled())
+    {
+      Salt2DOT s2d = new Salt2DOT();
+      s2d.salt2Dot(graph, URI.createFileURI(
+        "/tmp/graph_" + graph.getSName() + ".dot"));
+    }
+
 
     if (rootSNodes.size() > 0)
     {
@@ -249,19 +257,20 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     log.debug("result json string: {}", result);
 
-    try
+    if (log.isDebugEnabled())
     {
-
-      String path = "/tmp/" + "json.js";
-      FileOutputStream out = new FileOutputStream(path);
-      out.write(("var json = " + result).toString().getBytes("UTF-8"));
-      out.close();
+      try
+      {
+        String path = "/tmp/" + "json.js";
+        FileOutputStream out = new FileOutputStream(path);
+        out.write(("var json = " + result).toString().getBytes("UTF8"));
+        out.close();
+      }
+      catch (Exception ex)
+      {
+        log.error("writing json failed", ex);
+      }
     }
-    catch (Exception ex)
-    {
-      log.error("writing json failed", ex);
-    }
-
     return result.toString();
   }
 
@@ -397,17 +406,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         {
           if (e instanceof SRelation && hasRSTType((SRelation) e))
           {
-            JSONObject tmp = st.pop();
+            JSONObject tmp;
 
-            st.peek().append("children", node);
+
+            if (st.size() > 1)
+            {
+              tmp = st.pop();
+              st.peek().append("children", node);
+              sortChildren(st.peek());
+              st.push(tmp);
+            }
+            else
+            {
+              result.append("children", node);
+            }
+
             setSentenceSpan(node, st.peek());
-            sortChildren(st.peek());
-
-            // do not draw a line to the moved up node
-//            st.peek().getJSONObject("data").put("invisibleRelations",
-//              getUniStrId(currSnode));
-
-            st.push(tmp);
             isAppendedToParent = true;
             break;
           }
@@ -448,6 +462,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       try
       {
         result.append("children", st.pop());
+        sortChildren(result);
       }
       catch (JSONException ex)
       {
@@ -756,6 +771,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   {
     super.attach();
     addScrollbar();
+    setScrollable(true);
+
   }
 
   private boolean hasRSTType(SRelation e)

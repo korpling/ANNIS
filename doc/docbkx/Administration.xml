@@ -28,21 +28,22 @@
         <title>Installing an ANNIS public server</title>
         <para>The ANNIS server version can be installed on UNIX based server, or else under Windows
             using <link xlink:href="http://www.cygwin.com/">Cygwin</link>, the freely available UNIX
-            emulator. To install the ANNIS server: 
-            <procedure>
+            emulator. To install the ANNIS server: <procedure>
                 <step>
                     <para>Install a PostgreSQL 9.2 server for your operating system from <link
                             xlink:href="http://www.postgresql.org/download/"
                             >http://www.postgresql.org/download/</link> and <emphasis role="bold"
                             >make a note of the administrator password you set during the
                             installation</emphasis>. </para>
-                    <note><para>Under Linux, you might have to set the
-                        PostgreSQL password manually. E.g. on Ubuntu you can achieve this with by running the following
-                        commands:</para>
-                    <para>
-                        <programlisting>sudo -u postgres psql
+                    <note>
+                        <para>Under Linux, you might have to set the PostgreSQL password manually.
+                            E.g. on Ubuntu you can achieve this with by running the following
+                            commands:</para>
+                        <para>
+                            <programlisting>sudo -u postgres psql
 \password
-\q</programlisting></para></note>
+\q</programlisting></para>
+                    </note>
                 </step>
                 <step>
                     <para>Install a web server such as <link xlink:href="http://tomcat.apache.org/"
@@ -104,7 +105,7 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                 <step>
                     <para>To get the ANNIS front-end running, first download it: <link
                             xlink:href="https://github.com/downloads/korpling/ANNIS/annis-gui-${project.version}.war"
-                            >annis-gui-${project.version}.war</link>  and deploy it to your Java
+                            >annis-gui-${project.version}.war</link> and deploy it to your Java
                         servlet container (this is depending on the servlet container you
                         use).</para>
                 </step>
@@ -129,7 +130,7 @@ export PATH=$PATH:$ANNIS_HOME/bin</programlisting>
                 of the <filename>conf/shiro.ini</filename> configuration file. This allows a much
                 more individual configuration and the usage of external authorization services like
                 LDAP. </para>
-            
+
             <section>
                 <title>Configuration file location</title>
                 <para>There is a central location where the user configuration files are stored.
@@ -151,13 +152,13 @@ globalPermResolver = annis.security.ANNISRolePermissionResolver
                 <procedure>
                     <step>
                         <para>Create a file "groups" in the user-configuration directory (e.g.
-                            <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
+                                <filename>/etc/annis/user_config_trunk/groups</filename>):<programlisting>group1=pcc3,falko,tiger2
 group2=pcc3
 group3=tiger1
 demo=pcc2,falko</programlisting>This
                             example means that a member of group group1 will have access to corpora
                             with the names pcc3,falko, tiger2 (corpus names can be displayed with
-                            "<command>annis-admin.sh list</command>").</para>
+                                "<command>annis-admin.sh list</command>").</para>
                     </step>
                     <step>
                         <para>Create a subdirectory <filename>users</filename></para>
@@ -242,7 +243,90 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                executor="tomcatThreadPool" /> </screen></para>
             </section>
         </section>
-        
+        <section>
+            <title>General configuration advices</title>
+            <para>The ANNIS frontend will search in different folders for it's configuration.<table
+                    frame="all">
+                    <title>Folders for configuration</title>
+                    <tgroup cols="2">
+                        <colspec colname="c1" colnum="1" colwidth="1.0*"/>
+                        <colspec colname="c2" colnum="2" colwidth="1.0*"/>
+                        <thead>
+                            <row>
+                                <entry>Folder</entry>
+                                <entry>Description</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry><filename>&lt;Installation>/WEB-INF/conf/</filename></entry>
+                                <entry>Default configuration inside the deployed web application
+                                    folder. Should not be changed.</entry>
+                            </row>
+                            <row>
+                                <entry><envar>$ANNIS_CFG</envar> or
+                                    <filename>/etc/annis/</filename></entry>
+                                <entry>The global configuration folder defined by the environment
+                                    variable <envar>ANNIS_CFG</envar> or a default path if not
+                                    set.</entry>
+                            </row>
+                            <row>
+                                <entry><envar>~/.annis/</envar></entry>
+                                <entry>User specific configuration inside the
+                                        <filename>.annis</filename> sub-folder inside the user's
+                                    home folder </entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table></para>
+            <para>Configuration files can be either in the <link
+                    xlink:href="http://en.wikipedia.org/w/index.php?title=.properties&amp;oldid=521500688"
+                    >Java Properties</link> or <link xlink:href="http://www.json.org/">JSON</link>
+                format. Configuration files from the user directory can overwrite the global
+                configuration and the global configuration overwrites the default
+                configuration.</para>
+        </section>
+        <section>
+            <title>Create and configure instances</title>
+            <para>When multiple corpora from different sources are hosted on one server it is often
+                still desired to group the corpora by their origin and present them differently. You
+                should not be forced to have an ANNIS frontend and service installation for each of
+                this groups. Instead the administrator can define so called instances.</para>
+            <para>An instance is defined by a JSON file inside the <filename>instances</filename>
+                sub-folder in one of the configuration locations. The name of the file also defines
+                the instance name. Thus the file <filename>instances/falko.json</filename> defines
+                the instance named
+                "falko".<programlisting>{
+ "display-name": "Falko",
+ "default-querybuilder": "tigersearch",
+ "default-corpusset": "falko-essays",
+ "corpus-sets": [
+  {
+    "name": "falko-essays", 
+    "corpus": ["falko-essay-l1", "falko-essay-l2"]
+  },
+  {
+    "name": "falko-summaries", 
+    "corpus": ["falko-summary-l1", "falko-summary-l2"]
+  }
+ ]
+}</programlisting></para>
+            <para>Each instance configuration can have a verbose <code>display-name</code> which is
+                displayed in the title of the browser window. <code>default-querybuilder</code>
+                defines the short name of the query builder you want to use. Currently only
+                "tigersearch" is available, see the developer guide if you want to add your own
+                query builder.</para>
+            <para>While any user can group corpora into corpus sets for their own, you can define
+                corpus sets for the whole instance. Each corpus set is an JSON-object with a name
+                and a list of corpora that belong to the corpus set.</para>
+            <para>Any defined instance is assigned a special URL at which it can be accessed:
+                    <code>http://&lt;server>/annis-gui/app/instance-&lt;name></code>. The
+                    <code>default</code> instance is additionally accessible by not specifying any
+                instance name in the URL. You can configure your web server (e.g. Apache) to rewrite
+                the URLs if you need a more project specific and less "technical" URL (e.g.
+                    <code>http://&lt;server>/falko</code>).</para>
+        </section>
+
         <section>
             <title>Configuring Visualizations </title>
             <section>
@@ -250,26 +334,30 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                 <para>By default, ANNIS displays all search results in the Key Word in Context
                     (KWIC) view in the search result window. Further visualizations, such as syntax
                     trees or grid views, are displayed by default based on the following namespaces:
-                        <informaltable frame="void">
-                        <tbody>
-                            <tr>
-                                <td>Nodes with the namespace tiger:</td>
-                                <td>tree visualizer</td>
-                            </tr>
-                            <tr>
-                                <td>Nodes with the namespace exmaralda:</td>
-                                <td>grid visualizer</td>
-                            </tr>
-                            <tr>
-                                <td>Edges with the namespace mmax:</td>
-                                <td>discourse view</td>
-                            </tr>
-                            <tr>
-                                <td>Nodes with the namespace external:</td>
-                                <td>multimedia player</td>
-                            </tr>
-                        </tbody>
-                    </informaltable> In these cases the namespaces are usually taken from the source
+                        <informaltable frame="all">
+                        <tgroup cols="2">
+                            <colspec colname="c1" colnum="1" colwidth="1.0*"/>
+                            <colspec colname="c2" colnum="2" colwidth="1.0*"/>
+                            <tbody>
+                                <row>
+                                    <entry>Nodes with the namespace tiger:</entry>
+                                    <entry>tree visualizer</entry>
+                                </row>
+                                <row>
+                                    <entry>Nodes with the namespace exmaralda:</entry>
+                                    <entry>grid visualizer</entry>
+                                </row>
+                                <row>
+                                    <entry>Edges with the namespace mmax:</entry>
+                                    <entry>discourse view</entry>
+                                </row>
+                                <row>
+                                    <entry>Nodes with the namespace external:</entry>
+                                    <entry>multimedia player</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </informaltable>In these cases the namespaces are usually taken from the source
                     format in which the corpus was generated, and carried over into relAnnis during
                     the conversion. It is also possible to use other namespaces, most easily when
                     working with PAULA XML. In PAULA XML, the namespace is determined by the string
@@ -443,11 +531,63 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                                 </mediaobject>
                                             </screenshot></para>
                                     </listitem>
+                                    <listitem>
+                                        <para><emphasis>rst</emphasis> - imitates the RST-diagrams
+                                            from the RST-Tool (<link
+                                                xlink:href="http://www.wagsoft.com/RSTTool/"
+                                                >RSTTool</link>)</para>
+                                        <para>Note, that the rst-xml-format models edges beetwen
+                                            nucleus and satellite the other way around, than in the
+                                            common visualization of rst-graphs. So the dominance
+                                            relation between nodes must be defined in AQL like that: </para>
+                                        <para>
+                                            <programlisting>node &amp; node &amp; "Therefore" &amp; #1 >rst[relname="nonvolitional-result"] #2 &amp; #2 > #3</programlisting>
+                                        </para>
+                                        <para>The AQL-Query above searches for a sattelite which
+                                            contains the token "Therefore" and dominates a node with
+                                            the rst edge type "nonvolitional-result". Important is,
+                                            that the first note dominates the second one, also the
+                                            visualization shows it the other way around. </para>
+                                        <para><screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata fileref="images/rst_vis.png" width="70%"
+                                                        align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                            <para>Further the rst relations are not modeled as
+                                            pointing relations, so the <code>-></code> Operator
+                                            obviously does not provide a result.</para>
+                                    </listitem>
                                 </itemizedlist></para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="italic">display_name</emphasis> determines the
                                 heading that is shown for each visualizer in the interface</para>
+                        </listitem>
+                        <listitem>
+                            <para><emphasis role="italic">visibility</emphasis>determines the
+                                visibility state of the visualizer. Valid values are:</para>
+                            <itemizedlist>
+                                <listitem>
+                                    <para><emphasis>permanent</emphasis> - the visualizer is shown
+                                        and not closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>hidden</emphasis> - the visualizer is hidden,
+                                        but expandable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>visible</emphasis> - the visualizer is visible
+                                        and closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>preload</emphasis> - behaviour is the same as
+                                        hidden, but the visualizer starts to rendering in the
+                                        background.</para>
+                                </listitem>
+                            </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="italic">order</emphasis> determines the order in
@@ -494,6 +634,14 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                             grid levels visualize the same annotation name at
                                             different hierarchical depths.</para>
                                     </listitem>
+                                    <listitem>
+                                        <para><emphasis role="italic">arch_dependency</emphasis> –
+                                            if a annotation key is specified with
+                                                <userinput>node_key:key</userinput>, all nodes which
+                                            carry this annotation are searched for pointing
+                                            relations and instead token the annotation value is
+                                            used.</para>
+                                    </listitem>
                                 </itemizedlist></para>
                         </listitem>
                     </itemizedlist></para>
@@ -524,13 +672,7 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                     set for the ANNIS service in the file
                         <filename>&lt;service-home>/conf/annis-service.properties</filename> Using
                     the syntax, e.g. for a maximum context of 10 tokens:
-                    <programlisting>annis.max-context=1025</programlisting> To configure which steps
-                    are actually shown in the front-end (up to the maximum allowed by the service
-                    above) and the default context selected on login, configure the file:
-                        <filename>&lt;annis-web-home->/javascript/annis/config.js</filename> With
-                    the syntax:
-                    <programlisting>var search_context = [[0], [1], [2], [5], [10]]; 
-var search_context_default = 5;</programlisting></para>
+                    <programlisting>annis.max-context=10</programlisting></para>
             </section>
         </section>
     </section>
