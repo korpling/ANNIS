@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.ValueMap;
 
 /**
  *
@@ -96,7 +97,14 @@ public class VJITWrapper extends Widget implements Paintable
       jsonData = parseStringToJSON(uidl.getStringAttribute("visData"));
 
       // setup config for visualization
-      setupConfig();
+      if (uidl.hasAttribute("mappings"))
+      {
+        setupConfig(uidl.getMapAttribute("mappings"));
+      }
+      else
+      {
+        setupConfig();
+      }
 
       if (visualization == null)
       {
@@ -134,9 +142,28 @@ public class VJITWrapper extends Widget implements Paintable
     return json;
   }
 
+  private void setupConfig(ValueMap mappings)
+  {
+    if (config == null)
+    {
+      config = new JITConf();
+    }
+
+    for (String key : mappings.getKeySet())
+    {
+      config.setProperty(key, mappings.getString(key));
+    }
+
+    setupConfig();
+  }
+
   private void setupConfig()
   {
-    config = new JITConf();
+    if (config == null)
+    {
+      config = new JITConf();
+    }
+
     config.setProperty("json", jsonData);
     config.setProperty("wrapper", elementID);
     config.setProperty("container", "container_" + elementID);

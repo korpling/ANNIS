@@ -93,6 +93,7 @@ public class MainApp extends Application implements PluginSystem,
     MainApp.class);
 
   public final static String USER_KEY = "annis.gui.MainApp:USER_KEY";
+  public final static String WEBSERVICEURL_KEY = "annis.gui.MainApp:WEBSERVICEURL_KEY";
 
   public final static String CITATION_KEY = "annis.gui.MainApp:CITATION_KEY";
 
@@ -118,7 +119,14 @@ public class MainApp extends Application implements PluginSystem,
   {
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties(applicationProperties, "annis-gui.properties", context);
-
+    
+    // store the webservice URL property explicitly in the session in order to 
+    // access it from the "external" servlets
+    HttpSession session = ((WebApplicationContext) context).
+      getHttpSession();
+    session.setAttribute(WEBSERVICEURL_KEY, applicationProperties.getProperty(
+      Helper.KEY_WEB_SERVICE_URL));
+    
     super.start(applicationUrl, applicationProperties, context);
   }
 
