@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
@@ -82,14 +83,16 @@ public class BinaryServlet extends HttpServlet
 
       String range = request.getHeader("Range");
 
-
-      String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
-      if(annisServiceURL == null)
+      HttpSession session = request.getSession();
+      Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
+      
+      if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
         throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
       }
       
-      HttpSession session = request.getSession();
+      String annisServiceURL = (String) annisServiceURLObject;
+      
       WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
       
       WebResource binaryRes = annisRes.path("query").path("corpora")

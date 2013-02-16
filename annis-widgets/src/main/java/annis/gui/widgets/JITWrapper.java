@@ -20,6 +20,7 @@ import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
+import java.util.Properties;
 
 /**
  *
@@ -28,14 +29,15 @@ import com.vaadin.ui.ClientWidget;
 @ClientWidget(VJITWrapper.class)
 public class JITWrapper extends AbstractComponent
 {
-  
+
   private String visData = null;
+
+  private Properties mappings = null;
 
   public JITWrapper()
   {
     super();
-  }  
-  
+  }
 
   @Override
   public void paintContent(PaintTarget target)
@@ -44,11 +46,20 @@ public class JITWrapper extends AbstractComponent
     super.paintContent(target);
 
     target.addAttribute("visData", visData);
+    
+    if (mappings.size() > 0)
+    {
+      target.addAttribute("mappings", mappings);
+    }
   }
-
 
   public void setVisData(String visData)
   {
     this.visData = visData;
+  }
+
+  public void setProperties(Properties props)
+  {
+    this.mappings = props;
   }
 }
