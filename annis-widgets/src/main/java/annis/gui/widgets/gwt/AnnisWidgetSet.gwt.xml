@@ -7,7 +7,10 @@
 	<!-- Inherit DefaultWidgetSet -->
 	<inherits name="com.vaadin.DefaultWidgetSet" />
 
+  <inherits name="com.google.common.collect.Collect" />
   <inherits name="com.google.gwt.json.JSON" />
+  <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+  
 
 	<!-- Widgetset default theme -->
 	<!-- This is relative to widgetset_directory/public -->
@@ -33,8 +36,4 @@
    <add-linker name="xsiframe" />
    <set-configuration-property name="devModeRedirectEnabled" value="true" />
 
-    <inherits name="com.google.common.collect.Collect" />
-
-
-    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
 </module>

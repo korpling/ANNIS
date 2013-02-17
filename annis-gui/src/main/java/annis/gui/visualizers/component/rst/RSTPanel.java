@@ -15,14 +15,14 @@
  */
 package annis.gui.visualizers.component.rst;
 
+import annis.gui.components.CssRenderInfo;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
+import com.google.gwt.resources.css.ast.CssProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import java.util.Properties;
-import org.vaadin.csstools.RenderInfo;
-import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
 
 /**
  * RSTPanel manages the scrollbuttons and calles then {@link RSTImpl} the actual
@@ -41,7 +41,8 @@ public class RSTPanel extends Panel
     final int scrollStep = 200;
 
     // the calculation of the output json is done here.
-    final Panel rstView = new RSTImpl(visInput);
+    final RSTImpl rstView = new RSTImpl(visInput);
+    
 
     this.setHeight("-1px");
     this.setWidth("100%");
@@ -85,17 +86,12 @@ public class RSTPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        final Properties props = new Properties();
-        RenderInfo.get(rstView, new RenderInfo.Callback()
+        rstView.getRenderInfo().calculate(new CssRenderInfo.Callback() 
         {
           @Override
-          public void infoReceived(RenderInfo info)
+          public void renderInfoReceived(int width, int height)
           {
-            props.put("width", info.getProperty(CssProperty.width));
-            String width = ((String) props.get("width")).replaceAll("px", "");
-            int maxWidth = Integer.parseInt(width);
-
-            if (maxWidth - rstView.getScrollLeft() > scrollStep)
+            if (width - rstView.getScrollLeft() > scrollStep)
             {
               buttonLeft.setEnabled(true);
               rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
@@ -104,7 +100,7 @@ public class RSTPanel extends Panel
             {
               rstView.
                 setScrollLeft(
-                rstView.getScrollLeft() - (maxWidth - rstView.getScrollLeft()));
+                rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
 
               buttonLeft.setEnabled(true);
               buttonRight.setEnabled(false);

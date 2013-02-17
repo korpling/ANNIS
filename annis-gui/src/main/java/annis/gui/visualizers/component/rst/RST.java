@@ -34,9 +34,10 @@ public class RST extends AbstractVisualizer<RSTPanel>
     return "rst";
   }
 
+
   @Override
-  public RSTImpl createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-        return new RSTPanel(visInput);
+    return new RSTPanel(visInput);
   }
 }

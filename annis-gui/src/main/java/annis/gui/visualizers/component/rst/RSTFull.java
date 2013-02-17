@@ -35,7 +35,7 @@ public class RSTFull extends AbstractVisualizer<RSTPanel>
   }
 
   @Override
-  public RSTImpl createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
     return new RSTPanel(visInput);
   }
