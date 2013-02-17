@@ -531,11 +531,63 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                                 </mediaobject>
                                             </screenshot></para>
                                     </listitem>
+                                    <listitem>
+                                        <para><emphasis>rst</emphasis> - imitates the RST-diagrams
+                                            from the RST-Tool (<link
+                                                xlink:href="http://www.wagsoft.com/RSTTool/"
+                                                >RSTTool</link>)</para>
+                                        <para>Note, that the rst-xml-format models edges beetwen
+                                            nucleus and satellite the other way around, than in the
+                                            common visualization of rst-graphs. So the dominance
+                                            relation between nodes must be defined in AQL like that: </para>
+                                        <para>
+                                            <programlisting>node &amp; node &amp; "Therefore" &amp; #1 >rst[relname="nonvolitional-result"] #2 &amp; #2 > #3</programlisting>
+                                        </para>
+                                        <para>The AQL-Query above searches for a sattelite which
+                                            contains the token "Therefore" and dominates a node with
+                                            the rst edge type "nonvolitional-result". Important is,
+                                            that the first note dominates the second one, also the
+                                            visualization shows it the other way around. </para>
+                                        <para><screenshot>
+                                            <mediaobject>
+                                                <imageobject>
+                                                    <imagedata fileref="images/rst_vis.png" width="70%"
+                                                        align="center"/>
+                                                </imageobject>
+                                            </mediaobject>
+                                        </screenshot></para>
+                                            <para>Further the rst relations are not modeled as
+                                            pointing relations, so the <code>-></code> Operator
+                                            obviously does not provide a result.</para>
+                                    </listitem>
                                 </itemizedlist></para>
                         </listitem>
                         <listitem>
                             <para><emphasis role="italic">display_name</emphasis> determines the
                                 heading that is shown for each visualizer in the interface</para>
+                        </listitem>
+                        <listitem>
+                            <para><emphasis role="italic">visibility</emphasis>determines the
+                                visibility state of the visualizer. Valid values are:</para>
+                            <itemizedlist>
+                                <listitem>
+                                    <para><emphasis>permanent</emphasis> - the visualizer is shown
+                                        and not closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>hidden</emphasis> - the visualizer is hidden,
+                                        but expandable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>visible</emphasis> - the visualizer is visible
+                                        and closeable</para>
+                                </listitem>
+                                <listitem>
+                                    <para><emphasis>preload</emphasis> - behaviour is the same as
+                                        hidden, but the visualizer starts to rendering in the
+                                        background.</para>
+                                </listitem>
+                            </itemizedlist>
                         </listitem>
                         <listitem>
                             <para><emphasis role="italic">order</emphasis> determines the order in
@@ -588,12 +640,7 @@ $shiro1$SHA-256$1$Kne+VMg3qnT/zTPK/laSOQ==$lMLO4hAu[...]</screen>The
                                                 <userinput>node_key:key</userinput>, all nodes which
                                             carry this annotation are searched for pointing
                                             relations and instead token the annotation value is
-                                            used. If you also want to see the token level, you will
-                                            have to define the token_visbility property
-                                                with<userinput>token_visibility:visible</userinput>
-                                            or <userinput>token_visibility:hidden</userinput>. Take
-                                            into account, that the token_visibily property has only
-                                            an effect if a node_key is defined.</para>
+                                            used.</para>
                                     </listitem>
                                 </itemizedlist></para>
                         </listitem>

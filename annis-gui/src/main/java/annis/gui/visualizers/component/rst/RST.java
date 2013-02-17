@@ -25,7 +25,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class RST extends AbstractVisualizer<RSTImpl>
+public class RST extends AbstractVisualizer<RSTPanel>
 {
 
   @Override
@@ -34,9 +34,10 @@ public class RST extends AbstractVisualizer<RSTImpl>
     return "rst";
   }
 
+
   @Override
-  public RSTImpl createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-        return new RSTImpl(visInput);
+    return new RSTPanel(visInput);
   }
 }

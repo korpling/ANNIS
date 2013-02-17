@@ -107,11 +107,14 @@ public class SearchUI extends AnnisBaseUI
     
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
+ 
+    final ScreenshotMaker screenshot = new ScreenshotMaker(this);
+    addExtension(screenshot);
 
     HorizontalLayout layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
     layoutToolbar.setHeight("-1px");
-
+    
     mainLayout.addComponent(layoutToolbar);
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
@@ -136,9 +139,6 @@ public class SearchUI extends AnnisBaseUI
       }
     });
     
-    final ScreenshotMaker screenshot = new ScreenshotMaker(this);
-    layoutToolbar.addComponent(screenshot);
-
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);

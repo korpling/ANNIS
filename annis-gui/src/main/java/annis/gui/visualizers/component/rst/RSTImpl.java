@@ -16,6 +16,7 @@
 package annis.gui.visualizers.component.rst;
 
 import annis.gui.MatchedNodeColors;
+import annis.gui.components.CssRenderInfo;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import static annis.model.AnnisConstants.*;
@@ -36,6 +37,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -96,6 +98,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
+  
+  private CssRenderInfo renderInfo;
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
@@ -164,18 +168,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     jit = new JITWrapper();
     setContent(jit);
+    
+    renderInfo = new CssRenderInfo();
+  //  addExtension(renderInfo);
 
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
+    jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
-
 
   }
 
   private void addScrollbar()
   {
-    this.setWidth(this.getParent().getWidth(), this.getParent().getWidthUnits());
+    this.setWidth("100%");
+    this.setHeight("-1px");
     this.getContent().setSizeUndefined();
   }
 
@@ -485,6 +493,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return true;
   }
 
+  public CssRenderInfo getRenderInfo()
+  {
+    return renderInfo;
+  }
+  
   /**
    * Gets the overlapping token as string from a node, which are direct
    * dominated by this node.
@@ -762,6 +775,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     root.put("children", children);
 
     addScrollbar();
+
   }
 
   private boolean hasRSTType(SRelation e)

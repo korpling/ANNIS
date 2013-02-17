@@ -176,6 +176,27 @@ textarea.query {
   font-weight: bold;
 }
 
-.v-button-helpbutton {
-	padding-left: 0.5em;
+}
+
+.left-button, .right-button {
+  background-position: center;
+  background-repeat: repeat-y;
+}
+
+.left-button {
+  background-image: url(left_rst_arrow.png);
+}
+
+.right-button {
+  background-image: url(right_rst_arrow.png);
+}
+
+.right-button .v-button-wrap {
+    background: none;
+    border: medium none;
+    border-radius: 2px 2px 2px 2px;
+    display: block;
+    height: 100%;
+    padding: 4px 13px;
+    text-overflow: ellipsis;
 }

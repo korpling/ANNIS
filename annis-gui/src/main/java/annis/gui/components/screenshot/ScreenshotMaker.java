@@ -21,14 +21,11 @@ import org.json.JSONException;
 
 
 import com.vaadin.annotations.JavaScript;
-import com.vaadin.server.StreamResource;
-import com.vaadin.ui.AbstractJavaScriptComponent;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.UUID;
+import com.vaadin.server.AbstractJavaScriptExtension;
+import com.vaadin.server.ClientConnector;
+import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.ui.UI;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,16 +37,13 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @JavaScript({"jquery-1.9.1.min.js", "html2canvas.js", "screenshotmaker.js"})
-public class ScreenshotMaker extends AbstractJavaScriptComponent
+public class ScreenshotMaker extends AbstractJavaScriptExtension
 {
   private static final Logger log = LoggerFactory.getLogger(ScreenshotMaker.class);
   
   public ScreenshotMaker(final ScreenshotCallback callback)
   {
     Validate.notNull(callback);
-    
-    setHeight(0.0f, Unit.PIXELS);
-    setWidth(0.0f, Unit.PIXELS);
     
     addFunction("finishedScreenshot", new JavaScriptFunction() 
     {
@@ -59,6 +53,12 @@ public class ScreenshotMaker extends AbstractJavaScriptComponent
         parseAndCallback(arguments.getString(0), callback);
       }
     });
+  }
+
+  @Override
+  protected Class<? extends ClientConnector> getSupportedParentType()
+  {
+    return UI.class;
   }
   
   /**
@@ -77,7 +77,7 @@ public class ScreenshotMaker extends AbstractJavaScriptComponent
     {
       return;
     }
- 
+    
     // find the mime type
     final String[] typeInfoAndData = rawImage.split(",");
     String[] mimeAndEncoding = typeInfoAndData[0].replaceFirst("data:", "").split(";");

@@ -19,6 +19,10 @@
     return target;
   }
 
+  const DOMINANCE = "edge";
+  const RST = "rst";
+  const MULTINUC = "multinuc";
+
   var rst = function (config) {
 
     this.json = config.json;
@@ -288,25 +292,23 @@
         edgeType = adj[i][e].sType,
         annotation = adj[i][e].annotation;
 
-        if (edgeType === "rst")
+        if (edgeType === RST)
         {
           this.drawBezierCurve(from, to);
           this.plotRSTLabel(from, to, annotation);
         }
 
-        if (edgeType === "multinuc") {
+        if (edgeType === MULTINUC) {
           this.drawVerticalLine(from, to);
           this.plotMultinucLabel(from, annotation);
         }
 
-        if (edgeType === "edge")
+        if (edgeType === DOMINANCE)
         {
           this.drawSpan(from, to);
         }
       }
     }
-
-    this.context.stroke();
   };
 
   rst.getTopCenter = function(node)
@@ -333,8 +335,11 @@
     fromPosX = this.getTopCenter(source),
     toPosX = this.getTopCenter(target);
 
+    this.context.beginPath();
     this.context.moveTo(fromPosX, source.pos.y);
     this.context.lineTo(toPosX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawHorizontalLine = function (source)
@@ -342,8 +347,11 @@
     var mostLeftChild = this.getMostLeftNode(source).pos.x,
     mostRightChild = this.getMostRightNode(source).pos.x + this.config.nodeWidth;
 
+    this.context.beginPath();
     this.context.moveTo(mostLeftChild, source.pos.y);
     this.context.lineTo(mostRightChild, source.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawSpan = function(source, target)
@@ -351,16 +359,21 @@
     var targetCenterX = this.getTopCenter(target);
 
     // draw vertical line
+    this.context.beginPath();
     this.context.moveTo(targetCenterX, source.pos.y);
     this.context.lineTo(targetCenterX, target.pos.y);
+    this.context.closePath();
+    this.context.stroke();
   };
 
   rst.drawBezierCurve = function(source, target)
   {
     var from = source.pos,
     to = target.pos,
+
     fromX = this.getTopCenter(source),
     toX = this.getTopCenter(target),
+
     dim = 15,
     controllPoint = {};
 
@@ -374,15 +387,25 @@
     }
 
     //draw lines
+    this.context.beginPath();
     this.context.moveTo(fromX, from.y);
     this.context.quadraticCurveTo(controllPoint.x, controllPoint.y, toX, to.y, toX, to.y);
 
+    this.context.stroke();
+
 
     var headlen = 10;   // length of head in pixels
-    var angle = Math.atan2(to.y - from.y, to.x - fromX);
-    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
+    var angle = Math.atan2(to.y - controllPoint.y, to.x - controllPoint.x);
+
+
+    this.context.beginPath();
     this.context.moveTo(toX, to.y);
+    this.context.lineTo(toX - headlen*Math.cos(angle - Math.PI/6), to.y - headlen*Math.sin(angle - Math.PI/6));
     this.context.lineTo(toX - headlen*Math.cos(angle + Math.PI/6), to.y - headlen*Math.sin(angle + Math.PI/6));
+
+    this.context.fill();
+    this.context.closePath();
+
   };
 
   rst.plotMultinucLabel = function(source, annotation)

@@ -20,6 +20,7 @@ import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.LegacyComponent;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *
@@ -27,30 +28,43 @@ import java.util.Map;
  */
 public class JITWrapper extends AbstractComponent implements LegacyComponent
 {
-  
+
   private String visData = null;
+
+  private Properties mappings = null;
 
   public JITWrapper()
   {
     super();
-  }  
-  
+  }
 
   @Override
   public void paintContent(PaintTarget target)
     throws PaintException
   {
     target.addAttribute("visData", visData);
+    
+    if (mappings.size() > 0)
+    {
+      target.addAttribute("mappings", mappings);
+    }
   }
-
 
   public void setVisData(String visData)
   {
     this.visData = visData;
   }
 
+  public void setProperties(Properties props)
+  {
+    this.mappings = props;
+  }
+
+  @Override
   public void changeVariables(Object source,
     Map<String, Object> variables)
   {
   }
+  
+  
 }
