@@ -167,7 +167,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     count++;
 
     jit = new JITWrapper();
-    addComponent(jit);
+    setContent(jit);
+
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
@@ -764,12 +765,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-  }
 
-  @Override
-  public void attach()
-  {
-    super.attach();
     addScrollbar();
     setScrollable(true);
 

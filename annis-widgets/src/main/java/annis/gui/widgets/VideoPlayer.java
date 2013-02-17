@@ -15,14 +15,12 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VVideoPlayer;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.LegacyComponent;
 
 /**
  * Audio player that implements the functions needed by ANNIS.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VVideoPlayer.class)
 public class VideoPlayer extends MediaPlayerBase
 {
   public VideoPlayer(String resourceURL, String mimeType)

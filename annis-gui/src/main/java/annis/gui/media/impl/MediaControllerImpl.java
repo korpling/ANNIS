@@ -19,6 +19,7 @@ import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
 import annis.gui.media.MediaPlayer;
 import annis.visualizers.LoadableVisualizer;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class MediaControllerImpl implements MediaController
+public class MediaControllerImpl implements MediaController, Serializable
 {
 
   /**

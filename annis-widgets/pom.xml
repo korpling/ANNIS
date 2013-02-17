@@ -13,12 +13,11 @@
   <packaging>jar</packaging>
   <version>3.0.0-SNAPSHOT</version>
   <name>annis-widgets</name>
+ 
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>6.8.6</vaadin.version>
-    <gwt.version>2.3.0</gwt.version>
-    <gwt.plugin.version>2.2.0</gwt.plugin.version>
+    <vaadin.version>7.0.0</vaadin.version>
   </properties>
 
   <build>
@@ -27,102 +26,72 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
+        <version>2.4</version>
         <configuration>
-          <archive>
-            <index>true</index>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <!-- Implementation-Title and Implementation-Version come from the POM by default -->
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-            </manifest>
-            <manifestEntries>
-              <!-- Package format version - do not change -->
-              <Vaadin-Package-Version>1</Vaadin-Package-Version>
-
-              <!-- Add-on specific fields to update -->
-
-              <!-- Implementation-Title and Implementation-Version come from the POM by default -->
-              <!--
-                <Implementation-Title>${pom.name}</Implementation-Title>
-                <Implementation-Version>${pom.version}</Implementation-Version>
-              -->
-
-              <!-- Comma-separated list of widgetsets in the package -->
-              <Vaadin-Widgetsets>annis.gui.widgets.gwt.AnnisWidgetSet</Vaadin-Widgetsets>
-            </manifestEntries>
-          </archive>
+          <excludes>
+            <exclude>VAADIN/widgetsets/WEB-INF/**</exclude>
+            <exclude>VAADIN/gwt-unitCache/**</exclude>
+          </excludes>
         </configuration>
       </plugin>
 
-      <!-- Compiles your custom GWT components with the GWT compiler -->
-      <!-- A hosted mode browser for client-side widget debugging can be run with the goal gwt:run after uncommenting the
-      correct line below. A remote debugger can then be connected to port 8998. Note that e.g. a Jetty server should be running
-      with the server side parts - use the goal jetty:run . -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <version>${gwt.plugin.version}</version>
-        <configuration>
-          <!-- if you don't specify any modules, the plugin will find them -->
-          <!-- <modules> <module>annis.gui.widgets.gwt.MyWidgetSet</module> </modules> -->
-          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets</webappDirectory>
-          <!-- On Mac running Snow Leopard, add "-d32" -->
-          <!-- This causes error messages (but build works) in phase "package": two processes would use the same debug
-          port -->
-          <!--extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs -->
-          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>annis-widgets</runTarget>
-          <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
-          <noServer>true</noServer>
-          <port>8080</port>
-          <compileReport>false</compileReport>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>resources</goal>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <version>${gwt.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>${gwt.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-maven-plugin</artifactId>
-        <version>1.0.2</version>
-        <executions>
-          <execution>
-            <configuration>
-              <!-- if you don't specify any modules, the plugin will find them -->
-              <!-- <modules> <module>annis.gui.widgets.gwt.MyWidgetSet</module> </modules> -->
-            </configuration>
-            <goals>
-              <goal>update-widgetset</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+      <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
+			<!-- directory is cleaned properly -->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/main/webapp/VAADIN/widgetsets</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>7.0.0</version>
+				<configuration>
+					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+					<!-- <runTarget>mobilemail</runTarget> -->
+					<!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
+						way compatible with Vaadin eclipse plugin. -->
+					<webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
+					</webappDirectory>
+					<hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
+					</hostedWebapp>
+					<noServer>true</noServer>
+					<!-- Remove draftCompile when project is ready -->
+					<draftCompile>false</draftCompile>
+					<compileReport>true</compileReport>
+					<style>OBF</style>
+					<strict>true</strict>
+					<runTarget>http://localhost:8080/</runTarget>
+				</configuration>
+				<executions>
+					<execution>
+						<configuration>
+							<!-- if you don't specify any modules, the plugin will find them -->
+							<!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
+								</modules> -->
+						</configuration>
+						<goals>
+							<goal>resources</goal>
+							<goal>update-widgetset</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
     </plugins>
 
     <!-- This is needed for the sources required by the GWT compiler to be included in the produced JARs -->
@@ -179,14 +148,18 @@
   <dependencies>
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
+      <artifactId>vaadin-server</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-      <scope>provided</scope>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client-compiled</artifactId>
+      <version>${vaadin.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.validation</groupId>
@@ -210,33 +183,28 @@
     </dependency>
 
     <!-- other widget sets we use -->
+    <!-- TODO
     <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>js-screenshot</artifactId>
       <version>0.1.0</version>
       <scope>compile</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.vaadin.hene.splitbutton</groupId>
-      <artifactId>splitbutton</artifactId>
-      <version>0.9.7</version>
-      <scope>compile</scope>
-    </dependency>
-
+    -->
+  <dependency>
+    <groupId>org.vaadin.addons</groupId>
+    <artifactId>popupbutton</artifactId>
+    <version>2.2.0</version>
+  </dependency>
+    
+    <!-- TODO
     <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>contexthelp</artifactId>
       <version>1.3.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>css-tools</artifactId>
-      <version>0.3</version>
-    </dependency>
-
-
+    -->
+    
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>

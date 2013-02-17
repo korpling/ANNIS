@@ -177,8 +177,18 @@
     
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
-      <version>6.8.6</version>
+      <artifactId>vaadin-server</artifactId>
+      <version>7.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-themes</artifactId>
+      <version>7.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-theme-compiler</artifactId>
+      <version>7.0.0</version>
     </dependency>
     
    <dependency>

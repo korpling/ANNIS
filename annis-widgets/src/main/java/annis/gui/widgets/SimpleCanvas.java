@@ -15,21 +15,21 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VSimpleCanvas;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ClientWidget;
+
+import com.vaadin.ui.LegacyComponent;
 import java.awt.geom.Line2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author thomas
  */
-@ClientWidget(VSimpleCanvas.class)
-public class SimpleCanvas extends AbstractComponent
+public class SimpleCanvas extends AbstractComponent implements LegacyComponent
 {
   private List<Line2D> lines;
   
@@ -41,8 +41,6 @@ public class SimpleCanvas extends AbstractComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-    super.paintContent(target);
-    
     target.startTag("clear");
     target.endTag("clear");
     
@@ -65,6 +63,11 @@ public class SimpleCanvas extends AbstractComponent
   public void setLines(List<Line2D> lines)
   {
     this.lines = lines;
+  }
+
+  public void changeVariables(Object source,
+    Map<String, Object> variables)
+  {
   }
   
   
