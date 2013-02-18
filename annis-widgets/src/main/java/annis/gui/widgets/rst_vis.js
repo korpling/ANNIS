@@ -258,8 +258,8 @@
       var top = elem.clientHeight + elem.offsetTop;
       if  ( top > container.clientHeight)
       {
-        container.style.height = top + "px";
-        container.setAttribute("height", top + "px");
+        container.style.height = (top+5) + "px";
+        container.setAttribute("height", (top+5) + "px");
         canvas.setAttribute("height", top + "px");
       }
     }
