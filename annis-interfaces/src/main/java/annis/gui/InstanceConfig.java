@@ -16,6 +16,8 @@
 package annis.gui;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,6 +43,18 @@ public class InstanceConfig implements Serializable
   private List<CorpusSet> corpusSets;
   private String defaultCorpusSet;
   private Map<String,String> corpusMappings;
+  private FontConfig font;
+
+  public InstanceConfig()
+  {
+    instanceName = "";
+    instanceDisplayName = "";
+    defaultQueryBuilder = "";
+    corpusSets = new LinkedList<CorpusSet>();
+    defaultCorpusSet = "";
+    corpusMappings = new HashMap<String, String>();
+    
+  }
 
   /**
    * Get the internal short name of this instance.
@@ -139,5 +153,25 @@ public class InstanceConfig implements Serializable
   {
     this.corpusMappings = corpusMappings;
   }  
+
+  /**
+   * Get the special font used by this instance.
+   * @return 
+   */
+  @XmlElement(name="font")
+  public FontConfig getFont()
+  {
+    return font;
+  }
+
+  /**
+   * @see #getFont() 
+   * @param font 
+   */
+  public void setFont(FontConfig font)
+  {
+    this.font = font;
+  }
+  
   
 }

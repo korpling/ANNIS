@@ -82,6 +82,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
+    txtQuery.addStyleName("corpus-font");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);

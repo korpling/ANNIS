@@ -250,6 +250,7 @@ public class VisualizerPanel extends VerticalLayout
 
     Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
+    c.addStyleName("corpus-font");
 
     return c;
   }

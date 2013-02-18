@@ -30,7 +30,6 @@ import annis.security.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Page;
@@ -53,6 +52,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.vaadin.cssinject.CSSInject;
 
 /**
  * GUI for searching in corpora.
@@ -85,6 +85,7 @@ public class SearchUI extends AnnisBaseUI
   private QueryController queryController;
   private String lastQueriedFragment;
   private InstanceConfig instanceConfig;
+  private CSSInject css;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -109,6 +110,8 @@ public class SearchUI extends AnnisBaseUI
  
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
+    
+    css = new CSSInject(this);
 
     HorizontalLayout layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
@@ -303,11 +306,22 @@ public class SearchUI extends AnnisBaseUI
     
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
     
+    loadInstanceFonts();
     checkCitation(request);
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
   }
   
+  private void loadInstanceFonts()
+  {
+    if(instanceConfig != null && css != null && instanceConfig.getFont() != null)
+    {
+      FontConfig cfg = instanceConfig.getFont();
+      css.setStyles(
+        "@import url(" + cfg.getUrl() + ");\n"
+        + ".corpus-font {font-family: '" + cfg.getName() + "', monospace !important;}");
+    }
+  }
   
   private InstanceConfig getInstanceConfig(VaadinRequest request)
   {
