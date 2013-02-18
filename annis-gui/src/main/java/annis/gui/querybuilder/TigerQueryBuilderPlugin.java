@@ -15,17 +15,17 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.controlpanel.ControlPanel;
-import com.vaadin.terminal.ThemeResource;
+import annis.gui.QueryController;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.vaadin.jonatan.contexthelp.ContextHelp;
-import org.vaadin.jonatan.contexthelp.Placement;
 
 /**
  *
@@ -48,9 +48,9 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   }
 
   @Override
-  public TigerQueryBuilder createComponent(ControlPanel controlPanel)
+  public TigerQueryBuilder createComponent(QueryController controller)
   {
-    return new TigerQueryBuilder(controlPanel);
+    return new TigerQueryBuilder(controller);
   }
   
   public static class TigerQueryBuilder extends Panel implements Button.ClickListener
@@ -60,18 +60,17 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     private Button btClearAll;
     private TigerQueryBuilderCanvas queryBuilder;
 
-    public TigerQueryBuilder(ControlPanel controlPanel)
-    { 
+    public TigerQueryBuilder(QueryController controller)
+    {
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
       
-      VerticalLayout layout = (VerticalLayout) getContent();
+      VerticalLayout layout = new VerticalLayout();
+      setContent(layout);
       layout.setSizeFull();
       setSizeFull();
       
       layout.setMargin(false);
-
-      final ContextHelp help = new ContextHelp();
-      layout.addComponent(help);
+      
 
       HorizontalLayout toolbar = new HorizontalLayout();
       //toolbar.addStyleName("toolbar");
@@ -89,6 +88,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
         + "Click here to delete all node specification windows and reset the query builder.");
       toolbar.addComponent(btClearAll);
 
+      
       final Button btHelp = new Button();
       btHelp.setStyleName(ChameleonTheme.BUTTON_LINK);
       btHelp.setIcon(new ThemeResource("../runo/icons/16/help.png"));
@@ -97,19 +97,8 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
         @Override
         public void buttonClick(ClickEvent event)
         {
-          help.showHelpFor(btHelp);
-        }
-      });
-      toolbar.addComponent(btHelp);
-
-      toolbar.setWidth("-1px");
-      toolbar.setHeight("-1px");
-
-      addComponent(toolbar);
-
-      queryBuilder = new TigerQueryBuilderCanvas(controlPanel);
-      help.addHelpForComponent(btHelp,
-        "Click “Add node” to add a search term. "
+          String message = 
+            "Click “Add node” to add a search term. "
         + "You can move nodes freely by dragging\n"
         + "them for your convenience. Click “add” to insert some annotation criteria for the\n"
         + "search term. The field on the left of the node annotation will show annotation\n"
@@ -121,9 +110,24 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
         + "in one node and then on ‘Dock’ in another to connect search terms. Choose an\n"
         + "operator from the list on the line connecting the edges to determine e.g. if one\n"
         + "node should occur before the other, etc. For details on the meaning and usage of\n"
-        + "each operator, see the tutorial tab above.",
-        Placement.BELOW);
-      addComponent(queryBuilder);
+        + "each operator, see the tutorial tab above.";
+          
+          Notification notify = new Notification("Help for query builder",
+            Notification.Type.HUMANIZED_MESSAGE);
+          notify.setHtmlContentAllowed(true);
+          notify.setDescription(message);
+          notify.show(UI.getCurrent().getPage());
+        }
+      });
+      toolbar.addComponent(btHelp);
+
+      toolbar.setWidth("-1px");
+      toolbar.setHeight("-1px");
+
+      layout.addComponent(toolbar);
+
+      queryBuilder = new TigerQueryBuilderCanvas(controller);
+      layout.addComponent(queryBuilder);
 
       layout.setExpandRatio(queryBuilder, 1.0f);
     }

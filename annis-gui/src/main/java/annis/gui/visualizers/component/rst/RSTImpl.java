@@ -16,13 +16,10 @@
 package annis.gui.visualizers.component.rst;
 
 import annis.gui.MatchedNodeColors;
+import annis.gui.components.CssRenderInfo;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import static annis.model.AnnisConstants.*;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -40,6 +37,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.FileOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -100,7 +98,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
-
+  
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
    * mapping the sentence to a number by the order of the SStructures in the
@@ -167,7 +165,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     count++;
 
     jit = new JITWrapper();
-    addComponent(jit);
+    jit.setWidth("100%");
+    jit.setHeight("-1px");
+    setContent(jit);
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
@@ -175,11 +175,15 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     jit.requestRepaint();
 
   }
+  
+  public void addExtension(CssRenderInfo renderInfo)
+  {
+    super.addExtension(renderInfo);
+  }
 
   private void addScrollbar()
   {
     this.setWidth("100%");
-    this.setHeight("-1px");
     this.getContent().setSizeUndefined();
   }
 
@@ -744,14 +748,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-  }
 
-  @Override
-  public void attach()
-  {
-    super.attach();
     addScrollbar();
-    setScrollable(true);
 
   }
 

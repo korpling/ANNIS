@@ -5,18 +5,16 @@
 	-->
 
 	<!-- Inherit DefaultWidgetSet -->
-	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" />
+	<inherits name="com.vaadin.DefaultWidgetSet" />
 
+  <inherits name="com.google.common.collect.Collect" />
   <inherits name="com.google.gwt.json.JSON" />
+  <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+  
 
 	<!-- Widgetset default theme -->
 	<!-- This is relative to widgetset_directory/public -->
 	<stylesheet src="anniswidget/styles.css"/>
-
-  <script src="anniswidget/rst_vis.js" />
-
-  <!-- JQuery makes our life easier -->
-  <script src="anniswidget/jquery-1.8.2.min.js" />
 
     <!--
      Uncomment the following to compile the widgetset for one browser only.
@@ -32,19 +30,10 @@
      for webkit based browsers including Google Chrome.
     -->
 
-<!--   <set-property name="user.agent" value="gecko1_8,safari"/> -->
-
-    <inherits name="com.google.common.collect.Collect" />
-
-
-    <!-- automatically appended -->
-    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
-    <inherits name="org.vaadin.hene.splitbutton.widgetset.SplitButtonWidgetSet" />
-
-    <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
-
-
-    <inherits name="org.vaadin.jonatan.contexthelp.widgetset.ContexthelpWidgetset" />
-
-    <inherits name="org.vaadin.csstools.CssToolsWidgetset" />
+<!--   <set-property name="user.agent" value="gecko1_8,safari"/>-->
+   
+   <!-- enable SuperDevMode -->
+   <add-linker name="xsiframe" />
+   <set-configuration-property name="devModeRedirectEnabled" value="true" />
+   
 </module>

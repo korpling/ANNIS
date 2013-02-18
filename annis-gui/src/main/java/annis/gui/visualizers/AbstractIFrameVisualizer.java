@@ -15,12 +15,19 @@
  */
 package annis.gui.visualizers;
 
+import annis.gui.VisualizationToggle;
 import annis.gui.widgets.AutoHeightIFrame;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -30,9 +37,10 @@ import java.io.OutputStream;
  */
 public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
 {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
   /**
-   * Returns the character endocing for this particular Visualizer output. For
+   * Returns the character encoding for this particular Visualizer output. For
    * more information see
    * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
    * overridden to change default "utf-8".
@@ -60,16 +68,29 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
 
   @Override
-  public Component createComponent(VisualizerInput vis, Application application)
-  {
-    AutoHeightIFrame iframe;
-    ApplicationResource resource;
-
+  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle)
+  { 
+   
+    
+    VaadinSession session = VaadinSession.getCurrent();
+    if(session.getAttribute(IFrameResourceMap.class) == null)
+    {
+      session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
+    }
+    
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);
-    resource = vis.getVisPanel().createResource(outStream, getContentType());
-    String url = vis.getVisPanel().getApplication().getRelativeLocation(resource);
-    iframe = new AutoHeightIFrame(url == null ? "/error.html" : url);
+    
+    IFrameResource res  = new IFrameResource();
+    res.setData(outStream.toByteArray());
+    res.setMimeType(getContentType());
+    
+    UUID uuid = UUID.randomUUID();
+    session.getAttribute(IFrameResourceMap.class).put(uuid, res);
+  
+    URI base = UI.getCurrent().getPage().getLocation();
+    AutoHeightIFrame iframe = 
+      new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
     return iframe;
   }
 }

@@ -15,14 +15,15 @@
  */
 package annis.gui.visualizers.component.rst;
 
+import annis.gui.components.CssRenderInfo;
 import annis.gui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
+import com.google.gwt.resources.css.ast.CssProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import java.util.Properties;
-import org.vaadin.csstools.RenderInfo;
-import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
+import java.util.UUID;
 
 /**
  * RSTPanel manages the scrollbuttons and calles then {@link RSTImpl} the actual
@@ -33,6 +34,7 @@ import org.vaadin.csstools.client.VRenderInfoFetcher.CssProperty;
  */
 public class RSTPanel extends Panel
 {
+  private CssRenderInfo renderInfo;
 
   RSTPanel(VisualizerInput visInput)
   {
@@ -41,8 +43,9 @@ public class RSTPanel extends Panel
     final int scrollStep = 200;
 
     // the calculation of the output json is done here.
-    final Panel rstView = new RSTImpl(visInput);
-
+    final RSTImpl rstView = new RSTImpl(visInput);
+    rstView.setId(UUID.randomUUID().toString());
+    
     this.setHeight("-1px");
     this.setWidth("100%");
     grid.setHeight("-1px");
@@ -85,34 +88,32 @@ public class RSTPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        final Properties props = new Properties();
-        RenderInfo.get(rstView, new RenderInfo.Callback()
-        {
-          @Override
-          public void infoReceived(RenderInfo info)
-          {
-            props.put("width", info.getProperty(CssProperty.width));
-            String width = ((String) props.get("width")).replaceAll("px", "");
-            int maxWidth = Integer.parseInt(width);
-
-            if (maxWidth - rstView.getScrollLeft() > scrollStep)
-            {
-              buttonLeft.setEnabled(true);
-              rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
-            }
-            else
-            {
-              rstView.
-                setScrollLeft(
-                rstView.getScrollLeft() - (maxWidth - rstView.getScrollLeft()));
-
-              buttonLeft.setEnabled(true);
-              buttonRight.setEnabled(false);
-            }
-          }
-        });
+        renderInfo.calculate("#" + rstView.getId() + " canvas" );
       }
     });
+    
+    renderInfo = new CssRenderInfo(new CssRenderInfo.Callback() 
+    {
+      @Override
+      public void renderInfoReceived(int width, int height)
+      {
+        if (width - rstView.getScrollLeft() > scrollStep)
+        {
+          buttonLeft.setEnabled(true);
+          rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
+        }
+        else
+        {
+          rstView.
+            setScrollLeft(
+            rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
+
+          buttonLeft.setEnabled(true);
+          buttonRight.setEnabled(false);
+        }
+      }
+    });
+    rstView.addExtension(renderInfo);
 
     grid.addComponent(buttonLeft);
     grid.addComponent(rstView);
