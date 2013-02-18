@@ -22,18 +22,18 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * Allows to query for matches ({@link Match})  for a specific range. 
+ * 
+ * @see #loadBeans(int, int, annis.security.AnnisUser) 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class AnnisResultQuery implements Serializable
 {
@@ -41,42 +41,46 @@ public class AnnisResultQuery implements Serializable
 
   private Set<String> corpora;
   private String aql;
-  private Application app;
 
-  public AnnisResultQuery(Set<String> corpora, String aql, Application app)
+  public AnnisResultQuery(Set<String> corpora, String aql)
   {
     this.corpora = corpora;
     this.aql = aql;
-    this.app = app;
   }
 
-  public List<Match> loadBeans(int startIndex, int count, AnnisUser user)
+  /**
+   * Query for a list of matches ({@link Match}).
+   * @param offset where to start 
+   * @param limit how many items to get at maximum
+   * @param user use this user for authentification with the service
+   * @return 
+   */
+  public List<Match> loadBeans(int offset, int limit, AnnisUser user)
   {
     
     List<Match> result = new LinkedList<Match>();
-    if (app != null)
-    {
-      WebResource annisResource = Helper.getAnnisWebResource(app);
-      try
-      {
-        annisResource = annisResource.path("query").path("search").path("find")
-          .queryParam("q", aql)
-          .queryParam("offset", "" + startIndex)
-          .queryParam("limit", "" + count)         
-          .queryParam("corpora", StringUtils.join(corpora, ","));
 
-        result = annisResource.get(new GenericType<List<Match>>() {});
-      }
-      catch (UniformInterfaceException ex)
-      {
-        log.error(
-          ex.getResponse().getEntity(String.class), ex);
-      }
-      catch (ClientHandlerException ex)
-      {
-        log.error("could not execute REST call to query matches", ex);
-      }
+    WebResource annisResource = Helper.getAnnisWebResource();
+    try
+    {
+      annisResource = annisResource.path("query").path("search").path("find")
+        .queryParam("q", aql)
+        .queryParam("offset", "" + offset)
+        .queryParam("limit", "" + limit)         
+        .queryParam("corpora", StringUtils.join(corpora, ","));
+
+      result = annisResource.get(new GenericType<List<Match>>() {});
     }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(
+        ex.getResponse().getEntity(String.class), ex);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error("could not execute REST call to query matches", ex);
+    }
+
     return result;
   }
   

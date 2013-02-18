@@ -16,14 +16,14 @@
 package annis.gui.servlets;
 
 import annis.gui.Helper;
-import annis.gui.MainApp;
+import annis.gui.AnnisBaseUI;
+import annis.security.AnnisUser;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
@@ -84,7 +84,7 @@ public class BinaryServlet extends HttpServlet
       String range = request.getHeader("Range");
 
       HttpSession session = request.getSession();
-      Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
+      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
       
       if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
@@ -93,7 +93,8 @@ public class BinaryServlet extends HttpServlet
       
       String annisServiceURL = (String) annisServiceURLObject;
       
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
+        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
       
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))

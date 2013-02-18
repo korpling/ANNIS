@@ -18,8 +18,6 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
@@ -30,8 +28,8 @@ import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -119,32 +117,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
-    getWindow().addListener(new Window.ResizeListener() 
-    {
-
-      @Override
-      public void windowResized(ResizeEvent e)
-      {
-        layout.requestRepaintAll();
-      }
-    });
-    
-//    layout.setWidth(getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25, UNITS_PIXELS);
-    
-    // reset all registered media players    
-    MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
-    if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
-    {
-      mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
-    }
-    
+       
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 
@@ -157,11 +130,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       @Override
       protected void done()
       {
-        synchronized(getApplication())
+        VaadinSession session = VaadinSession.getCurrent();
+        session.lock();
+        try
         {
           indicator.setEnabled(false);
           indicator.setVisible(false);
           indicatorLayout.setVisible(false);
+        }
+        finally
+        {
+          session.unlock();
         }
       }
     };
@@ -175,8 +154,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       if (p == null)
       {
-        getWindow().showNotification("Could not get subgraphs",
-          Window.Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Could not get subgraphs",
+          Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {
@@ -284,7 +263,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
 
-      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
+      WebResource resResolver = Helper.getAnnisWebResource()
         .path("query").path("resolver");
 
       for (SingleResolverRequest r : resolverRequests)
@@ -426,7 +405,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       boolean allSuccessfull = true;
       
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = Helper.getAnnisWebResource();
       if (res != null)
       {
         res = res.path("query/search/subgraph");
@@ -452,18 +431,24 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             allSuccessfull = false;
           }
           
-          synchronized(getApplication())
+          VaadinSession session = VaadinSession.getCurrent();
+          session.lock();
+          try
           {
             
             if(lastProject != null)
             {
               addQueryResult(lastProject, j+firstMatchOffset);
             }
-            indicator.setValue((double) j++ / (double) matches.size());
+            indicator.setValue((float) j++ / (float) matches.size());
             if(j == matches.size())
             {
               indicator.setValue(1.0f);
             }
+          }
+          finally
+          {
+            session.unlock();
           }
         }
         

@@ -31,11 +31,13 @@ public class ImagePanel extends Panel
     setWidth("100%");
     setHeight("-1px");
     
+    VerticalLayout layout = new VerticalLayout();
+    setContent(layout);
+    
     // enable scrolling
-    ((VerticalLayout) getContent()).setSizeUndefined();
+    layout.setSizeUndefined();
     
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
-    addComponent(image);
+    layout.addComponent(image);
   }
 }

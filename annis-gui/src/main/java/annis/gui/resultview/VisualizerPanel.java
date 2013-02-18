@@ -24,23 +24,21 @@ import annis.gui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -71,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends CustomLayout
+public class VisualizerPanel extends VerticalLayout
   implements Button.ClickListener, VisualizationToggle
 {
 
@@ -82,8 +80,6 @@ public class VisualizerPanel extends CustomLayout
 
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
-
-  private ApplicationResource resource = null;
 
   private Component vis;
 
@@ -109,7 +105,6 @@ public class VisualizerPanel extends CustomLayout
 
   private String resultID;
 
-  ;
   private transient VisualizerPlugin visPlugin;
 
   private Set<String> visibleTokenAnnos;
@@ -123,6 +118,8 @@ public class VisualizerPanel extends CustomLayout
   private final String HIDDEN = "hidden";
 
   private final String PRELOADED = "preloaded";
+  
+  private ProgressIndicator progress;
 
   private final static String htmlTemplate =
     "<div id=\":id\"><div location=\"btEntry\"></div>"
@@ -149,9 +146,6 @@ public class VisualizerPanel extends CustomLayout
     String segmentationName,
     PluginSystem ps) throws IOException
   {
-    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes(
-      "UTF-8")));
-
     visPlugin = ps.getVisualizer(entry.getVisType());
 
     this.ps = ps;
@@ -167,15 +161,14 @@ public class VisualizerPanel extends CustomLayout
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
+    
+    this.progress = new ProgressIndicator();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-  }
-
-  @Override
-  public void attach()
-  {
-
+  
+    // this part was in attach() function...
+    
     if (visPlugin == null && ps != null)
     {
       entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
@@ -192,8 +185,8 @@ public class VisualizerPanel extends CustomLayout
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addListener((Button.ClickListener) this);
-        addComponent(btEntry, "btEntry");
+        btEntry.addClickListener((Button.ClickListener) this);
+        addComponent(btEntry);
       }
       else
       {
@@ -206,8 +199,8 @@ public class VisualizerPanel extends CustomLayout
           btEntry.setIcon(ICON_COLLAPSE);
           btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
             + ChameleonTheme.BUTTON_SMALL);
-          btEntry.addListener((Button.ClickListener) this);
-          addComponent(btEntry, "btEntry");
+          btEntry.addClickListener((Button.ClickListener) this);
+          addComponent(btEntry);
         }
 
 
@@ -218,15 +211,15 @@ public class VisualizerPanel extends CustomLayout
           if (vis != null)
           {
             vis.setVisible(true);
-            addComponent(vis, "iframe");
+            addComponent(vis);
           }
         }
         catch (Exception ex)
         {
-          getWindow().showNotification(
+          Notification.show(
             "Could not create visualizer " + visPlugin.getShortName(),
             ex.toString(),
-            Window.Notification.TYPE_TRAY_NOTIFICATION);
+            Notification.Type.TRAY_NOTIFICATION);
           log.error("Could not create visualizer " + visPlugin.getShortName(),
             ex);
         }
@@ -253,10 +246,9 @@ public class VisualizerPanel extends CustomLayout
       return null;
     }
 
-    final Application application = getApplication();
     final VisualizerInput input = createInput();
 
-    Component c = visPlugin.createComponent(input, application);
+    Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
 
     return c;
@@ -265,17 +257,16 @@ public class VisualizerPanel extends CustomLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL(getApplication().getProperty(
+    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().getAttribute(
       "AnnisWebService.URL"));
-    input.setContextPath(Helper.getContext(getApplication()));
-    input.setDotPath(getApplication().getProperty("DotPath"));
+    input.setContextPath(Helper.getContext());
+    input.setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
 
     input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
     input.setMarkedAndCovered(markedAndCovered);
-    input.setVisPanel(this);
 
     input.setResult(result);
     input.setToken(token);
@@ -286,7 +277,7 @@ public class VisualizerPanel extends CustomLayout
     {
       input.setMappings(entry.getMappings());
       input.setNamespace(entry.getNamespace());
-      String template = Helper.getContext(getApplication())
+      String template = Helper.getContext()
         + "/Resource/" + entry.getVisType() + "/%s";
       input.setResourcePathTemplate(template);
     }
@@ -333,22 +324,6 @@ public class VisualizerPanel extends CustomLayout
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
-
-  public ApplicationResource createResource(
-    ByteArrayOutputStream byteStream,
-    String mimeType)
-  {
-
-    StreamResource r;
-
-    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream),
-      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE),
-      getApplication());
-    r.setMIMEType(mimeType);
-
-    return r;
-  }
-
   private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
@@ -356,7 +331,7 @@ public class VisualizerPanel extends CustomLayout
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      WebResource annisResource = Helper.getAnnisWebResource();
       txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
         path(
         documentName).get(SaltProject.class);
@@ -366,17 +341,6 @@ public class VisualizerPanel extends CustomLayout
       log.error("General remote service exception", e);
     }
     return txt;
-  }
-
-  @Override
-  public void detach()
-  {
-    super.detach();
-
-    if (resource != null)
-    {
-      getApplication().removeResource(resource);
-    }
   }
 
   @Override
@@ -407,12 +371,14 @@ public class VisualizerPanel extends CustomLayout
         @Override
         public void run()
         {
+          VaadinSession session = VaadinSession.getCurrent();
           try
           {
             super.run();
             // wait maximum 60 seconds
             vis = get(60, TimeUnit.SECONDS);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
               if (callback != null && vis instanceof LoadableVisualizer)
               {
@@ -430,16 +396,20 @@ public class VisualizerPanel extends CustomLayout
                 }
               }
 
-              removeComponent("progress");
-
+              if(getComponentIndex(progress) > -1)
+              {
+                removeComponent(progress);
+              }
+              
               if (vis != null)
               {
                 vis.setVisible(true);
-                if (getComponent("iframe") == null)
-                {
-                  addComponent(vis, "iframe");
-                }
+                addComponent(vis);
               }
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           catch (InterruptedException ex)
@@ -458,12 +428,17 @@ public class VisualizerPanel extends CustomLayout
               error(
               "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
               ex);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
-              getWindow().showNotification(
+              Notification.show(
                 "Could not create visualizer " + visPlugin.getShortName(),
                 ex.toString(),
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
+            }
+            finally
+            {
+              session.unlock();
             }
             cancel(true);
           }
@@ -473,13 +448,13 @@ public class VisualizerPanel extends CustomLayout
 
 
       btEntry.setIcon(ICON_COLLAPSE);
-      ProgressIndicator progress = new ProgressIndicator();
+     
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
-      progress.setPollingInterval(100);
+      progress.setPollingInterval(250);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      addComponent(progress, "progress");
+      addComponent(progress);
     }
     // end if create input was needed
 

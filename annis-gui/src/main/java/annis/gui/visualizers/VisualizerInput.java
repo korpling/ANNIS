@@ -24,6 +24,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.Set;
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
-public class VisualizerInput
+public class VisualizerInput implements Serializable
 {
 
   private SDocument document;
@@ -54,7 +55,6 @@ public class VisualizerInput
   private List<SToken> token;
   private Set<String> tokenAnnos;
   private String segmentationName;
-  private VisualizerPanel visPanel;
 
   public String getAnnisWebServiceURL()
   {
@@ -364,22 +364,5 @@ public class VisualizerInput
   public String getSegmentationName()
   {
     return segmentationName;
-  }
-
-  /**
-   * @return the visPanel
-   */
-  public VisualizerPanel getVisPanel()
-  {
-    return visPanel;
-  }
-
-  /**
-   * @param visPanel this should be the parent VisualizerPanel for the
-   * visualizer which render this result
-   */
-  public void setVisPanel(VisualizerPanel visPanel)
-  {
-    this.visPanel = visPanel;
   }
 }

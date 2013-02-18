@@ -17,11 +17,13 @@ package annis.gui.querybuilder;
 
 import annis.gui.InstanceConfig;
 import annis.gui.PluginSystem;
+import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -29,6 +31,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sound.midi.ControllerEventListener;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -38,7 +41,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
   private PluginSystem pluginSystem;
-  private ControlPanel controlPanel;
+  private QueryController controller;
   private ComboBox cbChooseBuilder;
   private Map<String, String> short2caption;
   private Map<String, QueryBuilderPlugin> pluginRegistry;
@@ -46,24 +49,20 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private VerticalLayout layout;
   private InstanceConfig instanceConfig;
   
-  public QueryBuilderChooser(ControlPanel controlPanel, PluginSystem pluginSystem,
+  public QueryBuilderChooser(QueryController controller, PluginSystem pluginSystem,
     InstanceConfig instanceConfig)
   {
-    this.controlPanel = controlPanel;
+    this.controller = controller;
     this.pluginSystem = pluginSystem;
     this.instanceConfig = instanceConfig;
     
     this.pluginRegistry = new HashMap<String, QueryBuilderPlugin>();
     this.short2caption = new HashMap<String, String>();
-    
-  }
-
-  @Override
-  public void attach()
-  {
+ 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
-    layout = (VerticalLayout) getContent();
+    layout = new VerticalLayout();
+    setContent(layout);
     layout.setSizeFull();
     layout.setSpacing(true);
     setSizeFull();
@@ -88,7 +87,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     
     cbChooseBuilder.addListener((Property.ValueChangeListener) this);
     
-    addComponent(cbChooseBuilder);
+    layout.addComponent(cbChooseBuilder);
     layout.setExpandRatio(cbChooseBuilder, 0.0f);
     
     if(instanceConfig.getDefaultQueryBuilder() != null)
@@ -105,16 +104,16 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     QueryBuilderPlugin plugin = pluginRegistry.get((String) event.getProperty().getValue());
     if(plugin == null)
     {
-      getWindow().showNotification("Invalid selection (plugin not found)", 
-        Window.Notification.TYPE_WARNING_MESSAGE);
+      Notification.show("Invalid selection (plugin not found)", 
+        Notification.Type.WARNING_MESSAGE);
     }
     
-    Component component = plugin.createComponent(controlPanel);
+    Component component = plugin.createComponent(controller);
     if(lastComponent != null)
     {
-      removeComponent(lastComponent);
+      layout.removeComponent(lastComponent);
     }
-    addComponent(component);
+    layout.addComponent(component);
     layout.setExpandRatio(component, 1.0f);
     lastComponent = component;
   }

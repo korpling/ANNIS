@@ -17,15 +17,14 @@ package annis.gui.visualizers.component;
 
 import annis.CommonHelper;
 import annis.gui.MatchedNodeColors;
+import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaController;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
-import com.vaadin.Application;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -41,7 +40,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -56,10 +54,6 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 {
-  
-  @InjectPlugin
-  public MediaControllerFactory mcFactory;
-
   @Override
   public String getShortName()
   {
@@ -67,13 +61,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
   }
 
   @Override
-  public KWICInterface createComponent(VisualizerInput visInput, Application application)
+  public KWICInterface createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-    MediaController mediaController = null;
-    if(mcFactory != null && application instanceof MediaControllerHolder)
-    {
-      mediaController = mcFactory.getOrCreate((MediaControllerHolder) application);
-    }
+    MediaController mediaController = VaadinSession.getCurrent().getAttribute(MediaController.class);
     
     EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
     
@@ -189,11 +179,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       this.visInput = visInput;
       this.mediaController = mediaController;
       this.text = text;
-    }
-
-    @Override
-    public void attach()
-    {
 
       if (visInput != null)
       {
@@ -440,11 +425,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         }
         return "kwic-anno";
       }
-
+      
       @Override
-      public String getStyle(Object itemId, Object propertyId)
+      public String getStyle(Table source, Object itemId, Object propertyId)
       {
-         if (result == null)
+        if (result == null)
         {
           log.error("KWICStyleGenerator was restored from serialization and "
             + "can not generate new cells");

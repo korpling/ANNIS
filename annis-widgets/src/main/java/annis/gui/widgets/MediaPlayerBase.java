@@ -17,12 +17,12 @@ package annis.gui.widgets;
 
 import annis.gui.media.MediaPlayer;
 import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.widgets.gwt.client.VMediaPlayerBase;
+import annis.gui.widgets.gwt.client.ui.VMediaPlayerBase;
 import annis.visualizers.LoadableVisualizer;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
-import com.vaadin.terminal.gwt.client.VConsole;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.LegacyComponent;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public abstract class MediaPlayerBase extends AbstractComponent 
-  implements MediaPlayer, LoadableVisualizer
+  implements MediaPlayer, LoadableVisualizer, LegacyComponent
 {
 
   public enum PlayerAction
@@ -98,23 +98,21 @@ public abstract class MediaPlayerBase extends AbstractComponent
 
   @Override
   public void changeVariables(Object source, Map<String, Object> variables)
-  {
-    super.changeVariables(source, variables);
-    
+  {    
     if((Boolean) variables.get(VMediaPlayerBase.CANNOT_PLAY) == Boolean.TRUE)
     {     
       
-      if(getWindow() instanceof MimeTypeErrorListener)
+      if(getUI() instanceof MimeTypeErrorListener)
       {
-        ((MimeTypeErrorListener) getWindow()).notifyCannotPlayMimeType(mimeType);
+        ((MimeTypeErrorListener) getUI()).notifyCannotPlayMimeType(mimeType);
       }
     }
     if((Boolean) variables.get(VMediaPlayerBase.MIGHT_NOT_PLAY) == Boolean.TRUE)
     {     
       
-      if(getWindow() instanceof MimeTypeErrorListener)
+      if(getUI() instanceof MimeTypeErrorListener)
       {
-        ((MimeTypeErrorListener) getWindow()).notifyMightNotPlayMimeType(mimeType);
+        ((MimeTypeErrorListener) getUI()).notifyMightNotPlayMimeType(mimeType);
       }
     }
     
@@ -145,8 +143,6 @@ public abstract class MediaPlayerBase extends AbstractComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-    super.paintContent(target);
-    
     if(target.isFullRepaint())
     {
       sourcesAdded = false;

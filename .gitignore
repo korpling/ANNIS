@@ -9,3 +9,4 @@ target/
 /doc/.settings/
 /doc/html/
 /doc/latex/
+/annis-widgets/src/main/webapp/VAADIN/
