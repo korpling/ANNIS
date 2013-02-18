@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
  * GUI for searching in corpora.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@PreserveOnRefresh
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   LoginWindow.LoginListener,

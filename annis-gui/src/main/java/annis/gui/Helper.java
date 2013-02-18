@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -177,6 +180,19 @@ public class Helper
     
   }
   
+  private static String encodeBase64URL(String val)
+  {
+    try
+    {
+      return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error("Java Virtual Maschine can't handle UTF-8: I'm utterly confused", ex);
+    }
+    return "";
+  }
+  
   public static List<String> citationFragment(String aql, 
     Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
     int start, int limit)
@@ -184,9 +200,9 @@ public class Helper
     List<String> result = new ArrayList<String>();
     try
     {
-      result.add("q=" + URLEncoder.encode(aql, "UTF-8"));
-      result.add("c=" 
-        + URLEncoder.encode(StringUtils.join(corpora, ","), "UTF-8"));
+      result.add("_q=" + encodeBase64URL(aql));
+      result.add("_c=" 
+        + encodeBase64URL(StringUtils.join(corpora, ",")));
       result.add("cl=" 
         + URLEncoder.encode("" + contextLeft, "UTF-8"));
       result.add("cr=" 
@@ -197,8 +213,8 @@ public class Helper
         + URLEncoder.encode("" + limit, "UTF-8"));
       if(segmentation != null)
       {
-        result.add("seg=" 
-          + URLEncoder.encode("" + segmentation, "UTF-8"));
+        result.add("_seg=" 
+          + encodeBase64URL(segmentation));
       }
     }
     catch (UnsupportedEncodingException ex)
@@ -310,13 +326,22 @@ public class Helper
       {
         try
         {
-          value = URLDecoder.decode(parts[1], "UTF-8");
+          // every name that starts with "_" is base64 encoded
+          if(name.startsWith("_"))
+          {
+            value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
+          }
+          else
+          {
+            value = parts[1];
+          }
         }
         catch (UnsupportedEncodingException ex)
         {
-          log.warn(ex.getMessage(), ex);
+          log.error(ex.getMessage(), ex);
         }
       }
+      name = StringUtils.removeStart(name, "_");
       
       result.put(name, value);
     }
