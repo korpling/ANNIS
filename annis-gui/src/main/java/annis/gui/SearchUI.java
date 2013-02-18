@@ -304,6 +304,8 @@ public class SearchUI extends AnnisBaseUI
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
     
     checkCitation(request);
+    lastQueriedFragment = "";
+    evaluateFragment(getPage().getUriFragment());
   }
   
   
@@ -600,9 +602,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
-    String fragment = event.getUriFragment();
+    evaluateFragment(event.getUriFragment());    
+  }
+  
+  private void evaluateFragment(String fragment)
+  {
     // do nothing if not changed
-    if (fragment == null || fragment.equals(lastQueriedFragment))
+    if (fragment == null || fragment.isEmpty() || fragment.equals(lastQueriedFragment))
     {
       return;
     }
