@@ -18,6 +18,7 @@ package annis.gui.widgets.gwt.client.ui;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import annis.gui.widgets.gwt.client.ui.VVideoPlayer;
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.client.ui.LegacyConnector;
 import com.vaadin.shared.ui.Connect;
 

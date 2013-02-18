@@ -15,13 +15,11 @@
  */
 
 window.annis_gui_components_CssRenderInfo = function() {
-    var element = $(this.getElement());
     var component = this;
     
-    this.calculate = function () {
+    this.calculate = function (selector) {
       var result = {};
-      result[0] = element.offsetWidth;
-      result[1] = element.offsetHeight;
-      component.publishReslts(result);
+      
+      component.publishResults($(selector).width(), $(selector).height());
     }
 }

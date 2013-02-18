@@ -99,8 +99,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
   
-  private CssRenderInfo renderInfo;
-
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
    * mapping the sentence to a number by the order of the SStructures in the
@@ -167,11 +165,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     count++;
 
     jit = new JITWrapper();
+    jit.setWidth("100%");
+    jit.setHeight("-1px");
     setContent(jit);
-    
-    renderInfo = new CssRenderInfo();
-  //  addExtension(renderInfo);
-
 
     // send the json to the widget
     jit.setVisData(transformSaltToJSON(visInput));
@@ -179,11 +175,15 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     jit.requestRepaint();
 
   }
+  
+  public void addExtension(CssRenderInfo renderInfo)
+  {
+    super.addExtension(renderInfo);
+  }
 
   private void addScrollbar()
   {
     this.setWidth("100%");
-    this.setHeight("-1px");
     this.getContent().setSizeUndefined();
   }
 
@@ -493,11 +493,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     return true;
   }
 
-  public CssRenderInfo getRenderInfo()
-  {
-    return renderInfo;
-  }
-  
   /**
    * Gets the overlapping token as string from a node, which are direct
    * dominated by this node.

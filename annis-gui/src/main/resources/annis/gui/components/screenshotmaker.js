@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-window.annis_gui_components_screenshot_ScreenshotMaker = function() {
+window.annis_gui_components_ScreenshotMaker = function() {
     var element = $(this.getElement());
     var component = this;
     

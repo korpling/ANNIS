@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets;
 
+import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
@@ -26,6 +27,7 @@ import java.util.Properties;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
+@JavaScript({"jquery-1.8.2.min.js", "rst_vis.js"})
 public class JITWrapper extends AbstractComponent implements LegacyComponent
 {
 

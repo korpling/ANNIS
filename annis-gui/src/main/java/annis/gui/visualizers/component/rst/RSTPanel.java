@@ -23,6 +23,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * RSTPanel manages the scrollbuttons and calles then {@link RSTImpl} the actual
@@ -33,6 +34,7 @@ import java.util.Properties;
  */
 public class RSTPanel extends Panel
 {
+  private CssRenderInfo renderInfo;
 
   RSTPanel(VisualizerInput visInput)
   {
@@ -42,8 +44,8 @@ public class RSTPanel extends Panel
 
     // the calculation of the output json is done here.
     final RSTImpl rstView = new RSTImpl(visInput);
+    rstView.setId(UUID.randomUUID().toString());
     
-
     this.setHeight("-1px");
     this.setWidth("100%");
     grid.setHeight("-1px");
@@ -86,29 +88,32 @@ public class RSTPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        rstView.getRenderInfo().calculate(new CssRenderInfo.Callback() 
-        {
-          @Override
-          public void renderInfoReceived(int width, int height)
-          {
-            if (width - rstView.getScrollLeft() > scrollStep)
-            {
-              buttonLeft.setEnabled(true);
-              rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
-            }
-            else
-            {
-              rstView.
-                setScrollLeft(
-                rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
-
-              buttonLeft.setEnabled(true);
-              buttonRight.setEnabled(false);
-            }
-          }
-        });
+        renderInfo.calculate("#" + rstView.getId() + " canvas" );
       }
     });
+    
+    renderInfo = new CssRenderInfo(new CssRenderInfo.Callback() 
+    {
+      @Override
+      public void renderInfoReceived(int width, int height)
+      {
+        if (width - rstView.getScrollLeft() > scrollStep)
+        {
+          buttonLeft.setEnabled(true);
+          rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
+        }
+        else
+        {
+          rstView.
+            setScrollLeft(
+            rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
+
+          buttonLeft.setEnabled(true);
+          buttonRight.setEnabled(false);
+        }
+      }
+    });
+    rstView.addExtension(renderInfo);
 
     grid.addComponent(buttonLeft);
     grid.addComponent(rstView);

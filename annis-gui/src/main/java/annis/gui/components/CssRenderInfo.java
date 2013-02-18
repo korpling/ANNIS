@@ -15,6 +15,8 @@
  */
 package annis.gui.components;
 
+import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.Component;
@@ -26,29 +28,27 @@ import org.json.JSONException;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@JavaScript({"jquery-1.9.1.min.js","css_render_info.js"})
 public class CssRenderInfo extends AbstractJavaScriptExtension
 {
-  public CssRenderInfo()
+  public CssRenderInfo(final Callback callback)
   {
-    
-  }
-  
-  public void calculate(final Callback callback)
-  {
-    //re-add function
-    addFunction("publishResults", new JavaScriptFunction() 
+    addFunction("publishResults", new JavaScriptFunction()
     {
       @Override
       public void call(JSONArray arguments) throws JSONException
       {
-        if(callback != null)
+        if (callback != null)
         {
           callback.renderInfoReceived(arguments.getInt(0), arguments.getInt(
             1));
         }
       }
     });
-    callFunction("calculate");
+  }
+  public void calculate(String selector)
+  {
+    callFunction("calculate", selector);
   }
 
   @Override

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.components.screenshot;
+package annis.gui.components;
 
 import com.vaadin.ui.JavaScriptFunction;
 import org.json.JSONArray;

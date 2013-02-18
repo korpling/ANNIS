@@ -176,8 +176,6 @@ textarea.query {
   font-weight: bold;
 }
 
-}
-
 .left-button, .right-button {
   background-position: center;
   background-repeat: repeat-y;
@@ -185,10 +183,12 @@ textarea.query {
 
 .left-button {
   background-image: url(left_rst_arrow.png);
+  background-repeat: repeat-y;
 }
 
 .right-button {
   background-image: url(right_rst_arrow.png);
+  background-repeat: repeat-y;
 }
 
 .right-button .v-button-wrap {
