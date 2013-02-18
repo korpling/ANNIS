@@ -333,7 +333,7 @@ public class Helper
           }
           else
           {
-            value = parts[1];
+            value = URLDecoder.decode(parts[1], "UTF-8");
           }
         }
         catch (UnsupportedEncodingException ex)

@@ -616,13 +616,34 @@ public class SearchUI extends AnnisBaseUI
     Map<String, String> args = Helper.parseFragment(fragment);
 
     Set<String> corpora = new TreeSet<String>();
+    
     if (args.containsKey("c"))
     {
       String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
       corpora.addAll(Arrays.asList(corporaSplitted));
     }
 
-    if(args.get("cl") != null && args.get("cr") != null)
+    if(args.containsKey("c") && args.size() == 1)
+    {
+      // special case: we were called from outside and should only select
+      // our corpus
+      Set<String> mappedCorpora = new HashSet<String>();
+      // iterate over given corpora and map names if necessary
+      for(String c : corpora)
+      {
+        if(instanceConfig.getCorpusMappings() != null 
+          && instanceConfig.getCorpusMappings().containsKey(c))
+        {
+          mappedCorpora.add(instanceConfig.getCorpusMappings().get(c));
+        }
+        else
+        {
+          mappedCorpora.add(c);
+        }
+      }
+      queryController.setQuery(new Query("tok", mappedCorpora));
+    }
+    else if(args.get("cl") != null && args.get("cr") != null)
     {
       // full query with given context
       queryController.setQuery(new PagedResultQuery(
@@ -630,14 +651,15 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("cr")),
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
-        args.get("q"), corpora));
+        args.get("q"), corpora));      
+      queryController.executeQuery(true, true);
     }
     else
     {
       // use default context
-      queryController.setQuery(new Query(args.get("q"), corpora));
+      queryController.setQuery(new Query(args.get("q"), corpora));      
+      queryController.executeQuery(true, true);
     }    
-    queryController.executeQuery(true, true);
   }
   
   
