@@ -188,14 +188,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
     graph = visInput.getSResult().getSDocumentGraph();
     EList<SNode> rootSNodes = graph.getSRoots();
 
-    // debug output
-    if (log.isDebugEnabled())
-    {
-      Salt2DOT s2d = new Salt2DOT();
-      s2d.salt2Dot(graph, URI.createFileURI(
-        "/tmp/graph_" + graph.getSName() + ".dot"));
-    }
-
 
     if (rootSNodes.size() > 0)
     {
@@ -255,22 +247,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
         "jsonBuild", this);
     }
 
-    log.debug("result json string: {}", result);
-
-    if (log.isDebugEnabled())
-    {
-      try
-      {
-        String path = "/tmp/" + "json.js";
-        FileOutputStream out = new FileOutputStream(path);
-        out.write(("var json = " + result).toString().getBytes("UTF8"));
-        out.close();
-      }
-      catch (Exception ex)
-      {
-        log.error("writing json failed", ex);
-      }
-    }
     return result.toString();
   }
 
@@ -524,12 +500,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler
       int start = sSequences.get(0).getSStart();
       int end = sSequences.get(0).getSEnd();
       return text.getSText().substring(start, end);
+
+
     }
 
     // something fundamentally goes wrong
     log.error("{} instead of {}",
       sSequences.get(0).getSSequentialDS().getClass().getName(),
-      STextualDS.class.getName());
+      STextualDS.class
+      .getName());
+
 
     return null;
   }
