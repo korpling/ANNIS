@@ -15,9 +15,9 @@
  */
 package annis.gui.visualizers.component.rst;
 
+import annis.gui.VisualizationToggle;
 import annis.gui.visualizers.AbstractVisualizer;
 import annis.gui.visualizers.VisualizerInput;
-import com.vaadin.Application;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -34,10 +34,10 @@ public class RST extends AbstractVisualizer<RSTPanel>
     return "rst";
   }
 
+
   @Override
-  public RSTPanel createComponent(VisualizerInput visInput,
-    Application application)
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
   {
-        return new RSTPanel(visInput);
+    return new RSTPanel(visInput);
   }
 }

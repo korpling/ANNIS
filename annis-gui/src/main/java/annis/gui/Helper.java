@@ -24,9 +24,11 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import com.vaadin.Application;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
-import com.vaadin.ui.Window;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -98,6 +100,25 @@ public class Helper
     return createRESTClient(null, null);
   }
   
+  public static AnnisUser getUser()
+  {
+    Object o = VaadinSession.getCurrent().getSession().getAttribute(
+      AnnisBaseUI.USER_KEY);
+    if(o instanceof AnnisUser)
+    {
+      return (AnnisUser) o;
+    }
+    else
+    {
+      return null;
+    }
+  }
+  public static void setUser(AnnisUser user)
+  {
+    VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
+      user);
+  }
+  
   /**
    * Gets or creates a web resource to the ANNIS service.
    *
@@ -105,12 +126,12 @@ public class Helper
    * @param user The user object or null (should be of type {@link AnnisUser}).
    * @return A reference to the ANNIS service root resource.
    */
-  public static WebResource getAnnisWebResource(String uri, Object user)
+  public static WebResource getAnnisWebResource(String uri, AnnisUser user)
   {
     
-    if(user != null && user instanceof AnnisUser)
+    if(user != null)
     {
-      return ((AnnisUser) user).getClient().resource(uri);
+      return user.getClient().resource(uri);
     }
     
     // use the anonymous client
@@ -126,31 +147,37 @@ public class Helper
   /**
    * Gets or creates a web resource to the ANNIS service.
    *
-   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, java.lang.Object) }
-   * that gets all the needed information from the Vaadin {@link Application}
+   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)  }
+   * that does not need any arguments
    * 
-   * @param app  The Vaadin application.
    * @return A reference to the ANNIS service root resource.
    */
-  public static WebResource getAnnisWebResource(Application app)
+  public static WebResource getAnnisWebResource()
   {
     // get URI used by the application
-    String uri = app.getProperty(KEY_WEB_SERVICE_URL);
+    String uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
     
     // if already authentificated the REST client is set as the "user" property
-    Object user  = app.getUser();
+    AnnisUser user  = getUser();
     
     return getAnnisWebResource(uri, user);
   }
 
 
-  public static String getContext(Application app)
+  public static String getContext()
   {
-    WebApplicationContext context = (WebApplicationContext) app.getContext();
-    return context.getHttpSession().getServletContext().getContextPath();
+    if(VaadinService.getCurrentRequest() != null)
+    {
+      return  VaadinService.getCurrentRequest().getContextPath();
+    }
+    else
+    {
+      return (String) VaadinSession.getCurrent().getAttribute(AnnisBaseUI.CONTEXT_PATH);
+    }
+    
   }
   
-  public static List<String> citationFragmentParams(String aql, 
+  public static List<String> citationFragment(String aql, 
     Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
     int start, int limit)
   {
@@ -182,28 +209,20 @@ public class Helper
     return result;
   }
   
-  public static String generateCitation(Application app, String aql, 
+  public static String generateCitation(String aql, 
     Set<String> corpora, int contextLeft, int contextRight, String segmentation, 
     int start, int limit)
   {
     try
     {
-      URI appURI = app.getURL().toURI();
-
-      try
-      {
-        return new URI(appURI.getScheme(), null,
-          appURI.getHost(), appURI.getPort(),
-          getContext(app), null, 
-          StringUtils.join(citationFragmentParams(aql, corpora,
-            contextLeft, contextRight, segmentation, start, limit), "&"))
-          .toASCIIString();
-      }
-      catch (URISyntaxException ex)
-      {
-        log.error(null, ex);
-      }
-      return "ERROR";
+      URI appURI = UI.getCurrent().getPage().getLocation();
+      
+      return new URI(appURI.getScheme(), null,
+        appURI.getHost(), appURI.getPort(),
+        getContext(), null, 
+        StringUtils.join(citationFragment(aql, corpora,
+          contextLeft, contextRight, segmentation, start, limit), "&"))
+        .toASCIIString();
     }
     catch (URISyntaxException ex)
     {
@@ -212,38 +231,30 @@ public class Helper
     return "ERROR";
   }
 
-  public static String generateClassicCitation(Application app, String aql,
+  public static String generateClassicCitation(String aql,
     List<String> corpora,
     int contextLeft, int contextRight)
   {
+    StringBuilder sb = new StringBuilder();
+
+    URI appURI = UI.getCurrent().getPage().getLocation();
+
+    sb.append(getContext());
+    sb.append("/Cite/AQL(");
+    sb.append(aql);
+    sb.append("),CIDS(");
+    sb.append(StringUtils.join(corpora, ","));
+    sb.append("),CLEFT(");
+    sb.append(contextLeft);
+    sb.append("),CRIGHT(");
+    sb.append(contextRight);
+    sb.append(")");
+
     try
     {
-      StringBuilder sb = new StringBuilder();
-
-      URI appURI = app.getURL().toURI();
-
-      sb.append(getContext(app));
-      sb.append("/Cite/AQL(");
-      sb.append(aql);
-      sb.append("),CIDS(");
-      sb.append(StringUtils.join(corpora, ","));
-      sb.append("),CLEFT(");
-      sb.append(contextLeft);
-      sb.append("),CRIGHT(");
-      sb.append(contextRight);
-      sb.append(")");
-
-      try
-      {
-        return new URI(appURI.getScheme(), null,
-          appURI.getHost(), appURI.getPort(),
-          sb.toString(), null, null).toASCIIString();
-      }
-      catch (URISyntaxException ex)
-      {
-        log.error(null, ex);
-      }
-      return "ERROR";
+      return new URI(appURI.getScheme(), null,
+        appURI.getHost(), appURI.getPort(),
+        sb.toString(), null, null).toASCIIString();
     }
     catch (URISyntaxException ex)
     {
@@ -252,31 +263,37 @@ public class Helper
     return "ERROR";
   }
   
-  public static CorpusConfig getCorpusConfig(String corpus, 
-    Application app, Window window)
+  public static CorpusConfig getCorpusConfig(String corpus)
   {
     CorpusConfig corpusConfig = new CorpusConfig();
     corpusConfig.setConfig(new TreeMap<String, String>());
     
     try
     {
-      corpusConfig = Helper.getAnnisWebResource(app).path("query")
+      corpusConfig = Helper.getAnnisWebResource().path("query")
         .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
         .path("config").get(CorpusConfig.class);
     }
     catch(UnsupportedEncodingException ex)
     {
-      window.showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_TRAY_NOTIFICATION);
+      Notification.show("could not query corpus configuration", ex.
+        getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
     }
     catch (UniformInterfaceException ex)
     {
-      window.showNotification("could not query corpus configuration", ex.
-        getLocalizedMessage(), Window.Notification.TYPE_WARNING_MESSAGE);
+      Notification.show("could not query corpus configuration", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
     return corpusConfig;
   }
   
+  /**
+   * Parses the fragment.
+   * 
+   * Fragments have the form key1=value&key2=test ...
+   * @param fragment
+   * @return 
+   */
   public static Map<String,String> parseFragment(String fragment)
   {
     Map<String, String> result = new TreeMap<String, String>();

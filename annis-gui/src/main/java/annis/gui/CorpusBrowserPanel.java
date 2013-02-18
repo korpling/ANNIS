@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
@@ -27,9 +28,9 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Window.Notification;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
@@ -55,14 +56,14 @@ public class CorpusBrowserPanel extends Panel
   private Table tblEdgeAnno;
   private BeanItemContainer<CorpusBrowserEntry> containerEdgeAnno;
   private CitationLinkGenerator citationGenerator;
-  private ControlPanel controlPanel;
+  private QueryController controller;
 
   public CorpusBrowserPanel(final AnnisCorpus corpus,
-    ControlPanel controlPanel)
+    QueryController controller)
   {
     super("Available annotations");
     this.corpus = corpus;
-    this.controlPanel = controlPanel;
+    this.controller = controller;
 
     setSizeFull();
 
@@ -96,14 +97,7 @@ public class CorpusBrowserPanel extends Panel
     accordion.addTab(tblNodeAnno, "Node annotations", null);
     accordion.addTab(tblEdgeTypes, "Edge types", null);
     accordion.addTab(tblEdgeAnno, "Edge annotations", null);
-  }
-
-  @Override
-  public void attach()
-  {
-
-    citationGenerator.setMainWindow(getApplication().getMainWindow());
-
+  
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
@@ -225,7 +219,6 @@ public class CorpusBrowserPanel extends Panel
     tblEdgeTypes.setSortContainerPropertyId("name");
     tblEdgeAnno.setSortContainerPropertyId("name");
       
-    super.attach();
   }
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
@@ -233,7 +226,7 @@ public class CorpusBrowserPanel extends Panel
     Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
     try
     {
-      WebResource service = Helper.getAnnisWebResource(getApplication());
+      WebResource service = Helper.getAnnisWebResource();
       if(service != null)
       {
         WebResource query = service.path("query").path("corpora")
@@ -247,9 +240,9 @@ public class CorpusBrowserPanel extends Panel
     catch(Exception ex)
     {
       log.error(null, ex);
-      getWindow().showNotification(
+      Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
+        Notification.Type.WARNING_MESSAGE);
     }
     return new LinkedList<AnnisAttribute>(result);
   }
@@ -288,9 +281,9 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
       Set<String> corpusNameSet = new HashSet<String>();
       corpusNameSet.add(corpus.getName());
-      if(controlPanel != null)
+      if(controller != null)
       {
-        controlPanel.setQuery(cbe.getExample(), corpusNameSet);
+        controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
       }
     }
   }

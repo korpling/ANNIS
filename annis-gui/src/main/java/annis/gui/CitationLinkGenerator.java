@@ -16,10 +16,12 @@
 package annis.gui;
 
 import annis.gui.beans.CitationProvider;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 
@@ -30,9 +32,6 @@ import com.vaadin.ui.themes.BaseTheme;
 public class CitationLinkGenerator implements Table.ColumnGenerator,
   Button.ClickListener
 {
-
-  private Window mainWindow;
-
   @Override
   public Object generateCell(Table source, Object itemId, Object columnId)
   {
@@ -51,41 +50,30 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
         @Override
         public void buttonClick(ClickEvent event)
         {
-          if(mainWindow == null)
+   
+          if(citationProvider != null)
           {
-            event.getButton().getWindow().showNotification("Internal Error", "Main window was not set",
-              Window.Notification.TYPE_WARNING_MESSAGE);
+            CitationWindow c =
+              new CitationWindow(
+              citationProvider.getQuery(),
+              citationProvider.getCorpora(),
+              citationProvider.getLeftContext(),
+              citationProvider.getRightContext());
+            UI.getCurrent().addWindow(c);
+            c.center();
           }
           else
           {
-            if(citationProvider != null)
-            {
-              CitationWindow c =
-                new CitationWindow(mainWindow.getApplication(),
-                citationProvider.getQuery(),
-                citationProvider.getCorpora(),
-                citationProvider.getLeftContext(),
-                citationProvider.getRightContext());
-              mainWindow.addWindow(c);
-              c.center();
-            }
-            else
-            {
-              mainWindow.showNotification("Internal error",
-                "No valid citation link was found",
-                Window.Notification.TYPE_WARNING_MESSAGE);
-            }
+            Notification.show("Internal error",
+              "No valid citation link was found",
+              Notification.Type.WARNING_MESSAGE);
           }
+          
         }
       });
     }
 
     return btLink;
-  }
-
-  public void setMainWindow(Window mainWindow)
-  {
-    this.mainWindow = mainWindow;
   }
 
   @Override

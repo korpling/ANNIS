@@ -43,8 +43,6 @@ public class CorefVisualizer extends WriterVisualizer
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorefVisualizer.class);
 
-  VisualizerInput theInput;
-  Writer theWriter;
   long globalIndex;
   List<TReferent> ReferentList;
   List<TComponent> Komponent;
@@ -118,35 +116,33 @@ public class CorefVisualizer extends WriterVisualizer
    * @param writer writer to write with
    */
   @Override
-  public void writeOutput(VisualizerInput input, Writer writer)
+  public void writeOutput(VisualizerInput input, Writer w)
   {
-    this.theInput = input;
-    this.theWriter = writer;
     try
     {
-      println("<html>");
-      println("<head>");
+      println("<html>", w);
+      println("<head>", w);
 
       println("<link href=\"" 
-        + theInput.getResourcePath("coref/jquery.tooltip.css")
-        +"\" rel=\"stylesheet\" type=\"text/css\" >");
+        + input.getResourcePath("coref/jquery.tooltip.css")
+        +"\" rel=\"stylesheet\" type=\"text/css\" >", w);
       
       println("<script type=\"text/javascript\" src=\"" 
         + input.getResourcePath("coref/jquery-1.6.2.min.js")
-        +"\"></script>");
+        +"\"></script>", w);
       println("<script type=\"text/javascript\" src=\"" 
         + input.getResourcePath("coref/jquery.tooltip.min.js") 
-        +"\"></script>");
+        +"\"></script>", w);
       
       println("<link href=\"" 
-        + theInput.getResourcePath("coref/coref.css")
-        + "\" rel=\"stylesheet\" type=\"text/css\" >");
+        + input.getResourcePath("coref/coref.css")
+        + "\" rel=\"stylesheet\" type=\"text/css\" >", w);
       println("<script type=\"text/javascript\" src=\"" 
-        + theInput.getResourcePath("coref/CorefVisualizer.js")
-        + "\"></script>");
+        + input.getResourcePath("coref/CorefVisualizer.js")
+        + "\"></script>", w);
 
-      println("</head>");
-      println("<body>");
+      println("</head>", w);
+      println("<body>", w);
 
       //get Info
       globalIndex = 0;
@@ -162,7 +158,7 @@ public class CorefVisualizer extends WriterVisualizer
       AnnotationGraph anGraph = anResult.getGraph();
       if (anGraph == null)
       {
-        println("An Error occured: Could not get Graph of Result (Graph == null)</body>");
+        println("An Error occured: Could not get Graph of Result (Graph == null)</body>", w);
         return;
       }
       List<Edge> edgeList = anGraph.getEdges();
@@ -173,7 +169,7 @@ public class CorefVisualizer extends WriterVisualizer
 
       for (Edge e : edgeList)
       {
-        if (includeEdge(e))
+        if (includeEdge(e, input.getNamespace()))
         {
           visitedNodes = new LinkedList<Long>();
           //got Type for this?
@@ -212,7 +208,8 @@ public class CorefVisualizer extends WriterVisualizer
           Ref.Component = Componentnr;
           ReferentList.add(Ref);
 
-          List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), currentComponenttype, Componentnr);
+          List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), 
+            currentComponenttype, Componentnr, input.getNamespace());
 
           setReferent(e.getDestination(), globalIndex, 0);//neu
           setReferent(e.getSource(), globalIndex, 1);//neu
@@ -320,7 +317,7 @@ public class CorefVisualizer extends WriterVisualizer
           onclick = "togglePRAuto(this);";
         }
 
-        println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">");
+        println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
         int currentlinkcount = 0;
         if (underline)
         {
@@ -380,7 +377,7 @@ public class CorefVisualizer extends WriterVisualizer
                     + style + "\" onclick=\""
                     + onclick + "\" annis:pr_left=\""
                     + left2 + "\" annis:pr_right=\""
-                    + right2 + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>");
+                    + right2 + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
                 }
                 else
                 {//easier
@@ -394,14 +391,14 @@ public class CorefVisualizer extends WriterVisualizer
                     + style + "\" onclick=\""
                     + onclick + "\" annis:pr_left=\""
                     + left + "\" annis:pr_right=\""
-                    + right + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>");
+                    + right + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
                 }
               }
               currentlinkcount++;
               //while we've got underlines
               if (currentPositionComponent.equals(Long.MIN_VALUE))
               {
-                println("<tr><td height=\"5px\"></td></tr>");
+                println("<tr><td height=\"5px\"></td></tr>", w);
               }
               else
               {
@@ -435,15 +432,15 @@ public class CorefVisualizer extends WriterVisualizer
                   toolTipMaxLineCount = tooltip.length() / 40 + 1;
                 }
 
-                println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");//
+                println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
                 println("<tr><td height=\"3px\" width=\"100%\" "
                   + " style=\"" + style + addition + "\" onclick=\""
                   + onclick + "\" annis:pr_left=\""
                   + left + "\"annis:pr_right=\""
                   + right + "\" " + tooltip + "BGCOLOR=\""
-                  + Integer.toHexString(color) + "\"></td></tr>");
-                println("<tr><td height=\"2px\"></td></tr>");
-                println("</table></td></tr>");//
+                  + Integer.toHexString(color) + "\"></td></tr>", w);
+                println("<tr><td height=\"2px\"></td></tr>", w);
+                println("</table></td></tr>", w);//
               }
             }
           }
@@ -455,36 +452,36 @@ public class CorefVisualizer extends WriterVisualizer
           {
             if (currentlinkcount < maxlinkcount)
             {
-              println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>");
+              println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
             }
           }
-          println("</table></td></tr>");
+          println("</table></td></tr>", w);
         }
         else
         {
           println("<tr><td id=\"tok_"
             + tok.getId() + "\" " + " style=\""
             + style + "\" onclick=\""
-            + onclick + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>");
+            + onclick + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
           if (maxlinkcount > 0)
           {
-            println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
-            println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>");
-            println("</table></td></tr>");
+            println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
+            println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
+            println("</table></td></tr>", w);
           }
         }
-        println("</table>");
+        println("</table>", w);
       }
-      println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">");
-      println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">");
+      println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
+      println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
       if (toolTipMaxLineCount > 10)
       {
         toolTipMaxLineCount = 10;
       }
-      println("<tr><td height=\"n: " + (toolTipMaxLineCount * 15 + 15) + "px\"></td></tr>");
-      println("</table></td></tr>");
+      println("<tr><td height=\"n: " + (toolTipMaxLineCount * 15 + 15) + "px\"></td></tr>", w);
+      println("</table></td></tr>", w);
 
-      println("</body></html>");
+      println("</body></html>", w);
     }
     catch (IOException ex)
     {
@@ -500,7 +497,7 @@ public class CorefVisualizer extends WriterVisualizer
    * @param cnr Number of the Component
    * @return List of Tokens
    */
-  private List<Long> getAllTokens(AnnisNode a, String name, TComponenttype c, long cnr)
+  private List<Long> getAllTokens(AnnisNode a, String name, TComponenttype c, long cnr, String namespace)
   {
     List<Long> result = null;
     if (!visitedNodes.contains(a.getId()))
@@ -538,11 +535,11 @@ public class CorefVisualizer extends WriterVisualizer
       //get "P"-Edges!
       for (Edge e : a.getOutgoingEdges())
       {
-        if (includeEdge(e) && name.equals(e.getName())
+        if (includeEdge(e, namespace) && name.equals(e.getName())
           && !visitedNodes.contains(e.getDestination().getId()))
         {
           c.NodeList.add(e.getDestination().getId());
-          List<Long> Med = getAllTokens(e.getDestination(), name, c, cnr);
+          List<Long> Med = getAllTokens(e.getDestination(), name, c, cnr, namespace);
           for (Long l : Med)
           {
             if (!result.contains(l))
@@ -554,11 +551,11 @@ public class CorefVisualizer extends WriterVisualizer
       }
       for (Edge e : a.getIncomingEdges())
       {
-        if (includeEdge(e) && name.equals(e.getName())
+        if (includeEdge(e, namespace) && name.equals(e.getName())
           && !visitedNodes.contains(e.getSource().getId()))
         {
           c.NodeList.add(e.getSource().getId());
-          List<Long> Med = getAllTokens(e.getSource(), name, c, cnr);
+          List<Long> Med = getAllTokens(e.getSource(), name, c, cnr, namespace);
           for (Long l : Med)
           {
             if (!result.contains(l))
@@ -843,28 +840,28 @@ public class CorefVisualizer extends WriterVisualizer
     return (r * 65536 + g * 256 + b);
   }
 
-  private void println(String s) throws IOException
+  private void println(String s, Writer writer) throws IOException
   {
-    println(s, 0);
+    println(s, 0, writer);
   }
 
-  private void println(String s, int indent) throws IOException
+  private void println(String s, int indent, Writer writer) throws IOException
   {
     for(int i=0; i < indent; i++)
     {
-      theWriter.append("\t");
+      writer.append("\t");
     }
-    theWriter.append(s);
-    theWriter.append("\n");
+    writer.append(s);
+    writer.append("\n");
   }
 
-  private boolean includeEdge(Edge e)
+  private boolean includeEdge(Edge e, String namespace)
   {
     if (e != null && e.getName() != null
           && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
           && e.getDestination() != null
           && e.getNamespace() != null 
-          && e.getNamespace().equals(theInput.getNamespace()))
+          && e.getNamespace().equals(namespace))
     {
       return true;
     }

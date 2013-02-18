@@ -20,7 +20,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
@@ -53,13 +52,6 @@ public class MetaDataPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-
-    super.attach();
 
     // load meta data from service
     BeanItemContainer<Annotation> mData =
@@ -93,7 +85,7 @@ public class MetaDataPanel extends Panel
     String documentName)
   {
     List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource(getApplication());
+    WebResource res = Helper.getAnnisWebResource();
     try
     {
       res = res.path("query").path("corpora")
@@ -110,9 +102,9 @@ public class MetaDataPanel extends Panel
     {
       log.error(
         null, ex);
-      getWindow().showNotification("Remote exception: "
+      Notification.show("Remote exception: "
         + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
+        Notification.Type.WARNING_MESSAGE);
     }
     return result;
   }

@@ -17,7 +17,9 @@ package annis.gui.controlpanel;
 
 import annis.gui.Helper;
 import annis.gui.HistoryPanel;
+import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.model.Query;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -27,102 +29,93 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
-import org.vaadin.hene.splitbutton.SplitButton;
-import org.vaadin.hene.splitbutton.SplitButton.SplitButtonClickEvent;
+import org.vaadin.hene.popupbutton.PopupButton;
 
 /**
  *
  * @author thomas
  */
-public class QueryPanel extends Panel implements TextChangeListener,
+public class QueryPanel extends GridLayout implements TextChangeListener,
   ValueChangeListener
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
   
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
+  
+  // the view name
+  public static final String NAME = "query";
 
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
-  private SplitButton btHistory;
+  private PopupButton btHistory;
   private ListSelect lstHistory;
-  private ControlPanel controlPanel;
+  private QueryController controller;
   private ProgressIndicator piCount;
-  private HorizontalLayout buttonPanelLayout;
-  private GridLayout mainLayout;
-  private Panel panelStatus;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
   
-  public QueryPanel(final ControlPanel controlPanel)
+  public QueryPanel(final QueryController controller)
   {
-    this.controlPanel = controlPanel;
+    super(2,3);
+    this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
     
-    setSizeFull();
+    setSpacing(true);
+    setMargin(true);
 
-    mainLayout = new GridLayout(2, 3);
-    setContent(mainLayout);
-    mainLayout.setSizeFull();
-    mainLayout.setSpacing(true);
-    mainLayout.setMargin(true);
+    addComponent(new Label("AnnisQL:"), 0, 0);
+    addComponent(new Label("Status:"), 0, 2);
 
-    mainLayout.addComponent(new Label("AnnisQL:"), 0, 0);
-    mainLayout.addComponent(new Label("Status:"), 0, 2);
-
-    mainLayout.setRowExpandRatio(0, 1.0f);
-    mainLayout.setColumnExpandRatio(0, 0.2f);
-    mainLayout.setColumnExpandRatio(1, 0.8f);
+    setRowExpandRatio(0, 1.0f);
+    setColumnExpandRatio(0, 0.2f);
+    setColumnExpandRatio(1, 0.8f);
 
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
-    txtQuery.setSizeFull();
+    txtQuery.setWidth("100%");
+    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
-    txtQuery.addListener((TextChangeListener) this);
+    txtQuery.addTextChangeListener((TextChangeListener) this);
+    
 
-    mainLayout.addComponent(txtQuery, 1, 0);
+    addComponent(txtQuery, 1, 0);
 
-    panelStatus = new Panel();
-    panelStatus.setWidth(100f, UNITS_PERCENTAGE);
-    panelStatus.setHeight(3.5f, UNITS_EM);
-    ((VerticalLayout) panelStatus.getContent()).setMargin(false);
-    ((VerticalLayout) panelStatus.getContent()).setSpacing(false);
-    ((VerticalLayout) panelStatus.getContent()).setSizeFull();
-
+    VerticalLayout panelStatusLayout = new VerticalLayout();
+    panelStatusLayout.setHeight(3.5f, Unit.EM);
+    panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
+    
+    
     lblStatus = new Label();
-    lblStatus.setContentMode(Label.CONTENT_XHTML);
+    lblStatus.setContentMode(ContentMode.HTML);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
-    lblStatus.setHeight("-1px");
+    lblStatus.setHeight(3.5f, Unit.EM);
+    lblStatus.addStyleName("border-layout");
 
-    panelStatus.addComponent(lblStatus);
+    panelStatusLayout.addComponent(lblStatus);
 
-    mainLayout.addComponent(panelStatus, 1, 2);
+    addComponent(panelStatusLayout, 1, 2);
 
-    setScrollable(true);
-
-
-    Panel buttonPanel = new Panel();
-    buttonPanelLayout = new HorizontalLayout();
-    buttonPanel.setContent(buttonPanelLayout);
-    buttonPanelLayout.setWidth(100f, UNITS_PERCENTAGE);
-    mainLayout.addComponent(buttonPanel, 1, 1);
+    HorizontalLayout buttonLayout = new HorizontalLayout();
+    buttonLayout.setWidth("100%");
+    addComponent(buttonLayout, 1, 1);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
     piCount.setPollingInterval(500);
-    panelStatus.addComponent(piCount);
+    panelStatusLayout.addComponent(piCount);
 
 
     btShowResult = new Button("Show Result");
@@ -131,27 +124,22 @@ public class QueryPanel extends Panel implements TextChangeListener,
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
-    buttonPanel.addComponent(btShowResult);
+    buttonLayout.addComponent(btShowResult);
 
+    VerticalLayout historyListLayout = new VerticalLayout();
+    historyListLayout.setSizeUndefined();
+    
     lstHistory = new ListSelect();
+    lstHistory.setWidth("200px");
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
-    lstHistory.addListener((ValueChangeListener) this);
+    lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
     
-    btHistory = new SplitButton("History");
-    btHistory.addStyleName(SplitButton.STYLE_CHAMELEON);
-    btHistory.setWidth(100f, UNITS_PERCENTAGE);
-    btHistory.setComponent(lstHistory);    
-    btHistory.setButtonDescription("<strong>Show History</strong><br />"
-      + "Either use the short overview (arrow down) or click on the button "
-      + "for the extended view.");
-    buttonPanel.addComponent(btHistory);
-    
-    btHistory.addClickListener(new SplitButton.SplitButtonClickListener() {
-
+    Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener() 
+    {
       @Override
-      public void splitButtonClick(SplitButtonClickEvent event)
+      public void buttonClick(ClickEvent event)
       {
         if(historyWindow == null)
         {
@@ -160,18 +148,34 @@ public class QueryPanel extends Panel implements TextChangeListener,
           historyWindow.setWidth("400px");
           historyWindow.setHeight("250px");
         }
-        historyWindow.setContent(new HistoryPanel(history, controlPanel));
+        historyWindow.setContent(new HistoryPanel(history, controller));
         
-        if(getWindow().getChildWindows().contains(historyWindow))
+        if(UI.getCurrent().getWindows().contains(historyWindow))
         {
           historyWindow.bringToFront();
         }
         else
         {          
-          getWindow().addWindow(historyWindow);
+          UI.getCurrent().addWindow(historyWindow);
         }
       }
     });
+    btShowMoreHistory.setWidth("100%");
+    
+    historyListLayout.addComponent(lstHistory);
+    historyListLayout.addComponent(btShowMoreHistory);
+    
+    historyListLayout.setExpandRatio(lstHistory, 1.0f);
+    historyListLayout.setExpandRatio(btShowMoreHistory, 0.0f);
+    
+    btHistory = new PopupButton("History");
+    btHistory.setWidth(100f, Unit.PERCENTAGE);
+    btHistory.setContent(historyListLayout);
+    btHistory.setDescription("<strong>Show History</strong><br />"
+      + "Either use the short overview (arrow down) or click on the button "
+      + "for the extended view.");
+    buttonLayout.addComponent(btHistory);
+    
 
   }
   
@@ -228,7 +232,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     // validate query
     try
     {
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      WebResource annisResource = Helper.getAnnisWebResource();
       String result = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
       if ("ok".equalsIgnoreCase(result))
@@ -250,27 +254,27 @@ public class QueryPanel extends Panel implements TextChangeListener,
       {
         log.error(
           "Exception when communicating with service", ex);
-        getWindow().showNotification("Exception when communicating with service: " + ex.getMessage(),
-          Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Exception when communicating with service: " + ex.getMessage(),
+          Notification.Type.TRAY_NOTIFICATION);
       }
     }
     catch(ClientHandlerException ex)
     {
       log.error(
           "Could not connect to web service", ex);
-        getWindow().showNotification("Could not connect to web service: " + ex.getMessage(),
-          Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Could not connect to web service: " + ex.getMessage(),
+          Notification.Type.TRAY_NOTIFICATION);
     }
   }
-
+  
   @Override
   public void valueChange(ValueChangeEvent event)
   {
     btHistory.setPopupVisible(false);
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
-    if(controlPanel != null & e != null)
+    if(controller != null & e != null)
     {
-      controlPanel.setQuery(e.getQuery(), e.getCorpora());
+      controller.setQuery(new Query(e.getQuery(), e.getCorpora()));
     }
   }
 
@@ -280,9 +284,10 @@ public class QueryPanel extends Panel implements TextChangeListener,
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(controlPanel != null)
+      if(controller != null)
       {
-        controlPanel.executeQuery();
+        controller.setQuery((txtQuery.getValue()));
+        controller.executeQuery();
       }
     }
   }
@@ -298,7 +303,7 @@ public class QueryPanel extends Panel implements TextChangeListener,
     }
   }
 
-  protected void setStatus(String status)
+  public void setStatus(String status)
   {
     if(lblStatus != null)
     {

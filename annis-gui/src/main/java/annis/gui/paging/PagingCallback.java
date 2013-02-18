@@ -23,5 +23,5 @@ import java.io.Serializable;
  */
 public interface PagingCallback extends Serializable
 {
-  public void createPage(int start, int limit);
+  public void switchPage(int offset, int limit);
 }
