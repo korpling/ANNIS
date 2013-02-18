@@ -17,6 +17,7 @@ package annis.gui;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,6 +40,7 @@ public class InstanceConfig implements Serializable
   private String defaultQueryBuilder;
   private List<CorpusSet> corpusSets;
   private String defaultCorpusSet;
+  private Map<String,String> corpusMappings;
 
   /**
    * Get the internal short name of this instance.
@@ -118,8 +120,24 @@ public class InstanceConfig implements Serializable
   {
     this.defaultCorpusSet = defaultCorpusSet;
   }
-  
-  
-  
+
+  /**
+   * Get the mappings of corpus names.
+   * 
+   * A mapping is an alias for an imported corpus which can be used e.g.
+   * by external applications to reference to a persistant identifier instead
+   * of the internal corpus name.
+   * @return 
+   */
+  @XmlElement(name="corpus-mappings")
+  public Map<String, String> getCorpusMappings()
+  {
+    return corpusMappings;
+  }
+
+  public void setCorpusMappings(Map<String, String> corpusMappings)
+  {
+    this.corpusMappings = corpusMappings;
+  }  
   
 }
