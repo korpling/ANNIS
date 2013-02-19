@@ -15,9 +15,8 @@
  */
 package annis.libgui;
 
-import annis.gui.AnnisBaseUI;
+import annis.libgui.AnnisBaseUI;
 import annis.provider.SaltProjectProvider;
-import annis.security.AnnisUser;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;

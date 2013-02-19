@@ -15,11 +15,6 @@
  */
 package annis.libgui.visualizers;
 
-import annis.gui.visualizers.IFrameResource;
-import annis.gui.visualizers.IFrameResourceMap;
-import annis.gui.visualizers.ResourcePlugin;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.VisualizationToggle;
 import annis.gui.widgets.AutoHeightIFrame;
 import com.vaadin.server.VaadinSession;
@@ -72,7 +67,6 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   @Override
   public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle)
   { 
-   
     
     VaadinSession session = VaadinSession.getCurrent();
     if(session.getAttribute(IFrameResourceMap.class) == null)
