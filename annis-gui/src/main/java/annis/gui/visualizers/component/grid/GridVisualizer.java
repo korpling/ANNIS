@@ -91,7 +91,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     
     private AnnotationGrid grid;
     private transient VisualizerInput input;
-    private transient MediaController mediaController;
     private VerticalLayout layout;
 
     public enum ElementType
@@ -107,7 +106,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public GridVisualizerComponent(VisualizerInput input, MediaController mediaController)
     {
       this.input = input;
-      this.mediaController = mediaController;
       
       setWidth("100%");
       setHeight("-1");
@@ -123,6 +121,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
         grid = new AnnotationGrid(mediaController, resultID);
         grid.addStyleName("partitur_table");
+        grid.addStyleName("corpus-font");
         layout.addComponent(grid);
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();

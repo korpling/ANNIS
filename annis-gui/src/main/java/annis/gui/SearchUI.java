@@ -510,6 +510,11 @@ public class SearchUI extends AnnisBaseUI
     return controlPanel;
   }
 
+  public InstanceConfig getInstanceConfig()
+  {
+    return instanceConfig;
+  }
+  
   @Override
   public void screenshotReceived(byte[] imageData, String mimeType)
   {

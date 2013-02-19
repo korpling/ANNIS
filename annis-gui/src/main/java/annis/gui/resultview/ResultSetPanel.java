@@ -17,6 +17,7 @@ package annis.gui.resultview;
 
 import annis.CommonHelper;
 import annis.gui.Helper;
+import annis.gui.InstanceConfig;
 import annis.gui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
@@ -72,8 +73,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private ProgressIndicator indicator;
   private VerticalLayout indicatorLayout;
   private CssLayout layout;
+  private InstanceConfig instanceConfig;
 
-  public ResultSetPanel(List<Match> matches, PluginSystem ps,
+  public ResultSetPanel(List<Match> matches, PluginSystem ps, InstanceConfig instanceConfig,
     int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent, int firstMatchOffset)
@@ -85,6 +87,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
     this.firstMatchOffset = firstMatchOffset;
+    this.instanceConfig = instanceConfig;
 
     resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
@@ -195,7 +198,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
-        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName);
+        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName, instanceConfig);
       i++;
       
       panel.setWidth("100%");

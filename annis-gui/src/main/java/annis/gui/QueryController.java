@@ -67,12 +67,12 @@ public class QueryController implements PagingCallback
   private ResultViewPanel lastResultView;
   private AnnisResultQuery resultFetcher;
   private MatchAndDocumentCount lastCount;
-
   
   public QueryController(SearchUI ui)
   {
     this.ui = ui;    
     this.history = new ListOrderedSet<HistoryEntry>();
+   
   }
   
   public void updateCorpusSetList()
@@ -172,7 +172,7 @@ public class QueryController implements PagingCallback
       {
         ui.getMainTab().removeComponent(lastResultView);
       }
-      lastResultView = new ResultViewPanel(this, ui);
+      lastResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
       ui.getMainTab().addTab(lastResultView, "Query Result");
       ui.getMainTab().setSelectedTab(lastResultView);
 

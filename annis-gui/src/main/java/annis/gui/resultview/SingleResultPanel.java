@@ -16,6 +16,7 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.gui.InstanceConfig;
 import annis.gui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.PluginSystem;
@@ -66,13 +67,10 @@ public class SingleResultPanel extends VerticalLayout implements
   private transient Map<SNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
-  private ResolverProvider resolverProvider;
   private transient PluginSystem ps;
   private List<VisualizerPanel> visualizers;
   private Button btInfo;
-  private int resultNumber;
   private List<String> path;
-  private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private transient List<SToken> token;
   private HorizontalLayout infoBar;
@@ -82,13 +80,10 @@ public class SingleResultPanel extends VerticalLayout implements
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName)
+    Set<String> visibleTokenAnnos, String segmentationName, InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;
-    this.resolverProvider = resolverProvider;
-    this.resultNumber = resultNumber;
-    this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
 
     calculateHelperVariables();
@@ -151,7 +146,7 @@ public class SingleResultPanel extends VerticalLayout implements
           token, visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap, 
           htmlID, resultID, this,
-          segmentationName, ps);
+          segmentationName, ps, instanceConfig);
 
         visualizers.add(p);
         Properties mappings = entries[i].getMappings();

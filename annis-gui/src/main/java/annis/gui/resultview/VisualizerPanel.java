@@ -16,6 +16,7 @@
 package annis.gui.resultview;
 
 import annis.gui.Helper;
+import annis.gui.InstanceConfig;
 import annis.gui.PluginSystem;
 import annis.gui.VisualizationToggle;
 import annis.gui.media.MediaPlayer;
@@ -121,11 +122,7 @@ public class VisualizerPanel extends VerticalLayout
   
   private ProgressIndicator progress;
 
-  private final static String htmlTemplate =
-    "<div id=\":id\"><div location=\"btEntry\"></div>"
-    + "<div location=\"progress\"></div>"
-    + "<div location=\"iframe\"></div>"
-    + "</div>";
+  private InstanceConfig instanceConfig;
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -144,11 +141,13 @@ public class VisualizerPanel extends VerticalLayout
     String resultID,
     SingleResultPanel parent,
     String segmentationName,
-    PluginSystem ps) throws IOException
+    PluginSystem ps,
+    InstanceConfig instanceConfig) throws IOException
   {
     visPlugin = ps.getVisualizer(entry.getVisType());
 
     this.ps = ps;
+    this.instanceConfig = instanceConfig;
     this.entry = entry;
     this.markersExact = markedExactMap;
     this.markersCovered = markedAndCoveredMap;
@@ -273,6 +272,11 @@ public class VisualizerPanel extends VerticalLayout
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
+    if(instanceConfig != null && instanceConfig.getFont() != null)
+    {
+      input.setFont(instanceConfig.getFont());
+    }
+     
 
     if (entry != null)
     {
