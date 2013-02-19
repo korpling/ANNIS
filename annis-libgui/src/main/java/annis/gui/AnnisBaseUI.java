@@ -348,15 +348,16 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-
-    // TODO: package core plugins as extra project/jar and load them as jar
-    // add our core plugins by hand
-
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
 
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
-    File basicPlugins = new File(baseDir, "plugins");
+    
+    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-3.0.0-SNAPSHOT.jar");
+    pluginManager.addPluginsFrom(builtin.toURI());
+    log.info("added plugins from {}", builtin.getPath());
+    
+    File basicPlugins = new File(baseDir, "WEB-INF/plugins");
     if (basicPlugins.isDirectory())
     {
       pluginManager.addPluginsFrom(basicPlugins.toURI());
