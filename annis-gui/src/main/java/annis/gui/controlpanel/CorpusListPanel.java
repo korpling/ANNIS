@@ -256,7 +256,8 @@ public class CorpusListPanel extends VerticalLayout implements
       else
       {
         
-        if(instanceConfig != null && instanceConfig.getDefaultCorpusSet() != null)
+        if(instanceConfig != null && instanceConfig.getDefaultCorpusSet() != null 
+          && instanceConfig.getDefaultCorpusSet().length() > 0)
         {
           cbSelection.select(instanceConfig.getDefaultCorpusSet());
         }
