@@ -16,7 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.libgui.Helper;
-import annis.gui.widgets.components.HelpButton;
+import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.TextExporter;

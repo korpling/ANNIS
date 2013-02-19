@@ -18,7 +18,7 @@ package annis.gui;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
-import annis.gui.widgets.components.ScreenshotMaker;
+import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;

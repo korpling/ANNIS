@@ -16,7 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.libgui.Helper;
-import annis.gui.widgets.components.HelpButton;
+import annis.gui.components.HelpButton;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.GenericType;
