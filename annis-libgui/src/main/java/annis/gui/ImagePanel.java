@@ -1,3 +1,5 @@
+package annis.gui;
+
 /*
  * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
@@ -13,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
+
 
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Panel;
@@ -21,7 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 /**
- *
+ * Panel that displays an image.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class ImagePanel extends Panel

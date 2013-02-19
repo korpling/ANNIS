@@ -15,7 +15,6 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.AnnisBaseUI;
 import annis.gui.VisualizationToggle;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -26,7 +25,7 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Every visualizer must implement this interface. It' s also necessary to to
- * load this plugin by hand in {@link AnnisBaseUI#initPlugins()}
+ * load this plugin by hand in {@link annis.gui.AnnisBaseUI#initPlugins()}
  *
  * If you wish to implement an iframe visualizer you should extend the
  * {@link AbstractIFrameVisualizer} class, because this class already has

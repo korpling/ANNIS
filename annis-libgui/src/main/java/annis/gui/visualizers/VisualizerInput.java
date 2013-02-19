@@ -16,12 +16,10 @@
 package annis.gui.visualizers;
 
 import annis.gui.MatchedNodeColors;
-import annis.gui.resultview.VisualizerPanel;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;

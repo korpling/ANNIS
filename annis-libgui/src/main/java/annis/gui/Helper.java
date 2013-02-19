@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.AnnisBaseUI;
 import annis.provider.SaltProjectProvider;
 import annis.security.AnnisUser;
 import annis.service.objects.CorpusConfig;
