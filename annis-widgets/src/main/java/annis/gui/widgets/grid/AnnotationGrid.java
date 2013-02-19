@@ -15,8 +15,8 @@
  */
 package annis.gui.widgets.grid;
 
-import annis.gui.MatchedNodeColors;
-import annis.gui.media.MediaController;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.media.MediaController;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;

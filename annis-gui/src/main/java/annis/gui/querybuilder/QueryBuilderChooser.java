@@ -15,8 +15,8 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.InstanceConfig;
-import annis.gui.PluginSystem;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property;

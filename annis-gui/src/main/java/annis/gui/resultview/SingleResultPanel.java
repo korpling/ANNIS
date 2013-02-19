@@ -16,9 +16,9 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.MatchedNodeColors;
+import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.gui.PluginSystem;
+import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
 import com.vaadin.server.ThemeResource;

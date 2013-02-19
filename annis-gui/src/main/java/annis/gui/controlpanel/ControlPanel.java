@@ -15,7 +15,7 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.InstanceConfig;
+import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;

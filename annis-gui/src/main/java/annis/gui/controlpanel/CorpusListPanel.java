@@ -17,10 +17,10 @@ package annis.gui.controlpanel;
 
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.security.AnnisUserConfig;
-import annis.gui.CorpusSet;
-import annis.gui.InstanceConfig;
+import annis.libgui.CorpusSet;
+import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;

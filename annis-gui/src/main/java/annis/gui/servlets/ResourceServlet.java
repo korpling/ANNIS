@@ -15,7 +15,7 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.visualizers.ResourcePlugin;
+import annis.libgui.visualizers.ResourcePlugin;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
