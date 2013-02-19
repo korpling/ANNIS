@@ -160,6 +160,7 @@
     <module>annis-kickstarter</module>
     <module>annis-gui</module>
     <module>annis-widgets</module>
+    <module>annis-visualizers</module>
   </modules>
     
 </project>

@@ -19,21 +19,6 @@ import annis.gui.media.MediaController;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;
-import annis.gui.visualizers.iframe.CorefVisualizer;
-import annis.gui.visualizers.component.dependency.ProielDependecyTree;
-import annis.gui.visualizers.component.dependency.ProielRegularDependencyTree;
-import annis.gui.visualizers.iframe.dependency.VakyarthaDependencyTree;
-import annis.gui.visualizers.component.graph.DebugVisualizer;
-import annis.gui.visualizers.component.graph.DotGraphVisualizer;
-import annis.gui.visualizers.iframe.gridtree.GridTreeVisualizer;
-import annis.gui.visualizers.component.AudioVisualizer;
-import annis.gui.visualizers.component.KWICPanel;
-import annis.gui.visualizers.component.VideoVisualizer;
-import annis.gui.visualizers.component.grid.GridVisualizer;
-import annis.gui.visualizers.component.rst.RST;
-import annis.gui.visualizers.component.rst.RSTFull;
-import annis.gui.visualizers.iframe.partitur.PartiturVisualizer;
-import annis.gui.visualizers.component.tree.TigerTreeVisualizer;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -366,29 +351,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     // TODO: package core plugins as extra project/jar and load them as jar
     // add our core plugins by hand
-    pluginManager.addPluginsFrom(new ClassURI(CorefVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(DotGraphVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(DebugVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(GridTreeVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(GridVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(PartiturVisualizer.class).toURI());
-    pluginManager.
-      addPluginsFrom(new ClassURI(ProielDependecyTree.class).toURI());
-    pluginManager.
-      addPluginsFrom(new ClassURI(ProielRegularDependencyTree.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
-    pluginManager.
-      addPluginsFrom(new ClassURI(TigerTreeVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(VakyarthaDependencyTree.class).
-      toURI());
-    pluginManager.addPluginsFrom(new ClassURI(AudioVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(VideoVisualizer.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(KWICPanel.class).toURI());
 
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
 
-    pluginManager.addPluginsFrom(new ClassURI(RST.class).toURI());
-    pluginManager.addPluginsFrom(new ClassURI(RSTFull.class).toURI());
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     File basicPlugins = new File(baseDir, "plugins");

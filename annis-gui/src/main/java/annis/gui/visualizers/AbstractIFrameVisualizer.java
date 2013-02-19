@@ -23,10 +23,7 @@ import com.vaadin.ui.UI;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**

@@ -17,7 +17,6 @@ package annis.gui.visualizers;
 
 import annis.gui.AnnisBaseUI;
 import annis.gui.VisualizationToggle;
-import annis.gui.visualizers.component.KWICPanel;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;
@@ -39,7 +38,7 @@ import net.xeoh.plugins.base.Plugin;
  * {@link AbstractVisualizer} class. There you will have to implement the {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)
  * } method. Normally you need a inner or additional class which extends a
  * vaadin implementation of the {@link Component} interface. The
- * {@link KWICPanel} is an example for that.
+ * {@link annis.gui.visualizers.component.KWICPanel} is an example for that.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
