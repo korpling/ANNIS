@@ -29,12 +29,12 @@ public class EdgeBox extends Panel
   private static final String[][] EDGE_OPERATORS = new String[][]
   {
     {".",".2",".1,2",".*"},
-    { "is directly preceding (.)",
-      "is preceding with one token in between (.2)",
-      "is directly preceding or with one token in between(.1,2)",
-      "is indirectly preceding (.*)"}
+    { ".       [is directly preceding]",
+      ".2      [is preceding with one token in between]",
+      ".1,2    [is directly preceding or with one token in between]",
+      ".*      [is indirectly preceding]"}
   };
-  private static final String WIDTH = "50px";
+  private static final String WIDTH = "45px";
   
   
   
@@ -48,6 +48,7 @@ public class EdgeBox extends Panel
     edge.setNewItemsAllowed(true);
     edge.setValue(EDGE_OPERATORS[1][0]);
     edge.setWidth(WIDTH);
+    edge.setNullSelectionAllowed(false);
     addComponent(edge);
   }
   
