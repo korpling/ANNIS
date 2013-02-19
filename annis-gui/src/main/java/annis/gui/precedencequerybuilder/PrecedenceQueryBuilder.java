@@ -169,48 +169,37 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
 
   private String getAQLQuery()
   {
-    int count = 1;
-
-    //get all instances of type VerticalNode, Searchbox, Edgebox
-    Iterator<Component> itcmp = language.getComponentIterator();
-    Collection<Integer> sentenceVars = new ArrayList<Integer>();
+    int count = 1;    
     String query = "", edgeQuery = "", sentenceQuery = "";
-    while(itcmp.hasNext())
+    Collection<Integer> sentenceVars = new ArrayList<Integer>();
+    Iterator<EdgeBox> itEboxes = eboxes.iterator();
+    
+    for (VerticalNode v : vnodes)
     {
-      Component itElem = itcmp.next();
-
-      if(itElem instanceof VerticalNode)
+      Collection<SearchBox> sboxes = v.getSearchBoxes();
+      for (SearchBox s : sboxes)
       {
-        Collection<SearchBox> sbList = ((VerticalNode)itElem).getSearchBoxes();
-
-        for (SearchBox sb : sbList)
-        {
-          query += " & " + getAQLFragment(sb);
-        }
-
-
-
-        sentenceVars.add(new Integer(count));
-
-        for(int i=1; i < sbList.size(); i++)
-        {
-          String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
-          edgeQuery += addQuery;
-        }
-        //if a VerticalNode contains no condition/SearchBox, a placeholder
-        //is inserted to describe the gap as "anything"
-        if (sbList.isEmpty()) {query += "\n& /.*/";}
+        query += " & " + getAQLFragment(s);
       }
-
-      //after a VerticalNode there is always an... EDGEBOX!
-      //so the Query will be build in the right order
-      if(itElem instanceof EdgeBox)
+      if (sboxes.isEmpty())
       {
-        count++;
-        EdgeBox eb = (EdgeBox)itElem;
-        edgeQuery += "\n& #" + (count-1) +" "+ eb.getValue() +" "+ "#" + count;
+        //not sure we want to do it this way:
+        query += "\n& /.*/";
       }
-    }
+      
+      sentenceVars.add(new Integer(count));
+
+      for(int i=1; i < sboxes.size(); i++)
+      {
+        String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
+        edgeQuery += addQuery;
+      }
+      
+      count++;
+      String edgeQueryAdds = (itEboxes.hasNext()) ? "\n& #" + (count-1) +" "+ itEboxes.next().getValue() +" #" + count : "";
+      edgeQuery += edgeQueryAdds;
+    }    
+    
     //search within span?
     if(spb.searchWithinSpan())
     {
@@ -228,8 +217,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
       {
         addQuery = "\n& "+ spb.getSpanName() + " = /" + spb.getSpanValue() + "/";
       }
-      query += addQuery;    
-      count++;
+      query += addQuery;
       for(Integer i : sentenceVars)
       {
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
