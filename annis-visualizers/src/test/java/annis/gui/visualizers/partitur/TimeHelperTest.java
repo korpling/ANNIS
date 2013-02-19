@@ -15,7 +15,7 @@
  */
 package annis.gui.visualizers.partitur;
 
-import annis.gui.visualizers.iframe.partitur.TimeHelper;
+import annis.visualizers.iframe.partitur.TimeHelper;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
