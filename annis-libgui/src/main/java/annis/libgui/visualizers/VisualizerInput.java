@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers;
+package annis.libgui.visualizers;
 
-import annis.gui.MatchedNodeColors;
+import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;

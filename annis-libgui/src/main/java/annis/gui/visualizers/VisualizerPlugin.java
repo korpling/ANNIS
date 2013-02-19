@@ -15,7 +15,8 @@
  */
 package annis.gui.visualizers;
 
-import annis.gui.VisualizationToggle;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.VisualizationToggle;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;

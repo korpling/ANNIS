@@ -15,8 +15,8 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.media.MediaPlayer;
-import annis.gui.media.MimeTypeErrorListener;
+import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.MimeTypeErrorListener;
 import annis.gui.widgets.gwt.client.ui.VMediaPlayerBase;
 import annis.visualizers.LoadableVisualizer;
 import com.vaadin.server.PaintException;

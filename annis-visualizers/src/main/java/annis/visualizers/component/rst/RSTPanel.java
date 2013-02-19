@@ -15,14 +15,12 @@
  */
 package annis.visualizers.component.rst;
 
-import annis.gui.components.CssRenderInfo;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.components.CssRenderInfo;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
-import com.google.gwt.resources.css.ast.CssProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import java.util.Properties;
 import java.util.UUID;
 
 /**

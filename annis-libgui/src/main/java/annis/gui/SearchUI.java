@@ -15,11 +15,13 @@
  */
 package annis.gui;
 
+import annis.libgui.InstanceConfig;
+import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.media.MediaController;
-import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.media.impl.MediaControllerImpl;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MimeTypeErrorListener;
+import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;

@@ -15,8 +15,8 @@
  */
 package annis.visualizers.iframe;
 
-import annis.gui.visualizers.AbstractIFrameVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.AbstractIFrameVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import java.io.*;
 import org.slf4j.LoggerFactory;
 

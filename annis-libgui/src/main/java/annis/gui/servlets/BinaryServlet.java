@@ -15,7 +15,7 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.gui.AnnisBaseUI;
 import annis.security.AnnisUser;
 import annis.service.objects.AnnisBinary;

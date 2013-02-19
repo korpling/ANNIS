@@ -16,22 +16,20 @@
 package annis.visualizers.component;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaController;
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.Helper;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.VideoPlayer;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package annis.gui;
+package annis.libgui;
 
 /*
  * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.

@@ -15,7 +15,9 @@
  */
 package annis.gui;
 
-import annis.gui.media.MediaController;
+import annis.libgui.InstanceConfig;
+import annis.libgui.Helper;
+import annis.libgui.media.MediaController;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.visualizers.VisualizerPlugin;

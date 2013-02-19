@@ -15,10 +15,10 @@
  */
 package annis.visualizers.component;
 
-import annis.gui.ImagePanel;
-import annis.gui.VisualizationToggle;
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.ImagePanel;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Embedded;
 import java.io.File;

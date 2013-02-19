@@ -16,7 +16,7 @@
 package annis.visualizers.iframe.partitur;
 
 import annis.CommonHelper;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.service.ifaces.AnnisToken;

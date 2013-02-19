@@ -1,6 +1,6 @@
 package annis.visualizers.iframe.gridtree;
 
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
 import annis.model.AnnisNode;
 import annis.model.Annotation;

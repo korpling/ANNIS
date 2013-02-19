@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.media;
+package annis.libgui.media;
 
 import java.io.Serializable;
 

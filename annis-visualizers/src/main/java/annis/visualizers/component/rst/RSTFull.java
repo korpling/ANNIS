@@ -15,9 +15,9 @@
  */
 package annis.visualizers.component.rst;
 
-import annis.gui.VisualizationToggle;
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

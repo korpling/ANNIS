@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.media;
+package annis.libgui.media;
 
-import annis.gui.VisualizationToggle;
+import annis.libgui.VisualizationToggle;
 import net.xeoh.plugins.base.Plugin;
 
 /**

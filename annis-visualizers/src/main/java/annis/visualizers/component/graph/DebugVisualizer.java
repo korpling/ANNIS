@@ -15,7 +15,7 @@
  */
 package annis.visualizers.component.graph;
 
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.AbstractDotVisualizer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
 import java.io.File;

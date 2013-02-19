@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.media.impl;
+package annis.libgui.media;
 
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaController;
-import annis.gui.media.MediaPlayer;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
 import annis.visualizers.LoadableVisualizer;
 import java.io.Serializable;
 import java.util.HashMap;

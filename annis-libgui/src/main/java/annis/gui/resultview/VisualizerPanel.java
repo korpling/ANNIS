@@ -15,11 +15,11 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.gui.PluginSystem;
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaPlayer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaPlayer;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;

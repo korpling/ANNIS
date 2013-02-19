@@ -16,7 +16,7 @@
 package annis.gui.resultview;
 
 import annis.service.objects.Match;
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.security.AnnisUser;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;

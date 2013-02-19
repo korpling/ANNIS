@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.model.Query;

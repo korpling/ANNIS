@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.media;
+package annis.libgui;
+
+import annis.visualizers.LoadableVisualizer;
+import java.io.Serializable;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author thomas
  */
-public interface MimeTypeErrorListener
+public interface VisualizationToggle extends Serializable
 {
-  public void notifyCannotPlayMimeType(String mimeType);
-  public void notifyMightNotPlayMimeType(String mimeType);
+  /**
+   * Shows and hides the visualizer.
+   *
+   * @param visible 
+   */
+  public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback);
+  
+  /** Returns wether the visualization is visible. */
+  public boolean visualizerIsVisible();
 }

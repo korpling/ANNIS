@@ -15,8 +15,8 @@
  */
 package annis.visualizers.iframe.dependency;
 
-import annis.gui.MatchedNodeColors;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
 import static annis.model.AnnisConstants.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;

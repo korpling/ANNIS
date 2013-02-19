@@ -16,11 +16,11 @@
 package annis.visualizers.component;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaController;
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.Helper;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.AudioPlayer;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;

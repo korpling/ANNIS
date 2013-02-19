@@ -15,7 +15,7 @@
  */
 package annis.visualizers.iframe;
 
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisToken;

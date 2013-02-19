@@ -15,8 +15,8 @@
  */
 package annis.visualizers.component.tree;
 
-import annis.gui.MatchedNodeColors;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.AbstractImageVisualizer;
 import annis.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
 import annis.visualizers.component.tree.backends.staticimg.Java2dBackend;

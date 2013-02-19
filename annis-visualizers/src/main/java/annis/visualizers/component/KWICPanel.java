@@ -16,11 +16,11 @@
 package annis.visualizers.component;
 
 import annis.CommonHelper;
-import annis.gui.MatchedNodeColors;
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaController;
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;

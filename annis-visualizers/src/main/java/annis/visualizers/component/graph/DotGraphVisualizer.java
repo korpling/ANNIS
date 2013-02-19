@@ -15,9 +15,9 @@
  */
 package annis.visualizers.component.graph;
 
-import annis.gui.MatchedNodeColors;
+import annis.libgui.MatchedNodeColors;
 import annis.visualizers.component.AbstractDotVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;

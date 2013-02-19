@@ -15,7 +15,7 @@
  */
 package annis.visualizers.component.tree;
 
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;

@@ -15,12 +15,12 @@
  */
 package annis.visualizers.component.dependency;
 
-import annis.gui.MatchedNodeColors;
-import annis.visualizers.component.AbstractDotVisualizer;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
+import annis.visualizers.component.AbstractDotVisualizer;
 import java.util.HashSet;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;

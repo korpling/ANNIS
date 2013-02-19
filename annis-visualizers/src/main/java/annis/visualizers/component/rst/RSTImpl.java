@@ -15,9 +15,9 @@
  */
 package annis.visualizers.component.rst;
 
-import annis.gui.MatchedNodeColors;
-import annis.gui.components.CssRenderInfo;
-import annis.gui.visualizers.VisualizerInput;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.components.CssRenderInfo;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import static annis.model.AnnisConstants.*;
 import com.vaadin.ui.Panel;
