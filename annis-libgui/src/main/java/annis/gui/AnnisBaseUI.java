@@ -349,6 +349,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
 
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
