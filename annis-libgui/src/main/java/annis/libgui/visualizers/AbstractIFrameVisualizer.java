@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers;
+package annis.libgui.visualizers;
 
-import annis.gui.VisualizationToggle;
+import annis.gui.visualizers.IFrameResource;
+import annis.gui.visualizers.IFrameResourceMap;
+import annis.gui.visualizers.ResourcePlugin;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.VisualizationToggle;
 import annis.gui.widgets.AutoHeightIFrame;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
