@@ -15,11 +15,11 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.InstanceConfig;
-import annis.gui.PluginSystem;
+import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
+import annis.libgui.InstanceConfig;
 import annis.service.objects.Match;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;

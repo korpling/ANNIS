@@ -44,54 +44,54 @@
       </plugin>
 
       <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
-			<!-- directory is cleaned properly -->
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>src/main/webapp/VAADIN/widgetsets</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>7.0.0</version>
-				<configuration>
-					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-					<!-- <runTarget>mobilemail</runTarget> -->
-					<!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
-						way compatible with Vaadin eclipse plugin. -->
-					<webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
-					</webappDirectory>
-					<hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
-					</hostedWebapp>
-					<noServer>true</noServer>
-					<!-- Remove draftCompile when project is ready -->
-					<draftCompile>false</draftCompile>
-					<compileReport>true</compileReport>
-					<style>OBF</style>
-					<strict>true</strict>
-					<runTarget>http://localhost:8080/</runTarget>
-				</configuration>
-				<executions>
-					<execution>
-						<configuration>
-							<!-- if you don't specify any modules, the plugin will find them -->
-							<!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
-								</modules> -->
-						</configuration>
-						<goals>
-							<goal>resources</goal>
-							<goal>update-widgetset</goal>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+      <!-- directory is cleaned properly -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.4.1</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>src/main/webapp/VAADIN/widgetsets</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>7.0.0</version>
+        <configuration>
+          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+          <!-- <runTarget>mobilemail</runTarget> -->
+          <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
+    						way compatible with Vaadin eclipse plugin. -->
+          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
+          </webappDirectory>
+          <hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
+          </hostedWebapp>
+          <noServer>true</noServer>
+          <!-- Remove draftCompile when project is ready -->
+          <draftCompile>false</draftCompile>
+          <compileReport>true</compileReport>
+          <style>OBF</style>
+          <strict>true</strict>
+          <runTarget>http://localhost:8080/</runTarget>
+        </configuration>
+        <executions>
+          <execution>
+            <configuration>
+              <!-- if you don't specify any modules, the plugin will find them -->
+              <!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
+      								</modules> -->
+            </configuration>
+            <goals>
+              <goal>resources</goal>
+              <goal>update-widgetset</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <!-- This is needed for the sources required by the GWT compiler to be included in the produced JARs -->
@@ -181,25 +181,32 @@
       <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.7</version>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- other widget sets we use -->
-  <dependency>
-    <groupId>org.vaadin.addons</groupId>
-    <artifactId>popupbutton</artifactId>
-    <version>2.2.0</version>
-  </dependency>
-  <dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava-gwt</artifactId>
-    <version>12.0.1</version>
-    <scope>compile</scope>
-  </dependency>
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>popupbutton</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-gwt</artifactId>
+      <version>12.0.1</version>
+      <scope>compile</scope>
+    </dependency>
   
-  <dependency>
-   <groupId>org.vaadin.addons</groupId>
-   <artifactId>cssinject</artifactId>
-   <version>2.0.3</version>
-</dependency>
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>cssinject</artifactId>
+      <version>2.0.3</version>
+    </dependency>
 
   </dependencies>
 

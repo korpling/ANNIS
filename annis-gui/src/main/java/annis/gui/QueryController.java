@@ -15,19 +15,20 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.beans.HistoryEntry;
-import annis.gui.media.MediaController;
+import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.AnnisResultQuery;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.visualizers.IFrameResourceMap;
-import annis.security.AnnisUser;
+import annis.libgui.visualizers.IFrameResourceMap;
+import annis.libgui.AnnisUser;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.UniformInterfaceException;

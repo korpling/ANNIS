@@ -15,7 +15,7 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;

@@ -16,9 +16,9 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
-import annis.gui.InstanceConfig;
-import annis.gui.PluginSystem;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;

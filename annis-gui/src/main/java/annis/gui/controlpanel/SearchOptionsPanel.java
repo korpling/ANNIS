@@ -15,7 +15,7 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;

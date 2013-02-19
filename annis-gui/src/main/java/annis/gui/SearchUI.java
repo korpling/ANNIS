@@ -15,18 +15,23 @@
  */
 package annis.gui;
 
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.InstanceConfig;
+import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.media.MediaController;
-import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.media.impl.MediaControllerImpl;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MimeTypeErrorListener;
+import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.gui.servlets.ResourceServlet;
 import annis.gui.tutorial.TutorialPanel;
-import annis.gui.visualizers.IFrameResource;
-import annis.gui.visualizers.IFrameResourceMap;
-import annis.security.AnnisUser;
+import annis.libgui.visualizers.IFrameResource;
+import annis.libgui.visualizers.IFrameResourceMap;
+import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -50,6 +55,8 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.xeoh.plugins.base.PluginManager;
+import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.vaadin.cssinject.CSSInject;
@@ -353,6 +360,15 @@ public class SearchUI extends AnnisBaseUI
     // default to an empty instance config
     return new InstanceConfig();
   }
+
+  @Override
+  protected void addCustomUIPlugins(PluginManager pluginManager)
+  {
+    pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
+  }
+  
+  
   
   public void checkCitation(VaadinRequest request)
   {
