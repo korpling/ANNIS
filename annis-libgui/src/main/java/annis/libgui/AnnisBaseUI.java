@@ -357,6 +357,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
+    
+    addCustomUIPlugins(pluginManager);
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
