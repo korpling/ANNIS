@@ -1,4 +1,4 @@
-Front-end  {#frontend}
+Front-end  {#dev-frontend}
 =========
 
 The ANNIS front-end is a web application implemented in Java and the [Vaadin](https://vaadin.com/) framework. 

@@ -1,4 +1,4 @@
-Architecture {#architecture}
+Architecture {#dev-architecture}
 ============
 
 ANNIS is a web-based search and visualization architecture for

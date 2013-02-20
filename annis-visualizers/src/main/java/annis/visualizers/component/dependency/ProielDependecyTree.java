@@ -26,7 +26,9 @@ import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
+ * Visualizes unordered vertical tree of dependent tokens.
+ * 
+ * Requires GraphViz
  * @author thomas
  */
 @PluginImplementation

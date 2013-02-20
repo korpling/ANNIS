@@ -1,4 +1,4 @@
-Using an IDE  {#ide}
+Using an IDE  {#dev-ide}
 ========
 
 While you can use any text editor of your choice to change ANNIS and compile

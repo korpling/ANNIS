@@ -44,8 +44,10 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Provides a dependence visualization based on vakyartha visualization,
- * which was developed by Kim Gerdes.</p>
+ * Provides a dependence visualization based on vakyartha visualization,
+ * which was developed by Kim Gerdes.
+ * 
+ * Requires SVG enabled browser.
  *
  * <p>Originally this visualization was token based. Now Vakyartha extended to
  * visualize dependence between any nodes. This must be configured in the

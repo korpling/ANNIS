@@ -25,7 +25,10 @@ import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
+ * Visualizes arrow based dependency visualization for corpora 
+ * with dependencies between non terminal nodes.
+ * 
+ * Requires GraphViz.
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  */
 @PluginImplementation

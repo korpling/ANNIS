@@ -1,4 +1,4 @@
-Create new query builder  {#querybuilder}
+Create new query builder  {#dev-querybuilder}
 ========================
 
 A query builder is a class that

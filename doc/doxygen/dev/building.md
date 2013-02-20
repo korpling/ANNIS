@@ -1,4 +1,4 @@
-Building  {#building}
+Building  {#dev-building}
 ========
 
 ANNIS uses [Maven3](http://maven.apache.org/)  as build tool. Maven itself is

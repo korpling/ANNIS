@@ -33,7 +33,11 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * A view of the entire text of a document, possibly with interactive 
+ * coreference links. 
+ * It is possible to use this visualization to view entire texts
+ * even if you do not have coreference annotations.
+ * 
  * @author Thomas Krause
  * @author Christian Schulz-Hanke
  */
