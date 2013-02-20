@@ -148,7 +148,7 @@ short name| Description | Java class | Screenshot
 `arch_dependency` | dependency tree with labeled arches between tokens | [VakyarthaDependencyTree](@ref annis.visualizers.iframe.dependency.VakyarthaDependencyTree) | ![arch_dependency](arch_dependency_vis.png)
 `ordered_dependency` | arrow based dependency visualization for corpora with dependencies between non terminal nodes |[ProielRegularDependencyTree](@ref annis.visualizers.component.dependency.ProielRegularDependencyTree) | ![ordered_dependency](ordered_dependency_vis.png)
 `hierarchical_dependency` | unordered vertical tree of dependent tokens | [ProielDependecyTree](@ref annis.visualizers.component.dependency.ProielDependecyTree) | ![hierarchical_dependency](hierarchical_dependency_vis.png)
-`dot` | a debug view of the annotation graph | [DebugVisualizer](@ref annis.visualizers.component.graph.DebugVisualizer) | ![dot](graph_vis.png)
+`dot_vis` | a debug view of the annotation graph | [DotGraphVisualizer](@ref annis.visualizers.component.graph.DotGraphVisualizer) | ![dot_vis](graph_vis.png)
 `video` | a linked video file | [VideoVisualizer](@ref annis.visualizers.component.VideoVisualizer) | ![video](video.png)
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
 `rst` and `rst_full` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)

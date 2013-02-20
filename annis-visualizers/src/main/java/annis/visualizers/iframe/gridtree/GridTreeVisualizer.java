@@ -26,6 +26,11 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * correctly by grid_tree.
  * https://github.com/korpling/ANNIS/issues/14
  * 
+ * Mappings: <br />
+ * Specify the name of the annotation to be visualized in the grid 
+ * with <b>node_key:name</b>. Note that all grid levels visualize the same annotation 
+ * name at different hierarchical depths.
+ * 
  * @author Benjamin Weißenfels <b.pixeldrama@gmailcom>
  *
  */
