@@ -34,8 +34,7 @@ globalPermResolver.resourcePath = /etc/annis/user_config_trunk/
 
 ### User and group files ### {#admin-configure-userformat}
 
-1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/
-user_config_trunk/groups`):
+1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/user_config_trunk/groups`):
 \verbatim
 group1=pcc3,falko,tiger2
 group2=pcc3

@@ -61,8 +61,9 @@ annis-service.sh start
 gui-<version>.war from our website and deploy it to your Java servlet
 container (this is depending on the servlet container you use).
 
+\note
 We also **strongly recommend** reconfiguring the Postgres server’s default
-settings as described [here](@ref dev-configure-postgres).
+settings as described [here](@ref admin-configure-postgresql).
 
 Installing a local version (ANNIS Kickstarter) {#admin-install-kickstarter}
 ----------------------------------------------
