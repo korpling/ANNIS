@@ -29,13 +29,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Set;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import org.apache.commons.lang3.StringUtils;//levenshtein
 //added by Martin:
 
 /**
  *
  * @author tom
  */
-public class SearchBox extends Panel implements Button.ClickListener
+public class SearchBox extends Panel implements Button.ClickListener, ValueChangeListener
 {
   
   private int id;
@@ -126,6 +129,12 @@ public class SearchBox extends Panel implements Button.ClickListener
         cb.setValue(escapedItem);         
       }
     }
+  }
+  
+  @Override
+  public void valueChange(ValueChangeEvent event)
+  {
+    
   }
   
   public String getAttribute()
