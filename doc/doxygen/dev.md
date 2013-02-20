@@ -9,4 +9,5 @@ The ANNIS code is hosted at [Github](https://github.com/korpling/ANNIS).
 - \subpage dev-ide
 - \subpage dev-frontend
 - \subpage dev-querybuilder
+- \subpage dev-aql
 
