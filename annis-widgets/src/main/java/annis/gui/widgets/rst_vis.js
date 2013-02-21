@@ -19,6 +19,23 @@
     return target;
   }
 
+  /**
+   * Converts a string to an int.
+   *
+   * @param value if it is already an int it returns simple value, otherwise the
+   * value is parsed to int.
+   */
+  function stringToInt(value)
+  {
+
+    if ((typeof value) === "string") {
+      return parseInt(value);
+    }
+    else {
+      return value;
+    }
+  }
+
   const DOMINANCE = "edge";
   const RST = "rst";
   const MULTINUC = "multinuc";
@@ -38,16 +55,17 @@
     this.canvas = {};
 
     this.config = {
-      siblingOffet : config.siblingOffset || 200 ,
-      subTreeOffset : config.subTreeOffset || 100,
-      nodeWidth : config.nodeWidth  || 60,
-      labelSize : config.labelSize || 10,
+      siblingOffet : stringToInt(config.siblingOffset) || 100,
+      subTreeOffset : stringToInt(config.subTreeOffset) || 100,
+      nodeWidth : stringToInt(config.nodeWidth)  || 60,
+      labelSize : stringToInt(config.labelSize) || 10,
       container : config.container || "container",
       background : config.background || "#FFFFFF",
       wrapper :  config.wrapper || "wrapper",
       padding : config.padding || "0",
       edgeLabelColor : config.edgeLabelColor || "#14fe14",
-      nodeLabelColor : config.nodeLabelColor || "#fe0707"
+      nodeLabelColor : config.nodeLabelColor || "#fe0707",
+      dim : stringToInt(config.dim) || 15
     };
   }
 
@@ -258,8 +276,8 @@
       var top = elem.clientHeight + elem.offsetTop;
       if  ( top > container.clientHeight)
       {
-        container.style.height = (top+5) + "px";
-        container.setAttribute("height", (top+5) + "px");
+        container.style.height = top + "px";
+        container.setAttribute("height", top + "px");
         canvas.setAttribute("height", top + "px");
       }
     }
@@ -374,15 +392,14 @@
     fromX = this.getTopCenter(source),
     toX = this.getTopCenter(target),
 
-    dim = 15,
     controllPoint = {};
 
     if (fromX != toX)
     {
       controllPoint.x = (fromX + toX) / 2;
-      controllPoint.y = from.y - 2 * dim;
+      controllPoint.y = from.y - 2 * this.config.dim;
     } else {
-      controllPoint.x = fromX + 2 * dim;
+      controllPoint.x = fromX + 2 * this.config.dim;
       controllPoint.y = (from.y + to.y) / 2;
     }
 
@@ -431,6 +448,7 @@
     label.style.position = "absolute";
     label.innerHTML = annotation;
     label.style.fontSize = this.config.labelSize + "px";
+    label.style.fontStyle = "italic";
     label.style.color = this.config.edgeLabelColor;
 
     labelPos = {
@@ -448,20 +466,25 @@
   {
     var fromX = this.getTopCenter(source),
     toX = this.getTopCenter(target),
+    from = source.pos,
     label = document.createElement("label");
 
     this.container.appendChild(label);
     label.style.position = "absolute";
     label.innerHTML = annotation;
 
-    labelPos = {
-      x : (fromX + toX) / 2 - (label.offsetWidth / 2),
-      y : source.pos.y - 35
-    };
+    controllPoint = {};
+    controllPoint.x = (source.pos.x + target.pos.x) / 2;
+    controllPoint.y = from.y - 2 * this.config.dim;
 
-    label.style.top = labelPos.y + "px";
-    label.style.left = labelPos.x + "px";
+
+    label.style.top = controllPoint.y + "px";
+    label.style.left = controllPoint.x + "px";
+    label.style.fontStyle = "italic";
     label.style.fontSize = this.config.labelSize + "px";
+    label.style.textAlign="center";
+    label.style.width = label.clientWidth + "px";
+    label.style.display = "block";
     label.style.color = this.config.edgeLabelColor;
   };
 
