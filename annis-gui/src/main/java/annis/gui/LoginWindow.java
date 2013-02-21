@@ -15,7 +15,8 @@
  */
 package annis.gui;
 
-import annis.security.AnnisUser;
+import annis.libgui.Helper;
+import annis.libgui.AnnisUser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;

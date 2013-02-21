@@ -656,6 +656,8 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../annis-gui/src/main/java \
+                         ../annis-libgui/src/main/java \
+                         ../annis-visualizers/src/main/java \
                          ../annis-interfaces/src/main/java \
                          ../annis-kickstarter/src/main/java \
                          ../annis-service/src/main/java \
@@ -740,7 +742,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = 
+IMAGE_PATH             = images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 

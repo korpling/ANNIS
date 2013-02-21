@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;

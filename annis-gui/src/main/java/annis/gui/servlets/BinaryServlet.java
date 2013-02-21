@@ -15,9 +15,9 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.Helper;
-import annis.gui.AnnisBaseUI;
-import annis.security.AnnisUser;
+import annis.libgui.Helper;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientHandlerException;

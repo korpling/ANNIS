@@ -15,7 +15,7 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
 import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.model.Query;

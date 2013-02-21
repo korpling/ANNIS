@@ -15,7 +15,7 @@
  */
 package annis.security;
 
-import annis.gui.CorpusSet;
+import annis.libgui.CorpusSet;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;

@@ -15,22 +15,26 @@
  */
 package annis.gui;
 
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.InstanceConfig;
+import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.media.MediaController;
-import annis.gui.media.MimeTypeErrorListener;
-import annis.gui.media.impl.MediaControllerImpl;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MimeTypeErrorListener;
+import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.gui.servlets.ResourceServlet;
 import annis.gui.tutorial.TutorialPanel;
-import annis.gui.visualizers.IFrameResource;
-import annis.gui.visualizers.IFrameResourceMap;
-import annis.security.AnnisUser;
+import annis.libgui.visualizers.IFrameResource;
+import annis.libgui.visualizers.IFrameResourceMap;
+import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.Page;
@@ -51,6 +55,8 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.xeoh.plugins.base.PluginManager;
+import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +64,6 @@ import org.slf4j.LoggerFactory;
  * GUI for searching in corpora.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@PreserveOnRefresh
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   LoginWindow.LoginListener,
@@ -305,6 +310,8 @@ public class SearchUI extends AnnisBaseUI
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
     
     checkCitation(request);
+    lastQueriedFragment = "";
+    evaluateFragment(getPage().getUriFragment());
   }
   
   
@@ -338,6 +345,15 @@ public class SearchUI extends AnnisBaseUI
     // default to an empty instance config
     return new InstanceConfig();
   }
+
+  @Override
+  protected void addCustomUIPlugins(PluginManager pluginManager)
+  {
+    pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
+  }
+  
+  
   
   public void checkCitation(VaadinRequest request)
   {
@@ -601,9 +617,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
-    String fragment = event.getUriFragment();
+    evaluateFragment(event.getUriFragment());    
+  }
+  
+  private void evaluateFragment(String fragment)
+  {
     // do nothing if not changed
-    if (fragment == null || fragment.equals(lastQueriedFragment))
+    if (fragment == null || fragment.isEmpty() || fragment.equals(lastQueriedFragment))
     {
       return;
     }
@@ -611,13 +631,34 @@ public class SearchUI extends AnnisBaseUI
     Map<String, String> args = Helper.parseFragment(fragment);
 
     Set<String> corpora = new TreeSet<String>();
+    
     if (args.containsKey("c"))
     {
       String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
       corpora.addAll(Arrays.asList(corporaSplitted));
     }
 
-    if(args.get("cl") != null && args.get("cr") != null)
+    if(args.containsKey("c") && args.size() == 1)
+    {
+      // special case: we were called from outside and should only select
+      // our corpus
+      Set<String> mappedCorpora = new HashSet<String>();
+      // iterate over given corpora and map names if necessary
+      for(String c : corpora)
+      {
+        if(instanceConfig.getCorpusMappings() != null 
+          && instanceConfig.getCorpusMappings().containsKey(c))
+        {
+          mappedCorpora.add(instanceConfig.getCorpusMappings().get(c));
+        }
+        else
+        {
+          mappedCorpora.add(c);
+        }
+      }
+      queryController.setQuery(new Query("tok", mappedCorpora));
+    }
+    else if(args.get("cl") != null && args.get("cr") != null)
     {
       // full query with given context
       queryController.setQuery(new PagedResultQuery(
@@ -625,14 +666,15 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("cr")),
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
-        args.get("q"), corpora));
+        args.get("q"), corpora));      
+      queryController.executeQuery(true, true);
     }
     else
     {
       // use default context
-      queryController.setQuery(new Query(args.get("q"), corpora));
+      queryController.setQuery(new Query(args.get("q"), corpora));      
+      queryController.executeQuery(true, true);
     }    
-    queryController.executeQuery(true, true);
   }
   
   

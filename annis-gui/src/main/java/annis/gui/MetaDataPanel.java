@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
