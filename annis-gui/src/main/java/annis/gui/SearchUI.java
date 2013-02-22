@@ -490,7 +490,7 @@ public class SearchUI extends AnnisBaseUI
   {
     AnnisUser user = Helper.getUser();
     
-    if(user == null)
+    if(user != null)
     {
       Notification.show("Logged in as \"" + user.getUserName() + "\"",
         Notification.Type.TRAY_NOTIFICATION);

@@ -107,15 +107,17 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
       Notification.show("Invalid selection (plugin not found)", 
         Notification.Type.WARNING_MESSAGE);
     }
-    
-    Component component = plugin.createComponent(controller);
-    if(lastComponent != null)
+    else
     {
-      layout.removeComponent(lastComponent);
+      Component component = plugin.createComponent(controller);
+      if(lastComponent != null)
+      {
+        layout.removeComponent(lastComponent);
+      }
+      layout.addComponent(component);
+      layout.setExpandRatio(component, 1.0f);
+      lastComponent = component;
     }
-    layout.addComponent(component);
-    layout.setExpandRatio(component, 1.0f);
-    lastComponent = component;
   }
   
   

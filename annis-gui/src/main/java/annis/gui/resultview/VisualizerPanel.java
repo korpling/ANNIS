@@ -146,8 +146,7 @@ public class VisualizerPanel extends VerticalLayout
     String segmentationName,
     PluginSystem ps) throws IOException
   {
-    visPlugin = ps.getVisualizer(entry.getVisType());
-
+    
     this.ps = ps;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -167,17 +166,16 @@ public class VisualizerPanel extends VerticalLayout
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
   
-    // this part was in attach() function...
-    
-    if (visPlugin == null && ps != null)
+    if(entry != null && ps != null)
     {
-      entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
       visPlugin = ps.getVisualizer(entry.getVisType());
-    }
-
-    if (entry != null && visPlugin != null)
-    {
-
+      if (visPlugin == null)
+      {
+        // fallback to default visualizer if original vis type was not found
+        entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+        visPlugin = ps.getVisualizer(entry.getVisType());
+      }
+     
       if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
@@ -235,8 +233,9 @@ public class VisualizerPanel extends VerticalLayout
         }
 
       }
+      
     } // end if entry not null
-
+   
   }
 
   private Component createComponent()
