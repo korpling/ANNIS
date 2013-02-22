@@ -114,12 +114,6 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>de.hu-berlin.german.korpling.annis</groupId>
-                  <artifactId>annis-visualizers</artifactId>
-                  <version>3.0.0-SNAPSHOT</version>
-                  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCommon</artifactId>
                   <version>1.1.5</version>
@@ -185,6 +179,13 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>de.hu-berlin.german.korpling.annis</groupId>
+      <artifactId>annis-visualizers</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
+      <type>jar</type>
     </dependency>
     
     <dependency>
