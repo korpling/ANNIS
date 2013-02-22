@@ -86,6 +86,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   @Override
   protected void init(VaadinRequest request)
   {
+    initLogging();
+    
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
@@ -96,7 +98,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     
-    initLogging();
 
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
