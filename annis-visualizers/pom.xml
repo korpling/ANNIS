@@ -44,7 +44,7 @@
       </plugin>
     </plugins>
   </build>
->>>>>>> b6afc5c875ef2ddead29517d10c212a873f473f0
+
   <dependencies>
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
