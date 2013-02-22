@@ -363,7 +363,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
-    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-3.0.0-SNAPSHOT.jar");
+    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
+      + getVersionNumber() + ".jar");
     pluginManager.addPluginsFrom(builtin.toURI());
     log.info("added plugins from {}", builtin.getPath());
     
