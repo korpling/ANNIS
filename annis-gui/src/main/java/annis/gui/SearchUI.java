@@ -300,8 +300,8 @@ public class SearchUI extends AnnisBaseUI
             if(res != null)
             {
               response.setStatus(200);
-              response.getOutputStream().write(res.getData());
               response.setContentType(res.getMimeType());
+              response.getOutputStream().write(res.getData());
             }
           }
           return true;
