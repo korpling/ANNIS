@@ -24,6 +24,27 @@
       </repository>
     </distributionManagement>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <!-- put your configurations here -->
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+>>>>>>> b6afc5c875ef2ddead29517d10c212a873f473f0
   <dependencies>
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
