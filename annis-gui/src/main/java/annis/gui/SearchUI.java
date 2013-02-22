@@ -301,6 +301,7 @@ public class SearchUI extends AnnisBaseUI
             {
               response.setStatus(200);
               response.getOutputStream().write(res.getData());
+              response.setContentType(res.getMimeType());
             }
           }
           return true;
