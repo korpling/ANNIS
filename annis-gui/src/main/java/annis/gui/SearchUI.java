@@ -290,7 +290,11 @@ public class SearchUI extends AnnisBaseUI
           UUID uuid = UUID.fromString(uuidString);
           IFrameResourceMap map = 
             VaadinSession.getCurrent().getAttribute(IFrameResourceMap.class);
-          if(map != null)
+          if(map == null)
+          {
+            response.setStatus(404);
+          }
+          else
           {
             IFrameResource res = map.get(uuid);
             if(res != null)
@@ -299,7 +303,6 @@ public class SearchUI extends AnnisBaseUI
               response.getOutputStream().write(res.getData());
             }
           }
-          response.setStatus(404);
           return true;
         }
         
