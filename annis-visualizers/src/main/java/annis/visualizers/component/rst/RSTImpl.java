@@ -58,12 +58,12 @@ import org.slf4j.LoggerFactory;
  * This Visualization transforms the salt graph to a json object, which is sent
  * to the {@link VJITWrapper}.
  *
- * A node an incoming rst edge will be moved one level up, the that it becomes a
- * sibling of its original parent. This is done, because in typical rst
- * visualizations these nodes are drawn as siblings of their parent, so they are
- * in one horizontal line with their parent, but there are actually modeled as
- * childs, which is confusing, when we want to render these nodes. The json
- * would like this:
+ * A node with an incoming rst edge will be moved one level up, so that it
+ * becomes a sibling of its original parent. This is done, because in typical
+ * rst visualizations these nodes are drawn as siblings of their parent, so they
+ * are in one horizontal line with their parent, but they are actually modeled
+ * as children, which is confusing, when we want to render these nodes. The
+ * json, which is generated, looks nearly like this:
  *
  * <pre>
  * {
@@ -81,8 +81,9 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  *
- * The example above shows the rst connected nodes one and two are on the same
- * level in the json tree. The *natural* tree weere this:
+ * The example above shows the two nodes, which are connected by a rst edge.
+ * They are on the same level in the json tree. The *natural* tree would have
+ * looked like this:
  *
  * <pre>
  * {
