@@ -44,20 +44,19 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Provides a dependence visualization based on vakyartha visualization,
- * which was developed by Kim Gerdes.</p>
+ * Provides a dependence visualization based on vakyartha visualization,
+ * which was developed by Kim Gerdes.
+ * 
+ * Requires SVG enabled browser. <br />
  *
- * <p>Originally this visualization was token based. Now Vakyartha extended to
+ * Originally this visualization was token based. Now Vakyartha extended to
  * visualize dependence between any nodes. This must be configured in the
- * resolver_vis_map table. There exist a mapping column. Please read the section
- * <strong>Configuring Visualizations</strong> in the ANNIS-Manual how to
- * configure the visualization. Supported values for this visaulization are:
- *
- * <ul>
- *
- * <li>node_key:&lt;annotation key&gt;</li>
- *
- * </ul> </p>
+ * resolver_vis_map table. <br />
+ * 
+ * Mappings: <br />
+ * If a annotation key is specified with <b>node_key:key</b>, all
+ * nodes which carry this annotation are searched for pointing relations and
+ * instead token the annotation value is used.
  *
  * @author Thomas Krause <krause@informatik.hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>

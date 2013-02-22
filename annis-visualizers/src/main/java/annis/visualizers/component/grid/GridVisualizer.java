@@ -59,7 +59,14 @@ import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Visualizes annotations of a spans.
+ * 
+ * Mappings: <br/>
+ * It is possible to specify the order of annotation layers in each grid. 
+ * Use <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
+ * annotation layers. If <b>anno:</b> is used, additional annotation layers not present
+ * in the list will not be visualized. If mappings is left empty, layers will be
+ * ordered alphabetically
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation

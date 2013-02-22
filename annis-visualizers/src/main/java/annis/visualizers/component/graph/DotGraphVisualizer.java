@@ -25,8 +25,15 @@ import java.util.*;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
- * @author Thomas Krause
+ * A debug visualization of the annotation graph.
+ * 
+ * Mappings:<br/>
+ * Use <b>all_ns:true</b> to visualize the entire annotation graph. 
+ * Specifying e.g. <b>node_ns:tiger</b> or <b>edge_ns:tiger</b> instead 
+ * causes only nodes and edges of the namespace <b>tiger</b> to be visualized 
+ * (i.e. only a subgraph of all annotations).
+ * 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
 public class DotGraphVisualizer extends AbstractDotVisualizer

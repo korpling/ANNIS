@@ -14,9 +14,23 @@ import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
+ * A grid visualizing hierarchical tree annotations as ordered grid 
+ * layers.
+ * 
+ * Note that all layers represent the same annotation name at different 
+ * hierarchical depths, marked level:0,1,2,... etc. on the left
+ * 
  * Known Bug: the visualizer does not handle crossing edges.
- * {@linkplain https://github.com/korpling/ANNIS/issues/14}
- *
+ * Equal annotation names which cover the same range or 
+ * a subset of nodes and have the same hierarchical depths are not rendered
+ * correctly by grid_tree.
+ * https://github.com/korpling/ANNIS/issues/14
+ * 
+ * Mappings: <br />
+ * Specify the name of the annotation to be visualized in the grid 
+ * with <b>node_key:name</b>. Note that all grid levels visualize the same annotation 
+ * name at different hierarchical depths.
+ * 
  * @author Benjamin Weißenfels <b.pixeldrama@gmailcom>
  *
  */
