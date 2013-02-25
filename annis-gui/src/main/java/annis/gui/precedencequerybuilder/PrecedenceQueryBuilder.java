@@ -140,7 +140,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     String result = "\n& meta::"+mb.getMetaDatum()+" = ";
     if(values.size()==1)
     {
-      result += "\""+values+"\"";//CHECK !!!
+      result += "\""+values.iterator().next()+"\"";
     }
     else
     {      
