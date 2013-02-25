@@ -3,7 +3,7 @@
  * var viz = window.viz(config);
  * viz.init();
  *
- * 
+ *
  */
 ( function() {
 
@@ -28,7 +28,7 @@
 		 * Converts a string to an int.
 		 *
 		 * @param value
-		 *            if it is already an int it returns simple value, otherwise the
+		 *            if it is already an int it returns simply the value, otherwise the
 		 *            value is parsed to int.
 		 */
 		function stringToInt(value) {
@@ -144,7 +144,7 @@
 		 * defined in the dom, the element is not recreated and the containerElement
 		 * property of the config object is set to this HTML element.
 		 *
-		 * @param {conf}
+		 * @param conf
 		 *            holds the config of the rst-visualization
 		 *
 		 */
@@ -272,7 +272,7 @@
 		}
 
 		/**
-		 * This actually positions HTML element on wrapper element. The HTML Id of
+		 * This actually positions HTML elements on wrapper element. The HTML Id of
 		 * the wrapper element is contained in the conf object
 		 *
 		 * @param {conf}
@@ -304,8 +304,8 @@
 				// get the deepest one, it's hacky
 				var top = elem.clientHeight + elem.offsetTop;
 				if (top > container.clientHeight) {
-					container.style.height = top + "px";
-					container.setAttribute("height", top + "px");
+					container.style.height = top + 5 + "px";
+					container.setAttribute("height", top +"px");
 					canvas.setAttribute("height", top + "px");
 				}
 			}
@@ -525,6 +525,6 @@
 		 */
 		window.$viz = function(config) {
 			return new Rst(config);
-			
+
 		}
 	}());
