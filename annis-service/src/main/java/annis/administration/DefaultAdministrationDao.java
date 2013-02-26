@@ -88,6 +88,15 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private Map<String, String> tableInsertFrom;
 
+  // all files have to carry this suffix.
+  private final String REL_ANNIS_FILE_SUFFIX = ".tab";
+
+  /**
+   * Optional tab for example queries. If this tab not exist, a dummy file from
+   * the resource folder is used.
+   */
+  private final String EXAMPLE_QUERIES = "example_queries";
+
   /**
    * The name of the file and the relation containing the resolver information.
    */
@@ -100,7 +109,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
     "component", "rank", "edge_annotation",
-    FILE_RESOLVER_VIS_MAP, "example_queries"
+    FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES
   };
 
   private String[] tablesToCopyManually =
@@ -108,6 +117,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     "corpus", "corpus_annotation",
     "text",
     FILE_RESOLVER_VIS_MAP,
+    EXAMPLE_QUERIES,
     "corpus_stats",
     "media_files"
   };
@@ -217,7 +227,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
-      new FileSystemResource(new File(scriptPath, "resolver_vis_map.tab")));
+      new FileSystemResource(new File(scriptPath,
+      FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
   }
@@ -338,11 +349,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     importBinaryData(path);
     extendStagingText(corpusID);
-
+    extendStagingExampleQueries(corpusID);
     computeRealRoot();
-
-//    if (true) return;
-
     computeLevel();
     computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
@@ -390,6 +398,28 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("staging_area.sql", args);
   }
 
+  /**
+   * Reads tab seperated files from the filesystem, but it takes only files into
+   * account with the {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+   * suffix. Further it is straight forward except for the
+   * {@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP} and the
+   * {@link DefaultAdministrationDao#EXAMPLE_QUERIES}. This is done by this
+   * method automatically.
+   *
+   * <ul>
+   *
+   * <li>{@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP}: For backwards
+   * compatibility, the columns must be counted, since there exists one
+   * additional column for visibility behaviour of visualizers.</li>
+   *
+   * <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES}: If this file does not
+   * exists, an example file is copied from the resource folder</li>
+   *
+   * </ul>
+   *
+   * @param path The path to the relANNIS. The files have to have this suffix
+   * {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+   */
   void bulkImport(String path)
   {
     log.info("bulk-loading data");
@@ -399,7 +429,23 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        importResolverVisMapTable(path, table);
+        importResolverVisMapTable(path, table + REL_ANNIS_FILE_SUFFIX);
+      }
+      // check if example query exists. If not copy it from the resource folder.
+      else if (table.equalsIgnoreCase(EXAMPLE_QUERIES))
+      {
+        File f = new File(path, table + REL_ANNIS_FILE_SUFFIX);
+        if (f.exists())
+        {
+          bulkloadTableFromResource(tableInStagingArea(table),
+            new FileSystemResource(f));
+        }
+        else
+        {
+          f = new File(getScriptPath(), EXAMPLE_QUERIES + REL_ANNIS_FILE_SUFFIX);
+          bulkloadTableFromResource(tableInStagingArea(table),
+            new FileSystemResource(f));
+        }
       }
       else if (table.equalsIgnoreCase("node"))
       {
@@ -408,7 +454,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
-          new FileSystemResource(new File(path, table + ".tab")));
+          new FileSystemResource(new File(path, table + REL_ANNIS_FILE_SUFFIX)));
       }
     }
   }
@@ -591,6 +637,20 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     jdbcTemplate.execute(MediaImportHelper.SQL, preStat);
 
+  }
+
+  /**
+   * Updates the example queries table in the staging area. The final toplevel
+   * corpus must already be computed.
+   *
+   * @param toplevelID The final top level corpus id.
+   *
+   */
+  void extendStagingExampleQueries(long toplevelID)
+  {
+    log.info("extending _example_queries");
+    executeSqlFromScript("extend_staging_example_queries.sql",
+      makeArgs().addValue(":id", toplevelID));
   }
 
   void extendStagingText(long toplevelID)
@@ -1368,48 +1428,48 @@ public class DefaultAdministrationDao implements AdministrationDao
   private void importResolverVisMapTable(String path, String table)
   {
     try
-        {
+    {
 
-          // count cols for detecting old resolver_vis_map table format
-          File resolver_vis_tab = new File(path, table + ".tab");
+      // count cols for detecting old resolver_vis_map table format
+      File resolver_vis_tab = new File(path, table);
 
-          BufferedReader bReader = new BufferedReader(
-            new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
-          String firstLine = bReader.readLine();
-          bReader.close();
+      BufferedReader bReader = new BufferedReader(
+        new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
+      String firstLine = bReader.readLine();
+      bReader.close();
 
-          int cols = 9; // default number
-          if (firstLine != null)
-          {
-            String[] entries = firstLine.split("\t");
-            cols = entries.length;
-            log.debug("the first row: {} amount of cols: {}", entries, cols);
-          }
+      int cols = 9; // default number
+      if (firstLine != null)
+      {
+        String[] entries = firstLine.split("\t");
+        cols = entries.length;
+        log.debug("the first row: {} amount of cols: {}", entries, cols);
+      }
 
-          switch (cols)
-          {
-            // old format
-            case 8:
-              readOldResolverVisMapFormat(resolver_vis_tab);
-              break;
-            // new format
-            case 9:
-              bulkloadTableFromResource(tableInStagingArea(table),
-                new FileSystemResource(new File(path, table + ".tab")));
-              break;
-            default:
-              log.error("invalid amount of cols");
-              throw new RuntimeException();
-          }
+      switch (cols)
+      {
+        // old format
+        case 8:
+          readOldResolverVisMapFormat(resolver_vis_tab);
+          break;
+        // new format
+        case 9:
+          bulkloadTableFromResource(tableInStagingArea(table),
+            new FileSystemResource(new File(path, table)));
+          break;
+        default:
+          log.error("invalid amount of cols");
+          throw new RuntimeException();
+      }
 
-        }
-        catch (IOException e)
-        {
-          log.error("could not read {}", table + ".tab", e);
-        }
-        catch (FileAccessException e)
-        {
-          log.error("could not read {}", table + ".tab", e);
-        }
+    }
+    catch (IOException e)
+    {
+      log.error("could not read {}", table, e);
+    }
+    catch (FileAccessException e)
+    {
+      log.error("could not read {}", table, e);
+    }
   }
 }

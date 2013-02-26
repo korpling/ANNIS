@@ -219,13 +219,13 @@ CREATE TABLE user_config
   PRIMARY KEY(id)
 );
 
-CREATE TYPE query_type AS ('sequence', 'dominance', 'subtokenization');
+CREATE TYPE query_type AS ENUM ('sequence', 'dominance', 'subtokenization');
 
-CREATE TABLE query_examples
+CREATE TABLE example_queries
 (
-  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   "type" query_type NOT NULL,
   "used_operators" TEXT NOT NULL,
   "example_query" TEXT NOT NULL,
-  "description" TEXT NOT NULL
+  "description" TEXT NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );
