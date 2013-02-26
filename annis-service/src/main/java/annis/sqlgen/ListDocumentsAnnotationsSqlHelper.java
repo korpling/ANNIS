@@ -31,7 +31,7 @@ public class ListDocumentsAnnotationsSqlHelper implements
     String template = "SELECT DISTINCT meta.namespace, meta.name, meta.value \n" +
         "from corpus this, corpus docs \n" +
         "FULL JOIN corpus_annotation meta \n" +
-        "ON docs.pre=meta.corpus_ref \n" +
+        "ON docs.id=meta.corpus_ref \n" +
         "WHERE this.name = :toplevelname \n" +
         "AND docs.pre > this.pre \n" +
         "AND docs.post < this.post \n" +
