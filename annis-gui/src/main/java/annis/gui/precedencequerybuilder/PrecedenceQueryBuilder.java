@@ -465,6 +465,8 @@ service.path("query").path("corpora").path(corpus).path("annotations")
 
   public String killNamespace(String qName)
   {
+    // TODO rewrite this, so that it is only the first element that is removed
+    // TODO is this actually a good idea, there should be some kind of test whether or not it is a namespace?
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }
