@@ -1,10 +1,10 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -61,35 +61,48 @@ import org.springframework.transaction.annotation.Transactional;
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class DefaultAdministrationDao implements AdministrationDao
 {
-  
-  private static final Logger log = LoggerFactory.getLogger(AdministrationDao.class);
+
+  private static final Logger log = LoggerFactory.getLogger(
+    AdministrationDao.class);
   // external files path
+
   private String externalFilesPath;
   // script path
+
   private String scriptPath;
   // use Spring's JDBC support
+
   private JdbcTemplate jdbcTemplate;
   //private JdbcOperations jdbcOperations;
   // save the datasource to manually retrieve connections (needed for bulk-import)
+
   private DataSource dataSource;
+
   private boolean temporaryStagingArea;
+
   private String schemaVersion;
+
   private Map<String, String> mimeTypeMapping;
+
   private Map<String, String> tableInsertSelect;
+
   private Map<String, String> tableInsertFrom;
+
   /**
    * The name of the file and the relation containing the resolver information.
    */
   private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
   // tables imported from bulk files
   // DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
+
   private String[] importedTables =
   {
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
     "component", "rank", "edge_annotation",
-    FILE_RESOLVER_VIS_MAP
+    FILE_RESOLVER_VIS_MAP, "example_queries"
   };
+
   private String[] tablesToCopyManually =
   {
     "corpus", "corpus_annotation",
@@ -99,13 +112,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     "media_files"
   };
   // tables created during import
+
   private String[] createdTables =
   {
     "corpus_stats",
     "media_files"
   };
+
   private String dbLayout;
-  
+
   private ObjectMapper jsonMapper = new ObjectMapper();
 
   /**
@@ -113,14 +128,14 @@ public class DefaultAdministrationDao implements AdministrationDao
    */
   public void init()
   {
-    
+
     AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
     jsonMapper.setAnnotationIntrospector(introspector);
     // the json should be as compact as possible in the database
     jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
       false);
   }
-  
+
   ///// Subtasks of creating the database
   protected void dropDatabase(String database)
   {
@@ -132,7 +147,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       jdbcTemplate.execute("DROP DATABASE " + database);
     }
   }
-  
+
   protected void dropUser(String username)
   {
     String sql = "SELECT count(*) FROM pg_user WHERE usename = ?";
@@ -143,14 +158,14 @@ public class DefaultAdministrationDao implements AdministrationDao
       jdbcTemplate.execute("DROP USER " + username);
     }
   }
-  
+
   protected void createUser(String username, String password)
   {
     log.info("creating user: " + username);
     jdbcTemplate.execute("CREATE USER " + username + " PASSWORD '" + password
       + "'");
   }
-  
+
   protected void createDatabase(String database)
   {
     log.info("creating database: " + database
@@ -158,7 +173,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate.execute("CREATE DATABASE " + database
       + " ENCODING = 'UTF8' TEMPLATE template0");
   }
-  
+
   protected void installPlPgSql()
   {
     log.info("installing stored procedure language plpgsql");
@@ -171,32 +186,33 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.warn("plpqsql was already installed: " + ex.getMessage());
     }
   }
-  
+
   protected void createFunctionUniqueToplevelCorpusName()
   {
     log.info("creating trigger function: unique_toplevel_corpus_name");
     executeSqlFromScript("unique_toplevel_corpus_name.sql");
   }
-  
+
   protected void createSchema()
   {
     log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
-    
+
     // update schema version
     jdbcTemplate.execute("DELETE FROM repository_metadata WHERE \"name\"='schema-version'");
+
     jdbcTemplate.execute("INSERT INTO repository_metadata "
       + "VALUES ('schema-version', '"
       + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
-    
+
   }
-  
+
   protected void createSchemaIndexes()
   {
     log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schemaindex.sql");
   }
-  
+
   protected void populateSchema()
   {
     log.info("populating the schemas with default values");
@@ -205,17 +221,18 @@ public class DefaultAdministrationDao implements AdministrationDao
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
   }
-  
+
   @Override
   @Transactional(readOnly = true)
   public String getDatabaseSchemaVersion()
   {
     try
     {
-      
-      List<Map<String, Object>> result = jdbcTemplate.queryForList(
+
+      List<Map<String, Object>> result = jdbcTemplate.
+        queryForList(
         "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'");
-      
+
       String schema =
         result.size() > 0 ? (String) result.get(0).get("value") : "";
       return schema;
@@ -228,12 +245,13 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return "";
   }
-  
+
   @Override
   public boolean checkDatabaseSchemaVersion() throws AnnisException
   {
     String dbSchemaVersion = getDatabaseSchemaVersion();
-    if (getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(dbSchemaVersion))
+    if (getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(
+      dbSchemaVersion))
     {
       String error = "Wrong database schema \"" + dbSchemaVersion + "\", please initialize the database.";
       log.error(error);
@@ -249,36 +267,36 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // connect as super user to the default database to create new user and database
     if(superPassword != null)
-    {      
+    {
       log.info("Creating Annis database and user.");
       setDataSource(createDataSource(host, port,
       defaultDatabase, superUser, superPassword, useSSL));
-    
+
       dropDatabase(database);
       dropUser(user);
       createUser(user, password);
       createDatabase(database);
-      
+
       installPlPgSql();
     }
-    
+
     // switch to new database as new user for the rest
     setDataSource(createDataSource(host, port, database,
       user, password, useSSL));
-    
+
     createFunctionUniqueToplevelCorpusName();
     createSchema();
     createSchemaIndexes();
     populateSchema();
   }
-  
+
   private DataSource createDataSource(String host, String port,
     String database,
     String user, String password, boolean useSSL)
   {
     Properties props = new Properties();
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-    
+
     if(useSSL)
     {
       props.put("ssl", "true");
@@ -288,14 +306,12 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     props.put("user", user);
     props.put("password", password);
-    
+
     // why is this better?
-    // XXX: how to construct the datasource?    
+    // XXX: how to construct the datasource?
     return new SimpleDriverDataSource(new Driver(), url, props);
   }
 
-  
-  
   @Override
   @Transactional(readOnly = false)
   public void importCorpus(String path)
@@ -303,15 +319,15 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     // check schema version first
     checkDatabaseSchemaVersion();
-    
+
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-    
+
     createStagingAreaIndexes();
-    
+
     computeTopLevelCorpus();
     analyzeStagingTables();
-    
+
     computeLeftTokenRightToken();
 
 //    if (true) return;
@@ -319,10 +335,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     adjustRankPrePost();
     adjustTextId();
     long corpusID = updateIds();
-    
+
     importBinaryData(path);
     extendStagingText(corpusID);
-    
+
     computeRealRoot();
 
 //    if (true) return;
@@ -331,28 +347,28 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
     computeSpanFromSegmentation();
-    
+
     applyConstraints();
     analyzeStagingTables();
-    
+
     insertCorpus();
-    
+
     computeCorpusPath(corpusID);
-    
+
     createAnnotations(corpusID);
 
     // create the new facts table partition
     createFacts(corpusID);
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
-    
-    
+
+
     if (temporaryStagingArea)
     {
       dropStagingArea();
     }
     analyzeFacts(corpusID);
-    
+
   }
 
   ///// Subtasks of importing a corpus
@@ -365,7 +381,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       jdbcTemplate.execute("DROP INDEX " + index);
     }
   }
-  
+
   void createStagingArea(boolean useTemporary)
   {
     log.info("creating staging area");
@@ -373,12 +389,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area.sql", args);
   }
-  
+
   void bulkImport(String path)
   {
     log.info("bulk-loading data");
-    
-    
+
+
     for (String table : importedTables)
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
@@ -389,16 +405,17 @@ public class DefaultAdministrationDao implements AdministrationDao
 
           // count cols for detecting old resolver_vis_map table format
           File resolver_vis_tab = new File(path, table + ".tab");
-          
+
+
           bReader = new BufferedReader(
             new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
           String firstLine = bReader.readLine();
-          
+
           int cols = 9; // default number
           if (firstLine != null)
           {
             String[] entries = firstLine.split("\t");
-            cols = entries.length;            
+            cols = entries.length;
             log.debug("the first row: {} amount of cols: {}", entries, cols);
           }
 
@@ -406,56 +423,8 @@ public class DefaultAdministrationDao implements AdministrationDao
           {
             // old format
             case 8:
-              StringBuilder sb = new StringBuilder();
-              sb.append("CREATE TABLE tmp_resolver_vis_map ");
-              sb.append("( ");
-              sb.append("\"corpus\"   varchar, ");
-              sb.append("\"version\" 	varchar, ");
-              sb.append("\"namespace\"	varchar, ");
-              sb.append("\"element\"    varchar, ");
-              sb.append("\"vis_type\"   varchar NOT NULL, ");
-              sb.append("\"display_name\"   varchar NOT NULL, ");
-              sb.append("\"order\" integer default '0', ");
-              sb.append("\"mappings\" varchar");
-              sb.append(");");
-              
-              jdbcTemplate.execute(sb.toString());
-              
-              bulkloadTableFromResource("tmp_resolver_vis_map",
-                new FileSystemResource(resolver_vis_tab));
-              
-              sb = new StringBuilder();
-              
-              sb.append("INSERT INTO ");
-              sb.append(tableInStagingArea(FILE_RESOLVER_VIS_MAP));
-              sb.append("\n\t");
-              sb.append(" (");
-              sb.append("corpus, ");
-              sb.append("version, ");
-              sb.append("namespace, ");
-              sb.append("element, ");
-              sb.append("vis_type, ");
-              sb.append("display_name, ");
-              sb.append("\"order\", ");
-              sb.append("mappings");
-              sb.append(")");
-              sb.append("\n");
-              sb.append("SELECT tmp.corpus, ");
-              sb.append("tmp.version, ");
-              sb.append("tmp.namespace, ");
-              sb.append("tmp.element, ");
-              sb.append("tmp.vis_type, ");
-              sb.append("tmp.display_name, ");
-              sb.append("tmp.\"order\", ");
-              sb.append("tmp.mappings");
-              sb.append("\n\t");
-              sb.append("FROM tmp_resolver_vis_map AS tmp; ");
-              
-              jdbcTemplate.execute(sb.toString());
-              jdbcTemplate.execute("DROP TABLE tmp_resolver_vis_map;");
-              
+              readOldResolverVisMapFormat(resolver_vis_tab);
               break;
-
             // new format
             case 9:
               bulkloadTableFromResource(tableInStagingArea(table),
@@ -465,7 +434,7 @@ public class DefaultAdministrationDao implements AdministrationDao
               log.error("invalid amount of cols");
               throw new RuntimeException();
           }
-          
+
         }
         catch (IOException e)
         {
@@ -477,7 +446,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         }
         finally
         {
-          if(bReader != null)
+          if (bReader != null)
           {
             try
             {
@@ -501,7 +470,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
     }
   }
-  
+
   private void bulkImportNode(String path)
   {
     BufferedReader reader = null;
@@ -509,13 +478,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       // check column number by reading first line
       File nodeTabFile = new File(path, "node.tab");
+
       reader =
-        new BufferedReader(new InputStreamReader(new FileInputStream(nodeTabFile), "UTF-8"));
+        new BufferedReader(new InputStreamReader(
+        new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
-      
-      
-      int columnNumber = firstLine == null ? 13 : 
-        StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
+
+
+      int columnNumber = firstLine == null ? 13
+        : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
       if (columnNumber == 13)
       {
         // new node table with segmentations
@@ -541,10 +512,10 @@ public class DefaultAdministrationDao implements AdministrationDao
           + "continuous boolean,\n"
           + "span varchar(2000)\n"
           + ");");
-        
+
         bulkloadTableFromResource("_tmpnode",
           new FileSystemResource(nodeTabFile));
-        
+
         log.info("copying nodes from temporary helper table into staging area");
         jdbcTemplate.execute(
           "INSERT INTO " + tableInStagingArea("node") + "\n"
@@ -566,7 +537,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     finally
     {
-      if(reader != null)
+      if (reader != null)
       {
         try
         {
@@ -579,25 +550,25 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
     }
   }
-  
+
   void createStagingAreaIndexes()
   {
     log.info("creating indexes for staging area");
     executeSqlFromScript("indexes_staging.sql");
   }
-  
+
   void computeTopLevelCorpus()
   {
     log.info("computing top-level corpus");
     executeSqlFromScript("toplevel_corpus.sql");
   }
-  
+
   void importBinaryData(String path)
   {
     log.info("importing all binary data from ExtData");
     File extData = new File(path + "/ExtData");
     if (extData.canRead() && extData.isDirectory())
-    { 
+    {
       // import toplevel corpus media files
       File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
       for(File data : topFiles)
@@ -626,9 +597,10 @@ public class DefaultAdministrationDao implements AdministrationDao
           log.error("no canonical path given", ex);
         }
       }
-      
+
       // get each subdirectory (which corresponds to an document name)
-      File[] documents = extData.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+      File[] documents = extData.listFiles(
+        (FileFilter) DirectoryFileFilter.DIRECTORY);
       for (File doc : documents)
       {
         if (doc.isDirectory() && doc.canRead())
@@ -641,18 +613,22 @@ public class DefaultAdministrationDao implements AdministrationDao
             {
               if (mimeTypeMapping.containsKey(extension))
               {
-                log.info("import " + data.getCanonicalPath() + " to staging area");
-                
+                log.info(
+                  "import " + data.getCanonicalPath() + " to staging area");
+
                 // search for corpus_ref
                 String sqlScript =
                   "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
-                long corpusID = jdbcTemplate.queryForLong(sqlScript, doc.getName());
-                
+                long corpusID = jdbcTemplate.queryForLong(sqlScript, doc.
+                  getName());
+
                 importSingleFile(data.getCanonicalPath(), corpusID);
               }
               else
               {
-                log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+                log.
+                  warn(
+                  "not importing " + data.getCanonicalPath() + " since file type is unknown");
               }
             }
             catch (IOException ex)
@@ -664,46 +640,48 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
     }
   }
-  
+
   private void importSingleFile(String path, long corpusRef)
   {
+
     MediaImportHelper preStat = new MediaImportHelper(path, getRealDataDir(),
       corpusRef, mimeTypeMapping);
-   
+
     jdbcTemplate.execute(MediaImportHelper.SQL, preStat);
 
   }
-  
+
   void extendStagingText(long toplevelID)
   {
     log.info("extending _text");;
-    executeSqlFromScript("extend_staging_text.sql", makeArgs().addValue(":id", toplevelID));
+    executeSqlFromScript("extend_staging_text.sql", makeArgs().addValue(":id",
+      toplevelID));
   }
-  
+
   void computeLeftTokenRightToken()
   {
     log.info("computing values for struct.left_token and struct.right_token");
     executeSqlFromScript("left_token_right_token.sql");
   }
-  
+
   void computeRealRoot()
   {
     log.info("computing real root for rank");
     executeSqlFromScript("root.sql");
   }
-  
+
   void computeLevel()
   {
     log.info("computing values for rank.level (dominance and precedence)");
     executeSqlFromScript("level.sql");
-    
+
     log.info("computing values for rank.level (coverage)");
     executeSqlFromScript("level_coverage.sql");
   }
-  
+
   void computeCorpusStatistics(String path)
   {
-    
+
     File f = new File(path);
     String absolutePath = path;
     try
@@ -712,21 +690,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     catch (IOException ex)
     {
-      log.error("Something went really wrong when calculating the canonical path", ex);
+      log.error(
+        "Something went really wrong when calculating the canonical path", ex);
     }
-    
+
     log.info("computing statistics for top-level corpus");
     MapSqlParameterSource args = makeArgs().addValue(":path", absolutePath);
     executeSqlFromScript("corpus_stats.sql", args);
   }
-  
+
   void updateCorpusStatistic(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     log.info("updating statistics for top-level corpus");
     executeSqlFromScript("corpus_stats_upd.sql", args);
   }
-  
+
   void computeCorpusPath(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
@@ -734,7 +713,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
   }
-  
+
   protected void adjustRankPrePost()
   {
     log.info("updating pre and post order in _rank");
@@ -742,7 +721,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("analyzing _rank");
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("rank"));
   }
-  
+
   protected void adjustTextId()
   {
     log.info("updating id in _text and text_ref in _node");
@@ -759,47 +738,47 @@ public class DefaultAdministrationDao implements AdministrationDao
   long updateIds()
   {
     log.info("updating IDs in staging area");
-    
+
     int numOfEntries = jdbcTemplate.queryForInt(
       "SELECT COUNT(*) from corpus_stats");
-    
+
     long recentCorpusId = 0;
-    
+
     if (numOfEntries > 0)
     {
       recentCorpusId = jdbcTemplate.queryForLong(
         "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
     }
-    
+
     MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
     executeSqlFromScript("update_ids.sql", args);
-    
+
     log.info("query for the new corpus ID");
     long result = jdbcTemplate.queryForLong(
       "SELECT MAX(toplevel_corpus) FROM _node");
     log.info("new corpus ID is " + result);
     return result;
   }
-  
+
   void computeSpanFromSegmentation()
   {
     log.info("computing span value for segmentation nodes");
     executeSqlFromScript("span_from_segmentation.sql");
   }
-  
+
   void updateCorpusStatsId(long corpusId)
   {
     log.info("updating corpus ID in corpus_stat");
     jdbcTemplate.update("UPDATE _corpus_stats SET id = " + corpusId);
   }
-  
+
   void applyConstraints()
   {
     log.info("activating relational constraints");
     executeSqlFromScript("constraints.sql");
   }
-  
+
   void insertCorpus()
   {
     log.info("moving corpus from staging area to main db");
@@ -807,29 +786,29 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       int numOfEntries = jdbcTemplate.queryForInt("SELECT COUNT(*) from "
         + tableInStagingArea(table));
-      
-      
+
+
       if (numOfEntries > 0)
       {
         StringBuilder sql = new StringBuilder();
-  
-        String predefinedFrom = 
+
+        String predefinedFrom =
           tableInsertFrom == null ? null : tableInsertFrom.get(table);
-        String predefinedSelect = 
+        String predefinedSelect =
           tableInsertSelect == null ? null : tableInsertSelect.get(table);
-        
-        if(predefinedFrom != null || predefinedSelect != null)
+
+        if (predefinedFrom != null || predefinedSelect != null)
         {
-          if(predefinedFrom == null)
+          if (predefinedFrom == null)
           {
             predefinedFrom = predefinedSelect;
           }
-          
+
           sql.append("INSERT INTO ");
           sql.append(table);
           sql.append(" ( ");
           sql.append(predefinedSelect);
-          
+
           sql.append(" ) (SELECT ");
           sql.append(predefinedFrom);
           sql.append(" FROM ");
@@ -846,7 +825,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
     }
   }
-  
+
   void dropStagingArea()
   {
     log.info("dropping staging area");
@@ -854,22 +833,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     // tables must be dropped in reverse order
     List<String> tables = importedAndCreatedTables();
     Collections.reverse(tables);
-    
+
     for (String table : tables)
     {
       jdbcTemplate.execute("DROP TABLE " + tableInStagingArea(table));
     }
-    
+
   }
-  
+
   void dropMaterializedTables()
   {
     log.info("dropping materialized tables");
-    
+
     jdbcTemplate.execute("DROP TABLE facts");
-    
+
   }
-  
+
   void analyzeStagingTables()
   {
     for (String t : importedTables)
@@ -878,42 +857,42 @@ public class DefaultAdministrationDao implements AdministrationDao
       jdbcTemplate.execute("ANALYZE " + tableInStagingArea(t));
     }
   }
-  
+
   void createAnnotations(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
     log.info("creating annotations table for corpus with ID " + corpusID);
     executeSqlFromScript("annotations.sql", args);
-    
+
     log.info("indexing annotations table for corpus with ID " + corpusID);
     executeSqlFromScript("indexes_annotations.sql", args);
   }
-  
+
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
     jdbcTemplate.execute("ANALYZE facts_" + corpusID);
   }
-  
+
   void createFacts(long corpusID)
   {
-    
+
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-    
+
     log.info("creating materialized facts table for corpus with ID " + corpusID);
     executeSqlFromScript(dbLayout + "/facts.sql", args);
-    
+
     clusterFacts(corpusID);
-    
+
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
     executeSqlFromScript(dbLayout + "/indexes.sql", args);
-    
+
   }
-  
+
   void clusterFacts(long corpusID)
   {
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-    
+
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
     if (!executeSqlFromScript(dbLayout + "/cluster.sql", args))
@@ -927,22 +906,22 @@ public class DefaultAdministrationDao implements AdministrationDao
   public List<Long> listToplevelCorpora()
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
-    
-    
+
+
     return jdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.
       newInstance(Long.class));
   }
-  
+
   @Transactional(readOnly = false)
   @Override
   public void deleteCorpora(List<Long> ids)
   {
     File dataDir = getRealDataDir();
-    
+
     for (long l : ids)
     {
       log.info("deleting external data files");
-      
+
       List<String> filesToDelete = jdbcTemplate.queryForList(
         "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n" +
         "WHERE\n" +
@@ -957,9 +936,9 @@ public class DefaultAdministrationDao implements AdministrationDao
           f.delete();
         }
       }
-      
+
       log.info("dropping tables");
-      
+
       log.debug("dropping facts table for corpus " + l);
       jdbcTemplate.execute("DROP TABLE IF EXISTS facts_" + l);
       jdbcTemplate.execute("DROP TABLE IF EXISTS facts_edge_" + l);
@@ -969,28 +948,27 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.debug("dropping annotations table for corpus " + l);
       jdbcTemplate.execute("DROP TABLE IF EXISTS annotations_" + l);
     }
-    
+
     log.info("recursivly deleting corpora: " + ids);
+    
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
-    
   }
-  
+
   @Override
   public List<Map<String, Object>> listCorpusStats()
   {
     return jdbcTemplate.queryForList(
       "SELECT * FROM corpus_info ORDER BY name");
   }
-  
-  
+
   @Override
   public List<String> listUsedIndexes()
   {
     log.info("retrieving list of used indexes");
     return listIndexDefinitions(true);
   }
-  
+
   @Override
   public List<String> listUnusedIndexes()
   {
@@ -999,41 +977,48 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public AnnisUserConfig retrieveUserConfig(final String userName)
   {
     String sql = "SELECT * FROM user_config WHERE id=?";
-    AnnisUserConfig config = jdbcTemplate.query(sql, new Object[] {userName}, 
+    AnnisUserConfig config = jdbcTemplate.query(sql, new Object[]
+    {
+      userName
+    },
       new ResultSetExtractor<AnnisUserConfig>()
+    {
+      @Override
+      public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
       {
-        @Override
-        public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
+
+        // default to empty config
+        AnnisUserConfig c = new AnnisUserConfig();
+        c.setName(userName);
+
+        if (rs.next())
         {
-          
-          // default to empty config
-          AnnisUserConfig c = new AnnisUserConfig();
-          c.setName(userName);
-          
-          if(rs.next())
+          try
           {
-            try
-            {
-              c = jsonMapper.readValue(rs.getString("config"), AnnisUserConfig.class);
-            }
-            catch (IOException ex)
-            {
-              log.error("Could not parse JSON that is stored in database (user configuration)", ex);
-            }
+            c = jsonMapper.readValue(rs.getString("config"),
+              AnnisUserConfig.class);
           }
-          return c;
-        }}
-    );
-    
+          catch (IOException ex)
+          {
+            log.
+              error(
+              "Could not parse JSON that is stored in database (user configuration)",
+              ex);
+          }
+        }
+        return c;
+      }
+    });
+
     return config;
   }
-  
+
   @Override
-  @Transactional(readOnly=false)
+  @Transactional(readOnly = false)
   public void storeUserConfig(AnnisUserConfig config)
   {
     String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
@@ -1041,9 +1026,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       String jsonVal = jsonMapper.writeValueAsString(config);
-    
+
       // if no row was affected there is no entry yet and we should create one
-      if(jdbcTemplate.update(sqlUpdate, jsonVal, config.getName()) == 0)
+      if (jdbcTemplate.update(sqlUpdate, jsonVal, config.getName()) == 0)
       {
         jdbcTemplate.update(sqlInsert, config.getName(), jsonVal);
       }
@@ -1053,7 +1038,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
-  
+
   ///// Helpers
   private List<String> importedAndCreatedTables()
   {
@@ -1062,7 +1047,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     tables.addAll(Arrays.asList(createdTables));
     return tables;
   }
-  
+
   private List<String> allTables()
   {
     List<String> tables = new ArrayList<String>();
@@ -1077,12 +1062,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     return "_" + table;
   }
-  
+
   private MapSqlParameterSource makeArgs()
   {
     return new MapSqlParameterSource();
   }
-  
+
   private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
   {
     return ParameterizedSingleColumnRowMapper.newInstance(String.class);
@@ -1099,9 +1084,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       StringBuilder sqlBuf = new StringBuilder();
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(resource.getFile()), "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+        resource.
+        getFile()), "UTF-8"));
       for (String line = reader.readLine(); line != null; line =
-          reader.readLine())
+        reader.readLine())
       {
         sqlBuf.append(line).append("\n");
       }
@@ -1112,7 +1099,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         String value = placeHolderEntry.getValue().toString();
         log.debug("substitution for parameter '" + key + "' in SQL script: "
           + value);
-        
+
         sql = sql.replaceAll(key, value);
       }
       return sql;
@@ -1175,7 +1162,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "' into table '" + table + "'");
     String sql = "COPY " + table
       + " FROM STDIN WITH DELIMITER E'\t' NULL AS 'NULL'";
-    
+
     try
     {
       // retrieve the currently open connection if running inside a transaction
@@ -1184,9 +1171,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
-      
+
       DataSourceUtils.releaseConnection(con, dataSource);
-      
+
     }
     catch (SQLException e)
     {
@@ -1210,10 +1197,10 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "WHERE tablename IN (" + StringUtils.repeat("?", ",", tables.size()) + ") "
       + "AND lower(indexname) NOT IN "
       + "	(SELECT lower(conname) FROM pg_constraint WHERE contype in ('p', 'u'))";
-    
+
     return jdbcTemplate.query(sql, tables.toArray(), stringRowMapper());
   }
-  
+
   private List<String> listIndexDefinitions(boolean used)
   {
     return listIndexDefinitions(used, allTables());
@@ -1236,9 +1223,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "WHERE x.indexrelid = c.oid "
       + "AND c.relname IN ( " + StringUtils.repeat("?", ",", tables.size()) + ") "
       + "AND pg_stat_get_numscans(x.indexrelid) " + scansOp + " 0";
-        return jdbcTemplate.query(sql, tables.toArray(), stringRowMapper());
+    return jdbcTemplate.query(sql, tables.toArray(), stringRowMapper());
   }
-  
+
   public List<String> listIndexDefinitions(String... tables)
   {
     String sql = ""
@@ -1246,11 +1233,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "FROM pg_index x, pg_class c, pg_indexes i "
       + "WHERE x.indexrelid = c.oid "
       + "AND c.relname = i.indexname "
-      + "AND i.tablename IN ( " + StringUtils.repeat("?", ",", tables.length)  + " )";
+      + "AND i.tablename IN ( " + StringUtils.repeat("?", ",", tables.length) + " )";
     return jdbcTemplate.query(sql, tables,
       new ParameterizedSingleColumnRowMapper<String>());
   }
-  
+
   public List<String> listUsedIndexes(String... tables)
   {
     String sql = ""
@@ -1263,7 +1250,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     return jdbcTemplate.query(sql, tables,
       new ParameterizedSingleColumnRowMapper<String>());
   }
-  
+
   public boolean resetStatistics()
   {
     try
@@ -1283,27 +1270,28 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.dataSource = dataSource;
     jdbcTemplate = new JdbcTemplate(dataSource);
   }
-  
+
   public JdbcTemplate getJdbcTemplate()
   {
     return jdbcTemplate;
   }
-  
+
   public String getScriptPath()
   {
     return scriptPath;
   }
-  
+
   public void setScriptPath(String scriptPath)
   {
     this.scriptPath = scriptPath;
   }
-  
+
   public String getExternalFilesPath()
   {
     return externalFilesPath;
   }
-  
+<<<<<<< HEAD
+
   public File getRealDataDir()
   {
     File dataDir;
@@ -1318,47 +1306,47 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return dataDir;
   }
-  
+
   public void setExternalFilesPath(String externalFilesPath)
   {
     this.externalFilesPath = externalFilesPath;
   }
-  
+
   public String getDbLayout()
   {
     return dbLayout;
   }
-  
+
   public void setDbLayout(String dbLayout)
   {
     this.dbLayout = dbLayout;
   }
-  
+
   public boolean isTemporaryStagingArea()
   {
     return temporaryStagingArea;
   }
-  
+
   public void setTemporaryStagingArea(boolean temporaryStagingArea)
   {
     this.temporaryStagingArea = temporaryStagingArea;
   }
-  
+
   public String getSchemaVersion()
   {
     return schemaVersion;
   }
-  
+
   public void setSchemaVersion(String schemaVersion)
   {
     this.schemaVersion = schemaVersion;
   }
-  
+
   public Map<String, String> getMimeTypeMapping()
   {
     return mimeTypeMapping;
   }
-  
+
   public void setMimeTypeMapping(Map<String, String> mimeTypeMapping)
   {
     this.mimeTypeMapping = mimeTypeMapping;
@@ -1383,5 +1371,55 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.tableInsertFrom = tableInsertFrom;
   }
-  
+
+  private void readOldResolverVisMapFormat(File resolver_vis_tab)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("CREATE TABLE tmp_resolver_vis_map ");
+    sb.append("( ");
+    sb.append("\"corpus\"   varchar, ");
+    sb.append("\"version\" 	varchar, ");
+    sb.append("\"namespace\"	varchar, ");
+    sb.append("\"element\"    varchar, ");
+    sb.append("\"vis_type\"   varchar NOT NULL, ");
+    sb.append("\"display_name\"   varchar NOT NULL, ");
+    sb.append("\"order\" integer default '0', ");
+    sb.append("\"mappings\" varchar");
+    sb.append(");");
+
+    jdbcTemplate.execute(sb.toString());
+
+    bulkloadTableFromResource("tmp_resolver_vis_map",
+      new FileSystemResource(resolver_vis_tab));
+
+    sb = new StringBuilder();
+
+    sb.append("INSERT INTO ");
+    sb.append(tableInStagingArea(FILE_RESOLVER_VIS_MAP));
+    sb.append("\n\t");
+    sb.append(" (");
+    sb.append("corpus, ");
+    sb.append("version, ");
+    sb.append("namespace, ");
+    sb.append("element, ");
+    sb.append("vis_type, ");
+    sb.append("display_name, ");
+    sb.append("\"order\", ");
+    sb.append("mappings");
+    sb.append(")");
+    sb.append("\n");
+    sb.append("SELECT tmp.corpus, ");
+    sb.append("tmp.version, ");
+    sb.append("tmp.namespace, ");
+    sb.append("tmp.element, ");
+    sb.append("tmp.vis_type, ");
+    sb.append("tmp.display_name, ");
+    sb.append("tmp.\"order\", ");
+    sb.append("tmp.mappings");
+    sb.append("\n\t");
+    sb.append("FROM tmp_resolver_vis_map AS tmp; ");
+
+    jdbcTemplate.execute(sb.toString());
+    jdbcTemplate.execute("DROP TABLE tmp_resolver_vis_map;");
+  }
 }
