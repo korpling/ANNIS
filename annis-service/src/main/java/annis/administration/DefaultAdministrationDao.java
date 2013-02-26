@@ -399,65 +399,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        BufferedReader bReader = null;
-        try
-        {
-
-          // count cols for detecting old resolver_vis_map table format
-          File resolver_vis_tab = new File(path, table + ".tab");
-
-
-          bReader = new BufferedReader(
-            new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
-          String firstLine = bReader.readLine();
-
-          int cols = 9; // default number
-          if (firstLine != null)
-          {
-            String[] entries = firstLine.split("\t");
-            cols = entries.length;
-            log.debug("the first row: {} amount of cols: {}", entries, cols);
-          }
-
-          switch (cols)
-          {
-            // old format
-            case 8:
-              readOldResolverVisMapFormat(resolver_vis_tab);
-              break;
-            // new format
-            case 9:
-              bulkloadTableFromResource(tableInStagingArea(table),
-                new FileSystemResource(new File(path, table + ".tab")));
-              break;
-            default:
-              log.error("invalid amount of cols");
-              throw new RuntimeException();
-          }
-
-        }
-        catch (IOException e)
-        {
-          log.error("could not read {}", table + ".tab", e);
-        }
-        catch (FileAccessException e)
-        {
-          log.error("could not read {}", table + ".tab", e);
-        }
-        finally
-        {
-          if (bReader != null)
-          {
-            try
-            {
-              bReader.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
-        }
+        importResolverVisMapTable(path, table);
       }
       else if (table.equalsIgnoreCase("node"))
       {
@@ -1421,5 +1363,53 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     jdbcTemplate.execute(sb.toString());
     jdbcTemplate.execute("DROP TABLE tmp_resolver_vis_map;");
+  }
+
+  private void importResolverVisMapTable(String path, String table)
+  {
+    try
+        {
+
+          // count cols for detecting old resolver_vis_map table format
+          File resolver_vis_tab = new File(path, table + ".tab");
+
+          BufferedReader bReader = new BufferedReader(
+            new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
+          String firstLine = bReader.readLine();
+          bReader.close();
+
+          int cols = 9; // default number
+          if (firstLine != null)
+          {
+            String[] entries = firstLine.split("\t");
+            cols = entries.length;
+            log.debug("the first row: {} amount of cols: {}", entries, cols);
+          }
+
+          switch (cols)
+          {
+            // old format
+            case 8:
+              readOldResolverVisMapFormat(resolver_vis_tab);
+              break;
+            // new format
+            case 9:
+              bulkloadTableFromResource(tableInStagingArea(table),
+                new FileSystemResource(new File(path, table + ".tab")));
+              break;
+            default:
+              log.error("invalid amount of cols");
+              throw new RuntimeException();
+          }
+
+        }
+        catch (IOException e)
+        {
+          log.error("could not read {}", table + ".tab", e);
+        }
+        catch (FileAccessException e)
+        {
+          log.error("could not read {}", table + ".tab", e);
+        }
   }
 }
