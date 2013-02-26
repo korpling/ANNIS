@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.AutoGenQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import com.vaadin.ui.*;
@@ -24,46 +25,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * @author thomas
  */
 public class ControlPanel extends Panel
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
-  
+
   private static final long serialVersionUID = -2220211539424865671L;
+
   private QueryPanel queryPanel;
+
   private CorpusListPanel corpusList;
+
   private SearchOptionsPanel searchOptions;
+
   private QueryController controller;
-  
-  public ControlPanel(QueryController controller, InstanceConfig instanceConfig)
+
+  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+    AutoGenQueriesPanel autoGenQueries)
   {
     super("Search Form");
     this.controller = controller;
 
     setSizeFull();
-    
+
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
     VerticalLayout layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-    
+
     Accordion accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
-    corpusList = new CorpusListPanel(controller, instanceConfig);
+    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
 
     searchOptions = new SearchOptionsPanel();
 
     queryPanel = new QueryPanel(controller, instanceConfig);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
-    
+
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
@@ -73,7 +79,7 @@ public class ControlPanel extends Panel
 
     layout.setExpandRatio(accordion, 1.0f);
   }
-  
+
   public CorpusListPanel getCorpusList()
   {
     return corpusList;
@@ -88,5 +94,4 @@ public class ControlPanel extends Panel
   {
     return searchOptions;
   }
-
 }
