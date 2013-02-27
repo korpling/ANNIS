@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,14 +36,15 @@ class MetaBox extends Panel implements Button.ClickListener
 
   private Button btClose;
   private String selection;
-  private TwinColSelect tcs;
+  //private TwinColSelect tcs;
+  private OptionGroup tcs;
   private VerticalLayout sb;
   private PrecedenceQueryBuilder sq;
   private final String datum;
   
   private static final String LEFT_COLUMN_LABEL = "Available levels";
   private static final String RIGHT_COLUMN_LABEL = "Selected levels";
-  private static final String TWIN_COL_WIDTH = "350px";
+  private static final String TWIN_COL_WIDTH = "40px";
   
   public MetaBox(String ebene, PrecedenceQueryBuilder sq)
   {
@@ -64,17 +65,21 @@ class MetaBox extends Panel implements Button.ClickListener
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
     
-    TwinColSelect l = new TwinColSelect(ebene);
+    //TODO make it so that if annonames.length()>10 it becomes a twincolselect, and if there is less than 10 it is just optiongroup
+    //TwinColSelect l = new TwinColSelect(ebene);
+    OptionGroup l = new OptionGroup(ebene);
     for (String annoname : annonames) {
-      l.addItem(annoname);
+      if (!annoname.isEmpty()){
+        l.addItem(annoname);
+      }
     }
-    l.setRows(10);
+    //l.setRows(10);
     l.setNullSelectionAllowed(true);
     l.setMultiSelect(true);
     l.setImmediate(true);
-    l.setLeftColumnCaption(LEFT_COLUMN_LABEL);
-    l.setRightColumnCaption(RIGHT_COLUMN_LABEL);
-    l.setWidth(TWIN_COL_WIDTH);
+    //l.setLeftColumnCaption(LEFT_COLUMN_LABEL);
+    //l.setRightColumnCaption(RIGHT_COLUMN_LABEL);
+    //l.setWidth(TWIN_COL_WIDTH);
     tcs = l;
 
     sb.addComponent(tcs);
