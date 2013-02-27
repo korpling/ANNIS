@@ -21,6 +21,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
+import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
@@ -533,6 +534,23 @@ public class QueryService
 
     log.debug("fetch successfully");
     return bin;
+  }
+
+  @GET
+  @Path("corpora/example-queries/{top}")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<ExampleQuery> getExampleQueries(@PathParam("top") String top)
+  {
+    if (top == null)
+    {
+      //TODO get all generated example quries
+      return null;
+    }
+    else
+    {
+      // TODO catch only example queries for specific corpus
+      return null;
+    }
   }
 
   /**

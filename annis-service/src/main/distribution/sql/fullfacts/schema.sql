@@ -38,7 +38,7 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id), 
+  corpus_ref integer REFERENCES corpus(id),
   id    integer,
   name  varchar,
   text  text,
@@ -129,22 +129,22 @@ CREATE TABLE corpus_stats
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
   max_component_id integer NULL,
-  max_node_id bigint NULL, 
+  max_node_id bigint NULL,
   source_path varchar -- original path to the folder containing the relANNIS sources
 );
 
 
-CREATE VIEW corpus_info AS SELECT 
+CREATE VIEW corpus_info AS SELECT
   name,
-  id, 
+  id,
   text,
   tokens,
   source_path
-FROM 
+FROM
   corpus_stats;
-  
+
 CREATE TYPE resolver_visibility AS ENUM (
-  'permanent', 
+  'permanent',
   'visible',
   'hidden',
   'removed',
@@ -163,7 +163,7 @@ CREATE TABLE resolver_vis_map
   "visibility"    resolver_visibility NOT NULL DEFAULT 'hidden',
   "order" integer default '0',
   "mappings" varchar,
-   UNIQUE (corpus,version,namespace,element,vis_type)              
+   UNIQUE (corpus,version,namespace,element,vis_type)
 );
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
 COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
@@ -189,4 +189,15 @@ CREATE TABLE annotations
   edge_name varchar,
   toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
+);
+
+CREATE TYPE query_type AS ENUM ('SEQUENCE', 'DOMINANCE');
+
+CREATE TABLE example_queries
+(
+  "type" query_type NOT NULL,
+  "used_operators" TEXT NOT NULL,
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

@@ -219,7 +219,7 @@ CREATE TABLE user_config
   PRIMARY KEY(id)
 );
 
-CREATE TYPE query_type AS ENUM ('sequence', 'dominance', 'subtokenization');
+CREATE TYPE query_type AS ENUM ('SEQUENCE', 'DOMINANCE');
 
 CREATE TABLE example_queries
 (
