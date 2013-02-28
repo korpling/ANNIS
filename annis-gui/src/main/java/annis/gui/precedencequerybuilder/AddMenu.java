@@ -15,12 +15,14 @@
  */
 package annis.gui.precedencequerybuilder;
 
+import com.vaadin.ui.Button;
 import java.util.Collection;
 import java.util.Set;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
+import java.util.Iterator;
 
 /**
  *
@@ -35,21 +37,39 @@ public class AddMenu extends Panel
   private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
   
   
-  public AddMenu(Collection<String> annonames, final PrecedenceQueryBuilder sq, final VerticalNode vn)
+  public AddMenu(final PrecedenceQueryBuilder sq, final VerticalNode vn)
   {
     this.vn = vn;
     this.sq = sq;
     final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
-    for (final String annoname : annonames)
-    {
-      add.addItem(sq.killNamespace(annoname), new Command() {
+    for (final String annoname : vn.getAnnonames())
+    {      
+      add.addItem(annoname, new Command() {
         @Override
-        public void menuSelected(MenuItem selectedItem) {
-          vn.createSearchBox(sq.killNamespace(annoname));
+        public void menuSelected(MenuItem selectedItem) {         
+          vn.createSearchBox(annoname);
+          add.removeChild(selectedItem);
         }
       });
     }
     addComponent(addMenu);
+  }
+  
+  public void addItem(final String ebene)
+  {
+    final VerticalNode vn = this.vn;
+    final MenuBar.MenuItem add = addMenu.getItems().iterator().next();
+    int i = 0;
+    Iterator<MenuBar.MenuItem> items = addMenu.getItems().iterator();
+    /*find position for "new" Item here AND use insertItem instead of addItem*/
+    add.addItem(ebene, new Command() {
+      @Override
+      public void menuSelected(MenuItem selectedItem)
+      {
+        vn.createSearchBox(ebene);
+        add.removeChild(selectedItem);
+      }
+    });
   }
   
 }

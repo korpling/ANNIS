@@ -41,6 +41,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private Button btClose;
   private VerticalLayout v;
   private Collection<SearchBox> sboxes;
+  private AddMenu am;
   
   private static final String WIDTH = "200px";
   
@@ -62,8 +63,9 @@ public class VerticalNode extends Panel implements Button.ClickListener
     for (SearchBox haveSB : sboxes){
       annonames.remove(haveSB.getAttribute());
     }
-    AddMenu am = new AddMenu(annonames, sq, this); //AddMenu creates a menubar from 
+    AddMenu am = new AddMenu(sq, this); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
+    this.am = am;
     
     VerticalLayout vntoolbar = new VerticalLayout();
     vntoolbar.addComponent(btClose);
@@ -85,20 +87,27 @@ public class VerticalNode extends Panel implements Button.ClickListener
     }  
   }
 
-public void removeSearchBox(SearchBox s)
+  public void removeSearchBox(SearchBox s)
   {
     v.removeComponent(s);
     this.sboxes.remove(s);
+    annonames.add(s.getAttribute());
+    am.addItem(s.getAttribute());
   }
 
-public void createSearchBox(String ebene)
+  public void createSearchBox(String ebene)
   {
     SearchBox sb = new SearchBox(ebene, sq, this);
     this.sboxes.add(sb);
     v.addComponent(sb);
   }
-public Collection getSearchBoxes()
-{
-  return this.sboxes;
-}
+  public Collection getSearchBoxes()
+  {
+    return this.sboxes;
+  }
+  
+  public Collection<String> getAnnonames()
+  {
+    return annonames;
+  }
 }
