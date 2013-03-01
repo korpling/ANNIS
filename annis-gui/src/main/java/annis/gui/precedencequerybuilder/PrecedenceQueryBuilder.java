@@ -436,8 +436,7 @@ service.path("query").path("corpora").path(corpus).path("annotations")
             String aa = killNamespace(a.getName());
             if (aa.equals(meta))
             {
-              result = a.getValueSet();
-              break;
+              result.addAll(a.getValueSet());
             }
           }
         }
