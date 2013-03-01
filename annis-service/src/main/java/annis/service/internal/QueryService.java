@@ -536,21 +536,29 @@ public class QueryService
     return bin;
   }
 
+  /**
+   * Fetches the example queries for a specific corpus.
+   *
+   * @param top specifies the corpus the examples are fetched from.
+   *
+   */
   @GET
   @Path("corpora/example-queries/{top}")
   @Produces(MediaType.APPLICATION_XML)
   public List<ExampleQuery> getExampleQueries(@PathParam("top") String top)
   {
-    if (top == null)
-    {
-      //TODO get all generated example quries
-      return null;
-    }
-    else
-    {
-      // TODO catch only example queries for specific corpus
-      return null;
-    }
+    return annisDao.getExampleQueries(top);
+  }
+
+  /**
+   * Fetches all avaible example queries.
+   */
+  @GET
+  @Path("corpora/example-queries")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<ExampleQuery> getExampleQueries()
+  {
+    return annisDao.getExampleQueries(null);
   }
 
   /**

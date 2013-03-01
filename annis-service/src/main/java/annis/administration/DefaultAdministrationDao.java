@@ -437,11 +437,13 @@ public class DefaultAdministrationDao implements AdministrationDao
         File f = new File(path, table + REL_ANNIS_FILE_SUFFIX);
         if (f.exists())
         {
+          log.info(table + REL_ANNIS_FILE_SUFFIX + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
         }
         else
         {
+          log.info(table + REL_ANNIS_FILE_SUFFIX + " file not found");
           f = new File(getScriptPath(), EXAMPLE_QUERIES + REL_ANNIS_FILE_SUFFIX);
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));

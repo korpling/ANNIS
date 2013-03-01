@@ -37,13 +37,13 @@ public class ListExampleQueriesHelper implements
 
   public String createSQLQuery(String corpusName)
   {
-    if (corpusName != null)
+    if (corpusName == null)
     {
       return "SELECT * from example_queries";
     }
     else
     {
-      return "SELECT * FROM (SELECT id FROM CORPUS WHERE name = " + corpusName + ") AS corpus, example_queries WHERE corpus.id = corpus_ref";
+      return "SELECT * FROM (SELECT id FROM CORPUS WHERE name = \'" + corpusName + "\') AS corpus, example_queries WHERE corpus.id = corpus_ref";
     }
   }
 
@@ -52,9 +52,9 @@ public class ListExampleQueriesHelper implements
   {
     ExampleQuery exampleQuery = new ExampleQuery();
 
-    exampleQuery.setType(QueryType.valueOf(rs.getString("query_type")));
+    exampleQuery.setType(QueryType.valueOf(rs.getString("type")));
     exampleQuery.setUsedOperators("used_operators");
-    exampleQuery.setExampleQuery(rs.getString("example_queries"));
+    exampleQuery.setExampleQuery(rs.getString("example_query"));
     exampleQuery.setDescription(rs.getString("description"));
 
     return exampleQuery;
