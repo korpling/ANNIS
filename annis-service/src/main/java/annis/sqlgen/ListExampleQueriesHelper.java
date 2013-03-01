@@ -53,7 +53,7 @@ public class ListExampleQueriesHelper implements
     ExampleQuery exampleQuery = new ExampleQuery();
 
     exampleQuery.setType(QueryType.valueOf(rs.getString("type")));
-    exampleQuery.setUsedOperators("used_operators");
+    exampleQuery.setUsedOperators(rs.getString("used_operators"));
     exampleQuery.setExampleQuery(rs.getString("example_query"));
     exampleQuery.setDescription(rs.getString("description"));
 
