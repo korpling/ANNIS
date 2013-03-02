@@ -64,13 +64,6 @@ public class VerticalNode extends Panel implements Button.ClickListener
     AddMenu am = new AddMenu(sq, this, ebene); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     this.am = am;
-    /*
-    for (SearchBox haveSB : sboxes){
-      annonames.remove(haveSB.getAttribute());      
-    } */   
-    
-    //TODO: one item has to be deleted from menu
-    
     
     VerticalLayout vntoolbar = new VerticalLayout();
     vntoolbar.addComponent(btClose);
