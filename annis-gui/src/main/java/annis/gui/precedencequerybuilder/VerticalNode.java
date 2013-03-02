@@ -61,7 +61,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     
     annonames = sq.getAvailableAnnotationNames();
     
-    AddMenu am = new AddMenu(sq, this); //AddMenu creates a menubar from 
+    AddMenu am = new AddMenu(sq, this, ebene); //AddMenu creates a menubar from 
       // which users can pick the annotation level they are interested in
     this.am = am;
     /*

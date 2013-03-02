@@ -37,39 +37,58 @@ public class AddMenu extends Panel
   private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
   
   
-  public AddMenu(final PrecedenceQueryBuilder sq, final VerticalNode vn)
+  public AddMenu(final PrecedenceQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
     this.vn = vn;
     this.sq = sq;
     final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
     for (final String annoname : vn.getAnnonames())
     {      
-      add.addItem(annoname, new Command() {
-        @Override
-        public void menuSelected(MenuItem selectedItem) {         
-          vn.createSearchBox(annoname);
-          add.removeChild(selectedItem);
-        }
-      });
+      if(!annoname.equals(firstLevel))
+      {
+        add.addItem(annoname, new Command() {
+          @Override
+          public void menuSelected(MenuItem selectedItem) {         
+            vn.createSearchBox(annoname);
+            add.removeChild(selectedItem);
+          }
+        });
+      }
     }
+    
     addComponent(addMenu);
   }
   
   public void addItem(final String ebene)
   {
     final VerticalNode vn = this.vn;
-    final MenuBar.MenuItem add = addMenu.getItems().iterator().next();
-    int i = 0;
-    Iterator<MenuBar.MenuItem> items = addMenu.getItems().iterator();
+    final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
+    int p = 0;    
+    Iterator<String> items = vn.getAnnonames().iterator();
     /*find position for "new" Item here AND use insertItem instead of addItem*/
-    add.addItem(ebene, new Command() {
+  
+    Command com = new Command(){
       @Override
       public void menuSelected(MenuItem selectedItem)
       {
         vn.createSearchBox(ebene);
-        add.removeChild(selectedItem);
+        root.removeChild(selectedItem);
       }
-    });
+    };
+    
+    while(!items.next().equals(ebene))
+    {
+      p++;
+    }
+    
+    if(items.hasNext())
+    {
+      root.addItemBefore(ebene, null, com, root.getChildren().get(p));
+    }
+    else 
+    {
+      root.addItem(ebene, com);
+    }
   }
   
 }
