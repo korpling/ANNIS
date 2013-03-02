@@ -59,8 +59,13 @@ public class AddMenu extends Panel
     addComponent(addMenu);
   }
   
-  public void addItem(final String ebene)
+  public void reAddItem(final String ebene)
   {
+    /*
+     * WARNING:
+     * this method will cause an exception if you try to add an item that has
+     * not been on the list before 
+     */
     final VerticalNode vn = this.vn;
     final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
     int p = 0;    
