@@ -475,9 +475,9 @@
 			label.style.color = config.edgeLabelColor;
 		}
 
-		const DOMINANCE = "edge";
-		const RST = "rst";
-		const MULTINUC = "multinuc";
+		var DOMINANCE = "edge";
+		var RST = "rst";
+		var MULTINUC = "multinuc";
 
 		/**
 		 *
