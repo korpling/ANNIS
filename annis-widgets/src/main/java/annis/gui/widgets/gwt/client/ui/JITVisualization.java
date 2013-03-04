@@ -30,10 +30,6 @@ public class JITVisualization extends JavaScriptObject
   }
 
   final native void render() /*-{
-    this.layoutTree();
-    this.initWrapper();
-    this.initCanvas();
-    this.plotNodes();
-    this.plotEdges();
+    this.init();
   }-*/;
 }

@@ -34,11 +34,6 @@
     <servlet-name>BinaryServlet</servlet-name>
     <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
   </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/tutorial/*</url-pattern>
-  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Search</servlet-name>

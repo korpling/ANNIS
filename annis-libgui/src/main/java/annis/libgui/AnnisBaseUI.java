@@ -86,6 +86,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   @Override
   protected void init(VaadinRequest request)
   {
+    initLogging();
+    
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
@@ -96,7 +98,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     
-    initLogging();
 
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
@@ -362,7 +363,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
-    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-3.0.0-SNAPSHOT.jar");
+    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
+      + getVersionNumber() + ".jar");
     pluginManager.addPluginsFrom(builtin.toURI());
     log.info("added plugins from {}", builtin.getPath());
     

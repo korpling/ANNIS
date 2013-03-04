@@ -21,36 +21,33 @@ import annis.libgui.visualizers.VisualizerInput;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/) 
- * for a single match. 
- *  
- * Note, that the rst-xml-format models edges beetwen nucleus and satellite
- * the other way around, than in the common visualization of rst-graphs. So the
+ * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/)
+ * for a single match.
+ *
+ * Note, that the rst-xml-format models edges beetwen nucleus and satellite the
+ * other way around, than in the common visualization of rst-graphs. So the
  * dominance relation between nodes must be defined in AQL like that:
- * 
+ *
  * node & node & "Therefore" & #1 >rst[relname="nonvolitional-result"] #2 & #2
- * 
+ *
  * The AQL-Query above searches for a satellite which contains the token
  * "Therefore" and dominates a node with the rst edge type "nonvolitional-
- * result". Important is, that the first note dominates the second one, also the
+ * result". Important is, that the first node dominates the second one, also the
  * visualization shows it the other way around.
- * 
+ *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class RST extends AbstractVisualizer<RSTPanel>
-{
+public class RST extends AbstractVisualizer<RSTPanel> {
 
   @Override
-  public String getShortName()
-  {
+  public String getShortName() {
     return "rst";
   }
 
-
   @Override
-  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
-  {
+  public RSTPanel createComponent(VisualizerInput visInput,
+          VisualizationToggle visToggle) {
     return new RSTPanel(visInput);
   }
 }

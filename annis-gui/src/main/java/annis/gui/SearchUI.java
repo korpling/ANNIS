@@ -294,16 +294,20 @@ public class SearchUI extends AnnisBaseUI
           UUID uuid = UUID.fromString(uuidString);
           IFrameResourceMap map = 
             VaadinSession.getCurrent().getAttribute(IFrameResourceMap.class);
-          if(map != null)
+          if(map == null)
+          {
+            response.setStatus(404);
+          }
+          else
           {
             IFrameResource res = map.get(uuid);
             if(res != null)
             {
               response.setStatus(200);
+              response.setContentType(res.getMimeType());
               response.getOutputStream().write(res.getData());
             }
           }
-          response.setStatus(404);
           return true;
         }
         
@@ -505,7 +509,7 @@ public class SearchUI extends AnnisBaseUI
   {
     AnnisUser user = Helper.getUser();
     
-    if(user == null)
+    if(user != null)
     {
       Notification.show("Logged in as \"" + user.getUserName() + "\"",
         Notification.Type.TRAY_NOTIFICATION);
