@@ -446,6 +446,10 @@ public class ResultSetPanel extends Panel implements ResolverProvider
               indicator.setValue(1.0f);
             }
           }
+          catch(Exception ex)
+          {
+            log.error("Exception when adding query result", ex);
+          }
           finally
           {
             session.unlock();
