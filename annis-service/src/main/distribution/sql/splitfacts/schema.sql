@@ -33,7 +33,15 @@ CREATE TABLE corpus_annotation
   UNIQUE (corpus_ref, namespace, name)
 );
 COMMENT ON COLUMN corpus_annotation.corpus_ref IS 'foreign key to corpus.id';
-COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotation key';
+COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotation key';CREATE TYPE operator AS ENUM ('.', '>', '->');
+CREATE TABLE example_queries
+(
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "used_operators" operator[] NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
+);
 COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
@@ -200,13 +208,13 @@ CREATE TABLE annotations
   PRIMARY KEY (id)
 );
 
-CREATE TYPE query_type AS ENUM ('SEQUENCE', 'DOMINANCE');
-
+CREATE TYPE ops AS ENUM ('.', '>', '->');
 CREATE TABLE example_queries
 (
-  "type" query_type NOT NULL,
-  "used_operators" TEXT NOT NULL,
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "nodes" INTEGER NOT NULL,
+  "used_ops" ops[] NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

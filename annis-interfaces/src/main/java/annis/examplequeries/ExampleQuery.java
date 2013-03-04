@@ -20,8 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wraps example queries. The type of example query is restricted to values of
- * {@link QueryType}.
+ * Wraps example queries.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -31,7 +30,7 @@ public class ExampleQuery
 
   private static final Logger log = LoggerFactory.getLogger(ExampleQuery.class);
 
-  private QueryType type;
+  private String type;
 
   private String description;
 
@@ -39,12 +38,12 @@ public class ExampleQuery
 
   private String used_operators;
 
-  public QueryType getType()
+  public String getType()
   {
     return type;
   }
 
-  public void setType(QueryType type)
+  public void setType(String type)
   {
     this.type = type;
   }

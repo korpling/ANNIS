@@ -138,8 +138,6 @@ CREATE :tmp TABLE _media_files
 
 CREATE :tmp TABLE _example_queries
 (
-  "type" query_type NOT NULL,
-  "used_operators" TEXT NOT NULL,
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL
 );

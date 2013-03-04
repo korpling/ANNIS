@@ -16,7 +16,6 @@
 package annis.sqlgen;
 
 import annis.examplequeries.ExampleQuery;
-import annis.examplequeries.QueryType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -52,8 +51,8 @@ public class ListExampleQueriesHelper implements
   {
     ExampleQuery exampleQuery = new ExampleQuery();
 
-    exampleQuery.setType(QueryType.valueOf(rs.getString("type")));
-    exampleQuery.setUsedOperators(rs.getString("used_operators"));
+    exampleQuery.setType(rs.getString("type"));
+    exampleQuery.setUsedOperators(rs.getString("used_ops"));
     exampleQuery.setExampleQuery(rs.getString("example_query"));
     exampleQuery.setDescription(rs.getString("description"));
 

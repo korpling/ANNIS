@@ -219,13 +219,13 @@ CREATE TABLE user_config
   PRIMARY KEY(id)
 );
 
-CREATE TYPE query_type AS ENUM ('SEQUENCE', 'DOMINANCE');
-
+CREATE TYPE ops AS ENUM ('.', '>', '->');
 CREATE TABLE example_queries
 (
-  "type" query_type NOT NULL,
-  "used_operators" TEXT NOT NULL,
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "nodes" INTEGER NOT NULL,
+  "used_ops" ops[] NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

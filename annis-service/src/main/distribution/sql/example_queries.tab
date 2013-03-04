@@ -1,2 +1,2 @@
-sequence	.	tok=\"in\" & tok=\"Zossen\" & #1 .1 #2	searches for token in followed by Zossen in <a href=\"./\">pccv2</a>
-dominance	>	cat="S" & pos="NP" & #1 > #2	searches for sentences which includes a nominal phrase
+tok=\"in\" & tok=\"Zossen\" & #1 .1 #2	searches for token in followed by Zossen in <a href=\"./\">pccv2</a>
+cat="S" & pos="NP" & #1 > #2	searches for sentences which includes a nominal phrase
