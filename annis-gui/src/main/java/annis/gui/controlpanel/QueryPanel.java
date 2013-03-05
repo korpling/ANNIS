@@ -19,19 +19,23 @@ import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.server.ClassResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
@@ -83,14 +87,30 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font");
+    txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
-    
-
+   
     addComponent(txtQuery, 1, 0);
+    
+    final VirtualKeyboard virtualKeyboard = new VirtualKeyboard();
+    virtualKeyboard.extend(txtQuery);
+    
+    Button btShowKeyboard = new Button();
+    btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+    btShowKeyboard.addClickListener(new Button.ClickListener() {
 
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        virtualKeyboard.show();
+      }
+    });
+    addComponent(btShowKeyboard);
+    
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight(3.5f, Unit.EM);
     panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);

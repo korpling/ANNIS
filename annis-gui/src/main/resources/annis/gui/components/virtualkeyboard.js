@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-window.annis_gui_components_ScreenshotMaker = function() {
-    var element = $(this.getElement());
+window.annis_gui_components_VirtualKeyboard = function() {
     var component = this;
+    var elem = this.getElement(this.getParentId());
     
-    this.makeScreenshot = function () {
-      var  body = $(".v-app").get(0);
-      html2canvas(body, {
-        onrendered: function(canvas) {
-          component.finishedScreenshot(canvas.toDataURL());
-        }
-      });
+    VKI_attach(elem);
+    
+    this.show = function () {
+      VKI_show(elem);
     }
 }

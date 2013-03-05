@@ -19,6 +19,7 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.VirtualKeyboard;
 import annis.gui.controlpanel.ControlPanel;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -136,15 +137,15 @@ public class SearchUI extends AnnisBaseUI
 
       @Override
       public void buttonClick(ClickEvent event)
-      {
+      {        
         Window w =  new AboutWindow();
         w.setCaption("About ANNIS");
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
         w.setHeight("500px");
-        addWindow(w);
-        w.center();
+        //addWindow(w);
+        //w.center();
       }
     });
     

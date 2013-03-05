@@ -59,7 +59,7 @@
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
-        <version>7.0.0</version>
+        <version>7.0.1</version>
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
           <!-- <runTarget>mobilemail</runTarget> -->
@@ -76,6 +76,7 @@
           <style>OBF</style>
           <strict>true</strict>
           <runTarget>http://localhost:8080/</runTarget>
+          <localWorkers>2</localWorkers>
         </configuration>
         <executions>
           <execution>
