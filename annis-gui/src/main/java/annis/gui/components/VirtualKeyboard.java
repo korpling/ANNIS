@@ -19,20 +19,30 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
-import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.JavaScriptExtensionState;
+import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.TextArea;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @StyleSheet({"keyboard.css"})
-@JavaScript({"keyboard.js", "virtualkeyboard.js"})
+@JavaScript({"jquery-1.9.1.min.js","keyboard.js", "virtualkeyboard.js"})
 public class VirtualKeyboard extends AbstractJavaScriptExtension
 {
   public VirtualKeyboard()
   {
+    addFunction("updateLang", new JavaScriptFunction() {
+
+      @Override
+      public void call(JSONArray arguments) throws JSONException
+      {
+        ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
+      }
+    });
   }
   
   @Override
@@ -47,11 +57,36 @@ public class VirtualKeyboard extends AbstractJavaScriptExtension
     
   }
   
+  @Override
+  protected VKState getState()
+  {
+    return (VKState) super.getState();
+  }
+  
   public void show()
   {
     callFunction("show");
   }
   
+  public void setKeyboardLayout(String layout)
+  {
+    getState().setKeyboardLayout(layout);
+  }
   
+  public static class VKState extends JavaScriptExtensionState
+  {
+    private String keyboardLayout = "";
+
+    public String getKeyboardLayout()
+    {
+      return keyboardLayout;
+    }
+
+    public void setKeyboardLayout(String keyboardLayout)
+    {
+      this.keyboardLayout = keyboardLayout;
+    }
+    
+  }
   
 }

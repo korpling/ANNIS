@@ -1067,7 +1067,7 @@ var VKI_attach, VKI_show, VKI_close;
     [["1"], ["2"], ["3"], ["-"]],
     [["0"], ["."], ["="], ["+"]]
   ];
-
+  
   /* ****************************************************************
    * Attach the keyboard to an element
    *
@@ -1227,6 +1227,9 @@ var VKI_attach, VKI_show, VKI_close;
                     if (e.stopPropagation) { e.stopPropagation(); } else e.cancelBubble = true;
                     this.parentNode.style.display = "";
                     self.VKI_kts = self.VKI_kt = kbSelect.firstChild.nodeValue = this.firstChild.nodeValue;
+                    
+                    $(self.VKI_target).trigger("langchanged", self.VKI_kts);
+                    
                     self.VKI_buildKeys();
                     self.VKI_position(true);
                   }, false);
@@ -1723,6 +1726,7 @@ var VKI_attach, VKI_show, VKI_close;
         this.VKI_keyboard.parentNode.removeChild(this.VKI_keyboard);
         if (this.VKI_isIE6) this.VKI_iframe.parentNode.removeChild(this.VKI_iframe);
       } catch (e) {}
+      
       if (this.VKI_kt != this.VKI_kts) {
         kbSelect.firstChild.nodeValue = this.VKI_kt = this.VKI_kts;
         this.VKI_buildKeys();

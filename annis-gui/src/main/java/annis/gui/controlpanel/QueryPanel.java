@@ -69,7 +69,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   
   public QueryPanel(final QueryController controller)
   {
-    super(2,4);
+    super(2,3);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
@@ -96,20 +96,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     addComponent(txtQuery, 1, 0);
     
     final VirtualKeyboard virtualKeyboard = new VirtualKeyboard();
+    virtualKeyboard.setKeyboardLayout("Deutsch");
     virtualKeyboard.extend(txtQuery);
-    
-    Button btShowKeyboard = new Button();
-    btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
-    btShowKeyboard.addClickListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        virtualKeyboard.show();
-      }
-    });
-    addComponent(btShowKeyboard, 1, 1);
     
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight(3.5f, Unit.EM);
@@ -125,11 +113,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     panelStatusLayout.addComponent(lblStatus);
 
-    addComponent(panelStatusLayout, 1, 3);
+    addComponent(panelStatusLayout, 1, 2);
 
     HorizontalLayout buttonLayout = new HorizontalLayout();
     buttonLayout.setWidth("100%");
-    addComponent(buttonLayout, 1, 2);
+    addComponent(buttonLayout, 1, 1);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);
@@ -140,8 +128,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
 
     btShowResult = new Button("Show Result");
-    btShowResult.setWidth(100f, UNITS_PERCENTAGE);
-    btShowResult.addListener(new ShowResultClickListener());
+    btShowResult.setWidth("100%");
+    btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
@@ -190,12 +178,27 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     historyListLayout.setExpandRatio(btShowMoreHistory, 0.0f);
     
     btHistory = new PopupButton("History");
-    btHistory.setWidth(100f, Unit.PERCENTAGE);
     btHistory.setContent(historyListLayout);
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
     buttonLayout.addComponent(btHistory);
+    
+    Button btShowKeyboard = new Button();
+    btShowKeyboard.setDescription("Click to show a virtual keyboard");
+    btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+    btShowKeyboard.addClickListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        virtualKeyboard.show();
+      }
+    });
+    buttonLayout.addComponent(btShowKeyboard);
+    
+    buttonLayout.setExpandRatio(btShowResult, 1.0f);
     
 
   }

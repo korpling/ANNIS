@@ -18,7 +18,13 @@ window.annis_gui_components_VirtualKeyboard = function() {
     var component = this;
     var elem = this.getElement(this.getParentId());
     
-    VKI_attach(elem);
+    $(elem).bind("langchanged", function(e, newlang) {
+      component.updateLang(newlang);
+    });
+    
+    this.onStateChange = function() {
+      elem.lang = this.getState().keyboardLayout;
+    }
     
     this.show = function () {
       VKI_show(elem);
