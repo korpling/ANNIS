@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import java.util.Set;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.ui.AbstractSelect;
 import org.apache.commons.lang3.StringUtils;//levenshtein
 
 /**
