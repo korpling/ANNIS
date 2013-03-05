@@ -69,7 +69,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   
   public QueryPanel(final QueryController controller)
   {
-    super(2,3);
+    super(2,4);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
@@ -92,7 +92,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
-   
+    
     addComponent(txtQuery, 1, 0);
     
     final VirtualKeyboard virtualKeyboard = new VirtualKeyboard();
@@ -109,7 +109,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
         virtualKeyboard.show();
       }
     });
-    addComponent(btShowKeyboard);
+    addComponent(btShowKeyboard, 1, 1);
     
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight(3.5f, Unit.EM);
@@ -125,11 +125,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     panelStatusLayout.addComponent(lblStatus);
 
-    addComponent(panelStatusLayout, 1, 2);
+    addComponent(panelStatusLayout, 1, 3);
 
     HorizontalLayout buttonLayout = new HorizontalLayout();
     buttonLayout.setWidth("100%");
-    addComponent(buttonLayout, 1, 1);
+    addComponent(buttonLayout, 1, 2);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);

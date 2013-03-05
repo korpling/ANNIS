@@ -73,7 +73,7 @@ var VKI_attach, VKI_show, VKI_close;
   this.VKI_size = 2;  // Default keyboard size (1-5)
   this.VKI_sizeAdj = true;  // Allow user to adjust keyboard size
   this.VKI_clearPasswords = false;  // Clear password fields on focus
-  this.VKI_imageURI = "";  // If empty string, use imageless mode
+  this.VKI_imageURI = "<empty>";  // If empty string, use imageless mode
   this.VKI_clickless = 0;  // 0 = disabled, > 0 = delay in ms
   this.VKI_activeTab = 0;  // Tab moves to next: 1 = element, 2 = keyboard enabled element
   this.VKI_enterSubmit = true;  // Submit forms when Enter is pressed
@@ -1074,7 +1074,10 @@ var VKI_attach, VKI_show, VKI_close;
    */
   VKI_attach = function(elem) {
     if (elem.getAttribute("VKI_attached")) return false;
-    if (self.VKI_imageURI) {
+    if(self.VKI_imageURI === "<empty>") {
+      // do nothing, manual keyboard trigger
+    }
+    else if (self.VKI_imageURI) {
       var keybut = document.createElement('img');
           keybut.src = self.VKI_imageURI;
           keybut.alt = self.VKI_i18n['01'];

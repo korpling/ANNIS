@@ -31,12 +31,8 @@ import com.vaadin.ui.TextArea;
 @JavaScript({"keyboard.js", "virtualkeyboard.js"})
 public class VirtualKeyboard extends AbstractJavaScriptExtension
 {
-  
-  private final Resource keyboardImage = new ThemeResource("keyboard.png");
-
   public VirtualKeyboard()
   {
-    setResource("keyboard", keyboardImage);
   }
   
   @Override
