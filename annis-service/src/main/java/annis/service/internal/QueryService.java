@@ -539,26 +539,31 @@ public class QueryService
   /**
    * Fetches the example queries for a specific corpus.
    *
-   * @param top specifies the corpus the examples are fetched from.
+   * @param rawCorpusNames specifies the corpora the examples are fetched from.
    *
    */
   @GET
-  @Path("corpora/example-queries/{top}")
+  @Path("corpora/example-queries/")
   @Produces(MediaType.APPLICATION_XML)
-  public List<ExampleQuery> getExampleQueries(@PathParam("top") String top)
+  public List<ExampleQuery> getExampleQueries(
+    @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
   {
-    return annisDao.getExampleQueries(top);
-  }
-
-  /**
-   * Fetches all avaible example queries.
-   */
-  @GET
-  @Path("corpora/example-queries")
-  @Produces(MediaType.APPLICATION_XML)
-  public List<ExampleQuery> getExampleQueries()
-  {
-    return annisDao.getExampleQueries(null);
+    try
+    {
+      if (rawCorpusNames != null)
+      {
+        String[] corpusNames = rawCorpusNames.split(",");
+        return annisDao.getExampleQueries(corpusNames);
+      }
+      else
+      {
+        return annisDao.getExampleQueries(null);
+      }
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(400);
+    }
   }
 
   /**

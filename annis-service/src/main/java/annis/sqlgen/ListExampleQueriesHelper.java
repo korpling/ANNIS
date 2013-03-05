@@ -18,6 +18,7 @@ package annis.sqlgen;
 import annis.examplequeries.ExampleQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -34,15 +35,29 @@ public class ListExampleQueriesHelper implements
   private static final Logger log = LoggerFactory.
     getLogger(ListExampleQueriesHelper.class);
 
-  public String createSQLQuery(String corpusName)
+  public String createSQLQuery(String[] corpusNames)
   {
-    if (corpusName == null)
+    if (corpusNames == null || corpusNames.length == 0)
     {
       return "SELECT * from example_queries";
     }
     else
     {
-      return "SELECT * FROM (SELECT id FROM CORPUS WHERE name = \'" + corpusName + "\') AS corpus, example_queries WHERE corpus.id = corpus_ref";
+      String replaceName = ":corpusName";
+      String select = "\nSELECT * FROM (SELECT id FROM CORPUS WHERE name = \'"
+        + replaceName + "\') AS corpus, example_queries WHERE corpus.id = corpus_ref";
+
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < corpusNames.length; i++)
+      {
+        sb.append(select.replace(replaceName, corpusNames[i]));
+        if (i < corpusNames.length - 1)
+        {
+          sb.append("\nUNION");
+        }
+      }
+      sb.append("\nORDER BY corpus_ref");
+      return sb.toString();
     }
   }
 
