@@ -1,4 +1,5 @@
 {
   "default-querybuilder": "tigersearch",
-  "display-name" : "ANNIS"
+  "display-name" : "ANNIS",
+  "keyboard-layout" : "US International"
 }

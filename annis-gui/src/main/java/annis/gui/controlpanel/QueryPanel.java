@@ -21,6 +21,7 @@ import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
+import annis.libgui.InstanceConfig;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -67,7 +68,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
   
-  public QueryPanel(final QueryController controller)
+  public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
     super(2,3);
     this.controller = controller;
@@ -95,10 +96,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
     addComponent(txtQuery, 1, 0);
     
-    final VirtualKeyboard virtualKeyboard = new VirtualKeyboard();
-    virtualKeyboard.setKeyboardLayout("Deutsch");
-    virtualKeyboard.extend(txtQuery);
-    
+    final VirtualKeyboard virtualKeyboard;
+    if(instanceConfig.getKeyboardLayout() == null)
+    {
+      virtualKeyboard = null;
+    }
+    else
+    {
+      virtualKeyboard = new VirtualKeyboard();
+      virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
+      virtualKeyboard.extend(txtQuery);
+    }
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight(3.5f, Unit.EM);
     panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
@@ -183,21 +191,23 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
     buttonLayout.addComponent(btHistory);
-    
-    Button btShowKeyboard = new Button();
-    btShowKeyboard.setDescription("Click to show a virtual keyboard");
-    btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
-    btShowKeyboard.addClickListener(new Button.ClickListener() {
+   
+    if(virtualKeyboard != null)
+    {
+      Button btShowKeyboard = new Button();
+      btShowKeyboard.setDescription("Click to show a virtual keyboard");
+      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+      btShowKeyboard.addClickListener(new Button.ClickListener() {
 
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        virtualKeyboard.show();
-      }
-    });
-    buttonLayout.addComponent(btShowKeyboard);
-    
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          virtualKeyboard.show();
+        }
+      });
+      buttonLayout.addComponent(btShowKeyboard);
+    }
     buttonLayout.setExpandRatio(btShowResult, 1.0f);
     
 

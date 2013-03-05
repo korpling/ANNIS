@@ -45,7 +45,8 @@ public class InstanceConfig implements Serializable
   private String defaultCorpusSet;
   private Map<String,String> corpusMappings;
   private FontConfig font;
-
+  private String keyboardLayout;
+  
   public InstanceConfig()
   {
     instanceName = "";
@@ -173,6 +174,29 @@ public class InstanceConfig implements Serializable
   {
     this.font = font;
   }
+
+  /**
+   * Default keyboard layout used for the virtual keyboard. 
+   * 
+   * Do not set {@code null} to disable virtual keyboards.
+   * @return 
+   */
+  @XmlElement(name = "keyboard-layout")
+  public String getKeyboardLayout()
+  {
+    return keyboardLayout;
+  }
+
+  /**
+   * @see #getKeyboardLayout() 
+   * @param keyboardLayout 
+   */
+  public void setKeyboardLayout(String keyboardLayout)
+  {
+    this.keyboardLayout = keyboardLayout;
+  }
+  
+  
   
   
 }
