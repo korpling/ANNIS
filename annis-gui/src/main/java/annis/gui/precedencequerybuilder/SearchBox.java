@@ -101,7 +101,7 @@ public class SearchBox extends Panel implements Button.ClickListener, ValueChang
     
     sb.addComponent(sbtoolbar);
     
-    addComponent(sb);
+    addComponent(sb);    
 
   } 
  
