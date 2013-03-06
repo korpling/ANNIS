@@ -1228,8 +1228,14 @@ var VKI_attach, VKI_show, VKI_close;
                     this.parentNode.style.display = "";
                     self.VKI_kts = self.VKI_kt = kbSelect.firstChild.nodeValue = this.firstChild.nodeValue;
                     
-                    $(self.VKI_target).trigger("langchanged", self.VKI_kts);
-                    
+                    if(self.VKI_layout === undefined || self.VKI_layout[self.VKI_kts] === undefined)
+                    {
+                      // fallback
+                      $(self.VKI_target).trigger("langchanged", self.VKI_kts);
+                    }
+                    else {
+                      $(self.VKI_target).trigger("langchanged", self.VKI_layout[self.VKI_kts].lang[0]);
+                    }
                     self.VKI_buildKeys();
                     self.VKI_position(true);
                   }, false);
