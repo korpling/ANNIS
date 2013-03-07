@@ -68,7 +68,7 @@ public class SearchBox extends Panel implements Button.ClickListener, ValueChang
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableAnnotationLevels(ebene))
     {
-      annonames.add(a.replaceFirst("^[^:]*:", ""));
+      annonames.add(a);
     }
     this.annonames = annonames;//by Martin
     ComboBox l = new ComboBox(ebene);

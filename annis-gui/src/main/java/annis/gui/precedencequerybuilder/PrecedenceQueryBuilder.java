@@ -263,7 +263,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADD_LABEL, null);
         for (final String annoname : annonames)
         {
-          add.addItem(killNamespace(annoname), new MenuBar.Command() {
+          add.addItem(annoname, new MenuBar.Command() {
             @Override
             public void menuSelected(MenuBar.MenuItem selectedItem) {
               if (!vnodes.isEmpty())
@@ -273,7 +273,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
                 eboxes.add(eb);
               }
 
-              VerticalNode vn = new VerticalNode(killNamespace(annoname), sq);
+              VerticalNode vn = new VerticalNode(annoname, sq);
               language.addComponent(vn);
               vnodes.add(vn);
 
@@ -290,10 +290,10 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
         for (final String annoname : annonames)
         {
-          add.addItem(killNamespace(annoname), new MenuBar.Command() {
+          add.addItem(annoname, new MenuBar.Command() {
             @Override
             public void menuSelected(MenuBar.MenuItem selectedItem) {
-              MetaBox mb = new MetaBox(killNamespace(annoname), sq);
+              MetaBox mb = new MetaBox(annoname, sq);
               meta.addComponent(mb);
               mboxes.add(mb);
             }
@@ -452,10 +452,13 @@ service.path("query").path("corpora").path(corpus).path("annotations")
 
   public String killNamespace(String qName)
   {
-    // TODO rewrite this, so that it is only the first element that is removed
-    // TODO is this actually a good idea, there should be some kind of test whether or not it is a namespace?
-    String[] splitted = qName.split(":");
-    return splitted[splitted.length - 1];
+    String[] splitted = qName.split(":", 2);
+    if (splitted.length > 1){
+      return splitted[1];
+    }
+    else{
+      return qName;
+    }
   }
 
   public Set<String> getAvailableMetaNames()
